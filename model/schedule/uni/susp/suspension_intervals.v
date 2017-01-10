@@ -44,7 +44,7 @@ Module SuspensionIntervals.
            (Note that suspension_start can return time t itself.) *)
         Let suspension_start := time_after_last_execution job_arrival sched j t.
 
-        (* Next, using the service received by j in the interval [0, suspension_start), ... *)
+        (* Next, using the service received by j in the interval [0, suspension_start),...*)
         Let current_service := service sched j suspension_start.
 
         (* ... we recall the duration of the suspension expected for job j after having
@@ -151,7 +151,8 @@ Module SuspensionIntervals.
             case: (boolP (completed_by _ _ _ _)) => [COMP | NOTCOMP];
               first by apply completed_implies_not_scheduled in COMP;
                 first by rewrite SCHED' in COMP.
-            rewrite andTb (same_service_implies_same_last_execution _ _ _ _ suspension_start) //.
+            rewrite andTb (same_service_implies_same_last_execution _ _ _ _
+                                                                    suspension_start) //.
             rewrite /suspension_start last_execution_idempotent //.
             apply/andP; split; first by apply leq_addr.
             by rewrite ltn_add2l.
@@ -289,19 +290,20 @@ Module SuspensionIntervals.
                  total_suspension_of_j, total_suspension.
           intros t1 t2.
           apply leq_trans with (n := \sum_(0 <= s < job_cost j)
-                                      \sum_(t1 <= t < t2 | service sched j t == s) suspended_at j t).
+                            \sum_(t1 <= t < t2 | service sched j t == s) suspended_at j t).
           {
             rewrite (exchange_big_dep_nat (fun x => true)) //=.
             apply leq_sum; intros s _.
             destruct (boolP (suspended_at j s)) as [SUSP | NOTSUSP]; last by done.
             rewrite (big_rem (service sched j s)); first by rewrite eq_refl.
             rewrite mem_index_iota; apply/andP; split; first by done.
-            rewrite ltn_neqAle; apply/andP; split; last by apply cumulative_service_le_job_cost.
+            rewrite ltn_neqAle; apply/andP; split;
+              last by apply cumulative_service_le_job_cost.
             by apply suspended_implies_not_completed in SUSP.
           }
           {
             apply leq_sum_nat; move => s /andP [_ LT] _.
-            destruct (boolP [exists t: 'I_t2, (t >= t1) && (service sched j t == s)]) as [EX | ALL];
+            destruct (boolP [exists t:'I_t2, (t>=t1)&& (service sched j t==s)]) as [EX|ALL];
               last first.
             {
               rewrite negb_exists in ALL; move: ALL => /forallP ALL.
@@ -374,13 +376,13 @@ Module SuspensionIntervals.
         Proof.
           rename H_j_has_completed into COMP, H_jobs_must_arrive_to_execute into ARR.
           have EARLIER := exists_last_execution_with_smaller_service job_arrival
-                                                                     job_cost sched ARR j t COMP.
+                                                           job_cost sched ARR j t COMP.
           apply/eqP; rewrite eqn_leq; apply/andP; split;
             first by apply cumulative_suspension_le_total_suspension.
           rewrite /total_suspension /cumulative_suspension /cumulative_suspension_during.
           move: COMP => /eqP COMP.
           apply leq_trans with (n := \sum_(0 <= s < job_cost j)
-                                      \sum_(0 <= t0 < t | service sched j t0 == s) suspended_at j t0);
+                           \sum_(0 <= t0 < t | service sched j t0 == s) suspended_at j t0);
             last first.
           {
             rewrite (exchange_big_dep_nat (fun x => true)) //=.
@@ -409,7 +411,7 @@ Module SuspensionIntervals.
 
             move: (EARLIER s LTs) => [t' EQ'].
             apply leq_trans with (n := \sum_(0 <= t0 < t | (service sched j t0 == s) &&
-                                (b t' <= t0 < b t' + n (service sched j (b t')))) 1); last first.
+                          (b t' <= t0 < b t' + n (service sched j (b t')))) 1); last first.
             {
               rewrite big_mkcond [\sum_(_ <= _ < _ | _ == s)_]big_mkcond.
               apply leq_sum_nat; move => i /andP [_ LTi] _.
@@ -421,10 +423,11 @@ Module SuspensionIntervals.
               by apply: (leq_ltn_trans _ LTs); apply eq_leq; apply/eqP.
             }
             {
-              apply leq_trans with (n := \sum_(b t' <= t0 < b t' + n (service sched j (b t')) |
-                                               (0 <= t0 < t) && (service sched j t0 == s)) 1).
+              apply leq_trans with (n := \sum_(b t'<= t0< b t'+ n (service sched j (b t')) |
+                                            (0 <= t0 < t) && (service sched j t0 == s)) 1).
               {
-                apply leq_trans with (n := \sum_(b t' <= t0 < b t' + n (service sched j (b t'))) 1);
+                apply leq_trans with (n := \sum_(b t' <= t0 < b t'
+                                                         + n (service sched j (b t'))) 1);
                   first by simpl_sum_const; rewrite addKn -EQ'.
                 rewrite [in X in _ <= X]big_mkcond /=.
                 apply leq_sum_nat; move => i /andP [LEi GTi] _.
@@ -463,6 +466,55 @@ Module SuspensionIntervals.
         
       End SuspendsForTotalSuspension.
 
+      (* In this section, we prove that a job executes just before it starts suspending.  *)
+      Section ExecutionBeforeSuspension.
+
+        (* Assume that jobs do not execute before they arrive... *)
+        Hypothesis H_jobs_must_arrive_to_execute:
+          jobs_must_arrive_to_execute job_arrival sched.
+
+        (* ...and nor after completion. *)
+        Hypothesis H_completed_jobs_dont_execute:
+          completed_jobs_dont_execute job_cost sched.
+      
+        (* Assume that the schedule respects self-suspensions. *)
+        Hypothesis H_respects_self_suspensions: respects_self_suspensions.
+
+        (* Let j be any job... *)
+        Variable j: Job.
+
+        (* ...that has arrived by some time t. *)
+        Variable t: time.
+        Hypothesis H_arrived: has_arrived job_arrival j t.
+
+        (* If job j is not suspended at time t, but starts to suspend at time t + 1, ... *)
+        Hypothesis H_not_suspended_at_t: ~~ suspended_at j t.
+        Hypothesis H_begins_suspension: suspended_at j t.+1.
+
+        (* ...then j must be scheduled at time t. *)
+        Lemma executes_before_suspension:
+          scheduled_at sched j t.
+        Proof.
+          rename H_not_suspended_at_t into NOTSUSPs, H_begins_suspension into SUSPs'.
+          move: SUSPs' => /andP [NOTCOMP' /andP [GE LT]].
+          apply contraT; intro NOTSCHED.
+          suff BUG: suspended_at j t by rewrite BUG in NOTSUSPs.
+          apply suspended_in_suspension_interval with (t := t.+1); try done.
+          {
+            apply contraT; rewrite negbK; intro COMP.
+            suff COMP': completed_by job_cost sched j t.+1 by rewrite COMP' in NOTCOMP'.
+            by apply completion_monotonic with (t0 := t).
+          }
+          apply/andP; split; last by apply: (leq_ltn_trans _ LT).
+          apply leq_trans with (n := time_after_last_execution job_arrival sched j t);
+            last by apply last_execution_bounded_by_identity.
+          apply eq_leq, same_service_implies_same_last_execution.
+          rewrite /service /service_during big_nat_recr //= /service_at.
+          by apply negbTE in NOTSCHED; rewrite NOTSCHED.
+        Qed.
+        
+      End ExecutionBeforeSuspension.
+      
     End Lemmas.
       
   End DefiningSuspensionIntervals.

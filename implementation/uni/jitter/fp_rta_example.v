@@ -33,9 +33,15 @@ Module ResponseTimeAnalysisFP.
     Program Let ts := Build_set [:: tsk1; tsk2; tsk3] _.
 
     (* ...which can be shown to have valid parameters. *)
-    Fact ts_has_valid_parameters:
-      valid_sporadic_taskset task_cost task_period task_deadline ts.
+    Remark ts_has_positive_costs:
+      forall tsk, tsk \in ts -> task_cost tsk > 0.
     Proof.
+      intros tsk IN.
+      by repeat (move: IN => /orP [/eqP EQ | IN]; subst; compute); by done.
+    Qed.
+    Remark ts_has_positive_periods:
+      forall tsk, tsk \in ts -> task_period tsk > 0.
+    Proof.      
       intros tsk IN.
       repeat (move: IN => /orP [/eqP EQ | IN]; subst; compute); by done.
     Qed.
@@ -146,18 +152,19 @@ Module ResponseTimeAnalysisFP.
     Proof.
       rename H_jitter_is_bounded into JIT.
       intros tsk IN.
-      have VALID := periodic_arrivals_valid_job_parameters ts ts_has_valid_parameters.
-      have TSVALID := ts_has_valid_parameters.
       unfold valid_sporadic_job, valid_realtime_job in *; des.
       apply taskset_schedulable_by_fp_rta with (task_cost := task_cost)
                 (task_period := task_period) (task_deadline := task_deadline) (ts0 := ts)
                 (higher_eq_priority0 := RM task_period) (job_jitter0 := job_jitter)
                 (task_jitter := task_jitter); try (by done).
+      - by apply ts_has_positive_costs.
+      - by apply ts_has_positive_periods.
       - by apply periodic_arrivals_are_consistent.
-      - by apply periodic_arrivals_is_a_set.
+      - - apply periodic_arrivals_is_a_set.
       - by apply periodic_arrivals_all_jobs_from_taskset.
-      - by intros j ARRj; specialize (VALID j ARRj); des; repeat split; try (apply JIT). 
       - by apply periodic_arrivals_are_sporadic.
+      - by apply periodic_arrivals_job_cost_le_task_cost.
+      - by apply periodic_arrivals_job_deadline_eq_task_deadline.
       - by apply RM_is_reflexive.
       - by apply RM_is_transitive.
       - by apply scheduler_jobs_come_from_arrival_sequence.

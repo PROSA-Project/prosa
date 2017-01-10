@@ -146,7 +146,7 @@ Module ConcreteScheduler.
     (* Let alpha be an affinity associated with each task. *)
     Variable alpha: task_affinity sporadic_task num_cpus.
     
-    (* Let arr_seq be any job arrival sequence with consistent, non-duplicate arrivals. *)
+    (* Let arr_seq be any job arrival sequence with consistent, duplicate-free arrivals. *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_arrival_times_are_consistent: arrival_times_are_consistent job_arrival arr_seq.
     Hypothesis H_arrival_sequence_is_a_set: arrival_sequence_is_a_set arr_seq.

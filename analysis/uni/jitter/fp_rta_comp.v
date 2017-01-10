@@ -260,13 +260,13 @@ Module ResponseTimeIterationFP.
     Variable job_task: Job -> SporadicTask.
     
     (* Consider a task set ts... *)
-    Variable ts: taskset_of SporadicTask.
+    Variable ts: seq SporadicTask.
 
-    (* ...where tasks have valid parameters. *)
-    Hypothesis H_valid_task_parameters:
-      valid_sporadic_taskset task_cost task_period task_deadline ts.
+    (* ...with positive task costs and periods. *)
+    Hypothesis H_positive_costs: forall tsk, tsk \in ts -> task_cost tsk > 0.
+    Hypothesis H_positive_periods: forall tsk, tsk \in ts -> task_period tsk > 0.
 
-    (* Next, consider any job arrival sequence with consistent, non-duplicate arrivals, ... *)
+    (* Next, consider any job arrival sequence with consistent, duplicate-free arrivals, ... *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_arrival_times_are_consistent: arrival_times_are_consistent job_arrival arr_seq.
     Hypothesis H_arr_seq_is_a_set: arrival_sequence_is_a_set arr_seq.
@@ -276,18 +276,29 @@ Module ResponseTimeIterationFP.
       forall j,
         arrives_in arr_seq j ->
         job_task j \in ts.
-
-    (* ...have valid parameters,...*)
-    Hypothesis H_valid_job_parameters:
-      forall j,
-        arrives_in arr_seq j ->
-        valid_sporadic_job_with_jitter task_cost task_deadline task_jitter
-                                       job_cost job_deadline job_jitter job_task j.
-
+ 
     (* ... and satisfy the sporadic task model.*)
     Hypothesis H_sporadic_tasks:
       sporadic_task_model task_period job_arrival job_task arr_seq.
 
+    (* Assume that the cost of each job is bounded by the cost of its task,... *)
+    Hypothesis H_job_cost_le_task_cost:
+      forall j,
+        arrives_in arr_seq j ->
+        job_cost j <= task_cost (job_task j).
+
+    (* ...the jitter of each job is bounded by the jitter of its task,... *)
+    Hypothesis H_job_jitter_le_task_jitter:
+      forall j,
+        arrives_in arr_seq j ->
+        job_jitter j <= task_jitter (job_task j).
+
+    (* ...and that job deadlines equal task deadlines. *)
+    Hypothesis H_job_deadline_eq_task_deadline:
+      forall j,
+        arrives_in arr_seq j ->
+        job_deadline j = task_deadline (job_task j).
+    
     (* Assume any fixed-priority policy... *)
     Variable higher_eq_priority: FP_policy SporadicTask.
     
@@ -329,26 +340,21 @@ Module ResponseTimeIterationFP.
         (tsk, R) \In RTA_claimed_bounds ->
         response_time_bounded_by tsk (task_jitter tsk + R).
     Proof.
-      rename H_valid_task_parameters into PARAMS,
-             H_valid_job_parameters into JOBPARAMS.
       unfold valid_sporadic_job, valid_realtime_job,
              valid_sporadic_taskset, is_valid_sporadic_task in *.
       unfold RTA_claimed_bounds; intros tsk R.
       case SOME: fp_claimed_bounds => [rt_bounds|] IN; last by done.
-      move: (PARAMS) => PARAMStsk.
-      feed (PARAMStsk tsk);
-        [by apply fp_claimed_bounds_from_taskset with (tsk0 := tsk) (R0 := R) in SOME | des].
       apply uniprocessor_response_time_bound_fp with
             (task_cost0 := task_cost) (task_period0 := task_period)
-            (ts0 := ts) (task_deadline0 := task_deadline)
-            (job_deadline0 := job_deadline) (job_jitter0 := job_jitter)
+            (ts0 := ts) (job_jitter0 := job_jitter)
             (higher_eq_priority0 := higher_eq_priority); try (by done).
       {
         apply fp_claimed_bounds_gt_zero with (task_cost0 := task_cost)
           (task_period0 := task_period) (task_deadline0 := task_deadline)
           (higher_eq_priority0 := higher_eq_priority) (ts0 := ts) (task_jitter0 := task_jitter)
           (rt_bounds0 := rt_bounds) (tsk0 := tsk); try (by done).
-        by intros tsk0 IN0; specialize (PARAMS tsk0 IN0); des.
+        apply H_positive_costs.
+        by eapply fp_claimed_bounds_from_taskset; eauto 1.
       }
       by apply fp_claimed_bounds_yields_fixed_point with
         (task_deadline0 := task_deadline) (rt_bounds0 := rt_bounds). 
@@ -370,17 +376,13 @@ Module ResponseTimeIterationFP.
         have DL := fp_claimed_bounds_le_deadline task_cost task_period task_deadline
                                                  task_jitter higher_eq_priority ts.
         have BOUND := fp_analysis_yields_response_time_bounds.
-        rename H_test_succeeds into TEST, H_valid_job_parameters into JOBPARAMS.
+        rename H_test_succeeds into TEST.
         move:TEST; case TEST:(fp_claimed_bounds _ _ _ _ _) => [rt_bounds|] _//.
         intros tsk IN.
         move: (RESP rt_bounds TEST tsk IN) => [R INbounds].
         specialize (DL rt_bounds TEST tsk R INbounds).
         apply task_completes_before_deadline with
                 (task_deadline0 := task_deadline) (R0 := task_jitter tsk + R); try (by done).
-        {
-          intros j ARRj; unfold valid_sporadic_job_with_jitter in *.
-          by specialize (JOBPARAMS j ARRj); move: JOBPARAMS => [[_ [_ EQ]] _].
-        }
         by apply BOUND; rewrite /RTA_claimed_bounds TEST.
       Qed.
 

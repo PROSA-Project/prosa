@@ -30,9 +30,7 @@ Module ConcreteArrivalSequence.
 
     (* Let ts be any concrete task set with valid parameters. *)
     Variable ts: concrete_taskset.
-    Hypothesis H_valid_task_parameters:
-      valid_sporadic_taskset task_cost task_period task_deadline ts.
-    
+
     (* Regarding the periodic arrival sequence built from ts, we prove that...*)
     Let arr_seq := periodic_arrival_sequence ts.
 
@@ -56,22 +54,6 @@ Module ConcreteArrivalSequence.
       rewrite mem_pmap in ARRj.
       move: ARRj => /mapP ARRj; destruct ARRj as [tsk IN SOME].
       by unfold add_job in *; desf.
-    Qed.
-
-    (* ..., jobs have valid parameters, ... *)
-    Theorem periodic_arrivals_valid_job_parameters:
-      forall j,
-        arrives_in arr_seq j ->
-        valid_sporadic_job task_cost task_deadline job_cost job_deadline job_task j.
-    Proof.
-      rename H_valid_task_parameters into PARAMS.
-      unfold valid_sporadic_taskset, is_valid_sporadic_task in *.
-      move => j [t ARRj].
-      rewrite mem_pmap in ARRj; move: ARRj => /mapP [tsk IN SOME].
-      unfold add_job in SOME; desf.
-      specialize (PARAMS tsk IN); des.
-      unfold valid_sporadic_job, valid_realtime_job, job_cost_positive.
-      by repeat split; try (by done); apply leqnn.
     Qed.
 
     (* ... job arrivals satisfy the sporadic task model, ... *)
@@ -105,7 +87,31 @@ Module ConcreteArrivalSequence.
       apply (pmap_uniq) with (g := job_task); last by destruct ts.
       by unfold add_job, ocancel; intro tsk; desf.
     Qed.
-      
+
+    (* We also show that job costs are bounded by task costs... *)
+    Theorem periodic_arrivals_job_cost_le_task_cost:
+      forall j,
+        arrives_in arr_seq j ->
+        job_cost j <= task_cost (job_task j).
+    Proof.
+      intros j [t ARRj].
+      rewrite mem_pmap in ARRj.
+      move: ARRj => /mapP [tsk_j INj SOMEj].
+      by unfold add_job in SOMEj; desf. 
+    Qed.
+
+    (* ...and that job deadlines equal task deadlines. *)
+    Theorem periodic_arrivals_job_deadline_eq_task_deadline:
+      forall j,
+        arrives_in arr_seq j ->
+        job_deadline j = task_deadline (job_task j).
+    Proof.
+      intros j [t ARRj].
+      rewrite mem_pmap in ARRj.
+      move: ARRj => /mapP [tsk_j INj SOMEj].
+      by unfold add_job in SOMEj; desf. 
+    Qed.
+
   End Proofs.
   
 End ConcreteArrivalSequence.

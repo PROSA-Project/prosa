@@ -7,7 +7,7 @@ Module ResponseTime.
 
   Import UniprocessorSchedule SporadicTaskset TaskArrival.
 
-  (* In this section, we define the notion of a response-time bound. *)
+  (* In this section, we define the notion of response-time bound. *)
   Section ResponseTimeBound.
 
     Context {sporadic_task: eqType}.
@@ -22,23 +22,40 @@ Module ResponseTime.
     (* ...and any uniprocessor schedule of these jobs. *)
     Variable sched: schedule Job.
 
-    (* Let tsk be any task that is to be analyzed. *)
-    Variable tsk: sporadic_task.
-
     (* For simplicity, let's define some local names. *)
     Let job_has_completed_by := completed_by job_cost sched.
 
-    (* Then, we say that R is a response-time bound of tsk in this schedule ... *)
-    Variable R: time.
+    Section Job.
+      
+      (* Given any job j, ... *)
+      Variable j: Job.
+    
+      (* ...we say that R is a response-time bound of j in this schedule ... *)
+      Variable R: time.
 
-    (* ... iff any job j of tsk in this arrival sequence has
-       completed by (job_arrival j + R). *)
-    Definition is_response_time_bound_of_task :=
-      forall j,
-        arrives_in arr_seq j ->
-        job_task j = tsk ->
-        job_has_completed_by j (job_arrival j + R).
-        
+      (* ... iff j completes by (job_arrival j + R). *)
+      Definition is_response_time_bound_of_job := job_has_completed_by j (job_arrival j + R).
+
+    End Job.
+
+    Section Task.
+
+      (* Let tsk be any task that is to be analyzed. *)
+      Variable tsk: sporadic_task.
+
+      (* Then, we say that R is a response-time bound of tsk in this schedule ... *)
+      Variable R: time.
+
+      (* ... iff any job j of tsk in this arrival sequence has
+         completed by (job_arrival j + R). *)
+      Definition is_response_time_bound_of_task :=
+        forall j,
+          arrives_in arr_seq j ->
+          job_task j = tsk ->
+          is_response_time_bound_of_job j R.
+      
+      End Task.
+    
   End ResponseTimeBound.
 
   (* In this section, we prove some basic lemmas about response-time bounds. *)
@@ -61,7 +78,7 @@ Module ResponseTime.
       completed_jobs_dont_execute job_cost sched.
 
     (* For simplicity, let's define some local names. *)
-    Let job_has_completed_by := completed_by job_cost sched.
+    Let response_time_bounded_by := is_response_time_bound_of_job job_arrival job_cost sched.
 
     (* We begin by proving lemmas about job response-time bounds. *)
     Section SpecificJob.
@@ -71,8 +88,7 @@ Module ResponseTime.
       
       (* ...with response-time bound R. *)
       Variable R: time.
-      Hypothesis response_time_bound:
-        job_has_completed_by j (job_arrival j + R). 
+      Hypothesis response_time_bound: response_time_bounded_by j R.
 
       (* Then, the service received by j at any time t' after its response time is 0. *)
       Lemma service_after_job_rt_zero :

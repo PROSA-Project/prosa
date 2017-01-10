@@ -155,22 +155,22 @@ Module WorkloadBoundFP.
     Context {Task: eqType}.
     Variable task_cost: Task -> time.
     Variable task_period: Task -> time.
-    Variable task_deadline: Task -> time.
     Variable task_jitter: Task -> time.
     
     Context {Job: eqType}.
     Variable job_arrival: Job -> time.
     Variable job_cost: Job -> time.
-    Variable job_deadline: Job -> time.
     Variable job_jitter: Job -> time.
     Variable job_task: Job -> Task.
 
-    (* Let ts be any task set with valid task parameters. *)
+    (* Let ts be any task set... *)
     Variable ts: seq Task.
-    Hypothesis H_valid_task_parameters:
-      valid_sporadic_taskset task_cost task_period task_deadline ts.
+
+    (* ...with positive task periods. *)
+    Hypothesis H_positive_periods:
+      forall tsk, tsk \in ts -> task_period tsk > 0.
     
-    (* Consider any job arrival sequence with consistent, non-duplicate arrivals. *)
+    (* Consider any job arrival sequence with consistent, duplicate-free arrivals. *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_arrival_times_are_consistent: arrival_times_are_consistent job_arrival arr_seq.    
     Hypothesis H_arrival_sequence_is_a_set: arrival_sequence_is_a_set arr_seq.
@@ -178,18 +178,21 @@ Module WorkloadBoundFP.
     (* First, let's define some local names for clarity. *)
     Let actual_arrivals := actual_arrivals_between job_arrival job_jitter arr_seq.
 
-    (* Next, assume that all jobs come from the task set ...*)
+    (* Next, assume that all jobs come from the task set, ...*)
     Hypothesis H_all_jobs_from_taskset:
-      forall j,
-        arrives_in arr_seq j ->
-        job_task j \in ts.
+      forall j, arrives_in arr_seq j -> job_task j \in ts.
 
-    (* ...and have valid parameters. *)
-    Hypothesis H_valid_job_parameters:
+    (* ...the cost of each job is bounded by the cost of its task, ... *)
+    Hypothesis H_job_cost_le_task_cost:
       forall j,
         arrives_in arr_seq j ->
-        valid_sporadic_job_with_jitter task_cost task_deadline task_jitter
-                                       job_cost job_deadline job_jitter job_task j.
+        job_cost j <= task_cost (job_task j).
+
+    (* ...and the jitter of each job is bounded by the jitter of its task. *)
+    Hypothesis H_job_jitter_le_task_jitter:
+      forall j,
+        arrives_in arr_seq j ->
+        job_jitter j <= task_jitter (job_task j).
 
     (* Assume that jobs arrived sporadically. *)
     Hypothesis H_sporadic_arrivals:
@@ -221,16 +224,13 @@ Module WorkloadBoundFP.
         actual_hp_workload t (t + R) <= R.
     Proof.
       rename H_fixed_point into FIX, H_all_jobs_from_taskset into FROMTS,
-             H_valid_job_parameters into JOBPARAMS,
-             H_valid_task_parameters into PARAMS,
              H_arrival_times_are_consistent into CONS, H_arrival_sequence_is_a_set into SET.
       unfold actual_hp_workload, workload_of_higher_or_equal_priority_tasks,
              valid_sporadic_job_with_jitter, valid_sporadic_job, valid_realtime_job,
              valid_sporadic_taskset, is_valid_sporadic_task in *.
       have BOUND := sporadic_task_with_jitter_arrival_bound task_period task_jitter job_arrival
                     job_jitter job_task arr_seq CONS SET.
-      feed_n 2 BOUND; (try by done);
-        first by intros j ARRj; specialize (JOBPARAMS j ARRj); des.
+      feed_n 2 BOUND; (try by done).
       intro t.
       rewrite {2}FIX /workload_bound /total_workload_bound_fp.
       set l := actual_arrivals_between job_arrival job_jitter arr_seq t (t + R).
@@ -253,16 +253,12 @@ Module WorkloadBoundFP.
       {
         rewrite /num_actual_arrivals_of_task -sum1_size big_distrl /= big_filter.
         apply leq_sum_seq; move => j1 IN1 /eqP EQ.
-        rewrite -EQ mul1n.
-        feed (JOBPARAMS j1).
-        {
-          rewrite mem_filter in IN1; move: IN1 => /andP [_ ARR1].
-          by apply in_arrivals_implies_arrived in ARR1.
-        }
-        by move: JOBPARAMS => [[_ [LE _]] _].
+        rewrite -EQ mul1n; apply H_job_cost_le_task_cost.
+        rewrite mem_filter in IN1; move: IN1 => /andP [_ ARR1].
+        by apply in_arrivals_implies_arrived in ARR1.
       }
       rewrite /task_workload_bound_FP leq_mul2r; apply/orP; right.
-      feed (BOUND t (t + R) tsk0); first by feed (PARAMS tsk0); last by des.
+      feed (BOUND t (t + R) tsk0); first by apply H_positive_periods.
       by rewrite -addnA addKn in BOUND.
     Qed.
 

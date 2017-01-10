@@ -30,34 +30,39 @@ Module ResponseTimeAnalysisFP.
     Context {Job: eqType}.
     Variable job_arrival: Job -> time.
     Variable job_cost: Job -> time.
-    Variable job_deadline: Job -> time.
     Variable job_jitter: Job -> time.
     Variable job_task: Job -> SporadicTask.
     
-    (* Consider any job arrival sequence with consistent, non-duplicate arrivals... *)
+    (* Consider any task set ts... *)
+    Variable ts: seq SporadicTask.
+
+    (* ...with positive task periods. *)
+    Hypothesis H_positive_periods: forall tsk, tsk \in ts -> task_period tsk > 0.
+
+    (* Consider any job arrival sequence with consistent, duplicate-free arrivals... *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_arrival_times_are_consistent: arrival_times_are_consistent job_arrival arr_seq.
     Hypothesis H_arr_seq_is_a_set: arrival_sequence_is_a_set arr_seq.
     
-    (* ... in which jobs arrive sporadically and have valid parameters. *)
+    (* ... in which jobs arrive sporadically,... *)
     Hypothesis H_sporadic_tasks:
       sporadic_task_model task_period job_arrival job_task arr_seq.
-    Hypothesis H_valid_job_parameters:
+
+    (* ...the cost of each job is bounded by the cost of its task, ... *)
+    Hypothesis H_job_cost_le_task_cost:
       forall j,
         arrives_in arr_seq j ->
-        valid_sporadic_job_with_jitter task_cost task_deadline task_jitter
-                                       job_cost job_deadline job_jitter job_task j.
+        job_cost j <= task_cost (job_task j).
 
-    (* Consider a task set ts where all tasks have valid parameters... *)
-    Variable ts: seq SporadicTask.
-    Hypothesis H_valid_task_parameters:
-      valid_sporadic_taskset task_cost task_period task_deadline ts.
+    (* ...and the jitter of each job is bounded by the jitter of its task. *)
+    Hypothesis H_job_jitter_le_task_jitter:
+      forall j,
+        arrives_in arr_seq j ->
+        job_jitter j <= task_jitter (job_task j).
 
-    (* ... and assume that all jobs in the arrival sequence come from the task set. *)
+    (* Assume that all jobs in the arrival sequence come from the task set. *)
     Hypothesis H_all_jobs_from_taskset:
-      forall j,
-        arrives_in arr_seq j ->
-        job_task j \in ts.
+      forall j, arrives_in arr_seq j -> job_task j \in ts.
 
     (* Next, consider any uniprocessor schedule of this arrival sequence... *)
     Variable sched: schedule Job.
@@ -105,15 +110,13 @@ Module ResponseTimeAnalysisFP.
     Proof.
       unfold valid_sporadic_job_with_jitter, valid_sporadic_job,
              valid_sporadic_taskset, is_valid_sporadic_task in *.
-      rename H_response_time_is_fixed_point into FIX,
-             H_valid_task_parameters into PARAMS,
-             H_valid_job_parameters into JOBPARAMS.
+      rename H_response_time_is_fixed_point into FIX.
       intros j IN JOBtsk.
       set arr := actual_arrival job_arrival job_jitter.
       apply completion_monotonic with (t := arr j + R); try (by done).
       {
         rewrite -addnA leq_add2l leq_add2r.
-        by rewrite -JOBtsk; specialize (JOBPARAMS j IN); des.
+        by rewrite -JOBtsk; apply H_job_jitter_le_task_jitter.
       }
       set prio := FP_to_JLFP job_task higher_eq_priority.
       apply busy_interval_bounds_response_time with (arr_seq0 := arr_seq)
@@ -122,8 +125,7 @@ Module ResponseTimeAnalysisFP.
         - by intros x z y; apply H_priority_is_transitive.
       intros t.
       apply fp_workload_bound_holds with (task_cost0 := task_cost)
-            (task_period0 := task_period) (task_deadline0 := task_deadline)
-            (job_deadline0 := job_deadline) (task_jitter0 := task_jitter) (ts0 := ts); try (by done).
+            (task_period0 := task_period) (task_jitter0 := task_jitter) (ts0 := ts); try (by done).
       by rewrite JOBtsk.
     Qed.
 

@@ -72,7 +72,7 @@ Module TaskArrival.
     Variable job_arrival: Job -> time.
     Variable job_task: Job -> Task.
 
-    (* Consider any arrival sequence with consistent, non-duplicate arrivals, ... *)
+    (* Consider any arrival sequence with consistent, duplicate-free arrivals, ... *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_consistent_arrivals: arrival_times_are_consistent job_arrival arr_seq.
     Hypothesis H_no_duplicate_arrivals: arrival_sequence_is_a_set arr_seq.

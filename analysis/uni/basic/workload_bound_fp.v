@@ -160,7 +160,7 @@ Module WorkloadBoundFP.
     Hypothesis H_valid_task_parameters:
       valid_sporadic_taskset task_cost task_period task_deadline ts.
     
-    (* Consider any job arrival sequence with consistent, non-duplicate arrivals. *)
+    (* Consider any job arrival sequence with consistent, duplicate-free arrivals. *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_arrival_times_are_consistent: arrival_times_are_consistent job_arrival arr_seq.
     Hypothesis H_arr_seq_is_a_set: arrival_sequence_is_a_set arr_seq.

@@ -90,7 +90,7 @@ Module ConcreteScheduler.
     Variable job_cost: Job -> time.
     Variable job_jitter: Job -> time.
 
-    (* Assume any job arrival sequence with consistent, non-duplicate arrivals. *)
+    (* Assume any job arrival sequence with consistent, duplicate-free arrivals. *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_arrival_times_are_consistent: arrival_times_are_consistent job_arrival arr_seq.
     Hypothesis H_no_duplicate_arrivals: arrival_sequence_is_a_set arr_seq.

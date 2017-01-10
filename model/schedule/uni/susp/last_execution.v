@@ -356,6 +356,53 @@ Module LastExecution.
         Qed.
 
       End ExistsIntermediateExecution.
+
+      (* In this section we prove that before the last execution the job
+         must have received strictly less service. *)
+      Section LessServiceBeforeLastExecution.
+
+        (* Let t be any time... *)
+        Variable t: time.
+
+        (* ...and consider any earlier time t0 no earlier than the arrival of job j... *)
+        Variable t0: time.
+        Hypothesis H_no_earlier_than_arrival: has_arrived job_arrival j t0.
+
+        (* ...and before the last execution of job j (with respect to time t). *)
+        Hypothesis H_before_last_execution: t0 < time_after_last_execution j t.
+
+        (* Then, we can prove that the service received by j before time t0
+           is strictly less than the service received by j before time t. *)
+        Lemma less_service_before_start_of_suspension:
+          service sched j t0 < service sched j t.
+        Proof.
+          rename H_no_earlier_than_arrival into ARR, H_before_last_execution into LT.
+          set ex := time_after_last_execution in LT.
+          set S := service sched.
+          case EX:([exists t0:'I_t, scheduled_at sched j t0]); last first.
+          {
+            rewrite /ex /time_after_last_execution EX in LT.
+            apply leq_trans with (p := t0) in LT; last by done.
+            by rewrite ltnn in LT.
+          }
+          {
+            rewrite /ex /time_after_last_execution EX in LT.
+            set m := (X in _ < X + 1) in LT.
+            apply leq_ltn_trans with (n := S j m);
+              first by rewrite -/m addn1 ltnS in LT; apply extend_sum.
+            move: EX => /existsP [t' SCHED'].
+            have LTt: m < t by apply bigmax_ltn_ord with (i0 := t').
+            rewrite /S /service /service_during.
+            rewrite -> big_cat_nat with (p := t) (n := m); [simpl | by done | by apply ltnW].
+            rewrite -addn1 leq_add2l; destruct t; first by done.
+            rewrite big_nat_recl //.
+            apply leq_trans with (n := scheduled_at sched j m); last by apply leq_addr.
+            rewrite lt0n eqb0 negbK.
+            by apply bigmax_pred with (i0 := t').
+          }
+        Qed.
+
+      End LessServiceBeforeLastExecution.
       
     End Lemmas.
       
