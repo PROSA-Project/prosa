@@ -5,3 +5,8 @@
 *.aux
 Makefile*
 _CoqProject
+*.crashcoqide
+*.v#
+*.cache
+*~
+*.orig
