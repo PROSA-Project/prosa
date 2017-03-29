@@ -16,3 +16,4 @@ Require Export rt.util.sum.
 Require Export rt.util.minmax.
 Require Export rt.util.seqset.
 Require Export rt.util.step_function.
+Require Export rt.util.pick.
