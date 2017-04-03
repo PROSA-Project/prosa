@@ -120,21 +120,4 @@ Section Sorting.
     }
   Qed.
 
-  Lemma sort_over_list_sorted {T: eqType} (leT: rel T) (s: seq T) :
-    total_over_list leT s ->
-    sorted leT (sort leT s).
-  Proof.
-  (*  rewrite /sort; have allss: all sorted [::] by [].
-    elim: {s}_.+1 {-2}s [::] allss (ltnSn (size s)) => // n IHn s ss allss.
-    have: sorted s -> sorted (merge_sort_pop s ss).
-      elim: ss allss s => //= s2 ss IHss /andP[ord_s2 ord_ss] s ord_s.
-      exact: IHss ord_ss _ (merge_sorted ord_s ord_s2).
-    case: s => [|x1 [|x2 s _]]; try by auto.
-    move/ltnW/IHn; apply=> {n IHn s}; set s1 := if _ then _ else _.
-    have: sorted s1 by apply: (@merge_sorted [::x2] [::x1]).
-    elim: ss {x1 x2}s1 allss => /= [|s2 ss IHss] s1; first by rewrite andbT.
-    case/andP=> ord_s2 ord_ss ord_s1.
-    by case: {1}s2=> /= [|_ _]; [rewrite ord_s1 | apply: IHss (merge_sorted _ _)].*)
-  Admitted.
-
 End Sorting.
