@@ -403,8 +403,16 @@ Ltac exploit x :=
  || refine ((fun x y => y x) (x _ _) _)
  || refine ((fun x y => y x) (x _) _).
 
-(* Feed tactic -- exploit with multiple arguments.
-   (taken from http://comments.gmane.org/gmane.science.mathematics.logic.coq.club/7013) *)
+(* This tactic feeds the precondition of an implication in order to derive the conclusion
+   (taken from http://comments.gmane.org/gmane.science.mathematics.logic.coq.club/7013).
+
+   Usage: feed H.
+
+   H: P -> Q  ==becomes==>  H: P
+                            ____
+                            Q
+
+   After completing this proof, Q becomes a hypothesis in the context. *)
 Ltac feed H :=
   match type of H with
   | ?foo -> _ =>
@@ -412,15 +420,39 @@ Ltac feed H :=
     assert foo as FOO; [|specialize (H FOO); clear FOO]
   end.
 
+(* Generalization of feed for multiple hypotheses.
+   feed_n is useful for accessing conclusions of long implications.
+
+   Usage: feed_n 3 H.
+     H: P1 -> P2 -> P3 -> Q.
+
+   We'll be asked to prove P1, P2 and P3, so that Q can be inferred. *)
 Ltac feed_n n H := match constr:(n) with
   | O => idtac
   | (S ?m) => feed H ; [| feed_n m H]
-                   end.
+  end.
 
 (* ************************************************************************** *)
 (** * New tactics for ssreflect *)
 (* ************************************************************************** *)
 
+(* Tactic for simplifying a sum with constant term.
+   Usage: simpl_sum_const in H.
+   H: \sum_(2 <= x < 4) 5 > 0  ==becomes==>  H: 5 * (4 - 2) > 0 *)
 Ltac simpl_sum_const :=
   rewrite ?big_const_nat ?big_const_ord ?big_const_seq iter_addn ?muln1 ?mul1n ?mul0n
           ?muln0 ?addn0 ?add0n.
+
+(* Tactic for splitting all conjunctions in a hypothesis.
+   Usage: split_conj H.
+   H: A /\ (B /\ C)  ==becomes==>  H1: A
+                                   H2: B
+                                   H3: C *)
+Ltac split_conj X :=
+  hnf in X;
+  repeat match goal with
+    | H : ?p /\ ?q |- _ =>
+      let x' := H in
+      let y' := fresh H in
+        destruct H as [x' y']
+  end.
