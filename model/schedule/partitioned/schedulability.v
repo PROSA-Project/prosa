@@ -5,9 +5,10 @@ Require Import rt.model.schedule.global.basic.schedule.
 Require Import rt.model.schedule.partitioned.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
-Module PartitionSchedulability.
+Require rt.model.schedule.uni.schedule.
 
-  Require rt.model.schedule.uni.schedule.
+Module PartitionSchedulability.
+  
   Module uni_sched := rt.model.schedule.uni.schedulability.Schedulability.
   Import ArrivalSequence Partitioned Schedule Schedulability.
 

@@ -3,11 +3,13 @@ Require Import rt.model.arrival.basic.task.
 Require Import rt.model.schedule.global.jitter.job rt.model.arrival.basic.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
+Require rt.model.schedule.global.basic.schedule.
+
 (* Definition, properties and lemmas about schedules. *)
 Module ScheduleWithJitter.
 
   (* We import the original schedule module and redefine whatever is required. *)
-  Require Export rt.model.schedule.global.basic.schedule.
+  Export rt.model.schedule.global.basic.schedule.
   Export ArrivalSequence Schedule.
   
   (* We need to redefine the properties of a job that depend on the arrival time. *)

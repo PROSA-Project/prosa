@@ -3,6 +3,8 @@ Require Import rt.model.arrival.basic.task rt.model.priority rt.model.schedule.g
 Require Import rt.model.schedule.global.jitter.job rt.model.schedule.global.jitter.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
+Require rt.model.schedule.global.basic.interference.
+
 Module Interference.
 
   Import ScheduleOfSporadicTaskWithJitter Priority Workload.
@@ -10,7 +12,7 @@ Module Interference.
   (* We import some of the basic definitions, but we need to re-define almost everything
      since the definition of backlogged (and thus the definition of interference)
      changes with jitter. *)
-  Require Import rt.model.schedule.global.basic.interference.
+  Import rt.model.schedule.global.basic.interference.
   Export Interference.
   
   Section InterferenceDefs.

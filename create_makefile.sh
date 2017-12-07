@@ -1,3 +1,13 @@
+#!/bin/bash 
+
+# Include rt-proofs library in _CoqProject. (For Coq versions >= 8.6, remove spurious warnings.)
+version=$(echo $(coqc -v 1) | grep -o "version .\.." | tail -c 4)
+if ([ "$version" == "8.4" ] || [ "$version" == "8.5" ]) then
+  echo "-R . rt" > _CoqProject
+else
+  echo -R . rt -arg \"-w -notation-overriden,-parsing\" > _CoqProject
+fi
+
 # Compile all *.v files (except the ones that define the decidable equality). Those
 # are directly included in other files.
 coq_makefile -f _CoqProject $(find . -name "*.v" ! -name "*#*" ! -name "*eqdec*.v" -print) -o Makefile

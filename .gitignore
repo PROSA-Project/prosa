@@ -4,3 +4,4 @@
 *.html
 *.aux
 Makefile*
+_CoqProject

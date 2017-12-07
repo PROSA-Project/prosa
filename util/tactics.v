@@ -412,7 +412,7 @@ Ltac feed H :=
     assert foo as FOO; [|specialize (H FOO); clear FOO]
   end.
 
-Ltac feed_n n H := match constr:n with
+Ltac feed_n n H := match constr:(n) with
   | O => idtac
   | (S ?m) => feed H ; [| feed_n m H]
                    end.

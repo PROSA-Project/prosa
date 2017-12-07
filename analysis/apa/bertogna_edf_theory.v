@@ -919,7 +919,7 @@ Module ResponseTimeAnalysisEDF.
           rewrite -[_ < _]negbK in SUM.
           move: SUM => /negP SUM; apply SUM; rewrite -leqNgt.
           unfold I, total_interference_bound_edf.
-          rewrite big_seq_cond [\sum_(_ <- _ | let _ := _ in _)_]big_seq_cond.
+          rewrite big_seq_cond [X in _ <= X]big_seq_cond.
           apply leq_sum; move => tsk_k /andP [INBOUNDSk INTERFk]; destruct tsk_k as [tsk_k R_k].
           specialize (ALL (tsk_k, R_k) INBOUNDSk).
           unfold interference_bound_edf; simpl in *.
