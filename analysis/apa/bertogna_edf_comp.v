@@ -1,4 +1,4 @@
-Require Import rt.util.all rt.util.divround.
+Require Import rt.util.all.
 Require Import rt.analysis.apa.bertogna_edf_theory.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div path.
 
