@@ -15,9 +15,9 @@ Module Suspension.
     (* We define job suspension as a function that takes a job in the arrival
        sequence and its current service and returns how long the job must
        suspend next. *)
-    Definition job_suspension := Job -> (* job *)
-                                 time -> (* current service *)
-                                 time. (* duration of next suspension *)
+    Definition job_suspension := Job ->    (* job *)
+                                 time ->   (* current service *)
+                                 duration. (* duration of next suspension *)
 
   End SuspensionTimes.
 
@@ -25,7 +25,7 @@ Module Suspension.
   Section TotalSuspensionTime.
 
     Context {Job: eqType}.
-    Variable job_cost: Job -> time.    
+    Variable job_cost: Job -> time.
     
     (* Consider any job suspension function. *)
     Variable next_suspension: job_suspension Job.
@@ -56,7 +56,7 @@ Module Suspension.
     Let total_job_suspension := total_suspension job_cost next_suspension.
     
     (* Next, assume that for each task a suspension bound is known. *)
-    Variable suspension_bound: Task -> time.
+    Variable suspension_bound: Task -> duration.
 
     (* Then, we say that the arrival sequence satisfies the dynamic
        suspension model iff the total suspension time of each job is no

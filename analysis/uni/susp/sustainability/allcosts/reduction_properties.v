@@ -24,7 +24,6 @@ Module SustainabilityAllCostsProperties.
   
   Section ReductionProperties.
 
-    Context {Task: eqType}.
     Context {Job: eqType}.
     Variable job_arrival: Job -> time.
     Variable job_cost: Job -> time.
@@ -638,9 +637,9 @@ Module SustainabilityAllCostsProperties.
       Let cumulative_suspension_in_sched_new :=
         cumulative_suspension job_arrival inflated_job_cost reduced_suspension_duration sched_new.
 
-      (* To conclude, we prove that the suspension durations in the new schedule are no
-         longer than in the original schedule. *)
-      Lemma sched_new_has_shorter_suspensions:
+      (* To conclude, we prove that the cumulative suspension in the new schedule is no
+         larger than in the original schedule,... *)
+      Lemma sched_new_has_shorter_suspension:
         forall any_j t,
           cumulative_suspension_in_sched_new any_j t
           <= cumulative_suspension_in_sched_susp any_j t.
@@ -665,6 +664,65 @@ Module SustainabilityAllCostsProperties.
         }
       Qed.
 
+      (* ... which implies that the total suspension is also no larger. *)
+      Corollary sched_new_has_shorter_total_suspension:
+        forall any_j,
+          total_suspension inflated_job_cost reduced_suspension_duration any_j <=
+          total_suspension job_cost job_suspension_duration any_j.
+      Proof.
+        intros any_j.
+        apply leq_trans with (n := cumulative_suspension_in_sched_new any_j (arr_j + R)).
+        {
+          unfold total_suspension, reduced_suspension_duration, reduction.reduced_suspension_duration,
+                 build_suspension_duration.
+          rewrite -/sched_new.
+          set SUSP_new := _ job_arrival job_cost _ _ _ _ _ _ _.
+          set cost' := inflated_job_cost.
+          set arr := job_arrival j.
+          apply leq_trans with (n := \sum_(0 <= t < cost' any_j) \sum_(0 <= t0 < arr + R)
+                              if (service sched_new any_j t0 == t) then SUSP_new any_j t0 else false);
+            first by apply leq_sum; ins; rewrite big_mkcond; apply leq_sum; ins; case: (_ == _).
+          rewrite exchange_big /=.
+          apply leq_sum_nat; move => i /= LT _.
+          case COMP: (completed_in_sched_new any_j i).
+          {
+            apply leq_trans with (n := 0); last by done.
+            rewrite big_nat_cond big1 //; move => s /= LTs.
+            case EQ: (_ == _); last by done.
+            move: EQ => /eqP EQ; rewrite andbT -EQ {EQ} in LTs.
+            by move: COMP => /eqP COMP; rewrite ltn_neqAle COMP eq_refl in LTs.
+          }
+          {
+            apply negbT in COMP; rewrite /completed_in_sched_new /completed_by in COMP.
+            set s := service sched_new any_j i; rewrite -/s neq_ltn in COMP.
+            move: COMP => /orP [LTs | GTs]; last first.
+            {
+              suff BUG': inflated_job_cost any_j >= s by rewrite ltnNge BUG' in GTs.
+              apply cumulative_service_le_job_cost.
+              by apply sched_new_completed_jobs_dont_execute.
+            }
+            rewrite -> big_cat_nat with (n := s); [simpl | by done | by apply ltnW].
+            rewrite -> big_cat_nat with (m := s) (n := s.+1); [simpl | by done | by done].
+            rewrite big_nat_cond big1; last first.
+            {
+              move => i0; rewrite andbT; move => /= LT0.
+              by case EQ: (_ == _) => //; move: EQ => /eqP EQ; subst; rewrite ltnn in LT0.
+            }
+            rewrite add0n big_nat_recr //= eq_refl big_geq // add0n.
+            rewrite big_nat_cond big1; [rewrite addn0 |]; last first.
+            {
+              move => i0; rewrite andbT; move => /andP [LT0 _].
+              rewrite ltn_neqAle in LT0; move: LT0 => /andP [NEQ _].
+              by apply negbTE in NEQ; rewrite NEQ.
+            }
+            by rewrite -sched_new_suspension_matches.
+          }
+        }
+        apply leq_trans with (n := cumulative_suspension_in_sched_susp any_j (arr_j + R));
+          first by apply sched_new_has_shorter_suspension.
+        by apply cumulative_suspension_le_total_suspension.
+      Qed.
+      
     End SuspensionTable.
 
     (** Suspension-Related Schedule Properties *)
