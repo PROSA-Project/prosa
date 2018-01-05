@@ -94,6 +94,18 @@ Section UniqList.
     }
     by apply filter_idx_lt_take.
   Qed.
+
+  Lemma mapP2 (T: Type) (T': eqType) (s: seq T) (f: T -> T') y:
+    reflect (exists2 x, List.In x s & y = f x) (y \in map f s).
+  Proof.
+    elim: s => [|x s IHs]; first by right; case.
+    rewrite /= in_cons eq_sym; case Hxy: (f x == y);
+      first by left; exists x; [by left | by rewrite (eqP Hxy)].
+    apply: (iffP IHs) => [[x' Hx' ->]|[x' Hx' Dy]];
+      first by exists x'; [by right | by done].
+    exists x'; last by done.
+    by subst y; move: Hx' => [EQ | IN] //; subst; rewrite eq_refl in Hxy.
+  Qed. 
   
 End UniqList.
 
