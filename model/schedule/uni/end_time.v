@@ -1,5 +1,5 @@
 Require Import Arith Nat. 
-Require Import rt.util.all rt.util.tactics_gr.
+Require Import rt.util.all.
 Require Import rt.model.arrival.basic.task 
                rt.model.arrival.basic.job 
                rt.model.schedule.uni.schedule
@@ -124,14 +124,14 @@ Module end_time.
           job_end_time_p t c e.
       Proof. 
         induction wf as [| wf' IHwf']; intros t c; simpl.
-        -  destruct c; intros H; inverts H.  
+        -  destruct c; intros H; inversion H .  
            apply C0_.
-        -  intros IHSwf. cases (scheduled_at sched job t) as Hcases; destruct c.
+        -  intros IHSwf. case Hcases:(scheduled_at sched job t); destruct c.
           + inversion IHSwf. apply C0_.
-          + apply IHwf' in IHSwf. apply S_C_sched with (c:=c)(e:=e). 
+          + rewrite Hcases in IHSwf. apply IHwf' in IHSwf. apply S_C_sched with (c:=c)(e:=e). 
             apply Hcases. apply IHSwf.
           + inversion IHSwf. apply C0_.
-          + apply IHwf' in IHSwf. apply S_C_not_sched with (c:=c)(e:=e). 
+          + rewrite Hcases in IHSwf. apply IHwf' in IHSwf. apply S_C_not_sched with (c:=c)(e:=e). 
             * rewrite Hcases. done.
             * apply IHSwf.
       Qed.
@@ -148,8 +148,8 @@ Module end_time.
         induction H as [t|t c e Hcase1 Hpre [wf Hwf] |t c e Hcase2 Hpre [wf Hwf]].
         - exists 1. done.
         - exists (1+wf).
-          cases (scheduled_at sched job t) as Csa.
-          + false.
+          case Csa:(scheduled_at sched job t).
+          + done.
           + simpl. rewrite Csa. apply Hwf.
         - exists (1+wf). simpl. 
           rewrite Hcase2. apply Hwf.
@@ -165,7 +165,7 @@ Module end_time.
       Proof.
         intros* Hcase1 Hpre.
         induction t as [| t' IHt']; 
-        inversion Hpre; try apply H2; false. 
+        inversion Hpre; try apply H2; done. 
       Qed.
 
       (* If we consider a time t where the job is scheduled, then the end_time_predicate 
@@ -178,7 +178,7 @@ Module end_time.
       Proof.
         intros* Hcase2 Hpre.
         induction t as [| t' IHt']; 
-        inversion Hpre; try apply H2; false. 
+        inversion Hpre; try apply H2; done. 
       Qed.
 
       (* Assume that the job end time is job_end *)
@@ -225,7 +225,7 @@ Module end_time.
         - by rewrite big_geq.
         - apply arrival_le_end in Hpre.
           rewrite big_ltn // IHHpre /service_at.
-          cases (scheduled_at sched job t) as cases; try easy; false.
+          case cases:(scheduled_at sched job t); try easy; done.
         - apply arrival_le_end in Hpre. 
           rewrite big_ltn // IHHpre /service_at. 
           rewrite Hcase2 //. 
@@ -271,7 +271,7 @@ Module end_time.
           rewrite subn1 addnS //= addSn subn1 in Hpre.
           apply leq_ltn_trans with (m:=t) in Hpre; try (apply leq_addr).
           rewrite big_ltn // IHHpre /service_at /service_during.
-          cases (scheduled_at sched job t). false. done.  
+          case C:(scheduled_at sched job t);done.  
         - destruct c. 
           + inversion Hpre. apply big_geq. ssromega.
           + apply arrival_add_cost_le_end, leq_sub2r with (p:=1) in Hpre.

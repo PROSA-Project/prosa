@@ -1,5 +1,5 @@
 Require Import Arith Omega Nat.
-Require Import rt.util.all rt.util.tactics_gr.
+Require Import rt.util.all.
 Require Import rt.model.arrival.basic.job
                rt.model.arrival.basic.task_arrival
                rt.model.schedule.uni.schedulability
@@ -385,7 +385,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
             rewrite /to_next_slot  /from_start_of_slot. repeat (rewrite -addnBA //).
             rewrite case2 Hcases. repeat rewrite addSn case1 -subn1 subKn //.
             repeat rewrite subn0.
-            cases (c < time_slot) as Hc_slot; rewrite /duration_to_finish_from_start_of_slot_with.
+            case Hc_slot:(c < time_slot); rewrite /duration_to_finish_from_start_of_slot_with.
             * by rewrite ceil_eq1.
             * rewrite ceil_suba //; try ssromega.
               rewrite subn1 mulnBl mul1n addnA -addSn addn1.
@@ -677,7 +677,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         intro c.
         induction c as [| c IHc];intros ARR PEN SC.
         - rewrite /formula_rt /= addn0; apply (C0_ sched j).
-        - cases (is_scheduled_at ARR) as l.
+        - case l:(is_scheduled_at ARR).
           + destruct c as [|c];apply (S_C_sched sched j);rewrite // formula_sched_St //.
             * rewrite  /formula_rt /= addn0;apply C0_.
             * apply IHc.
@@ -738,8 +738,8 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         unfold Task_in_time_slot in in_time_slot_at. 
         fold  tdma_cycle in in_time_slot_at. fold time_slot in in_time_slot_at. fold slot_offset in in_time_slot_at.
         have cost_pos: job_cost j > 0 by apply H_valid_job.
-        cases (in_time_slot_at (job_arrival j)) as test_in_slot.
-        - cases (job_cost j <= time_slot - from_start_of_slot (job_arrival j)) as test_cost.
+        case test_in_slot:(in_time_slot_at (job_arrival j)).
+        - case test_cost:(job_cost j <= time_slot - from_start_of_slot (job_arrival j)).
           + set other := div_ceil (job_cost j) time_slot * (tdma_cycle - time_slot).
             apply leq_trans with (n:=div_ceil WCET time_slot * (tdma_cycle - time_slot) + job_cost j). 
             * rewrite gtn_eqF //. apply leq_addl.
@@ -803,14 +803,12 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         fold slot_offset in in_time_slot_at. fold from_start_of_slot in in_time_slot_at.
         assert (gt_ref: reflect (time_slot> from_start_of_slot (job_arrival j))%coq_nat 
         (time_slot >from_start_of_slot (job_arrival j))) by apply ltP.
-        cases (time_slot > from_start_of_slot (job_arrival j)) as hgt.
-        - apply decPcases in gt_ref. rewrite EXISTS ltnn in hgt.
-          false. 
+        case hgt:(time_slot > from_start_of_slot (job_arrival j)).
+        - apply decPcases in gt_ref. rewrite EXISTS ltnn in hgt. done. 
         - apply decPcases in gt_ref.
           destruct (TDMA_policy_case_RT_le_Period (job_arrival j)) as [hj |hj]. apply pendingArrival.
           unfold in_time_slot_at in hj.
-          + unfold from_start_of_slot in gt_ref. 
-            move /ltP/negP in gt_ref. contradiction. 
+          + rewrite /from_start_of_slot in gt_ref. rewrite /from_start_of_slot in EXISTS. case (_ < _) in gt_ref;try ssromega.
           + have F:in_time_slot_at (job_arrival j) = false by auto. rewrite F.
             rewrite /to_next_slot EXISTS /duration_to_finish_from_start_of_slot_with.
             rewrite mulnBl mul1n addnA  {1}gtn_eqF // -COST_WCET.
