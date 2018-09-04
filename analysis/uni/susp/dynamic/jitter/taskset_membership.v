@@ -133,7 +133,7 @@ Module TaskSetMembership.
       intros j_hp ARRhp HP.
       rewrite /actual_response_time.
       apply pick_min_holds; last by done.
-      exists (Ordinal (ltnSn (R (job_task j_hp)))). simpl.
+      exists (R (job_task j_hp)); split; first by done.
       by apply RESPhp; try (by done); first by apply FROM.
     Qed.
 
@@ -153,14 +153,14 @@ Module TaskSetMembership.
         rewrite /actual_response_time.
         apply pick_min_holds;
           last by intros x RESPx _ MINx; rewrite -ltnS in LT; apply (MINx (Ordinal LT)).
-        exists (Ordinal (ltnSn (R (job_task j_hp)))).
+        exists (R (job_task j_hp)); split; first by done.
         by apply RESPhp; try (by done); first by apply FROM.
       }
       {
         apply leq_trans with (n := (R (job_task j_hp))); last by apply ltnW. 
         rewrite -ltnS /actual_response_time.
         apply pick_min_ltn.
-        exists (Ordinal (ltnSn (R (job_task j_hp)))). simpl.
+        exists (R (job_task j_hp)); split; first by done.
         by apply RESPhp; try (by done); first by apply FROM.
       }
     Qed.

@@ -188,8 +188,8 @@ Module RTAByReduction.
       {
         intros j_hp ARRhp OTHERhp.
         rewrite /actual_response_time.
-        apply pick_min_holds; last by intros r RESP _.
-        exists (Ordinal (ltnSn (R (job_task j_hp)))).
+        apply pick_min_holds; last by intros r _ RESP _.
+        exists (R (job_task j_hp)); split; first by done.
         by apply RESPhp; try (by done); [by apply FROM | rewrite /other_hep_task -H_job_of_tsk].
       }
       {
