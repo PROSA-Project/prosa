@@ -163,8 +163,7 @@ Module UniprocessorSchedule.
         Proof.
           unfold completed_by; move => t t' LE /eqP COMPt.
           rewrite eqn_leq; apply/andP; split; first by apply H_completed_jobs.
-          by apply leq_trans with (n := service sched j t);
-            [by rewrite COMPt | by apply extend_sum].
+          rewrite- COMPt; by apply extend_sum.
         Qed.
 
         (* We also prove that a completed job cannot be scheduled. *)
