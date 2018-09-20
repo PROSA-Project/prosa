@@ -2,6 +2,7 @@
 *.glob
 *.vo
 *.html
+/html
 *.aux
 Makefile*
 _CoqProject
@@ -10,3 +11,6 @@ _CoqProject
 *.cache
 *~
 *.orig
+*/.#*
+#*#
+*.DS_Store
