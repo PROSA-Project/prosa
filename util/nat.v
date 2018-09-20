@@ -22,7 +22,7 @@ Section NatLemmas.
       n1 >= n2 ->
       (m1 + n1) - (m2 + n2) = m1 - m2 + (n1 - n2).
   Proof. by ins; ssromega. Qed.
-
+  
   Lemma subh3 :
     forall m n p,
       m + p <= n ->
@@ -31,6 +31,21 @@ Section NatLemmas.
   Proof.
     ins. rewrite <- leq_add2r with (p := p).
     by rewrite subh1 // -addnBA // subnn addn0.
+  Qed.
+
+  (* subh3: forall m n p : nat, m + p <= n -> p <= n -> m <= n - p *)
+  (*                 unnecessary condition -- ^^^^^^^^^ *)
+  (* TODO: del subh3 *)
+  Lemma subh3_ext:
+    forall m n p,
+      m + p <= n ->
+      m <= n - p.
+  Proof.
+    clear.
+    intros.
+    apply subh3; first by done.
+    apply leq_trans with (m+p); last by done.
+      by rewrite leq_addl.
   Qed.
 
   Lemma subh4:

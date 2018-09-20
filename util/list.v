@@ -109,6 +109,52 @@ Section UniqList.
   
 End UniqList.
 
+(* Additional lemmas about rem for lists. *)
+Section RemList.
+  
+  (* We prove that if x lies in xs excluding y, then x also lies in xs. *)
+  Lemma rem_in:
+    forall (T: eqType) (x y: T) (xs: seq T),
+      x \in rem y xs -> x \in xs.
+  Proof.
+    clear; intros.
+    induction xs; simpl in H.
+    { by rewrite in_nil in H. }
+    { rewrite in_cons; apply/orP.
+      destruct (a == y) eqn:EQ. 
+      { by move: EQ => /eqP EQ; subst a; right. }
+      { move: H; rewrite in_cons; move => /orP [/eqP H | H].
+        - by subst a; left.
+        - by right; apply IHxs.
+      }
+    }
+  Qed.
+
+  (* We prove that if we remove an element x for which P x from 
+     a filter, then the size of the filter decreases by 1. *)
+  Lemma filter_size_rem: 
+    forall (T: eqType) (x:T) (xs: seq T) (P: T -> bool), 
+      (x \in xs) ->
+      P x ->
+      size [seq y <- xs | P y] = size [seq y <- rem x xs | P y] + 1.
+  Proof.
+    clear; intros.
+    induction xs; first by inversion H.
+    move: H; rewrite in_cons; move => /orP [/eqP H | H]; subst.
+    { by simpl; rewrite H0 -[X in X = _]addn1 eq_refl. }
+    { specialize (IHxs H); simpl in *. 
+      case EQab: (a == x); simpl.
+      { move: EQab => /eqP EQab; subst.
+          by rewrite H0 addn1. }
+      { case Pa: (P a); simpl.
+        - by rewrite IHxs !addn1.
+        - by rewrite IHxs.
+      }
+    }
+  Qed.
+
+End RemList.
+
 (* Additional lemmas about list zip. *)
 Section Zip.
   
@@ -698,3 +744,88 @@ Section Order.
       x1 = x2.
 
 End Order.
+
+(* In this section we prove some additional lemmas about sequences. *)
+Section AdditionalLemmas.
+
+  (* We define a local function max over lists using foldl and maxn. *)
+  Let max := foldl maxn 0.
+  
+  (* We prove that max {x, xs} is equal to max {x, max xs}. *)
+  Lemma seq_max_cons: forall x xs, max (x :: xs) = maxn x (max xs).
+  Proof.
+    have L: forall s x xs, foldl maxn s (x::xs) = maxn x (foldl maxn s xs).
+    { clear; intros. 
+      generalize dependent s; generalize dependent x.
+      induction xs.
+      { by intros; rewrite maxnC. }
+      { intros; simpl in *.
+          by rewrite maxnC IHxs [maxn s a]maxnC IHxs maxnA [maxn s x]maxnC.
+      }
+    }
+      by intros; unfold max; apply L.
+  Qed.
+
+  (* We prove that for any two sequences xs and ys the fact that xs is a subsequence 
+     of ys implies that the size of xs is at most the size of ys. *)
+  Lemma subseq_leq_size:
+    forall {T: eqType} (xs ys: seq T),
+      uniq xs ->
+      (forall x, x \in xs -> x \in ys) ->
+      size xs <= size ys.
+  Proof.
+    clear; intros ? ? ? UNIQ SUB.
+    have Lem:
+      forall a ys,
+        (a \in ys) -> 
+        exists ysl ysr, ys = ysl ++ [::a] ++ ysr.
+    { clear; intros ? ? ? SUB.
+      induction ys; first by done.
+      move: SUB; rewrite in_cons; move => /orP [/eqP EQ|IN].
+      - by subst; exists [::], ys.
+      - feed IHys; first by done.
+        clear IN; move: IHys => [ysl [ysr EQ]].
+          by subst; exists(a0::ysl), ysr.
+    }
+    have EXm: exists m, size ys <= m.
+    { by exists (size ys). }
+    move: EXm => [m SIZEm].
+    move: SIZEm UNIQ SUB; move: xs ys.
+    induction m.
+    { intros.
+      move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys.
+      destruct xs; first by done.
+      specialize (SUB s).
+      feed SUB; first by rewrite in_cons; apply/orP; left.
+        by done.
+    }
+    { intros.
+      destruct xs as [ | x xs]; first by done.
+      specialize (@Lem _ x ys).
+      feed Lem.
+      { by apply SUB; rewrite in_cons; apply/orP; left. }
+      move: Lem => [ysl [ysr EQ]]; subst ys.
+      rewrite !size_cat; simpl; rewrite -addnC add1n addSn ltnS -size_cat.
+      eapply IHm.
+      - move: SIZEm; rewrite !size_cat; simpl; move => SIZE.
+          by rewrite add1n addnS ltnS addnC in SIZE.
+      - by move: UNIQ; rewrite cons_uniq; move => /andP [_ UNIQ].
+      - intros a IN.
+        destruct (a == x) eqn: EQ.
+        { exfalso.
+          move: EQ UNIQ; rewrite cons_uniq; move => /eqP EQ /andP [NIN UNIQ].
+            by subst; move: NIN => /negP NIN; apply: NIN.
+        }
+        { specialize (SUB a).
+          feed SUB.
+          { by rewrite in_cons; apply/orP; right. }
+          clear IN; move: SUB; rewrite !mem_cat; move => /orP [IN| /orP [IN|IN]].
+          - by apply/orP; right.
+          - exfalso.
+              by  move: IN; rewrite in_cons; move => /orP [IN|IN]; [rewrite IN in EQ | ].
+          - by apply/orP; left.
+        }
+    }
+  Qed.
+
+End AdditionalLemmas.

@@ -1,6 +1,7 @@
 Require Export rt.util.tactics.
 Require Export rt.util.notation.
 Require Export rt.util.bigcat.
+Require Export rt.util.pick.
 Require Export rt.util.bigord.
 Require Export rt.util.counting.
 Require Export rt.util.div_mod.
@@ -16,4 +17,4 @@ Require Export rt.util.sum.
 Require Export rt.util.minmax.
 Require Export rt.util.seqset.
 Require Export rt.util.step_function.
-Require Export rt.util.pick.
+Require Export rt.util.epsilon.

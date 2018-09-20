@@ -514,14 +514,55 @@ End MinMaxSeq.
 
 (* Additional lemmas about max. *)
 Section ExtraLemmas.
-  
-  Lemma leq_big_max I r (P : pred I) (E1 E2 : I -> nat) :
-    (forall i, P i -> E1 i <= E2 i) ->
-      \max_(i <- r | P i) E1 i <= \max_(i <- r | P i) E2 i.
+
+  Lemma leq_bigmax_cond_seq (T : eqType) (P : pred T) (r : seq T) F i0 :
+    i0 \in r -> P i0 -> F i0 <= \max_(i <- r | P i) F i.
   Proof.
-    move => leE12; elim/big_ind2 : _ => // m1 m2 n1 n2.
-    intros LE1 LE2; rewrite leq_max; unfold maxn.
-    by destruct (m2 < n2) eqn:LT; [by apply/orP; right | by apply/orP; left].
+    intros IN0 Pi0; by rewrite (big_rem i0) //= Pi0 leq_maxl.
+  Qed.
+
+  Lemma bigmax_sup_seq:
+    forall (T: eqType) (i: T) r (P: pred T) m F,
+      i \in r -> P i -> m <= F i -> m <= \max_(i <- r| P i) F i.
+  Proof.
+    intros.
+    induction r.
+    - by rewrite in_nil  in H.
+      move: H; rewrite in_cons; move => /orP [/eqP EQA | IN].
+      {
+        clear IHr; subst a.
+        rewrite (big_rem i) //=; last by rewrite in_cons; apply/orP; left.
+        apply leq_trans with (F i); first by done.
+          by rewrite H0 leq_maxl.
+      }
+      {
+        apply leq_trans with (\max_(i0 <- r | P i0) F i0); first by apply IHr.
+        rewrite [in X in _ <= X](big_rem a) //=; last by rewrite in_cons; apply/orP; left.
+
+        have Ob: a == a; first by done.
+          by rewrite Ob leq_maxr.
+      }
+  Qed.
+
+  Lemma bigmax_leq_seqP (T : eqType) (P : pred T) (r : seq T) F m :
+    reflect (forall i, i \in r -> P i -> F i <= m)
+            (\max_(i <- r | P i) F i <= m).
+  Proof.
+    apply: (iffP idP) => leFm => [i IINR Pi|];
+      first by apply: leq_trans leFm; apply leq_bigmax_cond_seq.
+    rewrite big_seq_cond; elim/big_ind: _ => // m1 m2.
+      by intros; rewrite geq_max; apply/andP; split. 
+      by move: m2 => /andP [M1IN Pm1]; apply: leFm.
+  Qed.
+
+  Lemma leq_big_max (T : eqType) (P : pred T) (r : seq T) F1 F2 :
+    (forall i, i \in r -> P i -> F1 i <= F2 i) ->
+    \max_(i <- r | P i) F1 i <= \max_(i <- r | P i) F2 i.
+  Proof.
+    intros; apply /bigmax_leq_seqP; intros.
+    specialize (H i); feed_n 2 H; try(done).
+    rewrite (big_rem i) //=; rewrite H1.
+      by apply leq_trans with (F2 i); [ | rewrite leq_maxl].
   Qed.
 
   Lemma bigmax_ord_ltn_identity n :
