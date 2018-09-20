@@ -110,6 +110,16 @@ Module ArrivalSequence.
 
         (* First, we show that the set of arriving jobs can be split
            into disjoint intervals. *)
+        Lemma job_arrived_between_cat:
+          forall t1 t t2,
+            t1 <= t ->
+            t <= t2 -> 
+            jobs_arrived_between t1 t2 = jobs_arrived_between t1 t ++ jobs_arrived_between t t2.
+        Proof.
+          unfold jobs_arrived_between; intros t1 t t2 GE LE.
+            by rewrite (@big_cat_nat _ _ _ t).
+        Qed.
+
         Lemma jobs_arrived_between_mem_cat:
           forall j t1 t t2,
             t1 <= t ->
@@ -117,28 +127,7 @@ Module ArrivalSequence.
             j \in jobs_arrived_between t1 t2 =
             (j \in jobs_arrived_between t1 t ++ jobs_arrived_between t t2).
         Proof.
-          unfold jobs_arrived_between; intros j t1 t t2 GE LE.
-          apply/idP/idP.
-          {
-            intros IN.
-            apply mem_bigcat_nat_exists in IN; move: IN => [arr [IN /andP [GE1 LT2]]].
-            rewrite mem_cat; apply/orP.
-            by destruct (ltnP arr t); [left | right];
-              apply mem_bigcat_nat with (j := arr); try (by apply/andP; split).
-          }
-          {
-            rewrite mem_cat; move => /orP [LEFT | RIGHT].
-            {
-              apply mem_bigcat_nat_exists in LEFT; move: LEFT => [t0 [IN0 /andP [GE0 LT0]]].
-              apply mem_bigcat_nat with (j := t0); last by done.
-              by rewrite GE0 /=; apply: (leq_trans LT0).
-            }
-            {
-              apply mem_bigcat_nat_exists in RIGHT; move: RIGHT => [t0 [IN0 /andP [GE0 LT0]]].
-              apply mem_bigcat_nat with (j := t0); last by done.
-              by rewrite LT0 andbT; apply: (leq_trans _ GE0).
-            }
-          }  
+            by intros j t1 t t2 GE LE; rewrite (job_arrived_between_cat _ t).
         Qed.
 
         Lemma jobs_arrived_between_sub:

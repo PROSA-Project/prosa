@@ -1,6 +1,6 @@
 Require Import rt.util.all.
 Require Import rt.model.arrival.basic.arrival_sequence rt.model.arrival.basic.task rt.model.arrival.basic.job.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path bigop.
 
 (* Properties of job arrival. *)
 Module TaskArrival.
@@ -59,6 +59,24 @@ Module TaskArrival.
     Definition num_arrivals_of_task (t1 t2: time) :=
       size (arrivals_of_task_between t1 t2).
 
+    (* In this section we prove some basic lemmas about number of arrivals of task. *)
+    Section Lemmas.
+
+      (* We show that the number of arrivals of task can be split into disjoint intervals. *) 
+      Lemma num_arrivals_of_task_cat:
+        forall t t1 t2,
+          t1 <= t <= t2 ->
+          num_arrivals_of_task t1 t2 = num_arrivals_of_task t1 t + num_arrivals_of_task t t2.
+      Proof.
+        move => t t1 t2 /andP [GE LE].
+        rewrite /num_arrivals_of_task /arrivals_of_task_between
+                /arrivals_between /jobs_arrived_between.
+        rewrite (@big_cat_nat _ _ _ t) //=.
+          by rewrite filter_cat size_cat.
+      Qed.
+      
+    End Lemmas.    
+
   End NumberOfArrivals.
 
   (* In this section, we prove some basic results regarding the
@@ -72,7 +90,7 @@ Module TaskArrival.
     Variable job_arrival: Job -> time.
     Variable job_task: Job -> Task.
 
-    (* Consider any arrival sequence with consistent, duplicate-free arrivals, ... *)
+    (* Consider any arrival sequence with consistent, non-duplicate arrivals, ... *)
     Variable arr_seq: arrival_sequence Job.
     Hypothesis H_consistent_arrivals: arrival_times_are_consistent job_arrival arr_seq.
     Hypothesis H_no_duplicate_arrivals: arrival_sequence_is_a_set arr_seq.
