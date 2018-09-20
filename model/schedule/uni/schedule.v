@@ -8,7 +8,7 @@ Module UniprocessorSchedule.
   Export Time ArrivalSequence.
 
   Section Schedule.
-
+ 
     (* We begin by defining a uniprocessor schedule. *)
     Section ScheduleDef.
 
@@ -60,9 +60,14 @@ Module UniprocessorSchedule.
         (* Job j is pending at time t iff it has arrived but has not yet completed. *)
         Definition pending (t: time) := has_arrived job_arrival j t && ~~ completed_by t.
 
+        (* Job j is pending earlier and at time t iff it has arrived before time t 
+           and has not been completed yet. *)
+        Definition pending_earlier_and_at (t: time) :=
+          arrived_before job_arrival j t && ~~ completed_by t.
+
         (* Job j is backlogged at time t iff it is pending and not scheduled. *)
         Definition backlogged (t: time) := pending t && ~~ scheduled_at t.
-
+        
       End JobProperties.
 
       (* In this section, we define some properties of the processor. *)
@@ -80,6 +85,25 @@ Module UniprocessorSchedule.
         Definition total_service (t2: time) := total_service_during 0 t2.
 
       End ProcessorProperties.
+
+      Section PropertyOfSequentiality.
+
+        Context {Task: eqType}.    
+        Variable job_task: Job -> Task.
+
+        (* We say that two jobs j1 and j2 are from the same task, if job_task j1 is equal to job_task j2. *)
+        Let same_task j1 j2 := job_task j1 == job_task j2.
+
+        (* We say that the jobs are sequential if they are executed
+           in the order they arrived. *) 
+        Definition sequential_jobs :=
+          forall j1 j2 t,
+            same_task j1 j2 ->
+            job_arrival j1 < job_arrival j2 ->
+            scheduled_at j2 t ->
+            completed_by j1 t.
+        
+      End PropertyOfSequentiality.
       
     End ScheduleProperties.
 
@@ -117,6 +141,11 @@ Module UniprocessorSchedule.
       (* Consider any uniprocessor schedule. *)
       Variable sched: schedule Job.
 
+      (* Let's define the remaining cost of job j as the amount of service 
+         that has to be received for its completion. *)
+      Definition remaining_cost j t :=
+        job_cost j - service sched j t.      
+
       (* Let's begin with lemmas about service. *)
       Section Service.
 
@@ -142,6 +171,24 @@ Module UniprocessorSchedule.
           by apply leq_sum; intros t0 _; apply leq_b1.
         Qed.
 
+        (* Assume that completed jobs do not execute. *)
+        Hypothesis H_completed_jobs:
+          completed_jobs_dont_execute job_cost sched.
+        
+        (* Note that if a job scheduled at some time t then remaining 
+             cost at this point is positive *)
+        Lemma scheduled_implies_positive_remaining_cost:
+          forall t,
+            scheduled_at sched j t ->
+            remaining_cost j t > 0.
+        Proof. 
+          intros.
+          rewrite subn_gt0 /service /service_during.
+          apply leq_trans with (\sum_(0 <= t0 < t.+1) service_at sched j t0);
+            last by rewrite H_completed_jobs.
+          by rewrite big_nat_recr //= -addn1 leq_add2l lt0b.
+        Qed.
+          
       End Service.
 
       (* Next, we prove properties related to job completion. *)
@@ -160,7 +207,7 @@ Module UniprocessorSchedule.
             t <= t' ->
             completed_by job_cost sched j t ->
             completed_by job_cost sched j t'.
-        Proof.
+        Proof. 
           unfold completed_by; move => t t' LE /eqP COMPt.
           rewrite eqn_leq; apply/andP; split; first by apply H_completed_jobs.
           rewrite- COMPt; by apply extend_sum.
@@ -182,6 +229,29 @@ Module UniprocessorSchedule.
           apply leq_add; first by move: COMPLETED => /eqP <-.
           by rewrite /service_at SCHED.
         Qed.
+
+        (* ... and that a scheduled job cannot be completed. *)
+        Lemma scheduled_implies_not_completed:
+          forall t,
+            scheduled_at sched j t ->
+            ~~ completed_by job_cost sched j t.
+        Proof.
+          rename H_completed_jobs into COMP.
+          unfold completed_jobs_dont_execute in COMP.
+          move => t SCHED.
+          rewrite /completed_by neq_ltn.
+          apply /orP; left.
+          apply leq_trans with (service sched j t.+1); last by done.
+          rewrite /service /service_during.            
+          rewrite [in X in _ < X] (@big_cat_nat _ _ _ t) //=.
+          rewrite -[\sum_(0 <= t0 < t) service_at sched j t0]addn0;
+          rewrite -addnA ltn_add2l addnC addn0 big_nat1.
+          rewrite lt0n; apply/neqP; intros CONT;
+          move: CONT => /eqP CONT; rewrite eqb0 in CONT;
+          move: CONT => /neqP CONT; apply CONT;
+          unfold scheduled_at in SCHED; move: SCHED => /eqP SCHED;
+          by rewrite SCHED.
+        Qed.
         
         (* Next, we show that the service received by job j in any interval
            is no larger than its cost. *)
@@ -198,7 +268,113 @@ Module UniprocessorSchedule.
             rewrite -> big_cat_nat with (m := 0) (n := t);
               [by apply leq_addl | by ins | by rewrite leqNgt negbT //].
         Qed.
-      
+
+        (* If a job isn't complete at time t, 
+           it can't be completed at time (t + remaining_cost j t - 1). *)
+        Lemma job_doesnt_complete_before_remaining_cost:
+          forall t,
+            ~~ completed_by job_cost sched j t -> 
+            ~~ completed_by job_cost sched j (t + remaining_cost j t - 1).
+        Proof.
+          intros t GT0.
+          unfold remaining_cost, completed_by in *.
+          have COSTGT0: job_cost j > 0.
+          {
+            apply contraT; rewrite -eqn0Ngt.
+            move => /eqP EQ0.
+            rewrite EQ0 in GT0.
+            move: GT0 => /eqP GT0.
+            exfalso; apply: GT0; apply /eqP.
+            rewrite eqn_leq.
+            apply /andP; split; last by done.
+            by rewrite -EQ0.
+          }
+          rewrite neq_ltn; apply /orP; left.
+          rewrite /service /service_during.
+          set delta := (X in (t + X - 1)).
+          have NONZERO: delta > 0.
+          {
+            rewrite neq_ltn in GT0.
+            move: GT0 => /orP [LTcost | GTcost]; first by rewrite ltn_subRL addn0.
+            exfalso.
+            rewrite ltnNge in GTcost; move: GTcost => /negP GTcost.
+              by apply GTcost.
+          }
+          rewrite (@big_cat_nat _ _ _ t) //= ?leq_addr //;
+            last by rewrite -addnBA; [rewrite leq_addr | done].
+          apply leq_ltn_trans with (n := service sched j t + \sum_(t <= i < t + delta - 1) 1);
+            first by rewrite leq_add2l; apply leq_sum; intros; apply leq_b1.
+          simpl_sum_const.
+          rewrite -addnBA // addKn.
+          rewrite addnBA // /delta.
+          rewrite subnKC; last by done.
+          rewrite subn1 -(ltn_add2r 1) addn1. 
+            by rewrite prednK // addn1 ltnSn.
+        Qed.
+        
+        (* In this section, we prove that the job with a positive 
+           cost must be scheduled to be completed. *)
+        Section JobMustBeScheduled.
+          
+          (* We assume that job j has positive cost, from which we can
+             infer that there always is a time in which j is pending. *)
+          Hypothesis H_positive_cost: job_cost j > 0.
+
+          (* Assume that jobs must arrive to execute. *)
+          Hypothesis H_jobs_must_arrive:
+            jobs_must_arrive_to_execute job_arrival sched.
+        
+          (* Then, we prove that the job with a positive cost 
+             must be scheduled to be completed. *)
+          Lemma completed_implies_scheduled_before:
+            forall t,
+              completed_by job_cost sched j t ->
+              exists t',
+                job_arrival j <= t' < t
+                /\ scheduled_at sched j t'.
+          Proof.
+            intros t COMPL.
+            induction t.
+            {
+              exfalso.
+              unfold completed_by, service, service_during in COMPL.
+              move: COMPL; rewrite big_geq //; move => /eqP H0.
+                by destruct (job_cost j).
+            }
+
+            destruct (completed_by job_cost sched j t) eqn:COMPLatt.
+            {
+              feed IHt; first by done.
+              move: IHt => [t' [JA SCHED]].
+              exists t'. split; first apply/andP; first split.
+              - by apply H_jobs_must_arrive in SCHED.
+              - move: JA => /andP [_ LT]. by apply leq_trans with t.
+              - by done.
+            }
+            {
+              clear IHt.
+              apply negbT in COMPLatt. unfold completed_by in *.
+              rewrite neq_ltn in COMPLatt; move: COMPLatt => /orP [LT | F]. 
+              {
+                unfold service, service_during in COMPL.
+                rewrite big_nat_recr //= in COMPL.
+                move: COMPL => /eqP COMPL. rewrite -COMPL -addn1 leq_add2l in LT.
+                rewrite lt0b in LT.
+                
+                exists t; split.
+                - by apply/andP; by split; first by apply H_jobs_must_arrive in LT.
+                - by done.
+              }
+              {
+                exfalso.
+                rewrite ltnNge in F. move: F => /negP F. apply F.
+                apply H_completed_jobs.
+              }
+            }
+          Qed.
+
+        End JobMustBeScheduled.
+        
       End Completion.
 
       (* In this section we prove properties related to job arrivals. *)
@@ -476,5 +652,5 @@ Module UniprocessorSchedule.
     End Lemmas.
   
   End Schedule.
-
+ 
 End UniprocessorSchedule.
