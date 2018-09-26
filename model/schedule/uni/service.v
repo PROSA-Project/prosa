@@ -148,9 +148,330 @@ Module Service.
         Qed.
 
       End ServiceBoundedByIntervalLength.
-      
+
     End Lemmas.
-    
+      
   End ServiceOverSets.
+
+  (* In this section, we introduce some auxiliary definitions about the service. *)
+  Section ExtraDefinitions.
+
+    Context {Task: eqType}.
+    Context {Job: eqType}.
+    Variable job_arrival: Job -> time.
+    Variable job_cost: Job -> time.
+    Variable job_task: Job -> Task.
+
+    (* Consider any job arrival sequence... *)
+    Variable arr_seq: arrival_sequence Job.
+
+    (* ...and any uniprocessor schedule of these jobs. *)
+    Variable sched: schedule Job.
+    
+    (* Let tsk be the task to be analyzed. *)
+    Variable tsk: Task.
+    
+    (* Recall the notion of a job of task tsk. *)
+    Let of_task_tsk j := job_task j == tsk.
+    
+    (* We define the cumulative task service received by the jobs from the task
+       that arrives in interval [ta1, ta2) within time interval [t1, t2). *)
+    Definition task_service_of_jobs_received_in ta1 ta2 t1 t2 :=
+      service_of_jobs sched (jobs_arrived_between arr_seq ta1 ta2) of_task_tsk t1 t2.
+
+    (* For simplicity, let's define a shorter version of task service 
+       for jobs that arrive and execute in the same interval [t1, t2). *)
+    Definition task_service_between t1 t2 := task_service_of_jobs_received_in t1 t2 t1 t2.
+      
+  End ExtraDefinitions.
+    
+  (* In this section, we prove some auxiliary lemmas about the service. *)
+  Section ExtraLemmas.
+
+    Context {Job: eqType}.
+    Variable job_arrival: Job -> time.
+    Variable job_cost: Job -> time.
+
+    (* Consider any arrival sequence with consistent, non-duplicate arrivals. *)
+    Variable arr_seq: arrival_sequence Job.
+    Hypothesis H_arrival_times_are_consistent: arrival_times_are_consistent job_arrival arr_seq.
+    Hypothesis H_arr_seq_is_a_set: arrival_sequence_is_a_set arr_seq.
+
+    (* Next, consider any uniprocessor schedule of this arrival sequence...*)
+    Variable sched: schedule Job.
+
+    (* ... where jobs do not execute before their arrival or after completion. *)
+    Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute job_arrival sched.
+    Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute job_cost sched.
+
+    (* For simplicity, let's define some local names. *)
+    Let job_completed_by := completed_by job_cost sched.
+    Let arrivals_between := jobs_arrived_between arr_seq.
+    
+    (* First, we prove that service is monotonic. *)
+    Lemma service_monotonic:
+      forall j t1 t2,
+        t1 <= t2 ->
+        service sched j t1 <= service sched j t2.
+    Proof.
+      intros.
+      rewrite /service /service_during [X in _ <= X](@big_cat_nat _ _ _ t1) //.
+        by rewrite leq_addr.
+    Qed.
+    
+    (* Next, we prove that service during can be splited into two parts. *)
+    Lemma service_during_cat:
+      forall j t t1 t2,
+        t1 <= t <= t2 -> 
+        service_during sched j t1 t2 =
+        service_during sched j t1 t + service_during sched j t t2.
+    Proof.
+      move => j' t t1 t2 /andP [GE LE].
+        by rewrite /service_during (@ big_cat_nat _ _ _ t).
+    Qed.
+    
+    (* We prove that if in some time interval [t1,t2) a job j receives k units of service, then
+       there exists time instant t in [t1,t2) such that job is scheduled at time t and 
+       service of job j within interval [t1,t) is equal to k. *)
+    Lemma incremental_service_during:
+      forall j t1 t2 k,
+        service_during sched j t1 t2 > k ->
+        exists t, t1 <= t < t2 /\ scheduled_at sched j t /\ service_during sched j t1 t = k.
+    Proof.
+      intros j t1 t2 k SERV.
+      have LE: t1 <= t2.
+      { rewrite leqNgt; apply/negP; intros CONTR.
+        apply ltnW in CONTR.
+          by move: SERV; rewrite /service_during big_geq.
+      }
+      induction k.
+      { case SCHED: (scheduled_at sched j t1).
+        { exists t1; repeat split; try done.
+          - apply/andP; split; first by done.
+            rewrite ltnNge; apply/negP; intros CONTR.
+              by move: SERV; rewrite/service_during big_geq.
+          - by rewrite /service_during big_geq.                
+        }  
+        { apply negbT in SCHED.
+          move: SERV; rewrite /service /service_during; move => /sum_seq_gt0P [t [IN SCHEDt]].
+          rewrite lt0b in SCHEDt.
+          rewrite mem_iota subnKC in IN; last by done.
+          move: IN => /andP [IN1 IN2].
+          move: (exists_first_intermediate_point
+                   ((fun t => scheduled_at sched j t)) t1 t IN1 SCHED SCHEDt)
+          => [x [/andP [H1 H4] [H2 H3]]].
+          exists x; repeat split; try done.
+          - apply/andP; split; first by apply ltnW.
+              by apply leq_ltn_trans with t. 
+          - apply/eqP; rewrite big_nat_cond big1 //.
+            move => y /andP [H5 _].
+              by apply/eqP; rewrite eqb0; apply H2.
+        }
+      }  
+      { feed IHk; first by apply ltn_trans with k.+1.
+        move: IHk => [t [/andP [NEQ1 NEQ2] [SCHEDt SERVk]]].
+        have SERVk1: service_during sched j t1 t.+1 = k.+1.
+        { rewrite (service_during_cat _ t).
+          rewrite  SERVk -[X in _ = X]addn1. apply/eqP; rewrite eqn_add2l. 
+          rewrite /service_during big_nat1. 
+          rewrite /service_at SCHEDt. by simpl.
+            by apply/andP; split.
+        } 
+        move: SERV; rewrite (service_during_cat _ t.+1); last first.
+        { by apply/andP; split; first apply leq_trans with t. }
+        rewrite SERVk1 -addn1 leq_add2l; move => SERV.
+        case SCHED: (scheduled_at sched j t.+1).
+        { exists t.+1; repeat split; try done.
+          apply/andP; split.
+          - apply leq_trans with t; by done. 
+          - rewrite ltnNge; apply/negP; intros CONTR.
+              by move: SERV; rewrite /service_during big_geq. 
+        } 
+        { apply negbT in SCHED.
+          move: SERV; rewrite /service /service_during; move => /sum_seq_gt0P [x [INx SCHEDx]].
+          rewrite lt0b in SCHEDx.
+          rewrite mem_iota subnKC in INx; last by done.
+          move: INx => /andP [INx1 INx2].
+          move: (exists_first_intermediate_point
+                   ((fun t => scheduled_at sched j t)) t.+1 x INx1 SCHED SCHEDx) => [y [/andP [H1 H4] [H2 H3]]].
+          exists y; repeat split; try done.
+          - apply/andP; split.
+            apply leq_trans with t; first by done. 
+            apply ltnW, ltn_trans with t.+1; by done.
+              by apply leq_ltn_trans with x. 
+          - rewrite (@big_cat_nat _ _ _ t.+1) //=; [ | by apply leq_trans with t | by apply ltn_trans with t.+1].
+            unfold service_during in SERVk1; rewrite SERVk1.
+            apply/eqP.
+            rewrite -{2}[k.+1]addn0 eqn_add2l.
+            rewrite big_nat_cond big1 //.
+            move => z /andP [H5 _].
+              by apply/eqP; rewrite eqb0; apply H2.
+        }
+      } 
+    Qed.
+    
+    (* Last, we prove that overall service of jobs at each time instant is at most 1. *)
+    Lemma service_of_jobs_le_1:
+      forall t1 t2 t P,
+        \sum_(j <- arrivals_between t1 t2 | P j) service_at sched j t <= 1.
+    Proof.
+      intros t1 t2 t P.
+      case SCHED: (sched t) => [j | ]; simpl.
+      { case ARR: (j \in arrivals_between t1 t2).
+        { rewrite (big_rem j) //=; simpl.
+          rewrite /service_at /scheduled_at SCHED; simpl.
+          rewrite -[1]addn0 leq_add //.
+          - by rewrite eq_refl; case (P j).
+          - rewrite leqn0 big1_seq; first by done.
+            move => j' /andP [_ ARRj'].
+            apply/eqP; rewrite eqb0.
+            apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
+            inversion CONTR; subst j'; clear CONTR.
+            rewrite rem_filter in ARRj'; last first.
+            eapply arrivals_uniq; eauto 2.
+            move: ARRj'; rewrite mem_filter; move => /andP [/negP CONTR _].
+              by apply: CONTR.
+        }
+        { apply leq_trans with 0; last by done.
+          rewrite leqn0 big1_seq; first by done.
+          move => j' /andP [_ ARRj'].
+          apply/eqP; rewrite eqb0.
+          rewrite /scheduled_at SCHED.
+          apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
+          inversion CONTR; clear CONTR.
+            by subst j'; rewrite ARR in ARRj'.
+        }
+      }                    
+      { apply leq_trans with 0; last by done.
+        rewrite leqn0 big1_seq; first by done.
+        move => j' /andP [_ ARRj'].
+          by rewrite /service_at /scheduled_at SCHED.
+      }
+    Qed.
+    
+    (* In this section, we introduce a connection between the cumulative 
+       service, cumulative workload, and completion of jobs. *)
+    Section WorkloadServiceAndCompletion. 
+
+      (* Let P be an arbitrary predicate on jobs. *)
+      Variable P: Job -> bool.
+      
+      (* Consider an arbitrary time interval [t1, t2). *)
+      Variables t1 t2: time.
+      
+      (* Let jobs be a set of all jobs arrived during [t1, t2). *) 
+      Let jobs := arrivals_between t1 t2.
+      
+      (* Next, we consider some time instant [t_compl]. *)
+      Variable t_compl: time.
+
+      (* First, we prove that the fact that the workload of [jobs] is equal to the service 
+         of [jobs] implies that any job in [jobs] is completed by time t_compl. *)
+      Lemma workload_eq_service_impl_all_jobs_have_completed:
+        workload_of_jobs job_cost jobs P =
+        service_of_jobs sched jobs P t1 t_compl -> 
+        (forall j, j \in jobs -> P j -> job_completed_by j t_compl).
+      Proof.
+        unfold jobs.
+        intros. 
+        move: (H0) => ARR.
+        apply (in_arrivals_implies_arrived_between job_arrival) in H0; last by done.
+        move: H0 => /andP [T1 T2].
+        have F1: forall a b, (a < b) || (a >= b).
+        { intros.
+          destruct (a < b) eqn:EQ; apply/orP.
+          - by left.
+          - by right; apply negbT in EQ; rewrite leqNgt.
+        }
+        move: (F1 t_compl t1) => /orP [LT | GT].
+        { rewrite /service_of_jobs /service_during in H.
+          rewrite exchange_big big_geq //= in H; last by rewrite ltnW.
+          rewrite /workload_of_jobs in H.
+          rewrite (big_rem j) ?H1 //= in H.
+          move: H => /eqP; rewrite addn_eq0; move => /andP [CZ _].
+          unfold job_completed_by, completed_by.
+          rewrite eqn_leq; apply/andP; split. 
+          - by done.
+          - by move: CZ => /eqP CZ; rewrite CZ. 
+        }
+        { unfold workload_of_jobs, service_of_jobs in H.
+          unfold job_completed_by, completed_by; apply/eqP.
+          rewrite /service /service_during (@big_cat_nat _ _ _ t1) //=.
+          rewrite (cumulative_service_before_job_arrival_zero
+                     job_arrival sched _ j 0 t1) // add0n.
+          apply sum_majorant_eqn with (F1 := fun j => service_during sched j t1 t_compl)
+                                      (xs := arrivals_between t1 t2) (P := P); try done.
+            by intros; apply cumulative_service_le_job_cost.
+        } 
+      Qed.
+
+      (* And vice versa, the fact that any job in [jobs] is completed by time t_compl 
+         implies that the workload of [jobs] is equal to the service of [jobs]. *)
+      Lemma all_jobs_have_completed_impl_workload_eq_service:
+        (forall j, j \in jobs -> P j -> job_completed_by j t_compl) ->
+        workload_of_jobs job_cost jobs P =
+        service_of_jobs sched jobs P t1 t_compl.
+      Proof.
+        unfold jobs.
+        intros.      
+        have F:
+          forall j t,
+            t <= t1 ->
+            (j \in arrivals_between t1 t2) ->
+            service_during sched j 0 t = 0.
+        { intros j t LE ARR.
+          eapply in_arrivals_implies_arrived_between in ARR; eauto 2.
+          move: ARR => /andP [GE LT].
+          unfold service_during.
+          apply/eqP.
+          rewrite big1_seq //.
+          move => x /andP [_ ARR].
+          eapply service_before_job_arrival_zero; eauto 2.
+          move: ARR; rewrite mem_iota subn0 add0n; move => /andP [_ LTt].
+          apply leq_trans with t; first by done.
+            by apply leq_trans with t1.
+        } 
+        destruct (t_compl <= t1) eqn:EQ.
+        { unfold service_of_jobs. unfold service_during.
+          rewrite exchange_big //=. 
+          rewrite big_geq; last by done.
+          rewrite /workload_of_jobs big1_seq //. 
+          move => j /andP [Pj ARR].
+          move: H (H _ ARR Pj) => _ /eqP H.
+          rewrite -H.
+            by apply F.
+        }
+        apply/eqP; rewrite eqn_leq; apply/andP; split; first last.
+        { by apply service_of_jobs_le_workload. }
+        { unfold workload_of_jobs, service_of_jobs.
+          rewrite big_seq_cond [X in _ <= X]big_seq_cond.
+          rewrite leq_sum //.
+          move => j /andP [ARR Pj].
+          move: H (H _ ARR Pj) => _ /eqP H.
+          rewrite -[service_during _ _ _ _ ]add0n.
+          rewrite -(F j t1); try done.
+          rewrite -(big_cat_nat) //=; last first.
+          { move: EQ =>/negP /negP; rewrite -ltnNge; move => EQ.
+              by apply ltnW.
+          }
+          unfold service, service_during in H.
+            by rewrite H.
+        }
+      Qed.
+
+      (* Using the lemmas above, we prove equivalence. *)
+      Lemma all_jobs_have_completed_equiv_workload_eq_service:
+        (forall j, j \in jobs -> P j -> job_completed_by j t_compl) <->
+        workload_of_jobs job_cost jobs P =
+        service_of_jobs sched jobs P t1 t_compl.
+      Proof.
+        split.
+        - by apply all_jobs_have_completed_impl_workload_eq_service.
+        - by apply workload_eq_service_impl_all_jobs_have_completed. 
+      Qed.
+      
+    End WorkloadServiceAndCompletion.
+    
+  End ExtraLemmas.
 
 End Service.

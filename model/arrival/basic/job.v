@@ -1,10 +1,10 @@
-Require Import rt.model.time rt.model.arrival.basic.task.
+Require Import rt.model.time rt.model.arrival.basic.task rt.model.arrival.basic.arrival_sequence.
 From mathcomp Require Import ssrnat ssrbool eqtype.  
-
+  
 (* Properties of different types of job: *)
 Module Job.
 
-  Import Time.
+  Import Time ArrivalSequence.
   
   (* 1) Basic Job *)
   Section ValidJob.
@@ -19,7 +19,7 @@ Module Job.
 
   End ValidJob.
 
-  (* 2) real-time job (with a deadline) *)
+  (* 2) Real-time job (with a deadline) *)
   Section ValidRealtimeJob.
 
     Context {Job: eqType}.
@@ -38,7 +38,7 @@ Module Job.
       job_deadline_positive.
 
   End ValidRealtimeJob.
-
+  
   (* 3) Job of sporadic task *)
   Section ValidSporadicTaskJob.
 
@@ -67,5 +67,27 @@ Module Job.
       job_deadline_eq_task_deadline.
 
   End ValidSporadicTaskJob.
+
+  (* 4) Job of task *)
+  Section ValidTaskJob.
+
+    Context {Task: eqType}.
+    Variable task_cost: Task -> time.
+    
+    Context {Job: eqType}.
+    Variable job_cost: Job -> time. 
+    Variable job_task: Job -> Task.
+
+    (* Consider any arrival sequence. *)
+    Variable arr_seq: arrival_sequence Job.
+    
+    (* The job cost from the arrival sequence 
+       cannot be larger than the task cost. *)
+    Definition cost_of_jobs_from_arrival_sequence_le_task_cost :=
+      forall j,
+        arrives_in arr_seq j ->
+        job_cost_le_task_cost task_cost job_cost job_task j.
+
+  End ValidTaskJob.
 
 End Job.

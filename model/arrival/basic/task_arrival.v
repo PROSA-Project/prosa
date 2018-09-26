@@ -54,7 +54,11 @@ Module TaskArrival.
     (* ...we can identify the jobs of tsk that arrived in any interval [t1, t2) ... *)
     Definition arrivals_of_task_between (t1 t2: time) :=
       [seq j <- arrivals_between t1 t2 | is_job_of_task j].
-  
+    
+    (* ...we define the jobs of tsk that arrived before some time instant t ... *)
+    Definition arrivals_of_task_before (t: time) :=
+      arrivals_of_task_between 0 t.
+    
     (* ...and also count the number of job arrivals. *)
     Definition num_arrivals_of_task (t1 t2: time) :=
       size (arrivals_of_task_between t1 t2).

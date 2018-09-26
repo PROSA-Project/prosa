@@ -271,7 +271,7 @@ Module UniprocessorSchedule.
         (* Let j be any job. *)
         Variable j: Job.
 
-        (* First, we show that if job j is scheduled, then it must be pending. *)
+        (* We show that if job j is scheduled, then it must be pending. *)
         Lemma scheduled_implies_pending:
           forall t,
             scheduled_at sched j t ->
@@ -289,6 +289,22 @@ Module UniprocessorSchedule.
           apply leq_add;
             first by move: COMPLETED => /eqP COMPLETED; rewrite -COMPLETED.
           by rewrite /service_at SCHED.
+        Qed.
+
+        (* Consider any arrival sequence. *)
+        Variable arr_seq: arrival_sequence Job.
+    
+        (* Then we prove that the job is pending at the moment of its arrival. *)
+        Lemma job_pending_at_arrival:
+            arrives_in arr_seq j ->
+            job_cost j > 0 ->
+            pending job_arrival job_cost sched j (job_arrival j).
+        Proof.
+          intros ARR POS.
+          apply/andP; split; first by rewrite /has_arrived.
+          rewrite neq_ltn; apply/orP; left.
+          rewrite /service /service_during (ignore_service_before_arrival); try done.
+            by rewrite big_geq; eauto 2.
         Qed.
 
       End Pending.

@@ -77,5 +77,60 @@ Module Workload.
     End PerJobPriority.
     
   End WorkloadDefs.
+  
+  (* We also define the workload of a task. *)
+  Section TaskWorkload.
 
+    Context {Task: eqType}.
+    Context {Job: eqType}.
+    Variable job_arrival: Job -> time.
+    Variable job_cost: Job -> time.
+    Variable job_task: Job -> Task.
+    
+    (* Consider any job arrival sequence. *)
+    Variable arr_seq: arrival_sequence Job.
+    
+    (* Let tsk be the task to be analyzed. *)
+    Variable tsk: Task.
+    
+    (* Recall the notion of a job of task tsk. *)
+    Let of_task_tsk j := job_task j == tsk.
+    
+    (* We define the task workload as the workload of jobs of task tsk. *)
+    Definition task_workload jobs := workload_of_jobs job_cost jobs of_task_tsk.
+
+    (* Next, we recall the definition of the task workload in interval [t1, t2). *)
+    Definition task_workload_between (t1 t2: time) :=
+      task_workload (jobs_arrived_between arr_seq t1 t2).
+    
+  End TaskWorkload.  
+
+  (* In this section, we prove a few basic lemmas about the workload. *)
+  Section BasicLemmas.
+   
+    Context {Job: eqType}.
+    Variable job_arrival: Job -> time.
+    Variable job_cost: Job -> time.
+    
+    (* Consider any job arrival sequence... *)
+    Variable arr_seq: arrival_sequence Job.
+    
+    (* For simplicity, let's define some local names. *)
+    Let arrivals_between := jobs_arrived_between arr_seq.  
+    
+    (* We prove that workload can be splited into two parts. *)
+    Lemma workload_of_jobs_cat:
+      forall t t1 t2 P,
+        t1 <= t <= t2 ->
+        workload_of_jobs job_cost (arrivals_between t1 t2) P =
+        workload_of_jobs job_cost (arrivals_between t1 t) P
+        + workload_of_jobs job_cost (arrivals_between t t2) P.
+    Proof.
+      move => t t1 t2 P /andP [GE LE].
+      rewrite /workload_of_jobs /arrivals_between.
+        by rewrite (job_arrived_between_cat _ _ t) // big_cat.
+    Qed.
+
+  End BasicLemmas.
+    
 End Workload.
