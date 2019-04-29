@@ -51,9 +51,11 @@ Section find_seq.
   Proof.
     intros.
     apply /negP /negP /hasPn.
-    intros. apply find_uniql with (x:=x) in H;auto.
-    case (x0==x)eqn:XX;move/eqP in XX;last trivial.
-    rewrite -XX in H0. by subst.
+    unfold prop_in1. intros.
+    apply find_uniql with (x:=x) in H; last by assumption.
+    case (x0==x) eqn:XX; last trivial.
+    move/eqP in XX.
+    rewrite XX in H1; by contradiction.
   Qed.
 
   Lemma findP_in_seq:
