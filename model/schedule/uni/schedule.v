@@ -94,15 +94,34 @@ Module UniprocessorSchedule.
         (* We say that two jobs j1 and j2 are from the same task, if job_task j1 is equal to job_task j2. *)
         Let same_task j1 j2 := job_task j1 == job_task j2.
 
-        (* We say that the jobs are sequential if they are executed
-           in the order they arrived. *) 
+        (* We say that the jobs are sequential if they are executed in the order they arrived. *) 
         Definition sequential_jobs :=
           forall j1 j2 t,
             same_task j1 j2 ->
             job_arrival j1 < job_arrival j2 ->
             scheduled_at j2 t ->
             completed_by j1 t.
+
+        (* Assume the hypothesis about sequential jobs holds. *)
+        Hypothesis H_sequential_jobs: sequential_jobs.
         
+        (* A simple corollary of this hypothesis is that the scheduler 
+           executes a job with the earliest arrival time. *)
+        Corollary scheduler_executes_job_with_earliest_arrival:
+          forall j1 j2 t,
+            same_task j1 j2 -> 
+            ~~ completed_by j2 t ->
+            scheduled_at j1 t ->
+            job_arrival j1 <= job_arrival j2.
+        Proof.
+          intros ? ? t TSK NCOMPL SCHED.
+          rewrite /same_task eq_sym in TSK.
+          have SEQ := H_sequential_jobs j2 j1 t TSK.
+          rewrite leqNgt; apply/negP; intros ARR.
+          move: NCOMPL => /negP NCOMPL; apply: NCOMPL.
+            by apply SEQ.
+        Qed.
+
       End PropertyOfSequentiality.
       
     End ScheduleProperties.
