@@ -273,7 +273,11 @@ Module RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
             F + (task_cost tsk - task_lock_in_service tsk) <= R.
 
       (* Then, using the results for the general RTA for FP-schedulers, we establish a 
-         response-time bound for the more concrete model of bounded nonpreemptive segments. *)
+         response-time bound for the more concrete model of bounded nonpreemptive segments. 
+         Note that in case of the general RTA for FP-schedulers, we just _assume_ that 
+         the priority inversion is bounded. In this module we provide the preemption model
+         with bounded nonpreemptive segments and _prove_ that the priority inversion is 
+         bounded. *)
       Theorem uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments:
         response_time_bounded_by tsk R.
       Proof.
