@@ -51,8 +51,8 @@ Module Priority.
   Section PropertiesFP.
 
     (* Assume that jobs are spawned by tasks. *)
-    Context {Job: eqType}.
     Context {Task: eqType}.
+    Context {Job: eqType}.
     Variable job_task: Job -> Task.
 
     (* Let task_priority be any FP policy. *)
@@ -91,10 +91,15 @@ Module Priority.
   (* Next, we define properties of a JLFP policy. *)
   Section PropertiesJLFP.
 
-    (* Consider any JLFP policy. *)
+    Context {Task: eqType}.
     Context {Job: eqType}.
-    Variable arr_seq: arrival_sequence Job.
+    Variable job_task: Job -> Task.
+    Variable job_arrival: Job -> time.
 
+    (* Consider any arrival sequence. *)
+    Variable arr_seq: arrival_sequence Job.
+    
+    (* Consider any JLFP policy. *)
     Variable job_priority: JLFP_policy Job.
 
     (* Now we define the properties. *)
@@ -114,6 +119,25 @@ Module Priority.
         arrives_in arr_seq j1 ->
         arrives_in arr_seq j2 ->
         job_priority j1 j2 || job_priority j2 j1.
+
+    (* Recall that the jobs are sequential if they are executed 
+       in the order they arrived (for more details see file 
+       rt.model.schedule.uni.schedule.v). 
+       
+       An arbitrary JLFP can violate the sequential jobs hypothesis. 
+       For example, consider two jobs j1, j2 of the same task such that 
+       [job_arrival j1 < job_arrival j2]. It is possible that the policy
+       will assign a higher priority to the second job [i.e., π(j1) < π(j2)].
+       But this situation contradicts to sequential job hypothesis.
+
+       We say that JLFP respects sequential jobs if for any two jobs 
+       j1, j2 from the same task the fact that [job_arrival j1 <= job_arrival j2]
+       implies [π(j1) >= π(j2)]. *)
+    Definition JLFP_respects_sequential_jobs :=
+      forall j1 j2,
+        job_task j1 == job_task j2 ->
+        job_arrival j1 <= job_arrival j2 ->
+        job_priority j1 j2.
 
   End PropertiesJLFP.
 
@@ -156,6 +180,7 @@ Module Priority.
     Context {Task: eqType}.
     Variable task_period: Task -> time.
     Variable task_deadline: Task -> time.
+    Variable job_arrival: Job -> time.
     Variable job_task: Job -> Task.
     
     (* Rate-monotonic orders tasks by smaller periods. *)
@@ -196,6 +221,19 @@ Module Priority.
         by intros y x z; apply leq_trans.
       Qed.
 
+      (* Any FP respects sequential jobs. *)
+      Lemma any_reflexive_FP_respects_sequential_jobs:
+        forall job_priority: FP_policy Task,
+          FP_is_reflexive job_priority ->
+          JLFP_respects_sequential_jobs
+            job_task job_arrival (FP_to_JLFP job_task job_priority).
+      Proof.
+        intros HP REFL j1 j2 TSK ARR.
+        move: TSK => /eqP TSK.
+        unfold FP_to_JLFP; rewrite TSK.
+          by apply REFL.
+      Qed.
+
     End Properties.
 
   End KnownFPPolicies.
@@ -203,41 +241,73 @@ Module Priority.
   (* In this section, we define known JLFP policies. *)
   Section KnownJLFPPolicies.
 
-    Context {Job: eqType}.
-    Variable job_arrival: Job -> time.
-    Variable job_deadline: Job -> time.
-
-    Variable arr_seq: arrival_sequence Job.
-
-    (* We define earliest deadline first (EDF) as ordering jobs by absolute deadlines. *)
-    Definition EDF (j1 j2: Job) :=
-      job_arrival j1 + job_deadline j1 <= job_arrival j2 + job_deadline j2.
-
-    Section Properties.
+    (* EDF policy. *)
+    Section EDF.
       
-      (* EDF is reflexive. *)
-      Lemma EDF_is_reflexive : JLFP_is_reflexive EDF.
+      Context {Job: eqType}.
+      Variable job_arrival: Job -> time.
+      Variable job_deadline: Job -> time.
+      
+      Variable arr_seq: arrival_sequence Job.
+
+      (* We define earliest deadline first (EDF) as ordering jobs by absolute deadlines. *)
+      Definition EDF (j1 j2: Job) :=
+        job_arrival j1 + job_deadline j1 <= job_arrival j2 + job_deadline j2.
+
+      Section Properties.
+        
+        (* EDF is reflexive. *)
+        Lemma EDF_is_reflexive : JLFP_is_reflexive EDF.
+        Proof.
+            by intros j; apply leqnn.
+        Qed.
+
+        (* EDF is transitive. *)
+        Lemma EDF_is_transitive : JLFP_is_transitive EDF.
+        Proof.
+            by intros y x z; apply leq_trans.
+        Qed.
+
+        (* EDF is total. *)
+        Lemma EDF_is_total : JLFP_is_total arr_seq EDF.
+        Proof.
+          unfold EDF; intros x y ARRx ARRy.
+          case (leqP (job_arrival x + job_deadline x)
+                     (job_arrival y + job_deadline y));
+            [by rewrite orTb | by move/ltnW => ->].
+        Qed.
+
+      End Properties.
+
+    End EDF.
+
+    (* EDF in the presence of tasks. *)
+    Section EDFwithTasks.
+      
+      Context {Task: eqType}.
+      Variable task_deadline: Task -> time.
+
+      Context {Job: eqType}.
+      Variable job_arrival: Job -> time.
+      Variable job_task: Job -> Task.
+
+      (* Notice that in the presence of tasks the relative dealine 
+         of a job is equal to the relative deadline of its task. *)
+      Definition job_relative_dealine (j: Job) := task_deadline (job_task j).
+
+      (* EDF respects sequential jobs.*)
+      Lemma EDF_respects_sequential_jobs:
+        JLFP_respects_sequential_jobs
+          job_task job_arrival (EDF job_arrival job_relative_dealine).
       Proof.
-        by intros j; apply leqnn.
+        intros j1 j2 TSK ARR.
+        move: TSK => /eqP TSK.
+        unfold EDF, job_relative_dealine; rewrite TSK.
+          by rewrite leq_add2r.
       Qed.
-
-      (* EDF is transitive. *)
-      Lemma EDF_is_transitive : JLFP_is_transitive EDF.
-      Proof.
-        by intros y x z; apply leq_trans.
-      Qed.
-
-      (* EDF is total. *)
-      Lemma EDF_is_total : JLFP_is_total arr_seq EDF.
-      Proof.
-        unfold EDF; intros x y ARRx ARRy.
-        case (leqP (job_arrival x + job_deadline x)
-                    (job_arrival y + job_deadline y));
-          [by rewrite orTb | by move/ltnW => ->].
-      Qed.
-
-    End Properties.
-
+      
+    End EDFwithTasks.
+    
   End KnownJLFPPolicies.
 
   (* In this section, we define the notion of a possible interfering task. *)
