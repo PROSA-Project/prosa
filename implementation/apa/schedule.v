@@ -408,7 +408,7 @@ Module ConcreteScheduler.
                 in BUG; des;
                 first by rewrite BUG in NOTSCHED.
               move: BUG => /andP [_ /negP HP].
-              by apply HP, order_sorted_rcons with (s := l'); try by done.
+              by apply HP, order_sorted_rcons with (xs := l'); try by done.
             }
             move: (IHl cpu CAN) => [j_old IN]; clear IHl LAST.
             by eapply replace_first_previous in IN; des;
@@ -467,7 +467,7 @@ Module ConcreteScheduler.
           }
           {
             subst j_last.
-            by apply order_sorted_rcons with (s := l').
+            by apply order_sorted_rcons with (xs := l').
           }
           {
             subst j_last; clear IHl.
@@ -485,7 +485,7 @@ Module ConcreteScheduler.
                 move: SHOULD => /andP [CAN' /negP HP].
                 unfold prev in IN'.
                 apply scheduler_job_in_mapping in IN'.
-                by exfalso; apply HP, order_sorted_rcons with (s := l').
+                by exfalso; apply HP, order_sorted_rcons with (xs := l').
               }
               {
                 destruct [exists cpu, ((cpu, Some j) \in prev)] eqn:EX.
@@ -497,7 +497,7 @@ Module ConcreteScheduler.
                       in IN''; des;
                     first by specialize (NOTSCHED cpu'); rewrite IN'' in NOTSCHED.
                   move: IN'' => /andP [_ /negP HP].
-                  by exfalso; apply HP, order_sorted_rcons with (s := l').
+                  by exfalso; apply HP, order_sorted_rcons with (xs := l').
                 }
                 {
                   apply negbT in EX; rewrite negb_exists in EX.
@@ -529,7 +529,7 @@ Module ConcreteScheduler.
               }
               {
                 move: BUG => /andP [_ /negP HP].
-                by apply HP, order_sorted_rcons with (s := l'); try by done.
+                by apply HP, order_sorted_rcons with (xs := l'); try by done.
               }
             }
             {

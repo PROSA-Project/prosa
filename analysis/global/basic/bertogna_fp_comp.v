@@ -304,7 +304,7 @@ Module ResponseTimeIterationFP.
         rename ts into ts'; destruct ts' as [ts UNIQ]; simpl in *.
         intros hp_idx idx LThp LT NEQ HP.
         rewrite ltn_neqAle; apply/andP; split; first by done.
-        by apply sorted_rel_implies_le_idx with (leT := higher_priority) (s := ts) (x0 := elem).
+        by apply sorted_rel_implies_le_idx with (leT := higher_priority) (xs := ts) (default := elem).
       Qed.
 
     End HighPriorityTasks.
