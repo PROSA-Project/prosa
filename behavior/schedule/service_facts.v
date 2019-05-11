@@ -1,5 +1,5 @@
 From rt.behavior.schedule Require Export schedule.
-From rt Require Import util.tactics.
+From rt.util Require Import tactics step_function.
 
 (** In this file, we establish basic facts about the service received by
     jobs. *)
@@ -217,5 +217,69 @@ Section RelationToScheduled.
     rewrite service_implies_scheduled //.
       by apply: negbTE.
   Qed.
+
+  (* Conversely, if a job receives service, then it must be scheduled. *)
+  Lemma service_at_implies_scheduled_at:
+    forall t,
+      service_at sched j t > 0 -> scheduled_at sched j t.
+  Proof.
+    move=> t.
+    destruct (scheduled_at sched j t) eqn:SCHEDULED; first trivial.
+    rewrite not_scheduled_implies_no_service // negbT //.
+  Qed.
+
+  (* Thus, if the cumulative amount of service changes, then it must be
+     scheduled, too. *)
+  Lemma service_delta_implies_scheduled:
+    forall t,
+      service sched j t < service sched j t.+1 -> scheduled_at sched j t.
+  Proof.
+    move => t.
+    rewrite -service_last_plus_before -{1}(addn0 (service sched j t)) ltn_add2l.
+    apply: service_at_implies_scheduled_at.
+  Qed.
+
+  (* Similarly, any job with positive cumulative service must have been
+     scheduled before. *)
+  Lemma positive_service_implies_scheduled_before:
+    forall t,
+      service sched j t > 0 -> exists t', (t' < t /\ scheduled_at sched j t').
+  Proof.
+    move=> t.
+    elim: t => [|t IND SERVICE].
+    - rewrite service0 //.
+    - destruct (scheduled_at sched j t) eqn:SCHED.
+      * exists t; split; auto.
+      * move: SERVICE. rewrite -service_last_plus_before not_scheduled_implies_no_service; last by apply negbT; assumption. rewrite addn0.
+        move=> SERVICE. apply IND in SERVICE. inversion SERVICE as [t'' [t''t SCHED_AT]].
+        exists t''; split; auto.
+  Qed.
+
+  Section AfterArrival.
+    (* Futhermore, if we know that jobs are not released early, then we can
+       narrow the interval during which they must have been scheduled. *)
+
+    Context `{JobArrival Job}.
+
+    (* Assume that jobs must arrive to execute. *)
+    Hypothesis H_jobs_must_arrive:
+      jobs_must_arrive_to_execute sched.
+
+    (* We prove that any job with positive cumulative service at time [t] must
+       have been scheduled some time since its arrival and before time [t]. *)
+    Lemma positive_service_implies_scheduled_since_arrival:
+      forall t,
+        service sched j t > 0 -> exists t', (job_arrival j <= t' < t /\ scheduled_at sched j t').
+    Proof.
+      move=> t SERVICE.
+      have EX_SCHED := positive_service_implies_scheduled_before t SERVICE.
+      inversion EX_SCHED as [t'' [TIMES SCHED_AT]].
+      exists t''; split; last by assumption.
+      rewrite /(_ && _) ifT //.
+      move: H_jobs_must_arrive. rewrite /jobs_must_arrive_to_execute /has_arrived => ARR.
+        by apply: ARR; exact.
+    Qed.
+
+  End AfterArrival.
 
 End RelationToScheduled.
