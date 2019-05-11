@@ -191,6 +191,27 @@ Section ServiceAndCompletionFacts.
       rewrite /service. rewrite -(service_during_cat sched j 0 t t') // leq_addl //.
     Qed.
 
+    Section ProperReleases.
+      Context `{JobArrival Job}.
+
+      (* Assume that jobs are not released early. *)
+      Hypothesis H_jobs_must_arrive:
+        jobs_must_arrive_to_execute sched.
+
+      (* We show that if job j is scheduled, then it must be pending. *)
+      Lemma scheduled_implies_pending:
+        forall t,
+          scheduled_at sched j t ->
+          pending sched j t.
+      Proof.
+        move=> t SCHED.
+        rewrite /pending.
+        apply /andP; split;
+          first by apply: H_jobs_must_arrive => //.
+        apply: scheduled_implies_not_completed => //.
+      Qed.
+
+    End ProperReleases.
   End GuaranteedService.
 
   (* If a job isn't complete at time t, it can't be completed at time (t +
@@ -212,3 +233,58 @@ Section ServiceAndCompletionFacts.
  Qed.
 
 End ServiceAndCompletionFacts.
+
+Section PositiveCost.
+  (** In this section, we establish facts that on jobs with non-zero costs that
+      must arrive to execute. *)
+
+  (* Consider any type of jobs with cost and arrival-time attributes,...*)
+  Context {Job: JobType}.
+  Context `{JobCost Job}.
+  Context `{JobArrival Job}.
+
+  (* ...any kind of processor model,... *)
+  Context {PState: Type}.
+  Context `{ProcessorState Job PState}.
+
+  (* ...and a given schedule. *)
+  Variable sched: schedule PState.
+
+  (* Let j be any job that is to be scheduled. *)
+  Variable j: Job.
+
+  (* We assume that job j has positive cost, from which we can
+     infer that there always is a time in which j is pending, ... *)
+  Hypothesis H_positive_cost: job_cost j > 0.
+
+  (* ...and that jobs must arrive to execute. *)
+  Hypothesis H_jobs_must_arrive:
+    jobs_must_arrive_to_execute sched.
+
+  (* Then, we prove that the job with a positive cost
+     must be scheduled to be completed. *)
+  Lemma completed_implies_scheduled_before:
+    forall t,
+      completed_by sched j t ->
+      exists t',
+        job_arrival j <= t' < t
+        /\ scheduled_at sched j t'.
+  Proof.
+    rewrite /completed_by.
+    move=> t COMPLETE.
+    have POSITIVE_SERVICE: 0 < service sched j t
+      by apply leq_trans with (n := job_cost j); auto.
+    by apply: positive_service_implies_scheduled_since_arrival; assumption.
+ Qed.
+
+  (* We also prove that the job is pending at the moment of its arrival. *)
+  Lemma job_pending_at_arrival:
+    pending sched j (job_arrival j).
+  Proof.
+    rewrite /pending.
+    apply/andP; split;
+      first by rewrite /has_arrived //.
+    rewrite /completed_by no_service_before_arrival // -ltnNge //.
+  Qed.
+
+End PositiveCost.

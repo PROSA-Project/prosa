@@ -4,51 +4,9 @@ From rt.util Require Import tactics step_function.
 (** In this file, we establish basic facts about the service received by
     jobs. *)
 
-
-Section UnitService.
-  (** To begin with, we establish facts about schedules in which a job receives
-      either 1 or 0 service units at all times. *)
-
-  (* Consider any job type and any processor state. *)
-  Context {Job: JobType}.
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
-
-  (* We say that a kind processor state provides unit service if no
-     job ever receives more than one unit of service at any time. *)
-  Definition unit_service_proc_model := forall j s, service_in j s <= 1.
-
-  (* Let's consider a unit-service model... *)
-  Hypothesis H_unit_service: unit_service_proc_model.
-
-  (* ...and a given schedule. *)
-  Variable sched: schedule PState.
-
-  (* Let j be any job that is to be scheduled. *)
-  Variable j: Job.
-
-  (* First, we prove that the instantaneous service cannot be greater than 1, ... *)
-  Lemma service_at_most_one:
-    forall t, service_at sched j t <= 1.
-  Proof.
-      by move=> t; rewrite /service_at.
-  Qed.
-
-  (* ...which implies that the cumulative service received by job j in any
-     interval of length delta is at most delta. *)
-  Lemma cumulative_service_le_delta:
-    forall t delta,
-      service_during sched j t (t + delta) <= delta.
-  Proof.
-    unfold service_during; intros t delta.
-    apply leq_trans with (n := \sum_(t <= t0 < t + delta) 1);
-      last by simpl_sum_const; rewrite addKn leqnn.
-      by apply: leq_sum => t' _; apply: service_at_most_one.
-  Qed.
-
-End UnitService.
-
 Section Composition.
+  (** To begin with, we provide some simple but handy rewriting rules for
+      [service] and [service_during]. *)
 
   (* Consider any job type and any processor state. *)
   Context {Job: eqType}.
@@ -169,6 +127,85 @@ Section Composition.
 
 End Composition.
 
+
+Section UnitService.
+  (** As a common special case, we establish facts about schedules in which a
+      job receives either 1 or 0 service units at all times. *)
+
+  (* Consider any job type and any processor state. *)
+  Context {Job: JobType}.
+  Context {PState: Type}.
+  Context `{ProcessorState Job PState}.
+
+  (* We say that a kind processor state provides unit service if no
+     job ever receives more than one unit of service at any time. *)
+  Definition unit_service_proc_model := forall j s, service_in j s <= 1.
+
+  (* Let's consider a unit-service model... *)
+  Hypothesis H_unit_service: unit_service_proc_model.
+
+  (* ...and a given schedule. *)
+  Variable sched: schedule PState.
+
+  (* Let j be any job that is to be scheduled. *)
+  Variable j: Job.
+
+  (* First, we prove that the instantaneous service cannot be greater than 1, ... *)
+  Lemma service_at_most_one:
+    forall t, service_at sched j t <= 1.
+  Proof.
+      by move=> t; rewrite /service_at.
+  Qed.
+
+  (* ...which implies that the cumulative service received by job j in any
+     interval of length delta is at most delta. *)
+  Lemma cumulative_service_le_delta:
+    forall t delta,
+      service_during sched j t (t + delta) <= delta.
+  Proof.
+    unfold service_during; intros t delta.
+    apply leq_trans with (n := \sum_(t <= t0 < t + delta) 1);
+      last by simpl_sum_const; rewrite addKn leqnn.
+      by apply: leq_sum => t' _; apply: service_at_most_one.
+  Qed.
+
+  Section ServiceIsAStepFunction.
+
+    (* We show that the service received by any job j is a step function. *)
+    Lemma service_is_a_step_function:
+      is_step_function (service sched j).
+    Proof.
+      rewrite /is_step_function => t.
+      rewrite addn1 -service_last_plus_before leq_add2l.
+      apply service_at_most_one.
+    Qed.
+
+    (* Next, consider any time t... *)
+    Variable t: instant.
+
+    (* ...and let s0 be any value less than the service received
+       by job j by time t. *)
+    Variable s0: duration.
+    Hypothesis H_less_than_s: s0 < service sched j t.
+
+    (* Then, we show that there exists an earlier time t0 where job j had s0
+       units of service. *)
+    Corollary exists_intermediate_service:
+      exists t0,
+        t0 < t /\
+        service sched j t0 = s0.
+    Proof.
+      feed (exists_intermediate_point (service sched j));
+        [by apply service_is_a_step_function | intros EX].
+      feed (EX 0 t); first by done.
+      feed (EX s0);
+        first by rewrite /service /service_during big_geq //.
+        by move: EX => /= [x_mid EX]; exists x_mid.
+    Qed.
+  End ServiceIsAStepFunction.
+
+End UnitService.
+
 Section Monotonicity.
   (** We establish a basic fact about the monotonicity of service. *)
 
@@ -239,20 +276,40 @@ Section RelationToScheduled.
     apply: service_at_implies_scheduled_at.
   Qed.
 
-  (* Similarly, any job with positive cumulative service must have been
-     scheduled before. *)
-  Lemma positive_service_implies_scheduled_before:
+  (* Similarly, any job that receives some service during an interval must be
+     scheduled during at some point during the interval... *)
+  Lemma cumulative_service_implies_scheduled:
+    forall t1 t2,
+      service_during sched j t1 t2 > 0 ->
+      exists t,
+        t1 <= t < t2 /\
+        scheduled_at sched j t.
+  Proof.
+    move=> t1 t2 NONZERO.
+    case (boolP([exists t: 'I_t2,
+                    (t >= t1) && (service_at sched j t > 0)])) => [EX | ALL].
+    - move: EX => /existsP [x /andP [GE SERV]].
+      exists x; split; auto.
+      by apply: service_at_implies_scheduled_at => //.
+    - rewrite negb_exists in ALL; move: ALL => /forallP ALL.
+      rewrite /service_during big_nat_cond in NONZERO.
+      rewrite big1 ?ltn0 // in NONZERO => i.
+      rewrite andbT; move => /andP [GT LT].
+      specialize (ALL (Ordinal LT)); simpl in ALL.
+      rewrite GT andTb -eqn0Ngt in ALL.
+      apply /eqP => //.
+  Qed.
+
+  (* ...which implies that any job with positive cumulative service must have
+     been scheduled at some point. *)
+  Corollary positive_service_implies_scheduled_before:
     forall t,
       service sched j t > 0 -> exists t', (t' < t /\ scheduled_at sched j t').
   Proof.
-    move=> t.
-    elim: t => [|t IND SERVICE].
-    - rewrite service0 //.
-    - destruct (scheduled_at sched j t) eqn:SCHED.
-      * exists t; split; auto.
-      * move: SERVICE. rewrite -service_last_plus_before not_scheduled_implies_no_service; last by apply negbT; assumption. rewrite addn0.
-        move=> SERVICE. apply IND in SERVICE. inversion SERVICE as [t'' [t''t SCHED_AT]].
-        exists t''; split; auto.
+    move=> t2.
+    rewrite /service => NONZERO.
+    have EX_SCHED := cumulative_service_implies_scheduled 0 t2 NONZERO.
+    by inversion EX_SCHED as [t [TIMES SCHED_AT]]; exists t; split.
   Qed.
 
   Section AfterArrival.
@@ -278,6 +335,64 @@ Section RelationToScheduled.
       rewrite /(_ && _) ifT //.
       move: H_jobs_must_arrive. rewrite /jobs_must_arrive_to_execute /has_arrived => ARR.
         by apply: ARR; exact.
+    Qed.
+
+    Lemma not_scheduled_before_arrival:
+      forall t, t < job_arrival j -> ~~ scheduled_at sched j t.
+    Proof.
+      move=> t EARLY.
+      apply: (contra (H_jobs_must_arrive j t)).
+      rewrite /has_arrived -ltnNge //.
+   Qed.
+
+    (* We show that job j does not receive service at any time t prior to its
+       arrival. *)
+    Lemma service_before_job_arrival_zero:
+      forall t,
+        t < job_arrival j ->
+        service_at sched j t = 0.
+    Proof.
+      move=> t NOT_ARR.
+      rewrite not_scheduled_implies_no_service // not_scheduled_before_arrival //.
+    Qed.
+
+    (* Note that the same property applies to the cumulative service. *)
+    Lemma cumulative_service_before_job_arrival_zero :
+      forall t1 t2 : instant,
+        t2 <= job_arrival j ->
+        service_during sched j t1 t2 = 0.
+    Proof.
+      move=> t1 t2 EARLY.
+      rewrite /service_during.
+      have ZERO_SUM: \sum_(t1 <= t < t2) service_at sched j t = \sum_(t1 <= t < t2) 0;
+        last by rewrite ZERO_SUM big_const_nat iter_addn mul0n addn0 //.
+      rewrite big_nat_cond [in RHS]big_nat_cond.
+      apply: eq_bigr => i /andP [TIMES _]. move: TIMES => /andP [le_t1_i lt_i_t2].
+      apply (service_before_job_arrival_zero i).
+        by apply leq_trans with (n := t2); auto.
+    Qed.
+
+    (* Hence, one can ignore the service received by a job before its arrival
+       time... *)
+    Lemma ignore_service_before_arrival:
+      forall t1 t2,
+        t1 <= job_arrival j ->
+        t2 >= job_arrival j ->
+        service_during sched j t1 t2 = service_during sched j (job_arrival j) t2.
+    Proof.
+      move=> t1 t2 le_t1 le_t2.
+      rewrite -(service_during_cat sched j t1 (job_arrival j) t2).
+      rewrite cumulative_service_before_job_arrival_zero //.
+        by apply/andP; split; exact.
+    Qed.
+
+    (* ... which we can also state in terms of cumulative service. *)
+    Corollary no_service_before_arrival:
+      forall t,
+        t <= job_arrival j -> service sched j t = 0.
+    Proof.
+      move=> t EARLY.
+      rewrite /service cumulative_service_before_job_arrival_zero //.
     Qed.
 
   End AfterArrival.
