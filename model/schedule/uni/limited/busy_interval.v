@@ -123,7 +123,7 @@ Module BusyIntervalJLFP.
       Variable tsk: Task.
 
       (* We say that task tsk has bounded priority inversion if all 
-       its jobs have bounded cumulative priority inversion. *)
+         its jobs have bounded cumulative priority inversion. *)
       Definition priority_inversion_is_bounded_by (B: time) :=
         forall (j: Job),
           arrives_in arr_seq j ->
@@ -368,6 +368,146 @@ Module BusyIntervalJLFP.
         
       End ProcessorAlwaysBusy.
 
+      (* In section we prove a few auxiliary lemmas about quiet time and service.  *)
+      Section QuietTimeAndServiceOfJobs.
+
+        (* Assume that there are no duplicate job arrivals... *)
+        Hypothesis H_arrival_sequence_is_a_set:
+          arrival_sequence_is_a_set arr_seq.
+        
+        (* ...and that jobs do not execute before their arrival nor after completion. *)
+        Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute job_arrival sched.
+        Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute job_cost sched.
+
+        (* We also assume that the schedule is work-conserving. *)
+        Hypothesis H_work_conserving: work_conserving job_arrival job_cost arr_seq sched.
+
+        (* Let t1 be a quiet time. *)
+        Variable t1: time.
+        Hypothesis H_quiet_time: quiet_time t1.
+
+        (* We prove that jobs with higher-than-or-equal priority that
+           arrived before time instant t1 receive no service after 
+           time instant t1. *)
+        Lemma jobs_receive_no_service_after_quiet_time:
+          forall (Δ: time),
+            let arrivals_after_t1 := arrivals_between t1 (t1 + Δ) in
+            let all_arrivals := arrivals_between 0 (t1 + Δ) in
+            
+            \sum_(j_hp <- arrivals_after_t1 | higher_eq_priority j_hp j)
+             service_during sched j_hp t1 (t1 + Δ) =
+            \sum_(j_hp <- all_arrivals | higher_eq_priority j_hp j)
+             service_during sched j_hp t1 (t1 + Δ).
+        Proof.
+          intros.
+          rewrite /arrivals_after_t1 /all_arrivals /arrivals_between.
+          rewrite [in X in _ = X](job_arrived_between_cat _ _ t1);
+            [ | | rewrite leq_addr]; try done.
+          rewrite big_cat //=.
+          rewrite -{1}[\sum_(j <- jobs_arrived_between _ _  (t1 + Δ) | _)
+                        service_during sched j t1 (t1 + Δ)]add0n.
+          apply/eqP. rewrite eqn_add2r eq_sym exchange_big //=.
+          rewrite big1_seq //.
+          move => t' /andP [_ NEQ]; rewrite mem_iota in NEQ.
+          rewrite big1_seq //.
+          move => jhp /andP [HP ARR].
+          apply/eqP; rewrite eqb0.
+          eapply completed_implies_not_scheduled with job_cost; first by done.
+          apply completion_monotonic with t1; [ | move: NEQ => /andP [T1 _] | ]; try done.
+          apply H_quiet_time; try done.
+          - by eapply in_arrivals_implies_arrived; eauto 2.
+          - by eapply in_arrivals_implies_arrived_before; eauto 2.
+        Qed. 
+
+        (* Assume that there is no quiet time in the interval (t1, t1 + Δ]. *)
+        Variable Δ: time.
+        Hypothesis H_no_quiet_time: forall t, t1 < t <= t1 + Δ -> ~ quiet_time t.
+        
+        (* Next we prove that the total service within a "non-quiet" 
+           time interval (t1, t1 + Δ] is exactly Δ. *)
+        Lemma no_idle_time_within_non_quiet_time_interval:
+          \sum_(j <- arrivals_between 0 (t1 + Δ)) service_during sched j t1 (t1 + Δ) = Δ.
+        Proof.
+          intros.
+          have EQ: \sum_(t1 <= x < t1 + Δ) 1 = Δ.
+          { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t1]addn0 subnDl subn0. }
+          rewrite -{3}EQ exchange_big //=. clear EQ.
+          apply/eqP; rewrite eqn_leq; apply/andP; split.
+          { rewrite leq_sum //.
+            move => t' _.
+            case SCHED: (sched t') => [j1 | ]; simpl.
+            { case ARR: (j1 \in arrivals_between 0 (t1 + Δ)).
+              { rewrite (big_rem j1) //=; simpl.
+                rewrite /service_at /scheduled_at SCHED; simpl.
+                rewrite -[1]addn0 leq_add //.
+                - by case (Some j1 == Some j1).
+                - rewrite leqn0 big1_seq; first by done.
+                  move => j2 /andP [_ ARRj2].
+                  apply/eqP; rewrite eqb0.
+                  apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
+                  inversion CONTR; subst j2; clear CONTR.
+                  rewrite rem_filter in ARRj2; last first.
+                  eapply arrivals_uniq; eauto 2.
+                  move: ARRj2; rewrite mem_filter; move => /andP [/negP CONTR _].
+                    by apply: CONTR. }
+              { apply leq_trans with 0; last by done.
+                rewrite leqn0 big1_seq; first by done.
+                move => j2 /andP [_ ARRj2].
+                apply/eqP; rewrite eqb0.
+                rewrite /scheduled_at SCHED.
+                apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
+                inversion CONTR; clear CONTR.
+                  by subst j2; rewrite ARR in ARRj2. } }                    
+            { apply leq_trans with 0; last by done.
+              rewrite leqn0 big1_seq; first by done.
+              move => j2 /andP [_ ARRj2].
+                by rewrite /service_at /scheduled_at SCHED. }
+          }                    
+          { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=.
+            rewrite leq_sum //.
+            move => t' /andP [/andP [LT GT] _].
+            apply/sum_seq_gt0P.
+            case SCHED: (sched t') => [j1 | ]; last first.
+            { exfalso.
+              move: LT; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
+              { subst t'.
+                feed (H_no_quiet_time t1.+1); first by apply/andP; split.
+                move: SCHED => /eqP SCHED.
+                apply: H_no_quiet_time.
+                  by apply idle_time_implies_quiet_time_at_the_next_time_instant.
+              }
+              { feed (H_no_quiet_time t').  by apply/andP; split; last rewrite ltnW.
+                apply: H_no_quiet_time.
+                intros j_hp IN HP ARR.
+                apply contraT; intros NOTCOMP.
+                destruct (scheduled_at sched j_hp t') eqn:SCHEDhp;
+                  first by move: SCHEDhp => /eqP SCHEDhp; rewrite SCHED in SCHEDhp.
+                apply negbT in SCHEDhp.
+                feed (H_work_conserving j_hp t' IN);
+                  first by repeat (apply/andP; split); first by apply ltnW.
+                move: H_work_conserving => [j_other /eqP SCHEDother].
+                  by rewrite SCHED in SCHEDother.
+              }              
+            }
+            { exists j1; split.
+              - unfold arrivals_between.
+                apply arrived_between_implies_in_arrivals with job_arrival; try done.
+                unfold jobs_come_from_arrival_sequence in *.
+                apply H_jobs_come_from_arrival_sequence with t'.
+                unfold scheduled_at . rewrite SCHED. by done.
+                unfold arrived_between; apply/andP; split; first by done.
+                unfold jobs_must_arrive_to_execute in *.
+                move: SCHED => /eqP SCHED.
+                apply H_jobs_must_arrive_to_execute in SCHED.
+                unfold has_arrived in SCHED.
+                  by apply leq_ltn_trans with t'.
+              -
+                  by rewrite /service_at /scheduled_at SCHED lt0b. }
+          } 
+        Qed.
+
+      End QuietTimeAndServiceOfJobs.
+
       (* In this section, we show that the length of any busy interval
          is bounded, as long as there is enough supply to accomodate
          the workload of tasks with higher or equal priority. *)
@@ -528,7 +668,7 @@ Module BusyIntervalJLFP.
              
               (* Assume that there is no quiet time in the interval (t1, t1 + delta]. *)
               Hypothesis H_no_quiet_time:
-                forall t, t1 < t <= t1 + delta -> ~ quiet_time t.
+                forall t, t1 < t <= t1 + delta -> ~ quiet_time t.                
 
               (* Since the interval is always non-quiet, the processor is always busy
                  with tasks of higher-or-equal priority or some lower priority job which was scheduled,
@@ -537,84 +677,21 @@ Module BusyIntervalJLFP.
               Lemma busy_interval_has_uninterrupted_service: 
                 delta <= priority_inversion_bound + hp_service t1 (t1 + delta).
               Proof.
-                clear H_workload_is_bounded.
                 move: H_is_busy_prefix => [H_strictly_larger [H_quiet [_ EXj]]].
-                                destruct (delta <= priority_inversion_bound) eqn:KLEΔ.
+                destruct (delta <= priority_inversion_bound) eqn:KLEΔ.
                 { by apply leq_trans with priority_inversion_bound; last rewrite leq_addr. }
-                apply negbT in KLEΔ; rewrite -ltnNge in KLEΔ.
-                have Lemma1:
-                  forall t delta P,
-                    \sum_(j <- arrivals_between t (t + delta) | P j)
-                     service_during sched j t (t + delta) <= delta.
-                { clear KLEΔ H_no_quiet_time H_delta_positive delta.
-                  intros.
-                  have EQ: \sum_(t <= x < t + delta) 1 = delta.
-                  { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t]addn0 subnDl subn0. }
-                  rewrite -{3}EQ; clear EQ.
-                  rewrite exchange_big //=.
-                  rewrite leq_sum //.
-                  move => t' _.
-                  case SCHED: (sched t') => [j1 | ]; simpl.
-                  { case ARR: (j1 \in arrivals_between t (t + delta)).
-                    { rewrite (big_rem j1) //=; simpl.
-                      rewrite /service_at /scheduled_at SCHED; simpl.
-                      rewrite -[1]addn0 leq_add //.
-                      - case (P j1); last by done.
-                          by case (Some j1 == Some j1).
-                      - rewrite leqn0 big1_seq; first by done.
-                        move => j2 /andP [_ ARRj2].
-                        apply/eqP; rewrite eqb0.
-                        apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
-                        inversion CONTR; subst j2; clear CONTR.
-                        rewrite rem_filter in ARRj2; last first.
-                        eapply arrivals_uniq; eauto 2.
-                        move: ARRj2; rewrite mem_filter; move => /andP [/negP CONTR _].
-                          by apply: CONTR. }
-                    { apply leq_trans with 0; last by done.
-                      rewrite leqn0 big1_seq; first by done.
-                      move => j2 /andP [_ ARRj2].
-                      apply/eqP; rewrite eqb0.
-                      rewrite /scheduled_at SCHED.
-                      apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
-                      inversion CONTR; clear CONTR.
-                        by subst j2; rewrite ARR in ARRj2.
-                    }
-                  }                    
-                  { apply leq_trans with 0; last by done.
-                    rewrite leqn0 big1_seq; first by done.
-                    move => j2 /andP [_ ARRj2].
-                      by rewrite /service_at /scheduled_at SCHED.
-                  }
-                }
-                have AbsLemma1:
-                  forall P F rs,
-                    \sum_(r <- rs | P r) F r =
-                    \sum_(r <- rs) F r - \sum_(r <- rs | ~~ P r) F r.
-                { clear.
-                  intros.
-                  induction rs; first by rewrite !big_nil subn0.
-                  rewrite !big_cons !IHrs; clear IHrs.
-                  case (P a); simpl; last by rewrite subnDl.
-                  rewrite addnBA; first by done.
-                  rewrite big_mkcond leq_sum //.
-                  intros t _.
-                    by case (P t).
-                }
-                apply leq_trans with (
-                  cumulative_priority_inversion j t1 (t1 + delta) + hp_service t1 (t1 + delta)); last first.
-                {
-                  rewrite leq_add2r.
+                apply negbT in KLEΔ; rewrite -ltnNge in KLEΔ. 
+                apply leq_trans with (cumulative_priority_inversion j t1 (t1 + delta) + hp_service t1 (t1 + delta)); last first.
+                { rewrite leq_add2r.
                   destruct (t1 + delta <= t_busy.+1) eqn:NEQ.
-                  {
-                    apply H_priority_inversion_is_bounded in H_is_busy_prefix.
+                  { apply H_priority_inversion_is_bounded in H_is_busy_prefix.
                     apply leq_trans with (cumulative_priority_inversion j t1 t_busy.+1); last by done.
                     unfold cumulative_priority_inversion.
                     rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + delta)) //=.
                     rewrite leq_addr //.
                     by rewrite leq_addr.
                   }
-                  {
-                    apply H_priority_inversion_is_bounded.
+                  { apply H_priority_inversion_is_bounded.
                     apply negbT in NEQ. rewrite -ltnNge in NEQ.
                     repeat split; try done.
                     - by rewrite -addn1 leq_add2l.
@@ -626,31 +703,8 @@ Module BusyIntervalJLFP.
                   }
                 }
                 unfold hp_service, service_of_higher_or_equal_priority_jobs, service_of_jobs.
-                have EQ:
-                    \sum_(j0 <- arrivals_between t1 (t1 + delta) | higher_eq_priority j0 j)
-                     service_during sched j0 t1 (t1 + delta)  =
-                    \sum_(j0 <- arrivals_between 0 (t1 + delta) | higher_eq_priority j0 j)
-                     service_during sched j0 t1 (t1 + delta).
-                {
-                  rewrite /arrivals_between.
-                  rewrite [in X in _ = X](job_arrived_between_cat _ _ t1); [ | | rewrite leq_addr]; try done.
-                  rewrite big_cat //=.
-                  rewrite -{1}[\sum_(j0 <- jobs_arrived_between _ _  (t1 + delta) | _)
-                             service_during sched j0 t1 (t1 + delta)]add0n.
-                  apply/eqP. rewrite eqn_add2r eq_sym exchange_big //=.
-                  rewrite big1_seq //.
-                  move => t /andP [_ NEQ]; rewrite mem_iota in NEQ.
-                  rewrite big1_seq //.
-                  move => jhp /andP [HP ARR].
-                  apply/eqP; rewrite eqb0.
-                  apply completed_implies_not_scheduled with job_cost; first by done.
-                  apply completion_monotonic with t1; [ | move: NEQ => /andP [T1 _] | ]; try done.
-                  apply H_quiet; try done.
-                  - eapply in_arrivals_implies_arrived; eauto 2.
-                  - eapply in_arrivals_implies_arrived_before; eauto 2.
-                }
-                rewrite EQ; clear EQ.
-                rewrite AbsLemma1. 
+                rewrite jobs_receive_no_service_after_quiet_time //. 
+                rewrite sum_pred_diff. 
                 rewrite addnBA; last first.
                 { rewrite big_mkcond //= leq_sum //.
                     by intros j' _; case (higher_eq_priority j' j). }
@@ -704,90 +758,9 @@ Module BusyIntervalJLFP.
                   rewrite leqn0 big1_seq; first by done.
                   move => j1 /andP [_ ARRj1].
                   rewrite /service_at /scheduled_at SCHED.
-                    by case (higher_eq_priority j1 j). }
-                have EQ:
-                  \sum_(r <- arrivals_between 0 (t1 + delta))
-                   service_during sched r t1 (t1 + delta) = delta.
-                {
-                  have EQ: \sum_(t1 <= x < t1 + delta) 1 = delta.
-                  { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t1]addn0 subnDl subn0. }
-                  rewrite -{3}EQ exchange_big //=. clear EQ.
-                  apply/eqP; rewrite eqn_leq; apply/andP; split.
-                  { rewrite leq_sum //.
-                    move => t' _.
-                    case SCHED: (sched t') => [j1 | ]; simpl.
-                    { case ARR: (j1 \in arrivals_between 0 (t1 + delta)).
-                      { rewrite (big_rem j1) //=; simpl.
-                        rewrite /service_at /scheduled_at SCHED; simpl.
-                        rewrite -[1]addn0 leq_add //.
-                        - by case (Some j1 == Some j1).
-                        - rewrite leqn0 big1_seq; first by done.
-                          move => j2 /andP [_ ARRj2].
-                          apply/eqP; rewrite eqb0.
-                          apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
-                          inversion CONTR; subst j2; clear CONTR.
-                          rewrite rem_filter in ARRj2; last first.
-                          eapply arrivals_uniq; eauto 2.
-                          move: ARRj2; rewrite mem_filter; move => /andP [/negP CONTR _].
-                            by apply: CONTR. }
-                      { apply leq_trans with 0; last by done.
-                        rewrite leqn0 big1_seq; first by done.
-                        move => j2 /andP [_ ARRj2].
-                        apply/eqP; rewrite eqb0.
-                        rewrite /scheduled_at SCHED.
-                        apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
-                        inversion CONTR; clear CONTR.
-                          by subst j2; rewrite ARR in ARRj2. } }                    
-                    { apply leq_trans with 0; last by done.
-                      rewrite leqn0 big1_seq; first by done.
-                      move => j2 /andP [_ ARRj2].
-                        by rewrite /service_at /scheduled_at SCHED. }
-                  }                    
-                  { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=.
-                    rewrite leq_sum //.
-                    move => t' /andP [/andP [LT GT] _].
-                    apply/sum_seq_gt0P.
-                    case SCHED: (sched t') => [j1 | ]; last first.
-                    { exfalso.
-                      move: LT; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
-                      { subst t'.
-                        feed (H_no_quiet_time t1.+1); first by apply/andP; split.
-                        move: SCHED => /eqP SCHED.
-                        apply: H_no_quiet_time.
-                          by apply idle_time_implies_quiet_time_at_the_next_time_instant.
-                      }
-                      {
-                        feed (H_no_quiet_time t') .  by apply/andP; split; last rewrite ltnW.
-                        apply: H_no_quiet_time.
-                        intros j_hp IN HP ARR.
-                        apply contraT; intros NOTCOMP.
-                        destruct (scheduled_at sched j_hp t') eqn:SCHEDhp;
-                          first by move: SCHEDhp => /eqP SCHEDhp; rewrite SCHED in SCHEDhp.
-                        apply negbT in SCHEDhp.
-                        feed (H_work_conserving j_hp t' IN);
-                          first by repeat (apply/andP; split); first by apply ltnW.
-                        move: H_work_conserving => [j_other /eqP SCHEDother].
-                          by rewrite SCHED in SCHEDother.
-                      }              
-                    }
-                    { exists j1; split.
-                      - unfold arrivals_between.
-                        apply arrived_between_implies_in_arrivals with job_arrival; try done.
-                        unfold jobs_come_from_arrival_sequence in *.
-                        apply H_jobs_come_from_arrival_sequence with t'.
-                        unfold scheduled_at . rewrite SCHED. by done.
-                        unfold arrived_between; apply/andP; split; first by done.
-                        unfold jobs_must_arrive_to_execute in *.
-                        move: SCHED => /eqP SCHED.
-                        apply H_jobs_must_arrive_to_execute in SCHED.
-                        unfold has_arrived in SCHED.
-                          by apply leq_ltn_trans with t'.
-                      -
-                          by rewrite /service_at /scheduled_at SCHED lt0b. }
-                  } 
-                } 
-                rewrite EQ; clear EQ.
-                  by rewrite leq_addr.
+                    by case (higher_eq_priority j1 j).
+                }
+                  by rewrite no_idle_time_within_non_quiet_time_interval // leq_addr.
               Qed.
 
               (* Moreover, the fact that the interval is not quiet also implies

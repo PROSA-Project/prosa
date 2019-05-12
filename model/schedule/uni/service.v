@@ -310,9 +310,9 @@ Module Service.
       } 
     Qed.
     
-    (* Last, we prove that overall service of jobs at each time instant is at most 1. *)
+    (* We prove that the overall service of jobs at each time instant is at most 1. *)
     Lemma service_of_jobs_le_1:
-      forall t1 t2 t P,
+      forall (t1 t2 t: time) (P: Job -> bool),
         \sum_(j <- arrivals_between t1 t2 | P j) service_at sched j t <= 1.
     Proof.
       intros t1 t2 t P.
@@ -347,6 +347,23 @@ Module Service.
         move => j' /andP [_ ARRj'].
           by rewrite /service_at /scheduled_at SCHED.
       }
+    Qed.
+
+    (* We prove that the overall service of jobs within 
+       some time interval [t, t + Δ) is at most Δ. *)
+    Lemma total_service_of_jobs_le_delta:  
+      forall (t Δ: time) (P: Job -> bool),
+        \sum_(j <- arrivals_between t (t + Δ) | P j)
+         service_during sched j t (t + Δ) <= Δ.
+    Proof.
+      intros.
+      have EQ: \sum_(t <= x < t + Δ) 1 = Δ.
+      { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t]addn0 subnDl subn0. } 
+      rewrite -{3}EQ; clear EQ.
+      rewrite exchange_big //=.
+      rewrite leq_sum //.
+      move => t' _.
+        by apply service_of_jobs_le_1.
     Qed.
     
     (* In this section, we introduce a connection between the cumulative 
