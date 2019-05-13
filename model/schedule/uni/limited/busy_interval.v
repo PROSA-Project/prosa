@@ -970,6 +970,44 @@ Module BusyIntervalJLFP.
           Qed.
           
         End BusyIntervalFromWorkloadBound.
+
+        (* If we know that the workload is bounded, we can also use the
+           busy interval to infer a response-time bound. *)
+        Section ResponseTimeBoundFromBusyInterval.
+
+          (* Let priority_inversion_bound be a constant that bounds the length of a priority inversion. *)
+          Variable priority_inversion_bound: time.
+          Hypothesis H_priority_inversion_is_bounded:
+            is_priority_inversion_bounded_by priority_inversion_bound.
+
+          (* Assume that for some positive delta, the sum of requested workload at
+             time (t1 + delta) and priority inversion is bounded by delta (i.e., the supply). *)
+          Variable delta: time.
+          Hypothesis H_delta_positive: delta > 0.
+          Hypothesis H_workload_is_bounded:
+            forall t, priority_inversion_bound + hp_workload t (t + delta) <= delta.
+
+          (* Then, job j must complete by (job_arrival j + delta). *)
+          Lemma busy_interval_bounds_response_time:
+            job_completed_by j (job_arrival j + delta).
+          Proof.
+            have BUSY := exists_busy_interval priority_inversion_bound _ delta.
+            destruct (job_cost j == 0) eqn:COST.
+            {  move: COST => /eqP COST.
+              rewrite /job_completed_by /completed_by eqn_leq.
+              apply/andP; split;
+                first by apply cumulative_service_le_job_cost.
+              by rewrite COST.
+            }
+            apply negbT in COST; rewrite -lt0n in COST.
+            feed_n 4 BUSY; try by done.
+            move: BUSY => [t1 [t2 [/andP [GE1 LT2] [GE2 BUSY]]]].
+            apply completion_monotonic with (t := t2); try (by done);
+              first by apply leq_trans with (n := t1 + delta); [| by rewrite leq_add2r].
+            apply job_completes_within_busy_interval with (t1 := t1); try by done.
+          Qed.
+
+        End ResponseTimeBoundFromBusyInterval.
        
       End BoundingBusyInterval.
 

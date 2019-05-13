@@ -4,7 +4,7 @@ Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.p
 Require Import rt.model.schedule.uni.schedule_of_task rt.model.schedule.uni.workload
                rt.model.schedule.uni.schedulability rt.model.schedule.uni.response_time
                rt.model.schedule.uni.service.
-Require Import rt.model.schedule.uni.basic.busy_interval rt.model.schedule.uni.basic.platform.
+Require Import rt.model.schedule.uni.limited.busy_interval rt.model.schedule.uni.basic.platform.
 Require Import rt.analysis.uni.basic.workload_bound_fp.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
@@ -12,7 +12,7 @@ Module ResponseTimeAnalysisFP.
 
   Import Job ScheduleOfTask SporadicTaskset Priority ResponseTime
          TaskArrival ArrivalBounds WorkloadBoundFP Platform Schedulability
-         BusyInterval Workload Service.
+         BusyIntervalJLFP Workload Service.
 
   (* In this section, we prove that any fixed point in the RTA for uniprocessor
      FP scheduling is a response-time bound. *)
@@ -98,15 +98,45 @@ Module ResponseTimeAnalysisFP.
     Proof.
       rename H_response_time_is_fixed_point into FIX.
       intros j ARRj JOBtsk.
+      move: (posnP (job_cost j)) => [Z|POS].
+      { rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
+        - by apply H_completed_jobs_dont_execute. 
+        - by rewrite Z. 
+      }
       set prio := FP_to_JLFP job_task higher_eq_priority.
-      apply busy_interval_bounds_response_time with (arr_seq0 := arr_seq)
-                                            (higher_eq_priority0 := prio); try (by done).
-        - by intros x; apply H_priority_is_reflexive.
-        - by intros x z y; apply H_priority_is_transitive.
-      apply fp_workload_bound_holds with (job_arrival0 := job_arrival) (task_cost0 := task_cost)
-        (task_period0 := task_period) (task_deadline0 := task_deadline)
-        (job_deadline0 := job_deadline) (ts0 := ts); try (by done).
-      by rewrite JOBtsk.
+      apply busy_interval_bounds_response_time with
+          (arr_seq0 := arr_seq)
+          (higher_eq_priority0 := prio)
+          (priority_inversion_bound := 0); try by done.
+      - by intros x; apply H_priority_is_reflexive.
+      { intros t1 t2 BUSY.
+        rewrite /cumulative_priority_inversion /is_priority_inversion leqn0.
+        rewrite big_nat big1 //; move => t NEQ.
+        destruct (sched t) eqn:SCHED; last by done.
+        have HP := pending_hp_job_exists
+                     job_arrival job_cost arr_seq _ sched
+                     prio _ ARRj _ _ _ _ _ _ BUSY _ NEQ.
+        feed_n 5 HP; try done.
+        { by intros x; apply H_priority_is_reflexive. }
+        move: HP => [jhp [ARRjhp [PEND PRIO]]].
+        apply/eqP; rewrite eqb0 Bool.negb_involutive.
+        rewrite /prio /FP_to_JLFP.
+        eapply H_priority_is_transitive with (job_task jhp); last by done.
+        destruct (s == jhp) eqn:EQ; first by move: EQ => /eqP EQ; subst s. 
+        apply H_respects_fp_policy with t; try done.
+        { apply/andP; split; first by done.
+          rewrite /scheduled_at SCHED.
+          apply/negP. intros SNEQ; move: SNEQ => /eqP SNEQ.
+          move: EQ => /negP EQ; apply EQ.
+            by inversion SNEQ.
+        } 
+        { by rewrite /scheduled_at SCHED. }
+      }
+      apply fp_workload_bound_holds with
+          (job_arrival0 := job_arrival) (task_cost0 := task_cost)
+          (task_period0 := task_period) (task_deadline0 := task_deadline)
+          (job_deadline0 := job_deadline) (ts0 := ts); try (by done).
+        by rewrite JOBtsk.
     Qed.
 
   End ResponseTimeBound.
