@@ -13,4 +13,5 @@ _CoqProject
 *.orig
 */.#*
 #*#
+.#*
 *.DS_Store
