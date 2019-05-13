@@ -10,7 +10,7 @@ Section State.
 
   Definition processor_state := option Job.
 
-  Instance pstate_instance : ProcessorState Job (option Job) :=
+  Global Instance pstate_instance : ProcessorState Job (option Job) :=
     {
       scheduled_in j s := s == Some j;
       service_in j s   := s == Some j
