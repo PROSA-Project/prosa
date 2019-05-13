@@ -722,16 +722,10 @@ Module SustainabilitySingleCostProperties.
         rewrite addnC -addnBA; last by rewrite SAME.
         apply leq_trans with (n := R - (Sw j (arr_j + r) (arr_j + R) + 0));
           last by rewrite leq_sub2l // leq_add2l; apply eq_leq; apply/eqP; rewrite subn_eq0 SAME.
-        rewrite addn0 subh3 //; last first.
-        {
-          apply leq_trans with (n := Sw j arr_j (arr_j+R)); last by apply cumulative_service_le_delta.
-          by apply extend_sum; first by apply leq_addr. 
-        }
-        {
-          apply leq_trans with (n := r + \sum_(arr_j+r<=t<arr_j+R) 1);
-            first by rewrite leq_add2l; apply leq_sum; intros t _; apply leq_b1.
+        rewrite addn0 subh3 //.
+        apply leq_trans with (n := r + \sum_(arr_j+r<=t<arr_j+R) 1);
+          first by rewrite leq_add2l; apply leq_sum; intros t _; apply leq_b1.
           by simpl_sum_const; rewrite subnDl subnKC.
-        }
       Qed.      
 
     End ComparingResponseTimes.

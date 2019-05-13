@@ -660,7 +660,7 @@ Module InterferenceBoundEDFJitter.
               have FST := interference_bound_edf_j_fst_is_job_of_tsk_k.
               destruct FST as [FSTtask [_ [LEdl _]]].            
               have LTr := interference_bound_edf_response_time_bound_of_j_fst_after_interval.
-              apply subh3; last by apply LEdk.
+              apply subh3.
               apply leq_trans with (n := job_interference job_arrival job_cost job_jitter sched j_i
                                        j_fst t1 (job_arrival j_fst + J_k + R_k) + (D_k - R_k - J_k)).
               {
@@ -1051,8 +1051,8 @@ Module InterferenceBoundEDFJitter.
               interference_caused_by j_fst t1 t2 <= D_i %% p_k - (D_k - R_k - J_k).
             Proof.
               intro LE.
-              apply subh3; last by apply interference_bound_edf_remainder_ge_slack.
-              by rewrite -subndiv_eq_mod; apply subh3; last by apply leq_trunc_div.
+              apply subh3.
+              by rewrite -subndiv_eq_mod; apply subh3.
             Qed.
               
             (* Next, we prove that interference caused by j_fst is bounded by the length

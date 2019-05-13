@@ -220,12 +220,12 @@ Module ResponseTimeAnalysisEDF.
         Lemma bertogna_edf_specific_bound_holds :
           x tsk_other <= edf_specific_bound tsk_other R_other.
         Proof.
-          apply interference_bound_edf_bounds_interference with (job_deadline0 := job_deadline)
-                                                   (arr_seq0 := arr_seq) (ts0 := ts); try (by done);
-            [ by apply bertogna_edf_tsk_other_in_ts
-            | by apply H_tasks_miss_no_deadlines
-            | by apply H_tasks_miss_no_deadlines | ].
-          by ins; apply H_all_previous_jobs_completed_on_time with (tsk_other := tsk_other). 
+          apply interference_bound_edf_bounds_interference with
+              (job_deadline0 := job_deadline)
+              (arr_seq0 := arr_seq) (ts0 := ts); try (by done);
+            [ by apply bertogna_edf_tsk_other_in_ts | 
+                by apply H_tasks_miss_no_deadlines | ].
+            by ins; apply H_all_previous_jobs_completed_on_time with (tsk_other := tsk_other). 
         Qed.
         
       End LemmasAboutInterferingTasks.
@@ -998,7 +998,7 @@ Module ResponseTimeAnalysisEDF.
         unfold interference_bound_edf, interference_bound_generic in LTmin.
         rewrite minnAC in LTmin; apply min_lt_same in LTmin.
         have BASICBOUND := bertogna_edf_workload_bounds_interference R' j BEFOREok tsk_other R_other HP.
-        have EDFBOUND := (bertogna_edf_specific_bound_holds tsk' R' INbounds j ARRj JOBtsk BEFOREok tsk_other R_other HP).
+        have EDFBOUND := (bertogna_edf_specific_bound_holds tsk' R' j ARRj JOBtsk BEFOREok tsk_other R_other HP).
         unfold minn in LTmin; clear -LTmin HP BASICBOUND EDFBOUND tsk; desf.
         {
           by apply (leq_ltn_trans BASICBOUND) in LTmin; rewrite ltnn in LTmin. 

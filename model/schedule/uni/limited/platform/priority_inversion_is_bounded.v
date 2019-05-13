@@ -125,7 +125,7 @@ Module PriorityInversionIsBounded.
         exists j_hp.
         have HP: higher_eq_priority j_hp j.
         { apply contraT; move => /negP NOTHP; exfalso.
-          have TEMP: t <= t2.-1; first by rewrite -subn1 subh3 //; [by rewrite addn1 | by apply leq_ltn_trans with t1].
+          have TEMP: t <= t2.-1; first by rewrite -subn1 subh3 // addn1.
           rewrite leq_eqVlt in TEMP; move: TEMP => /orP [/eqP EQUALt2m1 | LTt2m1];
                                                     first rewrite leq_eqVlt in GEt; first move: GEt => /orP [/eqP EQUALt1 | LARGERt1].
           { subst t; clear LEt.
@@ -444,7 +444,7 @@ Module PriorityInversionIsBounded.
           }
           apply SCHEDc; apply/andP; split.
           - rewrite -addn1 in NEQ.
-            apply subh3_ext in NEQ.
+            apply subh3 in NEQ.
               by rewrite subn1 in NEQ.
           - apply leq_trans with t1. by apply leq_pred. by done.
         }

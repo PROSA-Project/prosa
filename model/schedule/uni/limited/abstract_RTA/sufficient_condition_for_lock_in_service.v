@@ -156,7 +156,7 @@ Module AbstractRTALockInService.
             by apply/andP; split; last (apply negbT in NEQ; apply ltnW; rewrite ltnNge).
         } 
         { move: H_total_workload_is_bounded => BOUND.
-          apply subh3_ext in BOUND.
+          apply subh3 in BOUND.
           apply leq_trans with (delta - cumul_interference j t1 (t1 + delta)); first by done.
           apply leq_trans with (service_during sched j t1 (t1 + delta)).
           { rewrite -{1}[delta](interference_is_complement_to_schedule t1) //. 

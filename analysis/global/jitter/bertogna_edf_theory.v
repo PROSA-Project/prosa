@@ -228,9 +228,7 @@ Module ResponseTimeAnalysisEDFJitter.
           by apply interference_bound_edf_bounds_interference with (job_deadline0 := job_deadline)
                    (arr_seq0 := arr_seq) (ts0 := ts); try (by done);
           [  by apply bertogna_edf_tsk_other_in_ts
-          |  by apply H_tasks_miss_no_deadlines
-          |  by apply leq_trans with (n := task_jitter tsk + R);
-               [apply leq_addl | by apply H_tasks_miss_no_deadlines]
+          |  by apply H_tasks_miss_no_deadlines         
           |  by ins; apply H_all_previous_jobs_completed_on_time with (tsk_other := tsk_other)].
         Qed.
         
@@ -849,7 +847,7 @@ Module ResponseTimeAnalysisEDFJitter.
         unfold interference_bound_edf, interference_bound_generic in LTmin.
         rewrite minnAC in LTmin; apply min_lt_same in LTmin.
         specialize (BASICBOUND tsk' R' j ARRj JOBtsk BEFOREok tsk_other R_other HP).
-        specialize (EDFBOUND tsk' R' INbounds j ARRj JOBtsk BEFOREok tsk_other R_other HP).
+        specialize (EDFBOUND tsk' R' j ARRj JOBtsk BEFOREok tsk_other R_other HP).
         unfold minn in LTmin; clear -LTmin HP BASICBOUND EDFBOUND tsk; desf.
         {
           by apply (leq_ltn_trans BASICBOUND) in LTmin; rewrite ltnn in LTmin. 
