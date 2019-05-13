@@ -17,5 +17,7 @@ Section State.
     }.
   Proof.
       by move=> j [j'->|].
-  Qed.
+  Defined.
 End State.
+
+
