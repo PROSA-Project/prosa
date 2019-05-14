@@ -1,4 +1,5 @@
-From rt.behavior.schedule Require Export schedule service_facts.
+From rt.behavior.schedule Require Export schedule.
+From rt.behavior.facts Require Export service.
 
 (** In this file, we establish basic facts about job completions. *)
 
