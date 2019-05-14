@@ -110,6 +110,28 @@ Section ExtraLemmas.
     }
   Qed.
 
+  (* Trivial identity: any sum of zeros is zero. *)
+  Lemma sum0 m n:
+    \sum_(m <= i < n) 0 = 0.
+  Proof.
+    by rewrite big_const_nat iter_addn mul0n addn0 //.
+  Qed.
+
+  (* A sum of natural numbers equals zero iff all terms are zero. *)
+  Lemma big_nat_eq0 m n F:
+    \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
+  Proof.
+    split.
+    - rewrite /index_iota => /eqP.
+      rewrite -sum_nat_eq0_nat => /allP ZERO i.
+      rewrite -mem_index_iota /index_iota => IN.
+      by apply/eqP; apply ZERO.
+    - move=> ZERO.
+      have ->: \sum_(m <= i < n) F i = \sum_(m <= i < n) 0
+        by apply eq_big_nat => //.
+      by apply sum0.
+  Qed.
+
   Lemma leq_pred_sum:
     forall (T:eqType) (r: seq T) (P1 P2: pred T) F, 
       (forall i, P1 i -> P2 i) ->
