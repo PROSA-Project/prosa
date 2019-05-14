@@ -1,5 +1,6 @@
+From mathcomp Require Import ssrnat ssrbool fintype.
 From rt.behavior.schedule Require Export schedule.
-From rt.util Require Import tactics step_function.
+From rt.util Require Import tactics step_function sum.
 
 (** In this file, we establish basic facts about the service received by
     jobs. *)
@@ -95,21 +96,21 @@ Section Composition.
       t1 <= t2 ->
       (service_during sched j t1 t2) + (service_at sched j t2)
       = service_during sched j t1 t2.+1.
-    Proof.
-      move=> t1 t2 t1t2.
-      rewrite -(service_during_cat t1 t2 t2.+1); last by rewrite /(_ && _) ifT //.
-      rewrite service_during_instant //.
-    Qed.
+  Proof.
+    move=> t1 t2 t1t2.
+    rewrite -(service_during_cat t1 t2 t2.+1); last by rewrite /(_ && _) ifT //.
+    rewrite service_during_instant //.
+  Qed.
 
-    (* And hence also for [service]. *)
-    Corollary service_last_plus_before:
-      forall t,
-        (service sched j t) + (service_at sched j t)
-        = service sched j t.+1.
-    Proof.
-      move=> t.
-      rewrite /service. rewrite -service_during_last_plus_before //.
-    Qed.
+  (* And hence also for [service]. *)
+  Corollary service_last_plus_before:
+    forall t,
+      (service sched j t) + (service_at sched j t)
+      = service sched j t.+1.
+  Proof.
+    move=> t.
+    rewrite /service. rewrite -service_during_last_plus_before //.
+  Qed.
 
   (* Finally, we deconstruct the service received during an interval [t1, t3)
      into the service at a midpoint t2 and the service in the intervals before
@@ -276,29 +277,58 @@ Section RelationToScheduled.
     apply: service_at_implies_scheduled_at.
   Qed.
 
-  (* Similarly, any job that receives some service during an interval must be
-     scheduled during at some point during the interval... *)
-  Lemma cumulative_service_implies_scheduled:
+  (* We observe that a job receives cumulative service during some interval iff
+     it receives services at some specific time in the interval. *)
+  Lemma service_during_service_at:
+    forall t1 t2,
+      service_during sched j t1 t2 > 0
+      <->
+      exists t,
+        t1 <= t < t2 /\
+        service_at sched j t > 0.
+  Proof.
+    split.
+    {
+      move=> NONZERO.
+      case (boolP([exists t: 'I_t2,
+                      (t >= t1) && (service_at sched j t > 0)])) => [EX | ALL].
+      - move: EX => /existsP [x /andP [GE SERV]].
+        exists x; split; auto.
+      - rewrite negb_exists in ALL; move: ALL => /forallP ALL.
+        rewrite /service_during big_nat_cond in NONZERO.
+        rewrite big1 ?ltn0 // in NONZERO => i.
+        rewrite andbT; move => /andP [GT LT].
+        specialize (ALL (Ordinal LT)); simpl in ALL.
+        rewrite GT andTb -eqn0Ngt in ALL.
+        apply /eqP => //.
+    }
+    {
+      move=> [t [TT SERVICE]].
+      case (boolP (0 < service_during sched j t1 t2)) => // NZ.
+      exfalso.
+      rewrite -eqn0Ngt in NZ. move/eqP: NZ.
+      rewrite big_nat_eq0 => IS_ZERO.
+      have NO_SERVICE := IS_ZERO t TT.
+      apply lt0n_neq0 in SERVICE.
+        by move/neqP in SERVICE; contradiction.
+    }
+  Qed.
+
+  (* Thus, any job that receives some service during an interval must be
+     scheduled at some point during the interval... *)
+  Corollary cumulative_service_implies_scheduled:
     forall t1 t2,
       service_during sched j t1 t2 > 0 ->
       exists t,
         t1 <= t < t2 /\
         scheduled_at sched j t.
   Proof.
-    move=> t1 t2 NONZERO.
-    case (boolP([exists t: 'I_t2,
-                    (t >= t1) && (service_at sched j t > 0)])) => [EX | ALL].
-    - move: EX => /existsP [x /andP [GE SERV]].
-      exists x; split; auto.
-      by apply: service_at_implies_scheduled_at => //.
-    - rewrite negb_exists in ALL; move: ALL => /forallP ALL.
-      rewrite /service_during big_nat_cond in NONZERO.
-      rewrite big1 ?ltn0 // in NONZERO => i.
-      rewrite andbT; move => /andP [GT LT].
-      specialize (ALL (Ordinal LT)); simpl in ALL.
-      rewrite GT andTb -eqn0Ngt in ALL.
-      apply /eqP => //.
-  Qed.
+    move=> t1 t2.
+    rewrite service_during_service_at.
+    move=> [t' [TIMES SERVICED]].
+    exists t'; split => //.
+    by apply: service_at_implies_scheduled_at.
+ Qed.
 
   (* ...which implies that any job with positive cumulative service must have
      been scheduled at some point. *)
@@ -309,8 +339,76 @@ Section RelationToScheduled.
     move=> t2.
     rewrite /service => NONZERO.
     have EX_SCHED := cumulative_service_implies_scheduled 0 t2 NONZERO.
-    by inversion EX_SCHED as [t [TIMES SCHED_AT]]; exists t; split.
+    by move: EX_SCHED => [t [TIMES SCHED_AT]]; exists t; split.
   Qed.
+
+  Section GuaranteedService.
+    (* If we can assume that a scheduled job always receives service, we can
+       further prove the converse. *)
+
+    (* Assume j always receives some positive service. *)
+    Hypothesis H_scheduled_implies_serviced:
+      forall s, scheduled_in j s -> service_in j s > 0.
+
+    (* In other words, not being scheduled is equivalent to receiving zero
+       service. *)
+    Lemma no_service_not_scheduled:
+      forall t,
+        ~~ scheduled_at sched j t <-> service_at sched j t = 0.
+    Proof.
+      move=> t. rewrite /scheduled_at /service_at.
+      split => [NOT_SCHED | NO_SERVICE].
+      - apply negbTE in NOT_SCHED.
+        by rewrite service_implies_scheduled //.
+      - apply (contra (H_scheduled_implies_serviced (sched t))).
+        by rewrite -eqn0Ngt; apply /eqP => //.
+    Qed.
+
+    (* Then, if a job does not receive any service during an interval, it
+       is not scheduled. *)
+    Lemma no_service_during_implies_not_scheduled:
+      forall t1 t2,
+        service_during sched j t1 t2 = 0 ->
+        forall t,
+          t1 <= t < t2 -> ~~ scheduled_at sched j t.
+    Proof.
+      move=> t1 t2 ZERO_SUM t /andP [GT_t1 LT_t2].
+      rewrite no_service_not_scheduled.
+      move: ZERO_SUM.
+      rewrite /service_during big_nat_eq0 => IS_ZERO.
+      by apply (IS_ZERO t); apply /andP; split => //.
+    Qed.
+
+    (* If a job is scheduled at some point in an interval, it receivees
+       positive cumulative service during the interval... *)
+    Lemma scheduled_implies_cumulative_service:
+      forall t1 t2,
+        (exists t,
+            t1 <= t < t2 /\
+            scheduled_at sched j t) ->
+        service_during sched j t1 t2 > 0.
+    Proof.
+      move=> t1 t2 [t' [TIMES SCHED]].
+      rewrite service_during_service_at.
+      exists t'; split => //.
+      move: SCHED. rewrite /scheduled_at /service_at.
+        by apply (H_scheduled_implies_serviced (sched t')).
+    Qed.
+
+    (* ...which again applies to total service, too. *)
+    Corollary scheduled_implies_nonzero_service:
+      forall t,
+        (exists t',
+            t' < t /\
+            scheduled_at sched j t') ->
+        service sched j t > 0.
+    Proof.
+      move=> t [t' [TT SCHED]].
+      rewrite /service. apply scheduled_implies_cumulative_service.
+      exists t'; split => //.
+    Qed.
+
+  End GuaranteedService.
 
   Section AfterArrival.
     (* Futhermore, if we know that jobs are not released early, then we can
@@ -326,7 +424,8 @@ Section RelationToScheduled.
        have been scheduled some time since its arrival and before time [t]. *)
     Lemma positive_service_implies_scheduled_since_arrival:
       forall t,
-        service sched j t > 0 -> exists t', (job_arrival j <= t' < t /\ scheduled_at sched j t').
+        service sched j t > 0 ->
+        exists t', (job_arrival j <= t' < t /\ scheduled_at sched j t').
     Proof.
       move=> t SERVICE.
       have EX_SCHED := positive_service_implies_scheduled_before t SERVICE.
@@ -365,7 +464,7 @@ Section RelationToScheduled.
       move=> t1 t2 EARLY.
       rewrite /service_during.
       have ZERO_SUM: \sum_(t1 <= t < t2) service_at sched j t = \sum_(t1 <= t < t2) 0;
-        last by rewrite ZERO_SUM big_const_nat iter_addn mul0n addn0 //.
+        last by rewrite ZERO_SUM sum0.
       rewrite big_nat_cond [in RHS]big_nat_cond.
       apply: eq_bigr => i /andP [TIMES _]. move: TIMES => /andP [le_t1_i lt_i_t2].
       apply (service_before_job_arrival_zero i).
@@ -397,4 +496,89 @@ Section RelationToScheduled.
 
   End AfterArrival.
 
+  Section TimesWithSameService.
+    (** In this section, we prove some lemmas about time instants with same
+        service. *)
+
+    (* Consider any time instants t1 and t2... *)
+    Variable t1 t2: instant.
+
+    (* ...where t1 is no later than t2... *)
+    Hypothesis H_t1_le_t2: t1 <= t2.
+
+    (* ...and where job j has received the same amount of service. *)
+    Hypothesis H_same_service: service sched j t1 = service sched j t2.
+
+    (* First, we observe that this means that the job receives no service
+       during [t1, t2)... *)
+    Lemma constant_service_implies_no_service_during:
+      service_during sched j t1 t2 = 0.
+    Proof.
+      move: H_same_service.
+      rewrite -(service_cat sched j t1 t2) // -[service sched j t1 in LHS]addn0 => /eqP.
+      by rewrite eqn_add2l => /eqP //.
+    Qed.
+
+    (* ...which of course implies that it does not receive service at any
+       point, either. *)
+    Lemma constant_service_implies_not_scheduled:
+      forall t,
+        t1 <= t < t2 -> service_at sched j t = 0.
+    Proof.
+      move=> t /andP [GE_t1 LT_t2].
+      move: constant_service_implies_no_service_during.
+      rewrite /service_during big_nat_eq0 => IS_ZERO.
+      apply IS_ZERO. apply /andP; split => //.
+    Qed.
+
+    (* We show that job j receives service at some point t < t1 iff j receives
+       service at some point t' < t2. *)
+    Lemma same_service_implies_serviced_at_earlier_times:
+      [exists t: 'I_t1, service_at sched j t > 0] =
+      [exists t': 'I_t2, service_at sched j t' > 0].
+    Proof.
+      apply /idP/idP => /existsP [t SERVICED].
+      {
+        have LE: t < t2
+          by apply: (leq_trans _ H_t1_le_t2) => //.
+        by apply /existsP; exists (Ordinal LE).
+      }
+      {
+        case (boolP (t < t1)) => LE.
+        - by apply /existsP; exists (Ordinal LE).
+        - exfalso.
+          have TIMES: t1 <= t < t2
+            by apply /andP; split => //; rewrite leqNgt //.
+          have NO_SERVICE := constant_service_implies_not_scheduled t TIMES.
+          by rewrite NO_SERVICE in SERVICED.
+      }
+    Qed.
+
+    (* Then, under the assumption that scheduled jobs receives service,
+       we can translate this into a claim about scheduled_at. *)
+
+    (* Assume j always receives some positive service. *)
+    Hypothesis H_scheduled_implies_serviced:
+      forall s, scheduled_in j s -> service_in j s > 0.
+
+    (* We show that job j is scheduled at some point t < t1 iff j is scheduled
+       at some point t' < t2.  *)
+    Lemma same_service_implies_scheduled_at_earlier_times:
+      [exists t: 'I_t1, scheduled_at sched j t] =
+      [exists t': 'I_t2, scheduled_at sched j t'].
+    Proof.
+      have CONV: forall B, [exists b: 'I_B, scheduled_at sched j b]
+                           = [exists b: 'I_B, service_at sched j b > 0].
+      {
+        move=> B. apply/idP/idP => /existsP [b P]; apply /existsP; exists b.
+        - by move: P; rewrite /scheduled_at /service_at;
+            apply (H_scheduled_implies_serviced (sched b)).
+        - by apply service_at_implies_scheduled_at.
+      }
+      rewrite !CONV.
+      apply same_service_implies_serviced_at_earlier_times.
+    Qed.
+  End TimesWithSameService.
+
 End RelationToScheduled.
+
