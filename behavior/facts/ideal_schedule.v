@@ -8,15 +8,21 @@ Section OnlyOneJobScheduled.
      model. *)
   Context {Job: JobType}.
 
-  (* Consider an ideal schedule... *) Variable sched: schedule (processor_state
-  Job).
+  (* Consider an ideal schedule... *)
+  Variable sched: schedule (processor_state Job).
 
-  (* ...and two given jobs that are to be scheduled. *) Variable j1 j2: Job.
+  (* ...and two given jobs that are to be scheduled. *)
+  Variable j1 j2: Job.
 
   (* At any time t, if both j1 and j2 are scheduled, then they must be the same
-     job. *) Lemma only_one_job_scheduled: forall t, scheduled_at sched j1 t ->
-     scheduled_at sched j2 t -> j1 = j2.  Proof.  rewrite /scheduled_at
-     /scheduled_in /pstate_instance => t /eqP -> /eqP EQ.  by inversion EQ.
-     Qed.
+     job. *)
+  Lemma only_one_job_scheduled:
+    forall t,
+      scheduled_at sched j1 t ->
+      scheduled_at sched j2 t ->
+      j1 = j2.
+  Proof.
+    by rewrite /scheduled_at=>t/eqP->/eqP[->].
+  Qed.
 
 End OnlyOneJobScheduled.

@@ -1,7 +1,6 @@
 From rt.behavior.arrival Require Export arrival_sequence.
 From rt.util Require Import all.
 
-
 (* In this section, we establish useful facts about arrival sequence prefixes. *)
 Section ArrivalSequencePrefix.
 
@@ -121,7 +120,7 @@ Section ArrivalSequencePrefix.
         intros j t IN.
         Fail suff: arrived_between j 0 t by rewrite /arrived_between /=.
         have: arrived_between j 0 t by apply in_arrivals_implies_arrived_between.
-        by rewrite /arrived_between /=.
+          by rewrite /arrived_between /=.
       Qed.
 
       (* Similarly, we prove that if a job from the arrival sequence arrives

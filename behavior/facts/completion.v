@@ -3,7 +3,6 @@ From rt.behavior.facts Require Export service.
 
 (** In this file, we establish basic facts about job completions. *)
 
-
 Section CompletionFacts.
   (* Consider any job type,...*)
   Context {Job: JobType}.
@@ -28,7 +27,7 @@ Section CompletionFacts.
   Proof.
     move => t t' LE. rewrite /completed_by /service => COMP.
     apply leq_trans with (n := service_during sched j 0 t); auto.
-    by apply service_monotonic.
+      by apply service_monotonic.
   Qed.
 
   (* We observe that being incomplete is the same as not having received
@@ -66,7 +65,7 @@ Section CompletionFacts.
     move=> t SERVICE.
     rewrite subn_gt0 /service /service_during.
     apply leq_trans with (\sum_(0 <= t0 < t.+1) service_at sched j t0);
-      last by rewrite H_completed_jobs.
+    last by rewrite H_completed_jobs.
       by rewrite big_nat_recr //= -addn1 leq_add2l.
   Qed.
 
@@ -176,8 +175,8 @@ Section ServiceAndCompletionFacts.
         move /eqP in EQ.
         rewrite /completed_by EQ //.
       * apply leq_trans with (n := service sched j n + 1).
-        - rewrite leq_add2l /service_at //.
-        - rewrite -(ltnS (service sched j n + 1) _) -(addn1 (job_cost j)) ltn_add2r //.
+      - rewrite leq_add2l /service_at //.
+      - rewrite -(ltnS (service sched j n + 1) _) -(addn1 (job_cost j)) ltn_add2r //.
     Qed.
 
     (* We show that the service received by job j in any interval is no larger
@@ -208,7 +207,7 @@ Section ServiceAndCompletionFacts.
         move=> t SCHED.
         rewrite /pending.
         apply /andP; split;
-          first by apply: H_jobs_must_arrive => //.
+        first by apply: H_jobs_must_arrive => //.
         apply: scheduled_implies_not_completed => //.
       Qed.
 
@@ -225,13 +224,13 @@ Section ServiceAndCompletionFacts.
     move=> t.
     rewrite incomplete_is_positive_remaining_cost => REMCOST.
     rewrite -less_service_than_cost_is_incomplete -(service_cat sched j t);
-      last by rewrite -addnBA //; apply: leq_addr.
+    last by rewrite -addnBA //; apply: leq_addr.
     apply leq_ltn_trans with (n := service sched j t + remaining_cost sched j t - 1).
     - by rewrite -!addnBA //; rewrite leq_add2l; apply cumulative_service_le_delta; exact.
     - rewrite service_cost_invariant // -subn_gt0 subKn //.
       move: REMCOST. rewrite /remaining_cost subn_gt0 => SERVICE.
-      by apply leq_ltn_trans with (n := service sched j t).
- Qed.
+        by apply leq_ltn_trans with (n := service sched j t).
+  Qed.
 
 End ServiceAndCompletionFacts.
 
@@ -275,8 +274,8 @@ Section PositiveCost.
     move=> t COMPLETE.
     have POSITIVE_SERVICE: 0 < service sched j t
       by apply leq_trans with (n := job_cost j); auto.
-    by apply: positive_service_implies_scheduled_since_arrival; assumption.
- Qed.
+      by apply: positive_service_implies_scheduled_since_arrival; assumption.
+  Qed.
 
   (* We also prove that the job is pending at the moment of its arrival. *)
   Lemma job_pending_at_arrival:
@@ -284,7 +283,7 @@ Section PositiveCost.
   Proof.
     rewrite /pending.
     apply/andP; split;
-      first by rewrite /has_arrived //.
+    first by rewrite /has_arrived //.
     rewrite /completed_by no_service_before_arrival // -ltnNge //.
   Qed.
 
