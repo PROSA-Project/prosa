@@ -22,10 +22,6 @@ Class ProcessorState (Job : eqType) (State : Type) :=
 (* A schedule maps an instant to a processor state *)
 Definition schedule (PState : Type) := instant -> PState.
 
-(* Definition of a generic type of parameter relating jobs to a discrete cost *)
-
-Class JobCost (J : JobType) := job_cost : J -> nat.
-
 Section Schedule.
   Context {Job : eqType} {PState : Type}.
   Context `{ProcessorState Job PState}.
