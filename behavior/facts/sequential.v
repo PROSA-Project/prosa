@@ -1,4 +1,4 @@
-From rt.behavior Require Export sequential.
+From rt.behavior Require Export schedule.sequential.
 
 Section ExecutionOrder.
   (* Consider any type of job associated with any type of tasks... *)
@@ -39,4 +39,3 @@ Section ExecutionOrder.
   Qed.
 
 End ExecutionOrder.
-
