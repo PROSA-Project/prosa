@@ -5,7 +5,7 @@ From rt.util Require Import notation.
 (* Definitions and properties of job arrival sequences. *)
 
 (* We begin by defining a job arrival sequence. *)
-Section ArrivalSequenceDef.
+Section ArrivalSequence.
 
   (* Given any job type with decidable equality, ... *)
   Variable Job: JobType.
@@ -13,7 +13,7 @@ Section ArrivalSequenceDef.
   (* ..., an arrival sequence is a mapping from any time to a (finite) sequence of jobs. *)
   Definition arrival_sequence := instant -> seq Job.
 
-End ArrivalSequenceDef.
+End ArrivalSequence.
 
 (* Next, we define properties of jobs in a given arrival sequence. *)
 Section JobProperties.
