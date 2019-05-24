@@ -39,8 +39,8 @@ End JobProperties.
 
 Class JobArrival (J : JobType) := job_arrival : J -> instant.
 
-(* Next, we define properties of a valid arrival sequence. *)
-Section ArrivalSequenceProperties.
+(* Next, we define valid arrival sequences. *)
+Section ValidArrivalSequence.
 
   (* Assume that job arrival times are known. *)
   Context {Job: JobType}.
@@ -59,10 +59,15 @@ Section ArrivalSequenceProperties.
      jobs at any given time. *)
   Definition arrival_sequence_is_a_set := forall t, uniq (jobs_arriving_at arr_seq t).
 
-End ArrivalSequenceProperties.
+  (* We say that the arrival sequence is valid iff it is a set and arrival times
+     are consistent *)
+  Definition arrival_sequence_is_valid :=
+    arrival_times_are_consistent /\ arrival_sequence_is_a_set.
+
+End ValidArrivalSequence.
 
 (* Next, we define properties of job arrival times. *)
-Section PropertiesOfArrivalTime.
+Section ArrivalTimeProperties.
 
   (* Assume that job arrival times are known. *)
   Context {Job: JobType}.
@@ -83,7 +88,7 @@ Section PropertiesOfArrivalTime.
      some time t with t1 <= t < t2. *)
   Definition arrived_between (t1 t2 : instant) := t1 <= job_arrival j < t2.
 
-End PropertiesOfArrivalTime.
+End ArrivalTimeProperties.
 
 (* In this section, we define arrival sequence prefixes, which are useful to
    define (computable) properties over sets of jobs in the schedule. *)
