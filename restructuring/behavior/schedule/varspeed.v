@@ -1,4 +1,4 @@
-From rt.behavior.schedule Require Export schedule.
+From rt.restructuring.behavior.schedule Require Export schedule.
 
 (** Next, let us define a schedule with variable execution speed. *)
 Section State.

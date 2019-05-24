@@ -1,4 +1,4 @@
-From rt.behavior Require Export schedule task.
+From rt.restructuring.behavior Require Export schedule task.
 
 Section PropertyOfSequentiality.
   (* Consider any type of job associated with any type of tasks... *)

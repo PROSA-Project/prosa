@@ -1,4 +1,4 @@
-From rt.behavior.schedule Require Import schedule ideal.
+From rt.restructuring.behavior.schedule Require Import schedule ideal.
 (* Note: we do not re-export the basic definitions to avoid littering the global
    namespace with type class instances. *)
 

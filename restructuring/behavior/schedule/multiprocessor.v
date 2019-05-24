@@ -1,5 +1,5 @@
 From mathcomp Require Export fintype.
-From rt.behavior.schedule Require Export schedule.
+From rt.restructuring.behavior.schedule Require Export schedule.
 
 Section Schedule.
 

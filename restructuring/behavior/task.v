@@ -1,5 +1,5 @@
 From mathcomp Require Export ssrbool.
-From rt.behavior Require Export job.
+From rt.restructuring.behavior Require Export job.
 
 (* Throughout the library we assume that jobs have decidable equality *)
 

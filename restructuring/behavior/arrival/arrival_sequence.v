@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect seq ssrnat ssrbool bigop eqtype ssrfun.
-From rt.behavior Require Export time job.
+From rt.restructuring.behavior Require Export time job.
 From rt.util Require Import notation.
 
 (* Definitions and properties of job arrival sequences. *)
