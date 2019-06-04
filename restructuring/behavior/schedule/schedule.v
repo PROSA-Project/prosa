@@ -85,7 +85,7 @@ Section Schedule.
     (* We say that the schedule is valid iff
        - jobs come from some arrival sequence
        - a job can only be scheduled if it has arrived and is not completed yet *)
-    Definition schedule_is_valid (arr_seq : arrival_sequence Job) :=
+    Definition valid_schedule (arr_seq : arrival_sequence Job) :=
       jobs_come_from_arrival_sequence arr_seq /\
       jobs_must_arrive_to_execute /\
       completed_jobs_dont_execute.

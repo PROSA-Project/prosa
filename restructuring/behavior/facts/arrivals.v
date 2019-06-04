@@ -78,8 +78,8 @@ Section ArrivalSequencePrefix.
     Section ArrivalTimes.
 
       (* Assume that job arrival times are consistent. *)
-      Hypothesis H_arrival_times_are_consistent:
-        arrival_times_are_consistent arr_seq.
+      Hypothesis H_consistent_arrival_times:
+        consistent_arrival_times arr_seq.
 
       (* First, we prove that if a job belongs to the prefix
          (jobs_arrived_before t), then it arrives in the arrival sequence. *)
@@ -88,7 +88,7 @@ Section ArrivalSequencePrefix.
           j \in jobs_arrived_between t1 t2 ->
                 arrives_in arr_seq j.
       Proof.
-        rename H_arrival_times_are_consistent into CONS.
+        rename H_consistent_arrival_times into CONS.
         intros j t1 t2 IN.
         apply mem_bigcat_nat_exists in IN.
         move: IN => [arr [IN _]].
@@ -103,7 +103,7 @@ Section ArrivalSequencePrefix.
           j \in jobs_arrived_between t1 t2 ->
                 arrived_between j t1 t2.
       Proof.
-        rename H_arrival_times_are_consistent into CONS.
+        rename H_consistent_arrival_times into CONS.
         intros j t1 t2 IN.
         apply mem_bigcat_nat_exists in IN.
         move: IN => [t0 [IN /= LT]].
@@ -131,7 +131,7 @@ Section ArrivalSequencePrefix.
           arrived_between j t1 t2 ->
           j \in jobs_arrived_between t1 t2.
       Proof.
-        rename H_arrival_times_are_consistent into CONS.
+        rename H_consistent_arrival_times into CONS.
         move => j t1 t2 [a_j ARRj] BEFORE.
         have SAME := ARRj; apply CONS in SAME; subst a_j.
           by apply mem_bigcat_nat with (j := (job_arrival j)).
@@ -140,10 +140,10 @@ Section ArrivalSequencePrefix.
       (* Next, we prove that if the arrival sequence doesn't contain duplicate
          jobs, the same applies for any of its prefixes. *)
       Lemma arrivals_uniq :
-        arrival_sequence_is_a_set arr_seq ->
+        arrival_sequence_uniq arr_seq ->
         forall t1 t2, uniq (jobs_arrived_between t1 t2).
       Proof.
-        rename H_arrival_times_are_consistent into CONS.
+        rename H_consistent_arrival_times into CONS.
         unfold jobs_arrived_up_to; intros SET t1 t2.
         apply bigcat_nat_uniq; first by done.
         intros x t t' IN1 IN2.

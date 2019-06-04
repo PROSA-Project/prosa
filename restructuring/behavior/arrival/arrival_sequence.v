@@ -51,18 +51,18 @@ Section ValidArrivalSequence.
 
   (* We say that arrival times are consistent if any job that arrives in the
      sequence has the corresponding arrival time. *)
-  Definition arrival_times_are_consistent :=
+  Definition consistent_arrival_times :=
     forall j t,
       arrives_at arr_seq j t -> job_arrival j = t.
 
   (* We say that the arrival sequence is a set iff it doesn't contain duplicate
      jobs at any given time. *)
-  Definition arrival_sequence_is_a_set := forall t, uniq (jobs_arriving_at arr_seq t).
+  Definition arrival_sequence_uniq := forall t, uniq (jobs_arriving_at arr_seq t).
 
   (* We say that the arrival sequence is valid iff it is a set and arrival times
      are consistent *)
-  Definition arrival_sequence_is_valid :=
-    arrival_times_are_consistent /\ arrival_sequence_is_a_set.
+  Definition valid_arrival_sequence :=
+    consistent_arrival_times /\ arrival_sequence_uniq.
 
 End ValidArrivalSequence.
 
