@@ -101,8 +101,8 @@ Section CompletionFacts.
     rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
     rewrite /service /service_during big_nat_recr // /= -addn1.
     apply leq_add.
-    * by rewrite -/(service_during sched j 0 t) -/(completed_by sched j t).
-    * by rewrite /service_at; apply: H_scheduled_implies_serviced; rewrite -/(scheduled_at _ _ _).
+    - by rewrite -/(service_during sched j 0 t) -/(completed_by sched j t).
+    - by rewrite /service_at; apply: H_scheduled_implies_serviced; rewrite -/(scheduled_at _ _ _).
   Qed.
 
   (* ... and that a scheduled job cannot be completed. *)
@@ -170,13 +170,13 @@ Section ServiceAndCompletionFacts.
       elim => [| n IH]; first by rewrite service0 //.
       rewrite leq_eqVlt in IH.
       case/orP: IH => [EQ | LT]; rewrite -service_last_plus_before.
-      * rewrite not_scheduled_implies_no_service; first by rewrite addn0 //.
+      - rewrite not_scheduled_implies_no_service; first by rewrite addn0 //.
         apply: completed_implies_not_scheduled; auto. unfold unit_service_proc_model in H_unit_service.
         move /eqP in EQ.
         rewrite /completed_by EQ //.
-      * apply leq_trans with (n := service sched j n + 1).
-      - rewrite leq_add2l /service_at //.
-      - rewrite -(ltnS (service sched j n + 1) _) -(addn1 (job_cost j)) ltn_add2r //.
+      - apply leq_trans with (n := service sched j n + 1).
+        + rewrite leq_add2l /service_at //.
+        + rewrite -(ltnS (service sched j n + 1) _) -(addn1 (job_cost j)) ltn_add2r //.
     Qed.
 
     (* We show that the service received by job j in any interval is no larger
