@@ -78,11 +78,55 @@ Section TDMADefinitions.
   (* We define the function returning the slot offset for each task:
          i.e., the distance between the start of the TDMA cycle and
          the start of the task time slot *)
-  Definition Task_slot_offset (tsk : Task) :=
+  Definition task_slot_offset (tsk : Task) :=
     \sum_(prev_task <- ts | slot_order prev_task tsk && (prev_task != tsk)) task_time_slot prev_task.
 
   (* The following function tests whether a task is in its time slot at instant t *)
-  Definition Task_in_time_slot (tsk : Task) (t:instant):=
-    ((t + TDMA_cycle - (Task_slot_offset tsk)%% TDMA_cycle) %% TDMA_cycle)
+  Definition task_in_time_slot (tsk : Task) (t:instant):=
+    ((t + TDMA_cycle - (task_slot_offset tsk)%% TDMA_cycle) %% TDMA_cycle)
     < (task_time_slot tsk).
 End TDMADefinitions.
+
+Section TDMASchedule.
+
+  Context {Task : TaskType} {Job : JobType}.
+
+  Context `{JobArrival Job} `{JobCost Job} `{JobTask Job Task}.
+
+  (* Consider any job arrival sequence... *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (* ..., any uniprocessor ideal schedule ... *)
+  Variable sched : schedule (option Job).
+
+  (* ... and any sporadic task set. *)
+  Variable ts: {set Task}.
+
+  Context `{TDMAPolicy Task}.
+
+  (* In order to characterize a TDMA policy, we first define whether a job is executing its TDMA slot at time t. *)
+  Definition job_in_time_slot (job:Job) (t:instant):=
+    task_in_time_slot ts (job_task job) t.
+
+  (* We say that a TDMA policy is respected by the schedule iff
+       1. when a job is scheduled at time t, then the corresponding task
+          is also in its own time slot... *)
+  Definition sched_implies_in_slot j t:=
+    scheduled_at sched j t -> job_in_time_slot j t.
+
+  (* 2. when a job is backlogged at time t,the corresponding task
+          isn't in its own time slot or another previous job of the same task is scheduled *)
+  Definition backlogged_implies_not_in_slot_or_other_job_sched j t:=
+    backlogged sched j t ->
+    ~ job_in_time_slot j t \/
+    exists j_other, arrives_in arr_seq j_other/\
+                    job_arrival j_other < job_arrival j/\
+                    job_task j = job_task j_other/\
+                    scheduled_at sched j_other t.
+
+  Definition respects_TDMA_policy:=
+    forall (j:Job) (t:instant),
+      arrives_in arr_seq j ->
+      sched_implies_in_slot j t /\
+      backlogged_implies_not_in_slot_or_other_job_sched j t.
+End TDMASchedule.
