@@ -120,8 +120,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
         intros j ? ? ARR LE SERV NCOMP.
         move: NCOMP => /negP NCOMP; exfalso; apply: NCOMP.
         move: (H_completed_jobs_dont_execute j t) => SERV2.
-        apply completion_monotonic with t; try done.
-          by rewrite /completed_by eqn_leq; apply/andP; split.
+          by apply completion_monotonic with t.
       Qed.
 
     End FullyPreemptiveModel. 

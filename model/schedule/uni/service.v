@@ -407,16 +407,14 @@ Module Service.
           rewrite (big_rem j) ?H1 //= in H.
           move: H => /eqP; rewrite addn_eq0; move => /andP [CZ _].
           unfold job_completed_by, completed_by.
-          rewrite eqn_leq; apply/andP; split. 
-          - by done.
-          - by move: CZ => /eqP CZ; rewrite CZ. 
+            by move: CZ => /eqP CZ; rewrite CZ. 
         }
         { unfold workload_of_jobs, service_of_jobs in H.
-          unfold job_completed_by, completed_by; apply/eqP.
+          unfold job_completed_by, completed_by.
           rewrite /service /service_during (@big_cat_nat _ _ _ t1) //=.
           rewrite (cumulative_service_before_job_arrival_zero
                      job_arrival sched _ j 0 t1) // add0n.
-          apply sum_majorant_eqn with (F1 := fun j => service_during sched j t1 t_compl)
+          rewrite <- sum_majorant_eqn with (F1 := fun j => service_during sched j t1 t_compl)
                                       (xs := arrivals_between t1 t2) (P := P); try done.
             by intros; apply cumulative_service_le_job_cost.
         } 
@@ -454,9 +452,11 @@ Module Service.
           rewrite big_geq; last by done.
           rewrite /workload_of_jobs big1_seq //. 
           move => j /andP [Pj ARR].
-          move: H (H _ ARR Pj) => _ /eqP H.
-          rewrite -H.
-            by apply F.
+          move: H (H _ ARR Pj) => _ H.
+          rewrite <- F with (j := j) (t := t_compl); try done.
+          apply/eqP; rewrite eqn_leq; apply/andP; split.
+          - by apply H.
+          - by eauto 2.
         }
         apply/eqP; rewrite eqn_leq; apply/andP; split; first last.
         { by apply service_of_jobs_le_workload. }
@@ -464,15 +464,12 @@ Module Service.
           rewrite big_seq_cond [X in _ <= X]big_seq_cond.
           rewrite leq_sum //.
           move => j /andP [ARR Pj].
-          move: H (H _ ARR Pj) => _ /eqP H.
+          move: H (H _ ARR Pj) => _ H.
           rewrite -[service_during _ _ _ _ ]add0n.
           rewrite -(F j t1); try done.
           rewrite -(big_cat_nat) //=; last first.
-          { move: EQ =>/negP /negP; rewrite -ltnNge; move => EQ.
-              by apply ltnW.
-          }
-          unfold service, service_during in H.
-            by rewrite H.
+          move: EQ =>/negP /negP; rewrite -ltnNge; move => EQ.
+            by apply ltnW.
         }
       Qed.
 

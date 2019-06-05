@@ -258,12 +258,7 @@ Module ResponseTimeAnalysisFP.
           rewrite subh1; last by rewrite [R]REC // leq_addr.
           rewrite -addnBA // subnn addn0.
           move: (NOTCOMP) => /negP NOTCOMP'.
-          rewrite neq_ltn in NOTCOMP.
-          move: NOTCOMP => /orP [LT | BUG]; last first.
-          {
-            exfalso; rewrite ltnNge in BUG; move: BUG => /negP BUG; apply BUG.
-            by apply cumulative_service_le_job_cost.
-          }
+          rewrite -ltnNge in NOTCOMP.
           apply leq_ltn_trans with (n := (\sum_(job_arrival j <= t < job_arrival j + R)
                                        backlogged job_arrival job_cost sched j t) +
                                      service sched j (job_arrival j + R)); last first.
@@ -369,14 +364,10 @@ Module ResponseTimeAnalysisFP.
           intros j0 ARR0 INTERF.
           exploit (HAS (job_task j0));
             [by rewrite FROMTS | by done | move => [R0 INbounds]].
-          apply completion_monotonic with (t := job_arrival j0 + R0); first by done.
-          {
-            rewrite leq_add2l; apply leq_trans with (n := task_deadline (job_task j0));
+          apply completion_monotonic with (t := job_arrival j0 + R0).
+          - rewrite leq_add2l; apply leq_trans with (n := task_deadline (job_task j0));
               [by apply NOMISS' | by apply CONSTR; rewrite FROMTS].
-          }
-          {
-            by apply (RESP (job_task j0)).
-          }
+          - by apply (RESP (job_task j0)).
         Qed.
 
         (* 3) Next, we prove that the sum of the interference of each task is equal to the
@@ -656,8 +647,7 @@ Module ResponseTimeAnalysisFP.
                   }
                   {
                     intros j0 JOB0 ARR0 LT0.
-                    apply completion_monotonic with (t0 := job_arrival j0 + R);
-                      [by done | | by apply BEFOREok].
+                    apply completion_monotonic with (t0 := job_arrival j0 + R); [| by apply BEFOREok].
                     by rewrite leq_add2l; apply leq_trans with (n := task_deadline tsk);
                       last by apply CONSTR; rewrite -JOBtsk FROMTS.
                   }
@@ -1028,7 +1018,7 @@ Module ResponseTimeAnalysisFP.
                           arrives_in arr_seq j0 ->
                           job_task j0 = tsk ->
                           job_arrival j0 < job_arrival j ->
-                          service sched j0 (job_arrival j0 + R) == job_cost j0).
+                          service sched j0 (job_arrival j0 + R) >= job_cost j0).
       {
         by ins; apply IH; try (by done); rewrite ltn_add2r.
       } clear IH.

@@ -55,7 +55,7 @@ Module UniprocessorSchedule.
 
         (* Next, we say that job j has completed by time t if it received enough
            service in the interval [0, t). *)
-        Definition completed_by (t: time) := service t == job_cost j.
+        Definition completed_by (t: time) := job_cost j <= service t.
 
         (* Job j is pending at time t iff it has arrived but has not yet completed. *)
         Definition pending (t: time) := has_arrived job_arrival j t && ~~ completed_by t.
@@ -189,7 +189,7 @@ Module UniprocessorSchedule.
             last by simpl_sum_const; rewrite addKn leqnn.
           by apply leq_sum; intros t0 _; apply leq_b1.
         Qed.
-
+            
         (* Assume that completed jobs do not execute. *)
         Hypothesis H_completed_jobs:
           completed_jobs_dont_execute job_cost sched.
@@ -212,10 +212,6 @@ Module UniprocessorSchedule.
 
       (* Next, we prove properties related to job completion. *)
       Section Completion.
-
-        (* Assume that completed jobs do not execute. *)
-        Hypothesis H_completed_jobs:
-          completed_jobs_dont_execute job_cost sched.
               
         (* Let j be any job that is to be scheduled. *)
         Variable j: Job.
@@ -227,11 +223,15 @@ Module UniprocessorSchedule.
             completed_by job_cost sched j t ->
             completed_by job_cost sched j t'.
         Proof. 
-          unfold completed_by; move => t t' LE /eqP COMPt.
-          rewrite eqn_leq; apply/andP; split; first by apply H_completed_jobs.
-          rewrite- COMPt; by apply extend_sum.
-        Qed.
+          unfold completed_by; move => t t' LE COMPt.
+          apply leq_trans with (service sched j t); first by done.
+            by rewrite /service /service_during [in X in _ <= X](@big_cat_nat _ _ _ t) //= leq_addr.
+        Qed.          
 
+        (* Assume that completed jobs do not execute. *)
+        Hypothesis H_completed_jobs:
+          completed_jobs_dont_execute job_cost sched.
+        
         (* We also prove that a completed job cannot be scheduled. *)
         Lemma completed_implies_not_scheduled :
           forall t,
@@ -243,10 +243,10 @@ Module UniprocessorSchedule.
           intros t COMPLETED.
           apply/negP; red; intro SCHED.
           have BUG := COMP j t.+1.
-          rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
+          rewrite leqNgt in BUG; move: BUG => /negP BUG; apply: BUG.
           unfold service, service_during; rewrite big_nat_recr // /= -addn1.
-          apply leq_add; first by move: COMPLETED => /eqP <-.
-          by rewrite /service_at SCHED.
+          apply leq_add; first by done. 
+            by rewrite /service_at SCHED.
         Qed.
 
         (* ... and that a scheduled job cannot be completed. *)
@@ -255,21 +255,10 @@ Module UniprocessorSchedule.
             scheduled_at sched j t ->
             ~~ completed_by job_cost sched j t.
         Proof.
-          rename H_completed_jobs into COMP.
-          unfold completed_jobs_dont_execute in COMP.
           move => t SCHED.
-          rewrite /completed_by neq_ltn.
-          apply /orP; left.
-          apply leq_trans with (service sched j t.+1); last by done.
-          rewrite /service /service_during.            
-          rewrite [in X in _ < X] (@big_cat_nat _ _ _ t) //=.
-          rewrite -[\sum_(0 <= t0 < t) service_at sched j t0]addn0;
-          rewrite -addnA ltn_add2l addnC addn0 big_nat1.
-          rewrite lt0n; apply/neqP; intros CONT;
-          move: CONT => /eqP CONT; rewrite eqb0 in CONT;
-          move: CONT => /neqP CONT; apply CONT;
-          unfold scheduled_at in SCHED; move: SCHED => /eqP SCHED;
-          by rewrite SCHED.
+          rewrite /completed_by; apply/negP; intros CONTR.
+          apply completed_implies_not_scheduled in CONTR.
+            by move: CONTR => /negP CONTR; apply: CONTR.
         Qed.
         
         (* Next, we show that the service received by job j in any interval
@@ -298,26 +287,16 @@ Module UniprocessorSchedule.
           intros t GT0.
           unfold remaining_cost, completed_by in *.
           have COSTGT0: job_cost j > 0.
-          {
-            apply contraT; rewrite -eqn0Ngt.
+          { apply contraT; rewrite -eqn0Ngt.
             move => /eqP EQ0.
-            rewrite EQ0 in GT0.
-            move: GT0 => /eqP GT0.
-            exfalso; apply: GT0; apply /eqP.
-            rewrite eqn_leq.
-            apply /andP; split; last by done.
-            by rewrite -EQ0.
+              by rewrite EQ0 -ltnNge ltn0 in GT0.
           }
-          rewrite neq_ltn; apply /orP; left.
+          rewrite -ltnNge.
           rewrite /service /service_during.
           set delta := (X in (t + X - 1)).
           have NONZERO: delta > 0.
-          {
-            rewrite neq_ltn in GT0.
-            move: GT0 => /orP [LTcost | GTcost]; first by rewrite ltn_subRL addn0.
-            exfalso.
-            rewrite ltnNge in GTcost; move: GTcost => /negP GTcost.
-              by apply GTcost.
+          { rewrite -ltnNge in GT0.
+            by rewrite /delta subn_gt0. 
           }
           rewrite (@big_cat_nat _ _ _ t) //= ?leq_addr //;
             last by rewrite -addnBA; [rewrite leq_addr | done].
@@ -354,45 +333,36 @@ Module UniprocessorSchedule.
           Proof.
             intros t COMPL.
             induction t.
-            {
-              exfalso.
+            { exfalso.
               unfold completed_by, service, service_during in COMPL.
               move: COMPL; rewrite big_geq //; move => /eqP H0.
                 by destruct (job_cost j).
             }
-
             destruct (completed_by job_cost sched j t) eqn:COMPLatt.
-            {
-              feed IHt; first by done.
+            { feed IHt; first by done.
               move: IHt => [t' [JA SCHED]].
               exists t'. split; first apply/andP; first split.
               - by apply H_jobs_must_arrive in SCHED.
               - move: JA => /andP [_ LT]. by apply leq_trans with t.
               - by done.
             }
-            {
-              clear IHt.
-              apply negbT in COMPLatt. unfold completed_by in *.
-              rewrite neq_ltn in COMPLatt; move: COMPLatt => /orP [LT | F]. 
-              {
-                unfold service, service_during in COMPL.
-                rewrite big_nat_recr //= in COMPL.
-                move: COMPL => /eqP COMPL. rewrite -COMPL -addn1 leq_add2l in LT.
-                rewrite lt0b in LT.
-                
-                exists t; split.
-                - by apply/andP; by split; first by apply H_jobs_must_arrive in LT.
-                - by done.
+            { apply negbT in COMPLatt.
+              unfold completed_by in *.
+              rewrite -ltnNge in COMPLatt.
+              unfold service, service_during in COMPL.
+              rewrite big_nat_recr //= in COMPL.
+              have SCHED: scheduled_at sched j t.
+              { rewrite {2}/service_at in COMPL.
+                destruct (scheduled_at sched j t); first by done.
+                rewrite addn0 in COMPL.
+                  by exfalso; move: COMPL; rewrite leqNgt; move => /negP C; apply: C.
               }
-              {
-                exfalso.
-                rewrite ltnNge in F. move: F => /negP F. apply F.
-                apply H_completed_jobs.
-              }
+              exists t. split; first apply/andP; first split; try done.
+                by apply H_jobs_must_arrive in SCHED.
             }
           Qed.
 
-        End JobMustBeScheduled.
+        End JobMustBeScheduled. 
         
       End Completion.
 
@@ -481,9 +451,8 @@ Module UniprocessorSchedule.
           have BUG := COMP j t.+1.
           rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
           unfold service, service_during; rewrite -addn1 big_nat_recr // /=.
-          apply leq_add;
-            first by move: COMPLETED => /eqP COMPLETED; rewrite -COMPLETED.
-          by rewrite /service_at SCHED.
+          apply leq_add; first by done.
+            by rewrite /service_at SCHED.
         Qed.
 
         (* Consider any arrival sequence. *)
@@ -497,7 +466,7 @@ Module UniprocessorSchedule.
         Proof.
           intros ARR POS.
           apply/andP; split; first by rewrite /has_arrived.
-          rewrite neq_ltn; apply/orP; left.
+          rewrite -ltnNge. 
           rewrite /service /service_during (ignore_service_before_arrival); try done.
             by rewrite big_geq; eauto 2.
         Qed.

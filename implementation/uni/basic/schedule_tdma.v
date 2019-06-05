@@ -221,7 +221,7 @@ Module ConcreteSchedulerTDMA.
       rewrite /job_to_schedule.
       apply/eqP; intro FIND.
       apply findP_in_seq in FIND. move:FIND => [IN PEN].
-      by rewrite mem_filter /pending /completed_by -EQ eq_refl andbF andFb in PEN.
+      by rewrite mem_filter /pending /completed_by -EQ leqnn andbF andFb in PEN.
     Qed.
 
   End ImplementationTDMA.

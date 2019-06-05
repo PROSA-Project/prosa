@@ -261,10 +261,7 @@ Module AbstractSeqRTA.
         Proof. 
           move => JA; move: (H_j2_from_tsk) => /eqP TSK2eq.
           move: (posnP (job_cost j2)) => [ZERO|POS].
-          { rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-            - by apply H_completed_jobs_dont_execute.
-            - by rewrite ZERO.
-          }    
+          { by rewrite /is_response_time_bound_of_job /completed_by ZERO. }    
           move: (H_interference_and_workload_consistent_with_sequential_jobs
                    j1 t1 t2 H_j1_arrives H_j1_from_tsk H_j1_cost_positive H_busy_interval) => SWEQ.
           eapply all_jobs_have_completed_equiv_workload_eq_service
@@ -623,9 +620,7 @@ Module AbstractSeqRTA.
           move: (posnP (job_cost j)) => [ZERO|POS].
           { exfalso.
             move: COMPL => /negP COMPL; apply: COMPL.
-            rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-            - by apply H_completed_jobs_dont_execute.
-            - by rewrite ZERO.
+            by rewrite /is_response_time_bound_of_job /completed_by ZERO.
           }            
           set (A := job_arrival j - t1) in *.
           apply leq_trans with

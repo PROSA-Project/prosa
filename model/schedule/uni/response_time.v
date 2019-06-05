@@ -100,15 +100,11 @@ Module ResponseTime.
                H_completed_jobs_dont_execute into EXEC; ins.
         unfold is_response_time_bound_of_task, completed_by,
                completed_jobs_dont_execute in *.
-        apply/eqP; rewrite -leqn0.
-        rewrite <- leq_add2l with (p := job_cost j).
-        move: RT => /eqP RT; rewrite -{1}RT addn0.
-        apply leq_trans with (n := service sched j t'.+1);
-          last by apply EXEC.
-        unfold service, service_during.
-        rewrite -> big_cat_nat with (p := t'.+1) (n := job_arrival j + R);
-          [rewrite leq_add2l /= | by ins | by apply ltnW].
-        by rewrite big_nat_recr // /=; apply leq_addl.
+        apply/eqP; rewrite eqb0; apply/negP; intros CONTR.
+        unfold response_time_bounded_by,is_response_time_bound_of_job in *.
+        eapply completion_monotonic in RT; eauto 2.
+        apply completed_implies_not_scheduled in RT; eauto 2.
+          by move: RT => /negP RT; apply:RT.
       Qed.
 
       (* The same applies for the cumulative service of job j. *)

@@ -187,7 +187,7 @@ Module ResponseTimeAnalysisTDMA.
     Theorem uniprocessor_response_time_bound_TDMA: response_time_bounded_by tsk BOUND.
     Proof.
       intros j arr_seq_j JobTsk.
-      apply completion_monotonic with (t:=job_arrival j + RT j);first exact.
+      apply completion_monotonic with (t:=job_arrival j + RT j); try done. 
       - rewrite leq_add2l /BOUND. 
         apply (response_time_le_WCRT) 
         with (task_cost0:=task_cost) (task_deadline0:=task_deadline)(sched0:=sched)

@@ -292,18 +292,18 @@ Module SuspensionIntervals.
           intros t1 t2.
           apply leq_trans with (n := \sum_(0 <= s < job_cost j)
                             \sum_(t1 <= t < t2 | service sched j t == s) suspended_at j t).
-          {
-            rewrite (exchange_big_dep_nat (fun x => true)) //=.
+          { rewrite (exchange_big_dep_nat (fun x => true)) //=.
             apply leq_sum; intros s _.
             destruct (boolP (suspended_at j s)) as [SUSP | NOTSUSP]; last by done.
             rewrite (big_rem (service sched j s)); first by rewrite eq_refl.
             rewrite mem_index_iota; apply/andP; split; first by done.
             rewrite ltn_neqAle; apply/andP; split;
               last by apply cumulative_service_le_job_cost.
-            by apply suspended_implies_not_completed in SUSP.
+            apply suspended_implies_not_completed in SUSP.
+            rewrite neq_ltn; apply/orP; left.
+              by rewrite ltnNge.
           }
-          {
-            apply leq_sum_nat; move => s /andP [_ LT] _.
+          { apply leq_sum_nat; move => s /andP [_ LT] _.
             destruct (boolP [exists t:'I_t2, (t>=t1)&& (service sched j t==s)]) as [EX|ALL];
               last first.
             {
@@ -413,18 +413,16 @@ Module SuspensionIntervals.
             move: (EARLIER s LTs) => [t' EQ'].
             apply leq_trans with (n := \sum_(0 <= t0 < t | (service sched j t0 == s) &&
                           (b t' <= t0 < b t' + n (service sched j (b t')))) 1); last first.
-            {
-              rewrite big_mkcond [\sum_(_ <= _ < _ | _ == s)_]big_mkcond.
+            { rewrite big_mkcond [\sum_(_ <= _ < _ | _ == s)_]big_mkcond.
               apply leq_sum_nat; move => i /andP [_ LTi] _.
               case EQi: (service sched j i == s); [rewrite andTb | by rewrite andFb].
               case LE: (_ <= _ <= _); last by done.
               rewrite lt0n eqb0 negbK.
               apply suspended_in_suspension_interval with (t := t'); try (by done).
-              rewrite neq_ltn; apply/orP; left.
-              by apply: (leq_ltn_trans _ LTs); apply eq_leq; apply/eqP.
+              rewrite -ltnNge.
+                by apply: (leq_ltn_trans _ LTs); apply eq_leq; apply/eqP.
             }
-            {
-              apply leq_trans with (n := \sum_(b t'<= t0< b t'+ n (service sched j (b t')) |
+            { apply leq_trans with (n := \sum_(b t'<= t0< b t'+ n (service sched j (b t')) |
                                             (0 <= t0 < t) && (service sched j t0 == s)) 1).
               {
                 apply leq_trans with (n := \sum_(b t' <= t0 < b t'
@@ -439,7 +437,7 @@ Module SuspensionIntervals.
                   {
                     apply: (suspended_in_suspension_interval _ _ _ _ t');
                       try (by done); last by apply/andP; split.
-                    rewrite neq_ltn; apply/orP; left.
+                    rewrite -ltnNge.
                     rewrite (same_service_in_suspension_interval _ _ _ _ t') //;
                       first by rewrite EQ'.
                     by apply/andP; split; last by apply ltnW.

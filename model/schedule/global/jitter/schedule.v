@@ -86,8 +86,7 @@ Module ScheduleWithJitter.
           have BUG := COMP j t.+1.
           rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
           unfold service; rewrite -addn1 big_nat_recr // /=.
-          apply leq_add;
-            first by move: COMPLETED => /eqP COMPLETED; rewrite -COMPLETED.
+          apply leq_add; first by done.
           rewrite lt0n; apply/eqP; red; move => /eqP NOSERV.
           rewrite -not_scheduled_no_service in NOSERV.
           by rewrite SCHED in NOSERV.

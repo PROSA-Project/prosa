@@ -214,7 +214,7 @@ Module TaskSetRTA.
       {   
         intros j0 ARR0 LT0 JOB0.
         apply completion_monotonic with (t := job_arrival j0 + R tsk_i);
-          [by done | | by apply BEFOREok; rewrite // -JOBtsk].
+          [ | by apply BEFOREok; rewrite // -JOBtsk].
         by rewrite leq_add2l H_job_deadline_eq_task_deadline // JOB0 JOBtsk.
       }  
       {

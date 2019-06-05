@@ -80,7 +80,7 @@ Module FullyNonPreemptivePlatform.
         apply H_nonpreemptive_sched with ft.
         { by apply ltnW. }
         { by done. } 
-        { rewrite /completed_by neq_ltn; apply/orP; left.
+        { rewrite /completed_by -ltnNge.
           move: NCOMPL; rewrite neq_ltn; move => /orP [LE|GE]; [by done | exfalso].
           move: GE; rewrite ltnNge; move => /negP GE; apply: GE.
             by eauto 2.
@@ -96,7 +96,7 @@ Module FullyNonPreemptivePlatform.
         apply H_nonpreemptive_sched with ft.
         { by rewrite -ltnS. }
         { by done. }
-        { rewrite /completed_by neq_ltn; apply/orP; left.
+        { rewrite /completed_by -ltnNge.
           apply leq_ltn_trans with (service sched j t.+1).  
           { by rewrite /service /service_during big_nat_recr //= leq_addr. }
           { rewrite -addn1.

@@ -257,11 +257,9 @@ Module JitterScheduleService.
             by apply actual_arrivals_between_sub with (t3 := 0) (t4 := t).
           }
           apply leq_sum_seq; rewrite /act /actual_arrivals; intros j0 IN0 HP0.
-          apply eq_leq; symmetry; apply/eqP.
-          have ARRin: arrives_in arr_seq j0.
-            by apply in_actual_arrivals_between_implies_arrived in IN0.
-          apply in_actual_arrivals_implies_arrived_before in IN0.
-          by apply WORK.
+          apply WORK; try done.
+          - by apply in_actual_arrivals_between_implies_arrived in IN0.
+          - by apply in_actual_arrivals_implies_arrived_before in IN0.
         Qed.
 
       End ServiceEqualsWorkload.
@@ -378,9 +376,7 @@ Module JitterScheduleService.
               }
               rewrite /inflated_job_cost /reduction.inflated_job_cost.
               apply negbTE in NEQ; rewrite NEQ.
-              apply eq_leq; symmetry; apply/eqP.
-              apply completion_monotonic with (t := arr_hp + job_deadline j_hp);
-                [by done | | by apply NOMISS].
+              apply completion_monotonic with (t := arr_hp + job_deadline j_hp); last by apply NOMISS. 
               rewrite H_job_deadlines_equal_task_deadlines //.
               apply leq_trans with (n := arr_hp + task_period (job_task j_hp));
                 first by rewrite leq_add2l DL // FROM.
@@ -458,7 +454,7 @@ Module JitterScheduleService.
               apply leq_trans with (n := service sched_susp j_hp (arr_hp + Rhp));
                 last by apply extend_sum.
               apply leq_trans with (n := cost_hp);
-                last by apply eq_leq; symmetry; apply/eqP; apply RESPhp; last by apply/andP; split.
+                last by apply RESPhp; last by apply/andP; split.
               apply leq_trans with (n := inflated_job_cost j_hp);
                 last by rewrite /inflated_job_cost /reduction.inflated_job_cost -[_==_]negbK NEQ.
               apply cumulative_service_le_job_cost.
@@ -507,7 +503,7 @@ Module JitterScheduleService.
               {
                 rewrite /cost_hp leq_subLR.
                 apply leq_trans with (n := service sched_susp j_hp (arr_hp + Rhp));
-                  first by apply eq_leq;symmetry;apply/eqP; apply RESPhp; last by apply/andP; split.
+                  first by apply RESPhp; last by apply/andP; split.
                 rewrite /service /service_during.
                 apply leq_trans with (n := \sum_(arr_j <= t' < arr_hp+Rhp)
                                             1 + service sched_susp j_hp arr_j);
@@ -527,7 +523,7 @@ Module JitterScheduleService.
                 have LEcost: cost_hp <= Rhp.
                 {
                   apply leq_trans with (n := service sched_susp j_hp (arr_hp + Rhp));
-                    first by apply eq_leq;symmetry;apply/eqP;apply RESPhp; last by apply/andP;split.
+                    first by apply RESPhp; last by apply/andP;split.
                  apply leq_trans with (n := \sum_(arr_hp <= t' < arr_hp + Rhp) 1);
                   last by simpl_sum_const; rewrite addKn.
                   rewrite /service /service_during.
@@ -871,8 +867,7 @@ Module JitterScheduleService.
               feed (EQWORKj (t1 + d).+1); first by rewrite ltn_add2l.
               apply EQWORKj.
               intros j0 ARRin0 ARR0 HEP0; specialize (ALL j0 ARRin0 HEP0 ARR0).
-              by apply completion_monotonic with (t := t1 + d);
-                first by apply reduction_prop.sched_jitter_completed_jobs_dont_execute.
+                by apply completion_monotonic with (t := t1 + d).
             Qed.
 
             (* By combining each inequality above in sequence, we complete the induction
@@ -1231,33 +1226,30 @@ Module JitterScheduleService.
          is also bounded by R_j. *)
       Corollary jitter_reduction_job_j_completes_no_later:
         job_response_time_in_sched_susp_bounded_by j R_j.
-      Proof.
+      Proof. 
         move: (H_valid_schedule) => [_ [MUSTARRs [COMPs [WORK [PRIO SELF]]]]].
         rename H_response_time_of_j_in_sched_jitter into COMPj.
         apply contraT; intro NOTCOMPs.
         suff NOTCOMPj: ~~ job_response_time_in_sched_jitter_bounded_by j R_j;
           [by rewrite COMPj in NOTCOMPj | clear COMPj].
         have LESS := jitter_reduction_less_service_for_job_j NOTCOMPs.
-        rewrite neq_ltn; apply/orP; left.
+        rewrite -ltnNge. 
         rewrite /inflated_job_cost /reduction.inflated_job_cost eq_refl.
         apply leq_ltn_trans with (n := service_during sched_jitter j arr_j (arr_j + R_j)).
-        {
-          rewrite /service /service_during.
+        { rewrite /service /service_during.
           rewrite (ignore_service_before_arrival job_arrival) ?leq_addr //.
           apply jobs_with_jitter_must_arrive_to_execute with (job_jitter0 := job_jitter).
-          by apply reduction_prop.sched_jitter_jobs_execute_after_jitter.
+            by apply reduction_prop.sched_jitter_jobs_execute_after_jitter.
         }
         apply: (leq_ltn_trans LESS).
         rewrite -addn1 -addnA [_ + 1]addnC addnA; apply leq_add.
-        {
-          rewrite addn1; apply contraT; rewrite -leqNgt; intro LE.
+        { rewrite addn1; apply contraT; rewrite -leqNgt; intro LE.
           exfalso; move: NOTCOMPs => /negP NOTCOMPs; apply: NOTCOMPs.
           rewrite /job_response_time_in_sched_susp_bounded_by /is_response_time_bound_of_job.
-          rewrite /completed_by eqn_leq; apply/andP; split;
-            first by apply cumulative_service_le_job_cost.
+          rewrite /completed_by.
           apply: (leq_trans LE).
           rewrite /service /service_during.
-          by rewrite [X in _ <= X](ignore_service_before_arrival job_arrival) ?leq_addr.
+            by rewrite [X in _ <= X](ignore_service_before_arrival job_arrival) ?leq_addr.
         }
         by apply cumulative_suspension_le_total_suspension.
       Qed.

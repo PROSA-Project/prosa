@@ -219,8 +219,8 @@ Module AbstractRTAforFPwithArrivalCurves.
             { by apply job_task. } 
             have EQ:= not_quiet_implies_not_idle
                         job_arrival job_cost arr_seq _
-                        sched jlfp_higher_eq_priority j _ _ _ _ _ _ t1 t2 _ t.
-            feed_n 9 EQ; try done.
+                        sched jlfp_higher_eq_priority j _ _ _ _ _ t1 t2 _ t.
+            feed_n 8 EQ; try done.
             - by rewrite /jlfp_higher_eq_priority /JLFP_is_reflexive /FP_to_JLFP.
             - by move: BUSY => [PREF _].
             - by apply EQ; apply/eqP.
@@ -306,16 +306,14 @@ Module AbstractRTAforFPwithArrivalCurves.
         move: (posnP (job_cost j)) => [ZERO|POS].
         { exfalso.
           move: NCOMPL => /negP COMPL; apply: COMPL.
-          rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-          - by apply H_completed_jobs_dont_execute.
-          - by rewrite ZERO.
+            by rewrite /is_response_time_bound_of_job /completed_by ZERO.
         }    
         eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; first last; try done.
         { by intros x; apply H_priority_is_reflexive. }
         { by apply job_task. } 
         have T123 := cumulative_task_interference_split.
         rewrite /cumulative_task_interference in T123.
-        rewrite (T123 _ _ job_arrival job_cost _ _ _ _ _ _ _ _ j); eauto 2; last first.
+        rewrite (T123 _ _ job_arrival job_cost _ _ _ _ _ _ _ j); eauto 2; last first.
         { move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _].
             by eapply arrived_between_implies_in_arrivals; eauto 2. }
         { by apply any_reflexive_FP_respects_sequential_jobs. } 
@@ -420,10 +418,7 @@ Module AbstractRTAforFPwithArrivalCurves.
     Proof.
       intros js ARRs TSKs.
       move: (posnP (job_cost js)) => [ZERO|POS].
-      { rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-        - by apply H_completed_jobs_dont_execute.
-        - by rewrite ZERO.
-      }    
+      { by rewrite /is_response_time_bound_of_job /completed_by ZERO. }
       move: H_proper_job_lock_in_service => [T1 [T2 T3]].
       move: H_proper_task_lock_in_service => [T4 T5]. 
       eapply AbstractSeqRTA.uniprocessor_response_time_bound_seq with

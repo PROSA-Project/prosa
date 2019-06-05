@@ -955,8 +955,6 @@ Module ResponseTimeIterationEDF.
         have COMPLETED := RLIST tsk R HAS j ARRj JOBtsk.
         exploit (DL rt_bounds tsk R);
           [by ins | by ins | clear DL; intro DL].
-   
-        rewrite eqn_leq; apply/andP; split; first by apply cumulative_service_le_job_cost.
         apply leq_trans with (n := service sched j (job_arrival j + R)); last first.
         {
           unfold valid_sporadic_taskset, is_valid_sporadic_task in *.
@@ -964,8 +962,7 @@ Module ResponseTimeIterationEDF.
           specialize (JOBPARAMS j ARRj); des; rewrite JOBPARAMS1.
           by rewrite JOBtsk.
         }
-        rewrite leq_eqVlt; apply/orP; left; rewrite eq_sym.
-        by apply COMPLETED.
+        by done.
       Qed.
 
       (* For completeness, since all jobs of the arrival sequence

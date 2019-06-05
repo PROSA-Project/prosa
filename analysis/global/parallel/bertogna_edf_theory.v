@@ -234,12 +234,7 @@ Module ResponseTimeAnalysisEDF.
         rewrite subh1; last by rewrite [R](REC tsk) // leq_addr.
         rewrite -addnBA // subnn addn0.
         move: (NOTCOMP) => /negP NOTCOMP'.
-        rewrite neq_ltn in NOTCOMP.
-        move: NOTCOMP => /orP [LT | BUG]; last first.
-        {
-          exfalso; rewrite ltnNge in BUG; move: BUG => /negP BUG; apply BUG.
-          by apply cumulative_service_le_job_cost.
-        }
+        rewrite -ltnNge in NOTCOMP.
         apply leq_ltn_trans with (n := (\sum_(job_arrival j <= t < job_arrival j + R)
                                      backlogged job_arrival job_cost sched j t) +
                                    service sched j (job_arrival j + R)); last first.
@@ -461,7 +456,7 @@ Module ResponseTimeAnalysisEDF.
                                job_task j0 = tsk ->
                                (tsk, R0) \in rt_bounds ->
                                job_arrival j0 + R0 < job_arrival j + R' ->
-                               service sched j0 (job_arrival j0 + R0) == job_cost j0).
+                               service sched j0 (job_arrival j0 + R0) >= job_cost j0).
         {
             by ins; apply IH with (tsk := tsk0) (R := R0).
         }

@@ -108,10 +108,10 @@ Module Schedulability.
           unfold valid_sporadic_job, valid_realtime_job in *.
           intros j ARRj JOBtsk.
           apply completion_monotonic with (t := job_arrival j + R);
-            [by done | | by apply H_response_time_bounded].
+            last by apply H_response_time_bounded.
           rewrite leq_add2l.
           apply: (leq_trans H_R_le_deadline).
-          by rewrite H_job_deadline_eq_task_deadline // -JOBtsk leqnn.
+            by rewrite H_job_deadline_eq_task_deadline // -JOBtsk leqnn.
        Qed.
 
      End ResponseTimeIsBounded.

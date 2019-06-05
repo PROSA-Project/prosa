@@ -320,14 +320,14 @@ Module ReductionToBasicSchedule.
           {
             apply/eqP; case => SAME; subst.
             move: PEND => /andP [PEND _].
-              by rewrite /pending /completed_by EQ eq_refl andbF in PEND.
+              by rewrite /pending /completed_by EQ leqnn andbF in PEND.
           }
           {
             apply/eqP; case => SAME; subst.
             suff IN: j \in pending_jobs sched_new t.
             {
               rewrite mem_filter in IN; move: IN => /andP [/andP [_ NOTCOMP] _].
-              by rewrite /completed_by EQ eq_refl in NOTCOMP.
+              by rewrite /completed_by EQ leqnn in NOTCOMP.
             }
             by apply: (seq_min_in_seq (higher_eq_priority t)).
           }
@@ -337,7 +337,7 @@ Module ReductionToBasicSchedule.
           suff IN: j \in pending_jobs sched_new t.
           {
             rewrite mem_filter in IN; move: IN => /andP [/andP [_ NOTCOMP] _].
-            by rewrite /completed_by EQ eq_refl in NOTCOMP.
+            by rewrite /completed_by EQ leqnn in NOTCOMP.
           }
           by apply: (seq_min_in_seq (higher_eq_priority t)).
         }
@@ -490,20 +490,15 @@ Module ReductionToBasicSchedule.
               rename H_j_has_completed into COMP, H_induction_hypothesis into IH.
               apply leq_trans with (n := original_job_cost j +
                                          total_suspension original_job_cost next_suspension j).
-              {
-                by apply leq_trans with (n := inflated_job_cost j);
-                  first by apply cumulative_service_le_job_cost,
-                                 sched_new_completed_jobs_dont_execute.
+              { by apply leq_trans with (n := inflated_job_cost j);
+                  first apply cumulative_service_le_job_cost,
+                  sched_new_completed_jobs_dont_execute.
               }
-              have SERVs: job_service_with_suspensions j t.+1 = original_job_cost j.
-              {
-                  by apply/eqP; apply completion_monotonic with (t0 := t).
-              } rewrite SERVs; clear SERVs.
-              rewrite leq_add2l.
-              apply completion_monotonic with (t' := t.+1) in COMP; try (by done).
+              rewrite leq_add //; first by apply completion_monotonic with (t0 := t).
+              apply completion_monotonic with (t' := t.+1) in COMP; try done.
               rewrite /job_cumulative_suspension.
                 by rewrite -> cumulative_suspension_eq_total_suspension with
-                   (job_cost := original_job_cost).
+                    (job_cost := original_job_cost).
             Qed.
 
           End CompletedInSuspensionAwareSchedule.
@@ -519,6 +514,8 @@ Module ReductionToBasicSchedule.
             (* Since we know from the induction hypothesis that the service received by j is
                preserved in the interval [0, t), now we only have to consider the state of job j
                at time t in both schedules. That is, we need to prove the following property:
+
+
 
                 scheduled_at sched_new j t <=
                     job_suspended_at sched_susp j t + scheduled_at sched_susp j t.               *)
@@ -621,15 +618,14 @@ Module ReductionToBasicSchedule.
                 Proof.
                   have COMPNEW := reduction_inductive_step_j_hp_completed_in_new.
                   rename H_induction_hypothesis into IHt.
-                  rewrite /completed_by eqn_leq; apply/andP; split;
-                    first by apply cumulative_service_le_job_cost.
+                  rewrite /completed_by. 
                   rewrite -(leq_add2r (total_suspension original_job_cost next_suspension j_hp)).
                   rewrite -/(inflated_job_cost _).
-                  apply leq_trans with (n := job_service_without_suspensions j_hp t);
-                    first by apply eq_leq; symmetry; apply/eqP; apply COMPNEW.
+                  apply leq_trans with (n := job_service_without_suspensions j_hp t).
+                  apply COMPNEW.
                   feed (IHt j_hp); first by done.
                   apply: (leq_trans IHt).
-                  by rewrite leq_add2l; apply cumulative_suspension_le_total_suspension.
+                    by rewrite leq_add2l; apply cumulative_suspension_le_total_suspension.
                 Qed.
 
                 (* ...which of course is a contradiction, since we assumed that j_hp was scheduled
@@ -707,13 +703,12 @@ Module ReductionToBasicSchedule.
           have COMP := sched_new_completed_jobs_dont_execute.
           have SERV := suspension_oblivious_preserves_service.
           intros j t ARRj COMPLETED.
-          rewrite /completed_by eqn_leq; apply/andP; split;
-            first by apply cumulative_service_le_job_cost.
+          unfold completed_by in *.
           rewrite -(leq_add2r (total_suspension original_job_cost next_suspension j)).
           rewrite -/(inflated_job_cost j).
-          move: COMPLETED => /eqP EQ; rewrite -EQ.
+          apply leq_trans with (service sched_new j t); first by done.
           apply: (leq_trans (SERV j t ARRj)); rewrite leq_add2l.
-          by apply cumulative_suspension_le_total_suspension.
+            by apply cumulative_suspension_le_total_suspension.
         Qed.
 
       End Service.

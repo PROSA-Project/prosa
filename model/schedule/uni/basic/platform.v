@@ -153,8 +153,6 @@ Module Platform.
         rewrite /job_completed_by /completed_by /service /service_during.
         rewrite (ignore_service_before_arrival job_arrival);
           [ | by done | by done | by apply leq_addr].
-        rewrite eqn_leq; apply/andP; split;
-          first by apply cumulative_service_le_job_cost.
         apply leq_trans with (n := \sum_(job_arrival j <= t < job_arrival j + job_cost j) 1);
           first by simpl_sum_const; rewrite addKn leqnn.
         apply leq_trans with (n := \sum_(job_arrival j <= t < job_arrival j + job_cost j)
@@ -170,7 +168,7 @@ Module Platform.
         }
         apply BACK; apply/andP; split; last by done.
         apply/andP; split; first by done.
-        rewrite neq_ltn; apply/orP; left.
+        rewrite -ltnNge. 
         rewrite /service /service_during.
         rewrite -> big_cat_nat with (n := job_arrival j);
           [simpl | by done | by done].

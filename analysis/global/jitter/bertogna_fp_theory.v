@@ -255,12 +255,8 @@ Module ResponseTimeAnalysisFP.
           rewrite subh1; last by rewrite [R](REC) // leq_addr.
           rewrite -addnBA // subnn addn0.
           move: (NOTCOMP) => /negP NOTCOMP'.
-          rewrite neq_ltn in NOTCOMP.
-          move: NOTCOMP => /orP [LT | BUG]; last first.
-          {
-            exfalso; rewrite ltnNge in BUG; move: BUG => /negP BUG; apply BUG.
-            by apply cumulative_service_le_job_cost.
-          }
+          rewrite -ltnNge in NOTCOMP.
+
           apply leq_ltn_trans with (n := (\sum_(t1 <= t < t1 + R)
                                        backlogged job_arrival job_cost job_jitter sched j t) +
                                      service sched j (t1 + R)); last first.
@@ -806,7 +802,7 @@ Module ResponseTimeAnalysisFP.
       (* Now we start the proof. Assume by contradiction that job j
          is not complete at time (job_arrival j + job_jitter j + R'). *)
       rewrite addnA.
-      apply completion_monotonic with (t := job_arrival j + job_jitter j + R); first by done.
+      apply completion_monotonic with (t := job_arrival j + job_jitter j + R).
       {
         rewrite leq_add2r leq_add2l.
         specialize (PARAMS j ARRj); des.

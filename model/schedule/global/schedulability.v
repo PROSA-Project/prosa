@@ -102,17 +102,13 @@ Module Schedulability.
           service_at sched j t' = 0.
       Proof.
         intros t' LE.
-        rename no_deadline_miss into NOMISS,
+        rename no_deadline_miss into RT,
                H_completed_jobs_dont_execute into EXEC.
         unfold job_misses_no_deadline, completed, completed_jobs_dont_execute in *.
         apply/eqP; rewrite -leqn0.
-        rewrite <- leq_add2l with (p := job_cost j).
-        move: NOMISS => /eqP NOMISS; rewrite -{1}NOMISS addn0.
-        apply leq_trans with (n := service sched j t'.+1); last by apply EXEC.
-        unfold service; rewrite -> big_cat_nat with
-                                   (p := t'.+1) (n := job_arrival j + job_deadline j);
-            [rewrite leq_add2l /= | by ins | by apply ltnW].
-          by rewrite big_nat_recr // /=; apply leq_addl.
+        eapply completion_monotonic in RT; eauto 2.
+        apply completed_implies_not_scheduled in RT; eauto 2.
+          by move: RT; rewrite not_scheduled_no_service; move => /eqP RT; rewrite RT.
       Qed.
 
       (* The same applies for the cumulative service of job j. *)

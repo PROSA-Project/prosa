@@ -228,12 +228,7 @@ Module ResponseTimeAnalysisFP.
           rewrite subh1; last by rewrite REC leq_addr.
           rewrite -addnBA // subnn addn0.
           move: (NOTCOMP) => /negP NOTCOMP'.
-          rewrite neq_ltn in NOTCOMP.
-          move: NOTCOMP => /orP [LT | BUG]; last first.
-          {
-            exfalso; rewrite ltnNge in BUG; move: BUG => /negP BUG; apply BUG.
-            by apply cumulative_service_le_job_cost.
-          }
+          rewrite -ltnNge in NOTCOMP.
           apply leq_ltn_trans with (n := (\sum_(job_arrival j <= t < job_arrival j + R)
                                        backlogged job_arrival job_cost sched j t) +
                                      service sched j (job_arrival j + R)); last first.
@@ -448,7 +443,7 @@ Module ResponseTimeAnalysisFP.
                           arrives_in arr_seq j0 ->
                           job_task j0 = tsk ->
                           job_arrival j0 < job_arrival j ->
-                          service sched j0 (job_arrival j0 + R) == job_cost j0).
+                          service sched j0 (job_arrival j0 + R) >= job_cost j0).
       {
         by ins; apply IH; try (by done); rewrite ltn_add2r.
       } clear IH.

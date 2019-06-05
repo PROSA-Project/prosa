@@ -239,8 +239,8 @@ Module end_time.
         intro job_cmplted.
         unfold job_completed_by, completed_by, service, service_during. 
         rewrite (ignore_service_before_arrival job_arrival sched ) //. 
-        - apply service_eq_cost_at_end_time in job_cmplted. 
-          by apply /eqP.
+        - apply service_eq_cost_at_end_time in job_cmplted.
+            by rewrite -job_cmplted. 
         - by apply arrival_le_end in job_cmplted.
       Qed.
 

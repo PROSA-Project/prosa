@@ -391,11 +391,10 @@ Module AbstractRTA.
               apply completion_monotonic with (t' := t1 + A) in COMPL; try done; last first.
               { by rewrite leq_add2l; apply ltnW. }
               { rewrite /A subnKC in COMPL; last by done.
-                move: COMPL => /eqP.
+                move: COMPL; rewrite /completed_by leqNgt; move => /negP COMPL; apply: COMPL. 
                 rewrite /service (service_during_cat _ _ (job_arrival j)); last by apply/andP; split.
                 rewrite /service_during (cumulative_service_before_job_arrival_zero job_arrival) // add0n.
-                rewrite big_geq //.
-                  by move: (H_job_cost_positive) => POS EQ; rewrite /job_cost_positive -EQ in POS.
+                  by rewrite big_geq //.
               } 
             }
             rewrite -/A in IB.
@@ -437,10 +436,7 @@ Module AbstractRTA.
     Proof. 
       intros j ARR JOBtsk.
       move: (posnP (job_cost j)) => [ZERO|POS].
-      { rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-        - by apply H_completed_jobs_dont_execute.
-        - by rewrite ZERO.
-      }        
+      { by rewrite /is_response_time_bound_of_job /completed_by ZERO. } 
       move: (H_busy_interval_exists j ARR JOBtsk POS) => [t1 [t2 [NEQ [H2 BUSY]]]].
       move: (NEQ) (BUSY)=> /andP [GE LT] [_ QTt2].
       have A2LTL := relative_arrival_is_bounded _ ARR JOBtsk POS _ _ BUSY.

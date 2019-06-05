@@ -147,12 +147,10 @@ Module AbstractRTALockInService.
         case NEQ: (t1 + delta <= t2); last first.
         { intros.
           have L8 := job_completes_within_busy_interval.
-          move: L8 => /eqP L8.
+          apply leq_trans with (job_cost j); first by done.
           rewrite /service.
           rewrite (service_during_cat _ _ t2).
-          unfold service in L8. rewrite L8.
-          apply leq_trans with (job_cost j); first by auto. 
-          rewrite leq_addr //.
+          apply leq_trans with (service_during sched j 0 t2); [by done | by rewrite leq_addr].
             by apply/andP; split; last (apply negbT in NEQ; apply ltnW; rewrite ltnNge).
         } 
         { move: H_total_workload_is_bounded => BOUND.

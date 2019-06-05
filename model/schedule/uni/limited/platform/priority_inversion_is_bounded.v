@@ -117,8 +117,8 @@ Module PriorityInversionIsBounded.
         move => t /andP [GEt LEt] PREEMPTP.            
         have NOTIDLE := not_quiet_implies_not_idle
                           job_arrival job_cost arr_seq _
-                          sched higher_eq_priority j _ _ _ _ _ _ t1 t2 _ t.
-        feed_n 9 NOTIDLE; eauto 2.
+                          sched higher_eq_priority j _ _ _ _ _ t1 t2 _ t.
+        feed_n 8 NOTIDLE; eauto 2.
         unfold is_idle, FP_is_transitive, transitive in *.
         destruct (sched t) as [j_hp|] eqn:SCHED; [clear NOTIDLE | by exfalso; apply NOTIDLE].
         move: SCHED => /eqP SCHED.
@@ -276,8 +276,8 @@ Module PriorityInversionIsBounded.
         move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
         have NOTIDLE := not_quiet_implies_not_idle
                           job_arrival job_cost arr_seq _ sched higher_eq_priority
-                          j _ _ _ _ _ _ t1 t2 _ t.
-        feed_n 9 NOTIDLE; eauto 2.
+                          j _ _ _ _ _ t1 t2 _ t.
+        feed_n 8 NOTIDLE; eauto 2.
         apply/andP; split; [by apply leq_trans with tp | by done].
         destruct (sched t) as [j_hp|] eqn:SCHED;
           last by exfalso; apply NOTIDLE; rewrite /is_idle SCHED.
@@ -323,7 +323,7 @@ Module PriorityInversionIsBounded.
         feed (QUIET j_hp); first by eapply CONS, SCHED.
         specialize (QUIET HP LT).
         have COMP: job_completed_by j_hp t.
-        { by apply completion_monotonic with (t0 := t1); [ | apply leq_trans with tp | ]. }
+        { by apply completion_monotonic with (t0 := t1); [ apply leq_trans with tp | ]. }
         apply completed_implies_not_scheduled in COMP; last by done.
           by move: COMP => /negP COMP; apply COMP.
       Qed.

@@ -333,23 +333,23 @@ Module LastExecution.
         Proof.
           have SAME := same_service_since_last_execution.
           rename H_jobs_must_arrive_to_execute into ARR.
-          move: H_j_has_completed => /eqP COMP.
+          move: H_j_has_completed => COMP.
           feed (exists_intermediate_point (service sched j));
             first by apply service_is_a_step_function.
           move => EX; feed (EX (job_arrival j) t).
-          {
-            feed (cumulative_service_implies_scheduled sched j 0 t);
-              first by apply leq_ltn_trans with (n := s);
-              last by rewrite -/(service _ _ _) COMP.
+          { feed (cumulative_service_implies_scheduled sched j 0 t).
+            apply leq_ltn_trans with (n := s); first by done.
+            apply leq_trans with (job_cost j); by done.
             move => [t' [/= LTt SCHED]].
             apply leq_trans with (n := t'); last by apply ltnW.
               by apply ARR in SCHED.
           }
           feed (EX s).
-          {
-            apply/andP; split; last by rewrite COMP.
-            rewrite /service /service_during.
-            by rewrite (ignore_service_before_arrival job_arrival) // big_geq.
+          { apply/andP; split. 
+            - rewrite /service /service_during.
+                by rewrite (ignore_service_before_arrival job_arrival) // big_geq.
+            - apply leq_ltn_trans with (n := s); first by done.
+                by apply leq_trans with (job_cost j).
           }
           move: EX => [x_mid [_ SERV]]; exists x_mid.
           by rewrite -SERV SAME.

@@ -215,7 +215,7 @@ Module BusyInterval.
             feed (NOTQUIET t1.+1); first by apply/andP; split.
             apply NOTQUIET.
             intros j_hp IN HP ARR.
-            apply completion_monotonic with (t := t1); [by done | by done |].
+            apply completion_monotonic with (t := t1); [by done |].
             apply contraT; intro NOTCOMP.
             destruct (scheduled_at sched j_hp t1) eqn:SCHEDhp;
               first by move: SCHEDhp => /eqP SCHEDhp; rewrite IDLE in SCHEDhp.
@@ -393,7 +393,7 @@ Module BusyInterval.
                   specialize (QUIET BEFORE).
                   move: PEND => /andP [_ NOTCOMP].
                   apply completion_monotonic with (t' := t_busy) in QUIET;
-                    [by rewrite QUIET in NOTCOMP | by done |].
+                    first by rewrite QUIET in NOTCOMP.
                   by apply bigmax_ltn_ord with (i0 := t).
                 }
                 split; first by apply bigmax_ltn_ord with (i0 := t).
@@ -505,8 +505,7 @@ Module BusyInterval.
               Lemma busy_interval_too_much_workload:
                 actual_hp_workload t1 (t1 + delta) > actual_hp_service t1 (t1 + delta).
               Proof.
-                have PEND := not_quiet_implies_exists_pending_job 
-                             H_completed_jobs_dont_execute.
+                have PEND := not_quiet_implies_exists_pending_job.                             
                 rename H_no_quiet_time into NOTQUIET, 
                        H_is_busy_prefix into PREFIX, H_respects_policy into PRIO.
                 set l := actual_arrivals_between job_arrival job_jitter arr_seq t1 (t1 + delta).
@@ -536,12 +535,12 @@ Module BusyInterval.
                   destruct (higher_eq_priority j1 j); last by done.
                   by apply cumulative_service_le_job_cost. 
                 }
-                rewrite ltn_neqAle; apply/andP; split; last by apply cumulative_service_le_job_cost.
+                
                 unfold service_during.
                 rewrite (ignore_service_before_jitter job_arrival job_jitter) //;
                   last by apply/andP; split; last by apply ltnW.
                 rewrite <- ignore_service_before_jitter with (t2:=0); rewrite //; [|by apply ltnW].
-                by apply/negP.
+                  by rewrite ltnNge; apply/negP.
               Qed.
 
               (* Using the two lemmas above, we infer that the workload is larger than the
@@ -657,19 +656,18 @@ Module BusyInterval.
               apply/andP; split; first by apply leqnn.
               rewrite /completed_by /service /service_during.
               rewrite (cumulative_service_before_jitter_is_zero job_arrival job_jitter) //.
-              by rewrite eq_sym -lt0n H_positive_cost.
+                by rewrite -ltnNge.
             }
             move: PREFIX => [t1 [PREFIX /andP [GE1 GEarr]]].
             have BOUNDED := busy_interval_is_bounded (actual_job_arrival j) t1 PREFIX delta.
             feed_n 2 BOUNDED; [by done | by apply WORK | ].
             move: BOUNDED => [t2 [GE2 BUSY]].
             exists t1, t2; split.
-            {
-              apply/andP; split; first by done.
+            { apply/andP; split; first by done.
               apply contraT; rewrite -leqNgt; intro BUG.
               move: BUSY PREFIX => [[LE12 _] QUIET] [_ [_ NOTQUIET]].
               feed (NOTQUIET t2); first by apply/andP; split.
-              by exfalso; apply NOTQUIET.
+                by exfalso; apply NOTQUIET.
             }
             by split.
           Qed.
@@ -693,15 +691,8 @@ Module BusyInterval.
             job_completed_by j (actual_job_arrival j + delta).
           Proof.
             have BUSY := exists_busy_interval delta.
-            destruct (job_cost j == 0) eqn:COST.
-            {
-              move: COST => /eqP COST.
-              rewrite /job_completed_by /completed_by eqn_leq.
-              apply/andP; split;
-                first by apply cumulative_service_le_job_cost.
-              by rewrite COST.
-            }
-            apply negbT in COST; rewrite -lt0n in COST.
+            move: (posnP (job_cost j)) => [Z|POS].
+            { by rewrite /job_completed_by /completed_by Z. }
             feed_n 3 BUSY; try (by done).
             move: BUSY => [t1 [t2 [/andP [GE1 LT2] [GE2 BUSY]]]].
             apply completion_monotonic with (t := t2); try (by done);
@@ -711,7 +702,7 @@ Module BusyInterval.
             apply/andP; split; first by apply leqnn.
             rewrite /completed_by /service /service_during.
             rewrite (cumulative_service_before_jitter_is_zero job_arrival job_jitter) //.
-            by rewrite eq_sym -lt0n.
+              by rewrite -ltnNge.
           Qed.
 
         End ResponseTimeBoundFromBusyInterval.

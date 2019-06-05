@@ -232,19 +232,17 @@ Module SustainabilityAllCostsProperties.
                 /reduction.build_schedule.
         case: (_ < _); rewrite /reduction.highest_priority_job
                                /reduction.highest_priority_late_job.
-        {
-          apply/eqP; intro SCHEDn.
+        { apply/eqP; intro SCHEDn.
           apply seq_min_in_seq in SCHEDn.
           rewrite mem_filter in SCHEDn.
           move: SCHEDn => /andP [/andP [/andP [_ NOTCOMP] _] _].
-          by rewrite /completed_by EQ eq_refl in NOTCOMP.
+            by rewrite /completed_by EQ leqnn in NOTCOMP.
         }
-        {
-          apply/eqP; intro SCHEDn.
+        { apply/eqP; intro SCHEDn.
           apply seq_min_in_seq in SCHEDn.
           rewrite mem_filter in SCHEDn.
           move: SCHEDn => /andP [/andP [_ NOTCOMP] _].
-          by rewrite /completed_by EQ eq_refl in NOTCOMP.
+            by rewrite /completed_by EQ leqnn in NOTCOMP.
         }
       Qed. 
 
@@ -314,12 +312,11 @@ Module SustainabilityAllCostsProperties.
           completed_by job_cost sched_susp any_j t.
       Proof.
         intros j0 COMPn.
-        rewrite /completed_by eqn_leq; apply/andP; split;
-          first by apply cumulative_service_le_job_cost.
+        unfold completed_by in *.
         rewrite -(leq_add2r (inflated_job_cost j0 - job_cost j0)).
         rewrite subnKC; last by eauto 1.
-        move: COMPn => /eqP {1}<-.
-        by apply sched_new_service_invariant.
+        apply leq_trans with (service sched_new j0 t); first by done.
+          by apply sched_new_service_invariant.
       Qed.
       
     End ServiceInvariant.
@@ -576,7 +573,7 @@ Module SustainabilityAllCostsProperties.
           apply/negP; intro COMPmid.
           apply suspended_implies_not_completed in SUSPt.
           suff BUG: completed_by job_cost sched_susp j0 t by rewrite BUG in SUSPt.
-          by apply completion_monotonic with (t0 := k); [| by apply ltnW |].
+            by apply completion_monotonic with (t0 := k); [ apply ltnW |].
         }
         apply/andP; split;
           last by apply: (ltn_trans LT); move: SUSPt => /andP [_ /andP [_ GTt]].
@@ -685,22 +682,14 @@ Module SustainabilityAllCostsProperties.
           rewrite exchange_big /=.
           apply leq_sum_nat; move => i /= LT _.
           case COMP: (completed_in_sched_new any_j i).
-          {
-            apply leq_trans with (n := 0); last by done.
+          { apply leq_trans with 0; last by done.
             rewrite big_nat_cond big1 //; move => s /= LTs.
             case EQ: (_ == _); last by done.
             move: EQ => /eqP EQ; rewrite andbT -EQ {EQ} in LTs.
-            by move: COMP => /eqP COMP; rewrite ltn_neqAle COMP eq_refl in LTs.
+              by exfalso; move: LTs; rewrite ltnNge; move => /negP LTs; apply: LTs.
           }
-          {
-            apply negbT in COMP; rewrite /completed_in_sched_new /completed_by in COMP.
-            set s := service sched_new any_j i; rewrite -/s neq_ltn in COMP.
-            move: COMP => /orP [LTs | GTs]; last first.
-            {
-              suff BUG': inflated_job_cost any_j >= s by rewrite ltnNge BUG' in GTs.
-              apply cumulative_service_le_job_cost.
-              by apply sched_new_completed_jobs_dont_execute.
-            }
+          { apply negbT in COMP; rewrite -ltnNge in COMP.
+            set s := service sched_new any_j i; rewrite -/s in COMP.
             rewrite -> big_cat_nat with (n := s); [simpl | by done | by apply ltnW].
             rewrite -> big_cat_nat with (m := s) (n := s.+1); [simpl | by done | by done].
             rewrite big_nat_cond big1; last first.
@@ -790,24 +779,20 @@ Module SustainabilityAllCostsProperties.
         have IN0: j0 \in jobs_arrived_up_to arr_seq t.
           by eapply arrived_between_implies_in_arrivals; eauto 1.
         move: NOTSUSP => /orP [NOTSUSPs | LT]; last first.
-        {
-          clear SCHEDn; apply seq_min_exists with (x := j0).
-          by rewrite mem_filter PEND IN0 andbT LT.
+        { clear SCHEDn; apply seq_min_exists with (x := j0).
+            by rewrite mem_filter PEND IN0 andbT LT.
         }
         case (boolP (completed_by job_cost sched_susp j0 t)) => [COMPs | NOTCOMPs].
-        {
-          clear SCHEDn; apply seq_min_exists with (x := j0).
+        { clear SCHEDn; apply seq_min_exists with (x := j0).
           rewrite mem_filter PEND IN0 andbT /=.
           apply/orP; left.
           apply leq_trans with (n := job_cost j0 + (inflated_job_cost j0 - job_cost j0));
-            last by move: COMPs => /eqP <-; rewrite leq_add2r.
+            last by rewrite leq_add2r.
           rewrite subnKC; last by apply H_job_costs_do_not_decrease.
-          by rewrite ltn_neqAle; apply/andP; split;
-            last by apply sched_new_completed_jobs_dont_execute.
+            by rewrite ltnNge.
         }
         case (boolP (scheduled_at sched_susp j0 t)) => [SCHEDs | NOTSCHEDs].
-        {
-          clear SCHEDn; apply seq_min_exists with (x := j0).
+        { clear SCHEDn; apply seq_min_exists with (x := j0).
           by rewrite mem_filter PEND IN0 andbT SCHEDs orbT.
         }
         feed (WORKs j0 t IN); first by repeat (apply/andP; split).
@@ -887,11 +872,10 @@ Module SustainabilityAllCostsProperties.
           rewrite mem_filter PEND /= IN1 andbT.
           apply/orP; left.
           rewrite /reduction.job_is_late.
-          move: COMPs => /eqP ->; rewrite subnKC; last by eauto 1.
+          apply leq_trans with (job_cost j1 + (inflated_job_cost j1 - job_cost j1)); last by rewrite leq_add2r.
+          rewrite subnKC; last by eauto 1.            
           move: PEND => /andP [_ NOTCOMP].
-          rewrite ltn_neqAle; apply/andP; split; first by done.
-          apply cumulative_service_le_job_cost.
-          by apply sched_new_completed_jobs_dont_execute.
+            by rewrite ltnNge.
         }
         feed (WORKs j1 t ARRin); first by repeat (apply/andP; split).
         move: WORKs => [j_hp SCHEDhp].

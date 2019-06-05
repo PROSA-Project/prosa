@@ -148,7 +148,7 @@ Module ConcreteScheduler.
       rewrite /sched scheduler_uses_construction_function /highest_priority_job.
       apply/eqP; intro HP.
       apply seq_min_in_seq in HP.
-      by rewrite mem_filter /pending /completed_by -EQ eq_refl andbF /= in HP.
+      by rewrite mem_filter /pending /completed_by -EQ leqnn andbF /= in HP.
     Qed.
 
     (* In addition, the scheduler is work conserving... *)

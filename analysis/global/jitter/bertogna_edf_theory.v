@@ -250,12 +250,7 @@ Module ResponseTimeAnalysisEDFJitter.
           rewrite subh1; last by rewrite [R](REC tsk) // leq_addr.
           rewrite -addnBA // subnn addn0.
           move: (NOTCOMP) => /negP NOTCOMP'.
-          rewrite neq_ltn in NOTCOMP.
-          move: NOTCOMP => /orP [LT | BUG]; last first.
-          {
-            exfalso; rewrite ltnNge in BUG; move: BUG => /negP BUG; apply BUG.
-            by apply cumulative_service_le_job_cost.
-          }
+          rewrite -ltnNge in NOTCOMP.
           apply leq_ltn_trans with (n := (\sum_(t1 <= t < t1 + R)
                                        backlogged job_arrival job_cost job_jitter sched j t) +
                                      service sched j (t1 + R)); last first.
@@ -384,8 +379,7 @@ Module ResponseTimeAnalysisEDFJitter.
           intros t j0 LEt ARR0 LE.
           cut ((job_task j0) \in unzip1 rt_bounds = true); last by rewrite UNZIP FROMTS.
           move => /mapP [p IN EQ]; destruct p as [tsk' R0]; simpl in *; subst tsk'.
-          apply completion_monotonic with (t0 := job_arrival j0 +
-                                        task_jitter (job_task j0) + R0); first by done.
+          apply completion_monotonic with (t0 := job_arrival j0 + task_jitter (job_task j0) + R0).
           {
             rewrite -addnA leq_add2l.
             apply leq_trans with (n := task_deadline (job_task j0));
@@ -820,7 +814,7 @@ Module ResponseTimeAnalysisEDFJitter.
                                  job_task j0 = tsk ->
                                (tsk, R0) \in rt_bounds ->
                                job_arrival j0 + task_jitter tsk + R0 < job_arrival j + task_jitter tsk' + R' ->
-                               service sched j0 (job_arrival j0 + task_jitter tsk + R0) == job_cost j0).
+                               service sched j0 (job_arrival j0 + task_jitter tsk + R0) >= job_cost j0).
         {
             by ins; apply IH with (tsk := tsk0) (R := R0).
         }

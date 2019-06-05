@@ -169,7 +169,6 @@ Module RTAforConcreteModels.
           intros ? ? ? ARR; move => LE COMPL /negP NCOMPL.
           exfalso; apply: NCOMPL.
           apply completion_monotonic with t; try done.
-          rewrite /completed_by eqn_leq; apply/andP; split; try done.
         - repeat split; try done. 
           rewrite /task_lock_in_service_le_task_cost. by done.
           unfold task_lock_in_service_bounds_job_lock_in_service.
@@ -238,9 +237,7 @@ Module RTAforConcreteModels.
             rewrite /job_cost_le_task_cost TSK ZERO in NEQ.
               by apply/eqP; rewrite -leqn0.
           }
-          rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-          - by apply H_completed_jobs_dont_execute.
-          - by rewrite ZEROj.
+            by rewrite /is_response_time_bound_of_job /completed_by ZEROj.
         }
         eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with
             (job_max_nps := fun j => job_cost j)
@@ -330,9 +327,7 @@ Module RTAforConcreteModels.
         { intros j ARR TSK.
           move: (H_job_cost_le_task_cost _ ARR) => POSt.
           move: POSt; rewrite /job_cost_le_task_cost TSK ZERO leqn0; move => /eqP Z.
-          rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-          - by eauto 2.
-          - by rewrite Z.
+            by rewrite /is_response_time_bound_of_job /completed_by Z.
         } 
         have Fact2: 1 < size (task_preemption_points tsk).
         { have Fact2: 0 < size (task_preemption_points tsk).
@@ -398,11 +393,7 @@ Module RTAforConcreteModels.
             rewrite subnBA in LS; last first.          
             apply LSMj; try done.
             { rewrite lt0n; apply/negP; intros Z; move: Z => /eqP Z.
-              move: NCOMPL; rewrite /completed_by neq_ltn; move => /orP [LT|GT].
-              { by rewrite Z ltn0 in LT. }
-              { move: GT; rewrite ltnNge; move => /negP GT; apply: GT.
-                  by eapply H_completed_jobs_dont_execute.
-              }
+                by move: NCOMPL; rewrite /completed_by -ltnNge Z ltn0; move => LT.
             }
             have EQ: exists Δ, t' = t + Δ.
             { exists (t' - t); rewrite subnKC; by done. }
@@ -412,34 +403,30 @@ Module RTAforConcreteModels.
             apply H_schedule_with_limited_preemptions; first by done.
             rewrite /can_be_preempted_for_model_with_limited_preemptions; apply/negP.
             intros CONTR.
-            move: NCOMPL; rewrite /completed_by neq_ltn; move => /orP [SERV|SERV]; last first.
-            { exfalso.
-              move: (H_completed_jobs_dont_execute j (t + Δ)); rewrite leqNgt; move => /negP T.
-                by apply: T.
+            move: NCOMPL; rewrite /completed_by -ltnNge; move => SERV.
+            have NEQ: job_cost j - job_last_nps j < service sched j (t + Δ).
+            { apply leq_trans with (service sched j t); first by done.
+              rewrite /service /service_during [in X in _ <= X](@big_cat_nat _ _ _ t) //=.
+              rewrite leq_addr //. 
+              rewrite leq_addr //.
             }
-            { have NEQ: job_cost j - job_last_nps j < service sched j (t + Δ).
-              { apply leq_trans with (service sched j t); first by done.
-                rewrite /service /service_during [in X in _ <= X](@big_cat_nat _ _ _ t) //=.
-                rewrite leq_addr //. 
-                rewrite leq_addr //.
-              }
-              clear LS.
-              rewrite -ENDj in NEQ, SERV; last by done.
-              rewrite NondecreasingSequence.last_seq_minus_last_distance_seq in NEQ; last by eauto 2.
-              rewrite /NondecreasingSequence.last -nth_last in SERV. 
-              have EQ := NondecreasingSequence.antidensity_of_nondecreasing_seq.
-              specialize (EQ (job_preemption_points j) (service sched j (t + Δ)) (size (job_preemption_points j)).-2).
-              rewrite CONTR in EQ.
-              feed_n 2 EQ; first by eauto 2.
-              {
-                apply/andP; split; first by done.
-                rewrite prednK; first by done.
-                rewrite -(leq_add2r 1) !addn1 prednK.
-                eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2.
-                eapply list_of_preemption_point_is_not_empty with (job_cost0 := job_cost); eauto 2. 
-              }
-                by done.
+            clear LS.
+            rewrite -ENDj in NEQ, SERV; last by done.
+            rewrite NondecreasingSequence.last_seq_minus_last_distance_seq in NEQ; last by eauto 2.
+            rewrite /NondecreasingSequence.last -nth_last in SERV. 
+            have EQ := NondecreasingSequence.antidensity_of_nondecreasing_seq.
+            specialize (EQ (job_preemption_points j) (service sched j (t + Δ)) (size (job_preemption_points j)).-2).
+            rewrite CONTR in EQ.
+            feed_n 2 EQ; first by eauto 2.
+            {
+              apply/andP; split; first by done.
+              rewrite prednK; first by done.
+              rewrite -(leq_add2r 1) !addn1 prednK.
+              eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2.
+              eapply list_of_preemption_point_is_not_empty with (job_cost0 := job_cost); eauto 2. 
             }
+              by done.
+            
             rewrite -ENDj; last by done.
             apply leq_trans with (job_max_nps j).
             - by apply NondecreasingSequence.last_of_seq_le_max_of_seq.
@@ -589,11 +576,7 @@ Module RTAforConcreteModels.
             rewrite subnBA in LS; last first.
             apply LSMj; try done.
             { rewrite lt0n; apply/negP; intros Z; move: Z => /eqP Z.
-              move: NCOMPL. rewrite /completed_by neq_ltn. move => /orP [LT|GT].
-              { by rewrite Z ltn0 in LT. }
-              { move: GT; rewrite ltnNge; move => /negP GT; apply: GT.
-                  by eapply H_completed_jobs_dont_execute.
-              }
+                by move: NCOMPL; rewrite /completed_by -ltnNge Z ltn0.
             }
             have EQ: exists Δ, t' = t + Δ.
             { exists (t' - t); rewrite subnKC; by done. }
@@ -603,35 +586,30 @@ Module RTAforConcreteModels.
             apply H_schedule_with_limited_preemptions; first by done.
             rewrite /can_be_preempted_for_model_with_limited_preemptions; apply/negP.
             intros CONTR.
-            move: NCOMPL; rewrite /completed_by neq_ltn; move => /orP [SERV|SERV]; last first.
-            { exfalso.
-              move: (H_completed_jobs_dont_execute j (t + Δ)); rewrite leqNgt; move => /negP T.
-                by apply: T.
+            move: NCOMPL; rewrite /completed_by -ltnNge; move => SERV.
+            have NEQ: job_cost j - (job_last_nps j) < service sched j (t + Δ).
+            { apply leq_trans with (service sched j t); first by done.
+              rewrite /service /service_during [in X in _ <= X](@big_cat_nat _ _ _ t) //=.
+              rewrite leq_addr //.
+              rewrite leq_addr //.
             }
-            { have NEQ: job_cost j - (job_last_nps j) < service sched j (t + Δ).
-              { apply leq_trans with (service sched j t); first by done.
-                rewrite /service /service_during [in X in _ <= X](@big_cat_nat _ _ _ t) //=.
-                rewrite leq_addr //.
-                rewrite leq_addr //.
-              }
-              clear LS.
-              rewrite -END in NEQ, SERV; last by done.
-              rewrite NondecreasingSequence.last_seq_minus_last_distance_seq in NEQ.
-              rewrite /NondecreasingSequence.last -nth_last in SERV. 
-              have EQ := NondecreasingSequence.antidensity_of_nondecreasing_seq.
-              specialize (EQ (job_preemption_points j) (service sched j (t + Δ)) (size (job_preemption_points j)).-2).
-              rewrite CONTR in EQ.
-              feed_n 2 EQ; first by eauto 2.
-              {
-                apply/andP; split; first by done.
-                rewrite prednK; first by done.
-                rewrite -(leq_add2r 1) !addn1 prednK.
-                eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2. 
-                eapply list_of_preemption_point_is_not_empty with (job_cost0 := job_cost); eauto 2. 
-              }
-                by done.
-              eauto 2.
+            clear LS.
+            rewrite -END in NEQ, SERV; last by done.
+            rewrite NondecreasingSequence.last_seq_minus_last_distance_seq in NEQ.
+            rewrite /NondecreasingSequence.last -nth_last in SERV. 
+            have EQ := NondecreasingSequence.antidensity_of_nondecreasing_seq.
+            specialize (EQ (job_preemption_points j) (service sched j (t + Δ)) (size (job_preemption_points j)).-2).
+            rewrite CONTR in EQ.
+            feed_n 2 EQ; first by eauto 2.
+            {
+              apply/andP; split; first by done.
+              rewrite prednK; first by done.
+              rewrite -(leq_add2r 1) !addn1 prednK.
+              eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2. 
+              eapply list_of_preemption_point_is_not_empty with (job_cost0 := job_cost); eauto 2. 
             }
+              by done.
+            eauto 2.
             rewrite -END; last by done.
             apply leq_trans with (job_max_nps j).
             - by apply NondecreasingSequence.last_of_seq_le_max_of_seq.

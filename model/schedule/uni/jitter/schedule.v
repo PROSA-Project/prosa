@@ -157,9 +157,7 @@ Module UniprocessorScheduleWithJitter.
           have BUG := COMP j t.+1.
           rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
           unfold service, service_during; rewrite -addn1 big_nat_recr // /=.
-          apply leq_add;
-            first by move: COMPLETED => /eqP COMPLETED; rewrite -COMPLETED.
-          by rewrite /service_at SCHED.
+            by apply leq_add; last rewrite /service_at SCHED.
         Qed.
 
       End Pending.

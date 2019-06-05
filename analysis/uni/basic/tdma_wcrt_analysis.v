@@ -186,8 +186,8 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         - rewrite /has_arrived. auto.
         - rewrite /completed_by /service /service_during.
           rewrite ->cumulative_service_before_job_arrival_zero
-          with (job_arrival0:=job_arrival). rewrite neq_ltn. apply /orP.
-          left. apply H_valid_job. apply H_jobs_must_arrive_to_execute. auto.
+          with (job_arrival0:=job_arrival). rewrite -ltnNge. 
+          apply H_valid_job. apply H_jobs_must_arrive_to_execute. auto.
       Qed.
 
       (* Job is pending at t.+1 if 

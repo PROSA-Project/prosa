@@ -267,17 +267,15 @@ Module SustainabilitySingleCostProperties.
           by eapply in_arrivals_implies_arrived_before in IN; eauto.
         }
         destruct (sched_susp t) eqn:SCHEDs; last first.
-        {
-          apply/eqP; case => SAME; subst j0.
+        { apply/eqP; case => SAME; subst j0.
           suff NOTPEND: ~~ pending job_arrival inflated_job_cost sched_susp_highercost j_hp t.
-            by rewrite PENDhp in NOTPEND.
-          by rewrite /pending negb_and; apply/orP; right; rewrite negbK; apply/eqP.
+          - by rewrite PENDhp in NOTPEND.
+          - by rewrite /pending negb_and; apply/orP; right; rewrite negbK /completed_by EQ.
         }
-        {
-          case: ifP => [PEND | NOTPEND]; apply/eqP; case => SAME; subst j0;
-            last by move: PENDhp => /andP [_ NC]; rewrite /completed_by EQ eq_refl in NC.
+        { case: ifP => [PEND | NOTPEND]; apply/eqP; case => SAME; subst j0;
+            last by move: PENDhp => /andP [_ NC]; rewrite /completed_by EQ leqnn in NC.
           move: PEND => /andP [/andP [/andP [_ NC] _] _].
-          by rewrite /completed_by EQ eq_refl in NC.
+          by rewrite /completed_by EQ leqnn in NC.
         }
       Qed.
 
@@ -409,27 +407,25 @@ Module SustainabilitySingleCostProperties.
                  H_inflation_only_for_job_j into COSTother.
           have COMPLETIONw := sched_susp_highercost_completed_jobs_dont_execute.
           rewrite /completed_in_sched_susp/completed_in_sched_susp_highercost
-                  /completed_by in NOTCOMPj *.
+                  /completed_by -ltnNge in NOTCOMPj *.
           intros any_j; apply/idP/idP.
-          {
-            intros COMPs.
+          { intros COMPs.
             case (boolP (any_j == j)) => [/eqP EQ | NEQ]; subst.
-            {
-              suff BUG: service sched_susp j t == job_cost j by rewrite BUG in NOTCOMPj.
-              by apply completion_monotonic with (t0 := k); try (by done); apply ltnW.
+            { unfold completed_jobs_dont_execute in *. 
+              have BUG: service sched_susp j t >= job_cost j.
+              { apply completion_monotonic with (t0 := k); try (by done); apply ltnW. }
+                by exfalso; move: BUG; rewrite leqNgt; move => /negP BUG; apply: BUG.
             }
-            rewrite COSTother //; move: COMPs => /eqP <-.
-            apply/eqP; rewrite /service /service_during big_nat_cond [X in _=X]big_nat_cond.
-            apply eq_bigr; move => i /= /andP [LT _].
-            by rewrite /service_at IH //; apply: (leq_trans LT).
+            rewrite COSTother //.
+            apply leq_trans with (service sched_susp any_j k); first by done. 
+            rewrite /service /service_during big_nat_cond [X in _ <= X]big_nat_cond.
+            rewrite leq_sum //; move => i /= /andP [LT _].
+              by rewrite /service_at IH //; apply: (leq_trans LT).
           }
-          {
-            intros COMPw.
-            rewrite eqn_leq; apply/andP; split;
-              first by apply cumulative_service_le_job_cost.
+          { intros COMPw.
             apply leq_trans with (n := inflated_job_cost any_j);
               first by case (boolP (any_j==j)) => [/eqP EQ | NEQ]; subst; rewrite ?COSTj ?COSTother.
-            move: COMPw => /eqP <-.
+            apply leq_trans with (service sched_susp_highercost any_j k); first by done.
             apply leq_sum_nat; move => i /= LT _.
             by rewrite /service_at IH //; apply: (leq_trans LT).
           }
@@ -593,7 +589,7 @@ Module SustainabilitySingleCostProperties.
         intros k any_j LT; apply IHtmp; first by done.
         apply/negP; intro COMPk.
         suff COMPt: completed_in_sched_susp j t by rewrite COMPt in NOTCOMP.
-        by apply completion_monotonic with (t0 := k); [| apply ltnW|].
+          by apply completion_monotonic with (t0 := k);[apply ltnW|].
       Qed.
       
     End SchedulingInvariant.
@@ -638,17 +634,16 @@ Module SustainabilitySingleCostProperties.
         apply/negP; intro COMPt.
         suff BUG: t >= arr_j + r by rewrite leqNgt LT in BUG.
         have AFTER: arr_j <= t.
-        {
-          apply contraT; rewrite -ltnNge; intro BEFORE.
+        { apply contraT; rewrite -ltnNge; intro BEFORE.
           suff BUG: ~~ completed_in_sched_susp j t by rewrite COMPt in BUG.
           rewrite /completed_in_sched_susp /completed_by /service /service_during.
           rewrite (cumulative_service_before_job_arrival_zero job_arrival) //; last by apply ltnW.
-          by rewrite eq_sym -lt0n.
+            by rewrite -ltnNge.
         }
         rewrite -[t](addKn arr_j) -addnBA //.
         rewrite leq_add2l; apply TIGHT.
         rewrite /job_response_time_in_sched_susp_bounded_by /is_response_time_bound_of_job.
-        by rewrite subnKC.
+          by rewrite subnKC.
       Qed.
        
       (* Next, since r is an exact response time bound, we show that r <= R... *)
@@ -665,8 +660,13 @@ Module SustainabilitySingleCostProperties.
         set Sw := service_during sched_susp_highercost in RESPw RESPs TIGHT SAME.
         set Ss := service_during sched_susp in RESPs TIGHT SAME.
         apply contraT; rewrite -ltnNge; intros LT.
+        have RESPs': job_cost j == Ss j 0 (job_arrival j + r).
+        { rewrite eqn_leq; apply/andP; split; try done.
+            by apply H_completed_jobs_dont_execute.
+        }
         suff BUG: job_cost j > inflated_job_cost j by rewrite ltnNge COSTj in BUG.
-        move: RESPw RESPs => /eqP RESPw /eqP RESPs; rewrite -RESPw -RESPs.
+        move: RESPs RESPs' => _ /eqP RESPs; rewrite RESPs.
+        apply leq_ltn_trans with (Sw j 0 (job_arrival j + R)); first by done.
         rewrite /Ss /service_during.
         rewrite -> big_cat_nat with (n := arr_j + R);
           [simpl | by done | by rewrite leq_add2l ltnW].
@@ -675,16 +675,15 @@ Module SustainabilitySingleCostProperties.
         rewrite lt0n; apply/eqP; intro ZERO.
         suff BUG: R >= r by rewrite leqNgt LT in BUG.
         apply TIGHT.
-        rewrite -(eqn_add2r 0) -{2}ZERO addn0.
+        rewrite -(leq_add2r 0) -{3}ZERO addn0.
         rewrite -big_cat_nat //=; last by rewrite leq_add2l ltnW.
-        by rewrite -RESPs.
+          by rewrite RESPs.
       Qed.
 
       (* ...and also prove that R must be as large as the inflated job cost. *)
       Lemma R_bounds_inflated_cost: R >= inflated_job_cost j.
       Proof.
-        apply leq_trans with (n := service sched_susp_highercost j (arr_j + R));
-          first by apply eq_leq; symmetry; apply/eqP.
+        apply leq_trans with (n := service sched_susp_highercost j (arr_j + R)); first by done.
         rewrite /service /service_during.
         rewrite (ignore_service_before_arrival job_arrival) //; first last.
         - by apply leq_addr.
@@ -704,9 +703,9 @@ Module SustainabilitySingleCostProperties.
                H_response_time_bound_in_sched_susp_highercost into RESPw.
         rewrite leq_subLR.
         rewrite addnBA; last by apply GECOST.
-        apply leq_trans with (n := service_in_sched_susp j (arr_j + r) + R
-                                   - service_in_sched_susp_highercost j (arr_j + R));
-          last by apply leq_sub; [rewrite leq_add2r|]; apply eq_leq; [|symmetry]; apply/eqP.
+        apply leq_trans with
+            (n := service_in_sched_susp j (arr_j + r) + R - service_in_sched_susp_highercost j (arr_j + R));
+          last by rewrite leq_sub // leq_add2r.
         rewrite addnC.
         rewrite /service_in_sched_susp /service_in_sched_susp_highercost /service
                 /service_during in SAME *.

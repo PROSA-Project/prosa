@@ -121,9 +121,8 @@ Module PartitionSchedulability.
                H_partitioned into PART.
         intros tsk IN j ARRj JOBtsk.
         specialize (SCHED tsk IN j ARRj JOBtsk).
-        move: SCHED => /eqP <-.
         unfold service, uni.service, service_during, uni.service_during in *.
-        by apply/eqP; rewrite SAME // JOBtsk.
+          by rewrite SAME // JOBtsk.
       Qed.
 
     End Schedulability.

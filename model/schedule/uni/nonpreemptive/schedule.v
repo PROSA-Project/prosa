@@ -57,7 +57,7 @@ Module NonpreemptiveSchedule.
           apply H_nonpreemptive with (t := t1); [by done| by done| ].
           apply /negP; intros COMP.
           apply (scheduled_implies_not_completed job_cost) in SCHEDt2; last by done.
-          apply completion_monotonic with (t' := t2) in COMP; [ |by done| by done].
+          apply completion_monotonic with (t' := t2) in COMP; last by done.
             by move: SCHEDt2 => /negP SCHEDt2; apply: SCHEDt2.
         Qed.
 
@@ -90,9 +90,7 @@ Module NonpreemptiveSchedule.
             job_completed_by j (t + job_remaining_cost j t).
         Proof.
           intros j t SCHED.
-          rewrite /job_completed_by /completed_by eqn_leq.
-          apply /andP; split;
-          first by apply cumulative_service_le_job_cost.
+          rewrite /job_completed_by /completed_by.
           rewrite /service /service_during.
           rewrite (@big_cat_nat _ _ _ t) //= ?leq_addr //.
           apply leq_trans with (n := service sched j t + job_remaining_cost j t);
@@ -120,7 +118,7 @@ Module NonpreemptiveSchedule.
         Qed.
         
       End CompletionUnderNonpreemptive.
-      
+
       (* In this section, we determine bounds on the length of the execution interval. *)
       Section ExecutionInterval.
         
@@ -143,46 +141,33 @@ Module NonpreemptiveSchedule.
             unfold is_nonpreemptive_schedule in *.
             apply contraT; intros CONTRA; exfalso.
             rename H_j_is_scheduled_at_t into SCHED.
-            
             have COSTPOS: job_cost j > 0.
-            {
-              apply (scheduled_implies_not_completed job_cost) in SCHED.
+            { apply (scheduled_implies_not_completed job_cost) in SCHED; last by done.
               unfold job_completed_by, completed_by in SCHED.
               apply contraT; rewrite -eqn0Ngt.
               move => /eqP EQ0.
               rewrite EQ0 in SCHED.
-              move: SCHED => /eqP GT0.
-              exfalso; apply: GT0; apply /eqP.
-              rewrite eqn_leq.
-              apply /andP; split; last by done.
-              rewrite -EQ0.
-              apply H_completed_jobs_dont_execute.
-                by done.
-            } 
-            
-            have H := job_completes_after_remaining_cost
-                        H_completed_jobs_dont_execute
-                        j t SCHED.  
-            
+                by rewrite -ltnNge ltn0 in SCHED.
+            }
+
+            have H: service sched j (t + job_remaining_cost j t) == job_cost j.
+            { rewrite eqn_leq; apply/andP; split; eauto 2.
+                by apply job_completes_after_remaining_cost.
+            }              
             unfold job_completed_by, completed_by in H.
             move: H => /eqP H.
-
             unfold service, service_during in H.
-
-            rewrite
-              (@big_cat_nat _ _ _ (t - service sched j t)) //= in H;
+            rewrite (@big_cat_nat _ _ _ (t - service sched j t)) //= in H;
               last by rewrite leq_subLR addnC -addnA leq_addr.
             have R: forall a b c, a + b = c -> b < c -> a > 0.
-            {
-                by intros a b c EQ LT; induction a;
+            {  by intros a b c EQ LT; induction a;
                 first by rewrite add0n in EQ; subst b;
                 rewrite ltnn in LT.        
             }
-            
             apply R in H; last first.
             {
               have CUMLED := cumulative_service_le_delta sched j 0 t.
-              have CUMLEJC := cumulative_service_le_job_cost _ _ H_completed_jobs_dont_execute j 0 t.
+              have CUMLEJC := cumulative_service_le_job_cost _ _ j H_completed_jobs_dont_execute 0 t.
               rewrite (@big_cat_nat _ _ _ ((t - service sched j t).+1)) //=.
               {
                 rewrite big_nat_recl; last by done.
@@ -236,17 +221,13 @@ Module NonpreemptiveSchedule.
           Proof.
             rename H_j_is_scheduled_at_t into SCHED.
             intros GT; apply/negP; intros CONTRA.
-
             have L1 := job_doesnt_complete_before_remaining_cost
-                         job_cost sched H_completed_jobs_dont_execute
-                         j t.
+                         job_cost sched j H_completed_jobs_dont_execute t.
             feed L1; first by rewrite scheduled_implies_not_completed.
-
             have L2 := job_completes_after_remaining_cost
                          H_completed_jobs_dont_execute
                          j (t-service sched j t - 1).
             feed L2; first by done. 
-
             have EQ:
               t + job_remaining_cost j t - 1 =
               t - service sched j t - 1 + job_remaining_cost j (t - service sched j t - 1).
@@ -261,16 +242,13 @@ Module NonpreemptiveSchedule.
                 have COMPL: completed_by job_cost sched j (t + job_remaining_cost j t - 1).
                 {
                   apply completion_monotonic with (t0 := t' + job_remaining_cost j t');
-                  [by done | | by apply job_completes_after_remaining_cost].
-              
+                  [| by apply job_completes_after_remaining_cost].
                   unfold remaining_cost.
-
                   have LLF: t' < t - service sched j t.
                   {
                       by apply ltn_trans with (t - service sched j t - 1);
                     last by rewrite -addn1 subh1 // -addnBA // subnn addn0.
                   } clear LT.
-                  
                   rewrite !addnBA;
                     try(rewrite H_completed_jobs_dont_execute //).
                   rewrite [t' + _]addnC [t + _]addnC.
@@ -281,9 +259,8 @@ Module NonpreemptiveSchedule.
                     rewrite addn1 subn1 -pred_Sn;
                   [rewrite leq_subr | rewrite subh3 // addn1].
                 }
-            
                 have L3 := job_doesnt_complete_before_remaining_cost job_cost sched
-                             H_completed_jobs_dont_execute j t;
+                             j H_completed_jobs_dont_execute t;
                     feed L3; first by rewrite scheduled_implies_not_completed.
                 unfold job_completed_by in *.
                   by move: L3 => /negP L3; apply L3.

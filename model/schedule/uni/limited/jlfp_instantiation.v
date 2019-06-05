@@ -265,7 +265,7 @@ Module JLFPInstantiation.
             apply/negP; intros NEQ.
             move: SCHED => /eqP SCHED.
             move: NCOMPL => /negP NCOMPL; apply: NCOMPL.
-            apply completion_monotonic with t; [ by done | by apply ltnW | ].
+            apply completion_monotonic with t; [ by apply ltnW | ].
             apply/negP; intros NCOMPL; move: NCOMPL => /negP NCOMPL.
             have ARRle := (scheduler_executes_job_with_earliest_arrival
                              job_arrival _ _ _ _  s j t TSKEQ NCOMPL SCHED).
@@ -722,9 +722,8 @@ Module JLFPInstantiation.
                 rewrite [X in _ == X]big_mkcond //=.
                 rewrite [X in _ == X](bigD1_seq j) //=.
                 rewrite -big_mkcondl //=.
-                rewrite eqn_add2r.
-                move: H1 => /eqP H1.
-                  by rewrite -H1.
+                rewrite eqn_add2r H_priority_is_reflexive.
+                  by rewrite eqn_leq; apply/andP; split; try eauto 2.
               }
             }
               by move: H2EQ => /eqP H2EQ.

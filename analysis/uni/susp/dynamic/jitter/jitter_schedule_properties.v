@@ -244,10 +244,9 @@ Module JitterScheduleProperties.
         rewrite sched_jitter_uses_construction_function /reduction.build_schedule
                 -/hp_job_other_than_j.
         destruct (hp_job_other_than_j t) as [j_hp|] eqn:HP; last first.
-        {
-          case PENDj: pending; last by done.
+        { case PENDj: pending; last by done.
           apply/eqP; case => SAME; subst j0; move: PENDj => /andP [_ NOTCOMPj].
-          by rewrite /completed_by EQ eq_refl in NOTCOMPj.
+            by rewrite /completed_by EQ leqnn in NOTCOMPj.
         }
         rewrite /hp_job_other_than_j /reduction.highest_priority_job_other_than_j in HP.
         apply seq_min_in_seq in HP; rewrite mem_filter /pending /completed_by in HP.
@@ -256,12 +255,12 @@ Module JitterScheduleProperties.
         {
           move: PENDj => /andP [_ NOTCOMPj].
           case: (~~ higher_eq_priority _ _); apply/eqP; case => SAME; subst j0;
-            first by rewrite /completed_by EQ eq_refl in NOTCOMPj.
-          by rewrite EQ eq_refl in NOTCOMPhp.
+            first by rewrite /completed_by EQ leqnn in NOTCOMPj.
+          by rewrite EQ leqnn in NOTCOMPhp.
         }
         {
           apply/eqP; case => SAME; subst j0.
-          by rewrite EQ eq_refl in NOTCOMPhp.
+          by rewrite EQ leqnn in NOTCOMPhp.
         }
       Qed.
 

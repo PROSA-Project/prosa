@@ -68,7 +68,7 @@ Module Schedule.
     Definition service_during (t1 t2: time) := \sum_(t1 <= t < t2) service_at t.
     
     (* Job j has completed at time t if it received enough service. *)
-    Definition completed (t: time) := service t == job_cost j.
+    Definition completed (t: time) := service t >= job_cost j.
 
     (* Job j is pending at time t iff it has arrived but has not completed. *)
     Definition pending (t: time) := has_arrived job_arrival j t && ~~completed t.
@@ -277,10 +277,9 @@ Module Schedule.
           completed job_cost sched j t ->
           completed job_cost sched j t'.
       Proof.
-        unfold completed; move => t t' LE /eqP COMPt.
-        rewrite eqn_leq; apply/andP; split; first by apply H_completed_jobs.
-        by apply leq_trans with (n := service sched j t);
-          [by rewrite COMPt | by apply extend_sum].
+        unfold completed; move => t t' LE COMPt.
+        apply leq_trans with (service sched j t); first by done.
+          by rewrite /service /service_during [in X in _ <= X](@big_cat_nat _ _ _ t) //= leq_addr.
       Qed.
 
       (* A completed job cannot be scheduled. *)
@@ -294,10 +293,10 @@ Module Schedule.
         intros t COMPLETED.
         apply/negP; red; intro SCHED.
         have BUG := COMP j t.+1.
-        rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
-        unfold service; rewrite big_nat_recr // /= -addn1.
-        apply leq_add; first by move: COMPLETED => /eqP <-.
-        by rewrite lt0n -not_scheduled_no_service negbK.
+        rewrite leqNgt in BUG; move: BUG => /negP BUG; apply: BUG.
+        unfold service, service_during; rewrite big_nat_recr // /= -addn1.
+        apply leq_add; first by done. 
+          by rewrite lt0n -not_scheduled_no_service negbK.
       Qed.
         
       (* The service received by job j in any interval is no larger than its cost. *)
@@ -394,8 +393,7 @@ Module Schedule.
         have BUG := COMP j t.+1.
         rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
         unfold service; rewrite -addn1 big_nat_recr // /=.
-        apply leq_add;
-          first by move: COMPLETED => /eqP COMPLETED; rewrite -COMPLETED.
+        apply leq_add; first by done.
         rewrite lt0n; apply/eqP; red; move => /eqP NOSERV.
         rewrite -not_scheduled_no_service in NOSERV.
         by rewrite SCHED in NOSERV.

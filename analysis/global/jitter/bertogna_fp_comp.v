@@ -695,8 +695,6 @@ Module ResponseTimeIterationFP.
         } des.
         exploit (RLIST tsk R); [by done | by apply ARRj | by done | intro COMPLETED].
         exploit (DL rt_bounds tsk R); [by ins | by ins | clear DL; intro DL].
-        
-        rewrite eqn_leq; apply/andP; split; first by apply cumulative_service_le_job_cost.
         apply leq_trans with (n := service sched j (job_arrival j + (task_jitter tsk + R)));
           last first.
         {
@@ -704,7 +702,6 @@ Module ResponseTimeIterationFP.
           apply extend_sum; rewrite // leq_add2l.
           by specialize (JOBPARAMS j ARRj); des; rewrite JOBPARAMS2 JOBtsk.
         }
-        rewrite leq_eqVlt; apply/orP; left; rewrite eq_sym.
         by apply COMPLETED.
       Qed.
 

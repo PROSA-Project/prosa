@@ -266,7 +266,7 @@ Module ConstrainedDeadlines.
           assert (LEt: job_arrival j' + task_period tsk <= t).
             by apply leq_trans with (n := job_arrival j); first by rewrite -SAMEtsk.
           apply NOTCOMP'.
-          apply completion_monotonic with (t0 := job_arrival j' + task_period tsk); [by done | by done |].
+          apply completion_monotonic with (t0 := job_arrival j' + task_period tsk); [by done |].
           apply PREVtsk; try (by done).
           apply leq_trans with (n := job_arrival j' + task_period tsk); last by rewrite -SAMEtsk.
           rewrite -addn1; apply leq_add; first by done.

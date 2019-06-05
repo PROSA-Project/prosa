@@ -226,7 +226,7 @@ Module ConcreteScheduler.
       apply nth_or_none_mem in SCHED.
       rewrite mem_sort mem_filter in SCHED.
       move: SCHED => /andP [/andP [_ NOTCOMP] _].
-      by rewrite /completed EQ eq_refl in NOTCOMP.
+      by rewrite /completed EQ leqnn in NOTCOMP.
     Qed.
     
     (* In addition, the scheduler is (jitter-aware) work conserving, ... *)

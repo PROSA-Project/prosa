@@ -244,8 +244,8 @@ Module AbstractRTAforEDFwithArrivalCurves.
             { by apply job_task. } 
             have EQ:= not_quiet_implies_not_idle
                         job_arrival job_cost arr_seq
-                        _ sched EDF j _ _ _ _ _ _ t1 t2 _ t.
-            feed_n 9 EQ; try done.
+                        _ sched EDF j _ _ _ _ _ t1 t2 _ t.
+            feed_n 8 EQ; try done.
             { by rewrite /JLFP_is_reflexive /reflexive /EDF /Priority.EDF. }
             { by move: BUSY => [PREF _]. }            
               by eapply EQ; apply/eqP.
@@ -341,14 +341,12 @@ Module AbstractRTAforEDFwithArrivalCurves.
         move: (posnP (job_cost j)) => [ZERO|POS].
         { exfalso.
           move: NCOMPL => /negP COMPL; apply: COMPL.
-          rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-          - by apply H_completed_jobs_dont_execute.
-          - by rewrite ZERO.
+            by rewrite /is_response_time_bound_of_job /completed_by ZERO.
         }
         move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _]. 
         set (A := job_arrival j - t1) in *.
         have L2 := JLFPInstantiation.cumulative_task_interference_split
-                     job_arrival job_cost job_task arr_seq sched _ _ EDF _ tsk
+                     job_arrival job_cost job_task arr_seq sched _ EDF _ tsk
                      j.
         rewrite L2; first last; try done.
         { by eapply arrived_between_implies_in_arrivals; eauto. }
@@ -643,10 +641,7 @@ Module AbstractRTAforEDFwithArrivalCurves.
     Proof.
       intros js ARRs TSKs.
       move: (posnP (job_cost js)) => [ZERO|POS].
-      { rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-        - by apply H_completed_jobs_dont_execute.
-        - by rewrite ZERO.
-      }    
+      { by rewrite /is_response_time_bound_of_job /completed_by ZERO. }    
       eapply AbstractSeqRTA.uniprocessor_response_time_bound_seq with
           (interference0 := interference) (interfering_workload0 := interfering_workload)
           (task_interference_bound_function := fun tsk A R => IBF A R) (L0 := L); eauto 3.

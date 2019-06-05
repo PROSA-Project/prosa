@@ -99,10 +99,7 @@ Module ResponseTimeAnalysisFP.
       rename H_response_time_is_fixed_point into FIX.
       intros j ARRj JOBtsk.
       move: (posnP (job_cost j)) => [Z|POS].
-      { rewrite /is_response_time_bound_of_job /completed_by eqn_leq; apply/andP; split.
-        - by apply H_completed_jobs_dont_execute. 
-        - by rewrite Z. 
-      }
+      { by rewrite /is_response_time_bound_of_job /completed_by Z. }
       set prio := FP_to_JLFP job_task higher_eq_priority.
       apply busy_interval_bounds_response_time with
           (arr_seq0 := arr_seq)
@@ -115,8 +112,8 @@ Module ResponseTimeAnalysisFP.
         destruct (sched t) eqn:SCHED; last by done.
         have HP := pending_hp_job_exists
                      job_arrival job_cost arr_seq _ sched
-                     prio _ ARRj _ _ _ _ _ _ BUSY _ NEQ.
-        feed_n 5 HP; try done.
+                     prio _ ARRj _ _ _ _ _ BUSY _ NEQ.
+        feed_n 4 HP; try done.
         { by intros x; apply H_priority_is_reflexive. }
         move: HP => [jhp [ARRjhp [PEND PRIO]]].
         apply/eqP; rewrite eqb0 Bool.negb_involutive.
