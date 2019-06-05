@@ -1,4 +1,5 @@
 Require Import rt.util.all.
+
 Require Import rt.model.suspension.
 Require Import rt.model.arrival.basic.job rt.model.arrival.basic.arrival_sequence.
 Require Import rt.model.schedule.uni.schedule.
@@ -510,7 +511,7 @@ Module SuspensionIntervals.
             last by apply last_execution_bounded_by_identity.
           apply eq_leq, same_service_implies_same_last_execution.
           rewrite /service /service_during big_nat_recr //= /service_at.
-          by apply negbTE in NOTSCHED; rewrite NOTSCHED.
+          by apply negbTE in NOTSCHED; rewrite NOTSCHED addn0.
         Qed.
         
       End ExecutionBeforeSuspension.

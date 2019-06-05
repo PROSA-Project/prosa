@@ -386,7 +386,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
             rewrite case2 Hcases. repeat rewrite addSn case1 -subn1 subKn //.
             repeat rewrite subn0.
             case Hc_slot:(c < time_slot); rewrite /duration_to_finish_from_start_of_slot_with.
-            * by rewrite ceil_eq1.
+            * by rewrite ceil_eq1 //; ssromega.
             * rewrite ceil_suba //; try ssromega.
               rewrite subn1 mulnBl mul1n addnA -addSn addn1.
                apply/eqP. rewrite eqn_add2l subnBA // addnA. repeat rewrite addnBA; try ssromega.

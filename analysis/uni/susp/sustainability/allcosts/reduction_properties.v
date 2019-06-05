@@ -391,7 +391,7 @@ Module SustainabilityAllCostsProperties.
         have SAME: service sched_new j0 t.+1 = service sched_new j0 t.
         {
           apply negbTE in NOTSCHEDn.
-          by rewrite /service /service_during big_nat_recr //= /service_at NOTSCHEDn.
+          by rewrite /service /service_during big_nat_recr //= /service_at NOTSCHEDn addn0.
         }
         rewrite SAME {SAME} in NOTLATE'.
         have INV := sched_new_service_invariant t (ltnW LTr) j0.
@@ -520,7 +520,7 @@ Module SustainabilityAllCostsProperties.
             apply leq_trans with (n := suspension_start sched_susp j0 t); [|by apply IHt].
             apply eq_leq, same_service_implies_same_last_execution.
             rewrite /service /service_during big_nat_recr //= /service_at.
-            case (boolP (scheduled_at sched_susp j0 t)); last by done.
+            case (boolP (scheduled_at sched_susp j0 t)); last by rewrite addn0.
             intros SCHEDs; apply H_respects_self_suspensions in SCHEDs.
             by move: SUSPn => /andP [/andP [_ SUSPs] _].
           }
