@@ -1,3 +1,7 @@
+stages:
+  - build
+  - process
+
 .build:
   stage: build
   image: mathcomp/mathcomp:${CI_JOB_NAME}
@@ -17,7 +21,7 @@
   extends: .build
   # Keep track of all compiled output and the build infrastructure
   artifacts:
-    name: build-files
+    name: prosa-build-files
     paths:
     - _CoqProject
     - Makefile
@@ -44,8 +48,25 @@
     expire_in: 1 week
    
 validate:
-  stage: test
+  stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.9
   dependencies:
     - 1.9.0-coq-8.9
   script: make validate
+
+doc:
+  stage: process
+  image: mathcomp/mathcomp:1.9.0-coq-8.9
+  dependencies:
+    - 1.9.0-coq-8.9
+  script:
+    - make html
+    - mv html with-proofs
+    - make gallinahtml
+    - mv html without-proofs
+  artifacts:
+    name: "prosa-spec-$CI_COMMIT_REF_NAME"
+    paths:
+      - "with-proofs/"
+      - "without-proofs/"
+    expire_in: 1 week
