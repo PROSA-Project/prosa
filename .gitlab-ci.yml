@@ -1,43 +1,20 @@
 # Taken from https://gitlab.com/erikmd/docker-coq-gitlab-ci-demo-1/blob/master/.gitlab-ci.yml
 
-stages:
-  - build
-
 .build:
   stage: build
-  image: coqorg/${COQ_DOCKER_IMAGE}
-  before_script:
-    - if [ -n "${COMPILER_EDGE}" ]; then opam switch ${COMPILER_EDGE} && eval $(opam env); fi
-    - opam update -y
-    - opam install -y -j ${NJOBS} ${SSREFLECT_PACKAGE}
-    - opam config list
-    - opam repo list
-    - opam list
+  image: mathcomp/mathcomp:${CI_JOB_NAME}
   script:
-    - sudo chown -R coq:coq "$CI_PROJECT_DIR"
     - ./create_makefile.sh
     - make -j ${NJOBS}
     - make validate
 
-.ssreflect_latest:
+1.8.0-coq-8.8:
   extends: .build
-  variables:
-    SSREFLECT_PACKAGE: "coq-mathcomp-ssreflect"
-    COQ_DOCKER_IMAGE: ${CI_JOB_NAME}
 
-coq:8.9+ssreflect:1.8.0:
+1.9.0-coq-8.9:
   extends: .build
-  variables:
-    COQ_DOCKER_IMAGE: "coq:8.9"
-    # NOTE: we currently fix the mathcomp version to 1.8.0 here because
-    #       version 1.9.0 causes a build failure that still needs to be
-    #       investigated.    
-    SSREFLECT_PACKAGE: "coq-mathcomp-ssreflect.1.8.0"
 
-coq:8.9:
-  extends: .ssreflect_latest
-
-coq:dev:
-  extends: .ssreflect_latest
+1.9.0-coq-dev:
+  extends: .build
   # it's ok to fail with an unreleased version of Coq
   allow_failure: true 
