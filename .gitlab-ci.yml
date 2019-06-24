@@ -70,3 +70,9 @@ doc:
       - "with-proofs/"
       - "without-proofs/"
     expire_in: 1 week
+
+proof-length:
+  stage: process
+  image: python:3-alpine
+  script:
+    - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
