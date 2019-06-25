@@ -1,10 +1,10 @@
 From rt.restructuring.behavior.schedule Require Export schedule.
 
 (** Next we define a processor state that includes the possibility of spinning,
- *  where spinning jobs do not progress (= don't get service).  *)
+    where spinning jobs do not progress (= don't get service). *)
 Section State.
 
-  Variable Job: eqType.
+  Variable Job: JobType.
 
   Inductive processor_state :=
     Idle

@@ -3,7 +3,7 @@ From rt.restructuring.behavior.schedule Require Export schedule.
 (** Next, let us define a schedule with variable execution speed. *)
 Section State.
 
-  Variable Job: eqType.
+  Variable Job: JobType.
 
   Inductive processor_state :=
     Idle

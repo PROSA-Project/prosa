@@ -3,7 +3,7 @@ From rt.restructuring.behavior.schedule Require Export schedule.
 
 Section Schedule.
 
-  Variable Job: eqType.
+  Variable Job: JobType.
   Variable processor_state: Type.
   Context `{ProcessorState Job processor_state}.
 

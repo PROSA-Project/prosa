@@ -10,7 +10,7 @@ Section Composition.
       [service] and [service_during]. *)
 
   (* Consider any job type and any processor state. *)
-  Context {Job: eqType}.
+  Context {Job: JobType}.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 

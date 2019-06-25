@@ -1,12 +1,11 @@
 From rt.restructuring.behavior Require Export schedule.schedule.
 
-(** First let us define the notion of an ideal schedule state,
- *  as done in Prosa so far: either a job is scheduled or the system is idle.
- *)
+(** First let us define the notion of an ideal schedule state, as done in Prosa
+    so far: either a job is scheduled or the system is idle. *)
 
 Section State.
 
-  Variable Job: eqType.
+  Variable Job: JobType.
 
   Definition processor_state := option Job.
 
