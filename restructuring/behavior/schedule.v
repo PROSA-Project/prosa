@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-From rt.restructuring.behavior Require Export arrival.arrival_sequence.
+From rt.restructuring.behavior Require Export arrival_sequence.
 
 (* We define the notion of a generic processor state. The processor state type
    determines aspects of the execution environment are modeled (e.g., overheads, spinning).

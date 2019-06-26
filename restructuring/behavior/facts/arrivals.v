@@ -1,4 +1,4 @@
-From rt.restructuring.behavior.arrival Require Export arrival_sequence.
+From rt.restructuring.behavior Require Export arrival_sequence.
 From rt.util Require Import all.
 
 (* In this section, we establish useful facts about arrival sequence prefixes. *)

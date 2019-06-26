@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.behavior.schedule Require Export schedule.
+From rt.restructuring.behavior Require Export schedule.
 From rt.util Require Import tactics step_function sum.
 
 (** In this file, we establish basic facts about the service received by
@@ -581,4 +581,3 @@ Section RelationToScheduled.
   End TimesWithSameService.
 
 End RelationToScheduled.
-

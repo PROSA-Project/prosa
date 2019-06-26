@@ -1,4 +1,5 @@
-From rt.restructuring.behavior Require Export task arrival.arrival_sequence.
+From rt.restructuring.behavior Require Export arrival_sequence.
+From rt.restructuring.model Require Export task.
 
 Section TaskCost.
   Context {T : TaskType}.

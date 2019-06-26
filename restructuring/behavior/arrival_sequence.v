@@ -35,10 +35,6 @@ Section JobProperties.
 
 End JobProperties.
 
-(* Definition of a generic type of parameter for job_arrival *)
-
-Class JobArrival (J : JobType) := job_arrival : J -> instant.
-
 (* Next, we define valid arrival sequences. *)
 Section ValidArrivalSequence.
 
