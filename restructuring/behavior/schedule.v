@@ -45,11 +45,21 @@ Section Schedule.
   Definition service (j : Job) (t : instant) := service_during j 0 t.
 
   Context `{JobCost Job}.
+  Context `{JobDeadline Job}.
   Context `{JobArrival Job}.
 
   (* Next, we say that job j has completed by time t if it received enough
            service in the interval [0, t). *)
   Definition completed_by (j : Job) (t : instant) := service j t >= job_cost j.
+
+  (* We say that R is a response time bound of a job j if j has completed
+     by R units after its arrival *)
+  Definition job_response_time_bound (j : Job) (R : duration) :=
+    completed_by j (job_arrival j + R).
+
+  (* We say that a job meets its deadline if it completes by its absolute deadline *)
+  Definition job_meets_deadline (j : Job) :=
+    completed_by j (job_deadline j).
 
   (* Job j is pending at time t iff it has arrived but has not yet completed. *)
   Definition pending (j : Job) (t : instant) := has_arrived j t && ~~ completed_by j t.
