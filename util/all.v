@@ -18,3 +18,4 @@ Require Export rt.util.minmax.
 Require Export rt.util.seqset.
 Require Export rt.util.step_function.
 Require Export rt.util.epsilon.
+Require Export rt.util.search_arg.
