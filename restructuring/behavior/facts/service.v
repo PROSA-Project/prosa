@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export schedule schedule.platform_properties.
 From rt.util Require Import tactics step_function sum.
 
 (** In this file, we establish basic facts about the service received by
@@ -137,10 +137,6 @@ Section UnitService.
   Context {Job: JobType}.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
-
-  (* We say that a kind processor state provides unit service if no
-     job ever receives more than one unit of service at any time. *)
-  Definition unit_service_proc_model := forall j s, service_in j s <= 1.
 
   (* Let's consider a unit-service model... *)
   Hypothesis H_unit_service: unit_service_proc_model.
@@ -347,8 +343,7 @@ Section RelationToScheduled.
        further prove the converse. *)
 
     (* Assume j always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced:
-      forall s, scheduled_in j s -> service_in j s > 0.
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
     (* In other words, not being scheduled is equivalent to receiving zero
        service. *)
@@ -360,7 +355,7 @@ Section RelationToScheduled.
       split => [NOT_SCHED | NO_SERVICE].
       - apply negbTE in NOT_SCHED.
         by rewrite service_implies_scheduled //.
-      - apply (contra (H_scheduled_implies_serviced (sched t))).
+      - apply (contra (H_scheduled_implies_serviced j (sched t))).
         by rewrite -eqn0Ngt; apply /eqP => //.
     Qed.
 
@@ -392,7 +387,7 @@ Section RelationToScheduled.
       rewrite service_during_service_at.
       exists t'; split => //.
       move: SCHED. rewrite /scheduled_at /service_at.
-        by apply (H_scheduled_implies_serviced (sched t')).
+        by apply (H_scheduled_implies_serviced j (sched t')).
     Qed.
 
     (* ...which again applies to total service, too. *)
@@ -558,8 +553,7 @@ Section RelationToScheduled.
        we can translate this into a claim about scheduled_at. *)
 
     (* Assume j always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced:
-      forall s, scheduled_in j s -> service_in j s > 0.
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
     (* We show that job j is scheduled at some point t < t1 iff j is scheduled
        at some point t' < t2.  *)
@@ -572,7 +566,7 @@ Section RelationToScheduled.
       {
         move=> B. apply/idP/idP => /existsP [b P]; apply /existsP; exists b.
         - by move: P; rewrite /scheduled_at /service_at;
-            apply (H_scheduled_implies_serviced (sched b)).
+            apply (H_scheduled_implies_serviced j (sched b)).
         - by apply service_at_implies_scheduled_at.
       }
       rewrite !CONV.

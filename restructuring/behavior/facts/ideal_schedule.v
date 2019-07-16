@@ -1,28 +1,29 @@
-From rt.restructuring.behavior.schedule Require Import ideal.
+From rt.restructuring.behavior.schedule Require Import ideal platform_properties.
 (* Note: we do not re-export the basic definitions to avoid littering the global
    namespace with type class instances. *)
 
-(* In this section we show that an ideal schedule is unique at any point. *)
-Section OnlyOneJobScheduled.
-  (* Consider any job type and the ideal processor
-     model. *)
+(* In this section we estlish the classes to which an ideal schedule belongs. *)
+Section ScheduleClass.
+  (* Consider any job type and the ideal processor model. *)
   Context {Job: JobType}.
 
-  (* Consider an ideal schedule... *)
-  Variable sched: schedule (processor_state Job).
-
-  (* ...and two given jobs that are to be scheduled. *)
-  Variable j1 j2: Job.
-
-  (* At any time t, if both j1 and j2 are scheduled, then they must be the same
-     job. *)
-  Lemma only_one_job_scheduled:
-    forall t,
-      scheduled_at sched j1 t ->
-      scheduled_at sched j2 t ->
-      j1 = j2.
+  (* We note that the ideal processor model is a uniprocessor
+     model. *)
+  Lemma ideal_proc_model_is_a_uniprocessor_model:
+    @uniprocessor_model _ (processor_state Job) _.
   Proof.
-    by rewrite /scheduled_at=>t/eqP->/eqP[->].
+    move=> j1 j2 sched t.
+    by rewrite /scheduled_at=> /eqP-> /eqP[->].
   Qed.
 
-End OnlyOneJobScheduled.
+  (* We observe that the ideal processor model falls into the category
+     of ideal-progress models, i.e., a scheduled job always receives
+     service. *)
+  Lemma ideal_proc_model_ensures_ideal_progress:
+    @ideal_progress_proc_model _ (processor_state Job) _.
+  Proof.
+    move=> j s /eqP /eqP SOME.
+    by rewrite /service_in /pstate_instance SOME.
+  Qed.
+
+End ScheduleClass.

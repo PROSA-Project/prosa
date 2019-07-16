@@ -74,8 +74,7 @@ Section CompletionFacts.
    * remaining positive cost. *)
 
   (* Assume a scheduled job always receives some positive service. *)
-  Hypothesis H_scheduled_implies_serviced:
-    forall j s, scheduled_in j s -> service_in j s > 0.
+  Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
   (* Then a scheduled job has positive remaining cost. *)
   Corollary scheduled_implies_positive_remaining_cost:
@@ -132,7 +131,7 @@ End CompletionFacts.
 Section ServiceAndCompletionFacts.
   (** In this section, we establish some facts that are really about service,
       but are also related to completion and rely on some of the above lemmas.
-      Hence they are in this file, rather than service_facts.v. *)
+      Hence they are in this file rather than in the service facts file. *)
 
   (* Consider any job type,...*)
   Context {Job: JobType}.
@@ -158,8 +157,7 @@ Section ServiceAndCompletionFacts.
   Section GuaranteedService.
 
     (* Assume a scheduled job always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced:
-      forall j s, scheduled_in j s -> service_in j s > 0.
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
     (* Then we can easily show that the service never exceeds the total cost of
        the job. *)
