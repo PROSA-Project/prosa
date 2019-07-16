@@ -49,6 +49,20 @@ Section NatLemmas.
         rewrite BUG subKn ?eq_refl in EQ.
   Qed.
 
+  (* Simplify n + a - b + b - a = n if n >= b. *)
+  Lemma subn_abba:
+    forall n a b,
+      n >= b ->
+      n + a - b + b - a = n.
+  Proof.
+    move=> n a b le_bn.
+    rewrite subnK;
+      first by rewrite -addnBA // subnn addn0 //.
+    rewrite -[b]addn0.
+    apply leq_trans with (n := n + 0); rewrite !addn0 //.
+    apply leq_addr.
+  Qed.
+
   Lemma addmovr:
     forall m n p,
       m >= n ->
