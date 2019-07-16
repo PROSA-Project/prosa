@@ -120,6 +120,26 @@ Section NatLemmas.
 
 End NatLemmas.
 
+Section Interval.
+
+  (* Trivially, points before the start of an interval, or past the end of an
+     interval, are not included in the interval. *)
+  Lemma point_not_in_interval:
+    forall t1 t2 t',
+      t2 <= t' \/ t' < t1 ->
+      forall t,
+        t1 <= t < t2
+        -> t <> t'.
+  Proof.
+    move=> t1 t2 t' EXCLUDED t /andP [GEQ_t1 LT_t2] EQ.
+    subst.
+    case EXCLUDED => [INEQ | INEQ];
+      eapply leq_ltn_trans in INEQ; eauto;
+      by rewrite ltnn in INEQ.
+  Qed.
+
+End Interval.
+
 Section NatOrderLemmas.
 
   (* Mimic the way implicit arguments are used in ssreflect. *)
