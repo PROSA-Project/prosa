@@ -11,17 +11,6 @@ Section ArrivalSequencePrefix.
   (* Consider any job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
 
-  (* By concatenation, we construct the list of jobs that arrived in the
-     interval [t1, t2). *)
-  Definition jobs_arrived_between (t1 t2 : instant) :=
-    \cat_(t1 <= t < t2) jobs_arriving_at arr_seq t.
-
-  (* Based on that, we define the list of jobs that arrived up to time t, ...*)
-  Definition jobs_arrived_up_to (t : instant) := jobs_arrived_between 0 t.+1.
-
-  (* ...and the list of jobs that arrived strictly before time t. *)
-  Definition jobs_arrived_before (t : instant) := jobs_arrived_between 0 t.
-
   (* In this section, we prove some lemmas about arrival sequence prefixes. *)
   Section Lemmas.
 
@@ -30,42 +19,42 @@ Section ArrivalSequencePrefix.
 
       (* First, we show that the set of arriving jobs can be split
          into disjoint intervals. *)
-      Lemma job_arrived_between_cat:
+      Lemma arrivals_between_cat:
         forall t1 t t2,
           t1 <= t ->
           t <= t2 ->
-          jobs_arrived_between t1 t2 = jobs_arrived_between t1 t ++ jobs_arrived_between t t2.
+          arrivals_between arr_seq t1 t2 = arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2.
       Proof.
-        unfold jobs_arrived_between; intros t1 t t2 GE LE.
+        unfold arrivals_between; intros t1 t t2 GE LE.
           by rewrite (@big_cat_nat _ _ _ t).
       Qed.
 
       (* Second, the same observation applies to membership in the set of
          arrived jobs. *)
-      Lemma jobs_arrived_between_mem_cat:
+      Lemma arrivals_between_mem_cat:
         forall j t1 t t2,
           t1 <= t ->
           t <= t2 ->
-          j \in jobs_arrived_between t1 t2 =
-                (j \in jobs_arrived_between t1 t ++ jobs_arrived_between t t2).
+          j \in arrivals_between arr_seq t1 t2 =
+                (j \in arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2).
       Proof.
-          by intros j t1 t t2 GE LE; rewrite (job_arrived_between_cat _ t).
+          by intros j t1 t t2 GE LE; rewrite (arrivals_between_cat _ t).
       Qed.
 
       (* Third, we observe that we can grow the considered interval without
          "losing" any arrived jobs, i.e., membership in the set of arrived jobs
          is monotonic. *)
-      Lemma jobs_arrived_between_sub:
+      Lemma arrivals_between_sub:
         forall j t1 t1' t2 t2',
           t1' <= t1 ->
           t2 <= t2' ->
-          j \in jobs_arrived_between t1 t2 ->
-                j \in jobs_arrived_between t1' t2'.
+          j \in arrivals_between arr_seq t1 t2 ->
+          j \in arrivals_between arr_seq t1' t2'.
       Proof.
         intros j t1 t1' t2 t2' GE1 LE2 IN.
         move: (leq_total t1 t2) => /orP [BEFORE | AFTER];
-                                   last by rewrite /jobs_arrived_between big_geq // in IN.
-        rewrite /jobs_arrived_between.
+                                   last by rewrite /arrivals_between big_geq // in IN.
+        rewrite /arrivals_between.
         rewrite -> big_cat_nat with (n := t1); [simpl | by done | by apply: (leq_trans BEFORE)].
         rewrite mem_cat; apply/orP; right.
         rewrite -> big_cat_nat with (n := t2); [simpl | by done | by done].
@@ -85,8 +74,8 @@ Section ArrivalSequencePrefix.
          (jobs_arrived_before t), then it arrives in the arrival sequence. *)
       Lemma in_arrivals_implies_arrived:
         forall j t1 t2,
-          j \in jobs_arrived_between t1 t2 ->
-                arrives_in arr_seq j.
+          j \in arrivals_between arr_seq t1 t2 ->
+          arrives_in arr_seq j.
       Proof.
         rename H_consistent_arrival_times into CONS.
         intros j t1 t2 IN.
@@ -100,7 +89,7 @@ Section ArrivalSequencePrefix.
          t2. *)
       Lemma in_arrivals_implies_arrived_between:
         forall j t1 t2,
-          j \in jobs_arrived_between t1 t2 ->
+          j \in arrivals_between arr_seq t1 t2 ->
                 arrived_between j t1 t2.
       Proof.
         rename H_consistent_arrival_times into CONS.
@@ -114,11 +103,10 @@ Section ArrivalSequencePrefix.
            then it indeed arrives before time t. *)
       Lemma in_arrivals_implies_arrived_before:
         forall j t,
-          j \in jobs_arrived_before t ->
+          j \in arrivals_before arr_seq t ->
                 arrived_before j t.
       Proof.
         intros j t IN.
-        Fail suff: arrived_between j 0 t by rewrite /arrived_between /=.
         have: arrived_between j 0 t by apply in_arrivals_implies_arrived_between.
           by rewrite /arrived_between /=.
       Qed.
@@ -129,7 +117,7 @@ Section ArrivalSequencePrefix.
         forall j t1 t2,
           arrives_in arr_seq j ->
           arrived_between j t1 t2 ->
-          j \in jobs_arrived_between t1 t2.
+          j \in arrivals_between arr_seq t1 t2.
       Proof.
         rename H_consistent_arrival_times into CONS.
         move => j t1 t2 [a_j ARRj] BEFORE.
@@ -141,10 +129,10 @@ Section ArrivalSequencePrefix.
          jobs, the same applies for any of its prefixes. *)
       Lemma arrivals_uniq :
         arrival_sequence_uniq arr_seq ->
-        forall t1 t2, uniq (jobs_arrived_between t1 t2).
+        forall t1 t2, uniq (arrivals_between arr_seq t1 t2).
       Proof.
         rename H_consistent_arrival_times into CONS.
-        unfold jobs_arrived_up_to; intros SET t1 t2.
+        unfold arrivals_up_to; intros SET t1 t2.
         apply bigcat_nat_uniq; first by done.
         intros x t t' IN1 IN2.
           by apply CONS in IN1; apply CONS in IN2; subst.

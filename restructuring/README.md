@@ -1,8 +1,10 @@
 This is a work-in-progress directory and part of the larger Prosa restructuring effort. As parts in Prosa are changed to comply with the “new style”, they are placed here.
 
-The behavior directory collects all definitions and basic properties of system behavior (i.e., trace-based semantics).
+The behavior directory collects all definitions and basic properties of system behavior (i.e., trace-based semantics). Changes here are sensitive since this is the part of the library that everyone is going to use, so changes here should be discussed early.
 
-The model directory collects all definitions and basic properties of system models (e.g., sporadic tasks, arrival curves, scheduling policies etc.)
+The model directory collects all definitions and basic properties of system models (e.g., sporadic tasks, arrival curves, scheduling policies etc.). One should port and validate a new system model before the corresponding analysis.
+
+The analysis directory collects all definitions of system properties (e.g., schedulability, response time etc.), analysis results and proofs. The stucture of this directory is not clear yet.
 
 # Remarks
 

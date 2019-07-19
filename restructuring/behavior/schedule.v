@@ -52,6 +52,10 @@ Section Schedule.
            service in the interval [0, t). *)
   Definition completed_by (j : Job) (t : instant) := service j t >= job_cost j.
 
+  (* We say that job j completes at time t if it has completed by time t but
+     not by time t - 1 *)
+  Definition completes_at (j : Job) (t : instant) := ~~ completed_by j t.-1 && completed_by j t.
+
   (* We say that R is a response time bound of a job j if j has completed
      by R units after its arrival *)
   Definition job_response_time_bound (j : Job) (R : duration) :=
