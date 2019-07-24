@@ -15,7 +15,7 @@ Module Job.
     Variable j: Job.
 
     (* The job cost must be positive. *)
-    Definition job_cost_positive (j: Job) := job_cost j > 0.
+    Definition job_cost_positive := job_cost j > 0.
 
   End ValidJob.
 
