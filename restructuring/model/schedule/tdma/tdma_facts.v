@@ -1,4 +1,4 @@
-From rt.restructuring.model Require Export schedule.tdma.
+From rt.restructuring.model Require Export tdma.
 From rt.util Require Import all.
 
 (** In this section, we define the properties of TDMA and prove some basic lemmas. *)
