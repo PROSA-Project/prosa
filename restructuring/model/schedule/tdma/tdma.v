@@ -92,7 +92,7 @@ Section TDMASchedule.
 
   Context {Task : TaskType} {Job : JobType}.
 
-  Context `{JobArrival Job} `{JobCost Job} `{JobTask Job Task}.
+  Context `{JobArrival Job} `{JobCost Job} `{JobReady Job (option Job)} `{JobTask Job Task}.
 
   (* Consider any job arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.

@@ -14,6 +14,9 @@ Section Priority.
 
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
+
+  Context `{JobReady Job PState}.
+
   Variable sched : schedule PState.
 
   Definition respects_preemptive_priorities :=

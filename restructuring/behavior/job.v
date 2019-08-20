@@ -15,3 +15,7 @@ Class JobArrival (J : JobType) := job_arrival : J -> instant.
 
 (* Definition of a generic type of parameter relating jobs to an absolute deadline *)
 Class JobDeadline (J : JobType) := job_deadline : J -> instant.
+
+(* Definition of a generic type of release jitter parameter. *)
+Class JobJitter (J : JobType) := job_jitter : J -> duration.
+

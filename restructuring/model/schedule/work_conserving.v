@@ -19,6 +19,9 @@ Section WorkConserving.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
+  (* Further, allow for any notion of job readiness. *)
+  Context `{JobReady Job PState}.
+
   (* Given an arrival sequence and a schedule ... *)
   Variable arr_seq : arrival_sequence Job.
   Variable sched: schedule PState.
