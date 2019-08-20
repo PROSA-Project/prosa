@@ -286,3 +286,40 @@ Section PositiveCost.
   Qed.
 
 End PositiveCost.
+
+Section RelationToReady.
+  (* Consider any kinds of jobs and any kind of processor state. *)
+  Context {Job : JobType} {PState : Type}.
+  Context `{ProcessorState Job PState}.
+
+  (* Consider any schedule... *)
+  Variable sched : schedule PState.
+
+  (* ...and suppose that jobs have a cost, an arrival time, and a notion of
+     readiness. *)
+  Context `{JobCost Job}.
+  Context `{JobArrival Job}.
+  Context `{JobReady Job PState}.
+
+  (* We observe that a given job is ready only if it is also incomplete... *)
+  Lemma ready_implies_incomplete:
+    forall j t, job_ready sched j t -> ~~ completed_by sched j t.
+  Proof.
+    move=> j t READY.
+    move: (any_ready_job_is_pending sched j t READY).
+    by rewrite /pending => /andP [_ INCOMPLETE].
+  Qed.
+
+  (* ...and lift this observation also to the level of whole schedules. *)
+  Lemma completed_jobs_are_not_ready:
+    jobs_must_be_ready_to_execute sched ->
+    completed_jobs_dont_execute sched.
+  Proof.
+    rewrite /jobs_must_be_ready_to_execute /completed_jobs_dont_execute.
+    move=> READY_IF_SCHED j t SCHED.
+    move: (READY_IF_SCHED j t SCHED) => READY.
+    rewrite less_service_than_cost_is_incomplete.
+    by apply ready_implies_incomplete.
+  Qed.
+
+End RelationToReady.
