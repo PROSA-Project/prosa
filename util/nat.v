@@ -118,6 +118,17 @@ Section NatLemmas.
     intros* AC. ssromega.
   Qed.
 
+  (* We can drop additive terms on the lesser side of an inequality. *)
+  Lemma leq_addk:
+    forall m n k,
+      n + k <= m ->
+      n <= m.
+  Proof.
+    move=> m n p.
+    apply leq_trans.
+    by apply leq_addr.
+  Qed.
+
 End NatLemmas.
 
 Section Interval.
