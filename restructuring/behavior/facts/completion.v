@@ -1,6 +1,8 @@
 From rt.restructuring.behavior Require Export schedule.
 From rt.restructuring.behavior.facts Require Export service.
 
+From rt.util Require Import nat.
+
 (** In this file, we establish basic facts about job completions. *)
 
 Section CompletionFacts.
@@ -63,10 +65,9 @@ Section CompletionFacts.
       remaining_cost sched j t > 0.
   Proof.
     move=> t SERVICE.
-    rewrite subn_gt0 /service /service_during.
-    apply leq_trans with (\sum_(0 <= t0 < t.+1) service_at sched j t0);
-    last by rewrite H_completed_jobs.
-      by rewrite big_nat_recr //= -addn1 leq_add2l.
+    rewrite -incomplete_is_positive_remaining_cost -less_service_than_cost_is_incomplete.
+    apply H_completed_jobs.
+    by apply service_at_implies_scheduled_at.
   Qed.
 
   (* Consequently, if we have a have processor model where scheduled jobs
@@ -92,16 +93,11 @@ Section CompletionFacts.
       completed_by sched j t ->
       ~~ scheduled_at sched j t.
   Proof.
-    rename H_completed_jobs into COMP.
-    unfold completed_jobs_dont_execute in *.
-    intros t COMPLETED.
-    apply/negP; red; intro SCHED.
-    have BUG := COMP j t.+1.
-    rewrite leqNgt in BUG; move: BUG => /negP BUG; apply BUG.
-    rewrite /service /service_during big_nat_recr // /= -addn1.
-    apply leq_add.
-    - by rewrite -/(service_during sched j 0 t) -/(completed_by sched j t).
-    - by rewrite /service_at; apply: H_scheduled_implies_serviced; rewrite -/(scheduled_at _ _ _).
+    move=> t COMP.
+    apply contra with (b := ~~ completed_by sched j t);
+      last by apply /negPn.
+    move=> SCHED. move: (H_completed_jobs j t SCHED).
+    by rewrite less_service_than_cost_is_incomplete.
   Qed.
 
   (* ... and that a scheduled job cannot be completed. *)
@@ -114,15 +110,6 @@ Section CompletionFacts.
     have REMPOS := scheduled_implies_positive_remaining_cost t SCHED.
     rewrite /remaining_cost subn_gt0 in REMPOS.
       by rewrite -less_service_than_cost_is_incomplete.
-  Qed.
-
-  (* We further observe that [service] and [remaining_cost] are complements of
-     one another. *)
-  Lemma service_cost_invariant:
-    forall t,
-      (service sched j t) + (remaining_cost sched j t) = job_cost j.
-  Proof.
-    move=> t. rewrite /remaining_cost subnKC //.
   Qed.
 
 End CompletionFacts.
@@ -154,63 +141,49 @@ Section ServiceAndCompletionFacts.
   (* Assume that a scheduled job receives exactly one time unit of service. *)
   Hypothesis H_unit_service: unit_service_proc_model.
 
-  Section GuaranteedService.
+  (* To begin with, we establish that the cumulative service never exceeds a
+     job's total cost if service increases only by one at each step since
+     completed jobs don't execute. *)
+  Lemma service_at_most_cost:
+    forall t,
+      service sched j t <= job_cost j.
+  Proof.
+    move=> t.
+    elim: t => [|t]; first by rewrite service0.
+    rewrite -service_last_plus_before.
+    rewrite leq_eqVlt => /orP [/eqP EQ|LT].
+    - rewrite not_scheduled_implies_no_service;
+        first by rewrite addn0 EQ.
+      apply completed_implies_not_scheduled => //.
+      by rewrite /completed_by EQ.
+    - apply leq_trans with (n := service sched j t + 1);
+        last by rewrite addn1.
+      rewrite leq_add2l.
+      by apply H_unit_service.
+  Qed.
 
-    (* Assume a scheduled job always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+  (* This lets us conclude that [service] and [remaining_cost] are complements
+     of one another. *)
+  Lemma service_cost_invariant:
+    forall t,
+      (service sched j t) + (remaining_cost sched j t) = job_cost j.
+  Proof.
+    move=> t.
+    rewrite /remaining_cost subnKC //.
+    by apply service_at_most_cost.
+  Qed.
 
-    (* Then we can easily show that the service never exceeds the total cost of
-       the job. *)
-    Lemma service_le_cost:
-      forall t,
-        service sched j t <= job_cost j.
-    Proof.
-      elim => [| n IH]; first by rewrite service0 //.
-      rewrite leq_eqVlt in IH.
-      case/orP: IH => [EQ | LT]; rewrite -service_last_plus_before.
-      - rewrite not_scheduled_implies_no_service; first by rewrite addn0 //.
-        apply: completed_implies_not_scheduled; auto. unfold unit_service_proc_model in H_unit_service.
-        move /eqP in EQ.
-        rewrite /completed_by EQ //.
-      - apply leq_trans with (n := service sched j n + 1).
-        + rewrite leq_add2l /service_at //.
-        + rewrite -(ltnS (service sched j n + 1) _) -(addn1 (job_cost j)) ltn_add2r //.
-    Qed.
-
-    (* We show that the service received by job j in any interval is no larger
-       than its cost. *)
-    Lemma cumulative_service_le_job_cost:
-      forall t t',
-        service_during sched j t t' <= job_cost j.
-    Proof.
-      move=> t t'.
-      case/orP: (leq_total t t') => [tt'|tt']; last by rewrite service_during_geq //.
-      apply leq_trans with (n := service sched j t'); last by apply: service_le_cost.
-      rewrite /service. rewrite -(service_during_cat sched j 0 t t') // leq_addl //.
-    Qed.
-
-    Section ProperReleases.
-      Context `{JobArrival Job}.
-
-      (* Assume that jobs are not released early. *)
-      Hypothesis H_jobs_must_arrive:
-        jobs_must_arrive_to_execute sched.
-
-      (* We show that if job j is scheduled, then it must be pending. *)
-      Lemma scheduled_implies_pending:
-        forall t,
-          scheduled_at sched j t ->
-          pending sched j t.
-      Proof.
-        move=> t SCHED.
-        rewrite /pending.
-        apply /andP; split;
-        first by apply: H_jobs_must_arrive => //.
-        apply: scheduled_implies_not_completed => //.
-      Qed.
-
-    End ProperReleases.
-  End GuaranteedService.
+  (* We show that the service received by job j in any interval is no larger
+     than its cost. *)
+  Lemma cumulative_service_le_job_cost:
+    forall t t',
+      service_during sched j t t' <= job_cost j.
+  Proof.
+    move=> t t'.
+    case/orP: (leq_total t t') => [tt'|tt']; last by rewrite service_during_geq //.
+    apply leq_trans with (n := service sched j t'); last by apply: service_at_most_cost.
+    rewrite /service. rewrite -(service_during_cat sched j 0 t t') // leq_addl //.
+  Qed.
 
   (* If a job isn't complete at time t, it can't be completed at time (t +
      remaining_cost j t - 1). *)
@@ -229,6 +202,29 @@ Section ServiceAndCompletionFacts.
       move: REMCOST. rewrite /remaining_cost subn_gt0 => SERVICE.
         by apply leq_ltn_trans with (n := service sched j t).
   Qed.
+
+  Section GuaranteedService.
+
+    (* Assume a scheduled job always receives some positive service. *)
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+
+    (* Assume that jobs are not released early. *)
+    Context `{JobArrival Job}.
+    Hypothesis H_jobs_must_arrive: jobs_must_arrive_to_execute sched.
+
+    (* We show that if job j is scheduled, then it must be pending. *)
+    Lemma scheduled_implies_pending:
+      forall t,
+        scheduled_at sched j t ->
+        pending sched j t.
+    Proof.
+      move=> t SCHED.
+      rewrite /pending.
+      apply /andP; split;
+        first by apply: H_jobs_must_arrive => //.
+      by apply: scheduled_implies_not_completed => //.
+    Qed.
+  End GuaranteedService.
 
 End ServiceAndCompletionFacts.
 
