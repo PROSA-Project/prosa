@@ -137,7 +137,7 @@ Section ValidSchedule.
 
   (* ... and whether a job cannot be scheduled after it completes. *)
   Definition completed_jobs_dont_execute :=
-    forall j t, service sched j t <= job_cost j.
+    forall j t, scheduled_at sched j t -> service sched j t < job_cost j.
 
   (* We say that the schedule is valid iff
      - jobs come from some arrival sequence
