@@ -261,6 +261,28 @@ Section ExtraLemmas.
     rewrite addnC -addnBA; last by done.
       by rewrite subnn addn0.  
   Qed.
+
+  (* We show that the fact that the sum is smaller than the range 
+     of the summation implies the existence of a zero element. *)
+  Lemma sum_le_summation_range :
+    forall f t Δ,
+      \sum_(t <= x < t + Δ) f x < Δ ->
+      exists x, t <= x < t + Δ /\ f x = 0.
+  Proof.
+    induction Δ; intros; first by rewrite ltn0 in H.
+    destruct (f (t + Δ)) eqn: EQ.
+    { exists (t + Δ); split; last by done.
+        by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS].
+    }
+    { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS; move => H.
+      feed IHΔ.
+      { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
+      move: IHΔ => [z [/andP [LE GE] ZERO]].
+      exists z; split; last by done.
+      apply/andP; split; first by done.
+        by rewrite ltnS ltnW.
+    }
+  Qed.
   
 End ExtraLemmas.
 

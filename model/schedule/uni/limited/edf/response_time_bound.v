@@ -147,7 +147,7 @@ Module AbstractRTAforEDFwithArrivalCurves.
     (* Let L be any positive fixed point of the busy interval recurrence. *)
     Variable L: time.
     Hypothesis H_L_positive: L > 0.
-    Hypothesis H_fixed_point: L = priority_inversion_bound + total_rbf L.
+    Hypothesis H_fixed_point: L = total_rbf L.
 
     (* Next, we define an upper bound on interfering workload received from jobs 
        of other tasks with higher-than-or-equal priority. *)
@@ -297,21 +297,15 @@ Module AbstractRTAforEDFwithArrivalCurves.
           job_arrival job_cost job_task arr_seq sched tsk interference interfering_workload L.
       Proof.
         intros j ARR TSK POS.   
-        have EX := exists_busy_interval
+        have EX := exists_busy_interval_from_total_workload_bound
                      job_arrival job_cost arr_seq _ sched _
-                     EDF j _ _ _ _ _ _ priority_inversion_bound _ L.
-        feed_n 12 EX; try eauto 2.
+                     EDF _ _ _ _ _ L _ _ j ARR POS. 
+        feed_n 9 EX; try eauto 2.
         { by unfold JLFP_is_reflexive, reflexive, EDF, Priority.EDF. }
         { intros. 
-          rewrite {2}H_fixed_point leq_add //.
-          apply leq_trans with (workload_of_jobs job_cost (jobs_arrived_between arr_seq t (t + L)) predT).
-          - rewrite /workload_of_higher_or_equal_priority_jobs /workload_of_jobs
-                    big_mkcond [X in _ <= X]big_mkcond leq_sum //=.
-            intros s _.
-              by case (EDF s j).
-          - apply total_workload_le_total_rbf'' with job_task; try done.
-            intros tsk0 IN0.
-              by move: (H_family_of_proper_arrival_curves tsk0 IN0) => [ARRB _].              
+          rewrite {2}H_fixed_point.
+          apply total_workload_le_total_rbf'' with job_task; try done.
+            by intros tsk0 IN0;  move: (H_family_of_proper_arrival_curves tsk0 IN0) => [ARRB _].
         } 
         move: EX => [t1 [t2 [H1 [H2 GGG]]]].
         exists t1, t2; split; first by done.

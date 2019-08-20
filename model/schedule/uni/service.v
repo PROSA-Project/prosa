@@ -203,6 +203,7 @@ Module Service.
     (* ... where jobs do not execute before their arrival or after completion. *)
     Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute job_arrival sched.
     Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute job_cost sched.
+    Hypothesis H_jobs_come_from_arrival_sequence: jobs_come_from_arrival_sequence sched arr_seq.
 
     (* For simplicity, let's define some local names. *)
     Let job_completed_by := completed_by job_cost sched.
@@ -365,6 +366,95 @@ Module Service.
       move => t' _.
         by apply service_of_jobs_le_1.
     Qed.
+
+    (* Next we prove that total service that is lower than the 
+       range implies the existence of an idle time instant. *)
+    Lemma low_service_implies_existence_of_idle_time :
+      forall t1 t2,
+        t1 <= t2 ->
+        service_of_jobs sched (arrivals_between 0 t2) predT t1 t2 < t2 - t1 ->
+        exists t, t1 <= t < t2 /\ is_idle sched t.
+    Proof.
+      intros ? ? LE SERV.
+      have EX: exists δ, t2 = t1 + δ.
+      { by exists (t2 - t1); rewrite subnKC // ltnW. }
+      move: EX => [δ EQ]; subst t2; clear LE.
+      rewrite {3}[t1 + δ]addnC -addnBA // subnn addn0 in SERV.
+      rewrite /service_of_jobs exchange_big //= in SERV.
+      apply sum_le_summation_range in SERV.
+      move: SERV => [x [/andP [GEx LEx] L]].
+      exists x; split; first by apply/andP; split.
+      apply/negPn; apply/negP; intros NIDLE.
+      unfold is_idle in NIDLE.
+      destruct(sched x) eqn:SCHED; last by done.
+      move: SCHED => /eqP SCHED; clear NIDLE.
+      move: L => /eqP; rewrite -sum_nat_eq0_nat; move => /allP L.
+      specialize (L s); feed L. 
+      { unfold arrivals_between.
+        eapply arrived_between_implies_in_arrivals; eauto 2.
+        apply/andP; split; first by done.
+        apply H_jobs_must_arrive_to_execute in SCHED.
+          by apply leq_ltn_trans with x.
+      } 
+        by move: L; simpl; rewrite /service_at /scheduled_at SCHED eqb0; move => /eqP EQ.
+    Qed.
+
+    (* In this section we prove a few facts about splitting 
+       the total service of a set of jobs. *)
+    Section ServiceCat.
+      
+      (* We show that the total service of jobs released in a time interval [t1,t2) during [t1,t2)
+         is equal to the sum of:
+         (1) the total service of jobs released in time interval [t1, t) during time [t1, t)
+         (2) the total service of jobs released in time interval [t1, t) during time [t, t2)
+         and (3) the total service of jobs released in time interval [t, t2) during time [t, t2). *)
+      Lemma service_of_jobs_cat_scheduling_interval :
+        forall P t1 t2 t,
+          t1 <= t <= t2 -> 
+          service_of_jobs sched (arrivals_between t1 t2) P t1 t2
+          = service_of_jobs sched (arrivals_between t1 t) P t1 t
+            + service_of_jobs sched (arrivals_between t1 t) P t t2
+            + service_of_jobs sched (arrivals_between t t2) P t t2. 
+      Proof.
+        move => P t1 t2 t /andP [GEt LEt].
+        rewrite /arrivals_between (job_arrived_between_cat _ _ t) //.
+        rewrite {1}/service_of_jobs big_cat //=.
+        rewrite exchange_big //= (@big_cat_nat _ _ _ t) //=;
+                rewrite [in X in X + _ + _]exchange_big //= [in X in _ + X + _]exchange_big //=.
+        apply/eqP; rewrite -!addnA eqn_add2l eqn_add2l.
+        rewrite exchange_big //= (@big_cat_nat _ _ _ t) //= [in X in _ + X]exchange_big //=.
+        rewrite -[service_of_jobs _ _ _ _ _]add0n /service_of_jobs eqn_add2r.
+        rewrite big_nat_cond big1 //.
+        move => x /andP [/andP [GEi LTi] _].
+        rewrite big_seq_cond big1 //.
+        move => s /andP [ARR Ps].
+        rewrite /service_at /scheduled_at.
+        apply/eqP; rewrite eqb0; apply/negP; intros SCHED.
+        apply H_jobs_must_arrive_to_execute in SCHED.
+        eapply in_arrivals_implies_arrived_between in ARR; eauto 2.
+        move: SCHED; rewrite /has_arrived leqNgt; move => /negP CONTR; apply: CONTR.
+        move: ARR => /andP [ARR1 ARR2].
+          by apply leq_trans with t.
+      Qed.
+
+      (* We show that the total service of jobs released in a time interval [t1,t2) during [t,t2)
+         is equal to the sum of: 
+         (1) the total service of jobs released in a time interval [t1,t) during [t,t2)
+         and (2) the total service of jobs released in a time interval [t,t2) during [t,t2). *)
+      Lemma service_of_jobs_cat_arrival_interval :
+        forall P t1 t2 t,
+          t1 <= t <= t2 ->
+          service_of_jobs sched (arrivals_between t1 t2) P t t2 = 
+          service_of_jobs sched (arrivals_between t1 t) P t t2 +
+          service_of_jobs sched (arrivals_between t t2) P t t2.
+      Proof.
+        move => P t1 t2 t /andP [GEt LEt].
+        apply/eqP;rewrite eq_sym; apply/eqP.
+        rewrite /arrivals_between [in X in _ = X](job_arrived_between_cat _ _ t) //.
+          by rewrite {3}/service_of_jobs -big_cat //=.
+      Qed.
+          
+    End ServiceCat.
     
     (* In this section, we introduce a connection between the cumulative 
        service, cumulative workload, and completion of jobs. *)

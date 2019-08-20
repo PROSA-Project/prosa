@@ -129,8 +129,7 @@ Module RTAforConcreteModels.
           job_arrival job_cost arr_seq sched
           can_be_preempted_for_fully_preemptive_model higher_eq_priority.
 
-      (* Let L be any positive fixed point of the busy interval recurrence, 
-         determined by the higher-or-equal-priority workload. *)
+      (* Let L be any positive fixed point of the busy interval recurrence. *)
       Variable L: time.
       Hypothesis H_L_positive: L > 0.
       Hypothesis H_fixed_point: L = total_rbf L.
@@ -173,7 +172,6 @@ Module RTAforConcreteModels.
           rewrite /task_lock_in_service_le_task_cost. by done.
           unfold task_lock_in_service_bounds_job_lock_in_service.
             by intros ? ARR TSK; rewrite -TSK; apply H_job_cost_le_task_cost. 
-        - by rewrite BLOCK add0n.
         - move => A /andP [LT NEQ].
           specialize (H_R_is_maximum A); feed H_R_is_maximum.
           { by apply/andP; split. }
@@ -204,11 +202,10 @@ Module RTAforConcreteModels.
         \max_(tsk_other <- ts | (tsk_other != tsk) && (D tsk_other > D tsk))
          (task_cost tsk_other - ε).
 
-      (* Let L be any positive fixed point of the busy interval recurrence, determined by 
-         the sum of blocking and higher-or-equal-priority workload. *)
+      (* Let L be any positive fixed point of the busy interval recurrence. *)
       Variable L: time.
       Hypothesis H_L_positive: L > 0.
-      Hypothesis H_fixed_point: L = blocking_bound + total_rbf L.
+      Hypothesis H_fixed_point: L = total_rbf L.
 
       (* To reduce the time complexity of the analysis, recall the notion of search space. *)
       Let is_in_search_space A :=
@@ -294,11 +291,10 @@ Module RTAforConcreteModels.
         \max_(tsk_other <- ts | (tsk_other != tsk) && (D tsk_other > D tsk))
          (task_max_nps tsk_other - ε).
       
-      (* Let L be any positive fixed point of the busy interval recurrence, determined by 
-         the sum of blocking and higher-or-equal-priority workload. *)
+      (* Let L be any positive fixed point of the busy interval recurrence. *)
       Variable L: time.
       Hypothesis H_L_positive: L > 0.
-      Hypothesis H_fixed_point: L = blocking_bound + total_rbf L.
+      Hypothesis H_fixed_point: L = total_rbf L.
 
       (* To reduce the time complexity of the analysis, recall the notion of search space. *)
       Let is_in_search_space A :=
@@ -365,8 +361,7 @@ Module RTAforConcreteModels.
         eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments
           with (task_lock_in_service := fun tsk => (task_cost tsk - (task_last_nps tsk - ε))) 
                (job_lock_in_service := fun job => (job_cost job - (job_last_nps job - ε)))
-               (L0 := L) (job_max_nps0 := job_max_nps)
-               (job_cost0 := job_cost )
+               (L0 := L)(job_cost0 := job_cost) (task_max_nps0 := task_max_nps)
         ; eauto 2.
         { by apply model_with_fixed_preemption_points_is_correct. }
         { eapply model_with_fixed_preemption_points_is_model_with_bounded_nonpreemptive_regions; eauto 2.
@@ -425,8 +420,7 @@ Module RTAforConcreteModels.
               eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2.
               eapply list_of_preemption_point_is_not_empty with (job_cost0 := job_cost); eauto 2. 
             }
-              by done.
-            
+              by done.            
             rewrite -ENDj; last by done.
             apply leq_trans with (job_max_nps j).
             - by apply NondecreasingSequence.last_of_seq_le_max_of_seq.
@@ -525,11 +519,10 @@ Module RTAforConcreteModels.
         \max_(tsk_other <- ts | (tsk_other != tsk) && (D tsk_other > D tsk))
          (task_max_nps tsk_other - ε).
 
-      (* Let L be any positive fixed point of the busy interval recurrence, determined by 
-         the sum of blocking and higher-or-equal-priority workload. *)
+      (* Let L be any positive fixed point of the busy interval recurrence. *)
       Variable L: time.
       Hypothesis H_L_positive: L > 0.
-      Hypothesis H_fixed_point: L = blocking_bound + total_rbf L.
+      Hypothesis H_fixed_point: L = total_rbf L.
 
       (* To reduce the time complexity of the analysis, recall the notion of search space. *)
       Let is_in_search_space A :=

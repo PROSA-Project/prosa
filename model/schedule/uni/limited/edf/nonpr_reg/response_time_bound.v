@@ -306,7 +306,7 @@ Module RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       (* Let L be any positive fixed point of the busy interval recurrence. *)
       Variable L: time.
       Hypothesis H_L_positive: L > 0.
-      Hypothesis H_fixed_point: L = blocking_bound + total_rbf L.
+      Hypothesis H_fixed_point: L = total_rbf L.
 
       (* To reduce the time complexity of the analysis, recall the notion of search space. *)
       Let is_in_search_space A :=
