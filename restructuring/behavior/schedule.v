@@ -84,7 +84,7 @@ End Schedule.
    scheduled only when it is ready. This notion of readiness is a general
    concept that is used to model jitter, self-suspensions, etc.  Crucially, we
    require that any sensible notion of readiness is a refinement of the notion
-   of a pending job, i.e., any ready job must also be ready. *)
+   of a pending job, i.e., any ready job must also be pending. *)
 Class JobReady (Job : JobType) (PState : Type)
       `{ProcessorState Job PState} `{JobCost Job} `{JobArrival Job} :=
   {

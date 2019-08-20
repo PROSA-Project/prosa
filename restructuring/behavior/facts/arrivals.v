@@ -1,5 +1,42 @@
-From rt.restructuring.behavior Require Export arrival_sequence.
+From rt.restructuring.behavior Require Export arrival_sequence schedule.
 From rt.util Require Import all.
+
+(* In this section, we relate job readiness to [has_arrived]. *)
+Section Arrived.
+  (* Consider any kinds of jobs and any kind of processor state. *)
+  Context {Job : JobType} {PState : Type}.
+  Context `{ProcessorState Job PState}.
+
+  (* Consider any schedule... *)
+  Variable sched : schedule PState.
+
+  (* ...and suppose that jobs have a cost, an arrival time, and a notion of
+     readiness. *)
+  Context `{JobCost Job}.
+  Context `{JobArrival Job}.
+  Context `{JobReady Job PState}.
+
+  (* We observe that a given job must have arrived to be ready... *)
+  Lemma ready_implies_arrived:
+    forall j t, job_ready sched j t -> has_arrived j t.
+  Proof.
+    move=> j t READY.
+    move: (any_ready_job_is_pending sched j t READY).
+    by rewrite /pending => /andP [ARR _].
+  Qed.
+
+  (* ...and lift this observation also to the level of whole schedules. *)
+  Lemma jobs_must_arrive_to_be_ready:
+    jobs_must_be_ready_to_execute sched ->
+    jobs_must_arrive_to_execute sched.
+  Proof.
+    rewrite /jobs_must_be_ready_to_execute /jobs_must_arrive_to_execute.
+    move=> READY_IF_SCHED j t SCHED.
+    move: (READY_IF_SCHED j t SCHED) => READY.
+    by apply ready_implies_arrived.
+  Qed.
+
+End Arrived.
 
 (* In this section, we establish useful facts about arrival sequence prefixes. *)
 Section ArrivalSequencePrefix.
