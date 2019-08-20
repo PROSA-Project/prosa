@@ -9,7 +9,7 @@ From rt.restructuring.analysis Require Import schedulability transform.facts.edf
 Section Optimality.
   (* For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
-  
+
   (* ... and any valid job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
   Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
@@ -27,7 +27,9 @@ Section Optimality.
         all_deadlines_of_arrivals_met arr_seq edf_sched /\
         is_EDF_schedule edf_sched.
   Proof.
-    move=> [sched [[COME [ARR COMP]] DL_ARR_MET]].
+    move=> [sched [[COME READY] DL_ARR_MET]].
+    have ARR  := jobs_must_arrive_to_be_ready sched READY.
+    have COMP := completed_jobs_are_not_ready sched READY.
     move: (all_deadlines_met_in_valid_schedule _ _ COME DL_ARR_MET) => DL_MET.
     set sched' := edf_transform sched.
     exists sched'. split; last split.

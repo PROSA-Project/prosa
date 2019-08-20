@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.behavior Require Import schedule.ideal facts.all.
+From rt.restructuring.behavior Require Export facts.all.
 From rt.restructuring.model Require Export schedule.edf.
 From rt.restructuring.analysis Require Export schedulability transform.edf_trans transform.facts.swaps.
 
@@ -11,6 +11,10 @@ From rt.util Require Import tactics nat.
     the proofs of individual properties of the obtained EDF
     schedule. *)
 
+(* Throughout this file, we assume ideal uniprocessor schedules. *)
+From rt.restructuring.behavior Require Export schedule.ideal.
+(* Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+From rt.restructuring.model.readiness Require Export basic.
 
 (** We start by analyzing the helper function [find_swap_candidate],
     which is a problem-specific wrapper around [search_arg]. *)
@@ -210,6 +214,8 @@ Section MakeEDFAtFacts.
   Lemma mea_completed_jobs:
     completed_jobs_dont_execute sched'.
   Proof.
+    have IDEAL := @ideal_proc_model_ensures_ideal_progress Job.
+    have UNIT := @ideal_proc_model_provides_unit_service Job.
     rewrite /sched' /make_edf_at.
     destruct (sched t_edf) as [j_orig|] eqn:SCHED; last by done.
     have SCHED': scheduled_at sched j_orig t_edf
@@ -871,9 +877,12 @@ Section Optimality.
     Theorem edf_schedule_is_valid:
       valid_schedule equivalent_edf_schedule arr_seq.
     Proof.
-      move: H_sched_valid => [COME [ARR COMP]].
-      rewrite /valid_schedule; split; last split.
-      - by apply edf_transform_jobs_come_from_arrival_sequence.
+      move: H_sched_valid => [COME READY].
+      rewrite /valid_schedule; split;
+        first by apply edf_transform_jobs_come_from_arrival_sequence.
+      have ARR  := jobs_must_arrive_to_be_ready sched READY.
+      have COMP := completed_jobs_are_not_ready sched READY.
+      apply basic_readiness_compliance.
       - by apply edf_transform_jobs_must_arrive.
       - by apply edf_transform_completed_jobs_dont_execute.
     Qed.
@@ -882,7 +891,9 @@ Section Optimality.
     Theorem edf_schedule_meets_all_deadlines:
       all_deadlines_met equivalent_edf_schedule.
     Proof.
-      move: H_sched_valid => [COME [ARR COMP]].
+      move: H_sched_valid => [COME READY].
+      have ARR  := jobs_must_arrive_to_be_ready sched READY.
+      have COMP := completed_jobs_are_not_ready sched READY.
       by apply edf_transform_deadlines_met.
     Qed.
 
@@ -903,7 +914,9 @@ Section Optimality.
       all_deadlines_of_arrivals_met arr_seq equivalent_edf_schedule.
     Proof.
       move=> j ARR_j.
-      move: H_sched_valid => [COME [ARR COMP]].
+      move: H_sched_valid => [COME READY].
+      have ARR  := jobs_must_arrive_to_be_ready sched READY.
+      have COMP := completed_jobs_are_not_ready sched READY.
       destruct (job_cost j ==  0) eqn:COST.
       - move: COST => /eqP COST.
         rewrite /job_meets_deadline /completed_by COST.
