@@ -1,4 +1,5 @@
 From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior.facts Require Import completion.
 
 (* We define the readiness indicator function for the classic Liu & Layland
    model without jitter and no self-suspensions, where jobs are always
@@ -22,4 +23,24 @@ Section LiuAndLaylandReadiness.
     }.
   Proof. trivial. Defined.
 
+
+  (* Under this definition, a schedule satisfies that only ready jobs execute
+     as long as jobs must arrive to execute and completed jobs don't execute,
+     which we note with the following theorem. *)
+  Theorem basic_readiness_compliance:
+    forall sched,
+      jobs_must_arrive_to_execute sched ->
+      completed_jobs_dont_execute sched ->
+      jobs_must_be_ready_to_execute sched.
+  Proof.
+    move=> sched ARR COMP.
+    rewrite /jobs_must_be_ready_to_execute =>  j t SCHED.
+    rewrite /job_ready /basic_ready_instance /pending.
+    apply /andP; split.
+    - by apply ARR.
+    - rewrite -less_service_than_cost_is_incomplete.
+      by apply COMP.
+  Qed.
+
 End LiuAndLaylandReadiness.
+
