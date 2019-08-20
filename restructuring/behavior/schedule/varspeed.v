@@ -22,7 +22,7 @@ Section State.
     Definition service_in (s : processor_state) : nat :=
       match s with
       | Idle => 0
-      | Progress j' s  => if j' == j then s else 0
+      | Progress j' speed  => if j' == j then speed else 0
       end.
 
   End Service.
@@ -35,4 +35,5 @@ Section State.
   Proof.
       by move=> j []//= j' s->.
   Defined.
+  
 End State.
