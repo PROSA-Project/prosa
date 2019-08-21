@@ -234,7 +234,7 @@ Section SwappedFacts.
       by apply ltnW.
   Qed.
 
-  (* We further observe that, *after* t2, the swapped schedule again does not
+  (* Likewise, we observe that, *after* t2, the swapped schedule again does not
      differ with regard to the service received by any job. *)
   Lemma service_after_swap_invariant:
     forall t,
@@ -299,11 +299,11 @@ Section SwappedScheduleProperties.
      [t1] and [t2] have been swapped. *)
   Let sched' := swapped sched t1 t2.
 
-  (* First, we observe that if completed jobs don't execute in the
-     original schedule, then that's still the case after the swap. *)
-  Lemma swapped_completed_jobs_dont_execute:
-    completed_jobs_dont_execute sched ->
-    completed_jobs_dont_execute sched'.
+  (* First, we observe that if jobs never accomulate more service than
+     required, then that's still the case after the swap. *)
+  Lemma swapped_service_bound:
+    (forall j t, service sched  j t <= job_cost j) ->
+    (forall j t, service sched' j t <= job_cost j).
   Proof.
     move=> COMP.
     rewrite /completed_jobs_dont_execute => j  t.
@@ -325,6 +325,22 @@ Section SwappedScheduleProperties.
     }
   Qed.
 
+  (* From the above service bound, we conclude that, if if completed jobs don't
+     execute in the original schedule, then that's still the case after the
+     swap, assuming an ideal unit-service model (i.e., scheduled jobs receive
+     exactly one unit of service). *)
+  Lemma swapped_completed_jobs_dont_execute:
+    unit_service_proc_model ->
+    ideal_progress_proc_model ->
+    completed_jobs_dont_execute sched ->
+    completed_jobs_dont_execute sched'.
+  Proof.
+    move=> UNIT IDEAL COMP.
+    apply ideal_progress_completed_jobs => //.
+    apply swapped_service_bound.
+    by move=> j; apply service_at_most_cost.
+  Qed.
+
   (* Suppose all jobs in the original schedule come from some arrival sequence... *)
   Variable arr_seq: arrival_sequence Job.
   Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
@@ -344,7 +360,7 @@ End SwappedScheduleProperties.
     when the job moved earlier has an earlier deadline than the job
     being moved to a later allocation, assuming that the former has
     not yet missed its deadline, which is the core transformation of
-    the classic EDF optimality proof. *) 
+    the classic EDF optimality proof. *)
 Section EDFSwap.
   (* For any given type of jobs with costs and deadlines... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job}.
