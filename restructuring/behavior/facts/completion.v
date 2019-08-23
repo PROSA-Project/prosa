@@ -224,6 +224,7 @@ Section ServiceAndCompletionFacts.
         first by apply: H_jobs_must_arrive => //.
       by apply: scheduled_implies_not_completed => //.
     Qed.
+
   End GuaranteedService.
 
 End ServiceAndCompletionFacts.
@@ -283,7 +284,7 @@ Section PositiveCost.
 
 End PositiveCost.
 
-Section RelationToReady.
+Section CompletedJobs.
   (* Consider any kinds of jobs and any kind of processor state. *)
   Context {Job : JobType} {PState : Type}.
   Context `{ProcessorState Job PState}.
@@ -318,4 +319,20 @@ Section RelationToReady.
     by apply ready_implies_incomplete.
   Qed.
 
-End RelationToReady.
+  (* We further observe that completed jobs don't execute if scheduled jobs
+     always receive non-zero service and cumulative service never exceeds job
+     costs. *)
+  Lemma ideal_progress_completed_jobs:
+    ideal_progress_proc_model ->
+    (forall j t, service sched j t <= job_cost j) ->
+    completed_jobs_dont_execute sched.
+  Proof.
+    move=> IDEAL SERVICE_BOUND j t SCHED.
+    have UB := SERVICE_BOUND j t.+1.
+    have POS := IDEAL _ _ SCHED.
+    apply ltn_leq_trans with (n := service sched j t.+1) => //.
+    rewrite -service_last_plus_before /service_at.
+    by rewrite -{1}(addn0 (service sched j t)) ltn_add2l.
+  Qed.
+
+End CompletedJobs.
