@@ -7,7 +7,7 @@ Section ScheduleClass.
   (* Consider any job type and the ideal processor model. *)
   Context {Job: JobType}.
 
-  (* We note that the ideal processor model is a uniprocessor
+  (* We note that the ideal processor model is indeed a uniprocessor
      model. *)
   Lemma ideal_proc_model_is_a_uniprocessor_model:
     @uniprocessor_model _ (processor_state Job) _.
@@ -24,6 +24,15 @@ Section ScheduleClass.
   Proof.
     move=> j s /eqP /eqP SOME.
     by rewrite /service_in /pstate_instance SOME.
+  Qed.
+
+  (* The ideal processor model is a unit-service model. *)
+  Lemma ideal_proc_model_provides_unit_service:
+    @unit_service_proc_model _ (processor_state Job) _.
+  Proof.
+    move=> j s.
+    rewrite /service_in /pstate_instance.
+    by elim: (s == Some j).
   Qed.
 
 End ScheduleClass.
