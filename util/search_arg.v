@@ -15,8 +15,9 @@ From rt.util Require Import tactics.
 *)
 
 Section ArgSearch.
+  
   (* Given a function [f] that maps the naturals to elements of type [T]... *)
-  Context {T: Type}.
+  Context {T : Type}.
   Variable f: nat -> T.
 
   (* ... a predicate [P] on [T] ... *)
@@ -28,7 +29,7 @@ Section ArgSearch.
   (* ... we define the procedure [search_arg] to iterate a given search space
      [a, b), while checking each element whether [f] satisfies [P] at that
      point and returning the extremum as defined by [R]. *)
-  Fixpoint search_arg (a b: nat): option nat :=
+  Fixpoint search_arg (a b : nat) : option nat :=
     if a < b then
       match b with
       | 0 => None
@@ -202,3 +203,36 @@ Section ArgSearch.
   Qed.
 
 End ArgSearch.
+
+Section ExMinn.
+
+  (* We show that the fact that the minimal satisfying argument [ex_minn ex] of 
+     a predicate [pred] satisfies another predicate [P] implies the existence
+     of a minimal element that satisfies both [pred] and [P]. *) 
+  Lemma prop_on_ex_minn:
+    forall (P : nat -> Prop) (pred : nat -> bool) (ex : exists n, pred n),
+      P (ex_minn ex) ->
+      exists n, P n /\ pred n /\ (forall n', pred n' -> n <= n').
+  Proof.
+    intros.
+    exists (ex_minn ex); repeat split; auto.
+    all: have MIN := ex_minnP ex; move: MIN => [n Pn MIN]; auto.
+  Qed.
+
+  (* As a corollary, we show that if there is a constant [c] such 
+     that [P c], then the minimal satisfying argument [ex_minn ex] 
+     of a predicate [P] is less than or equal to [c]. *)
+  Corollary ex_minn_le_ex:
+    forall (P : nat -> bool) (exP : exists n, P n) (c : nat),
+      P c -> 
+      ex_minn exP <= c.
+  Proof. 
+    intros ? ? ? EX.
+    rewrite leqNgt; apply/negP; intros GT.
+    pattern (ex_minn (P:=P) exP) in GT;
+      apply prop_on_ex_minn in GT; move: GT => [n [LT [Pn MIN]]].
+    specialize (MIN c EX).
+      by move: MIN; rewrite leqNgt; move => /negP MIN; apply: MIN.
+  Qed.
+  
+End ExMinn.
