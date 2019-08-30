@@ -24,7 +24,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     EDF uniprocessor scheduling of real-time tasks with arbitrary arrival models.  *)
 Module AbstractRTAforEDFwithArrivalCurves.
   
-  Import Job Epsilon ArrivalCurves TaskArrival ScheduleOfTask Priority
+  Import Job ArrivalCurves TaskArrival ScheduleOfTask Priority
          UniprocessorSchedule Workload Service ResponseTime MaxArrivalsWorkloadBound
          BusyIntervalJLFP LimitedPreemptionPlatform RBF Service JLFPInstantiation.
  

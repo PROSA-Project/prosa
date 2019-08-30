@@ -3,15 +3,18 @@ From rt.restructuring.model Require Export task.
 
 (* In this file we provide basic definitions related to tasks on arrival sequences *)
 Section TaskArrivals.
-  Context {Job : JobType} {Task : TaskType}.
 
+  (* Consider any type of job associated with any type of tasks. *)
+  Context {Job: JobType}.
+  Context {Task: TaskType}.
   Context `{JobTask Job Task}.
 
-  (* Consider any job arrival sequence, *)
+  (* Consider any job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
 
   Section Definitions.
-    (* And a given task *)
+
+    (* Let tsk be any task. *)
     Variable tsk : Task.
 
     (* We define the sequence of jobs of tsk arriving at time t *)

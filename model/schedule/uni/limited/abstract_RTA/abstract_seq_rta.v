@@ -23,7 +23,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     and sequential jobs. *)
 Module AbstractSeqRTA. 
 
-  Import Job Epsilon ArrivalCurves TaskArrival ScheduleOfTask UniprocessorSchedule Workload
+  Import Job ArrivalCurves TaskArrival ScheduleOfTask UniprocessorSchedule Workload
          Service ResponseTime MaxArrivalsWorkloadBound 
          AbstractRTADefinitions AbstractRTALockInService AbstractRTAReduction AbstractRTA. 
 

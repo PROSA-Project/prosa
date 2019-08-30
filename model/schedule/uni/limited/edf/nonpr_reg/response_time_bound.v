@@ -21,7 +21,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 (** In this module we prove a general RTA theorem for EDF-schedulers. *)
 Module RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
-  Import Epsilon Job ArrivalCurves TaskArrival Priority  UniprocessorSchedule Workload Service
+  Import Job ArrivalCurves TaskArrival Priority  UniprocessorSchedule Workload Service
          ResponseTime MaxArrivalsWorkloadBound LimitedPreemptionPlatform RBF 
          AbstractRTAforEDFwithArrivalCurves BusyIntervalJLFP PriorityInversionIsBounded. 
 

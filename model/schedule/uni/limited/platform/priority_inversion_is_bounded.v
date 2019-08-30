@@ -15,7 +15,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     is bounded. *)
 Module PriorityInversionIsBounded.
 
-  Import Epsilon Job Priority UniprocessorSchedule LimitedPreemptionPlatform BusyIntervalJLFP. 
+  Import Job Priority UniprocessorSchedule LimitedPreemptionPlatform BusyIntervalJLFP. 
 
   Section PriorityInversionIsBounded.
 

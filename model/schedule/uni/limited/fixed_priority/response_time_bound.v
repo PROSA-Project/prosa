@@ -25,7 +25,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     FP uniprocessor scheduling of real-time tasks with arbitrary arrival models.  *)
 Module AbstractRTAforFPwithArrivalCurves.
    
-  Import Epsilon Job ArrivalCurves TaskArrival Priority ScheduleOfTask
+  Import Job ArrivalCurves TaskArrival Priority ScheduleOfTask
          UniprocessorSchedule Workload Service ResponseTime MaxArrivalsWorkloadBound
          LimitedPreemptionPlatform RBF BusyIntervalJLFP JLFPInstantiation.
   

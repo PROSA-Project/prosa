@@ -10,7 +10,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
    
 Module AbstractRTAReduction. 
 
-  Import Epsilon UniprocessorSchedule.
+  Import UniprocessorSchedule.
 
   (* The response-time analysis we are presenting in this series of documents is based on searching 
      over all possible values of A, the relative arrival time of the job respective to the beginning 

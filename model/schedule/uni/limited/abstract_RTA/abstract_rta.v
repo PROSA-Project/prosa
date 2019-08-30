@@ -15,8 +15,8 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     of uniprocessor scheduling of real-time tasks with arbitrary arrival models. *)
 Module AbstractRTA. 
 
-  Import Job Epsilon UniprocessorSchedule Service ResponseTime 
-         AbstractRTADefinitions AbstractRTALockInService AbstractRTAReduction. 
+  Import Job UniprocessorSchedule Service ResponseTime  AbstractRTADefinitions
+         AbstractRTALockInService AbstractRTAReduction. 
 
   (* In this section we prove that the maximum among the solutions of the response-time bound 
      recurrence is a response time bound for tsk. Note that in this section we do not rely on 

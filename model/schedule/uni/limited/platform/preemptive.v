@@ -16,7 +16,7 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype 
    can_be_preempted for the fully preemptive model and prove its correctness. *)
 Module FullyPreemptivePlatform.
 
-  Import Epsilon Job SporadicTaskset UniprocessorSchedule Priority
+  Import Job SporadicTaskset UniprocessorSchedule Priority
          Service LimitedPreemptionPlatform.
   
   Section FullyPreemptiveModel.

@@ -9,7 +9,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     of uniprocessor scheduling of real-time tasks with arbitrary arrival models. *)
 Module AbstractRTADefinitions. 
 
-  Import Job Epsilon UniprocessorSchedule.
+  Import Job UniprocessorSchedule.
 
   (* In this section, we introduce all the abstract notions required by the analysis. *)
   Section Definitions.

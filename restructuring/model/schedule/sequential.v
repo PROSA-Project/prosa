@@ -2,9 +2,10 @@ From rt.restructuring.behavior Require Export schedule.
 From rt.restructuring.model Require Export task.
 
 Section PropertyOfSequentiality.
+
   (* Consider any type of job associated with any type of tasks... *)
-  Context {Job: JobType}.
-  Context {Task: TaskType}.
+  Context {Job : JobType}.
+  Context {Task : TaskType}.
   Context `{JobTask Job Task}.
 
   (* ... with arrival times and costs ... *)

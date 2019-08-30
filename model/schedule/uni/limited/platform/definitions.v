@@ -16,7 +16,7 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype 
    predicate for various preemption models. *)
 Module LimitedPreemptionPlatform.
 
-  Import Epsilon Job SporadicTaskset UniprocessorSchedule Priority Service.
+  Import Job SporadicTaskset UniprocessorSchedule Priority Service.
   
   (* In this section, we define a processor platform with limited preemptions. *)
   Section Properties.

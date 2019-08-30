@@ -24,7 +24,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     (4) FP with floating nonpreemptive regions. *)
 Module RTAforConcreteModels.
 
-  Import Epsilon Job ArrivalCurves TaskArrival Priority UniprocessorSchedule Workload Service
+  Import Job ArrivalCurves TaskArrival Priority UniprocessorSchedule Workload Service
          ResponseTime MaxArrivalsWorkloadBound LimitedPreemptionPlatform ModelWithLimitedPreemptions
          RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves NonpreemptiveSchedule
          FullyNonPreemptivePlatform FullyPreemptivePlatform.

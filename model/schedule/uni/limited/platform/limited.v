@@ -13,7 +13,7 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype 
     model with floating nonpreemptive regions. *)
 Module ModelWithLimitedPreemptions.
 
-  Import Epsilon Job NondecreasingSequence UniprocessorSchedule LimitedPreemptionPlatform.
+  Import Job NondecreasingSequence UniprocessorSchedule LimitedPreemptionPlatform.
 
   (* In this section, we instantiate can_be_preempted for the model with fixed preemption points and
      the model with floating nonpreemptive regions. We also prove that the definitions are correct. *)

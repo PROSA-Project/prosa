@@ -12,7 +12,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     receives enough service to become nonpreemptive. *)
 Module AbstractRTALockInService. 
 
-  Import Job Epsilon UniprocessorSchedule Service  AbstractRTADefinitions.
+  Import Job UniprocessorSchedule Service  AbstractRTADefinitions.
 
   (* Previously we defined the notion of lock-in service (see limited.schedule.v file). 
      Lock-in service is the amount of service after which a job cannot be preempted until 

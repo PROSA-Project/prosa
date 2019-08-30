@@ -7,7 +7,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* In this file, we provide additional definitions and 
    lemmas about lock-in-serivce-compliant schedules. *)
-  Import Job Epsilon Service UniprocessorSchedule.
+  Import Job Service UniprocessorSchedule.
 
   Section Definitions.
 
