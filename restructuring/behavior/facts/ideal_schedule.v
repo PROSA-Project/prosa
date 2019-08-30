@@ -1,4 +1,4 @@
-From rt.restructuring.behavior.schedule Require Import ideal platform_properties.
+From rt.restructuring.model.processor Require Import ideal platform_properties.
 (* Note: we do not re-export the basic definitions to avoid littering the global
    namespace with type class instances. *)
 

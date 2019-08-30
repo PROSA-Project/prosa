@@ -1,5 +1,4 @@
-From rt.restructuring.behavior Require Export schedule.ideal.
-From rt.restructuring.model Require Export task.
+From rt.restructuring.model Require Export task processor.ideal.
 From rt.util Require Export seqset list.
 From mathcomp Require Export ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop div.
 

@@ -12,7 +12,7 @@ From rt.util Require Import tactics nat.
     schedule. *)
 
 (* Throughout this file, we assume ideal uniprocessor schedules. *)
-From rt.restructuring.behavior Require Export schedule.ideal.
+From rt.restructuring.model.processor Require Export ideal.
 (* Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 From rt.restructuring.model.readiness Require Export basic.
 
