@@ -1,5 +1,5 @@
 From rt.restructuring.behavior Require Export schedule.
-From rt.restructuring.behavior.facts Require Export service.
+From rt.restructuring.analysis.basic_facts Require Export service.
 
 From rt.util Require Import nat.
 

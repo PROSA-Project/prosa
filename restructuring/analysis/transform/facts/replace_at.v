@@ -1,5 +1,5 @@
 From rt.restructuring.analysis.transform Require Export swap.
-From rt.restructuring.behavior.facts Require Import all.
+From rt.restructuring.analysis.basic_facts Require Import all.
 From rt.util Require Import nat.
 
 (** In this file, we make a few simple observations about schedules with

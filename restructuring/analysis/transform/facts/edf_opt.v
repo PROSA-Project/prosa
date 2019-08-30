@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.behavior Require Export facts.all.
+From rt.restructuring.analysis Require Export basic_facts.all.
 From rt.restructuring.model Require Export schedule.edf.
 From rt.restructuring.analysis Require Export schedulability transform.edf_trans transform.facts.swaps.
 

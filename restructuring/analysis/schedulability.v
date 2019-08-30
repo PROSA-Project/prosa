@@ -1,5 +1,6 @@
-From rt.restructuring.behavior Require Export schedule facts.completion.
+From rt.restructuring.behavior Require Export schedule.
 From rt.restructuring.model Require Export task.
+From rt.restructuring.analysis.basic_facts Require Export completion.
 From rt.util Require Export seqset.
 
 Section Task.

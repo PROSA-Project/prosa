@@ -1,5 +1,6 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.behavior Require Import schedule facts.all.
+From rt.restructuring.behavior Require Import schedule.
+From rt.restructuring.analysis Require Import basic_facts.all.
 
 (** This file provides an operation that transforms a finite prefix of
     a given schedule by applying a point-wise transformation to each
