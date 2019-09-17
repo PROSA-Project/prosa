@@ -9,9 +9,9 @@ Section PropertesOfJob.
   Context `{JobCost Job}.
 
   (* Consider an arbitrary job. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (* The job cost must be positive. *)
   Definition job_cost_positive := job_cost j > 0.
 
-End PropertesOfJob.
+End PropertesOfJob. 

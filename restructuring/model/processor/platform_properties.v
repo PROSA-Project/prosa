@@ -4,14 +4,14 @@ From rt.restructuring.behavior Require Export schedule.
    following properties that a processor model might possess. *)
 Section ProcessorModels.
   (* Consider any job type and any processor state. *)
-  Context {Job: JobType}.
-  Context {PState: Type}.
+  Context {Job : JobType}.
+  Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
   (* We say that a processor model provides unit service if no
      job ever receives more than one unit of service at any time. *)
   Definition unit_service_proc_model :=
-    forall j s, service_in j s <= 1.
+    forall (j : Job) (s : PState), service_in j s <= 1.
 
   (* We say that a processor model offers ideal progress if a scheduled job
      always receives non-zero service. *)

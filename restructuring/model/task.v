@@ -1,6 +1,5 @@
 From mathcomp Require Export ssrbool.
 From rt.restructuring.behavior Require Export job.
-
 From rt.restructuring.behavior Require Export arrival_sequence.
   
 (* Throughout the library we assume that tasks have decidable equality *)
@@ -32,9 +31,11 @@ Section SameTask.
   Context {Task : TaskType}.
   Context `{JobTask Job Task}.
 
-  (* ... we say that two jobs j1 and j2 are from the same task iff job_task j1
-     is equal to job_task j2. *)
-  Definition same_task j1 j2 := job_task j1 == job_task j2.
+  (* ... we say that two jobs j1 and j2 are from the same task iff job_task j1 is equal to job_task j2, ... *)
+  Definition same_task (j1 j2 : Job) := job_task j1 == job_task j2.
+  
+  (* ... we also say that job j is a job of task tsk iff job_task j is equal to tsk. *)
+  Definition job_of_task (tsk : Task) (j : Job) := job_task j == tsk.
 
 End SameTask.
 
