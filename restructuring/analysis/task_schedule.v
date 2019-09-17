@@ -37,7 +37,7 @@ Section ScheduleOfTask.
       else false.
 
     (* ...which also corresponds to the instantaneous service it receives. *)
-    Definition task_service_at (t: instant) := task_scheduled_at t.
+    Definition task_service_at (t : instant) := task_scheduled_at t.
 
     (* Based on the notion of instantaneous service, we define the
        cumulative service received by tsk during any interval [t1, t2)... *)
