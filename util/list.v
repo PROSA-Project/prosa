@@ -748,6 +748,22 @@ End Order.
 (* In this section we prove some additional lemmas about sequences. *)
 Section AdditionalLemmas.
 
+  (* First, we prove that x ∈ xs implies that xs can be split 
+     into two parts such that xs = xsl ++ [::x] ++ xsr. *)
+  Lemma in_cat:
+    forall {X : eqType} (x : X) (xs : list X),
+      x \in xs -> exists xsl xsr, xs = xsl ++ [::x] ++ xsr.
+  Proof.
+    intros ? ? ? SUB.
+    induction xs; first by done.
+    move: SUB; rewrite in_cons; move => /orP [/eqP EQ|IN].
+    - by subst; exists [::], xs.
+    - feed IHxs; first by done.
+      clear IN; move: IHxs => [xsl [xsr EQ]].
+        by subst; exists (a::xsl), xsr.
+  Qed.
+  
+
   (* We define a local function max over lists using foldl and maxn. *)
   Let max := foldl maxn 0.
   
@@ -769,41 +785,24 @@ Section AdditionalLemmas.
   (* We prove that for any two sequences xs and ys the fact that xs is a subsequence 
      of ys implies that the size of xs is at most the size of ys. *)
   Lemma subseq_leq_size:
-    forall {T: eqType} (xs ys: seq T),
+    forall {X : eqType} (xs ys: seq X),
       uniq xs ->
       (forall x, x \in xs -> x \in ys) ->
       size xs <= size ys.
   Proof.
     clear; intros ? ? ? UNIQ SUB.
-    have Lem:
-      forall a ys,
-        (a \in ys) -> 
-        exists ysl ysr, ys = ysl ++ [::a] ++ ysr.
-    { clear; intros ? ? ? SUB.
-      induction ys; first by done.
-      move: SUB; rewrite in_cons; move => /orP [/eqP EQ|IN].
-      - by subst; exists [::], ys.
-      - feed IHys; first by done.
-        clear IN; move: IHys => [ysl [ysr EQ]].
-          by subst; exists(a0::ysl), ysr.
-    }
-    have EXm: exists m, size ys <= m.
-    { by exists (size ys). }
+    have EXm: exists m, size ys <= m; first by exists (size ys).
     move: EXm => [m SIZEm].
     move: SIZEm UNIQ SUB; move: xs ys.
-    induction m.
-    { intros.
-      move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys.
+    induction m; intros.
+    { move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys.
       destruct xs; first by done.
       specialize (SUB s).
-      feed SUB; first by rewrite in_cons; apply/orP; left.
-        by done.
+        by feed SUB; [rewrite in_cons; apply/orP; left | done]. 
     }
-    { intros.
-      destruct xs as [ | x xs]; first by done.
-      specialize (@Lem _ x ys).
-      feed Lem.
-      { by apply SUB; rewrite in_cons; apply/orP; left. }
+    { destruct xs as [ | x xs]; first by done.
+      move: (@in_cat _ x ys) => Lem.
+      feed Lem; first by apply SUB; rewrite in_cons; apply/orP; left.
       move: Lem => [ysl [ysr EQ]]; subst ys.
       rewrite !size_cat; simpl; rewrite -addnC add1n addSn ltnS -size_cat.
       eapply IHm.
@@ -817,8 +816,7 @@ Section AdditionalLemmas.
             by subst; move: NIN => /negP NIN; apply: NIN.
         }
         { specialize (SUB a).
-          feed SUB.
-          { by rewrite in_cons; apply/orP; right. }
+          feed SUB; first by rewrite in_cons; apply/orP; right.
           clear IN; move: SUB; rewrite !mem_cat; move => /orP [IN| /orP [IN|IN]].
           - by apply/orP; right.
           - exfalso.

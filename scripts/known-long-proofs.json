@@ -300,15 +300,6 @@
         },
         "./util/div_mod.v": {
             "divSn_cases": 54
-        },
-        "./util/list.v": {
-            "subseq_leq_size": 52
-        },
-        "./util/step_function.v": {
-            "exists_intermediate_point": 43
-        },
-        "./util/sum.v": {
-            "sum_majorant_eqn": 40
         }
     }
 }

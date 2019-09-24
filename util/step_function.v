@@ -37,47 +37,40 @@ Section StepFunction.
       Lemma exists_intermediate_point:
         exists x_mid, x1 <= x_mid < x2 /\ f x_mid = y.
       Proof.
-        unfold is_step_function in *.
-        rename H_is_interval into INT,
-               H_step_function into STEP, H_between into BETWEEN.
+        rename H_is_interval into INT, H_step_function into STEP, H_between into BETWEEN.
         move: x2 INT BETWEEN; clear x2.
         suff DELTA:
           forall delta,
             f x1 <= y < f (x1 + delta) ->
-            exists x_mid, x1 <= x_mid < x1 + delta /\ f x_mid = y.                  {
-          move => x2 LE /andP [GEy LTy].
+            exists x_mid, x1 <= x_mid < x1 + delta /\ f x_mid = y.
+        { move => x2 LE /andP [GEy LTy].
           exploit (DELTA (x2 - x1));
             first by apply/andP; split; last by rewrite addnBA // addKn.
-          by rewrite addnBA // addKn.
+            by rewrite addnBA // addKn.
         }
         induction delta.
-        {
-          rewrite addn0; move => /andP [GE0 LT0].
-          by apply (leq_ltn_trans GE0) in LT0; rewrite ltnn in LT0.
+        { rewrite addn0; move => /andP [GE0 LT0].
+            by apply (leq_ltn_trans GE0) in LT0; rewrite ltnn in LT0.
         }
-        {
-          move => /andP [GT LT].
+        { move => /andP [GT LT].
           specialize (STEP (x1 + delta)); rewrite leq_eqVlt in STEP.
           have LE: y <= f (x1 + delta).
-          {
-            move: STEP => /orP [/eqP EQ | STEP];
+          { move: STEP => /orP [/eqP EQ | STEP];
               first by rewrite !addn1 in EQ; rewrite addnS EQ ltnS in LT.
             rewrite [X in _ < X]addn1 ltnS in STEP.
             apply: (leq_trans _ STEP).
-            by rewrite addn1 -addnS ltnW.
+              by rewrite addn1 -addnS ltnW.
           } clear STEP LT.
           rewrite leq_eqVlt in LE.
           move: LE => /orP [/eqP EQy | LT].
-          {
-            exists (x1 + delta); split; last by rewrite EQy.
-            by apply/andP; split; [by apply leq_addr | by rewrite addnS].
+          { exists (x1 + delta); split; last by rewrite EQy.
+              by apply/andP; split; [by apply leq_addr | by rewrite addnS].
           }
-          {
-            feed (IHdelta); first by apply/andP; split.
+          { feed (IHdelta); first by apply/andP; split.
             move: IHdelta => [x_mid [/andP [GE0 LT0] EQ0]].
             exists x_mid; split; last by done.
             apply/andP; split; first by done.
-            by apply: (leq_trans LT0); rewrite addnS.
+              by apply: (leq_trans LT0); rewrite addnS.
           }  
         }
       Qed.

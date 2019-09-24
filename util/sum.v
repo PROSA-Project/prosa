@@ -1,4 +1,4 @@
-Require Import rt.util.tactics rt.util.notation rt.util.sorting rt.util.nat.
+From rt.util Require Import tactics notation sorting nat ssromega.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 (* Lemmas about sum. *)
@@ -41,22 +41,18 @@ Section ExtraLemmas.
     all (fun x => F x == 0) r = (\sum_(i <- r) F i == 0).
   Proof.
     destruct (all (fun x => F x == 0) r) eqn:ZERO.
-    {
-      move: ZERO => /allP ZERO; rewrite -leqn0.
+    - move: ZERO => /allP ZERO; rewrite -leqn0.
       rewrite big_seq_cond (eq_bigr (fun x => 0));
         first by rewrite big_const_seq iter_addn mul0n addn0 leqnn.
       intro i; rewrite andbT; intros IN.
       specialize (ZERO i); rewrite IN in ZERO.
         by move: ZERO => /implyP ZERO; apply/eqP; apply ZERO.
-    }
-    {
-      apply negbT in ZERO; rewrite -has_predC in ZERO.
+    - apply negbT in ZERO; rewrite -has_predC in ZERO.
       move: ZERO => /hasP ZERO; destruct ZERO as [x IN NEQ]; simpl in NEQ.
       rewrite (big_rem x) /=; last by done.
       symmetry; apply negbTE; rewrite neq_ltn; apply/orP; right.
       apply leq_trans with (n := F x); last by apply leq_addr.
         by rewrite lt0n.
-    }
   Qed.
   
   Lemma leq_sum1_smaller_range m n (P Q: pred nat) a b:
@@ -141,7 +137,7 @@ Section ExtraLemmas.
     intros.
     rewrite big_mkcond [in X in _ <= X]big_mkcond//= leq_sum //.
     intros i _. 
-    destruct P1 eqn:P1a; destruct P2 eqn:P2a; [by done | | by done | by done].
+    destruct P1 eqn:P1a; destruct P2 eqn:P2a; try done. 
     exfalso.
     move: P1a P2a => /eqP P1a /eqP P2a.
     rewrite eqb_id in P1a; rewrite eqbF_neg in P2a.
@@ -209,7 +205,6 @@ Section ExtraLemmas.
       \sum_(x <- xs | P x) F1 x = \sum_(x <- xs | P x) F2 x ->
       (forall x, x \in xs -> P x -> F1 x = F2 x).
   Proof.
-    clear.      
     intros T xs F1 F2 P H1 H2 x IN PX.
     induction xs; first by done.
     have Fact: \sum_(j <- xs | P j) F1 j <= \sum_(j <- xs | P j) F2 j.
@@ -223,11 +218,7 @@ Section ExtraLemmas.
         by rewrite in_cons; apply/orP; right. }
     rewrite big_cons [RHS]big_cons in H2.
     have EqLeq: forall a b c d, a + b = c + d -> a <= c -> b >= d.
-    { clear; intros.
-      rewrite leqNgt; apply/negP; intros H1.
-      move: H => /eqP; rewrite eqn_leq; move => /andP [LE GE].
-      move: GE; rewrite leqNgt; move => /negP GE; apply: GE.
-        by apply leq_trans with (a + d); [rewrite ltn_add2l | rewrite leq_add2r]. }
+    { clear; intros; ssromega. } 
     move: IN; rewrite in_cons; move => /orP [/eqP EQ | IN]. 
     { subst a.
       rewrite PX in H2.
