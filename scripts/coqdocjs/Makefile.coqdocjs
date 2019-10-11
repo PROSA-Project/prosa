@@ -1,0 +1,9 @@
+htmlpretty: $(GLOBFILES) $(VFILES)
+	$(SHOW)'COQDOC -d html $(GAL) --with-header scripts/coqdocjs/header.html --with-footer scripts/coqdocjs/footer.html'
+	$(HIDE)mkdir -p html
+	$(HIDE)$(COQDOC) \
+		-toc $(COQDOCFLAGS) \
+		--with-header scripts/coqdocjs/header.html --with-footer scripts/coqdocjs/footer.html \
+		-html $(GAL) $(COQDOCLIBS) -d html $(VFILES)
+	$(HIDE)cp scripts/coqdocjs/resources/* html
+	$(HIDE)mv html/index.html html/indexpage.html

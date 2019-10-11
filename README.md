@@ -45,7 +45,11 @@ For example, the schedulability analysis for global scheduling with release jitt
 
 The Coqdoc documentation (as shown on the [webpage](http://prosa.mpi-sws.org/documentation.html)) can be easily generated with `Make`:
 
-```$ make gallinahtml -j4```
+```$ make html -j 4``` *Documentation with proofs*
+
+```$ make gallinahtml -j 4``` *Documentation without proofs*
+
+```$ make htmlpretty -j 4``` *Pretty documentation (can also hide/show proofs)*
 
 Since Coqdoc requires object files as input, please make sure that the code is compilable.
 

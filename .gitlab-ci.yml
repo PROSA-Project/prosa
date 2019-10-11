@@ -60,15 +60,18 @@ doc:
   dependencies:
     - 1.9.0-coq-8.9
   script:
-    - make html
+    - make html -j ${NJOBS}
     - mv html with-proofs
-    - make gallinahtml
+    - make gallinahtml -j ${NJOBS}
     - mv html without-proofs
+    - make htmlpretty -j ${NJOBS}
+    - mv html pretty
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
       - "with-proofs/"
       - "without-proofs/"
+      - "pretty/"
     expire_in: 1 week
 
 proof-length:

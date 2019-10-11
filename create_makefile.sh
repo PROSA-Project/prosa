@@ -36,3 +36,5 @@ else
 	sed -i 's|rm -f $(VOFILES) $(VOFILES:.vo=.vio) $(GFILES) $(VFILES:.v=.v.d) $(VFILES:=.beautified) $(VFILES:=.old)|find . -name "*.vo" -delete -o -name "*.glob" -delete -o -name "*.v.d" -delete -o -name "*.vio" -delete -o -name "*.old" -delete -o -name "*.beautified" -delete|g' Makefile
 fi
 
+# Patch Makefile.coqdocjs for pretty documentation targets
+printf "\n# Include pretty documentation targets\ninclude scripts/coqdocjs/Makefile.coqdocjs" >> Makefile
