@@ -6,6 +6,9 @@ From rt.util Require Import nat.
 (* We define the readiness indicator function for models with release jitter
    (and no self-suspensions). *)
 
+(* Definition of a generic type of release jitter parameter. *)
+Class JobJitter (Job : JobType) := job_jitter : Job -> duration.
+
 Section ReadinessOfJitteryJobs.
   (* Consider any kind of jobs... *)
   Context {Job : JobType}.

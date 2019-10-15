@@ -2,12 +2,15 @@ From rt.restructuring.behavior Require Import job schedule.
 From rt.restructuring.model Require Import job task.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
-
 (** * Platform with limited preemptions *)
 (** Since the notion of preemption points is based on an user-provided 
     predicate (variable job_can_be_preempted), it does not guarantee that 
     the scheduler will enforce correct behavior. For that, we must 
     define additional predicates. *)
+
+(* Definition of a generic type of parameter relating jobs to their preemption points. *)
+Class JobPreemptable (Job : JobType) := job_preemptable : Job -> duration -> bool.
+
 Section ValidPreemptionModel.
 
   (* Consider any type of tasks ... *)
