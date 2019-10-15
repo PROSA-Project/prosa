@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Import job schedule.
+From rt.restructuring.behavior Require Import all.
 From rt.restructuring.model Require Import job task.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.

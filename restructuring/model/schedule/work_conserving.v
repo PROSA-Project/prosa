@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export schedule arrival_sequence.
+From rt.restructuring.behavior Require Export all.
 
 (* In this file, we introduce a restrictive definition of work conserving
    uniprocessor schedules. The definition is restrictive because it does not

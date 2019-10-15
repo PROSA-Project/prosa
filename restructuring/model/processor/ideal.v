@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export all.
 
 (** First let us define the notion of an ideal schedule state, as done in Prosa
     so far: either a job is scheduled or the system is idle. *)

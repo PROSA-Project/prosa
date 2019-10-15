@@ -1,5 +1,5 @@
 From rt.util Require Import all.
-From rt.restructuring.behavior Require Import job schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model Require Import task processor.ideal.
   
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

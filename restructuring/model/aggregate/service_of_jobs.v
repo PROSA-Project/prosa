@@ -1,5 +1,5 @@
 From rt.util Require Import tactics sum.
-From rt.restructuring.behavior Require Import schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model Require Import task schedule.priority_based.priorities processor.ideal.
 From rt.restructuring.analysis Require Import workload.
 From rt.restructuring.analysis.basic_facts Require Import arrivals completion ideal_schedule.

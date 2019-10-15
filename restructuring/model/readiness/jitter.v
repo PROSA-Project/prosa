@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export all.
 
 From rt.util Require Import nat.
 

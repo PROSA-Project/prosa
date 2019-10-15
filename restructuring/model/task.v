@@ -1,6 +1,5 @@
 From mathcomp Require Export ssrbool.
-From rt.restructuring.behavior Require Export job.
-From rt.restructuring.behavior Require Export arrival_sequence.
+From rt.restructuring.behavior Require Export all.
   
 (* Throughout the library we assume that tasks have decidable equality *)
 Definition TaskType := eqType.

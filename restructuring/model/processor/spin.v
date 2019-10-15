@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export all.
 
 (** Next we define a processor state that includes the possibility of spinning,
     where spinning jobs do not progress (= don't get service). *)

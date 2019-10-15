@@ -1,5 +1,5 @@
 From rt.util Require Import all.
-From rt.restructuring.behavior Require Import schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model Require Import job task.
 From rt.restructuring.model.aggregate Require Import task_arrivals.
 From rt.restructuring.model.arrival Require Import arrival_curves.

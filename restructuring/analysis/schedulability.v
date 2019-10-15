@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model Require Export task.
 From rt.restructuring.analysis.basic_facts Require Export completion.
 From rt.util Require Export seqset.

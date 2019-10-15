@@ -1,5 +1,5 @@
 From rt.util Require Import tactics sum.
-From rt.restructuring.behavior Require Import schedule.
+From rt.restructuring.behavior Require Import service.
 From rt.restructuring.model Require Export service_of_jobs.
 From rt.restructuring.model Require Import task schedule.priority_based.priorities processor.ideal.
 From rt.restructuring.analysis Require Import workload.
@@ -255,10 +255,10 @@ Section IdealModelLemmas.
         rewrite /workload_of_jobs in EQ.
         rewrite (big_rem j) ?Pj //= in EQ.
         move: EQ => /eqP; rewrite addn_eq0; move => /andP [CZ _].
-        unfold completed_by, schedule.completed_by.
+        unfold completed_by, service.completed_by.
           by move: CZ => /eqP CZ; rewrite CZ. 
       }
-      { unfold workload_of_jobs, service_of_jobs in EQ; unfold completed_by, schedule.completed_by.
+      { unfold workload_of_jobs, service_of_jobs in EQ; unfold completed_by, service.completed_by.
         rewrite /service -(service_during_cat _ _ _ t1); last by apply/andP; split. 
         rewrite cumulative_service_before_job_arrival_zero // add0n.
         rewrite <- sum_majorant_eqn with (F1 := fun j => service_during sched j t1 t_compl)

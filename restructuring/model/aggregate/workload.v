@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Import schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model Require Import task schedule.priority_based.priorities.
 From rt.restructuring.analysis Require Import basic_facts.arrivals.
 

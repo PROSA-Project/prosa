@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model.processor Require Export platform_properties.
 From rt.util Require Import tactics step_function sum.
 

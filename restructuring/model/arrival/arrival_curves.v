@@ -1,5 +1,5 @@
 From rt.util Require Import all.
-From rt.restructuring.behavior Require Export arrival_sequence.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model Require Import task_arrivals.
 
 (* In this section, we define the notion of arrival curves, which

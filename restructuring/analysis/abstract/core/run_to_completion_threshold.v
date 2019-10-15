@@ -1,5 +1,5 @@
 From rt.util Require Import epsilon sum tactics search_arg.
-From rt.restructuring.behavior Require Import job schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.analysis.basic_facts Require Import completion.
 From rt.restructuring.model Require Import job task preemption.preemption_model.
 

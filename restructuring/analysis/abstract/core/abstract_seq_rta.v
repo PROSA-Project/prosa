@@ -1,5 +1,5 @@
 From rt.util Require Import epsilon tactics rewrite_facilities sum counting list.
-From rt.restructuring.behavior Require Import schedule.
+From rt.restructuring.behavior Require Import service.
 From rt.restructuring.model Require Import job task preemption.preemption_model.
 From rt.restructuring.model.arrival Require Import arrival_curves. 
 From rt.restructuring.model.schedule Require Import sequential.
@@ -241,7 +241,7 @@ Section Sequential_Abstract_RTA.
       Proof. 
         move => JA; move: (H_j2_from_tsk) => /eqP TSK2eq.
         move: (posnP (@job_cost _ H3 j2)) => [ZERO|POS].
-        { by rewrite /completed_by /schedule.completed_by ZERO. }    
+        { by rewrite /completed_by /service.completed_by ZERO. }    
         move: (H_interference_and_workload_consistent_with_sequential_jobs
                  j1 t1 t2 H_j1_arrives H_j1_from_tsk H_j1_cost_positive H_busy_interval) => SWEQ.
         eapply all_jobs_have_completed_equiv_workload_eq_service
@@ -336,7 +336,7 @@ Section Sequential_Abstract_RTA.
               rewrite /cumul_task_interference /definitions.cumul_interference
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
-                      /service_of_jobs.service_of_jobs_at /scheduled_at /schedule.scheduled_at /scheduled_in;
+                      /service_of_jobs.service_of_jobs_at /scheduled_at /service.scheduled_at /scheduled_in;
                 simpl.
               rewrite !H_idle.
               rewrite big1_eq addn0 add0n. 
@@ -369,7 +369,7 @@ Section Sequential_Abstract_RTA.
               rewrite /cumul_task_interference /definitions.cumul_interference
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
-                      /service_of_jobs.service_of_jobs_at /scheduled_at /schedule.scheduled_at /scheduled_in; simpl.
+                      /service_of_jobs.service_of_jobs_at /scheduled_at /service.scheduled_at /scheduled_in; simpl.
               have ARRs: arrives_in arr_seq j'; first by apply H_jobs_come_from_arrival_sequence with t; apply/eqP.
               rewrite H_sched H_not_job_of_tsk; simpl.
               rewrite (negbTE (option_inj_neq (neqprop_to_neqbool
@@ -410,7 +410,7 @@ Section Sequential_Abstract_RTA.
               rewrite /cumul_task_interference /definitions.cumul_interference
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
-                      /service_of_jobs.service_of_jobs_at /scheduled_at /schedule.scheduled_at /scheduled_in; simpl.
+                      /service_of_jobs.service_of_jobs_at /scheduled_at /service.scheduled_at /scheduled_in; simpl.
               have ARRs: arrives_in arr_seq j'; first by apply H_jobs_come_from_arrival_sequence with t; apply/eqP.
               rewrite H_sched H_not_job_of_tsk addn0; simpl;
                 rewrite [Some j' == Some j](negbTE (option_inj_neq (neq_sym H_j_neq_j'))) addn0.
@@ -419,7 +419,7 @@ Section Sequential_Abstract_RTA.
                 { by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x). }
                 move: (H_work_conserving j t1 t2 t H_j_arrives H_job_of_tsk H_job_cost_positive H_busy_interval NEQT) => [Hn _].
                 apply/eqP;rewrite eq_sym eqb_id; apply/negPn/negP; intros CONTR; move: CONTR => /negP CONTR.
-                apply Hn in CONTR; rewrite /schedule.scheduled_at in CONTR; simpl in CONTR.
+                apply Hn in CONTR; rewrite /service.scheduled_at in CONTR; simpl in CONTR.
                   by rewrite H_sched [Some j' == Some j](negbTE (option_inj_neq (neq_sym H_j_neq_j'))) in CONTR.
               }
               rewrite big_mkcond; apply/sum_seq_gt0P; exists j'; split; last first.
@@ -469,14 +469,14 @@ Section Sequential_Abstract_RTA.
               rewrite /cumul_task_interference /definitions.cumul_interference
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
-                      /service_of_jobs.service_of_jobs_at /scheduled_at /schedule.scheduled_at /scheduled_in.
+                      /service_of_jobs.service_of_jobs_at /scheduled_at /service.scheduled_at /scheduled_in.
               rewrite H_sched H_job_of_tsk neq_antirefl addn0; simpl.
               move: (H_work_conserving j _ _ t H_j_arrives H_job_of_tsk H_job_cost_positive H_busy_interval) => WORK.
               feed WORK.
               { move: H_t_in_interval => /andP [NEQ1 NEQ2].
                   by apply/andP; split; last apply ltn_trans with (t1 + x). }
               move: WORK => [_ ZIJT].
-              feed ZIJT; first by rewrite /schedule.scheduled_at /scheduled_at H_sched; simpl.
+              feed ZIJT; first by rewrite /service.scheduled_at /scheduled_at H_sched; simpl.
               move: ZIJT => /negP /eqP; rewrite eqb_negLR; simpl; move => /eqP ZIJT; rewrite ZIJT; simpl; rewrite add0n.
               rewrite !eq_refl; simpl; rewrite big_mkcond //=; apply/sum_seq_gt0P.
                 by exists j; split; [apply j_is_in_arrivals_between | rewrite /job_of_task H_job_of_tsk H_sched !eq_refl]. 
@@ -696,7 +696,7 @@ Section Sequential_Abstract_RTA.
         move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
         { exfalso.
           move: COMPL => /negP COMPL; apply: COMPL.
-            by rewrite /schedule.completed_by /completed_by ZERO.
+            by rewrite /service.completed_by /completed_by ZERO.
         }            
         set (A := job_arrival j - t1) in *.
         apply leq_trans with

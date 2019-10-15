@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.analysis.basic_facts Require Import completion.
 
 (* We define the readiness indicator function for the classic Liu & Layland

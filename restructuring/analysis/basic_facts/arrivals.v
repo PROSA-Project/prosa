@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export arrival_sequence schedule.
+From rt.restructuring.behavior Require Export all.
 From rt.util Require Import all.
 
 (* In this section, we relate job readiness to [has_arrived]. *)

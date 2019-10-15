@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export schedule job.
+From rt.restructuring.behavior Require Export all.
 From rt.restructuring.analysis.basic_facts Require Import all.
 
 (** This file defines simple allocation substitutions and a swapping operation

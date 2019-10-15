@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.behavior Require Export schedule.
+From rt.restructuring.behavior Require Export all.
 
 (** In this file, we define what it means to be an "EDF schedule". *)
 Section DefinitionOfEDF.
