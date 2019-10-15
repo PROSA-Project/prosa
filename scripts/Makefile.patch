@@ -1,5 +1,14 @@
 --- Makefile.orig	2019-10-15 22:37:51.000000000 +0200
 +++ Makefile	2019-10-15 22:33:50.000000000 +0200
+@@ -179,7 +179,7 @@
+ # these flags do NOT contain the libraries, to make them easier to overwrite
+ COQFLAGS?=-q $(OTHERFLAGS) $(COQEXTRAFLAGS)
+ COQCHKFLAGS?=-silent -o $(COQCHKEXTRAFLAGS)
+-COQDOCFLAGS?=-interpolate -utf8 $(COQDOCEXTRAFLAGS)
++COQDOCFLAGS?=-interpolate -utf8 --parse-comments --coqlib https://coq.inria.fr/distrib/current/stdlib/ --external https://math-comp.github.io/math-comp/htmldoc/ mathcomp $(COQDOCEXTRAFLAGS)
+ 
+ COQDOCLIBS?=$(COQLIBS_NOML)
+ 
 @@ -422,6 +422,9 @@
  	$(HIDE)mkdir -p html
  	$(HIDE)$(COQDOC) \
