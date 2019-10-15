@@ -1,0 +1,12 @@
+--- Makefile.orig	2019-10-15 22:37:51.000000000 +0200
++++ Makefile	2019-10-15 22:33:50.000000000 +0200
+@@ -422,6 +422,9 @@
+ 	$(HIDE)mkdir -p html
+ 	$(HIDE)$(COQDOC) \
+ 		-toc $(COQDOCFLAGS) -html $(GAL) $(COQDOCLIBS) -d html $(VFILES)
++# Prosa hack: let's tweak the style a bit
++	$(HIDE)sed -i.bak "s/#90bdff/#eeeeee/" html/coqdoc.css
++	$(HIDE)rm html/coqdoc.css.bak
+ 
+ mlihtml: $(MLIFILES:.mli=.cmi)
+ 	$(SHOW)'CAMLDOC -d $@'
