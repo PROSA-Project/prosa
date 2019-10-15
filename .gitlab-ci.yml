@@ -9,9 +9,6 @@ stages:
     - ./create_makefile.sh
     - make -j ${NJOBS}
 
-1.9.0-coq-8.9:
-  extends: .build
-
 1.9.0-coq-8.10:
   extends: .build
   # Keep track of all compiled output and the build infrastructure
@@ -42,6 +39,15 @@ stages:
     - "*/*/*/*/*/*/*/*/*/*.glob"
     expire_in: 1 week
 
+proof-length:
+  stage: build
+  image: python:3-alpine
+  script:
+    - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
+
+1.9.0-coq-8.9:
+  extends: .build
+
 1.9.0-coq-dev:
   extends: .build
   # it's ok to fail with an unreleased version of Coq
@@ -55,6 +61,7 @@ latest-coq-8.10:
 validate:
   stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.10
+  needs: ["1.9.0-coq-8.10"]
   dependencies:
     - 1.9.0-coq-8.10
   script: make validate
@@ -62,6 +69,7 @@ validate:
 doc:
   stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.10
+  needs: ["1.9.0-coq-8.10"]  
   dependencies:
     - 1.9.0-coq-8.10
   script:
@@ -79,15 +87,10 @@ doc:
       - "pretty/"
     expire_in: 1 week
 
-proof-length:
-  stage: process
-  image: python:3-alpine
-  script:
-    - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
-
 proof-state:
   stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.10
+  needs: ["1.9.0-coq-8.10"]  
   dependencies:
     - 1.9.0-coq-8.10
   script:
@@ -97,6 +100,7 @@ proof-state:
     - ln -s ../scripts/
     - ln -s ../_CoqProject
     - ../create_makefile.sh
+    - make
     - make html -j ${NJOBS} COQDOCEXTRAFLAGS=--plain-comments
     - mv html ../with-proofs-and-proof-state
   artifacts:
