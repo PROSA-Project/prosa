@@ -539,7 +539,7 @@ Module ResponseTimeIterationEDF.
         (exists k, k <= max_steps ts /\ f k = f k.+1) ->
         f (max_steps ts) = f (max_steps ts).+1.
       Proof.
-        by intros EX; des; apply iter_fix with (k := k).
+        by intros EX; des; apply (@fixedpoint.iter_fix _ _ _ k).
       Qed.
 
       (* Else, we derive a contradiction. *)

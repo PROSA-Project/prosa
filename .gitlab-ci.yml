@@ -9,15 +9,10 @@ stages:
     - ./create_makefile.sh
     - make -j ${NJOBS}
 
-1.8.0-coq-8.8:
-  extends: .build
-
-1.9.0-coq-dev:
-  extends: .build
-  # it's ok to fail with an unreleased version of Coq
-  allow_failure: true 
-
 1.9.0-coq-8.9:
+  extends: .build
+
+1.9.0-coq-8.10:
   extends: .build
   # Keep track of all compiled output and the build infrastructure
   artifacts:
@@ -46,19 +41,24 @@ stages:
     - "*/*/*/*/*/*/*/*/*.glob"
     - "*/*/*/*/*/*/*/*/*/*.glob"
     expire_in: 1 week
+
+1.9.0-coq-dev:
+  extends: .build
+  # it's ok to fail with an unreleased version of Coq
+  allow_failure: true
    
 validate:
   stage: process
-  image: mathcomp/mathcomp:1.9.0-coq-8.9
+  image: mathcomp/mathcomp:1.9.0-coq-8.10
   dependencies:
-    - 1.9.0-coq-8.9
+    - 1.9.0-coq-8.10
   script: make validate
 
 doc:
   stage: process
-  image: mathcomp/mathcomp:1.9.0-coq-8.9
+  image: mathcomp/mathcomp:1.9.0-coq-8.10
   dependencies:
-    - 1.9.0-coq-8.9
+    - 1.9.0-coq-8.10
   script:
     - make html -j ${NJOBS}
     - mv html with-proofs

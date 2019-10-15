@@ -429,7 +429,7 @@ Section Sequential_Abstract_RTA.
                 { by move: H_not_job_of_tsk => /eqP TSK; rewrite TSK. }
                 { by move: H_sched => /eqP SCHEDt; apply scheduled_implies_pending;
                                        auto using ideal_proc_model_ensures_ideal_progress. }
-                case ARRNEQ: (job_arrival j' <= job_arrival j).
+                case_eq (job_arrival j' <= job_arrival j) => ARRNEQ.
                 { move: ARR => /andP [РР _].
                   eapply arrived_between_implies_in_arrivals; eauto 2.
                     by apply/andP; split; last rewrite /A subnKC // addn1 ltnS.
@@ -498,7 +498,7 @@ Section Sequential_Abstract_RTA.
             2: by apply interference_plus_sched_le_serv_of_task_plus_task_interference_idle.
             have ARRs: arrives_in arr_seq j1;
               first by apply H_jobs_come_from_arrival_sequence with t; apply/eqP.
-            case TSK: (job_task j1 == tsk).
+            case_eq (job_task j1 == tsk) => TSK.
             2: by eapply interference_plus_sched_le_serv_of_task_plus_task_interference_task; [edone| apply/negbT].
             case EQ: (j == j1); [move: EQ => /eqP EQ; subst j1 | ].
             1: by apply interference_plus_sched_le_serv_of_task_plus_task_interference_j.

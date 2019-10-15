@@ -9,12 +9,12 @@ Section State.
 
   Definition processor_state := option Job.
 
-  Global Instance pstate_instance : ProcessorState Job (option Job) :=
+  Global Program Instance pstate_instance : ProcessorState Job (option Job) :=
     {
       scheduled_in j s := s == Some j;
-      service_in j s   := s == Some j
+      service_in j s   := s == Some j;
     }.
-  Proof.
-      by move=> j [j'->|].
+  Next Obligation.
+    by rewrite H.
   Defined.
 End State.

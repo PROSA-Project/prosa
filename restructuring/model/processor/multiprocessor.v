@@ -13,12 +13,13 @@ Section Schedule.
 
   Definition identical_state := processor num_cpus -> processor_state.
 
-  Global Instance multiproc_state : ProcessorState Job (identical_state) :=
+  Global Program Instance multiproc_state : ProcessorState Job (identical_state) :=
     {
       scheduled_in j s := [exists cpu, scheduled_in j (s cpu)];
       service_in j s := \sum_(cpu < num_cpus) service_in j (s cpu)
     }.
-  Proof.
+  Next Obligation.
+    move: j s H0.
     move=> j s /existsP Hsched.
     apply/eqP.
     rewrite sum_nat_eq0.

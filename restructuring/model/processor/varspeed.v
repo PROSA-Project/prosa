@@ -27,12 +27,13 @@ Section State.
 
   End Service.
 
-  Global Instance pstate_instance : ProcessorState Job processor_state :=
+  Global Program Instance pstate_instance : ProcessorState Job processor_state :=
     {
       scheduled_in := scheduled_in;
       service_in   := service_in
     }.
-  Proof.
+  Next Obligation.
+      move: j s H.
       by move=> j []//= j' s->.
   Defined.
   

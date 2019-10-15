@@ -23,12 +23,12 @@ Section ReadinessOfJitteryJobs.
 
   (* A job that experiences jitter is ready only when the jitter-induced delay
      has passed after its arrival and if it is not yet complete. *)
-  Global Instance jitter_ready_instance : JobReady Job PState :=
+  Global Program Instance jitter_ready_instance : JobReady Job PState :=
     {
       job_ready sched j t := is_released j t && ~~ completed_by sched j t
     }.
-  Proof.
-    move=> sched j t /andP [REL UNFINISHED].
+  Next Obligation.
+    move: H3 => /andP [REL UNFINISHED].
     rewrite /pending. apply /andP. split => //.
     move: REL. rewrite /is_released /has_arrived.
     by apply leq_addk.

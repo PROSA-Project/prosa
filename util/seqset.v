@@ -16,7 +16,7 @@ Section SeqSet.
   Canonical Structure setSubType := [subType for _set_seq].
   Definition set_eqMixin := [eqMixin of set by <:].
   Canonical Structure set_eqType := EqType set set_eqMixin.
-  Canonical Structure mem_set_predType := mkPredType (fun (l : set) => mem_seq (_set_seq l)).
+  Canonical Structure mem_set_predType := PredType (fun (l : set) => mem_seq (_set_seq l)).
   Definition set_of of phant T := set.
 
 End SeqSet.

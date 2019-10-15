@@ -31,12 +31,12 @@ Section State.
 
   End Service.
 
-  Global Instance pstate_instance : ProcessorState Job (processor_state) :=
+  Global Program Instance pstate_instance : ProcessorState Job (processor_state) :=
     {
       scheduled_in := scheduled_in;
       service_in   := service_in
     }.
-  Proof.
-    by move=> j [|j'|j']//=->.
+  Next Obligation.
+    by move: H; case s => //= j' ->.
   Defined.
 End State.
