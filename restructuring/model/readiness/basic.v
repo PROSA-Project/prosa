@@ -1,29 +1,29 @@
 From rt.restructuring.behavior Require Export all.
 From rt.restructuring.analysis.basic_facts Require Import completion.
 
-(* We define the readiness indicator function for the classic Liu & Layland
+(** We define the readiness indicator function for the classic Liu & Layland
    model without jitter and no self-suspensions, where jobs are always
    ready. *)
 
 Section LiuAndLaylandReadiness.
-  (* Consider any kind of jobs... *)
+  (** Consider any kind of jobs... *)
   Context {Job : JobType}.
 
-  (* ... and any kind of processor state. *)
+  (** ... and any kind of processor state. *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (* Supose jobs have an arrival time and a cost. *)
+  (** Supose jobs have an arrival time and a cost. *)
   Context `{JobArrival Job} `{JobCost Job}.
 
-  (* In the basic Liu & Layland model, a job is ready iff it is pending. *)
+  (** In the basic Liu & Layland model, a job is ready iff it is pending. *)
   Global Program Instance basic_ready_instance : JobReady Job PState :=
     {
       job_ready sched j t := pending sched j t
     }.
 
 
-  (* Under this definition, a schedule satisfies that only ready jobs execute
+  (** Under this definition, a schedule satisfies that only ready jobs execute
      as long as jobs must arrive to execute and completed jobs don't execute,
      which we note with the following theorem. *)
   Theorem basic_readiness_compliance:

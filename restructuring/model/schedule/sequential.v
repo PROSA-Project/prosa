@@ -3,23 +3,23 @@ From rt.restructuring.model Require Export task.
 
 Section PropertyOfSequentiality.
 
-  (* Consider any type of job associated with any type of tasks... *)
+  (** Consider any type of job associated with any type of tasks... *)
   Context {Job : JobType}.
   Context {Task : TaskType}.
   Context `{JobTask Job Task}.
 
-  (* ... with arrival times and costs ... *)
+  (** ... with arrival times and costs ... *)
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (* ... and any kind of processor state model. *)
+  (** ... and any kind of processor state model. *)
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
-  (* Given a schedule ... *)
+  (** Given a schedule ... *)
   Variable sched: schedule PState.
 
-  (* ...we say that jobs (or, rather, tasks) are sequential if each task's jobs
+  (** ...we say that jobs (or, rather, tasks) are sequential if each task's jobs
      are executed in the order they arrived. *)
   Definition sequential_jobs :=
     forall (j1 j2: Job) (t: instant),

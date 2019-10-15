@@ -3,28 +3,28 @@ From rt.restructuring.behavior Require Export all.
 
 From rt.util Require Import nat.
 
-(* We define the readiness indicator function for models with release jitter
+(** We define the readiness indicator function for models with release jitter
    (and no self-suspensions). *)
 
-(* Definition of a generic type of release jitter parameter. *)
+(** Definition of a generic type of release jitter parameter. *)
 Class JobJitter (Job : JobType) := job_jitter : Job -> duration.
 
 Section ReadinessOfJitteryJobs.
-  (* Consider any kind of jobs... *)
+  (** Consider any kind of jobs... *)
   Context {Job : JobType}.
 
-  (* ... and any kind of processor state. *)
+  (** ... and any kind of processor state. *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (* Supose jobs have an arrival time, a cost, and a release jitter bound. *)
+  (** Supose jobs have an arrival time, a cost, and a release jitter bound. *)
   Context `{JobArrival Job} `{JobCost Job} `{JobJitter Job}.
 
-  (* We say that a job is released at a time after its arrival if the job's
+  (** We say that a job is released at a time after its arrival if the job's
      release jitter has passed. *)
   Definition is_released (j : Job) (t : instant) := job_arrival j + job_jitter j <= t.
 
-  (* A job that experiences jitter is ready only when the jitter-induced delay
+  (** A job that experiences jitter is ready only when the jitter-induced delay
      has passed after its arrival and if it is not yet complete. *)
   Global Program Instance jitter_ready_instance : JobReady Job PState :=
     {

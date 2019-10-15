@@ -4,14 +4,14 @@ From rt.restructuring.behavior Require Export all.
 (** In this file, we define what it means to be an "EDF schedule". *)
 Section DefinitionOfEDF.
 
-  (* For any given type of jobs... *)
+  (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
-  (* ... any given type of processor states: *)
+  (** ... any given type of processor states: *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.
 
-  (* We say that a schedule is locally an EDF schedule at a point in
+  (** We say that a schedule is locally an EDF schedule at a point in
      time [t] if the job scheduled at time [t] has a deadline that is
      earlier than or equal to the deadline of any other job that could
      be scheduled at time t but is scheduled later.
@@ -28,7 +28,7 @@ Section DefinitionOfEDF.
         job_arrival j' <= t ->
         job_deadline j <= job_deadline j'.
 
-  (* A schedule is an EDF schedule if it is locally EDF at every point in time. *)
+  (** A schedule is an EDF schedule if it is locally EDF at every point in time. *)
   Definition is_EDF_schedule (sched: schedule PState) := forall t, EDF_at sched t.
 
 End DefinitionOfEDF.

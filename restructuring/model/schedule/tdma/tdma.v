@@ -5,7 +5,7 @@ From mathcomp Require Export ssreflect ssrbool ssrfun eqtype ssrnat seq fintype 
 (** In this section, we define the TDMA policy.*)
 Section TDMAPolicy.
 
-  (* The TDMA policy is based on two properties.
+  (** The TDMA policy is based on two properties.
       (1) Each task has a fixed, reserved time slot for execution;
       (2) These time slots are ordered in sequence to form a TDMA cycle, which repeats along the timeline.
       An example of TDMA schedule is illustrated in the following.
@@ -16,10 +16,10 @@ Section TDMAPolicy.
    *)
 
   Variable Task: eqType.
-  (* With each task, we associate the duration of the corresponding TDMA slot. *)
+  (** With each task, we associate the duration of the corresponding TDMA slot. *)
   Definition TDMA_slot := Task -> duration.
 
-  (* Moreover, within each TDMA cycle, task slots are ordered according to some relation.
+  (** Moreover, within each TDMA cycle, task slots are ordered according to some relation.
   (i.e, slot_order slot1 slot2 means that slot1 comes before slot2 in a TDMA cycle) *)
   Definition TDMA_slot_order := rel Task.
 
@@ -29,29 +29,29 @@ Class TDMAPolicy (T : TaskType) :=
   { task_time_slot : TDMA_slot T;
     slot_order : TDMA_slot_order T }.
 
-(* First, we define the properties of a valid TDMA policy. *)
+(** First, we define the properties of a valid TDMA policy. *)
 Section ValidTDMAPolicy.
 
   Context {Task : eqType}.
 
-  (* Consider any task set ts... *)
+  (** Consider any task set ts... *)
   Variable ts : {set Task}.
 
-  (* ...and a TDMA policy. *)
+  (** ...and a TDMA policy. *)
   Context `{TDMAPolicy Task}.
 
-  (* Time slot order must be transitive... *)
+  (** Time slot order must be transitive... *)
   Definition transitive_slot_order := transitive slot_order.
 
-  (* ..., totally ordered over the task set... *)
+  (** ..., totally ordered over the task set... *)
   Definition total_slot_order :=
     total_over_list slot_order ts.
 
-  (* ... and antisymmetric over task set. *)
+  (** ... and antisymmetric over task set. *)
   Definition antisymmetric_slot_order :=
     antisymmetric_over_list slot_order ts.
 
-  (* A valid time slot must be positive *)
+  (** A valid time slot must be positive *)
   Definition valid_time_slot :=
     forall tsk, tsk \in ts -> task_time_slot tsk > 0.
 
@@ -65,23 +65,23 @@ Section TDMADefinitions.
 
   Context {Task : eqType}.
 
-  (* Consider any task set ts... *)
+  (** Consider any task set ts... *)
   Variable ts : {set Task}.
 
-  (* ...and a TDMA policy. *)
+  (** ...and a TDMA policy. *)
   Context `{TDMAPolicy Task}.
 
-  (* We define the TDMA cycle as the sum of all the tasks' time slots *)
+  (** We define the TDMA cycle as the sum of all the tasks' time slots *)
   Definition TDMA_cycle:=
     \sum_(tsk <- ts) task_time_slot tsk.
 
-  (* We define the function returning the slot offset for each task:
+  (** We define the function returning the slot offset for each task:
          i.e., the distance between the start of the TDMA cycle and
          the start of the task time slot *)
   Definition task_slot_offset (tsk : Task) :=
     \sum_(prev_task <- ts | slot_order prev_task tsk && (prev_task != tsk)) task_time_slot prev_task.
 
-  (* The following function tests whether a task is in its time slot at instant t *)
+  (** The following function tests whether a task is in its time slot at instant t *)
   Definition task_in_time_slot (tsk : Task) (t:instant):=
     ((t + TDMA_cycle - (task_slot_offset tsk)%% TDMA_cycle) %% TDMA_cycle)
     < (task_time_slot tsk).
@@ -93,28 +93,28 @@ Section TDMASchedule.
 
   Context `{JobArrival Job} `{JobCost Job} `{JobReady Job (option Job)} `{JobTask Job Task}.
 
-  (* Consider any job arrival sequence... *)
+  (** Consider any job arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
 
-  (* ..., any uniprocessor ideal schedule ... *)
+  (** ..., any uniprocessor ideal schedule ... *)
   Variable sched : schedule (option Job).
 
-  (* ... and any sporadic task set. *)
+  (** ... and any sporadic task set. *)
   Variable ts: {set Task}.
 
   Context `{TDMAPolicy Task}.
 
-  (* In order to characterize a TDMA policy, we first define whether a job is executing its TDMA slot at time t. *)
+  (** In order to characterize a TDMA policy, we first define whether a job is executing its TDMA slot at time t. *)
   Definition job_in_time_slot (job:Job) (t:instant):=
     task_in_time_slot ts (job_task job) t.
 
-  (* We say that a TDMA policy is respected by the schedule iff
+  (** We say that a TDMA policy is respected by the schedule iff
        1. when a job is scheduled at time t, then the corresponding task
           is also in its own time slot... *)
   Definition sched_implies_in_slot j t:=
     scheduled_at sched j t -> job_in_time_slot j t.
 
-  (* 2. when a job is backlogged at time t,the corresponding task
+  (** 2. when a job is backlogged at time t,the corresponding task
           isn't in its own time slot or another previous job of the same task is scheduled *)
   Definition backlogged_implies_not_in_slot_or_other_job_sched j t:=
     backlogged sched j t ->
