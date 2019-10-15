@@ -250,7 +250,6 @@ Section RelationToScheduled.
     rewrite /service_at /scheduled_at.
     move=> t NOT_SCHED.
     rewrite service_implies_scheduled //.
-      by apply: negbTE.
   Qed.
 
   (* Conversely, if a job receives service, then it must be scheduled. *)
@@ -354,8 +353,7 @@ Section RelationToScheduled.
     Proof.
       move=> t. rewrite /scheduled_at /service_at.
       split => [NOT_SCHED | NO_SERVICE].
-      - apply negbTE in NOT_SCHED.
-        by rewrite service_implies_scheduled //.
+      - by rewrite service_implies_scheduled //.
       - apply (contra (H_scheduled_implies_serviced j (sched t))).
         by rewrite -eqn0Ngt; apply /eqP => //.
     Qed.

@@ -15,6 +15,6 @@ Section State.
       service_in j s   := s == Some j;
     }.
   Next Obligation.
-    by rewrite H.
+    by move: H=> /negbTE->.
   Defined.
 End State.

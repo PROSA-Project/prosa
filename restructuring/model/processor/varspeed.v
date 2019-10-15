@@ -34,7 +34,7 @@ Section State.
     }.
   Next Obligation.
       move: j s H.
-      by move=> j []//= j' s->.
+      by move=> j []//= j' s/negbTE->.
   Defined.
-  
+
 End State.

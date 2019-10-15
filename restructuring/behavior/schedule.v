@@ -9,16 +9,15 @@ Class ProcessorState (Job : JobType) (State : Type) :=
   {
     (* For a given processor state, the [scheduled_in] predicate checks whether a given
        job is running in that state. *)
-    scheduled_in: Job -> State -> bool;
+    scheduled_in : Job -> State -> bool;
     (* For a given processor state, the [service_in] function determines how much
        service a given job receives in that state. *)
-    service_in: Job -> State -> work;
+    service_in : Job -> State -> work;
     (* For a given processor state, a job does not receive service if it is not scheduled
        in that state *)
     service_implies_scheduled :
-      forall j s, scheduled_in j s = false -> service_in j s = 0
+      forall j s, ~~ scheduled_in j s -> service_in j s = 0
   }.
 
 (* A schedule maps an instant to a processor state *)
 Definition schedule (PState : Type) := instant -> PState.
-

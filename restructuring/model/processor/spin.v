@@ -37,6 +37,7 @@ Section State.
       service_in   := service_in
     }.
   Next Obligation.
-    by move: H; case s => //= j' ->.
+    move: H.
+    by case: s=>//= j' /negbTE->.
   Defined.
 End State.
