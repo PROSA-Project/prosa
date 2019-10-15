@@ -12,7 +12,7 @@ Class ProcessorState (Job : JobType) (State : Type) :=
     scheduled_in: Job -> State -> bool;
     (* For a given processor state, the [service_in] function determines how much
        service a given job receives in that state. *)
-    service_in: Job -> State -> nat;
+    service_in: Job -> State -> work;
     (* For a given processor state, a job does not receive service if it is not scheduled
        in that state *)
     service_implies_scheduled :
