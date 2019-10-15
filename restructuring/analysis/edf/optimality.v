@@ -7,14 +7,14 @@ From rt.restructuring.analysis Require Import schedulability transform.facts.edf
     schedule in which all deadlines are met. *)
 
 Section Optimality.
-  (* For any given type of jobs... *)
+  (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
-  (* ... and any valid job arrival sequence. *)
+  (** ... and any valid job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
   Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
 
-  (* We observe that EDF is optimal in the sense that, if there exists
+  (** We observe that EDF is optimal in the sense that, if there exists
      any schedule in which all jobs of arr_seq meet their deadline,
      then there also exists an EDF schedule in which all deadlines are
      met. *)
@@ -44,16 +44,16 @@ End Optimality.
     that avoids a dependency on a given arrival sequence. *)
 Section WeakOptimality.
 
-  (* For any given type of jobs,... *)
+  (** For any given type of jobs,... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
-  (* ...if we have a well-behaved schedule in which no deadlines are missed,... *)
+  (** ...if we have a well-behaved schedule in which no deadlines are missed,... *)
   Variable any_sched: schedule (ideal.processor_state Job).
   Hypothesis H_must_arrive: jobs_must_arrive_to_execute any_sched.
   Hypothesis H_completed_dont_execute: completed_jobs_dont_execute any_sched.
   Hypothesis H_all_deadlines_met: all_deadlines_met any_sched.
 
-  (* ...then there also exists a corresponding EDF schedule in which
+  (** ...then there also exists a corresponding EDF schedule in which
      no deadlines are missed (and in which exactly the same set of
      jobs is scheduled, as ensured by the last clause). *)
   Theorem weak_EDF_optimality:

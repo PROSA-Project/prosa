@@ -11,81 +11,81 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 (** * Task Workload Bounded by Arrival Curves *)
 Section TaskWorkloadBoundedByArrivalCurves.
 
-  (* Consider any type of tasks ... *)
+  (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
 
-  (*  ... and any type of jobs associated with these tasks. *)
+  (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   
-  (* Consider any arrival sequence with consistent, non-duplicate arrivals... *)
+  (** Consider any arrival sequence with consistent, non-duplicate arrivals... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (* ... and any ideal uniprocessor schedule of this arrival sequence.*)
+  (** ... and any ideal uniprocessor schedule of this arrival sequence.*)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
-  (* Consider an FP policy that indicates a higher-or-equal priority relation. *)
+  (** Consider an FP policy that indicates a higher-or-equal priority relation. *)
   Variable higher_eq_priority : FP_policy Task.
   Let jlfp_higher_eq_priority := FP_to_JLFP Job Task.
 
-  (* For simplicity, let's define some local names. *)
+  (** For simplicity, let's define some local names. *)
   Let arrivals_between := arrivals_between arr_seq.
   
-  (* We define the notion of request bound function. *)
+  (** We define the notion of request bound function. *)
   Section RequestBoundFunction.
     
-    (* Let MaxArrivals denote any function that takes a task and an interval length
+    (** Let MaxArrivals denote any function that takes a task and an interval length
        and returns the associated number of job arrivals of the task. *) 
     Context `{MaxArrivals Task}.
     
-    (* In this section, we define a bound for the workload of a single task
+    (** In this section, we define a bound for the workload of a single task
        under uniprocessor FP scheduling. *)
     Section SingleTask.
 
-      (* Consider any task tsk that is to be scheduled in an interval of length delta. *)
+      (** Consider any task tsk that is to be scheduled in an interval of length delta. *)
       Variable tsk : Task.
       Variable delta : duration.
 
-      (* We define the following workload bound for the task. *)
+      (** We define the following workload bound for the task. *)
       Definition task_request_bound_function := task_cost tsk * max_arrivals tsk delta.
 
     End SingleTask.
 
-    (* In this section, we define a bound for the workload of multiple tasks. *)
+    (** In this section, we define a bound for the workload of multiple tasks. *)
     Section AllTasks.
 
-      (* Consider a task set ts... *)
+      (** Consider a task set ts... *)
       Variable ts : list Task.
 
-      (* ...and let tsk be any task in task set. *)
+      (** ...and let tsk be any task in task set. *)
       Variable tsk : Task.
       
-      (* Let delta be the length of the interval of interest. *)
+      (** Let delta be the length of the interval of interest. *)
       Variable delta : duration.
       
-      (* Recall the definition of higher-or-equal-priority task and
+      (** Recall the definition of higher-or-equal-priority task and
          the per-task workload bound for FP scheduling. *)
       Let is_hep_task tsk_other := higher_eq_priority tsk_other tsk.
       Let is_other_hep_task tsk_other := higher_eq_priority tsk_other tsk && (tsk_other != tsk).
 
-      (* Using the sum of individual workload bounds, we define the following bound
+      (** Using the sum of individual workload bounds, we define the following bound
          for the total workload of tasks in any interval of length delta. *)
       Definition total_request_bound_function :=
         \sum_(tsk <- ts) task_request_bound_function tsk delta.
       
-      (* Similarly, we define the following bound for the total workload of tasks of 
+      (** Similarly, we define the following bound for the total workload of tasks of 
          higher-or-equal priority (with respect to tsk) in any interval of length delta. *)
       Definition total_hep_request_bound_function_FP :=
         \sum_(tsk_other <- ts | is_hep_task tsk_other)
          task_request_bound_function tsk_other delta.
       
-      (* We also define a bound for the total workload of higher-or-equal 
+      (** We also define a bound for the total workload of higher-or-equal 
          priority tasks other than tsk in any interval of length delta. *)
       Definition total_ohep_request_bound_function_FP :=
         \sum_(tsk_other <- ts | is_other_hep_task tsk_other)
@@ -95,66 +95,66 @@ Section TaskWorkloadBoundedByArrivalCurves.
 
   End RequestBoundFunction.
 
-  (* In this section we prove some lemmas about request bound functions. *)
+  (** In this section we prove some lemmas about request bound functions. *)
   Section ProofWorkloadBound.
 
-    (* Consider a task set ts... *)
+    (** Consider a task set ts... *)
     Variable ts : list Task.
 
-    (* ...and let tsk be any task in ts. *)
+    (** ...and let tsk be any task in ts. *)
     Variable tsk : Task.
     Hypothesis H_tsk_in_ts : tsk \in ts.
 
-    (* Assume that the job costs are no larger than the task costs. *)
+    (** Assume that the job costs are no larger than the task costs. *)
     Hypothesis H_job_cost_le_task_cost :
       cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
-    (* Next, we assume that all jobs come from the task set. *)
+    (** Next, we assume that all jobs come from the task set. *)
     Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
       
-    (* Let max_arrivals be any arrival bound for taskset ts. *)
+    (** Let max_arrivals be any arrival bound for taskset ts. *)
     Context `{MaxArrivals Task}.
     Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts. 
     
-    (* Let's define some local names for clarity. *)
+    (** Let's define some local names for clarity. *)
     Let task_rbf := task_request_bound_function tsk.
     Let total_rbf := total_request_bound_function ts.
     Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
     Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
 
-    (* Next, we consider any job j of tsk. *)
+    (** Next, we consider any job j of tsk. *)
     Variable j : Job.
     Hypothesis H_j_arrives : arrives_in arr_seq j.
     Hypothesis H_job_of_tsk : job_task j = tsk.
     
-    (* Next, we say that two jobs j1 and j2 are in relation other_higher_eq_priority, iff 
+    (** Next, we say that two jobs j1 and j2 are in relation other_higher_eq_priority, iff 
        j1 has higher or equal priority than j2 and is produced by a different task. *)
     Let other_higher_eq_priority j1 j2 := jlfp_higher_eq_priority j1 j2 && (~~ same_task j1 j2).
 
-    (* Next, we recall the notions of total workload of jobs... *)
+    (** Next, we recall the notions of total workload of jobs... *)
     Let total_workload t1 t2 := workload_of_jobs predT (arrivals_between t1 t2).
     
-    (* ...notions of workload of higher or equal priority jobs... *)
+    (** ...notions of workload of higher or equal priority jobs... *)
     Let total_hep_workload t1 t2 :=
       workload_of_jobs (fun j_other => jlfp_higher_eq_priority j_other j) (arrivals_between t1 t2).
     
-    (* ... workload of other higher or equal priority jobs... *)
+    (** ... workload of other higher or equal priority jobs... *)
     Let total_ohep_workload t1 t2 :=
       workload_of_jobs (fun j_other => other_higher_eq_priority j_other j) (arrivals_between t1 t2).
 
-    (* ... and the workload of jobs of the same task as job j. *)
+    (** ... and the workload of jobs of the same task as job j. *)
     Let task_workload t1 t2 :=
       workload_of_jobs (job_of_task tsk) (arrivals_between t1 t2).
     
-    (* In this section we prove that the workload of any jobs is 
+    (** In this section we prove that the workload of any jobs is 
        no larger than the request bound function. *) 
     Section WorkloadIsBoundedByRBF.
 
-      (* Consider any time t and any interval of length delta. *)
+      (** Consider any time t and any interval of length delta. *)
       Variable t : instant.
       Variable delta : instant.
 
-      (* First, we show that workload of task tsk is bounded by 
+      (** First, we show that workload of task tsk is bounded by 
          the number of arrivals of the task times the cost of the task. *)
       Lemma task_workload_le_num_of_arrivals_times_cost:
         task_workload t (t + delta)
@@ -168,7 +168,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
           by apply H_job_cost_le_task_cost.
       Qed.
       
-      (* As a corollary, we prove that workload of task is 
+      (** As a corollary, we prove that workload of task is 
          no larger the than task request bound function. *)
       Corollary task_workload_le_task_rbf:
         task_workload t (t + delta) <= task_rbf delta.
@@ -181,7 +181,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
           by apply H_is_arrival_bound; last rewrite leq_addr.
       Qed.
 
-      (* Next, we prove that total workload of other tasks with
+      (** Next, we prove that total workload of other tasks with
          higher-or-equal priority is no larger than the total
          request bound function. *)
       Lemma total_workload_le_total_rbf:
@@ -217,7 +217,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
         }
       Qed.
 
-      (* Next, we prove that total workload of tasks with higher-or-equal 
+      (** Next, we prove that total workload of tasks with higher-or-equal 
          priority is no larger than the total request bound function. *)
       Lemma total_workload_le_total_rbf':
         total_hep_workload t (t + delta) <= total_hep_rbf delta.
@@ -252,7 +252,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
         }
       Qed.
       
-      (* Next, we prove that total workload of tasks is 
+      (** Next, we prove that total workload of tasks is 
          no larger than the total request bound function. *)
       Lemma total_workload_le_total_rbf'':
         total_workload t (t + delta) <= total_rbf delta.

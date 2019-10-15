@@ -7,22 +7,22 @@ From rt.restructuring.analysis.basic_facts Require Import all.
 (** We begin by defining the notion of a schedule with a "tweaked" (i.e.,
     overridden) allocation. *)
 Section ReplaceAt.
-  (* For any given type of jobs... *)
+  (** For any given type of jobs... *)
   Context {Job : JobType}.
-  (* ... any given type of processor states, ... *)
+  (** ... any given type of processor states, ... *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.
 
-  (* ...consider any given reference schedule. *)
+  (** ...consider any given reference schedule. *)
   Variable original_sched: schedule PState.
 
-  (* Suppose we are given a specific time [t'] ... *)
+  (** Suppose we are given a specific time [t'] ... *)
   Variable t': instant.
 
-  (* ...and a replacement state [new_state]. *)
+  (** ...and a replacement state [new_state]. *)
   Variable new_state: PState.
 
-  (* Then the schedule with replacement is simply one that returns the given
+  (** Then the schedule with replacement is simply one that returns the given
      [new_state] at [t'], and the original allocation at all other times. *)
   Definition replace_at (t : instant) :=
     if t' == t then new_state else (original_sched t).
@@ -33,19 +33,19 @@ End ReplaceAt.
 (** Based on [replace_at], we define the notion of a schedule with swapped
     allocations. *)
 Section Swapped.
-  (* For any given type of jobs... *)
+  (** For any given type of jobs... *)
   Context {Job : JobType}.
-  (* ... any given type of processor states, ... *)
+  (** ... any given type of processor states, ... *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.
 
-  (* ...consider any given reference schedule. *)
+  (** ...consider any given reference schedule. *)
   Variable original_sched: schedule PState.
 
-  (* Given two specific times [t1] and [t2]... *)
+  (** Given two specific times [t1] and [t2]... *)
   Variable t1 t2: instant.
 
-  (* ...we define the notion of a schedule in which the two allocations at [t1]
+  (** ...we define the notion of a schedule in which the two allocations at [t1]
      and [t2] have been swapped. *)
   Definition swapped : schedule PState :=
     let s1 := original_sched t1 in

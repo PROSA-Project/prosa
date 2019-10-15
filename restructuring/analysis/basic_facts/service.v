@@ -10,21 +10,21 @@ Section Composition.
   (** To begin with, we provide some simple but handy rewriting rules for
       [service] and [service_during]. *)
 
-  (* Consider any job type and any processor state. *)
+  (** Consider any job type and any processor state. *)
   Context {Job: JobType}.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
-  (* For any given schedule... *)
+  (** For any given schedule... *)
   Variable sched: schedule PState.
 
-  (* ...and any given job... *)
+  (** ...and any given job... *)
   Variable j: Job.
 
-  (* ...we establish a number of useful rewriting rules that decompose
+  (** ...we establish a number of useful rewriting rules that decompose
      the service received during an interval into smaller intervals. *)
 
-  (* As a trivial base case, no job receives any service during an empty
+  (** As a trivial base case, no job receives any service during an empty
      interval. *)
   Lemma service_during_geq:
     forall t1 t2,
@@ -34,14 +34,14 @@ Section Composition.
     rewrite /service_during big_geq //.
   Qed.
 
-  (* Equally trivially, no job has received service prior to time zero. *)
+  (** Equally trivially, no job has received service prior to time zero. *)
   Corollary service0:
     service sched j 0 = 0.
   Proof.
     rewrite /service service_during_geq //.
   Qed.
 
-  (* Trivially, an interval consiting of one time unit is equivalent to
+  (** Trivially, an interval consiting of one time unit is equivalent to
      service_at.  *)
   Lemma service_during_instant:
     forall t,
@@ -51,7 +51,7 @@ Section Composition.
      by rewrite /service_during big_nat_recr ?big_geq //.
   Qed.
 
-  (* Next, we observe that we can look at the service received during an
+  (** Next, we observe that we can look at the service received during an
      interval [t1, t3) as the sum of the service during [t1, t2) and [t2, t3)
      for any t2 \in [t1, t3]. (The "_cat" suffix denotes the concatenation of
      the two intervals.) *)
@@ -65,7 +65,7 @@ Section Composition.
       by rewrite /service_during -big_cat_nat /=.
   Qed.
 
-  (* Since [service] is just a special case of [service_during], the same holds
+  (** Since [service] is just a special case of [service_during], the same holds
      for [service]. *)
   Lemma service_cat:
     forall t1 t2,
@@ -77,7 +77,7 @@ Section Composition.
     rewrite /service service_during_cat //.
   Qed.
 
-  (* As a special case, we observe that the service during an interval can be
+  (** As a special case, we observe that the service during an interval can be
      decomposed into the first instant and the rest of the interval. *)
   Lemma service_during_first_plus_later:
     forall t1 t2,
@@ -91,7 +91,7 @@ Section Composition.
       by rewrite -service_during_instant //.
   Qed.
 
-  (* Symmetrically, we have the same for the end of the interval. *)
+  (** Symmetrically, we have the same for the end of the interval. *)
   Lemma service_during_last_plus_before:
     forall t1 t2,
       t1 <= t2 ->
@@ -103,7 +103,7 @@ Section Composition.
     rewrite service_during_instant //.
   Qed.
 
-  (* And hence also for [service]. *)
+  (** And hence also for [service]. *)
   Corollary service_last_plus_before:
     forall t,
       (service sched j t) + (service_at sched j t)
@@ -113,7 +113,7 @@ Section Composition.
     rewrite /service. rewrite -service_during_last_plus_before //.
   Qed.
 
-  (* Finally, we deconstruct the service received during an interval [t1, t3)
+  (** Finally, we deconstruct the service received during an interval [t1, t3)
      into the service at a midpoint t2 and the service in the intervals before
      and after. *)
   Lemma service_split_at_point:
@@ -134,28 +134,28 @@ Section UnitService.
   (** As a common special case, we establish facts about schedules in which a
       job receives either 1 or 0 service units at all times. *)
 
-  (* Consider any job type and any processor state. *)
+  (** Consider any job type and any processor state. *)
   Context {Job: JobType}.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
-  (* Let's consider a unit-service model... *)
+  (** Let's consider a unit-service model... *)
   Hypothesis H_unit_service: unit_service_proc_model.
 
-  (* ...and a given schedule. *)
+  (** ...and a given schedule. *)
   Variable sched: schedule PState.
 
-  (* Let j be any job that is to be scheduled. *)
+  (** Let j be any job that is to be scheduled. *)
   Variable j: Job.
 
-  (* First, we prove that the instantaneous service cannot be greater than 1, ... *)
+  (** First, we prove that the instantaneous service cannot be greater than 1, ... *)
   Lemma service_at_most_one:
     forall t, service_at sched j t <= 1.
   Proof.
       by move=> t; rewrite /service_at.
   Qed.
 
-  (* ...which implies that the cumulative service received by job j in any
+  (** ...which implies that the cumulative service received by job j in any
      interval of length delta is at most delta. *)
   Lemma cumulative_service_le_delta:
     forall t delta,
@@ -169,7 +169,7 @@ Section UnitService.
 
   Section ServiceIsAStepFunction.
 
-    (* We show that the service received by any job j is a step function. *)
+    (** We show that the service received by any job j is a step function. *)
     Lemma service_is_a_step_function:
       is_step_function (service sched j).
     Proof.
@@ -178,15 +178,15 @@ Section UnitService.
       apply service_at_most_one.
     Qed.
 
-    (* Next, consider any time t... *)
+    (** Next, consider any time t... *)
     Variable t: instant.
 
-    (* ...and let s0 be any value less than the service received
+    (** ...and let s0 be any value less than the service received
        by job j by time t. *)
     Variable s0: duration.
     Hypothesis H_less_than_s: s0 < service sched j t.
 
-    (* Then, we show that there exists an earlier time t0 where job j had s0
+    (** Then, we show that there exists an earlier time t0 where job j had s0
        units of service. *)
     Corollary exists_intermediate_service:
       exists t0,
@@ -207,18 +207,18 @@ End UnitService.
 Section Monotonicity.
   (** We establish a basic fact about the monotonicity of service. *)
 
-  (* Consider any job type and any processor model. *)
+  (** Consider any job type and any processor model. *)
   Context {Job: JobType}.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
-  (* Consider any given schedule... *)
+  (** Consider any given schedule... *)
   Variable sched: schedule PState.
 
-  (* ...and a given job that is to be scheduled. *)
+  (** ...and a given job that is to be scheduled. *)
   Variable j: Job.
 
-  (* We observe that the amount of service received is monotonic by definition. *)
+  (** We observe that the amount of service received is monotonic by definition. *)
   Lemma service_monotonic:
     forall t1 t2,
       t1 <= t2 ->
@@ -231,18 +231,18 @@ Section Monotonicity.
 End Monotonicity.
 
 Section RelationToScheduled.
-  (* Consider any job type and any processor model. *)
+  (** Consider any job type and any processor model. *)
   Context {Job: JobType}.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
-  (* Consider any given schedule... *)
+  (** Consider any given schedule... *)
   Variable sched: schedule PState.
 
-  (* ...and a given job that is to be scheduled. *)
+  (** ...and a given job that is to be scheduled. *)
   Variable j: Job.
 
-  (* We observe that a job that isn't scheduled cannot possibly receive service. *)
+  (** We observe that a job that isn't scheduled cannot possibly receive service. *)
   Lemma not_scheduled_implies_no_service:
     forall t,
       ~~ scheduled_at sched j t -> service_at sched j t = 0.
@@ -252,7 +252,7 @@ Section RelationToScheduled.
     rewrite service_implies_scheduled //.
   Qed.
 
-  (* Conversely, if a job receives service, then it must be scheduled. *)
+  (** Conversely, if a job receives service, then it must be scheduled. *)
   Lemma service_at_implies_scheduled_at:
     forall t,
       service_at sched j t > 0 -> scheduled_at sched j t.
@@ -262,7 +262,7 @@ Section RelationToScheduled.
     rewrite not_scheduled_implies_no_service // negbT //.
   Qed.
 
-  (* Thus, if the cumulative amount of service changes, then it must be
+  (** Thus, if the cumulative amount of service changes, then it must be
      scheduled, too. *)
   Lemma service_delta_implies_scheduled:
     forall t,
@@ -273,7 +273,7 @@ Section RelationToScheduled.
     apply: service_at_implies_scheduled_at.
   Qed.
 
-  (* We observe that a job receives cumulative service during some interval iff
+  (** We observe that a job receives cumulative service during some interval iff
      it receives services at some specific time in the interval. *)
   Lemma service_during_service_at:
     forall t1 t2,
@@ -310,7 +310,7 @@ Section RelationToScheduled.
     }
   Qed.
 
-  (* Thus, any job that receives some service during an interval must be
+  (** Thus, any job that receives some service during an interval must be
      scheduled at some point during the interval... *)
   Corollary cumulative_service_implies_scheduled:
     forall t1 t2,
@@ -326,7 +326,7 @@ Section RelationToScheduled.
     by apply: service_at_implies_scheduled_at.
  Qed.
 
-  (* ...which implies that any job with positive cumulative service must have
+  (** ...which implies that any job with positive cumulative service must have
      been scheduled at some point. *)
   Corollary positive_service_implies_scheduled_before:
     forall t,
@@ -339,13 +339,13 @@ Section RelationToScheduled.
   Qed.
 
   Section GuaranteedService.
-    (* If we can assume that a scheduled job always receives service, we can
+    (** If we can assume that a scheduled job always receives service, we can
        further prove the converse. *)
 
-    (* Assume j always receives some positive service. *)
+    (** Assume j always receives some positive service. *)
     Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
-    (* In other words, not being scheduled is equivalent to receiving zero
+    (** In other words, not being scheduled is equivalent to receiving zero
        service. *)
     Lemma no_service_not_scheduled:
       forall t,
@@ -358,7 +358,7 @@ Section RelationToScheduled.
         by rewrite -eqn0Ngt; apply /eqP => //.
     Qed.
 
-    (* Then, if a job does not receive any service during an interval, it
+    (** Then, if a job does not receive any service during an interval, it
        is not scheduled. *)
     Lemma no_service_during_implies_not_scheduled:
       forall t1 t2,
@@ -373,7 +373,7 @@ Section RelationToScheduled.
       by apply (IS_ZERO t); apply /andP; split => //.
     Qed.
 
-    (* If a job is scheduled at some point in an interval, it receivees
+    (** If a job is scheduled at some point in an interval, it receivees
        positive cumulative service during the interval... *)
     Lemma scheduled_implies_cumulative_service:
       forall t1 t2,
@@ -389,7 +389,7 @@ Section RelationToScheduled.
         by apply (H_scheduled_implies_serviced j (sched t')).
     Qed.
 
-    (* ...which again applies to total service, too. *)
+    (** ...which again applies to total service, too. *)
     Corollary scheduled_implies_nonzero_service:
       forall t,
         (exists t',
@@ -405,16 +405,16 @@ Section RelationToScheduled.
   End GuaranteedService.
 
   Section AfterArrival.
-    (* Futhermore, if we know that jobs are not released early, then we can
+    (** Futhermore, if we know that jobs are not released early, then we can
        narrow the interval during which they must have been scheduled. *)
 
     Context `{JobArrival Job}.
 
-    (* Assume that jobs must arrive to execute. *)
+    (** Assume that jobs must arrive to execute. *)
     Hypothesis H_jobs_must_arrive:
       jobs_must_arrive_to_execute sched.
 
-    (* We prove that any job with positive cumulative service at time [t] must
+    (** We prove that any job with positive cumulative service at time [t] must
        have been scheduled some time since its arrival and before time [t]. *)
     Lemma positive_service_implies_scheduled_since_arrival:
       forall t,
@@ -438,7 +438,7 @@ Section RelationToScheduled.
       rewrite /has_arrived -ltnNge //.
    Qed.
 
-    (* We show that job j does not receive service at any time t prior to its
+    (** We show that job j does not receive service at any time t prior to its
        arrival. *)
     Lemma service_before_job_arrival_zero:
       forall t,
@@ -449,7 +449,7 @@ Section RelationToScheduled.
       rewrite not_scheduled_implies_no_service // not_scheduled_before_arrival //.
     Qed.
 
-    (* Note that the same property applies to the cumulative service. *)
+    (** Note that the same property applies to the cumulative service. *)
     Lemma cumulative_service_before_job_arrival_zero :
       forall t1 t2 : instant,
         t2 <= job_arrival j ->
@@ -465,7 +465,7 @@ Section RelationToScheduled.
         by apply leq_trans with (n := t2); auto.
     Qed.
 
-    (* Hence, one can ignore the service received by a job before its arrival
+    (** Hence, one can ignore the service received by a job before its arrival
        time... *)
     Lemma ignore_service_before_arrival:
       forall t1 t2,
@@ -479,7 +479,7 @@ Section RelationToScheduled.
         by apply/andP; split; exact.
     Qed.
 
-    (* ... which we can also state in terms of cumulative service. *)
+    (** ... which we can also state in terms of cumulative service. *)
     Corollary no_service_before_arrival:
       forall t,
         t <= job_arrival j -> service sched j t = 0.
@@ -494,16 +494,16 @@ Section RelationToScheduled.
     (** In this section, we prove some lemmas about time instants with same
         service. *)
 
-    (* Consider any time instants t1 and t2... *)
+    (** Consider any time instants t1 and t2... *)
     Variable t1 t2: instant.
 
-    (* ...where t1 is no later than t2... *)
+    (** ...where t1 is no later than t2... *)
     Hypothesis H_t1_le_t2: t1 <= t2.
 
-    (* ...and where job j has received the same amount of service. *)
+    (** ...and where job j has received the same amount of service. *)
     Hypothesis H_same_service: service sched j t1 = service sched j t2.
 
-    (* First, we observe that this means that the job receives no service
+    (** First, we observe that this means that the job receives no service
        during [t1, t2)... *)
     Lemma constant_service_implies_no_service_during:
       service_during sched j t1 t2 = 0.
@@ -513,7 +513,7 @@ Section RelationToScheduled.
       by rewrite eqn_add2l => /eqP //.
     Qed.
 
-    (* ...which of course implies that it does not receive service at any
+    (** ...which of course implies that it does not receive service at any
        point, either. *)
     Lemma constant_service_implies_not_scheduled:
       forall t,
@@ -525,7 +525,7 @@ Section RelationToScheduled.
       apply IS_ZERO. apply /andP; split => //.
     Qed.
 
-    (* We show that job j receives service at some point t < t1 iff j receives
+    (** We show that job j receives service at some point t < t1 iff j receives
        service at some point t' < t2. *)
     Lemma same_service_implies_serviced_at_earlier_times:
       [exists t: 'I_t1, service_at sched j t > 0] =
@@ -548,13 +548,13 @@ Section RelationToScheduled.
       }
     Qed.
 
-    (* Then, under the assumption that scheduled jobs receives service,
+    (** Then, under the assumption that scheduled jobs receives service,
        we can translate this into a claim about scheduled_at. *)
 
-    (* Assume j always receives some positive service. *)
+    (** Assume j always receives some positive service. *)
     Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
-    (* We show that job j is scheduled at some point t < t1 iff j is scheduled
+    (** We show that job j is scheduled at some point t < t1 iff j is scheduled
        at some point t' < t2.  *)
     Lemma same_service_implies_scheduled_at_earlier_times:
       [exists t: 'I_t1, scheduled_at sched j t] =

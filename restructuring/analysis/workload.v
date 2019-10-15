@@ -8,23 +8,23 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 (** In this file, we establish basic facts about the workload of sets of jobs. *)  
 Section WorkloadFacts.
 
-  (* Consider any type of tasks ... *)
+  (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
 
-  (*  ... and any type of jobs associated with these tasks. *)
+  (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (* Consider any job arrival sequence. *)
+  (** Consider any job arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   
-  (* For simplicity, let's define a local name. *)
+  (** For simplicity, let's define a local name. *)
   Let arrivals_between := arrivals_between arr_seq.  
   
-  (* We prove that workload can be split into two parts. *)
+  (** We prove that workload can be split into two parts. *)
   Lemma workload_of_jobs_cat:
     forall t t1 t2 P,
       t1 <= t <= t2 ->

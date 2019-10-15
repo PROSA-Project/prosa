@@ -17,7 +17,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
     of uniprocessor scheduling of real-time tasks with arbitrary arrival models
     and sequential jobs. *)
 
-  (* We prove that the maximum among the solutions of the response-time bound
+  (** We prove that the maximum among the solutions of the response-time bound
      recurrence for some set of parameters is a response-time bound for tsk. 
      Note that in this section we _do_ rely on the hypothesis about job 
      sequentiality. This allows us to provide a more precise response-time
@@ -25,65 +25,65 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
      in the order they arrive. *) 
 Section Sequential_Abstract_RTA.
 
-  (* Consider any type of tasks ... *)
+  (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
   Context `{TaskRunToCompletionThreshold Task}.
 
-  (*  ... and any type of jobs associated with these tasks. *)
+  (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobPreemptable Job}. 
  
-  (* Consider any arrival sequence with consistent, non-duplicate arrivals... *)
+  (** Consider any arrival sequence with consistent, non-duplicate arrivals... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (* Next, consider any ideal uniprocessor schedule of this arrival sequence...*)
+  (** Next, consider any ideal uniprocessor schedule of this arrival sequence...*)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
   
-  (* ... where jobs do not execute before their arrival nor after completion. *) 
+  (** ... where jobs do not execute before their arrival nor after completion. *) 
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
-  (* Assume that the job costs are no larger than the task costs. *)
+  (** Assume that the job costs are no larger than the task costs. *)
   Hypothesis H_job_cost_le_task_cost:
     cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
-  (* Consider an arbitrary task set. *)
+  (** Consider an arbitrary task set. *)
   Variable ts : list Task.
 
-  (* Let tsk be any task in ts that is to be analyzed. *)
+  (** Let tsk be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
   
-  (* Consider a valid preemption model... *)
+  (** Consider a valid preemption model... *)
   Hypothesis H_valid_preemption_model:
     valid_preemption_model arr_seq sched.
   
-  (* ...and a valid task run-to-completion threshold function. That is, 
+  (** ...and a valid task run-to-completion threshold function. That is, 
      [task_run_to_completion_threshold tsk] is (1) no bigger than tsk's 
      cost, (2) for any job of task tsk job_run_to_completion_threshold 
      is bounded by task_run_to_completion_threshold. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
 
-  (* Let max_arrivals be a family of valid arrival curves, i.e., for any task tsk in ts 
+  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task tsk in ts 
      [max_arrival tsk] is (1) an arrival bound of tsk, and (2) it is a monotonic function 
      that equals 0 for the empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
   
-  (* Assume we are provided with abstract functions for interference and interfering workload. *)
+  (** Assume we are provided with abstract functions for interference and interfering workload. *)
   Variable interference : Job -> instant -> bool.
   Variable interfering_workload : Job -> instant -> duration.
   
-  (* Let's define some local names for clarity. *)
+  (** Let's define some local names for clarity. *)
   Let task_rbf := task_request_bound_function tsk.
   Let busy_interval := busy_interval sched interference interfering_workload.
   Let arrivals_between := arrivals_between arr_seq.
@@ -92,11 +92,11 @@ Section Sequential_Abstract_RTA.
   Let task_service_of_jobs_in := task_service_of_jobs_in sched tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
  
-  (* In this section, we introduce a few new definitions to make it easier
+  (** In this section, we introduce a few new definitions to make it easier
      to express the new bound of the worst-case execution time. *)
   Section Definitions.
 
-    (* When assuming sequential jobs, we can introduce an additional hypothesis that 
+    (** When assuming sequential jobs, we can introduce an additional hypothesis that 
        ensures that the values of interference and workload remain consistent. It states 
        that any of tsk's job, that arrived before the busy interval, should be
        completed by the beginning of the busy interval. *)
@@ -108,7 +108,7 @@ Section Sequential_Abstract_RTA.
           busy_interval j t1 t2 ->
           task_workload_between 0 t1 = task_service_of_jobs_in (arrivals_between 0 t1) 0 t1.
 
-    (* Next we introduce the notion of task interference. Intuitively, task tsk incurs 
+    (** Next we introduce the notion of task interference. Intuitively, task tsk incurs 
        interference when some of the jobs of task tsk incur interference. As a result, 
        tsk cannot make any progress. More formally, task tsk experiences interference at 
        a time instant time t, if at time t task tsk is not scheduled and there exists 
@@ -129,11 +129,11 @@ Section Sequential_Abstract_RTA.
       (~~ task_scheduled_at sched tsk t)
         && has (fun j => interference j t) (task_arrivals_before arr_seq tsk upper_bound).
     
-    (* Next we define the cumulative task interference. *)
+    (** Next we define the cumulative task interference. *)
     Definition cumul_task_interference tsk upper_bound t1 t2 :=
       \sum_(t1 <= t < t2) task_interference_received_before tsk upper_bound t. 
     
-    (* We say that task interference is bounded by task_interference_bound_function (tIBF) 
+    (** We say that task interference is bounded by task_interference_bound_function (tIBF) 
        iff for any job j of task tsk cumulative _task_ interference within the interval 
        [t1, t1 + R) is bounded by function tIBF(tsk, A, R). 
        Note that this definition is almost the same as the definition of job_interference_is_bounded_by 
@@ -152,37 +152,37 @@ Section Sequential_Abstract_RTA.
     
   End Definitions.
 
-  (* In this section, we prove that the maximum among the solutions of the 
+  (** In this section, we prove that the maximum among the solutions of the 
      response-time bound recurrence is a response-time bound for tsk. *)
   Section ResponseTimeBound.
     
-    (* For simplicity, let's define some local names. *)
+    (** For simplicity, let's define some local names. *)
     Let cumul_interference := cumul_interference interference.
     Let cumul_workload := cumul_interfering_workload interfering_workload.
     Let cumul_task_interference := cumul_task_interference tsk.
     
-    (* We assume that the schedule is work-conserving. *)
+    (** We assume that the schedule is work-conserving. *)
     Hypothesis H_work_conserving:
       work_conserving arr_seq sched tsk interference interfering_workload. 
     
-    (* Unlike the previous theorem [uniprocessor_response_time_bound], we assume 
+    (** Unlike the previous theorem [uniprocessor_response_time_bound], we assume 
        that (1) jobs are sequential, moreover (2) functions interference and 
        interfering_workload are consistent with the hypothesis of sequential jobs. *)
     Hypothesis H_sequential_jobs : sequential_jobs sched. 
     Hypothesis H_interference_and_workload_consistent_with_sequential_jobs:
       interference_and_workload_consistent_with_sequential_jobs.
 
-    (* Assume we have a constant L which bounds the busy interval of any of tsk's jobs. *)
+    (** Assume we have a constant L which bounds the busy interval of any of tsk's jobs. *)
     Variable L : duration.
     Hypothesis H_busy_interval_exists:
       busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
 
-    (* Next, we assume that task_interference_bound_function is a bound on interference incurred by the task. *) 
+    (** Next, we assume that task_interference_bound_function is a bound on interference incurred by the task. *) 
     Variable task_interference_bound_function : Task -> duration -> duration -> duration.
     Hypothesis H_task_interference_is_bounded: 
       task_interference_is_bounded_by task_interference_bound_function.   
     
-    (* Given any job j of task tsk that arrives exactly A units after the beginning of the busy 
+    (** Given any job j of task tsk that arrives exactly A units after the beginning of the busy 
        interval, the bound on the total interference incurred by j within an interval of length Δ 
        is no greater than [task_rbf (A + ε) - task_cost tsk + task's IBF Δ]. Note that in case of 
        sequential jobs the bound consists of two parts: (1) the part that bounds the interference 
@@ -191,13 +191,13 @@ Section Sequential_Abstract_RTA.
     Let total_interference_bound (tsk : Task) (A Δ : duration) :=
       task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A Δ.
 
-    (* Note that since we consider the modified interference bound function, the search space has
+    (** Note that since we consider the modified interference bound function, the search space has
        also changed. One can see that the new search space is guaranteed to include any A for which 
        [task_rbf (A) ≠ task_rbf (A + ε)], since this implies the fact that 
        [total_interference_bound (tsk, A, Δ) ≠ total_interference_bound (tsk, A + ε, Δ)]. *)
     Let is_in_search_space_seq := is_in_search_space tsk L total_interference_bound. 
 
-    (* Consider any value R, and assume that for any relative arrival time A from the search 
+    (** Consider any value R, and assume that for any relative arrival time A from the search 
        space there is a solution F of the response-time recurrence that is bounded by R. In
        contrast to the formula in "non-sequential" Abstract RTA, assuming that jobs are 
        sequential leads to a more precise response-time bound. Now we can explicitly express 
@@ -217,11 +217,11 @@ Section Sequential_Abstract_RTA.
                   + task_interference_bound_function tsk A (A + F) /\
           F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
     
-    (* In this section we prove a few simple lemmas about the completion of jobs from the task 
+    (** In this section we prove a few simple lemmas about the completion of jobs from the task 
        considering the busy interval of the job under consideration. *)
     Section CompletionOfJobsFromSameTask.
 
-      (* Consider any two jobs j1 j2 of tsk. *)
+      (** Consider any two jobs j1 j2 of tsk. *)
       Variable j1 j2 : Job. 
       Hypothesis H_j1_arrives: arrives_in arr_seq j1.
       Hypothesis H_j2_arrives: arrives_in arr_seq j2. 
@@ -229,11 +229,11 @@ Section Sequential_Abstract_RTA.
       Hypothesis H_j2_from_tsk: job_task j2 = tsk.
       Hypothesis H_j1_cost_positive: job_cost_positive j1.
       
-      (* Consider the busy interval [t1, t2) of job j1. *)
+      (** Consider the busy interval [t1, t2) of job j1. *)
       Variable t1 t2 : instant.
       Hypothesis H_busy_interval : busy_interval j1 t1 t2.
 
-      (* We prove that if a job from task tsk arrived before the beginning of the busy 
+      (** We prove that if a job from task tsk arrived before the beginning of the busy 
          interval, then it must be completed before the beginning of the busy interval *)
       Lemma completed_before_beginning_of_busy_interval:
         job_arrival j2 < t1 ->
@@ -249,7 +249,7 @@ Section Sequential_Abstract_RTA.
           by apply arrived_between_implies_in_arrivals.
       Qed.
 
-      (* Next we prove that if a job is pending after the beginning 
+      (** Next we prove that if a job is pending after the beginning 
          of the busy interval [t1, t2) then it arrives after t1. *) 
       Lemma arrives_after_beginning_of_busy_interval:
         forall t,
@@ -269,61 +269,61 @@ Section Sequential_Abstract_RTA.
  
     End CompletionOfJobsFromSameTask.
 
-    (* Since we are going to use the [uniprocessor_response_time_bound] theorem to prove 
+    (** Since we are going to use the [uniprocessor_response_time_bound] theorem to prove 
        the theorem of this section, we have to show that all the hypotheses are satisfied. 
        Namely, we need to show that hypotheses [H_sequential_jobs, H_i_w_are_task_consistent 
        and H_task_interference_is_bounded_by] imply [H_job_interference_is_bounded], and the 
        fact that [H_R_is_maximum_seq] implies [H_R_is_maximum]. *)
     
-    (* In this section we show that there exists a bound for cumulative interference for any
+    (** In this section we show that there exists a bound for cumulative interference for any
        job of task tsk, i.e., the hypothesis H_job_interference_is_bounded holds. *)
     Section BoundOfCumulativeJobInterference.
 
-      (* Consider any job j of tsk. *)
+      (** Consider any job j of tsk. *)
       Variable j : Job. 
       Hypothesis H_j_arrives : arrives_in arr_seq j.
       Hypothesis H_job_of_tsk : job_task j = tsk.
       Hypothesis H_job_cost_positive : job_cost_positive j.
 
-      (* Consider the busy interval [t1, t2) of job j. *)
+      (** Consider the busy interval [t1, t2) of job j. *)
       Variable t1 t2 : instant.
       Hypothesis H_busy_interval : busy_interval j t1 t2.
 
-      (* Let's define A as a relative arrival time of job j (with respect to time t1). *)
+      (** Let's define A as a relative arrival time of job j (with respect to time t1). *)
       Let A : duration := job_arrival j - t1.
 
-      (* Consider an arbitrary time x ... *) 
+      (** Consider an arbitrary time x ... *) 
       Variable x : duration.
-      (* ... such that (t1 + x) is inside the busy interval... *)
+      (** ... such that (t1 + x) is inside the busy interval... *)
       Hypothesis H_inside_busy_interval : t1 + x < t2.
-      (* ... and job j is not completed by time (t1 + x). *)
+      (** ... and job j is not completed by time (t1 + x). *)
       Hypothesis H_job_j_is_not_completed : ~~ completed_by sched j (t1 + x).
 
-      (* In this section, we show that the cumulative interference of job j in the interval [t1, t1 + x)
+      (** In this section, we show that the cumulative interference of job j in the interval [t1, t1 + x)
          is bounded by the sum of the task workload in the interval [t1, t1 + A + ε) and the cumulative 
          interference of j's task in the interval [t1, t1 + x). Note that the task workload is computed 
          only on the interval [t1, t1 + A + ε). Thanks to the hypothesis about sequential jobs, jobs of 
          task tsk that arrive after [t1 + A + ε] cannot interfere with j. *) 
       Section TaskInterferenceBoundsInterference.
 
-        (* We start by proving a simpler analog of the lemma which states that at
+        (** We start by proving a simpler analog of the lemma which states that at
            any time instant t ∈ [t1, t1 + x) the sum of [interference j t] and 
            [scheduled_at j t] is no larger than the sum of [the service received
            by jobs of task tsk at time t] and [task_iterference tsk t]. *)
 
-        (* Next we consider 4 cases. *)
+        (** Next we consider 4 cases. *)
         Section CaseAnalysis.
 
-          (* Consider an arbitrary time instant t ∈ [t1, t1 + x). *)
+          (** Consider an arbitrary time instant t ∈ [t1, t1 + x). *)
           Variable t : instant.
           Hypothesis H_t_in_interval : t1 <= t < t1 + x.
           
           Section Case1. 
 
-            (* Assume the processor is idle at time t. *)
+            (** Assume the processor is idle at time t. *)
             Hypothesis H_idle : sched t = None.
             
-            (* In case when the processor is idle, one can show that
+            (** In case when the processor is idle, one can show that
                [interference j t = 1, scheduled_at j t = 0]. But since 
                interference doesn't come from a job of task tsk
                [task_interferece tsk = 1]. Which reduces to [1 ≤ 1]. *)
@@ -351,12 +351,12 @@ Section Sequential_Abstract_RTA.
 
           Section Case2.
 
-            (* Assume a job j' from another task is scheduled at time t. *)
+            (** Assume a job j' from another task is scheduled at time t. *)
             Variable j' : Job.
             Hypothesis H_sched :  sched t = Some j'.
             Hypothesis H_not_job_of_tsk : job_task j' != tsk.
 
-            (* If a job j' from another task is scheduled at time t, 
+            (** If a job j' from another task is scheduled at time t, 
                then [interference j t = 1, scheduled_at j t = 0]. But
                since interference doesn't come from a job of task tsk
                [task_interferece tsk = 1]. Which reduces to [1 ≤ 1]. *)
@@ -391,13 +391,13 @@ Section Sequential_Abstract_RTA.
 
           Section Case3.
 
-            (* Assume a job j' (different from j) of task tsk is scheduled at time t. *)
+            (** Assume a job j' (different from j) of task tsk is scheduled at time t. *)
             Variable j' : Job.
             Hypothesis H_sched :  sched t = Some j'.
             Hypothesis H_not_job_of_tsk : job_task j' == tsk.
             Hypothesis H_j_neq_j' : j != j'.
             
-            (* If a job j' (different from j) of task tsk is scheduled at time t, then 
+            (** If a job j' (different from j) of task tsk is scheduled at time t, then 
                [interference j t = 1, scheduled_at j t = 0]. Moreover, since interference 
                comes from a job of the same task [task_interferece tsk = 0]. However, 
                in this case [service_of_jobs of tsk = 1]. Which reduces to [1 ≤ 1]. *)        
@@ -451,10 +451,10 @@ Section Sequential_Abstract_RTA.
 
           Section Case4.
             
-            (* Assume that job j is scheduled at time t. *)
+            (** Assume that job j is scheduled at time t. *)
             Hypothesis H_sched : sched t = Some j.
 
-            (* If job j is scheduled at time t, then [interference = 0, scheduled_at = 1], but 
+            (** If job j is scheduled at time t, then [interference = 0, scheduled_at = 1], but 
              note that [service_of_jobs of tsk = 1], therefore inequality reduces to [1 ≤ 1]. *)
             Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_j:
               interference j t + scheduled_at sched j t <=
@@ -484,7 +484,7 @@ Section Sequential_Abstract_RTA.
             
           End Case4.
  
-          (* We use the above case analysis to prove that any time instant 
+          (** We use the above case analysis to prove that any time instant 
              t ∈ [t1, t1 + x) the sum of [interference j t] and [scheduled_at j t]
              is no larger than the sum of [the service received by jobs of task 
              tsk at time t] and [task_iterference tsk t]. *)
@@ -508,7 +508,7 @@ Section Sequential_Abstract_RTA.
 
         End CaseAnalysis.
         
-        (* Next we prove cumulative version of the lemma above. *)
+        (** Next we prove cumulative version of the lemma above. *)
         Lemma cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference:
           cumul_interference j t1 (t1 + x)
           <= (task_service_of_jobs_in (arrivals_between t1 (t1 + A + ε)) t1 (t1 + x)
@@ -531,7 +531,7 @@ Section Sequential_Abstract_RTA.
             by apply interference_plus_sched_le_serv_of_task_plus_task_interference.
         Qed.
 
-        (* On the other hand, the service terms in the inequality 
+        (** On the other hand, the service terms in the inequality 
            above can be upper-bound by the workload terms. *)
         Lemma serv_of_task_le_workload_of_task_plus:
           task_service_of_jobs_in (arrivals_between t1 (t1 + A + ε)) t1 (t1 + x)
@@ -555,7 +555,7 @@ Section Sequential_Abstract_RTA.
             by apply service_of_jobs_le_workload; auto using ideal_proc_model_provides_unit_service.
         Qed.
 
-        (* Finally, we show that the cumulative interference of job j in the interval [t1, t1 + x)
+        (** Finally, we show that the cumulative interference of job j in the interval [t1, t1 + x)
            is bounded by the sum of the task workload in the interval [t1, t1 + A + ε) and 
            the cumulative interference of j's task in the interval [t1, t1 + x). *)
         Lemma cumulative_job_interference_le_task_interference_bound:
@@ -573,7 +573,7 @@ Section Sequential_Abstract_RTA.
 
       End TaskInterferenceBoundsInterference.
       
-      (* In order to obtain a more convenient bound of the cumulative interference, we need to 
+      (** In order to obtain a more convenient bound of the cumulative interference, we need to 
          abandon the actual workload in favor of a bound which depends on task parameters only.
          So, we show that actual workload of the task excluding workload of any job j is no 
          greater than bound of workload excluding the cost of job j's task. *)
@@ -620,7 +620,7 @@ Section Sequential_Abstract_RTA.
           by rewrite -TSK2; apply H_job_cost_le_task_cost; exists (t1 + A); apply rem_in in ARR'.
       Qed.
       
-      (* Finally, we use the lemmas above to obtain the bound on
+      (** Finally, we use the lemmas above to obtain the bound on
          interference in terms of task_rbf and task_interfere. *)
       Lemma cumulative_job_interference_bound:
         cumul_interference j t1 (t1 + x) 
@@ -640,19 +640,19 @@ Section Sequential_Abstract_RTA.
       
     End BoundOfCumulativeJobInterference. 
 
-    (* In this section, we prove that [H_R_is_maximum_seq] implies [H_R_is_maximum]. *)
+    (** In this section, we prove that [H_R_is_maximum_seq] implies [H_R_is_maximum]. *)
     Section MaxInSeqHypothesisImpMaxInNonseqHypothesis.
 
-      (* Consider any job j of tsk. *)
+      (** Consider any job j of tsk. *)
       Variable j : Job.
       Hypothesis H_j_arrives : arrives_in arr_seq j.
       Hypothesis H_job_of_tsk : job_task j = tsk.
 
-      (* For simplicity, let's define a local name for the search space. *)
+      (** For simplicity, let's define a local name for the search space. *)
       Let is_in_search_space A :=
         is_in_search_space tsk L total_interference_bound A.
       
-      (* We prove that [H_R_is_maximum] holds. *)
+      (** We prove that [H_R_is_maximum] holds. *)
       Lemma max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis:
         forall (A : duration),
           is_in_search_space A ->
@@ -680,7 +680,7 @@ Section Sequential_Abstract_RTA.
       
     End MaxInSeqHypothesisImpMaxInNonseqHypothesis. 
 
-    (* Finally, we apply the [uniprocessor_response_time_bound] theorem, and using the 
+    (** Finally, we apply the [uniprocessor_response_time_bound] theorem, and using the 
        lemmas above, we prove that all the requirements are satisfied. So, R is a response
        time bound. *) 
     Theorem uniprocessor_response_time_bound_seq:

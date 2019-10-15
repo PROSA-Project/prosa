@@ -10,43 +10,43 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
    of run-to-completion-threshold-compilant schedules. *)
 Section RunToCompletionThreshold.
  
-  (* Consider any type of tasks ... *)
+  (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
 
-  (*  ... and any type of jobs associated with these tasks. *)
+  (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (* In addition, we assume existence of a function
+  (** In addition, we assume existence of a function
      maping jobs to theirs preemption points ... *)
   Context `{JobPreemptable Job}.
 
-  (* ...and a function mapping tasks to theirs
+  (** ...and a function mapping tasks to theirs
      run-to-completion threshold. *)
   Context `{TaskRunToCompletionThreshold Task}.
 
-  (* Consider any kind of processor state model, ... *)
+  (** Consider any kind of processor state model, ... *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (* ... any job arrival sequence, ... *)
+  (** ... any job arrival sequence, ... *)
   Variable arr_seq: arrival_sequence Job.
 
-  (* ... and any given schedule. *)
+  (** ... and any given schedule. *)
   Variable sched: schedule PState. 
 
-  (* In this section we define the notion of a run-to-completion threshold for a job. *)
+  (** In this section we define the notion of a run-to-completion threshold for a job. *)
   Section JobRunToCompletionThreshold.
     
-    (* We define the notion of job's run-to-completion threshold: run-to-completion threshold 
+    (** We define the notion of job's run-to-completion threshold: run-to-completion threshold 
        is the amount of service after which a job cannot be preempted until its completion. *)
     Definition runs_to_completion_from (j : Job) (ρ : duration) :=
       all (fun (δ : duration) => ~~ job_preemptable j δ) (index_iota ρ (job_cost j)).
 
-    (* Note that a run-to-completion threshold exists for any job. *)
+    (** Note that a run-to-completion threshold exists for any job. *)
     Lemma eventually_runs_to_completion:
       forall (j : Job), exists (ρ : duration), runs_to_completion_from j ρ.
     Proof.
@@ -56,24 +56,24 @@ Section RunToCompletionThreshold.
         by move: GE; rewrite leqNgt; move => /negP GE; apply: GE.
     Qed.    
 
-    (* We define run-to-completion threshold of a job as the minimal progress 
+    (** We define run-to-completion threshold of a job as the minimal progress 
        the job should reach to become non-preemptive until completion. *)
     Definition job_run_to_completion_threshold (j : Job) : duration :=
       ex_minn (eventually_runs_to_completion j).
 
-    (* In this section we prove a few simple lemmas
+    (** In this section we prove a few simple lemmas
        about run-to-completion threshold for a job. *)
     Section Lemmas.
 
-      (* Assume that the preemption model is valid. *)
+      (** Assume that the preemption model is valid. *)
       Hypothesis H_valid_preemption_model:
         valid_preemption_model arr_seq sched.
 
-      (* Consider an arbitrary job j from the arrival sequence. *)
+      (** Consider an arbitrary job j from the arrival sequence. *)
       Variable j : Job.
       Hypothesis H_j_in_arrival_seq : arrives_in arr_seq j.
 
-      (* First, we prove that a job cannot be preempted 
+      (** First, we prove that a job cannot be preempted 
          during execution of the last segment. *)
       Lemma job_cannot_be_preempted_within_last_segment:
         forall (ρ : duration), 
@@ -87,7 +87,7 @@ Section RunToCompletionThreshold.
           by apply RUNS; rewrite mem_index_iota; apply/andP; split.
       Qed.
       
-      (* We prove that the run-to-completion threshold is positive for any job. I.e., in order
+      (** We prove that the run-to-completion threshold is positive for any job. I.e., in order
          to become non-preemptive a job must receive at least one unit of service. *)
       Lemma job_run_to_completion_threshold_positive:
         job_cost_positive j ->
@@ -104,7 +104,7 @@ Section RunToCompletionThreshold.
           by apply H_valid_preemption_model.
       Qed.
 
-      (* Next we show that the run-to-completion threshold
+      (** Next we show that the run-to-completion threshold
          is at most the cost of a job. *)
       Lemma job_run_to_completion_threshold_le_job_cost:
         job_cost_positive j -> 
@@ -117,7 +117,7 @@ Section RunToCompletionThreshold.
           by move: GE; rewrite leqNgt; move => /negP GE; apply: GE.
       Qed.
       
-      (* In order to get a consistent schedule, the scheduler should respect 
+      (** In order to get a consistent schedule, the scheduler should respect 
          the notion of run-to-completion threshold. We assume that, after 
          a job reaches its run-to-completion threshold, it cannot be preempted
          until its completion. *)
@@ -139,7 +139,7 @@ Section RunToCompletionThreshold.
 
   End JobRunToCompletionThreshold.
 
-  (* Since a task model may not provide exact information about preemption point of 
+  (** Since a task model may not provide exact information about preemption point of 
      a task run-to-completion, task's run-to-completion threshold cannot be defined in
      terms of preemption points of a task (unlike job's run-to-completion threshold).   
      Therefore, one can assume the existence of a function that maps a task to 
@@ -147,11 +147,11 @@ Section RunToCompletionThreshold.
      of a valid run-to-completion threshold of a task. *)
   Section ValidTaskRunToCompletionThreshold.
         
-    (* A task's run-to-completion threshold should be at most the cost of the task. *)
+    (** A task's run-to-completion threshold should be at most the cost of the task. *)
     Definition task_run_to_completion_threshold_le_task_cost tsk :=
       task_run_to_completion_threshold tsk <= task_cost tsk.
     
-    (* We say that the run-to-completion threshold of a task tsk
+    (** We say that the run-to-completion threshold of a task tsk
        bounds the job run-to-completionthreshold iff for any job j
        of task tsk the job run-to-completion threshold is less than 
        or equal to the task run-to-completion threshold. *) 
@@ -161,7 +161,7 @@ Section RunToCompletionThreshold.
         job_task j = tsk ->
         job_run_to_completion_threshold j <= task_run_to_completion_threshold tsk.
 
-    (* We say that task_run_to_completion_threshold is a valid task run-to-completion 
+    (** We say that task_run_to_completion_threshold is a valid task run-to-completion 
        threshold for a task tsk iff [task_run_to_completion_threshold tsk] is (1) no 
        bigger than tsk's cost, (2) for any job of task tsk job_run_to_completion_threshold
        is bounded by task_run_to_completion_threshold. *)

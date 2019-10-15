@@ -5,9 +5,9 @@ From rt.restructuring.analysis.basic_facts Require Export service completion.
     model w.r.t. deadlines. *)
 
 Section DeadlineFacts.
-  (* Consider any given type of jobs with costs and deadlines... *)
+  (** Consider any given type of jobs with costs and deadlines... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job}.
-  (* ... any given type of processor states. *)
+  (** ... any given type of processor states. *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.
 
@@ -15,16 +15,16 @@ Section DeadlineFacts.
     always receive service. *)
   Section IdealProgressSchedules.
 
-    (* Consider a given reference schedule... *)
+    (** Consider a given reference schedule... *)
     Variable sched: schedule PState.
 
-    (* ...in which complete jobs don't execute... *)
+    (** ...in which complete jobs don't execute... *)
     Hypothesis H_completed_jobs: completed_jobs_dont_execute sched.
 
-    (* ...and scheduled jobs always receive service. *)
+    (** ...and scheduled jobs always receive service. *)
     Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
-    (* We observe that, if a job is known to meet its deadline, then
+    (** We observe that, if a job is known to meet its deadline, then
        its deadline must be later than any point at which it is
        scheduled. That is, if a job that meets its deadline is
        scheduled at time t, we may conclude that its deadline is at a
@@ -52,10 +52,10 @@ Section DeadlineFacts.
       both schedules or none. *)
   Section EqualProgress.
 
-    (* Consider any two schedules [sched] and [sched']. *)
+    (** Consider any two schedules [sched] and [sched']. *)
     Variable sched sched': schedule PState.
 
-    (* We observe that, if the service is invariant at the time of a
+    (** We observe that, if the service is invariant at the time of a
        job's absolute deadline, and if the job meets its deadline in one of the schedules, 
        then it meets its deadline also in the other schedule. *)
     Lemma service_invariant_implies_deadline_met:

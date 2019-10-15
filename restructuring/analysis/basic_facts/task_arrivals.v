@@ -1,20 +1,20 @@
 From rt.restructuring.model.aggregate Require Export task_arrivals.
 
-(* In this file we provide basic properties related to tasks on arrival sequences. *)
+(** In this file we provide basic properties related to tasks on arrival sequences. *)
 Section TaskArrivals.
 
-  (* Consider any type of job associated with any type of tasks. *)
+  (** Consider any type of job associated with any type of tasks. *)
   Context {Job : JobType}.
   Context {Task : TaskType}.
   Context `{JobTask Job Task}.
 
-  (* Consider any job arrival sequence. *)
+  (** Consider any job arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 
-  (* Let tsk be any task. *)
+  (** Let tsk be any task. *)
   Variable tsk : Task.
 
-  (* We show that the number of arrivals of task can be split into disjoint intervals. *) 
+  (** We show that the number of arrivals of task can be split into disjoint intervals. *) 
   Lemma num_arrivals_of_task_cat:
     forall t t1 t2,
       t1 <= t <= t2 ->

@@ -10,52 +10,52 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 (** * Lemmas about Service Received by Sets of Jobs *)
 (** In this file, we establish basic facts about the service received by _sets_ of jobs. *)
 
-(* To begin with, we provide some basic properties of service 
+(** To begin with, we provide some basic properties of service 
    of a set of jobs in case of a generic scheduling model. *)
 Section GenericModelLemmas.
 
-  (* Consider any type of tasks ... *)
+  (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   
-  (*  ... and any type of jobs associated with these tasks. *)
+  (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   
-  (* Consider any kind of processor state model, ... *)
+  (** Consider any kind of processor state model, ... *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (* ... any job arrival sequence with consistent arrivals, .... *)
+  (** ... any job arrival sequence with consistent arrivals, .... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (* ... and any schedule of this arrival sequence ...*)
+  (** ... and any schedule of this arrival sequence ...*)
   Variable sched : schedule PState.
   
-  (* ... where jobs do not execute before their arrival or after completion. *)
+  (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
   
-  (* Let P be any predicate over jobs. *)
+  (** Let P be any predicate over jobs. *)
   Variable P : Job -> bool.
 
-  (* Let's define some local names for clarity. *)
+  (** Let's define some local names for clarity. *)
   Let arrivals_between := arrivals_between arr_seq.
   
-  (* In this section, we prove that the service received by any set of jobs
+  (** In this section, we prove that the service received by any set of jobs
      is upper-bounded by the corresponding workload. *)
   Section ServiceBoundedByWorkload.
 
-    (* Let jobs denote any (finite) set of jobs. *)
+    (** Let jobs denote any (finite) set of jobs. *)
     Variable jobs : seq Job.
 
-    (* Assume that the processor model is a unit service moodel. I.e., 
+    (** Assume that the processor model is a unit service moodel. I.e., 
        no job ever receives more than one unit of service at any time. *)
     Hypothesis H_unit_service : unit_service_proc_model.
 
-    (* Then, we prove that the service received by those jobs is no larger than their workload. *)
+    (** Then, we prove that the service received by those jobs is no larger than their workload. *)
     Lemma service_of_jobs_le_workload:
       forall t1 t2,
         service_of_jobs sched P jobs t1 t2 <= workload_of_jobs P jobs.
@@ -67,11 +67,11 @@ Section GenericModelLemmas.
 
   End ServiceBoundedByWorkload.
     
-  (* In this section we prove a few facts about splitting 
+  (** In this section we prove a few facts about splitting 
      the total service of a set of jobs. *)
   Section ServiceCat.
 
-    (* We show that the total service of jobs released in a time interval [t1,t2) 
+    (** We show that the total service of jobs released in a time interval [t1,t2) 
        during [t1,t2) is equal to the sum of:
        (1) the total service of jobs released in time interval [t1, t) during time [t1, t)
        (2) the total service of jobs released in time interval [t1, t) during time [t, t2)
@@ -101,7 +101,7 @@ Section GenericModelLemmas.
         by move: ARR => /andP [N1 N2]; apply leq_trans with t.
     Qed.
 
-    (* We show that the total service of jobs released in a time interval [t1,t2)
+    (** We show that the total service of jobs released in a time interval [t1,t2)
        during [t,t2) is equal to the sum of: 
        (1) the total service of jobs released in a time interval [t1,t) during [t,t2)
        and (2) the total service of jobs released in a time interval [t,t2) during [t,t2). *)
@@ -122,48 +122,48 @@ Section GenericModelLemmas.
     
 End GenericModelLemmas.
 
-(* In this section, we prove some properties about service
+(** In this section, we prove some properties about service
    of sets of jobs for ideal uniprocessor model. *)
 Section IdealModelLemmas.
 
-  (* Consider any type of tasks ... *)
+  (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   
-  (*  ... and any type of jobs associated with these tasks. *)
+  (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (* Consider any arrival sequence with consistent arrivals. *)
+  (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (* Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
+  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
 
-  (* ... where jobs do not execute before their arrival or after completion. *)
+  (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
   
-  (* Let P be any predicate over jobs. *)
+  (** Let P be any predicate over jobs. *)
   Variable P : Job -> bool.
 
-  (* Let's define some local names for clarity. *)
+  (** Let's define some local names for clarity. *)
   Let arrivals_between := arrivals_between arr_seq.
   Let completed_by := completed_by sched.
   
-  (* In this section, we prove that the service received by any set of jobs
+  (** In this section, we prove that the service received by any set of jobs
      is upper-bounded by the corresponding interval length. *)
   Section ServiceOfJobsIsBoundedByLength.
 
-    (* Let jobs denote any (finite) set of jobs. *)
+    (** Let jobs denote any (finite) set of jobs. *)
     Variable jobs : seq Job.
     
-    (* Assume that the sequence of jobs is a set. *)
+    (** Assume that the sequence of jobs is a set. *)
     Hypothesis H_no_duplicate_jobs : uniq jobs. 
 
-    (* We prove that the overall service of jobs at a single time instant is at most 1. *)
+    (** We prove that the overall service of jobs at a single time instant is at most 1. *)
     Lemma service_of_jobs_le_1:
       forall t, \sum_(j <- jobs | P j) service_at sched j t <= 1.
     Proof.
@@ -200,7 +200,7 @@ Section IdealModelLemmas.
       }
     Qed.
 
-    (* Then, we prove that the service received by those jobs is no larger than their workload. *)
+    (** Then, we prove that the service received by those jobs is no larger than their workload. *)
     Corollary service_of_jobs_le_length_of_interval:
       forall (t : instant) (Δ : duration),
         service_of_jobs sched P jobs t (t + Δ) <= Δ.
@@ -217,26 +217,26 @@ Section IdealModelLemmas.
 
   End ServiceOfJobsIsBoundedByLength.
   
-  (* In this section, we introduce a connection between the cumulative 
+  (** In this section, we introduce a connection between the cumulative 
      service, cumulative workload, and completion of jobs. *)
   Section WorkloadServiceAndCompletion. 
 
-    (* Consider an arbitrary time interval [t1, t2). *)
+    (** Consider an arbitrary time interval [t1, t2). *)
     Variables t1 t2 : instant.
     
-    (* Let jobs be a set of all jobs arrived during [t1, t2). *) 
+    (** Let jobs be a set of all jobs arrived during [t1, t2). *) 
     Let jobs := arrivals_between t1 t2.
     
-    (* Next, we consider some time instant [t_compl]. *)
+    (** Next, we consider some time instant [t_compl]. *)
     Variable t_compl : instant.
 
-    (* And state the proposition that all jobs are completed by time 
+    (** And state the proposition that all jobs are completed by time 
        t_compl. Next we show that this proposition is equivalent to
        the fact that [workload of jobs = service of jobs]. *) 
     Let all_jobs_completed_by t_compl :=
       forall j, j \in jobs -> P j -> completed_by j t_compl.
     
-    (* First, we prove that if the workload of [jobs] is equal to the service 
+    (** First, we prove that if the workload of [jobs] is equal to the service 
        of [jobs], then any job in [jobs] is completed by time t_compl. *)
     Lemma workload_eq_service_impl_all_jobs_have_completed:
       workload_of_jobs P jobs =
@@ -267,7 +267,7 @@ Section IdealModelLemmas.
       }
     Qed.
 
-    (* And vice versa, the fact that any job in [jobs] is completed by time t_compl 
+    (** And vice versa, the fact that any job in [jobs] is completed by time t_compl 
        implies that the workload of [jobs] is equal to the service of [jobs]. *)
     Lemma all_jobs_have_completed_impl_workload_eq_service:
       all_jobs_completed_by t_compl -> 
@@ -307,7 +307,7 @@ Section IdealModelLemmas.
       }
     Qed. 
 
-    (* Using the lemmas above, we prove equivalence. *)
+    (** Using the lemmas above, we prove equivalence. *)
     Corollary all_jobs_have_completed_equiv_workload_eq_service:
       all_jobs_completed_by t_compl <->
       workload_of_jobs P jobs =

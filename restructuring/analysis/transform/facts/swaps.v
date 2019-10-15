@@ -7,23 +7,23 @@ From rt.util Require Import nat.
     classic EDF optimality proof. *)
 
 Section SwappedFacts.
-  (* For any given type of jobs... *)
+  (** For any given type of jobs... *)
   Context {Job : JobType}.
-  (* ... any given type of processor states: *)
+  (** ... any given type of processor states: *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.
 
-  (* ...consider any given reference schedule. *)
+  (** ...consider any given reference schedule. *)
   Variable sched: schedule PState.
 
-  (* Suppose we are given two specific times [t1] and [t2]. *)
+  (** Suppose we are given two specific times [t1] and [t2]. *)
   Variable t1 t2: instant.
 
-  (* In the following, let [sched'] denote the schedule in which the
+  (** In the following, let [sched'] denote the schedule in which the
      allocations at [t1] and [t2] have been swapped. *)
   Let sched' := swapped sched t1 t2.
   
-  (* First, we note that the trivial case where t1 == t2 is not interesting
+  (** First, we note that the trivial case where t1 == t2 is not interesting
      because then the two schedules are identical. *)
   Lemma trivial_swap:
     t1 = t2 ->
@@ -36,7 +36,7 @@ Section SwappedFacts.
     by move /eqP ->.
   Qed.
 
-  (* In this trivial case, the amount of service received hence
+  (** In this trivial case, the amount of service received hence
      is obviously always identical. *)
   Lemma trivial_swap_service_invariant:
     t1 = t2 ->
@@ -49,7 +49,7 @@ Section SwappedFacts.
     by rewrite trivial_swap.
   Qed.
 
-  (* In any case, the two schedules do not differ at non-swapped times. *)
+  (** In any case, the two schedules do not differ at non-swapped times. *)
   Lemma swap_other_times_invariant:
     forall t,
       t <> t1 ->
@@ -60,7 +60,7 @@ Section SwappedFacts.
     by rewrite /sched' /swapped !rest_of_schedule_invariant //.
   Qed.
 
-  (* By definition, if a job is scheduled at t2 in the original
+  (** By definition, if a job is scheduled at t2 in the original
      schedule, then it is found at t1 in the new schedule. *)
   Lemma swap_job_scheduled_t1:
     forall j,
@@ -74,7 +74,7 @@ Section SwappedFacts.
     - by rewrite ifT.
   Qed.
 
-  (* Similarly, a job scheduled at t1 in the original schedule is
+  (** Similarly, a job scheduled at t1 in the original schedule is
      scheduled at t2 after the swap. *)
   Lemma swap_job_scheduled_t2:
     forall j,
@@ -88,7 +88,7 @@ Section SwappedFacts.
     - by rewrite ifT.
   Qed.
 
-  (* If a job is scheduled at any time not involved in the swap, then
+  (** If a job is scheduled at any time not involved in the swap, then
      it remains scheduled at that time in the new schedule. *)
   Lemma swap_job_scheduled_other_times:
     forall j t,
@@ -102,7 +102,7 @@ Section SwappedFacts.
     by rewrite swap_other_times_invariant //; apply: not_eq_sym.
   Qed.
 
-  (* To make case analysis more convenient, we summarize the preceding
+  (** To make case analysis more convenient, we summarize the preceding
      three lemmas as a disjunction. *)
   Corollary swap_job_scheduled_cases:
     forall j t,
@@ -126,7 +126,7 @@ Section SwappedFacts.
         by rewrite -swap_job_scheduled_other_times.
   Qed.
 
-  (* From this, we can easily conclude that no jobs have appeared out
+  (** From this, we can easily conclude that no jobs have appeared out
      of thin air: if a job scheduled at some time in the new schedule,
      then it was also scheduled at some time in the original
      schedule. *)
@@ -144,7 +144,7 @@ Section SwappedFacts.
     - by exists t1.
   Qed.
 
-  (* Mirroring swap_job_scheduled_cases above, we also state a
+  (** Mirroring swap_job_scheduled_cases above, we also state a
      disjunction for case analysis under the premise that a job is
      scheduled in the original schedule. *)
   Lemma swap_job_scheduled_original_cases:
@@ -169,7 +169,7 @@ Section SwappedFacts.
         by rewrite swap_job_scheduled_other_times.
   Qed.
 
-  (* Thus, we can conclude that no jobs are lost: if a job is
+  (** Thus, we can conclude that no jobs are lost: if a job is
      scheduled at some point in the original schedule, then it is also
      scheduled at some point in the new schedule. *)
   Corollary swap_job_scheduled_original:
@@ -190,11 +190,11 @@ Section SwappedFacts.
       statements about invariants about the cumulative amount of
       service received. *)
   
-  (* To avoid dealing with symmetric cases, assume in the following
+  (** To avoid dealing with symmetric cases, assume in the following
      that t1 and t2 are ordered. *)
   Hypothesis H_well_ordered: t1 <= t2.
 
-  (* As another trivial invariant, we observe that nothing has changed
+  (** As another trivial invariant, we observe that nothing has changed
      before time t1. *)
   Lemma swap_before_invariant:
     forall t,
@@ -207,7 +207,7 @@ Section SwappedFacts.
        [move: t_lt_t1|move: t_lt_t2]; rewrite ltnn.
   Qed.
 
-  (* Similarly, nothing has changed after time t2. *)
+  (** Similarly, nothing has changed after time t2. *)
   Lemma swap_after_invariant:
     forall t,
       t2 < t ->
@@ -219,7 +219,7 @@ Section SwappedFacts.
        [move: t1_lt_t|move: t2_lt_t]; rewrite ltnn.
   Qed.
 
-  (* Thus, we observe that, before t1, the two schedules are identical with
+  (** Thus, we observe that, before t1, the two schedules are identical with
      regard to the service received by any job because they are identical. *)
   Corollary service_before_swap_invariant:
     forall t,
@@ -234,7 +234,7 @@ Section SwappedFacts.
       by apply ltnW.
   Qed.
 
-  (* Likewise, we observe that, *after* t2, the swapped schedule again does not
+  (** Likewise, we observe that, *after* t2, the swapped schedule again does not
      differ with regard to the service received by any job. *)
   Lemma service_after_swap_invariant:
     forall t,
@@ -256,7 +256,7 @@ Section SwappedFacts.
       [rewrite addnC|]; by apply leq_addr.
   Qed.
 
-  (* Finally, we note that, trivially, jobs that are not involved in
+  (** Finally, we note that, trivially, jobs that are not involved in
      the swap receive invariant service. *)
   Lemma service_of_others_invariant:
     forall t j,
@@ -280,26 +280,26 @@ End SwappedFacts.
     scheduled obtained by swapping the allocations at times [t1] and
     [t2]. *)
 Section SwappedScheduleProperties.
-  (* For any given type of jobs... *)
+  (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
-  (* ... any given type of processor states: *)
+  (** ... any given type of processor states: *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.
 
-  (* ...consider any given reference schedule. *)
+  (** ...consider any given reference schedule. *)
   Variable sched: schedule PState.
 
-  (* Suppose we are given two specific times [t1] and [t2]... *)
+  (** Suppose we are given two specific times [t1] and [t2]... *)
   Variable t1 t2: instant.
 
-  (* ...such that [t1] is no later than [t2]. *)
+  (** ...such that [t1] is no later than [t2]. *)
   Hypothesis H_order: t1 <= t2.
 
-  (* We let [sched'] denote the schedule in which the allocations at
+  (** We let [sched'] denote the schedule in which the allocations at
      [t1] and [t2] have been swapped. *)
   Let sched' := swapped sched t1 t2.
 
-  (* First, we observe that if jobs never accomulate more service than
+  (** First, we observe that if jobs never accomulate more service than
      required, then that's still the case after the swap. *)
   Lemma swapped_service_bound:
     (forall j t, service sched  j t <= job_cost j) ->
@@ -325,7 +325,7 @@ Section SwappedScheduleProperties.
     }
   Qed.
 
-  (* From the above service bound, we conclude that, if if completed jobs don't
+  (** From the above service bound, we conclude that, if if completed jobs don't
      execute in the original schedule, then that's still the case after the
      swap, assuming an ideal unit-service model (i.e., scheduled jobs receive
      exactly one unit of service). *)
@@ -341,11 +341,11 @@ Section SwappedScheduleProperties.
     by move=> j; apply service_at_most_cost.
   Qed.
 
-  (* Suppose all jobs in the original schedule come from some arrival sequence... *)
+  (** Suppose all jobs in the original schedule come from some arrival sequence... *)
   Variable arr_seq: arrival_sequence Job.
   Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
 
-  (* ...then that's still the case in the new schedule. *)
+  (** ...then that's still the case in the new schedule. *)
   Lemma swapped_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched' arr_seq.
   Proof.
@@ -362,29 +362,29 @@ End SwappedScheduleProperties.
     not yet missed its deadline, which is the core transformation of
     the classic EDF optimality proof. *)
 Section EDFSwap.
-  (* For any given type of jobs with costs and deadlines... *)
+  (** For any given type of jobs with costs and deadlines... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job}.
-  (* ... any given type of processor states... *)
+  (** ... any given type of processor states... *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.
 
-  (* ...consider a given reference schedule... *)
+  (** ...consider a given reference schedule... *)
   Variable sched: schedule PState.
 
-  (* ...in which complete jobs don't execute... *)
+  (** ...in which complete jobs don't execute... *)
   Hypothesis H_completed_jobs:
     completed_jobs_dont_execute sched.
 
-  (* ...and scheduled jobs always receive service. *)
+  (** ...and scheduled jobs always receive service. *)
   Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
 
-  (* Suppose we are given two specific times [t1] and [t2]... *)
+  (** Suppose we are given two specific times [t1] and [t2]... *)
   Variable t1 t2: instant.
 
-  (* ...that are ordered. *)
+  (** ...that are ordered. *)
   Hypothesis H_well_ordered: t1 <= t2.
 
-  (* Further, assume that, if there are jobs scheduled at times t1 and t2, then
+  (** Further, assume that, if there are jobs scheduled at times t1 and t2, then
      they either have the same deadline or violate EDF, ... *)
   Hypothesis H_not_EDF:
     forall j1 j2,
@@ -392,7 +392,7 @@ Section EDFSwap.
       scheduled_at sched j2 t2 ->
       job_deadline j1 >=  job_deadline j2.
 
-  (* ...and that we don't move idle times or deadline misses earlier,
+  (** ...and that we don't move idle times or deadline misses earlier,
      i.e., if t1 is not an idle time, then neither is t2 and whatever
      job is scheduled at time t2 has not yet missed its deadline. *)
   Hypothesis H_no_idle_time_at_t2:
@@ -400,22 +400,22 @@ Section EDFSwap.
       scheduled_at sched j1 t1 ->
       exists j2, scheduled_at sched j2 t2 /\ job_deadline j2 > t2.
 
-  (* Consider the schedule obtained from swapping the allocations at times t1 and t2. *)
+  (** Consider the schedule obtained from swapping the allocations at times t1 and t2. *)
   Let sched' := swapped sched t1 t2.
 
-  (* The key property of this transformation is that, for any job that
+  (** The key property of this transformation is that, for any job that
      meets its deadline in the original schedule, we have not
      introduced any deadline misses, which we establish by considering
      a number of different cases. *)
   Section NoNewDeadlineMissesCases.
 
-    (* Consider any job... *)
+    (** Consider any job... *)
     Variable j: Job.
 
-    (* ... that meets its deadline in the original schedule. *)
+    (** ... that meets its deadline in the original schedule. *)
     Hypothesis H_deadline_met: job_meets_deadline sched j.
 
-    (* First we observe that jobs that are not involved in the swap
+    (** First we observe that jobs that are not involved in the swap
        still meet their deadlines. *)
     Lemma uninvolved_implies_deadline_met:
       ~~ scheduled_at sched j t1 ->
@@ -427,7 +427,7 @@ Section EDFSwap.
       by apply: service_of_others_invariant.
     Qed.
 
-    (* Next, we observe that a swap is unproblematic for the job scheduled at
+    (** Next, we observe that a swap is unproblematic for the job scheduled at
        time t2. *)
     Lemma moved_earlier_implies_deadline_met:
       scheduled_at sched j t2 ->
@@ -439,7 +439,7 @@ Section EDFSwap.
       by apply scheduled_at_implies_later_deadline with (sched0 := sched) => //.
     Qed.
 
-    (* Finally, we observe is also unproblematic for the job that is
+    (** Finally, we observe is also unproblematic for the job that is
        moved to a later allocation. *)
     Lemma moved_later_implies_deadline_met:
       scheduled_at sched j t1 ->
@@ -455,7 +455,7 @@ Section EDFSwap.
 
   End NoNewDeadlineMissesCases.
 
-  (* From the above case analysis, we conclude that no deadline misses
+  (** From the above case analysis, we conclude that no deadline misses
      are introduced in the schedule obtained from swapping the
      allocations at times t1 and t2. *)
   Theorem edf_swap_no_deadline_misses_introduced:
