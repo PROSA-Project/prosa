@@ -1,7 +1,8 @@
 From rt.util Require Import sum.
 From rt.restructuring.behavior Require Import schedule.
-From rt.restructuring.model Require Import task schedule.priority_based.priorities arrival.arrival_curves.
-From rt.restructuring.model.arrival Require Import task_arrivals arrival_curves.
+From rt.restructuring.model Require Import task schedule.priority_based.priorities.
+From rt.restructuring.model.aggregate Require Import task_arrivals.
+From rt.restructuring.model.arrival Require Import arrival_curves.
 From rt.restructuring.analysis Require Import
      workload ideal_schedule basic_facts.arrivals.
 
