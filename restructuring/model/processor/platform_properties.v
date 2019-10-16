@@ -3,9 +3,12 @@ From rt.restructuring.behavior Require Export all.
 (** To reason about classes of schedule types / processor models, we define the
    following properties that a processor model might possess. *)
 Section ProcessorModels.
-  (** Consider any job type and any processor state. *)
+  (** Consider any job type and any processor state. Note: we make the
+      processor state an explicit variable (rather than implicit
+      context) because it is the primary subject of the following
+      definitions. *)
   Context {Job : JobType}.
-  Context {PState : Type}.
+  Variable PState : Type.
   Context `{ProcessorState Job PState}.
 
   (** We say that a processor model provides unit service if no

@@ -140,7 +140,7 @@ Section UnitService.
   Context `{ProcessorState Job PState}.
 
   (** Let's consider a unit-service model... *)
-  Hypothesis H_unit_service: unit_service_proc_model.
+  Hypothesis H_unit_service: unit_service_proc_model PState.
 
   (** ...and a given schedule. *)
   Variable sched: schedule PState.
@@ -343,7 +343,7 @@ Section RelationToScheduled.
        further prove the converse. *)
 
     (** Assume j always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
     (** In other words, not being scheduled is equivalent to receiving zero
        service. *)
@@ -552,7 +552,7 @@ Section RelationToScheduled.
        we can translate this into a claim about scheduled_at. *)
 
     (** Assume j always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
     (** We show that job j is scheduled at some point t < t1 iff j is scheduled
        at some point t' < t2.  *)

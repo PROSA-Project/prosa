@@ -53,7 +53,7 @@ Section GenericModelLemmas.
 
     (** Assume that the processor model is a unit service moodel. I.e., 
        no job ever receives more than one unit of service at any time. *)
-    Hypothesis H_unit_service : unit_service_proc_model.
+    Hypothesis H_unit_service : unit_service_proc_model PState.
 
     (** Then, we prove that the service received by those jobs is no larger than their workload. *)
     Lemma service_of_jobs_le_workload:

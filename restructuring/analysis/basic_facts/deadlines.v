@@ -22,7 +22,7 @@ Section DeadlineFacts.
     Hypothesis H_completed_jobs: completed_jobs_dont_execute sched.
 
     (** ...and scheduled jobs always receive service. *)
-    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
     (** We observe that, if a job is known to meet its deadline, then
        its deadline must be later than any point at which it is

@@ -330,8 +330,8 @@ Section SwappedScheduleProperties.
      swap, assuming an ideal unit-service model (i.e., scheduled jobs receive
      exactly one unit of service). *)
   Lemma swapped_completed_jobs_dont_execute:
-    unit_service_proc_model ->
-    ideal_progress_proc_model ->
+    unit_service_proc_model PState ->
+    ideal_progress_proc_model PState ->
     completed_jobs_dont_execute sched ->
     completed_jobs_dont_execute sched'.
   Proof.
@@ -376,7 +376,7 @@ Section EDFSwap.
     completed_jobs_dont_execute sched.
 
   (** ...and scheduled jobs always receive service. *)
-  Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+  Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
   (** Suppose we are given two specific times [t1] and [t2]... *)
   Variable t1 t2: instant.

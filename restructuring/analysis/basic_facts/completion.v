@@ -75,7 +75,7 @@ Section CompletionFacts.
    * remaining positive cost. *)
 
   (** Assume a scheduled job always receives some positive service. *)
-  Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+  Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
   (** Then a scheduled job has positive remaining cost. *)
   Corollary scheduled_implies_positive_remaining_cost:
@@ -139,7 +139,7 @@ Section ServiceAndCompletionFacts.
   Variable j: Job.
 
   (** Assume that a scheduled job receives exactly one time unit of service. *)
-  Hypothesis H_unit_service: unit_service_proc_model.
+  Hypothesis H_unit_service: unit_service_proc_model PState.
 
   (** To begin with, we establish that the cumulative service never exceeds a
      job's total cost if service increases only by one at each step since
@@ -206,7 +206,7 @@ Section ServiceAndCompletionFacts.
   Section GuaranteedService.
 
     (** Assume a scheduled job always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model.
+    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
     (** Assume that jobs are not released early. *)
     Context `{JobArrival Job}.
@@ -323,7 +323,7 @@ Section CompletedJobs.
      always receive non-zero service and cumulative service never exceeds job
      costs. *)
   Lemma ideal_progress_completed_jobs:
-    ideal_progress_proc_model ->
+    ideal_progress_proc_model PState ->
     (forall j t, service sched j t <= job_cost j) ->
     completed_jobs_dont_execute sched.
   Proof.
