@@ -19,9 +19,9 @@ Section PropertyOfSequentiality.
   (** Given a schedule ... *)
   Variable sched: schedule PState.
 
-  (** ...we say that jobs (or, rather, tasks) are sequential if each task's jobs
+  (** ...we say that tasks are sequential if each task's jobs
      are executed in the order they arrived. *)
-  Definition sequential_jobs :=
+  Definition sequential_tasks :=
     forall (j1 j2: Job) (t: instant),
       same_task j1 j2 ->
       job_arrival j1 < job_arrival j2 ->

@@ -17,8 +17,8 @@ Section ExecutionOrder.
   (** Assume a schedule ... *)
   Variable sched: schedule PState.
 
-  (** in which the sequential jobs hypothesis holds. *)
-  Hypothesis H_sequential_jobs: sequential_jobs sched.
+  (** in which the sequential tasks hypothesis holds. *)
+  Hypothesis H_sequential_tasks: sequential_tasks sched.
 
 
   (** A simple corollary of this hypothesis is that the scheduler
@@ -32,7 +32,7 @@ Section ExecutionOrder.
   Proof.
     intros ? ? t TSK NCOMPL SCHED.
     rewrite /same_task eq_sym in TSK.
-    have SEQ := H_sequential_jobs j2 j1 t TSK.
+    have SEQ := H_sequential_tasks j2 j1 t TSK.
     rewrite leqNgt; apply/negP; intros ARR.
     move: NCOMPL => /negP NCOMPL; apply: NCOMPL.
       by apply SEQ.
