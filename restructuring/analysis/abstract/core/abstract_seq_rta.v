@@ -1,6 +1,7 @@
-From rt.util Require Import epsilon tactics rewrite_facilities sum counting list.
+From rt.util Require Import all.
 From rt.restructuring.behavior Require Import service.
-From rt.restructuring.model Require Import job task preemption.preemption_model.
+From rt.restructuring.model Require Import job task.
+From rt.restructuring.model.preemption Require Import preemption_model task.parameters.
 From rt.restructuring.model.arrival Require Import arrival_curves.
 From rt.restructuring.model.schedule Require Import sequential.
 From rt.restructuring.analysis Require Import

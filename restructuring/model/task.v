@@ -13,16 +13,6 @@ Class TaskDeadline (Task : TaskType) := task_deadline : Task -> duration.
 (** Definition of a generic type of parameter for task cost *)
 Class TaskCost (Task : TaskType) := task_cost : Task -> duration.
 
-(** Definition of a generic type of parameter relating tasks 
-   to the length of the maximum nonpreeptive segment. *)
-Class TaskMaxNonpreemptiveSegment (Task : TaskType) :=
-  task_max_nonpreeptive_segment : Task -> duration.
-
-(** Definition of a generic type of parameter relating tasks
-   to theirs run-to-completion threshold. *)
-Class TaskRunToCompletionThreshold (Task : TaskType) :=
-  task_run_to_completion_threshold : Task -> duration.
-
 Section SameTask.
   
   (** For any type of job associated with any type of tasks... *)
@@ -37,14 +27,6 @@ Section SameTask.
   Definition job_of_task (tsk : Task) (j : Job) := job_task j == tsk.
 
 End SameTask.
-
-(** Given task deadlines and a mapping from jobs to tasks we provide a generic definition of job_deadline *)
-Instance job_deadline_from_task_deadline
-         (Job : JobType) (Task : TaskType)
-         `{TaskDeadline Task} `{JobArrival Job} `{JobTask Job Task} : JobDeadline Job :=
-  fun j => job_arrival j + task_deadline (job_task j).
-
-
 
 (** In this section, we introduce properties of a task. *)
 Section PropertesOfTask.

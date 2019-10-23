@@ -1,7 +1,8 @@
 From rt.util Require Import epsilon sum tactics search_arg.
 From rt.restructuring.behavior Require Export all.
 From rt.restructuring.analysis.basic_facts Require Import completion.
-From rt.restructuring.model Require Import job task preemption.preemption_model.
+From rt.restructuring.model Require Import job task.
+From rt.restructuring.model.preemption Require Import preemption_model task.parameters.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

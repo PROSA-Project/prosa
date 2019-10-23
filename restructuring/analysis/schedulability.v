@@ -1,5 +1,5 @@
 From rt.restructuring.behavior Require Export all.
-From rt.restructuring.model Require Export task.
+From rt.restructuring.model Require Export task job_deadline.
 From rt.restructuring.analysis.basic_facts Require Export completion.
 From rt.util Require Export seqset.
 
@@ -101,9 +101,9 @@ Section Schedulability.
     intros j ARRj JOBtsk.
     rewrite /job_meets_deadline.
     apply completion_monotonic with (t := job_arrival j + R);
-    [ | by apply H_response_time_bounded].
+      [ | by apply H_response_time_bounded].
     rewrite /job_deadline leq_add2l JOBtsk.
-    by rewrite (leq_trans H_R_le_deadline).
+      by erewrite leq_trans; eauto.
   Qed.
 
 End Schedulability.

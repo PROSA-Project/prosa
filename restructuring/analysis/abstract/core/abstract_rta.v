@@ -1,6 +1,7 @@
-From rt.util Require Import tactics nat sum ssromega.
+From rt.util Require Import all.
 From rt.restructuring.behavior Require Export all.
-From rt.restructuring.model Require Import job task preemption.preemption_model.
+From rt.restructuring.model Require Import job task.
+From rt.restructuring.model.preemption Require Import preemption_model task.parameters.
 From rt.restructuring.analysis Require Import schedulability ideal_schedule.
 From rt.restructuring.analysis.abstract Require Import run_to_completion_threshold. 
 From rt.restructuring.analysis.abstract.core Require Import
