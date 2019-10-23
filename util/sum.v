@@ -64,6 +64,25 @@ Section ExtraLemmas.
     }
   Qed.
 
+  Lemma sum_notin_rem_eqn:
+    forall (T:eqType) (a: T) xs P F,
+      a \notin xs ->
+      \sum_(x <- xs | P x && (x != a)) F x = \sum_(x <- xs | P x) F x.
+  Proof.
+    intros ? ? ? ? ? NOTIN.
+    induction xs; first by rewrite !big_nil.
+    rewrite !big_cons.
+    rewrite IHxs; clear IHxs; last first.
+    { apply/memPn; intros y IN.
+      move: NOTIN => /memPn NOTIN.
+        by apply NOTIN; rewrite in_cons; apply/orP; right.
+    }
+    move: NOTIN => /memPn NOTIN. 
+    move: (NOTIN a0) => NEQ.
+    feed NEQ; first by (rewrite in_cons; apply/orP; left).
+      by rewrite NEQ Bool.andb_true_r.
+  Qed.
+  
   (* Trivial identity: any sum of zeros is zero. *)
   Lemma sum0 m n:
     \sum_(m <= i < n) 0 = 0.
