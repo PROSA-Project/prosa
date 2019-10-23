@@ -24,3 +24,22 @@ Section State.
     by exists tt.
   Defined.
 End State.
+
+(** In this section we define the notion of idleness for ideal uni-processor. *)
+Section IsIdle.
+  
+  (** Consider any type of job. *)
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+  
+  (** Consider any arrival sequence... *)
+  Variable arr_seq : arrival_sequence Job.
+  
+  (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
+  Variable sched : schedule ((*ideal*)processor_state Job).
+  
+  (** We say that the processor is idle at time t iff there is no job being scheduled. *)
+  Definition is_idle (t : instant) := sched t == None.
+
+End IsIdle.
