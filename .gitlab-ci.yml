@@ -46,7 +46,12 @@ stages:
   extends: .build
   # it's ok to fail with an unreleased version of Coq
   allow_failure: true
-   
+
+latest-coq-8.10:
+  extends: .build
+  # it's ok to fail with an unreleased version of ssreflect
+  allow_failure: true
+
 validate:
   stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.10
