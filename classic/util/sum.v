@@ -120,51 +120,9 @@ Section ExtraLemmas.
   
 End ExtraLemmas.
 
+
 (* Lemmas about arithmetic with sums. *)
 Section SumArithmetic.
-
-  Lemma sum_seq_diff:
-    forall (T:eqType) (rs: seq T) (F G : T -> nat),
-      (forall i : T, i \in rs -> G i <= F i) ->
-      \sum_(i <- rs) (F i - G i) = \sum_(i <- rs) F i - \sum_(i <- rs) G i.
-  Proof.
-    intros.
-    induction rs; first by rewrite !big_nil subn0. 
-    rewrite !big_cons subh2.
-    - apply/eqP; rewrite eqn_add2l; apply/eqP; apply IHrs.
-        by intros; apply H; rewrite in_cons; apply/orP; right.
-    - by apply H; rewrite in_cons; apply/orP; left.
-    - rewrite big_seq_cond [in X in _ <= X]big_seq_cond.
-      rewrite leq_sum //; move => i /andP [IN _].
-        by apply H; rewrite in_cons; apply/orP; right.
-  Qed.
-  
-  Lemma sum_diff:
-    forall n F G,
-      (forall i (LT: i < n), F i >= G i) ->
-      \sum_(0 <= i < n) (F i - G i) =
-      (\sum_(0 <= i < n) (F i)) - (\sum_(0 <= i < n) (G i)).       
-  Proof.
-    intros n F G ALL.
-    rewrite sum_seq_diff; first by done.
-    move => i; rewrite mem_index_iota; move => /andP [_ LT].
-      by apply ALL.
-  Qed.
-
-  Lemma sum_pred_diff:
-    forall (T: eqType) (rs: seq T) (P: T -> bool) (F: T -> nat),
-      \sum_(r <- rs | P r) F r =
-      \sum_(r <- rs) F r - \sum_(r <- rs | ~~ P r) F r.
-  Proof.
-    clear; intros.
-    induction rs; first by rewrite !big_nil subn0.
-    rewrite !big_cons !IHrs; clear IHrs.
-    case (P a); simpl; last by rewrite subnDl.
-    rewrite addnBA; first by done.
-    rewrite big_mkcond leq_sum //.
-    intros t _.
-      by case (P t).
-  Qed.
   
   Lemma telescoping_sum :
     forall (T: Type) (F: T->nat) r (x0: T),

@@ -11,13 +11,6 @@ Section NatLemmas.
     by destruct b1,b2;
     rewrite ?addn0 ?add0n ?addn1 ?orTb ?orbT ?orbF ?orFb.
   Qed.
-
-  Lemma subh2 :
-    forall m1 m2 n1 n2,
-      m1 >= m2 ->
-      n1 >= n2 ->
-      (m1 + n1) - (m2 + n2) = m1 - m2 + (n1 - n2).
-  Proof. by ins; ssromega. Qed.
   
   Lemma subh4:
     forall m n p,

@@ -9,6 +9,13 @@ Section NatLemmas.
       m >= n ->
       m - n + p = m + p - n.
   Proof. by ins; ssromega. Qed.
+
+  Lemma subh2 :
+    forall m1 m2 n1 n2,
+      m1 >= m2 ->
+      n1 >= n2 ->
+      (m1 + n1) - (m2 + n2) = m1 - m2 + (n1 - n2).
+  Proof. by ins; ssromega. Qed.
   
   Lemma subh3:
     forall m n p,
