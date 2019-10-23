@@ -189,6 +189,15 @@ Section ArrivalSequencePrefix.
           by apply CONS in IN1; apply CONS in IN2; subst.
       Qed.
 
+      (** Also note there can't by any arrivals in an empty time interval. *)
+      Lemma arrivals_between_geq:
+        forall t1 t2,
+          t1 >= t2 ->
+          arrivals_between arr_seq t1 t2  = [::].
+      Proof.
+          by intros ? ? GE; rewrite /arrivals_between big_geq.
+      Qed.
+      
     End ArrivalTimes.
 
   End Lemmas.
