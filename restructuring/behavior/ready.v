@@ -3,15 +3,20 @@ From rt.restructuring.behavior Require Export service.
 
 
 (** We define a general notion of readiness of a job: a job can be
-   scheduled only when it is ready. This notion of readiness is a general
-   concept that is used to model jitter, self-suspensions, etc.  Crucially, we
-   require that any sensible notion of readiness is a refinement of the notion
+   scheduled only when it is ready, as determined by the predicate
+   [job_ready]. This notion of readiness is a general concept that is
+   used to model jitter, self-suspensions, etc.  Crucially, we require
+   that any sensible notion of readiness is a refinement of the notion
    of a pending job, i.e., any ready job must also be pending. *)
 Class JobReady (Job : JobType) (PState : Type)
       `{ProcessorState Job PState} `{JobCost Job} `{JobArrival Job} :=
   {
     job_ready : schedule PState -> Job -> instant -> bool;
-    any_ready_job_is_pending : forall sched j t, job_ready sched j t -> pending sched j t;
+
+    (** What follows is the consistency requirement: We require any
+        reasonable readiness model to consider only pending jobs to be
+        ready. *)
+    _ : forall sched j t, job_ready sched j t -> pending sched j t;
   }.
 
 (** Based on the general notion of readiness, we define what it means to be

@@ -14,14 +14,28 @@ Section Arrived.
      readiness. *)
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
-  Context `{JobReady Job PState}.
+  (* We give the readiness typeclass instance a name here because we rely on it
+     explicitly in proofs. *)
+  Context {ReadyParam : JobReady Job PState}.
 
-  (** We observe that a given job must have arrived to be ready... *)
+  (** First, we note that readiness models are by definition consistent
+      w.r.t. [pending]. *)
+  Lemma any_ready_job_is_pending:
+    forall j t,
+      job_ready sched j t -> pending sched j t.
+  Proof.
+    move: ReadyParam => [is_ready CONSISTENT].
+    move=> j t READY.
+    apply CONSISTENT.
+    by exact READY.
+  Qed.
+
+  (** Next, we observe that a given job must have arrived to be ready... *)
   Lemma ready_implies_arrived:
     forall j t, job_ready sched j t -> has_arrived j t.
   Proof.
     move=> j t READY.
-    move: (any_ready_job_is_pending sched j t READY).
+    move: (any_ready_job_is_pending j t READY).
     by rewrite /pending => /andP [ARR _].
   Qed.
 
