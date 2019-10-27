@@ -1,0 +1,33 @@
+From rt.util Require Import all.
+From rt.restructuring.behavior Require Import all.
+From rt.restructuring.model Require Import processor.ideal.
+From rt.restructuring.model.preemption Require Import job.parameters.
+ 
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
+
+(** * Schedule with Limited Preemptions *)
+(** In this section we introduce the notion of preemptions-aware
+    schedule. *)
+Section ScheduleWithLimitedPreemptions.
+
+  (**  Consider any type of jobs. *)
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+  Context `{JobPreemptable Job}.
+
+  (** Consider any arrival sequence. *)
+  Variable arr_seq : arrival_sequence Job.
+  
+  (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
+  Variable sched : schedule (ideal.processor_state Job).
+  
+  (** Based on the definition of the model with preemption points, 
+      we define a valid schedule with limited preemptions. *)
+  Definition valid_schedule_with_limited_preemptions :=
+    forall j t,
+      arrives_in arr_seq j ->
+      ~~ job_preemptable j (service sched j t) ->
+      scheduled_at sched j t.
+  
+End ScheduleWithLimitedPreemptions.
