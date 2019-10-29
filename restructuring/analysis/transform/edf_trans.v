@@ -45,7 +45,7 @@ Section EDFTransformation.
      t1. *)
   Definition make_edf_at (sched: SchedType) (t1: instant): SchedType :=
     match sched t1 with
-    | None => sched (** leave idle instants alone *)
+    | None => sched (* leave idle instants alone *)
     | Some j =>
       let
         t2 := find_swap_candidate sched t1 j

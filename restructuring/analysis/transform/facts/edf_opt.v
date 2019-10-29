@@ -12,9 +12,9 @@ From rt.util Require Import tactics nat.
     schedule. *)
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-From rt.restructuring.model.processor Require Export ideal.
+From rt.restructuring.model.processor Require Import ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-From rt.restructuring.model.readiness Require Export basic.
+From rt.restructuring.model.readiness Require Import basic.
 
 (** We start by analyzing the helper function [find_swap_candidate],
     which is a problem-specific wrapper around [search_arg]. *)

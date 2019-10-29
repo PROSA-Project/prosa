@@ -6,6 +6,12 @@ From rt.restructuring.analysis Require Import schedulability transform.facts.edf
     (assuming an ideal uniprocessor), then there is also an EDF
     schedule in which all deadlines are met. *)
 
+(** The following results assume ideal uniprocessor schedules... *)
+From rt.restructuring.model.processor Require ideal.
+(** ... and the basic (i.e., Liu & Layland) readiness model under which any
+    pending job is ready. *)
+From rt.restructuring.model.readiness Require basic.
+
 Section Optimality.
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
@@ -40,8 +46,10 @@ Section Optimality.
 
 End Optimality.
 
-(** We further state a weaker notion of the above optimality claim
-    that avoids a dependency on a given arrival sequence. *)
+(** We further state a weaker notion of the above optimality claim that avoids
+    a dependency on a given arrival sequence. Specifically, it establishes
+    that, given a reference schedule without deadline misses, there exists an
+    EDF schedule of the same jobs in which no deadlines are missed. *)
 Section WeakOptimality.
 
   (** For any given type of jobs,... *)
