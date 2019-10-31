@@ -1,3 +1,4 @@
+From mathcomp Require Import all_ssreflect.
 From rt.restructuring.behavior Require Export all.
 
 (** Next we define a processor state that includes the possibility of spinning,
@@ -15,7 +16,7 @@ Section State.
 
     Variable j : Job.
 
-    Definition scheduled_in (s : processor_state) : bool :=
+    Definition scheduled_on (s : processor_state) (_ : unit) : bool :=
       match s with
       | Idle        => false
       | Spin j'     => j' == j
@@ -33,11 +34,14 @@ Section State.
 
   Global Program Instance pstate_instance : ProcessorState Job (processor_state) :=
     {
-      scheduled_in := scheduled_in;
+      scheduled_on := scheduled_on;
       service_in   := service_in
     }.
   Next Obligation.
     move: H.
-    by case: s=>//= j' /negbTE->.
+    case: s=>//= j' /existsP.
+    rewrite /nat_of_bool.
+    case: ifP=>//=_[].
+    by exists.
   Defined.
 End State.

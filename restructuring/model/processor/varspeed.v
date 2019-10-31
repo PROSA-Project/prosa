@@ -1,3 +1,4 @@
+From mathcomp Require Import all_ssreflect.
 From rt.restructuring.behavior Require Export all.
 
 (** Next, let us define a schedule with variable execution speed. *)
@@ -13,7 +14,7 @@ Section State.
 
     Variable j : Job.
 
-    Definition scheduled_in (s : processor_state) : bool :=
+    Definition scheduled_on (s : processor_state) (_ : unit) : bool :=
       match s with
       | Idle => false
       | Progress j' _  => j' == j
@@ -29,12 +30,14 @@ Section State.
 
   Global Program Instance pstate_instance : ProcessorState Job processor_state :=
     {
-      scheduled_in := scheduled_in;
+      scheduled_on := scheduled_on;
       service_in   := service_in
     }.
   Next Obligation.
-      move: j s H.
-      by move=> j []//= j' s/negbTE->.
+    move: H.
+    case: s=>//= j' v /existsP.
+    case: ifP=>//=_[].
+    by exists.
   Defined.
 
 End State.

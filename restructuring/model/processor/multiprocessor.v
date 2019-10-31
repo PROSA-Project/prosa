@@ -15,7 +15,7 @@ Section Schedule.
 
   Global Program Instance multiproc_state : ProcessorState Job (identical_state) :=
     {
-      scheduled_in j s := [exists cpu, scheduled_in j (s cpu)];
+      scheduled_on j s (cpu : processor num_cpus) := scheduled_in j (s cpu);
       service_in j s := \sum_(cpu < num_cpus) service_in j (s cpu)
     }.
   Next Obligation.
