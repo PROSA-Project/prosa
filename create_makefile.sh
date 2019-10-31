@@ -1,7 +1,7 @@
 #!/bin/bash 
 
 # options passed to `find` for locating relevant source files
-FIND_OPTS=( . -name '*.v' ! -name '*#*' ! -path './.git/*' )
+FIND_OPTS=( . -name '*.v' ! -name '*#*' ! -path './.git/*' ! -path './with-proof-state/*' )
 
 while ! [ -z "$1" ]
 do
