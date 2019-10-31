@@ -15,8 +15,8 @@ r"""
 """
 , re.VERBOSE)
 
-PROOF_START_PATTERN = re.compile(r"[ \t^]Proof\.")
-PROOF_END_PATTERN = re.compile(r"[ \t^.]Qed\.")
+PROOF_START_PATTERN = re.compile(r"[ \t^](Proof|Next +Obligation)\.")
+PROOF_END_PATTERN = re.compile(r"[ \t^.](Qed|Defined)\.")
 
 CLAIM_NAME_PATTERN = re.compile(
 r"""
