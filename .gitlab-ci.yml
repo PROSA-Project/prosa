@@ -84,3 +84,23 @@ proof-length:
   image: python:3-alpine
   script:
     - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
+
+proof-state:
+  stage: process
+  image: mathcomp/mathcomp:1.9.0-coq-8.10
+  dependencies:
+    - 1.9.0-coq-8.10
+  script:
+    - find restructuring util -iname *.v | xargs -P ${NJOBS} -n 1 scripts/record-proof-state.py -c '-R . rt -w -notation-overriden,-parsing' --timeout 20
+    - scripts/intersperse-proof-state.py `find restructuring util -iname *.v`
+    - cd with-proof-state/
+    - ln -s ../scripts/
+    - ln -s ../_CoqProject
+    - ../create_makefile.sh
+    - make html -j ${NJOBS} COQDOCEXTRAFLAGS=--plain-comments
+    - mv html ../with-proofs-and-proof-state
+  artifacts:
+    name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
+    paths:
+      - "with-proofs-and-proof-state/"
+    expire_in: 1 week
