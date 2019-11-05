@@ -71,8 +71,8 @@ Section CompletionFacts.
   Qed.
 
   (** Consequently, if we have a have processor model where scheduled jobs
-   * necessarily receive service, we can conclude that scheduled jobs have
-   * remaining positive cost. *)
+      necessarily receive service, we can conclude that scheduled jobs have
+      remaining positive cost. *)
 
   (** Assume a scheduled job always receives some positive service. *)
   Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
