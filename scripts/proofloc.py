@@ -27,6 +27,9 @@ r"""
 """
 , re.VERBOSE)
 
+COMMENT_START_PATTERN = re.compile(r"\(\*")
+COMMENT_END_PATTERN = re.compile(r"\*\)")
+
 def banner(fname):
     fill1 = (76 - len(fname)) // 2
     fill2 = 76 - len(fname) - fill1
@@ -41,25 +44,31 @@ def silent(tag, line_number, line):
 def process_file(fname, annotate=silent):
     proofs = []
     in_proof = False
+    in_comment = 0
     claim = '???'
     with open(fname) as f:
         for i, line in enumerate(f):
+            # simplification: we assume comment start/end not on otherwise
+            # significant lines
+            in_comment += len(COMMENT_START_PATTERN.findall(line))
+            in_comment -= len(COMMENT_END_PATTERN.findall(line))
+            assert in_comment >= 0
             name_match = CLAIM_NAME_PATTERN.search(line)
             if not name_match is None:
                 claim = name_match.group(2)
             if in_proof:
-                if PROOF_END_PATTERN.search(line):
+                if not in_comment and PROOF_END_PATTERN.search(line):
                     annotate('###', i, line)
                     proofs.append( (fname, start + 1, claim, i - start - 1) )
                     in_proof = False
                     claim = '???'
                 else:
                     annotate(' P ', i, line)
-            elif SINGLE_LINE_PROOF_PATTERN.search(line):
+            elif not in_comment and SINGLE_LINE_PROOF_PATTERN.search(line):
                 annotate('*P*', i, line)
                 proofs.append( (fname, i + 1, claim, 1) )
                 claim = '???'
-            elif PROOF_START_PATTERN.search(line):
+            elif not in_comment and PROOF_START_PATTERN.search(line):
                 annotate('***', i, line)
                 in_proof = True
                 start = i
