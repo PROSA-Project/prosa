@@ -1,6 +1,6 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job.
-Require Import rt.model.schedule.uni.schedule.
+Require Import rt.classic.model.arrival.basic.job.
+Require Import rt.classic.model.schedule.uni.schedule.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

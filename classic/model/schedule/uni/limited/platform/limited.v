@@ -1,8 +1,8 @@
 Require Import rt.util.all.  
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task.
-Require Import rt.model.schedule.uni.schedule. 
-Require Export rt.model.schedule.uni.limited.platform.definitions.
-Require Export rt.model.schedule.uni.limited.platform.util.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task.
+Require Import rt.classic.model.schedule.uni.schedule. 
+Require Export rt.classic.model.schedule.uni.limited.platform.definitions.
+Require Export rt.classic.model.schedule.uni.limited.platform.util.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

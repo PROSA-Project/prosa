@@ -1,6 +1,6 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task.
-Require Import rt.model.schedule.global.basic.schedule.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task.
+Require Import rt.classic.model.schedule.global.basic.schedule.
 From mathcomp Require Import ssreflect eqtype ssrbool ssrnat seq bigop.
 
 (* Definitions of deadline miss. *)

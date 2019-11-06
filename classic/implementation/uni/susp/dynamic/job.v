@@ -1,5 +1,5 @@
 Require Import rt.util.all.
-Require Import rt.implementation.uni.susp.dynamic.task.
+Require Import rt.classic.implementation.uni.susp.dynamic.task.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
 
 Module ConcreteJob.

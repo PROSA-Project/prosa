@@ -1,5 +1,5 @@
 Require Import rt.util.all.
-Require Import rt.analysis.apa.bertogna_edf_theory.
+Require Import rt.classic.analysis.apa.bertogna_edf_theory.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div path.
 
 Module ResponseTimeIterationEDF.

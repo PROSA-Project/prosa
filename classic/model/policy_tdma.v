@@ -1,7 +1,7 @@
 Require Import  rt.util.all.
-Require Import  rt.model.time
-                rt.model.arrival.basic.task 
-                rt.model.arrival.basic.job.
+Require Import  rt.classic.model.time
+                rt.classic.model.arrival.basic.task 
+                rt.classic.model.arrival.basic.job.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop div.
 
 Module PolicyTDMA.

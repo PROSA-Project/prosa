@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job.
-Require Import rt.model.arrival.basic.task_arrival.
-Require Import rt.model.arrival.jitter.arrival_sequence.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job.
+Require Import rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.arrival.jitter.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path.
 
 (* In this file, we provide definitions and lemmas about task arrivals

@@ -1,8 +1,8 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.jitter.arrival_sequence rt.model.priority.
-Require Import rt.model.schedule.global.jitter.schedule
-               rt.model.schedule.global.jitter.platform.
-Require Import rt.model.schedule.global.transformation.construction.
+Require Import rt.classic.model.arrival.jitter.arrival_sequence rt.classic.model.priority.
+Require Import rt.classic.model.schedule.global.jitter.schedule
+               rt.classic.model.schedule.global.jitter.platform.
+Require Import rt.classic.model.schedule.global.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype bigop seq path.
 
 Module ConcreteScheduler.

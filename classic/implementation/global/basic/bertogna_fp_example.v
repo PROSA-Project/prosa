@@ -1,13 +1,13 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.priority.
-Require Import rt.model.schedule.global.schedulability.
-Require Import rt.model.schedule.global.basic.schedule rt.model.schedule.global.basic.platform.
-Require Import rt.analysis.global.basic.workload_bound
-               rt.analysis.global.basic.interference_bound_fp
-               rt.analysis.global.basic.bertogna_fp_comp.
-Require Import rt.implementation.job rt.implementation.task
-               rt.implementation.arrival_sequence.
-Require Import rt.implementation.global.basic.schedule.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
+Require Import rt.classic.model.schedule.global.schedulability.
+Require Import rt.classic.model.schedule.global.basic.schedule rt.classic.model.schedule.global.basic.platform.
+Require Import rt.classic.analysis.global.basic.workload_bound
+               rt.classic.analysis.global.basic.interference_bound_fp
+               rt.classic.analysis.global.basic.bertogna_fp_comp.
+Require Import rt.classic.implementation.job rt.classic.implementation.task
+               rt.classic.implementation.arrival_sequence.
+Require Import rt.classic.implementation.global.basic.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

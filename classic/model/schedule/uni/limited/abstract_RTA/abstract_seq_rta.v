@@ -1,19 +1,19 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.workload
-               rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.response_time
-               rt.model.schedule.uni.schedule_of_task.
-Require Import rt.model.schedule.uni.limited.rbf
-               rt.model.schedule.uni.limited.schedule.
-Require Import rt.model.arrival.curves.bounds.
-Require Import rt.analysis.uni.arrival_curves.workload_bound. 
-Require Import rt.model.schedule.uni.limited.abstract_RTA.definitions
-               rt.model.schedule.uni.limited.abstract_RTA.sufficient_condition_for_lock_in_service
-               rt.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space
-               rt.model.schedule.uni.limited.abstract_RTA.abstract_rta.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.workload
+               rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.response_time
+               rt.classic.model.schedule.uni.schedule_of_task.
+Require Import rt.classic.model.schedule.uni.limited.rbf
+               rt.classic.model.schedule.uni.limited.schedule.
+Require Import rt.classic.model.arrival.curves.bounds.
+Require Import rt.classic.analysis.uni.arrival_curves.workload_bound. 
+Require Import rt.classic.model.schedule.uni.limited.abstract_RTA.definitions
+               rt.classic.model.schedule.uni.limited.abstract_RTA.sufficient_condition_for_lock_in_service
+               rt.classic.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space
+               rt.classic.model.schedule.uni.limited.abstract_RTA.abstract_rta.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

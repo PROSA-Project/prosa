@@ -1,8 +1,8 @@
 Require Import rt.util.all.
-Require Import rt.model.priority rt.model.suspension.
-Require Import rt.model.arrival.basic.arrival_sequence.
-Require Import rt.model.schedule.uni.susp.schedule
-               rt.model.schedule.uni.susp.platform.
+Require Import rt.classic.model.priority rt.classic.model.suspension.
+Require Import rt.classic.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.schedule.uni.susp.schedule
+               rt.classic.model.schedule.uni.susp.platform.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

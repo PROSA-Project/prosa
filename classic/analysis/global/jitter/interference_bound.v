@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.arrival_sequence rt.model.priority.
-Require Import rt.model.schedule.global.jitter.schedule rt.model.schedule.global.jitter.interference.
-Require Import rt.analysis.global.jitter.workload_bound.
+Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.priority.
+Require Import rt.classic.model.schedule.global.jitter.schedule rt.classic.model.schedule.global.jitter.interference.
+Require Import rt.classic.analysis.global.jitter.workload_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module InterferenceBoundJitter.

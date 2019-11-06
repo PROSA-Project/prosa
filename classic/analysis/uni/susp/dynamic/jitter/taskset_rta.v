@@ -1,15 +1,15 @@
 Require Import rt.util.all.
-Require Import rt.model.priority rt.model.suspension.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival rt.model.arrival.basic.arrival_sequence.
-Require Import rt.model.arrival.jitter.job.
-Require Import rt.model.schedule.uni.response_time.
-Require Import rt.model.schedule.uni.susp.schedule rt.model.schedule.uni.susp.platform
-               rt.model.schedule.uni.susp.valid_schedule.
-Require Import rt.model.schedule.uni.jitter.valid_schedule.
-Require Import rt.analysis.uni.susp.dynamic.jitter.rta_by_reduction
-               rt.analysis.uni.susp.dynamic.jitter.jitter_taskset_generation
-               rt.analysis.uni.susp.dynamic.jitter.taskset_membership.
+Require Import rt.classic.model.priority rt.classic.model.suspension.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival rt.classic.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.arrival.jitter.job.
+Require Import rt.classic.model.schedule.uni.response_time.
+Require Import rt.classic.model.schedule.uni.susp.schedule rt.classic.model.schedule.uni.susp.platform
+               rt.classic.model.schedule.uni.susp.valid_schedule.
+Require Import rt.classic.model.schedule.uni.jitter.valid_schedule.
+Require Import rt.classic.analysis.uni.susp.dynamic.jitter.rta_by_reduction
+               rt.classic.analysis.uni.susp.dynamic.jitter.jitter_taskset_generation
+               rt.classic.analysis.uni.susp.dynamic.jitter.taskset_membership.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* In this file we use the reduction to jitter-aware schedule to analyze

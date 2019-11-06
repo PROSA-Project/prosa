@@ -1,13 +1,13 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival
-               rt.model.priority.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.workload
-               rt.model.schedule.uni.schedule_of_task.
-Require Import rt.model.schedule.uni.limited.busy_interval
-               rt.model.schedule.uni.limited.abstract_RTA.definitions
-               rt.model.schedule.uni.limited.abstract_RTA.abstract_seq_rta.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival
+               rt.classic.model.priority.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.workload
+               rt.classic.model.schedule.uni.schedule_of_task.
+Require Import rt.classic.model.schedule.uni.limited.busy_interval
+               rt.classic.model.schedule.uni.limited.abstract_RTA.definitions
+               rt.classic.model.schedule.uni.limited.abstract_RTA.abstract_seq_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * JLFP instantiation of Interference and Interfering Workload *)

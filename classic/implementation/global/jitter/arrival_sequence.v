@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.arrival_sequence rt.model.arrival.basic.task rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.global.jitter.job.
-Require Import rt.implementation.global.jitter.task rt.implementation.global.jitter.job.
+Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.global.jitter.job.
+Require Import rt.classic.implementation.global.jitter.task rt.classic.implementation.global.jitter.job.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq div.
 
 Module ConcreteArrivalSequence.

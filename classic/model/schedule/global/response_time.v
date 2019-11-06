@@ -1,6 +1,6 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.global.basic.schedule.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.global.basic.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Definition of response-time bound and some simple lemmas. *)

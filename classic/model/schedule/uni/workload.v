@@ -1,6 +1,6 @@
 Require Import rt.util.all.
-Require Import rt.model.time rt.model.arrival.basic.task rt.model.arrival.basic.job rt.model.arrival.basic.arrival_sequence
-               rt.model.priority.
+Require Import rt.classic.model.time rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence
+               rt.classic.model.priority.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module Workload.

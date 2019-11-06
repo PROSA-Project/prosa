@@ -1,9 +1,9 @@
 Require Import rt.util.all.
 
-Require Import rt.model.suspension.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.arrival_sequence.
-Require Import rt.model.schedule.uni.schedule.
-Require Import rt.model.schedule.uni.susp.last_execution.
+Require Import rt.classic.model.suspension.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.schedule.uni.schedule.
+Require Import rt.classic.model.schedule.uni.susp.last_execution.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module SuspensionIntervals.

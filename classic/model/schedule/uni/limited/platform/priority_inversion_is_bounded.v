@@ -1,17 +1,17 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival
-               rt.model.priority.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.schedule.
-Require Import rt.model.schedule.uni.limited.platform.definitions
-               rt.model.schedule.uni.limited.busy_interval.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival
+               rt.classic.model.priority.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.schedule.
+Require Import rt.classic.model.schedule.uni.limited.platform.definitions
+               rt.classic.model.schedule.uni.limited.busy_interval.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Priority inversion is bounded *)
 (** In this module we prove that any priority inversion that occurs in the model with bounded 
-    nonpreemptive segments defined in module rt.model.schedule.uni.limited.platform.definitions 
+    nonpreemptive segments defined in module rt.classic.model.schedule.uni.limited.platform.definitions 
     is bounded. *)
 Module PriorityInversionIsBounded.
 

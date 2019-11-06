@@ -1,5 +1,5 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job rt.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq.
 
 (* Definitions of FP, JLFP and JLDP priority relations. *)
@@ -122,7 +122,7 @@ Module Priority.
 
     (* Recall that the jobs are sequential if they are executed 
        in the order they arrived (for more details see file 
-       rt.model.schedule.uni.schedule.v). 
+       rt.classic.model.schedule.uni.schedule.v). 
        
        An arbitrary JLFP can violate the sequential jobs hypothesis. 
        For example, consider two jobs j1, j2 of the same task such that 

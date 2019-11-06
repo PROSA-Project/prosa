@@ -1,8 +1,8 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.arrival_sequence rt.model.priority.
-Require Import rt.model.schedule.uni.schedule.
-Require Import rt.model.schedule.uni.susp.platform.
-Require Import rt.model.schedule.uni.transformation.construction.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.priority.
+Require Import rt.classic.model.schedule.uni.schedule.
+Require Import rt.classic.model.schedule.uni.susp.platform.
+Require Import rt.classic.model.schedule.uni.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype bigop seq path.
 
 Module ConcreteScheduler.

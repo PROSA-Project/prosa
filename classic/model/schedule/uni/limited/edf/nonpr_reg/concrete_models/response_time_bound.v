@@ -1,21 +1,21 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival
-               rt.model.priority.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.workload
-               rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.response_time.
-Require Import rt.model.schedule.uni.limited.schedule
-               rt.model.schedule.uni.limited.edf.response_time_bound
-               rt.model.schedule.uni.limited.edf.nonpr_reg.response_time_bound
-               rt.model.schedule.uni.limited.rbf.
-Require Import rt.model.arrival.curves.bounds
-               rt.analysis.uni.arrival_curves.workload_bound.
-Require Import rt.model.schedule.uni.nonpreemptive.schedule
-               rt.model.schedule.uni.limited.platform.limited
-               rt.model.schedule.uni.limited.platform.preemptive
-               rt.model.schedule.uni.limited.platform.nonpreemptive.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival
+               rt.classic.model.priority.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.workload
+               rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.response_time.
+Require Import rt.classic.model.schedule.uni.limited.schedule
+               rt.classic.model.schedule.uni.limited.edf.response_time_bound
+               rt.classic.model.schedule.uni.limited.edf.nonpr_reg.response_time_bound
+               rt.classic.model.schedule.uni.limited.rbf.
+Require Import rt.classic.model.arrival.curves.bounds
+               rt.classic.analysis.uni.arrival_curves.workload_bound.
+Require Import rt.classic.model.schedule.uni.nonpreemptive.schedule
+               rt.classic.model.schedule.uni.limited.platform.limited
+               rt.classic.model.schedule.uni.limited.platform.preemptive
+               rt.classic.model.schedule.uni.limited.platform.nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

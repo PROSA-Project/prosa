@@ -1,12 +1,12 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.response_time.
-Require Import rt.model.schedule.uni.limited.schedule
-               rt.model.schedule.uni.limited.abstract_RTA.definitions
-               rt.model.schedule.uni.limited.abstract_RTA.sufficient_condition_for_lock_in_service
-               rt.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space.
+Require Import rt.classic.model.arrival.basic.job.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.response_time.
+Require Import rt.classic.model.schedule.uni.limited.schedule
+               rt.classic.model.schedule.uni.limited.abstract_RTA.definitions
+               rt.classic.model.schedule.uni.limited.abstract_RTA.sufficient_condition_for_lock_in_service
+               rt.classic.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space.
  
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

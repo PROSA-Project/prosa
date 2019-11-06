@@ -1,11 +1,11 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.priority.
-Require Import rt.model.schedule.uni.schedule rt.model.schedule.uni.schedulability.
-Require Import rt.analysis.uni.basic.workload_bound_fp
-               rt.analysis.uni.basic.fp_rta_comp.
-Require Import rt.implementation.job rt.implementation.task
-               rt.implementation.arrival_sequence.
-Require Import rt.implementation.uni.basic.schedule.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
+Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
+Require Import rt.classic.analysis.uni.basic.workload_bound_fp
+               rt.classic.analysis.uni.basic.fp_rta_comp.
+Require Import rt.classic.implementation.job rt.classic.implementation.task
+               rt.classic.implementation.arrival_sequence.
+Require Import rt.classic.implementation.uni.basic.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

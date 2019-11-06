@@ -1,8 +1,8 @@
 Require Import rt.util.all.
-Require Import rt.model.priority.
-Require Import rt.model.arrival.basic.arrival_sequence.
-Require Import rt.model.schedule.uni.jitter.schedule
-               rt.model.schedule.uni.jitter.platform.
+Require Import rt.classic.model.priority.
+Require Import rt.classic.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.schedule.uni.jitter.schedule
+               rt.classic.model.schedule.uni.jitter.platform.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

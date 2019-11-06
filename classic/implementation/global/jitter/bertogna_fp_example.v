@@ -1,15 +1,15 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.priority.
-Require Import rt.model.schedule.global.schedulability.
-Require Import rt.model.schedule.global.jitter.job rt.model.schedule.global.jitter.schedule
-               rt.model.schedule.global.jitter.platform.
-Require Import rt.analysis.global.jitter.workload_bound
-               rt.analysis.global.jitter.interference_bound_fp
-               rt.analysis.global.jitter.bertogna_fp_comp.
-Require Import rt.implementation.global.jitter.job
-               rt.implementation.global.jitter.task
-               rt.implementation.global.jitter.schedule
-               rt.implementation.global.jitter.arrival_sequence.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.priority.
+Require Import rt.classic.model.schedule.global.schedulability.
+Require Import rt.classic.model.schedule.global.jitter.job rt.classic.model.schedule.global.jitter.schedule
+               rt.classic.model.schedule.global.jitter.platform.
+Require Import rt.classic.analysis.global.jitter.workload_bound
+               rt.classic.analysis.global.jitter.interference_bound_fp
+               rt.classic.analysis.global.jitter.bertogna_fp_comp.
+Require Import rt.classic.implementation.global.jitter.job
+               rt.classic.implementation.global.jitter.task
+               rt.classic.implementation.global.jitter.schedule
+               rt.classic.implementation.global.jitter.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

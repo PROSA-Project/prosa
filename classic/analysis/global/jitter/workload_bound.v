@@ -1,8 +1,8 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.global.workload rt.model.schedule.global.response_time
-               rt.model.schedule.global.schedulability.
-Require Import rt.model.schedule.global.jitter.job rt.model.schedule.global.jitter.schedule.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.global.workload rt.classic.model.schedule.global.response_time
+               rt.classic.model.schedule.global.schedulability.
+Require Import rt.classic.model.schedule.global.jitter.job rt.classic.model.schedule.global.jitter.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq div fintype bigop path.
 
 Module WorkloadBoundJitter.

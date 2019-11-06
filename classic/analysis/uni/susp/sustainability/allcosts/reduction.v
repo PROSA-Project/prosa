@@ -1,9 +1,9 @@
 Require Import rt.util.all.
-Require Import rt.model.priority rt.model.suspension.
-Require Import rt.model.schedule.uni.susp.schedule
-               rt.model.schedule.uni.susp.platform
-               rt.model.schedule.uni.susp.build_suspension_table.
-Require Import rt.model.schedule.uni.transformation.construction.
+Require Import rt.classic.model.priority rt.classic.model.suspension.
+Require Import rt.classic.model.schedule.uni.susp.schedule
+               rt.classic.model.schedule.uni.susp.platform
+               rt.classic.model.schedule.uni.susp.build_suspension_table.
+Require Import rt.classic.model.schedule.uni.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq bigop fintype.
 
 (* In this file, we prove that uniprocessor suspension-aware scheduling is

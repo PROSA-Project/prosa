@@ -1,9 +1,9 @@
 Require Import  rt.util.all.
-Require Import  rt.model.arrival.basic.task 
-                rt.model.arrival.basic.job rt.model.priority 
-                rt.model.arrival.basic.task_arrival
-                rt.model.schedule.uni.schedule.
-Require Import  rt.model.policy_tdma.
+Require Import  rt.classic.model.arrival.basic.task 
+                rt.classic.model.arrival.basic.job rt.classic.model.priority 
+                rt.classic.model.arrival.basic.task_arrival
+                rt.classic.model.schedule.uni.schedule.
+Require Import  rt.classic.model.policy_tdma.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 Module Platform_TDMA.

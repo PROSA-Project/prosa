@@ -1,22 +1,22 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival
-               rt.model.priority.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.workload
-               rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.response_time
-               rt.model.schedule.uni.schedule_of_task.
-Require Import rt.model.schedule.uni.limited.platform.definitions
-               rt.model.schedule.uni.limited.schedule
-               rt.model.schedule.uni.limited.busy_interval
-               rt.model.schedule.uni.limited.rbf
-               rt.model.schedule.uni.limited.abstract_RTA.definitions
-               rt.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space
-               rt.model.schedule.uni.limited.abstract_RTA.abstract_seq_rta
-               rt.model.schedule.uni.limited.jlfp_instantiation.
-Require Import rt.model.arrival.curves.bounds. 
-Require Import rt.analysis.uni.arrival_curves.workload_bound.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival
+               rt.classic.model.priority.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.workload
+               rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.response_time
+               rt.classic.model.schedule.uni.schedule_of_task.
+Require Import rt.classic.model.schedule.uni.limited.platform.definitions
+               rt.classic.model.schedule.uni.limited.schedule
+               rt.classic.model.schedule.uni.limited.busy_interval
+               rt.classic.model.schedule.uni.limited.rbf
+               rt.classic.model.schedule.uni.limited.abstract_RTA.definitions
+               rt.classic.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space
+               rt.classic.model.schedule.uni.limited.abstract_RTA.abstract_seq_rta
+               rt.classic.model.schedule.uni.limited.jlfp_instantiation.
+Require Import rt.classic.model.arrival.curves.bounds. 
+Require Import rt.classic.analysis.uni.arrival_curves.workload_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Abstract RTA for EDF-schedulers *)

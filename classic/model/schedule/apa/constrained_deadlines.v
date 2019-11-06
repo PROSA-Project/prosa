@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.priority rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.global.basic.schedule.
-Require Import rt.model.schedule.apa.interference rt.model.schedule.apa.affinity rt.model.schedule.apa.platform.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.global.basic.schedule.
+Require Import rt.classic.model.schedule.apa.interference rt.classic.model.schedule.apa.affinity rt.classic.model.schedule.apa.platform.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 Module ConstrainedDeadlines.

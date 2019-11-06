@@ -1,13 +1,13 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.priority.
-Require Import rt.model.schedule.uni.schedule rt.model.schedule.uni.schedulability.
-Require Import rt.model.schedule.uni.susp.suspension_intervals.
-Require Import rt.analysis.uni.basic.workload_bound_fp.
-Require Import rt.analysis.uni.susp.dynamic.oblivious.fp_rta.
-Require Import rt.implementation.uni.susp.dynamic.job
-               rt.implementation.uni.susp.dynamic.task
-               rt.implementation.uni.susp.dynamic.arrival_sequence.
-Require Import rt.implementation.uni.susp.schedule.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
+Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
+Require Import rt.classic.model.schedule.uni.susp.suspension_intervals.
+Require Import rt.classic.analysis.uni.basic.workload_bound_fp.
+Require Import rt.classic.analysis.uni.susp.dynamic.oblivious.fp_rta.
+Require Import rt.classic.implementation.uni.susp.dynamic.job
+               rt.classic.implementation.uni.susp.dynamic.task
+               rt.classic.implementation.uni.susp.dynamic.arrival_sequence.
+Require Import rt.classic.implementation.uni.susp.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

@@ -1,11 +1,11 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.priority rt.model.arrival.basic.task_arrival
-               rt.model.arrival.basic.arrival_bounds.
-Require Import rt.model.schedule.uni.schedule_of_task rt.model.schedule.uni.workload
-               rt.model.schedule.uni.schedulability rt.model.schedule.uni.response_time
-               rt.model.schedule.uni.service.
-Require Import rt.model.schedule.uni.limited.busy_interval rt.model.schedule.uni.basic.platform.
-Require Import rt.analysis.uni.basic.workload_bound_fp.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival
+               rt.classic.model.arrival.basic.arrival_bounds.
+Require Import rt.classic.model.schedule.uni.schedule_of_task rt.classic.model.schedule.uni.workload
+               rt.classic.model.schedule.uni.schedulability rt.classic.model.schedule.uni.response_time
+               rt.classic.model.schedule.uni.service.
+Require Import rt.classic.model.schedule.uni.limited.busy_interval rt.classic.model.schedule.uni.basic.platform.
+Require Import rt.classic.analysis.uni.basic.workload_bound_fp.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module ResponseTimeAnalysisFP.

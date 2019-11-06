@@ -1,13 +1,13 @@
 Require Import Arith.
 Require Import  rt.util.all
-                rt.model.arrival.basic.job
-                rt.model.arrival.basic.task_arrival
-                rt.model.schedule.uni.schedulability
-                rt.model.schedule.uni.schedule_of_task 
-                rt.model.schedule.uni.response_time
-                rt.analysis.uni.basic.tdma_wcrt_analysis.
-Require Import  rt.model.schedule.uni.basic.platform_tdma
-                rt.model.schedule.uni.end_time.
+                rt.classic.model.arrival.basic.job
+                rt.classic.model.arrival.basic.task_arrival
+                rt.classic.model.schedule.uni.schedulability
+                rt.classic.model.schedule.uni.schedule_of_task 
+                rt.classic.model.schedule.uni.response_time
+                rt.classic.analysis.uni.basic.tdma_wcrt_analysis.
+Require Import  rt.classic.model.schedule.uni.basic.platform_tdma
+                rt.classic.model.schedule.uni.end_time.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 Set Bullet Behavior "Strict Subproofs".

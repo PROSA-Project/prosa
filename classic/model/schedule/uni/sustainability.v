@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.arrival_sequence
-               rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.schedulability.
+Require Import rt.classic.model.arrival.basic.arrival_sequence
+               rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.schedulability.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module Sustainability.

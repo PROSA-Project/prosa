@@ -1,13 +1,13 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.priority.
-Require Import rt.model.schedule.global.schedulability.
-Require Import rt.model.schedule.global.basic.schedule rt.model.schedule.global.basic.platform.
-Require Import rt.analysis.global.parallel.workload_bound
-               rt.analysis.global.parallel.interference_bound_edf
-               rt.analysis.global.parallel.bertogna_edf_comp.
-Require Import rt.implementation.job rt.implementation.task
-               rt.implementation.arrival_sequence.
-Require Import rt.implementation.global.basic.schedule. (* Use sequential scheduler. *)
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
+Require Import rt.classic.model.schedule.global.schedulability.
+Require Import rt.classic.model.schedule.global.basic.schedule rt.classic.model.schedule.global.basic.platform.
+Require Import rt.classic.analysis.global.parallel.workload_bound
+               rt.classic.analysis.global.parallel.interference_bound_edf
+               rt.classic.analysis.global.parallel.bertogna_edf_comp.
+Require Import rt.classic.implementation.job rt.classic.implementation.task
+               rt.classic.implementation.arrival_sequence.
+Require Import rt.classic.implementation.global.basic.schedule. (* Use sequential scheduler. *)
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisEDF.

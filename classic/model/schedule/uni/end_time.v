@@ -1,9 +1,9 @@
 Require Import Arith Nat. 
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task 
-               rt.model.arrival.basic.job 
-               rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.response_time.
+Require Import rt.classic.model.arrival.basic.task 
+               rt.classic.model.arrival.basic.job 
+               rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.response_time.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Set Bullet Behavior "Strict Subproofs".

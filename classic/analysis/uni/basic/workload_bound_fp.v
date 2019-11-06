@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job rt.model.priority
-               rt.model.arrival.basic.task_arrival rt.model.arrival.basic.arrival_bounds.
-Require Import rt.model.schedule.uni.schedule rt.model.schedule.uni.workload.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.priority
+               rt.classic.model.arrival.basic.task_arrival rt.classic.model.arrival.basic.arrival_bounds.
+Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.workload.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 Module WorkloadBoundFP.

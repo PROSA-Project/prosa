@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.time rt.model.arrival.basic.task rt.model.arrival.basic.job.
-Require Import rt.model.schedule.uni.schedule.
-Require Import rt.model.arrival.jitter.arrival_sequence.
+Require Import rt.classic.model.time rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job.
+Require Import rt.classic.model.schedule.uni.schedule.
+Require Import rt.classic.model.arrival.jitter.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* In this file, we prove additional definitions and lemmas about jitter-aware schedules. *)

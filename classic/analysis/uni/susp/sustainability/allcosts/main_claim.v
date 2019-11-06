@@ -1,16 +1,16 @@
 Require Import rt.util.all.
-Require Import rt.model.priority rt.model.suspension.
-Require Import rt.model.arrival.basic.arrival_sequence.
-Require Import rt.model.schedule.uni.response_time
-               rt.model.schedule.uni.sustainability.
-Require Import rt.model.schedule.uni.susp.suspension_intervals
-               rt.model.schedule.uni.susp.schedule
-               rt.model.schedule.uni.susp.valid_schedule
-               rt.model.schedule.uni.susp.build_suspension_table
-               rt.model.schedule.uni.susp.platform.
-Require Import rt.analysis.uni.susp.sustainability.allcosts.reduction
-               rt.analysis.uni.susp.sustainability.allcosts.reduction_properties.
-Require Import rt.model.schedule.uni.transformation.construction.
+Require Import rt.classic.model.priority rt.classic.model.suspension.
+Require Import rt.classic.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.schedule.uni.response_time
+               rt.classic.model.schedule.uni.sustainability.
+Require Import rt.classic.model.schedule.uni.susp.suspension_intervals
+               rt.classic.model.schedule.uni.susp.schedule
+               rt.classic.model.schedule.uni.susp.valid_schedule
+               rt.classic.model.schedule.uni.susp.build_suspension_table
+               rt.classic.model.schedule.uni.susp.platform.
+Require Import rt.classic.analysis.uni.susp.sustainability.allcosts.reduction
+               rt.classic.analysis.uni.susp.sustainability.allcosts.reduction_properties.
+Require Import rt.classic.model.schedule.uni.transformation.construction.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

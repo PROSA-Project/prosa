@@ -1,9 +1,9 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job
-               rt.model.arrival.basic.arrival_sequence
-               rt.model.priority rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.uni.service rt.model.schedule.uni.workload.
-Require Import rt.model.schedule.uni.jitter.schedule rt.model.schedule.uni.jitter.platform.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.arrival_sequence
+               rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.uni.service rt.classic.model.schedule.uni.workload.
+Require Import rt.classic.model.schedule.uni.jitter.schedule rt.classic.model.schedule.uni.jitter.platform.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* In this file, we provide definitions and lemmas about busy intervals

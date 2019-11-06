@@ -1,6 +1,6 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job rt.model.priority rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.uni.jitter.schedule.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.uni.jitter.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (* In this file, we define properties about the platform in jitter-aware schedules. *)

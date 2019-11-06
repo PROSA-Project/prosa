@@ -1,19 +1,19 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival
-               rt.model.priority.
-Require Import rt.model.arrival.curves.bounds
-               rt.analysis.uni.arrival_curves.workload_bound.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.workload
-               rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.response_time.
-Require Import rt.model.schedule.uni.limited.platform.definitions
-               rt.model.schedule.uni.limited.platform.priority_inversion_is_bounded
-               rt.model.schedule.uni.limited.schedule
-               rt.model.schedule.uni.limited.busy_interval
-               rt.model.schedule.uni.limited.fixed_priority.response_time_bound
-               rt.model.schedule.uni.limited.rbf.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival
+               rt.classic.model.priority.
+Require Import rt.classic.model.arrival.curves.bounds
+               rt.classic.analysis.uni.arrival_curves.workload_bound.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.workload
+               rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.response_time.
+Require Import rt.classic.model.schedule.uni.limited.platform.definitions
+               rt.classic.model.schedule.uni.limited.platform.priority_inversion_is_bounded
+               rt.classic.model.schedule.uni.limited.schedule
+               rt.classic.model.schedule.uni.limited.busy_interval
+               rt.classic.model.schedule.uni.limited.fixed_priority.response_time_bound
+               rt.classic.model.schedule.uni.limited.rbf.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

@@ -1,21 +1,21 @@
 Require Import rt.util.all.
-Require Import rt.model.priority rt.model.suspension.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task
-               rt.model.arrival.basic.arrival_sequence rt.model.arrival.basic.task_arrival.
-Require Import rt.model.arrival.jitter.job.
-Require Import rt.model.schedule.uni.schedulability rt.model.schedule.uni.service
-               rt.model.schedule.uni.workload
-               rt.model.schedule.uni.response_time.
-Require Import rt.model.schedule.uni.jitter.schedule
-               rt.model.schedule.uni.jitter.platform.
-Require Import rt.model.schedule.uni.susp.suspension_intervals
-               rt.model.schedule.uni.susp.schedule
-               rt.model.schedule.uni.susp.valid_schedule
-               rt.model.schedule.uni.susp.platform.
-Require Import rt.analysis.uni.susp.dynamic.jitter.jitter_schedule
-               rt.analysis.uni.susp.dynamic.jitter.jitter_schedule_properties
-               rt.analysis.uni.susp.dynamic.jitter.jitter_schedule_service
-               rt.analysis.uni.susp.dynamic.jitter.jitter_taskset_generation.
+Require Import rt.classic.model.priority rt.classic.model.suspension.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task
+               rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.arrival.jitter.job.
+Require Import rt.classic.model.schedule.uni.schedulability rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.workload
+               rt.classic.model.schedule.uni.response_time.
+Require Import rt.classic.model.schedule.uni.jitter.schedule
+               rt.classic.model.schedule.uni.jitter.platform.
+Require Import rt.classic.model.schedule.uni.susp.suspension_intervals
+               rt.classic.model.schedule.uni.susp.schedule
+               rt.classic.model.schedule.uni.susp.valid_schedule
+               rt.classic.model.schedule.uni.susp.platform.
+Require Import rt.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule
+               rt.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule_properties
+               rt.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule_service
+               rt.classic.analysis.uni.susp.dynamic.jitter.jitter_taskset_generation.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (* In this file, we determine task response-time bounds in suspension-aware
@@ -87,7 +87,7 @@ Module RTAByReduction.
       forall j, arrives_in arr_seq j -> job_cost j > 0.
     
     (* Next, consider any valid suspension-aware schedule of this arrival sequence.
-       (Note: see rt.model.schedule.uni.susp.valid_schedule.v for details) *)
+       (Note: see rt.classic.model.schedule.uni.susp.valid_schedule.v for details) *)
     Variable sched_susp: schedule Job.
     Hypothesis H_valid_schedule:
       valid_suspension_aware_schedule job_arrival arr_seq job_higher_eq_priority

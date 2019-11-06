@@ -1,5 +1,5 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.arrival_sequence rt.model.arrival.basic.task rt.model.arrival.basic.job.
+Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path bigop.
 
 (* Properties of job arrival. *)

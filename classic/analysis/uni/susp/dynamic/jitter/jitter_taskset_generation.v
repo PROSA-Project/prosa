@@ -1,8 +1,8 @@
 Require Import rt.util.all.
-Require Import rt.model.priority rt.model.suspension.
-Require Import rt.model.arrival.basic.arrival_sequence.
-Require Import rt.model.schedule.uni.jitter.schedule.
-Require Import rt.analysis.uni.susp.dynamic.jitter.jitter_schedule.
+Require Import rt.classic.model.priority rt.classic.model.suspension.
+Require Import rt.classic.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.schedule.uni.jitter.schedule.
+Require Import rt.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq.
 
 (* In this file we construct a jitter-aware task set that contains the

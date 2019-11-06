@@ -1,7 +1,7 @@
 Require Import rt.util.all. 
-Require Import rt.model.arrival.basic.job.
-Require Import rt.model.schedule.uni.service
-               rt.model.schedule.uni.schedule.
+Require Import rt.classic.model.arrival.basic.job.
+Require Import rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.schedule.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
@@ -133,7 +133,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
       Let job_lock_in_service (j: Job) := ε.
 
       (* Let's import definition of nonpreemptive schedule. *)
-      Require Import rt.model.schedule.uni.nonpreemptive.schedule.
+      Require Import rt.classic.model.schedule.uni.nonpreemptive.schedule.
 
       (* Next, we assume that the schedule is fully nonpreemptive. *) 
       Hypothesis H_is_nonpreemptive_schedule: 

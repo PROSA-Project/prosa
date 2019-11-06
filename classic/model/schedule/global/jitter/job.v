@@ -1,7 +1,7 @@
-Require Import rt.model.time rt.model.arrival.basic.task.
+Require Import rt.classic.model.time rt.classic.model.arrival.basic.task.
 From mathcomp Require Import ssrnat ssrbool eqtype.  
 
-Require Export rt.model.arrival.basic.job.
+Require Export rt.classic.model.arrival.basic.job.
 
 (* Properties of different types of job: *)
 Module JobWithJitter.

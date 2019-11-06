@@ -1,12 +1,12 @@
 Require Import Arith Omega Nat.
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task_arrival
-               rt.model.schedule.uni.schedulability
-               rt.model.schedule.uni.schedule_of_task 
-               rt.model.schedule.uni.response_time.
-Require Import rt.model.schedule.uni.basic.platform_tdma
-               rt.model.schedule.uni.end_time.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task_arrival
+               rt.classic.model.schedule.uni.schedulability
+               rt.classic.model.schedule.uni.schedule_of_task 
+               rt.classic.model.schedule.uni.response_time.
+Require Import rt.classic.model.schedule.uni.basic.platform_tdma
+               rt.classic.model.schedule.uni.end_time.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 Set Bullet Behavior "Strict Subproofs".

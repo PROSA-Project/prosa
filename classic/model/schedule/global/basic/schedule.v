@@ -1,5 +1,5 @@
 Require Import rt.util.all
-               rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.arrival.basic.arrival_sequence.
+               rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Definition, properties and lemmas about schedules. *)

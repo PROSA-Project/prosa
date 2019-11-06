@@ -1,12 +1,12 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.task
-               rt.model.priority
-               rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.uni.schedule
-               rt.model.schedule.uni.service
-               rt.model.schedule.uni.basic.platform.
-Require Export rt.model.schedule.uni.limited.platform.definitions.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task
+               rt.classic.model.priority
+               rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.uni.schedule
+               rt.classic.model.schedule.uni.service
+               rt.classic.model.schedule.uni.basic.platform.
+Require Export rt.classic.model.schedule.uni.limited.platform.definitions.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

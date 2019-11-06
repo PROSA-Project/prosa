@@ -1,15 +1,15 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.priority.
-Require Import rt.model.schedule.global.schedulability.
-Require Import rt.model.schedule.global.basic.schedule.
-Require Import rt.model.schedule.apa.affinity rt.model.schedule.apa.interference rt.model.schedule.apa.platform.
-Require Import rt.analysis.apa.workload_bound
-               rt.analysis.apa.interference_bound_edf
-               rt.analysis.apa.bertogna_edf_comp.
-Require Import rt.implementation.apa.job
-               rt.implementation.apa.task
-               rt.implementation.apa.schedule
-               rt.implementation.apa.arrival_sequence.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
+Require Import rt.classic.model.schedule.global.schedulability.
+Require Import rt.classic.model.schedule.global.basic.schedule.
+Require Import rt.classic.model.schedule.apa.affinity rt.classic.model.schedule.apa.interference rt.classic.model.schedule.apa.platform.
+Require Import rt.classic.analysis.apa.workload_bound
+               rt.classic.analysis.apa.interference_bound_edf
+               rt.classic.analysis.apa.bertogna_edf_comp.
+Require Import rt.classic.implementation.apa.job
+               rt.classic.implementation.apa.task
+               rt.classic.implementation.apa.schedule
+               rt.classic.implementation.apa.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq fintype bigop div.
 
 Module ResponseTimeAnalysisEDF.

@@ -1,7 +1,7 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.arrival_sequence rt.model.arrival.basic.job
-               rt.model.arrival.basic.task rt.model.arrival.basic.task_arrival.
-Require Import rt.implementation.task rt.implementation.job.
+Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.implementation.task rt.classic.implementation.job.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq div.
 
 Module ConcreteArrivalSequence.

@@ -1,5 +1,5 @@
 Require Import rt.util.all.
-Require Import rt.implementation.global.jitter.task.
+Require Import rt.classic.implementation.global.jitter.task.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
 
 Module ConcreteJob.

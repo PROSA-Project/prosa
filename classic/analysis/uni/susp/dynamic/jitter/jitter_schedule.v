@@ -1,8 +1,8 @@
 Require Import rt.util.all.
-Require Import rt.model.priority rt.model.suspension.
-Require Import rt.model.arrival.basic.arrival_sequence.
-Require Import rt.model.schedule.uni.jitter.schedule.
-Require Import rt.model.schedule.uni.transformation.construction.
+Require Import rt.classic.model.priority rt.classic.model.suspension.
+Require Import rt.classic.model.arrival.basic.arrival_sequence.
+Require Import rt.classic.model.schedule.uni.jitter.schedule.
+Require Import rt.classic.model.schedule.uni.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq.
 
 (* In this file, we formalize a reduction from a suspension-aware schedule

@@ -1,11 +1,11 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.job rt.model.arrival.basic.task rt.model.arrival.basic.arrival_sequence
-               rt.model.priority rt.model.suspension rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.uni.schedule rt.model.schedule.uni.schedulability.
-Require Import rt.model.schedule.uni.susp.suspension_intervals
-               rt.model.schedule.uni.susp.schedule rt.model.schedule.uni.susp.platform.
-Require Import rt.analysis.uni.basic.fp_rta_comp.
-Require Import rt.analysis.uni.susp.dynamic.oblivious.reduction.
+Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.arrival_sequence
+               rt.classic.model.priority rt.classic.model.suspension rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
+Require Import rt.classic.model.schedule.uni.susp.suspension_intervals
+               rt.classic.model.schedule.uni.susp.schedule rt.classic.model.schedule.uni.susp.platform.
+Require Import rt.classic.analysis.uni.basic.fp_rta_comp.
+Require Import rt.classic.analysis.uni.susp.dynamic.oblivious.reduction.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module SuspensionObliviousFP.

@@ -1,12 +1,12 @@
 Require Import rt.util.all.
-Require Import rt.model.priority.
-Require Import rt.model.arrival.basic.task.
-Require Import rt.model.arrival.jitter.job rt.model.arrival.jitter.arrival_sequence
-               rt.model.arrival.jitter.task_arrival.
-Require Import rt.model.schedule.uni.schedulability
-               rt.model.schedule.uni.response_time.
-Require Import rt.model.schedule.uni.jitter.schedule rt.model.schedule.uni.jitter.platform.
-Require Import rt.analysis.uni.jitter.workload_bound_fp rt.analysis.uni.jitter.fp_rta_theory.
+Require Import rt.classic.model.priority.
+Require Import rt.classic.model.arrival.basic.task.
+Require Import rt.classic.model.arrival.jitter.job rt.classic.model.arrival.jitter.arrival_sequence
+               rt.classic.model.arrival.jitter.task_arrival.
+Require Import rt.classic.model.schedule.uni.schedulability
+               rt.classic.model.schedule.uni.response_time.
+Require Import rt.classic.model.schedule.uni.jitter.schedule rt.classic.model.schedule.uni.jitter.platform.
+Require Import rt.classic.analysis.uni.jitter.workload_bound_fp rt.classic.analysis.uni.jitter.fp_rta_theory.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path ssrfun.
 
 Module ResponseTimeIterationFP.

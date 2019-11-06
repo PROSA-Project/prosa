@@ -1,11 +1,11 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.arrival.basic.job rt.model.priority rt.model.arrival.basic.task_arrival.
-Require Import rt.model.schedule.global.response_time rt.model.schedule.global.workload
-               rt.model.schedule.global.schedulability.
-Require Import rt.model.schedule.global.basic.schedule rt.model.schedule.global.basic.platform
-               rt.model.schedule.global.basic.interference rt.model.schedule.global.basic.interference_edf.
-Require Import rt.analysis.global.parallel.workload_bound
-               rt.analysis.global.parallel.interference_bound.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival.
+Require Import rt.classic.model.schedule.global.response_time rt.classic.model.schedule.global.workload
+               rt.classic.model.schedule.global.schedulability.
+Require Import rt.classic.model.schedule.global.basic.schedule rt.classic.model.schedule.global.basic.platform
+               rt.classic.model.schedule.global.basic.interference rt.classic.model.schedule.global.basic.interference_edf.
+Require Import rt.classic.analysis.global.parallel.workload_bound
+               rt.classic.analysis.global.parallel.interference_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div path.
 
 Module InterferenceBoundEDF.

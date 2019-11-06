@@ -1,16 +1,16 @@
 Require Import rt.util.all rt.util.find_seq
                Arith.
-Require Import rt.model.arrival.basic.job
-               rt.model.arrival.basic.arrival_sequence
-               rt.model.schedule.uni.basic.platform_tdma
-               rt.model.arrival.basic.task rt.model.policy_tdma.
-Require Import rt.model.schedule.uni.schedule rt.model.schedule.uni.schedulability.
-Require Import rt.model.priority
-               rt.analysis.uni.basic.tdma_rta_theory
-               rt.model.schedule.uni.transformation.construction.
-Require Import rt.implementation.job rt.implementation.task
-               rt.implementation.arrival_sequence
-               rt.implementation.uni.basic.schedule.
+Require Import rt.classic.model.arrival.basic.job
+               rt.classic.model.arrival.basic.arrival_sequence
+               rt.classic.model.schedule.uni.basic.platform_tdma
+               rt.classic.model.arrival.basic.task rt.classic.model.policy_tdma.
+Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
+Require Import rt.classic.model.priority
+               rt.classic.analysis.uni.basic.tdma_rta_theory
+               rt.classic.model.schedule.uni.transformation.construction.
+Require Import rt.classic.implementation.job rt.classic.implementation.task
+               rt.classic.implementation.arrival_sequence
+               rt.classic.implementation.uni.basic.schedule.
 
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 

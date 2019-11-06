@@ -1,5 +1,5 @@
-Require Import rt.model.time rt.util.all.
-Require Import rt.implementation.task.
+Require Import rt.classic.model.time rt.util.all.
+Require Import rt.classic.implementation.task.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
 
 Module ConcreteJob.

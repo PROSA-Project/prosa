@@ -1,6 +1,6 @@
 Require Import rt.util.all.
-Require Import rt.model.schedule.global.basic.schedule.
-Require Import rt.analysis.global.parallel.workload_bound.
+Require Import rt.classic.model.schedule.global.basic.schedule.
+Require Import rt.classic.analysis.global.parallel.workload_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module InterferenceBoundGeneric.

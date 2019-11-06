@@ -1,9 +1,9 @@
 Require Import rt.util.all.
-Require Import rt.model.arrival.basic.task rt.model.priority rt.model.schedule.global.workload.
-Require Import rt.model.schedule.global.jitter.job rt.model.schedule.global.jitter.schedule.
+Require Import rt.classic.model.arrival.basic.task rt.classic.model.priority rt.classic.model.schedule.global.workload.
+Require Import rt.classic.model.schedule.global.jitter.job rt.classic.model.schedule.global.jitter.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
-Require rt.model.schedule.global.basic.interference.
+Require rt.classic.model.schedule.global.basic.interference.
 
 Module Interference.
 
@@ -12,7 +12,7 @@ Module Interference.
   (* We import some of the basic definitions, but we need to re-define almost everything
      since the definition of backlogged (and thus the definition of interference)
      changes with jitter. *)
-  Import rt.model.schedule.global.basic.interference.
+  Import rt.classic.model.schedule.global.basic.interference.
   Export Interference.
   
   Section InterferenceDefs.
