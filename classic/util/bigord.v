@@ -1,4 +1,4 @@
-Require Import rt.util.tactics.
+Require Import rt.classic.util.tactics.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Lemmas about big operators over Ordinals that use Ordinal functions.

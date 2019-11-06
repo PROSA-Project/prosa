@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.priority.
 Require Import rt.classic.model.schedule.global.workload.
 Require Import rt.classic.model.schedule.global.jitter.schedule rt.classic.model.schedule.global.jitter.interference.

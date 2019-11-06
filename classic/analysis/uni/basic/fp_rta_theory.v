@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival
                rt.classic.model.arrival.basic.arrival_bounds.
 Require Import rt.classic.model.schedule.uni.schedule_of_task rt.classic.model.schedule.uni.workload

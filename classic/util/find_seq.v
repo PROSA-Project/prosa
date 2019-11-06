@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
-Require Import rt.util.all. 
+Require Import rt.classic.util.all. 
 
 Section find_seq.
   Context {T:eqType}.

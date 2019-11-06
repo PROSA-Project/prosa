@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.priority rt.classic.model.suspension.
 Require Import rt.classic.model.schedule.uni.susp.schedule.
 Require Import rt.classic.model.schedule.uni.transformation.construction.

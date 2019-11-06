@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.suspension.
 Require Import rt.classic.model.schedule.uni.susp.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq bigop fintype.

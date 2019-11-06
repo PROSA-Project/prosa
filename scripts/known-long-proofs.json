@@ -298,7 +298,7 @@
         "./classic/model/schedule/uni/sustainability.v": {
             "weak_sustainability_equivalence": 50
         },
-        "./util/div_mod.v": {
+        "./classic/util/div_mod.v": {
             "divSn_cases": 54
         }
     }

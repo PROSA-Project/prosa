@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task.
 Require Import rt.classic.model.schedule.global.basic.schedule.
 From mathcomp Require Import ssreflect eqtype ssrbool ssrnat seq bigop.

@@ -1,5 +1,5 @@
 From rt.restructuring.model Require Export task processor.ideal.
-From rt.util Require Export seqset list.
+From rt.util Require Export seqset rel.
 From mathcomp Require Export ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop div.
 
 (** In this section, we define the TDMA policy.*)

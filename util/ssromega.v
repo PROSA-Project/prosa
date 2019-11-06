@@ -1,7 +1,7 @@
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 Require Import Omega.
 
-(* Taken from http://github.com/pi8027/formalized-postscript/blob/master/stdlib_ext.v *)
+(* Adopted from http://github.com/pi8027/formalized-postscript/blob/master/stdlib_ext.v *)
 
 Ltac arith_hypo_ssrnat2coqnat :=
   match goal with

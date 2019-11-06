@@ -1,4 +1,4 @@
-Require Import rt.classic.model.time rt.util.all.
+Require Import rt.classic.model.time rt.classic.util.all.
 From mathcomp Require Import ssrnat ssrbool eqtype fintype seq.
 
 (* Attributes of a valid sporadic task. *)

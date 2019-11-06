@@ -1,4 +1,4 @@
-Require Import rt.util.tactics rt.util.notation rt.util.sorting rt.util.nat rt.util.list.
+Require Import rt.classic.util.tactics rt.classic.util.notation rt.classic.util.sorting rt.classic.util.nat rt.classic.util.list.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Section MinMaxSeq.

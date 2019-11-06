@@ -1,4 +1,4 @@
-Require Import rt.util.all.  
+Require Import rt.classic.util.all.  
 Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task.
 Require Import rt.classic.model.schedule.uni.schedule. 
 Require Export rt.classic.model.schedule.uni.limited.platform.definitions.

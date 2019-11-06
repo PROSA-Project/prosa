@@ -1,5 +1,5 @@
 From rt.restructuring.model Require Export task.
-From rt.util Require Export list.
+From rt.util Require Export rel.
 From mathcomp Require Export seq.
 
 (** Definitions of FP, JLFP and JLDP priority relations. *)

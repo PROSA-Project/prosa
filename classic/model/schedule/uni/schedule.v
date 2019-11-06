@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.time rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

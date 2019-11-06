@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.arrival.basic.arrival_sequence           
         rt.classic.model.arrival.basic.task_arrival.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq div.

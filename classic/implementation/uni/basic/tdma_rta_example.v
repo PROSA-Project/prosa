@@ -1,4 +1,4 @@
-Require Import rt.util.all rt.util.find_seq
+Require Import rt.classic.util.all rt.classic.util.find_seq
                .
 Require Import rt.classic.model.arrival.basic.job
                rt.classic.model.arrival.basic.arrival_sequence

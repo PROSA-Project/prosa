@@ -1,4 +1,4 @@
-Require Import rt.util.all.
+Require Import rt.classic.util.all.
 Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.priority.
 Require Import rt.classic.model.schedule.uni.schedule.
 Require Import rt.classic.model.schedule.uni.susp.platform.
