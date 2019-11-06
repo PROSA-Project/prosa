@@ -1,6 +1,6 @@
 # List of Tactics
 
-In effort to make it easier for new users to get started with the RT-PROOFs project, this file maintains a list of the tactics used in the project.
+In effort to make it easier for new users to get started with the Prosa project, the idea is to maintain a list of the tactics used in the project in this file.
 
 Each tactic should be named and briefly described (just a few sentences). Please add links to additional documentation elsewhere (if available).
 
