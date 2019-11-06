@@ -9,9 +9,9 @@ from collections import defaultdict
 
 SINGLE_LINE_PROOF_PATTERN = re.compile(
 r"""
-[ \t^]Proof\.  # Proof keyword
+([ \t]|^)Proof\.  # Proof keyword
 .*             # The actual proof.
-[ \t^.]Qed\.   # End of proof keyword.
+[ \t.]Qed\.   # End of proof keyword.
 """
 , re.VERBOSE)
 
