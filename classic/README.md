@@ -23,6 +23,8 @@ Classic Prosa contains the following base directories:
 - **classic/implementation/:** Instantiation of each schedulability analysis with concrete task and scheduler implementations.  
 Instantiating the main theorems in an assumption free environment shows the absence of contradictory assumptions in the proofs.
 
+- **classic/util/:** additional helper lemmas, notations, and tactics that are no longer used in the "new Prosa".
+
 ### Internal Directories
 
 The major concepts in classic Prosa are specified in the *classic/model/* folder.
