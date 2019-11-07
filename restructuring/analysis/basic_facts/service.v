@@ -1,4 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
+
 From rt.restructuring.behavior Require Export all.
 From rt.restructuring.model.processor Require Export platform_properties.
 From rt.util Require Import tactics step_function sum.
@@ -289,7 +290,8 @@ Section RelationToScheduled.
       case (boolP([exists t: 'I_t2,
                       (t >= t1) && (service_at sched j t > 0)])) => [EX | ALL].
       - move: EX => /existsP [x /andP [GE SERV]].
-        exists x; split; auto.
+        exists x; split => //.
+        apply /andP; by split.
       - rewrite negb_exists in ALL; move: ALL => /forallP ALL.
         rewrite /service_during big_nat_cond in NONZERO.
         rewrite big1 ?ltn0 // in NONZERO => i.
