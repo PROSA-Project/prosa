@@ -34,6 +34,12 @@ First, create an appropriate `Makefile`.
 ./create_makefile.sh
 ```
 
+Alternatively, to avoid compiling the older "classic" Prosa, specify the `--without-classic` option.
+
+```
+./create_makefile.sh --without-classic
+```
+
 Second, compile the library.
 
 ```
