@@ -10,7 +10,7 @@ Section BigCatLemmas.
       x \in (f j) ->
       x \in \cat_(m <= i < n) (f i).
   Proof.
-    intros T x m n j f LE IN; move: LE => /andP LE; des.
+    intros T x m n j f LE IN; move: LE => /andP [LE LE0].
     rewrite -> big_cat_nat with (n := j); simpl; [| by ins | by apply ltnW].
     rewrite mem_cat; apply/orP; right.
     destruct n; first by rewrite ltn0 in LE0.
@@ -30,7 +30,7 @@ Section BigCatLemmas.
     rewrite big_nat_recr // /= mem_cat in IN.
     move: IN => /orP [HEAD | TAIL].
     {
-      apply IHn in HEAD; destruct HEAD; exists x0; des.
+      apply IHn in HEAD; destruct HEAD; exists x0.  move: H => [H /andP [H0 H1]].
       split; first by done.
       by apply/andP; split; [by done | by apply ltnW].
     }
