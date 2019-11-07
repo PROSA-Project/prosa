@@ -248,7 +248,7 @@ Section ExtraLemmas.
       \sum_(t <= x < t + Δ) 1 = Δ. 
   Proof.
     intros.
-    simpl_sum_const.
+    rewrite big_const_nat iter_addn_0 mul1n.
     rewrite addnC -addnBA; last by done.
       by rewrite subnn addn0.  
   Qed.

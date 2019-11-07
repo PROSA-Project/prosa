@@ -164,8 +164,8 @@ Section UnitService.
   Proof.
     unfold service_during; intros t delta.
     apply leq_trans with (n := \sum_(t <= t0 < t + delta) 1);
-      last by simpl_sum_const; rewrite addKn leqnn.
-      by apply: leq_sum => t' _; apply: service_at_most_one.
+      last by rewrite sum_of_ones.
+    by apply: leq_sum => t' _; apply: service_at_most_one.
   Qed.
 
   Section ServiceIsAStepFunction.
