@@ -5,7 +5,6 @@
 /html
 *.aux
 Makefile*
-_CoqProject
 *.crashcoqide
 *.v#
 *.cache

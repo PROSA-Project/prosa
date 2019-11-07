@@ -14,10 +14,6 @@ do
     shift
 done
 
-# Include rt-proofs library in _CoqProject.
-# (For Coq versions >= 8.6, remove spurious warnings.)
-echo -R . rt -arg \"-w -notation-overriden,-parsing\" > _CoqProject
-
 # Compile all *.v files
 if [ "yes" == "$SKIP_CLASSIC" ]
 then

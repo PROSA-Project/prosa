@@ -1,0 +1,1 @@
+-R . rt -arg "-w -notation-overriden,-parsing"
