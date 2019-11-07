@@ -343,7 +343,7 @@ Section Sequential_Abstract_RTA.
               simpl; rewrite lt0b.
               apply/hasP; exists j; last by done.
                 by rewrite mem_filter; apply/andP; split;
-                  [rewrite H_job_of_tsk | eapply arrived_between_implies_in_arrivals; edone].
+                  [rewrite H_job_of_tsk | eapply arrived_between_implies_in_arrivals; eassumption].
             Qed.
 
           End Case1.
@@ -383,7 +383,7 @@ Section Sequential_Abstract_RTA.
               simpl; rewrite lt0b.
               apply/hasP; exists j; last by done.
                 by rewrite  mem_filter; apply/andP; split;
-                  [rewrite H_job_of_tsk | eapply arrived_between_implies_in_arrivals; edone].
+                  [rewrite H_job_of_tsk | eapply arrived_between_implies_in_arrivals; eassumption].
             Qed.
 
           End Case2.
@@ -498,7 +498,7 @@ Section Sequential_Abstract_RTA.
             have ARRs: arrives_in arr_seq j1;
               first by apply H_jobs_come_from_arrival_sequence with t; rewrite scheduled_at_def; apply/eqP.
             case_eq (job_task j1 == tsk) => TSK.
-            2: by eapply interference_plus_sched_le_serv_of_task_plus_task_interference_task; [edone| apply/negbT].
+            2: by eapply interference_plus_sched_le_serv_of_task_plus_task_interference_task; [eassumption| apply/negbT].
             case EQ: (j == j1); [move: EQ => /eqP EQ; subst j1 | ].
             1: by apply interference_plus_sched_le_serv_of_task_plus_task_interference_j.
             eapply interference_plus_sched_le_serv_of_task_plus_task_interference_job;
