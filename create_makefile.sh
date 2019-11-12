@@ -1,10 +1,16 @@
 #!/bin/bash 
 
+# options passed to `find` for locating relevant source files
+FIND_OPTS=( . -name '*.v' ! -name '*#*' ! -path './.git/*' )
+
 while ! [ -z "$1" ]
 do
     case "$1" in
         --without-classic)
-            SKIP_CLASSIC=yes
+            FIND_OPTS+=( ! -path './classic/*' )
+            ;;
+        --only-classic)
+            FIND_OPTS+=( ! -path './restructuring/*' )
             ;;
         *)
             echo "Unrecognized option: $1"
@@ -14,13 +20,10 @@ do
     shift
 done
 
-# Compile all *.v files
-if [ "yes" == "$SKIP_CLASSIC" ]
-then
-    coq_makefile -f _CoqProject $(find . -name "*.v"  ! -name "*#*" ! -path "./.git/*" ! -path "./classic/*" -print) -o Makefile
-else
-    coq_makefile -f _CoqProject $(find . -name "*.v"  ! -name "*#*" ! -path "./.git/*" -print) -o Makefile
-fi
+FIND_OPTS+=( -print )
+
+# Compile all relevant *.v files
+coq_makefile -f _CoqProject $(find "${FIND_OPTS[@]}" ) -o Makefile
 
 # Fix the 'make validate' command. It doesn't handle the library prefix properly
 # and cause clashes for files with the same name. This forces full filenames and
