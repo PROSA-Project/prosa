@@ -34,7 +34,7 @@ First, create an appropriate `Makefile`.
 ./create_makefile.sh
 ```
 
-Alternatively, to avoid compiling the older "classic" Prosa, specify the `--without-classic` option.
+Alternatively, to avoid compiling the older "classic" Prosa, specify the `--without-classic` option. This can speed up compilation considerably and is a good idea during development.  (It's also possible to *only* compile the "classic" Prosa by specifying the `--only-classic` option, but this is rarely needed.)
 
 ```
 ./create_makefile.sh --without-classic
