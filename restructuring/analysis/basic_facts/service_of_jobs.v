@@ -1,9 +1,9 @@
-From rt.util Require Import tactics sum.
-From rt.restructuring.behavior Require Import service.
-From rt.restructuring.model Require Export service_of_jobs.
-From rt.restructuring.model Require Import task schedule.priority_based.priorities processor.ideal.
-From rt.restructuring.analysis Require Import workload.
-From rt.restructuring.analysis.basic_facts Require Import arrivals completion ideal_schedule.
+From rt.util Require Import all. 
+From rt.restructuring.behavior Require Import all.
+From rt.restructuring.model Require Export task workload service_of_jobs.
+From rt.restructuring.model.processor Require Export ideal platform_properties.
+From rt.restructuring.model.schedule Require Import priority_based.priorities. 
+From rt.restructuring.analysis.basic_facts Require Import arrivals service completion ideal_schedule.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
@@ -141,7 +141,9 @@ Section IdealModelLemmas.
 
   (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-
+  Hypothesis H_jobs_come_from_arrival_sequence:
+    jobs_come_from_arrival_sequence sched arr_seq.
+    
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
@@ -153,6 +155,40 @@ Section IdealModelLemmas.
   Let arrivals_between := arrivals_between arr_seq.
   Let completed_by := completed_by sched.
 
+  (** We prove that if the total service within some time interval [[t1,t2)] 
+      is smaller than [t2-t1], then there is an idle time instant t ∈ [[t1,t2)]. *)
+  Lemma low_service_implies_existence_of_idle_time :
+    forall t1 t2,
+      service_of_jobs sched predT (arrivals_between 0 t2) t1 t2 < t2 - t1 ->
+      exists t, t1 <= t < t2 /\ is_idle sched t.
+  Proof.
+    intros ? ? SERV.
+    destruct (t1 <= t2) eqn:LE; last first.
+    { move: LE => /negP/negP; rewrite -ltnNge.
+      move => LT; apply ltnW in LT; rewrite -subn_eq0 in LT.
+        by rewrite (eqbool_to_eqprop LT) ltn0 in SERV.
+    }
+    have EX: exists δ, t2 = t1 + δ.
+    { by exists (t2 - t1); rewrite subnKC // ltnW. }
+    move: EX => [δ EQ]; subst t2; clear LE.
+    rewrite {3}[t1 + δ]addnC -addnBA // subnn addn0 in SERV.
+    rewrite /service_of_jobs exchange_big //= in SERV.
+    apply sum_le_summation_range in SERV.
+    move: SERV => [x [/andP [GEx LEx] L]].
+    exists x; split; first by apply/andP; split.
+    apply/negPn; apply/negP; intros NIDLE.
+    unfold is_idle in NIDLE.
+    destruct(sched x) eqn:SCHED; last by done.
+    move: SCHED => /eqP SCHED; clear NIDLE; rewrite -scheduled_at_def/= in SCHED.
+    move: L => /eqP; rewrite -sum_nat_eq0_nat; move => /allP L.
+    specialize (L s); feed L. 
+    { unfold arrivals_between.
+      eapply arrived_between_implies_in_arrivals; eauto 2.
+        by apply H_jobs_must_arrive_to_execute in SCHED; apply leq_ltn_trans with x.
+    } 
+      by move: L; simpl;rewrite eqb0; move => /eqP EQ.
+  Qed.
+  
   (** In this section, we prove that the service received by any set of jobs
      is upper-bounded by the corresponding interval length. *)
   Section ServiceOfJobsIsBoundedByLength.
@@ -215,6 +251,22 @@ Section IdealModelLemmas.
         by apply service_of_jobs_le_1.
     Qed.
 
+    (** Similar lemma holds for two instants. *)
+    Corollary service_of_jobs_le_length_of_interval':
+      forall (t1 t2 : instant),
+        service_of_jobs sched P jobs t1 t2 <= t2 - t1.
+    Proof.
+      intros.
+      have <-: \sum_(t1 <= x < t2) 1 = t2 - t1.
+      { by rewrite big_const_nat iter_addn mul1n addn0. } 
+      rewrite /service_of_jobs exchange_big //=.
+      rewrite leq_sum //.
+      move => t' _.
+      have SE :=  service_of_jobs_le_1 t'.
+      eapply leq_trans; last by eassumption.
+        by rewrite leq_sum //.
+    Qed.
+    
   End ServiceOfJobsIsBoundedByLength.
 
   (** In this section, we introduce a connection between the cumulative
@@ -318,6 +370,6 @@ Section IdealModelLemmas.
       - by apply workload_eq_service_impl_all_jobs_have_completed.
     Qed.
 
-  End WorkloadServiceAndCompletion.
+  End WorkloadServiceAndCompletion. 
 
 End IdealModelLemmas.
