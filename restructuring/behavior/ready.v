@@ -1,6 +1,7 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
 From rt.restructuring.behavior Require Export service.
 
+(** * Readiness of a Job *)
 
 (** We define a general notion of readiness of a job: a job can be
    scheduled only when it is ready, as determined by the predicate
@@ -19,6 +20,8 @@ Class JobReady (Job : JobType) (PState : Type)
     _ : forall sched j t, job_ready sched j t -> pending sched j t;
   }.
 
+(** * Backlogged Jobs *)
+
 (** Based on the general notion of readiness, we define what it means to be
    backlogged, i.e., ready to run but not executing. *)
 Section Backlogged.
@@ -36,9 +39,11 @@ Section Backlogged.
 End Backlogged.
 
 
+(** * Validity of a Schedule *)
+
 (** With the readiness concept in place, we define the notion of valid schedules. *)
 Section ValidSchedule.
-  (** Consider any kinds of jobs and any kind of processor state. *)
+  (** Consider any kind of jobs and any kind of processor state. *)
   Context {Job : JobType} {PState : Type}.
   Context `{ProcessorState Job PState}.
 

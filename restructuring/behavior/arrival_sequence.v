@@ -2,7 +2,10 @@ From mathcomp Require Export ssreflect seq ssrnat ssrbool bigop eqtype ssrfun.
 From rt.restructuring.behavior Require Export time job.
 From rt.util Require Import notation.
 
-(** Definitions and properties of job arrival sequences. *)
+(** This module contains basic definitions and properties of job arrival
+    sequences. *)
+
+(** * Notion of an Arrival Sequence *)
 
 (** We begin by defining a job arrival sequence. *)
 Section ArrivalSequence.
@@ -14,6 +17,8 @@ Section ArrivalSequence.
   Definition arrival_sequence := instant -> seq Job.
 
 End ArrivalSequence.
+
+(** * Arrival of a Job *)
 
 (** Next, we define properties of jobs in a given arrival sequence. *)
 Section JobProperties.
@@ -34,6 +39,8 @@ Section JobProperties.
   Definition arrives_in (j : Job) := exists t, j \in arrivals_at t.
 
 End JobProperties.
+
+(** * Validity of an Arrival Sequence *)
 
 (** Next, we define valid arrival sequences. *)
 Section ValidArrivalSequence.
@@ -62,6 +69,8 @@ Section ValidArrivalSequence.
 
 End ValidArrivalSequence.
 
+(** * Arrival Time Predicates *)
+
 (** Next, we define properties of job arrival times. *)
 Section ArrivalTimeProperties.
 
@@ -85,6 +94,8 @@ Section ArrivalTimeProperties.
   Definition arrived_between (t1 t2 : instant) := t1 <= job_arrival j < t2.
 
 End ArrivalTimeProperties.
+
+(** * Finite Arrival Sequence Prefixes *)
 
 (** In this section, we define arrival sequence prefixes, which are useful to
    define (computable) properties over sets of jobs in the schedule. *)

@@ -1,10 +1,24 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
 From rt.restructuring.behavior Require Export arrival_sequence.
 
-(** We define the notion of a generic processor state. The processor state type
-   determines aspects of the execution environment are modeled (e.g., overheads, spinning).
-   In the most simple case (i.e., Ideal.processor_state), at any time,
-   either a particular job is either scheduled or it is idle. *)
+(** * Generic Processor State *)
+
+(** Rather than choosing a specific schedule representation up front, we define
+    the notion of a generic processor state, which allows us to state general
+    definitions of core concepts (such as "how much service has a job
+    received") that work across many possble scenarios (e.g., ideal
+    uniprocessor schedules, schedules with overheads, variable-speed
+    processors, multiprocessors, etc.).
+
+    A concrete processor state type precisely determines how all relevant
+    aspects of the execution environment are modeled (e.g., scheduled jobs,
+    overheads, spinning). Here, we define just the common interface of all
+    possible concrete processor states by means of a "type class", i.e., we
+    define a few generic predicates and an invariant that must be defined by
+    all concrete processor state types.
+
+    In the most simple case (i.e., an ideal uniprocessor state), at any time,
+    either a particular job is scheduled or the processor is idle. *)
 Class ProcessorState (Job : JobType) (State : Type) :=
   {
     (** A [ProcessorState] instance provides a finite set of cores on which
@@ -31,7 +45,13 @@ Class ProcessorState (Job : JobType) (State : Type) :=
       forall j s, ~~ scheduled_in j s -> service_in j s = 0
   }.
 
-(** A schedule maps an instant to a processor state *)
+(** * Schedule Representation *)
+
+(** In Prosa, schedules are represented as functions, which allows us to model
+    potentially infinite schedules. More specifically, a schedule simply maps
+    each instant to a processor state, which reflects state of the computing
+    platform at the specific time (e.g., which job is presently scheduled). *)
+
 Definition schedule (PState : Type) := instant -> PState.
 
 (** The following line instructs Coq to not let proofs use knowledge of how

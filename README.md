@@ -4,6 +4,12 @@ This repository contains the main Coq specification & proof development of the [
 
 <center><img alt="RT-Proofs logo" src="http://prosa.mpi-sws.org/figures/rt-proofs-logo.png" width="300px"></center>
 
+## Documentation
+
+Up-to-date documentation for all branches of the main Prosa repository is available on the Prosa homeage:
+
+- <https://prosa.mpi-sws.org/branches>
+
 ## Publications
 
 Please see the [list of publications](http://prosa.mpi-sws.org/documentation.html#publications) on the Prosa project's homepage. 
@@ -45,11 +51,6 @@ Second, compile the library.
 ```
 make -j
 ```
-
-## Documentation
-
-Up-to-date documentation for all branches of the main Prosa repository is available at <https://prosa.mpi-sws.org/branches>.
-
 
 ## Generating HTML Documentation
 
