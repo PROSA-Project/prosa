@@ -88,7 +88,7 @@ Section RewriteFacilities.
       { apply/eqP; rewrite eq_sym eqbF_neg.
           by apply/eqP; intros EQ; subst b; apply H_npb. }
         by rewrite Bool.andb_false_l.
-    Admitted.
+    Abort.
      *)
     
     (*
