@@ -1,8 +1,11 @@
-From rt.util Require Import nat sum tactics.
+From rt.util Require Import all.
 From rt.restructuring.behavior Require Export all.
-From rt.restructuring.model Require Import job task preemption.preemption_model.
-From rt.restructuring.analysis Require Import service completion ideal_schedule.
-From rt.restructuring.analysis.abstract Require Import run_to_completion_threshold core.definitions.
+From rt.restructuring.analysis.basic_facts Require Import all.
+From rt.restructuring.model Require Import job task.
+From rt.restructuring.model.preemption Require Import valid_model job.parameters.
+From rt.restructuring.analysis.basic_facts.preemption Require Import 
+     rtc_threshold.job_preemptable.
+From rt.restructuring.analysis.abstract Require Import core.definitions.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

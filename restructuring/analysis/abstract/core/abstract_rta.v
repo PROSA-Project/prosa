@@ -1,9 +1,10 @@
 From rt.util Require Import all.
-From rt.restructuring.behavior Require Export all.
+From rt.restructuring.behavior Require Import all.
 From rt.restructuring.model Require Import job task.
-From rt.restructuring.model.preemption Require Import preemption_model task.parameters.
-From rt.restructuring.analysis Require Import schedulability ideal_schedule.
-From rt.restructuring.analysis.abstract Require Import run_to_completion_threshold. 
+From rt.restructuring.model.preemption Require Import
+     valid_model job.parameters task.parameters rtc_threshold.valid_rtct.
+From rt.restructuring.analysis.basic_facts.preemption Require Import rtc_threshold.job_preemptable.
+From rt.restructuring.analysis Require Import schedulability basic_facts.all.
 From rt.restructuring.analysis.abstract.core Require Import
      definitions reduction_of_search_space sufficient_condition_for_run_to_completion_threshold.
 

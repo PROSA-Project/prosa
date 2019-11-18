@@ -1,26 +1,29 @@
 From rt.util Require Import all.
-From rt.restructuring.behavior Require Import service.
+From rt.restructuring.behavior Require Import all.
 From rt.restructuring.model Require Import job task.
-From rt.restructuring.model.preemption Require Import preemption_model task.parameters.
-From rt.restructuring.model.arrival Require Import arrival_curves.
+From rt.restructuring.model.preemption Require Import rtc_threshold.valid_rtct
+     valid_model job.parameters task.parameters.
+From rt.restructuring.analysis.basic_facts.preemption Require Import 
+     rtc_threshold.job_preemptable.
+From rt.restructuring.model.arrival Require Import arrival_curves. 
 From rt.restructuring.model.schedule Require Import sequential.
 From rt.restructuring.analysis Require Import
      schedulability ideal_schedule workload task_schedule arrival.workload_bound arrival.rbf.
-From rt.restructuring.analysis.basic_facts Require Import arrivals task_arrivals ideal_schedule service_of_jobs.
-From rt.restructuring.analysis.abstract Require Import run_to_completion_threshold.
+From rt.restructuring.analysis.basic_facts Require Import all task_arrivals. 
 From rt.restructuring.analysis.abstract.core Require Import definitions reduction_of_search_space
      sufficient_condition_for_run_to_completion_threshold abstract_rta.
-
+  
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** * Abstract Response-Time Analysis with sequential jobs *)
+
+(** * Abstract Response-Time Analysis with sequential tasks *)
 (** In this section we propose the general framework for response-time analysis (RTA)
     of uniprocessor scheduling of real-time tasks with arbitrary arrival models
-    and sequential jobs. *)
+    and sequential tasks. *)
 
   (** We prove that the maximum among the solutions of the response-time bound
      recurrence for some set of parameters is a response-time bound for tsk.
-     Note that in this section we _do_ rely on the hypothesis about job
+     Note that in this section we _do_ rely on the hypothesis about task
      sequentiality. This allows us to provide a more precise response-time
      bound function, since jobs of the same task will be executed strictly
      in the order they arrive. *)
@@ -97,11 +100,11 @@ Section Sequential_Abstract_RTA.
      to express the new bound of the worst-case execution time. *)
   Section Definitions.
 
-    (** When assuming sequential jobs, we can introduce an additional hypothesis that
+    (** When assuming sequential tasks, we can introduce an additional hypothesis that
        ensures that the values of interference and workload remain consistent. It states
        that any of tsk's job, that arrived before the busy interval, should be
        completed by the beginning of the busy interval. *)
-    Definition interference_and_workload_consistent_with_sequential_jobs :=
+    Definition interference_and_workload_consistent_with_sequential_tasks :=
       forall (j : Job) (t1 t2 : instant),
           arrives_in arr_seq j ->
           job_task j = tsk ->
@@ -167,11 +170,11 @@ Section Sequential_Abstract_RTA.
       work_conserving arr_seq sched tsk interference interfering_workload.
 
     (** Unlike the previous theorem [uniprocessor_response_time_bound], we assume
-       that (1) jobs are sequential, moreover (2) functions interference and
-       interfering_workload are consistent with the hypothesis of sequential jobs. *)
-    Hypothesis H_sequential_jobs : sequential_jobs sched.
-    Hypothesis H_interference_and_workload_consistent_with_sequential_jobs:
-      interference_and_workload_consistent_with_sequential_jobs.
+       that (1) tasks are sequential, moreover (2) functions interference and
+       interfering_workload are consistent with the hypothesis of sequential tasks. *)
+    Hypothesis H_sequential_tasks : sequential_tasks sched.
+    Hypothesis H_interference_and_workload_consistent_with_sequential_tasks:
+      interference_and_workload_consistent_with_sequential_tasks.
 
     (** Assume we have a constant L which bounds the busy interval of any of tsk's jobs. *)
     Variable L : duration.
@@ -186,7 +189,7 @@ Section Sequential_Abstract_RTA.
     (** Given any job j of task tsk that arrives exactly A units after the beginning of the busy
        interval, the bound on the total interference incurred by j within an interval of length Δ
        is no greater than [task_rbf (A + ε) - task_cost tsk + task's IBF Δ]. Note that in case of
-       sequential jobs the bound consists of two parts: (1) the part that bounds the interference
+       sequential tasks the bound consists of two parts: (1) the part that bounds the interference
        received from other jobs of task tsk -- [task_rbf (A + ε) - task_cost tsk] and (2) any other
        interferece that is bounded by task_IBF(tsk, A, Δ). *)
     Let total_interference_bound (tsk : Task) (A Δ : duration) :=
@@ -200,7 +203,7 @@ Section Sequential_Abstract_RTA.
 
     (** Consider any value R, and assume that for any relative arrival time A from the search
        space there is a solution F of the response-time recurrence that is bounded by R. In
-       contrast to the formula in "non-sequential" Abstract RTA, assuming that jobs are
+       contrast to the formula in "non-sequential" Abstract RTA, assuming that tasks are
        sequential leads to a more precise response-time bound. Now we can explicitly express
        the interference caused by other jobs of the task under consideration.
 
@@ -243,7 +246,7 @@ Section Sequential_Abstract_RTA.
         move => JA; move: (H_j2_from_tsk) => /eqP TSK2eq.
         move: (posnP (@job_cost _ H3 j2)) => [ZERO|POS].
         { by rewrite /completed_by /service.completed_by ZERO. }
-        move: (H_interference_and_workload_consistent_with_sequential_jobs
+        move: (H_interference_and_workload_consistent_with_sequential_tasks
                  j1 t1 t2 H_j1_arrives H_j1_from_tsk H_j1_cost_positive H_busy_interval) => SWEQ.
         eapply all_jobs_have_completed_equiv_workload_eq_service
           with (j := j2) in SWEQ; eauto 2; try done.
@@ -272,7 +275,7 @@ Section Sequential_Abstract_RTA.
 
     (** Since we are going to use the [uniprocessor_response_time_bound] theorem to prove
        the theorem of this section, we have to show that all the hypotheses are satisfied.
-       Namely, we need to show that hypotheses [H_sequential_jobs, H_i_w_are_task_consistent
+       Namely, we need to show that hypotheses [H_sequential_tasks, H_i_w_are_task_consistent
        and H_task_interference_is_bounded_by] imply [H_job_interference_is_bounded], and the
        fact that [H_R_is_maximum_seq] implies [H_R_is_maximum]. *)
 
@@ -303,7 +306,7 @@ Section Sequential_Abstract_RTA.
       (** In this section, we show that the cumulative interference of job j in the interval [t1, t1 + x)
          is bounded by the sum of the task workload in the interval [t1, t1 + A + ε) and the cumulative
          interference of j's task in the interval [t1, t1 + x). Note that the task workload is computed
-         only on the interval [t1, t1 + A + ε). Thanks to the hypothesis about sequential jobs, jobs of
+         only on the interval [t1, t1 + A + ε). Thanks to the hypothesis about sequential tasks, jobs of
          task tsk that arrive after [t1 + A + ε] cannot interfere with j. *)
       Section TaskInterferenceBoundsInterference.
 
@@ -437,7 +440,7 @@ Section Sequential_Abstract_RTA.
                     by apply/andP; split; last rewrite /A subnKC // addn1 ltnS. }
                 { exfalso.
                   apply negbT in ARRNEQ; rewrite -ltnNge in ARRNEQ.
-                  move: (H_sequential_jobs j j' t) => CONTR.
+                  move: (H_sequential_tasks j j' t) => CONTR.
                   feed_n 3 CONTR; try done.
                   { by rewrite /same_task eq_sym H_job_of_tsk. }
                   { by move: H_sched => /eqP SCHEDt; rewrite scheduled_at_def. }
@@ -664,7 +667,7 @@ Section Sequential_Abstract_RTA.
       Proof.
         move: H_valid_run_to_completion_threshold => [PRT1 PRT2].
         intros A INSP.
-        clear H_sequential_jobs H_interference_and_workload_consistent_with_sequential_jobs.
+        clear H_sequential_tasks H_interference_and_workload_consistent_with_sequential_tasks.
         move: (H_R_is_maximum_seq _ INSP) => [F [FIX LE]].
         exists F; split; last by done.
         rewrite {1}FIX.
