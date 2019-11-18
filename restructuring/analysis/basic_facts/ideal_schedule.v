@@ -9,6 +9,8 @@ Section ScheduleClass.
   Local Transparent service_in scheduled_in scheduled_on.
   (** Consider any job type and the ideal processor model. *)
   Context {Job: JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.  
 
   (** We note that the ideal processor model is indeed a uniprocessor
      model. *)
@@ -64,4 +66,44 @@ Section ScheduleClass.
   Proof.
       by rewrite /service_at service_in_is_scheduled_in.
   Qed.
+    
+  (** Next we prove a lemma which helps us to do a case analysis on
+   the state of an ideal schedule. *)
+  Lemma ideal_proc_model_sched_case_analysis:
+    forall (sched : schedule (ideal.processor_state Job)) (t : instant),
+      is_idle sched t \/ exists j, scheduled_at sched j t. 
+  Proof.
+    intros.
+    unfold is_idle; simpl; destruct (sched t) eqn:EQ.
+    - by right; exists s; auto; rewrite scheduled_at_def EQ.
+    - by left; auto.
+  Qed.
+  
 End ScheduleClass.
+
+(** * Automation *)
+(** We add the above lemmas into a "Hint Database" basic_facts, so Coq 
+    will be able to apply them automatically. *)
+Hint Resolve ideal_proc_model_is_a_uniprocessor_model
+     ideal_proc_model_ensures_ideal_progress
+     ideal_proc_model_provides_unit_service : basic_facts.
+
+(** We also provide tactics for case analysis on ideal processor state. *)
+
+(** The first tactic generates two subgoals: one with idle processor and 
+    the other with processor executing a job named JobName. *)
+Ltac ideal_proc_model_sched_case_analysis sched t JobName :=
+  let Idle := fresh "Idle" in
+  let Sched := fresh "Sched_" JobName in
+  destruct (ideal_proc_model_sched_case_analysis sched t) as [Idle | [JobName Sched]].
+
+(** The second tactic is similar to the first, but it additionally generates 
+    two equalities: [sched t = None] and [sched t = Some j]. *)
+Ltac ideal_proc_model_sched_case_analysis_eq sched t JobName :=
+  let Idle := fresh "Idle" in
+  let IdleEq := fresh "Eq" Idle in
+  let Sched := fresh "Sched_" JobName in 
+  let SchedEq := fresh "Eq" Sched in
+  destruct (ideal_proc_model_sched_case_analysis sched t) as [Idle | [JobName Sched]];
+  [move: (Idle) => /eqP IdleEq; rewrite ?IdleEq
+  | move: (Sched); simpl; move => /eqP SchedEq; rewrite ?SchedEq].
