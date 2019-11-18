@@ -1,5 +1,6 @@
 From rt.restructuring.model Require Export task.
-From rt.util Require Export rel.
+From rt.util Require Export rel list.
+
 From mathcomp Require Export seq.
 
 (** Definitions of FP, JLFP and JLDP priority relations. *)
@@ -24,9 +25,20 @@ Instance JLFP_to_JLDP (Job: JobType) `{JLFP_policy Job} : JLDP_policy Job :=
   fun _ j1 j2 => hep_job j1 j2.
 
 Section Priorities.
-  Context {Job: eqType}.
 
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** In this section we define properties of JLDP policy. *)
   Section JLDP.
+
     (** Consider any JLDP policy. *)
     Context `{JLDP_policy Job}.
 
@@ -40,14 +52,59 @@ Section Priorities.
 
   End JLDP.
 
+  (** In this section we define properties of JLFP policy. *)
+  Section JLFP.
+    
+    (** Consider any JLFP policy. *)
+    Context `{JLFP_policy Job}.
+
+    (** Recall that a task is sequential if its jobs are executed in
+        the order that they arrive.
+       
+       An arbitrary JLFP can violate the sequential tasks hypothesis.
+       For example, consider two jobs j1, j2 of the same task such
+       that [job_arrival j1 < job_arrival j2]. It is possible that the
+       policy will assign a higher priority to the second job [i.e.,
+       π(j1) < π(j2)].  But this situation contradicts the sequential
+       tasks hypothesis.
+
+       We say that a policy respects sequential tasks if for any two
+       jobs j1, j2 from the same task the fact that [job_arrival j1 <=
+       job_arrival j2] implies [π(j1) >= π(j2)]. *)
+    Definition policy_respects_sequential_tasks :=
+      forall j1 j2,
+        job_task j1 == job_task j2 ->
+        job_arrival j1 <= job_arrival j2 ->
+        hep_job j1 j2.
+    
+  End JLFP.
+
+  (** In this section we define properties of FP policy. *)
   Section FP.
+    
     (** Consider any FP policy. *)
-    Context {Task : TaskType}.
     Context `{FP_policy Task}.
 
     (** We define whether the policy is antisymmetric over a taskset ts. *)
     Definition antisymmetric_over_taskset (ts : seq Task) :=
-      antisymmetric_over_list hep_task ts.
+      antisymmetric_over_list hep_task ts.    
+    
+    (** Note that any FP_policy respects sequential tasks hypothesis,
+        meaning that later-arrived jobs of a task don't have higher
+        priority than earlier-arrived jobs of the same task. *)
+    Remark respects_sequential_tasks :
+      reflexive_priorities -> 
+      policy_respects_sequential_tasks. 
+    Proof.
+      move => REFL j1 j2 /eqP EQ LT.
+      rewrite /hep_job /FP_to_JLFP EQ.
+        by eapply (REFL 0).
+    Qed.
+
   End FP.
+  
 End Priorities.
 
+(** We add the above lemma into a "Hint Database" basic_facts, so Coq 
+    will be able to apply them automatically. *)
+Hint Resolve respects_sequential_tasks : basic_facts.
