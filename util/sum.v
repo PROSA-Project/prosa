@@ -13,6 +13,16 @@ Section ExtraLemmas.
       by apply leq_sum; move => j /andP [IN H]; apply LE.
   Qed.
 
+  Lemma eq_sum_seq: forall (I: eqType) (r: seq I) (P: pred I) (E1 E2 : I -> nat), 
+      (forall i, i \in r -> P i -> E1 i == E2 i) ->
+      \sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i.
+  Proof.
+    intros; rewrite eqn_leq; apply/andP; split.
+    - apply leq_sum_seq; intros.
+        by move: (H i H0 H1) => /eqP EQ; rewrite EQ.
+    - apply leq_sum_seq; intros.
+        by move: (H i H0 H1) => /eqP EQ; rewrite EQ.
+  Qed.  
 
   Lemma sum_nat_eq0_nat (T : eqType) (F : T -> nat) (r: seq T) :
     all (fun x => F x == 0) r = (\sum_(i <- r) F i == 0).
