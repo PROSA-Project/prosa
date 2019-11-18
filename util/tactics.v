@@ -77,3 +77,35 @@ Ltac feed_n n H := match constr:(n) with
   | O => idtac
   | (S ?m) => feed H ; [| feed_n m H]
   end.
+
+(* ************************************************************************** *)
+(** * Handier movement of inequalities. *)
+(* ************************************************************************** *)
+Ltac move_neq_down H :=
+  exfalso;
+  (move: H; rewrite ltnNge; move => /negP H; apply: H; clear H)
+  || (move: H; rewrite leqNgt; move => /negP H; apply: H; clear H).
+
+Ltac move_neq_up H :=
+  (rewrite ltnNge; apply/negP; intros H)
+  || (rewrite leqNgt; apply/negP; intros H).
+
+(** The following tactic converts inequality [t1 <= t2] into a constant
+ [k] such that [t2 = t1 + k] and substitutes all the occurrences of
+ [t2]. *)
+Ltac convert_two_instants_into_instant_and_duration t1 t2 k :=
+  match goal with
+  | [ H: (t1 <= t2) = true |- _ ] =>
+    ltac:(
+      assert (EX : exists (k: nat), t2 = t1 + k);
+      [exists (t2 - t1); rewrite subnKC; auto | ];
+      destruct EX as [k EQ]; subst t2; clear H
+    )
+  | [ H: (t1 < t2) = true |- _ ] =>
+    ltac:(
+      assert (EX : exists (k: nat), t2 = t1 + k);
+      [exists (t2 - t1); rewrite subnKC; auto using ltnW | ];
+      destruct EX as [k EQ]; subst t2; clear H
+    )
+  end.
+
