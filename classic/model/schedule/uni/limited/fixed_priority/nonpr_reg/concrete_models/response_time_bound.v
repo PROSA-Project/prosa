@@ -304,7 +304,7 @@ Module RTAforConcreteModels.
         { have Fact2: 0 < size (task_preemption_points tsk).
           { apply/negPn/negP; rewrite -eqn0Ngt; intros CONTR; move: CONTR => /eqP CONTR.
             move: (END _ H_tsk_in_ts) => EQ.
-            move: EQ; rewrite /NondecreasingSequence.last -nth_last nth_default; last by rewrite CONTR.
+            move: EQ; rewrite /last0 -nth_last nth_default; last by rewrite CONTR.
               by intros; rewrite -EQ in POSt.
           } 
           have EQ: 2 = size [::0; task_cost tsk]; first by done. 
@@ -320,14 +320,14 @@ Module RTAforConcreteModels.
           { rewrite EQ; clear EQ.
             move: (BEG _ H_tsk_in_ts) => EQ.
             rewrite -EQ; clear EQ.
-            rewrite /NondecreasingSequence.first -nth0. 
+            rewrite /first0 -nth0. 
             apply/(nthP 0).
             exists 0; by done.
           }
           { rewrite EQ; clear EQ.
             move: (END _ H_tsk_in_ts) => EQ.
             rewrite -EQ; clear EQ.
-            rewrite /NondecreasingSequence.last -nth_last.
+            rewrite /last0 -nth_last.
             apply/(nthP 0).
             exists ((size (task_preemption_points tsk)).-1); last by done. 
               by rewrite -(leq_add2r 1) !addn1 prednK //.
@@ -344,7 +344,7 @@ Module RTAforConcreteModels.
           eapply model_with_fixed_preemption_points_is_model_with_bounded_nonpreemptive_regions; eauto 2.
           intros j ARR. 
           unfold ModelWithLimitedPreemptions.job_max_nps, task_max_nps, lengths_of_segments.
-          apply NondecreasingSequence.max_of_dominating_seq.
+          apply max_of_dominating_seq.
           intros. apply HYP2.
             by done.
         }
@@ -354,11 +354,11 @@ Module RTAforConcreteModels.
             rewrite subn1 -(leq_add2r 1) !addn1 prednK; last first.
             apply LSMj; try done. 
             rewrite /job_last_nps /ModelWithLimitedPreemptions.job_last_nps
-                    ltnS /NondecreasingSequence.last -nth_last NondecreasingSequence.function_of_distances_is_correct.
+                    ltnS /last0 -nth_last function_of_distances_is_correct.
             apply leq_trans with (job_max_nps j);
-              first by apply NondecreasingSequence.distance_between_neighboring_elements_le_max_distance_in_seq. 
+              first by apply distance_between_neighboring_elements_le_max_distance_in_seq. 
             rewrite -ENDj; last by done.
-              by apply NondecreasingSequence.max_distance_in_seq_le_last_element_of_seq; eauto 2. 
+              by apply max_distance_in_seq_le_last_element_of_seq; eauto 2. 
           }  
           { by intros j ARR; rewrite leq_subLR leq_addl. }
           { intros ? ? ? ARR LE LS NCOMPL.
@@ -383,9 +383,9 @@ Module RTAforConcreteModels.
             }
             clear LS.
             rewrite -ENDj in NEQ, SERV; last by done.
-            rewrite NondecreasingSequence.last_seq_minus_last_distance_seq in NEQ; last by eauto 2.
-            rewrite /NondecreasingSequence.last -nth_last in SERV. 
-            have EQ := NondecreasingSequence.antidensity_of_nondecreasing_seq.
+            rewrite last_seq_minus_last_distance_seq in NEQ; last by eauto 2.
+            rewrite /last0 -nth_last in SERV. 
+            have EQ := antidensity_of_nondecreasing_seq.
             specialize (EQ (job_preemption_points j) (service sched j (t + Δ)) (size (job_preemption_points j)).-2).
             rewrite CONTR in EQ.
             feed_n 2 EQ; first by eauto 2.
@@ -400,8 +400,8 @@ Module RTAforConcreteModels.
             
             rewrite -ENDj; last by done.
             apply leq_trans with (job_max_nps j).
-            - by apply NondecreasingSequence.last_of_seq_le_max_of_seq.
-            - by apply NondecreasingSequence.max_distance_in_seq_le_last_element_of_seq; eauto 2.
+            - by apply last_of_seq_le_max_of_seq.
+            - by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
           }
         }
         {
@@ -413,31 +413,31 @@ Module RTAforConcreteModels.
             unfold task_last_nps.
             rewrite !subnBA; first last.
             apply LSMj; try done.
-            rewrite /ModelWithLimitedPreemptions.task_last_nps /NondecreasingSequence.last -nth_last.
+            rewrite /ModelWithLimitedPreemptions.task_last_nps /last0 -nth_last.
             apply HYP3.
               by done.
               rewrite -(ltn_add2r 1) !addn1 prednK //.
               move: (Fact2) => Fact3.
-              rewrite NondecreasingSequence.size_of_seq_of_distances // addn1 ltnS // in Fact2. 
+              rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2. 
               rewrite -subh1 -?[in X in _ <= X]subh1; first last. 
               { apply leq_trans with (job_max_nps j).
-                - by apply NondecreasingSequence.last_of_seq_le_max_of_seq. 
-                - by rewrite -ENDj //; apply NondecreasingSequence.max_distance_in_seq_le_last_element_of_seq; eauto 2.
+                - by apply last_of_seq_le_max_of_seq. 
+                - by rewrite -ENDj //; apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
               } 
               { apply leq_trans with (task_max_nps tsk). 
-                - by apply NondecreasingSequence.last_of_seq_le_max_of_seq. 
-                - by rewrite -END //; apply NondecreasingSequence.max_distance_in_seq_le_last_element_of_seq; eauto 2.
+                - by apply last_of_seq_le_max_of_seq. 
+                - by rewrite -END //; apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
               }
               rewrite -ENDj; last eauto 2.
               rewrite -END; last eauto 2.
-              rewrite !NondecreasingSequence.last_seq_minus_last_distance_seq.
+              rewrite !last_seq_minus_last_distance_seq.
               have EQ: size (job_preemption_points j) = size (task_preemption_points tsk).
               { rewrite -TSK.
                   by apply HYP1.
               }
               rewrite EQ; clear EQ. 
               rewrite leq_add2r.
-              apply NondecreasingSequence.domination_of_distances_implies_domination_of_seq; try done; eauto 2. 
+              apply domination_of_distances_implies_domination_of_seq; try done; eauto 2. 
               rewrite BEG // BEGj //.
               eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2.
               rewrite -TSK; apply HYP1; try done.
@@ -447,17 +447,17 @@ Module RTAforConcreteModels.
         }
         { rewrite subKn; first by done.
           rewrite /task_last_nps  -(leq_add2r 1) subn1 !addn1 prednK; last first.
-          { rewrite /ModelWithLimitedPreemptions.task_last_nps /NondecreasingSequence.last -nth_last.
+          { rewrite /ModelWithLimitedPreemptions.task_last_nps /last0 -nth_last.
             apply HYP3; try by done. 
             rewrite -(ltn_add2r 1) !addn1 prednK //.
             move: (Fact2) => Fact3.
-              by rewrite NondecreasingSequence.size_of_seq_of_distances // addn1 ltnS // in Fact2.
+              by rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2.
           }        
           { apply leq_trans with (task_max_nps tsk).
-            - by apply NondecreasingSequence.last_of_seq_le_max_of_seq. 
+            - by apply last_of_seq_le_max_of_seq. 
             - rewrite -END; last by done.
               apply ltnW; rewrite ltnS; try done.
-                by apply NondecreasingSequence.max_distance_in_seq_le_last_element_of_seq; eauto 2. 
+                by apply max_distance_in_seq_le_last_element_of_seq; eauto 2. 
           }
         }
       Qed.
@@ -535,10 +535,10 @@ Module RTAforConcreteModels.
             rewrite subn1 -(leq_add2r 1) !addn1 prednK; last first.
             apply LSMj; try done.
             rewrite /job_last_nps /ModelWithLimitedPreemptions.job_last_nps
-                    ltnS /NondecreasingSequence.last -nth_last NondecreasingSequence.function_of_distances_is_correct.
-            apply leq_trans with (job_max_nps j); first by apply NondecreasingSequence.distance_between_neighboring_elements_le_max_distance_in_seq.
+                    ltnS /last0 -nth_last function_of_distances_is_correct.
+            apply leq_trans with (job_max_nps j); first by apply distance_between_neighboring_elements_le_max_distance_in_seq.
             rewrite -END; last by done.
-              by apply NondecreasingSequence.max_distance_in_seq_le_last_element_of_seq; eauto 2.
+              by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
           }  
           { by intros j ARR; rewrite leq_subLR leq_addl. }
           { intros ? ? ? ARR LE LS NCOMPL.  
@@ -563,9 +563,9 @@ Module RTAforConcreteModels.
             }
             clear LS.
             rewrite -END in NEQ, SERV; last by done.
-            rewrite NondecreasingSequence.last_seq_minus_last_distance_seq in NEQ.
-            rewrite /NondecreasingSequence.last -nth_last in SERV. 
-            have EQ := NondecreasingSequence.antidensity_of_nondecreasing_seq.
+            rewrite last_seq_minus_last_distance_seq in NEQ.
+            rewrite /last0 -nth_last in SERV. 
+            have EQ := antidensity_of_nondecreasing_seq.
             specialize (EQ (job_preemption_points j) (service sched j (t + Δ)) (size (job_preemption_points j)).-2).
             rewrite CONTR in EQ.
             feed_n 2 EQ; first by eauto 2.
@@ -581,8 +581,8 @@ Module RTAforConcreteModels.
             
             rewrite -END; last by done.
             apply leq_trans with (job_max_nps j).
-            - by apply NondecreasingSequence.last_of_seq_le_max_of_seq.
-            - by apply NondecreasingSequence.max_distance_in_seq_le_last_element_of_seq; eauto 2.
+            - by apply last_of_seq_le_max_of_seq.
+            - by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
           }
         }
         {

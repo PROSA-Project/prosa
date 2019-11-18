@@ -2,7 +2,7 @@ Require Import rt.classic.util.all.
 Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task.
 Require Import rt.classic.model.schedule.uni.schedule. 
 Require Export rt.classic.model.schedule.uni.limited.platform.definitions.
-Require Export rt.classic.model.schedule.uni.limited.platform.util.
+Require Export rt.util.nondecreasing.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
@@ -13,7 +13,7 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype 
     model with floating nonpreemptive regions. *)
 Module ModelWithLimitedPreemptions.
 
-  Import Job NondecreasingSequence UniprocessorSchedule LimitedPreemptionPlatform.
+  Import Job UniprocessorSchedule LimitedPreemptionPlatform.
 
   (* In this section, we instantiate can_be_preempted for the model with fixed preemption points and
      the model with floating nonpreemptive regions. We also prove that the definitions are correct. *)
@@ -46,11 +46,11 @@ Module ModelWithLimitedPreemptions.
 
         (* Next, we define a function that maps a job to the
            length of the longest nonpreemptive segment of job j. *)
-        Definition job_max_nps (j: Job) := max (lengths_of_segments j).
+        Definition job_max_nps (j : Job) := max0 (lengths_of_segments j).
 
         (* Similarly, job_last is a function that maps a job to the  
            length of the last nonpreemptive segment. *)
-        Definition job_last_nps (j: Job) := last (lengths_of_segments j).
+        Definition job_last_nps (j : Job) := last0 (lengths_of_segments j).
 
         (* Next, we describe some structural properties that
            a sequence of preemption points should satisfy. *)
@@ -65,11 +65,11 @@ Module ModelWithLimitedPreemptions.
         
         (* (3) We also require the sequence of preemption points to contain the beginning... *)
         Definition beginning_of_execution_in_preemption_points :=
-          forall j, arrives_in arr_seq j -> first (job_preemption_points j) = 0.
+          forall j, arrives_in arr_seq j -> first0 (job_preemption_points j) = 0.
 
         (* ... and (4) the end of execution for any job j.*)
         Definition end_of_execution_in_preemption_points :=
-          forall j, arrives_in arr_seq j -> last (job_preemption_points j) = job_cost j.
+          forall j, arrives_in arr_seq j -> last0 (job_preemption_points j) = job_cost j.
 
         (* (5) We require the sequence of preemption points to be a nondecreasing sequence. *)
         Definition preemption_points_is_nondecreasing_sequence :=
@@ -96,8 +96,8 @@ Module ModelWithLimitedPreemptions.
 
         (* Similarly to job's nonpreemptive segments, we define the length of the max
            nonpreemptive segment and lenght of the last nonpreemptive segment. *)
-        Definition task_last_nps tsk := last (distances (task_preemption_points tsk)).
-        Definition task_max_nps tsk := max (distances (task_preemption_points tsk)).
+        Definition task_last_nps tsk := last0 (distances (task_preemption_points tsk)).
+        Definition task_max_nps tsk := max0 (distances (task_preemption_points tsk)).
          
         (* Consider an arbitrary task set ts. *)     
         Variable ts: list Task.
@@ -107,11 +107,11 @@ Module ModelWithLimitedPreemptions.
         
         (* (1) We require the sequence of preemption points to contain the beginning... *)
         Definition task_beginning_of_execution_in_preemption_points :=
-          forall tsk, tsk \in ts -> first (task_preemption_points tsk) = 0.
+          forall tsk, tsk \in ts -> first0 (task_preemption_points tsk) = 0.
 
         (* ... and (2) the end of execution for any job j.*)
         Definition task_end_of_execution_in_preemption_points :=
-          forall tsk, tsk \in ts -> last (task_preemption_points tsk) = task_cost tsk.
+          forall tsk, tsk \in ts -> last0 (task_preemption_points tsk) = task_cost tsk.
 
         (* (3) We require the sequence of preemption points 
            to be a nondecreasing sequence. *)
@@ -239,7 +239,7 @@ Module ModelWithLimitedPreemptions.
           { by specialize (EMPT j H_j_arrives ZERO); rewrite EMPT. }
           apply/negPn/negP; rewrite -eqn0Ngt; intros CONTR; move: CONTR => /eqP CONTR.
           move: (END _ H_j_arrives) => EQ.
-          move: EQ; rewrite /last -nth_last nth_default; last by rewrite CONTR.
+          move: EQ; rewrite /last0 -nth_last nth_default; last by rewrite CONTR.
           intros.
             by rewrite /job_cost_positive -EQ in POS.
         Qed.
@@ -250,7 +250,7 @@ Module ModelWithLimitedPreemptions.
           move: H_limited_preemptions_job_model => [EMPT [LS [BEG [END _]]]].
           move: (BEG _ H_j_arrives) => EQ.
           rewrite -EQ; clear EQ.
-          rewrite /first -nth0. 
+          rewrite /first0 -nth0. 
           apply/(nthP 0).
           exists 0.
           - by apply list_of_preemption_point_is_not_empty.
@@ -263,7 +263,7 @@ Module ModelWithLimitedPreemptions.
           move: H_limited_preemptions_job_model => [EMPT [LS [BEG [END _]]]].
           move: (END _ H_j_arrives) => EQ.
           rewrite -EQ; clear EQ.
-          rewrite /last -nth_last.
+          rewrite /last0 -nth_last.
           apply/(nthP 0).
           exists ((size (job_preemption_points j)).-1); last by done. 
           rewrite -(leq_add2r 1) !addn1 prednK //.
@@ -348,9 +348,9 @@ Module ModelWithLimitedPreemptions.
           }
           set (preemptions := job_preemption_points j).
           set (serv := progr).
-          have Fact1: job_cost j <= last preemptions. 
+          have Fact1: job_cost j <= last0 preemptions. 
           { by apply last_is_max_in_nondecreasing_seq; eauto 2; apply job_cost_in_nonpreemptive_points. }
-          have Fact2: first preemptions <= serv < last preemptions.
+          have Fact2: first0 preemptions <= serv < last0 preemptions.
           { apply/andP; split.
             - by rewrite /preemptions BEG.
             - rewrite /serv /preemptions END; last by done.
