@@ -1,4 +1,4 @@
-From rt.util Require Export tactics.
+Require Export rt.util.tactics.
 
 (* *********************************************************************)
 (*                                                                     *)

@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype.
-From rt.util Require Import tactics.
+Require Import rt.util.tactics.
 
 (** This file introduces a function called search_arg that allows finding the
     argument within a given range for which a function is minimal w.r.t. to a

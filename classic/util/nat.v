@@ -1,4 +1,4 @@
-From rt.util Require Export nat.
+Require Export rt.util.nat.
 
 Require Import rt.classic.util.tactics rt.util.ssromega.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.

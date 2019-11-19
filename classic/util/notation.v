@@ -1,4 +1,4 @@
-From rt.util Require Export notation.
+Require Export rt.util.notation.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

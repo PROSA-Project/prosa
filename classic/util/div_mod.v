@@ -1,4 +1,4 @@
-From rt.util Require Export div_mod.
+Require Export rt.util.div_mod.
 
 Require Import Arith Omega Nat.
 Require Import rt.classic.util.tactics rt.util.ssromega rt.classic.util.nat.

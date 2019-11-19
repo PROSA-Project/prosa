@@ -1,4 +1,4 @@
-From rt.util Require Export bigcat.
+Require Export rt.util.bigcat.
 
 Require Import rt.classic.util.tactics rt.classic.util.notation rt.classic.util.bigord.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.

@@ -1,4 +1,4 @@
-From rt.util Require Export counting.
+Require Export rt.util.counting.
 
 Require Import rt.classic.util.tactics rt.classic.util.ord_quantifier.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.

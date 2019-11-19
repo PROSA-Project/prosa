@@ -1,4 +1,4 @@
-From rt.util Require Export list.
+Require Export rt.util.list.
 
 Require Import rt.classic.util.tactics.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.

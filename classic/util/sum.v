@@ -1,6 +1,10 @@
-From rt.util Require Export sum ssromega.
+Require Export rt.util.sum.
+Require Export rt.util.ssromega.
 
-From rt.classic.util Require Import tactics notation sorting nat.
+Require Import rt.classic.util.tactics.
+Require Import rt.classic.util.notation.
+Require Import rt.classic.util.sorting.
+Require Import rt.classic.util.nat.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 (* Lemmas about sum. *)

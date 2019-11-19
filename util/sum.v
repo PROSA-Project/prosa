@@ -1,4 +1,8 @@
-From rt.util Require Import tactics notation nat ssromega. 
+Require Import rt.util.tactics.
+Require Import rt.util.notation.
+Require Import rt.util.nat.
+Require Import rt.util.ssromega.
+
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 (* Lemmas about sum. *)

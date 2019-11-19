@@ -1,4 +1,4 @@
-From rt.util Require Export seqset.
+Require Export rt.util.seqset.
 
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq fintype.
 
