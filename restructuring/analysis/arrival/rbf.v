@@ -1,9 +1,10 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.model Require Import job task.
-From rt.restructuring.model.aggregate Require Import task_arrivals.
-From rt.restructuring.model.arrival Require Import arrival_curves.
-From rt.restructuring.analysis Require Import arrival.workload_bound.
+Require Import rt.util.all.
+Require Export rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.aggregate.task_arrivals.
+Require Import rt.restructuring.model.arrival.arrival_curves.
+Require Import rt.restructuring.analysis.arrival.workload_bound.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

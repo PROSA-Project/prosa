@@ -1,7 +1,8 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring Require Import model.job model.task.
-From rt.restructuring.model.preemption Require Import task.parameters.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.preemption.task.parameters.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

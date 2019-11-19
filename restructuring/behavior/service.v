@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-From rt.restructuring.behavior Require Export schedule.
+Require Export rt.restructuring.behavior.schedule.
 
 Section Service.
 

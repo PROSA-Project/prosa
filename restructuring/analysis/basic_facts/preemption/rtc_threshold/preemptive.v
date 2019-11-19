@@ -1,10 +1,12 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model Require Import job task.
-From rt.restructuring.model.preemption Require Import rtc_threshold.valid_rtct
-     job.instance.preemptive task.instance.preemptive rtc_threshold.instance.preemptive.
-From rt.restructuring.analysis.basic_facts.preemption Require Import 
-     rtc_threshold.job_preemptable.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+Require Import rt.restructuring.model.preemption.job.instance.preemptive.
+Require Import rt.restructuring.model.preemption.task.instance.preemptive.
+Require Import rt.restructuring.model.preemption.rtc_threshold.instance.preemptive.
+Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run

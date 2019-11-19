@@ -1,5 +1,5 @@
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.analysis.basic_facts Require Import all.
+Require Export rt.restructuring.behavior.all.
+Require Import rt.restructuring.analysis.basic_facts.all.
 
 (** This file defines simple allocation substitutions and a swapping operation
     as used for instance in the classic EDF optimality proof. *)

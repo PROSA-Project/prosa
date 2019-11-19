@@ -1,8 +1,10 @@
-From rt.util Require Import all.
-From rt.restructuring.model Require Import job task.
-From rt.restructuring.analysis.basic_facts Require Import all.
-From rt.restructuring.model.preemption Require Import
-     valid_model job.parameters task.parameters.
+Require Import rt.util.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.analysis.basic_facts.all.
+Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
 
 (** * Run-to-Completion Threshold *) 
 (** In this section, we provide a few basic properties 

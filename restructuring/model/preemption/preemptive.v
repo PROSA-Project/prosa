@@ -1,10 +1,10 @@
-From rt.util Require Export nondecreasing.
+Require Export rt.util.nondecreasing.
 
-From rt.restructuring.model.preemption Require Export
-     valid_model valid_schedule
-     job.instance.preemptive 
-     task.instance.preemptive 
-     rtc_threshold.instance.preemptive.
+Require Export rt.restructuring.model.preemption.valid_model.
+Require Export rt.restructuring.model.preemption.valid_schedule.
+Require Export rt.restructuring.model.preemption.job.instance.preemptive.
+Require Export rt.restructuring.model.preemption.task.instance.preemptive.
+Require Export rt.restructuring.model.preemption.rtc_threshold.instance.preemptive.
 
 From rt.restructuring.analysis.basic_facts.preemption Require Export
      job.preemptive task.preemptive rtc_threshold.preemptive.

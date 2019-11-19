@@ -1,9 +1,12 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.analysis.basic_facts Require Import ideal_schedule.
-From rt.restructuring.model Require Import job task.
-From rt.restructuring.model Require Import processor.ideal.
-From rt.restructuring.model.preemption Require Import job.parameters task.parameters valid_model.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.processor.ideal.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.preemption.valid_model.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Preemption Time in Ideal Uni-Processor Model *)

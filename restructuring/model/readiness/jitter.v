@@ -1,7 +1,7 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-From rt.restructuring.behavior Require Export all.
+Require Export rt.restructuring.behavior.all.
 
-From rt.util Require Import nat.
+Require Import rt.util.nat.
 
 (** We define the readiness indicator function for models with release jitter
    (and no self-suspensions). *)

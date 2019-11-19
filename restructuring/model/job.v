@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export all.
+Require Export rt.restructuring.behavior.all.
 From mathcomp Require Export eqtype ssrnat.
 
 (** In this section, we introduce properties of a job. *)

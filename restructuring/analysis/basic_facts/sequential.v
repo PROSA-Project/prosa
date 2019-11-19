@@ -1,4 +1,4 @@
-From rt.restructuring.model Require Export schedule.sequential.
+Require Export rt.restructuring.model.schedule.sequential.
 
 Section ExecutionOrder.
   (** Consider any type of job associated with any type of tasks... *)

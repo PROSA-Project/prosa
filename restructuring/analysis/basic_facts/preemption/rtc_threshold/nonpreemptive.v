@@ -1,10 +1,16 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model Require Import job task schedule.nonpreemptive.
-From rt.restructuring.model.preemption Require Import
-     valid_model job.parameters task.parameters rtc_threshold.valid_rtct
-     job.instance.nonpreemptive task.instance.nonpreemptive rtc_threshold.instance.nonpreemptive.
-From rt.restructuring.analysis.basic_facts.preemption Require Import job.nonpreemptive.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.schedule.nonpreemptive.
+Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+Require Import rt.restructuring.model.preemption.job.instance.nonpreemptive.
+Require Import rt.restructuring.model.preemption.task.instance.nonpreemptive.
+Require Import rt.restructuring.model.preemption.rtc_threshold.instance.nonpreemptive.
+Require Import rt.restructuring.analysis.basic_facts.preemption.job.nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
  

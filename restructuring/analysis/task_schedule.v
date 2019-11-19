@@ -1,6 +1,6 @@
-From rt.restructuring.model Require Import task.
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.analysis.basic_facts Require Import ideal_schedule.
+Require Import rt.restructuring.model.task.
+Require Export rt.restructuring.behavior.all.
+Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

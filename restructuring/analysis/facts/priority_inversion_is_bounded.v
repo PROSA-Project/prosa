@@ -1,17 +1,22 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.analysis.basic_facts Require Import all.
-From rt.restructuring.model.preemption Require Import
-     valid_model preemption_time job.parameters task.parameters.
-From rt.restructuring.model.schedule Require Import priority_based.preemption_aware.
-From rt.restructuring.analysis.definitions Require Export no_carry_in busy_interval priority_inversion.
-From rt.restructuring.analysis.facts Require Export busy_interval_exists no_carry_in_exists.
+Require Import rt.util.all.
+Require Export rt.restructuring.behavior.all.
+Require Import rt.restructuring.analysis.basic_facts.all.
+Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.preemption_time.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.schedule.priority_based.preemption_aware.
+Require Export rt.restructuring.analysis.definitions.no_carry_in.
+Require Export rt.restructuring.analysis.definitions.busy_interval.
+Require Export rt.restructuring.analysis.definitions.priority_inversion.
+Require Export rt.restructuring.analysis.facts.busy_interval_exists.
+Require Export rt.restructuring.analysis.facts.no_carry_in_exists.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout the file we assume for the classic Liu & Layland model
     of readiness without jitter and no self-suspensions, where
     pending jobs are always ready. *)
-From rt.restructuring.model Require Import readiness.basic.
+Require Import rt.restructuring.model.readiness.basic.
 
 (** * Priority inversion is bounded *)
 (** In this module we prove that any priority inversion that occurs in the model with bounded 

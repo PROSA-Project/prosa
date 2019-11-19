@@ -1,6 +1,6 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model Require Import task.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.task.
 
 (** * Static information about preemption points *)
 

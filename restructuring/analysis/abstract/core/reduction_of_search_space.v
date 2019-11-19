@@ -1,5 +1,6 @@
-From rt.util Require Import epsilon tactics.
-From rt.restructuring.model Require Import task.
+Require Import rt.util.epsilon.
+Require Import rt.util.tactics.
+Require Import rt.restructuring.model.task.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

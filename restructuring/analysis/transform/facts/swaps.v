@@ -1,6 +1,7 @@
-From rt.restructuring.analysis.transform Require Export swap facts.replace_at.
-From rt.restructuring.analysis.basic_facts Require Import all.
-From rt.util Require Import nat.
+Require Export rt.restructuring.analysis.transform.swap.
+Require Export rt.restructuring.analysis.transform.facts.replace_at.
+Require Import rt.restructuring.analysis.basic_facts.all.
+Require Import rt.util.nat.
 
 (** In this file, we establish invariants about schedules in which two
     allocations have been swapped, as for instance it is done in the

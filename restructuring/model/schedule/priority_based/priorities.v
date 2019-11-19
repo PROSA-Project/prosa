@@ -1,5 +1,6 @@
-From rt.restructuring.model Require Export task.
-From rt.util Require Export rel list.
+Require Export rt.restructuring.model.task.
+Require Export rt.util.rel.
+Require Export rt.util.list.
 
 From mathcomp Require Export seq.
 

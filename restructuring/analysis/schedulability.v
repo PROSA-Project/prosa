@@ -1,7 +1,8 @@
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.model Require Export task job_deadline.
-From rt.restructuring.analysis.basic_facts Require Export completion.
-From rt.util Require Export seqset.
+Require Export rt.restructuring.behavior.all.
+Require Export rt.restructuring.model.task.
+Require Export rt.restructuring.model.job_deadline.
+Require Export rt.restructuring.analysis.basic_facts.completion.
+Require Export rt.util.seqset.
 
 Section Task.
   Context {Task : TaskType}.

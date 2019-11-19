@@ -1,7 +1,9 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model.preemption Require Import valid_model job.parameters task.parameters.
-From rt.restructuring.model.preemption Require Import job.instance.preemptive.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.preemption.job.instance.preemptive.
 
 (** * Preemptions in Fully Premptive Model *)
 (** In this section, we prove that instantiation of predicate

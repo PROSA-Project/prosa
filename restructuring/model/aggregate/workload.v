@@ -1,6 +1,7 @@
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.model Require Import task schedule.priority_based.priorities.
-From rt.restructuring.analysis Require Import basic_facts.arrivals.
+Require Export rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.schedule.priority_based.priorities.
+Require Import rt.restructuring.analysis.basic_facts.arrivals.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

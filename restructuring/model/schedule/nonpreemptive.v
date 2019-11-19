@@ -1,5 +1,5 @@
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model Require Import job.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.job.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** In this section we introduce the notion of a non-preemptive schedule. *)

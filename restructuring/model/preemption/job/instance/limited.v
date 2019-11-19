@@ -1,6 +1,7 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model.preemption Require Import job.parameters task.parameters.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
 
 (** Definition of a parameter relating a job
     to the sequence of its preemption points. *)

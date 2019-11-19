@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-From rt.restructuring.behavior Require Export all.
+Require Export rt.restructuring.behavior.all.
 
 
 (** First let us define the notion of an ideal schedule state, as done in Prosa

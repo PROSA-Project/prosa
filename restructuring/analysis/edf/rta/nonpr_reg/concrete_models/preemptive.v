@@ -1,15 +1,22 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.analysis.basic_facts Require Import all.
-From rt.restructuring.model Require Import job task workload processor.ideal readiness.basic.
-From rt.restructuring.model.arrival Require Import arrival_curves.
-From rt.restructuring.model.schedule Require Import
-     work_conserving priority_based.priorities priority_based.edf priority_based.preemption_aware.
-From rt.restructuring.analysis.arrival Require Import workload_bound rbf.
-From rt.restructuring.analysis.edf.rta Require Import nonpr_reg.response_time_bound.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.analysis.basic_facts.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.aggregate.workload.
+Require Import rt.restructuring.model.processor.ideal.
+Require Import rt.restructuring.model.readiness.basic.
+Require Import rt.restructuring.model.arrival.arrival_curves.
+Require Import rt.restructuring.model.schedule.work_conserving.
+Require Import rt.restructuring.model.schedule.priority_based.priorities.
+Require Import rt.restructuring.model.schedule.priority_based.edf.
+Require Import rt.restructuring.model.schedule.priority_based.preemption_aware.
+Require Import rt.restructuring.analysis.arrival.workload_bound.
+Require Import rt.restructuring.analysis.arrival.rbf.
+Require Import rt.restructuring.analysis.edf.rta.nonpr_reg.response_time_bound.
 
 (** Assume we have a fully preemptive model. *)
-From rt.restructuring.model Require Import preemption.preemptive.
+Require Import rt.restructuring.model.preemption.preemptive.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

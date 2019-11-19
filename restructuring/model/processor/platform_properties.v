@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export all.
+Require Export rt.restructuring.behavior.all.
 
 (** To reason about classes of schedule types / processor models, we define the
    following properties that a processor model might possess. *)

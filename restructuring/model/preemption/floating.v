@@ -1,15 +1,15 @@
-From rt.util Require Export
-     nondecreasing.
+Require Export rt.util.nondecreasing.
 
-From rt.restructuring.model.preemption Require Export
-     valid_model valid_schedule
-     job.parameters task.parameters
-     job.instance.limited 
-     task.instance.floating 
-     rtc_threshold.instance.floating.
+Require Export rt.restructuring.model.preemption.valid_model.
+Require Export rt.restructuring.model.preemption.valid_schedule.
+Require Export rt.restructuring.model.preemption.job.parameters.
+Require Export rt.restructuring.model.preemption.task.parameters.
+Require Export rt.restructuring.model.preemption.job.instance.limited.
+Require Export rt.restructuring.model.preemption.task.instance.floating.
+Require Export rt.restructuring.model.preemption.rtc_threshold.instance.floating.
 
-From rt.restructuring.analysis.basic_facts.preemption Require Export
-     job.limited task.floating rtc_threshold.floating.
+Require Export rt.restructuring.analysis.basic_facts.preemption.job.limited.
+Require Export rt.restructuring.analysis.basic_facts.preemption.task.floating.
+Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.floating.
 
-From rt.restructuring.analysis.facts Require Export
-     priority_inversion_is_bounded.
+Require Export rt.restructuring.analysis.facts.priority_inversion_is_bounded.

@@ -1,9 +1,17 @@
-From rt.util Require Import all. 
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model Require Export task workload service_of_jobs.
-From rt.restructuring.model.processor Require Export ideal platform_properties.
-From rt.restructuring.model.schedule Require Import priority_based.priorities. 
-From rt.restructuring.analysis.basic_facts Require Import arrivals service completion ideal_schedule.
+Require Import rt.util.all.
+
+Require Import rt.restructuring.behavior.all.
+Require Export rt.restructuring.model.task.
+Require Export rt.restructuring.model.aggregate.workload.
+Require Export rt.restructuring.model.aggregate.service_of_jobs.
+Require Export rt.restructuring.model.processor.ideal.
+Require Export rt.restructuring.model.processor.platform_properties.
+Require Import rt.restructuring.model.schedule.priority_based.priorities.
+
+Require Import rt.restructuring.analysis.basic_facts.arrivals.
+Require Import rt.restructuring.analysis.basic_facts.service.
+Require Import rt.restructuring.analysis.basic_facts.completion.
+Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

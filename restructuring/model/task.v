@@ -1,5 +1,5 @@
 From mathcomp Require Export ssrbool.
-From rt.restructuring.behavior Require Export all.
+Require Export rt.restructuring.behavior.all.
   
 (** Throughout the library we assume that tasks have decidable equality *)
 Definition TaskType := eqType.

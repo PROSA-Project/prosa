@@ -1,6 +1,6 @@
-From rt.restructuring.analysis.transform Require Export swap.
-From rt.restructuring.analysis.basic_facts Require Import all.
-From rt.util Require Import nat.
+Require Export rt.restructuring.analysis.transform.swap.
+Require Import rt.restructuring.analysis.basic_facts.all.
+Require Import rt.util.nat.
 
 (** In this file, we make a few simple observations about schedules with
     replacements. *)

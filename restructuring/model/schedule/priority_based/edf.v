@@ -1,5 +1,7 @@
-From rt.restructuring.model Require Import job task job_deadline
-     schedule.priority_based.priorities.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.job_deadline.
+Require Import rt.restructuring.model.schedule.priority_based.priorities.
 From mathcomp Require Export seq.
 
 (** In this section we introduce the notion of EDF priorities. *)

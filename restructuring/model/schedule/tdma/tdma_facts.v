@@ -1,5 +1,5 @@
-From rt.restructuring.model Require Export tdma.
-From rt.util Require Import all.
+Require Export rt.restructuring.model.schedule.tdma.tdma.
+Require Import rt.util.all.
 
 (** In this section, we define the properties of TDMA and prove some basic lemmas. *)
 Section TDMAFacts.

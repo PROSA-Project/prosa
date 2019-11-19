@@ -1,11 +1,13 @@
-From rt.util Require Export nondecreasing.
+Require Export rt.util.nondecreasing.
 
-From rt.restructuring.model.preemption Require Export
-     valid_model valid_schedule
-     job.parameters task.parameters
-     job.instance.limited
-     task.instance.limited
-     rtc_threshold.instance.limited.
+Require Export rt.restructuring.model.preemption.valid_model.
+Require Export rt.restructuring.model.preemption.valid_schedule.
+Require Export rt.restructuring.model.preemption.job.parameters.
+Require Export rt.restructuring.model.preemption.task.parameters.
+Require Export rt.restructuring.model.preemption.job.instance.limited.
+Require Export rt.restructuring.model.preemption.task.instance.limited.
+Require Export rt.restructuring.model.preemption.rtc_threshold.instance.limited.
 
-From rt.restructuring.analysis.basic_facts.preemption Require Export
-     job.limited task.limited rtc_threshold.limited.
+Require Export rt.restructuring.analysis.basic_facts.preemption.job.limited.
+Require Export rt.restructuring.analysis.basic_facts.preemption.task.limited.
+Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.limited.

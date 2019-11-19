@@ -1,6 +1,7 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all. 
-From rt.restructuring.model.preemption Require Import job.parameters.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+
+Require Import rt.restructuring.model.preemption.job.parameters.
 
 (** * Platform for Fully Premptive Model *)
 (** In this section, we instantiate [job_preemptable] for the fully

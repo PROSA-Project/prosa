@@ -1,6 +1,7 @@
 From mathcomp Require Export ssreflect seq ssrnat ssrbool bigop eqtype ssrfun.
-From rt.restructuring.behavior Require Export time job.
-From rt.util Require Import notation.
+Require Export rt.restructuring.behavior.time.
+Require Export rt.restructuring.behavior.job.
+Require Import rt.util.notation.
 
 (** This module contains basic definitions and properties of job arrival
     sequences. *)

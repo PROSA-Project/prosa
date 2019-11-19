@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-From rt.restructuring.behavior Require Export all.
+Require Export rt.restructuring.behavior.all.
 
 (** Next we define a processor state that includes the possibility of spinning,
     where spinning jobs do not progress (= don't get service). *)

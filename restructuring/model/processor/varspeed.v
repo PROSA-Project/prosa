@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-From rt.restructuring.behavior Require Export all.
+Require Export rt.restructuring.behavior.all.
 
 (** Next, let us define a schedule with variable execution speed. *)
 Section State.

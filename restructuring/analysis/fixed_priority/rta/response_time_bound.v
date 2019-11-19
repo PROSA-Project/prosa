@@ -1,18 +1,28 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.analysis.basic_facts Require Import all.
-From rt.restructuring.model Require Import job task workload processor.ideal readiness.basic.
-From rt.restructuring.model.arrival Require Import arrival_curves.
-From rt.restructuring.model.preemption Require Import valid_model
-     job.parameters task.parameters rtc_threshold.valid_rtct.
-From rt.restructuring.model.schedule Require Import
-     work_conserving priority_based.priorities priority_based.preemption_aware.
-From rt.restructuring.analysis.arrival Require Import workload_bound rbf.
-From rt.restructuring.analysis Require Export schedulability.
-From rt.restructuring.analysis.definitions Require Export busy_interval priority_inversion.
-From rt.restructuring.analysis.facts Require Export busy_interval_exists.
-From rt.restructuring.analysis.abstract Require Import
-     core.definitions core.abstract_seq_rta instantiations.ideal_processor.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.analysis.basic_facts.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.aggregate.workload.
+Require Import rt.restructuring.model.processor.ideal.
+Require Import rt.restructuring.model.readiness.basic.
+Require Import rt.restructuring.model.arrival.arrival_curves.
+Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+Require Import rt.restructuring.model.schedule.work_conserving.
+Require Import rt.restructuring.model.schedule.priority_based.priorities.
+Require Import rt.restructuring.model.schedule.priority_based.preemption_aware.
+Require Import rt.restructuring.analysis.arrival.workload_bound.
+Require Import rt.restructuring.analysis.arrival.rbf.
+Require Export rt.restructuring.analysis.schedulability.
+Require Export rt.restructuring.analysis.definitions.busy_interval.
+Require Export rt.restructuring.analysis.definitions.priority_inversion.
+Require Export rt.restructuring.analysis.facts.busy_interval_exists.
+Require Import rt.restructuring.analysis.abstract.core.definitions.
+Require Import rt.restructuring.analysis.abstract.core.abstract_seq_rta.
+Require Import rt.restructuring.analysis.abstract.instantiations.ideal_processor.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

@@ -1,8 +1,13 @@
-From rt.util Require Import tactics sum.
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.model Require Import task schedule.priority_based.priorities processor.ideal.
-From rt.restructuring.analysis Require Import workload.
-From rt.restructuring.analysis.basic_facts Require Import arrivals completion ideal_schedule.
+Require Import rt.util.tactics.
+Require Import rt.util.sum.
+Require Export rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.schedule.priority_based.priorities.
+Require Import rt.restructuring.model.processor.ideal.
+Require Import rt.restructuring.analysis.basic_facts.workload.
+Require Import rt.restructuring.analysis.basic_facts.arrivals.
+Require Import rt.restructuring.analysis.basic_facts.completion.
+Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
      
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

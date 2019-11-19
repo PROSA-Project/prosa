@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-From rt.restructuring.behavior Require Export arrival_sequence.
+Require Export rt.restructuring.behavior.arrival_sequence.
 
 (** * Generic Processor State *)
 

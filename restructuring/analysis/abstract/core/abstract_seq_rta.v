@@ -1,17 +1,28 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import all.
-From rt.restructuring.model Require Import job task.
-From rt.restructuring.model.preemption Require Import rtc_threshold.valid_rtct
-     valid_model job.parameters task.parameters.
-From rt.restructuring.analysis.basic_facts.preemption Require Import 
-     rtc_threshold.job_preemptable.
-From rt.restructuring.model.arrival Require Import arrival_curves. 
-From rt.restructuring.model.schedule Require Import sequential.
-From rt.restructuring.analysis Require Import
-     schedulability ideal_schedule workload task_schedule arrival.workload_bound arrival.rbf.
-From rt.restructuring.analysis.basic_facts Require Import all task_arrivals. 
-From rt.restructuring.analysis.abstract.core Require Import definitions reduction_of_search_space
-     sufficient_condition_for_run_to_completion_threshold abstract_rta.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.all.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
+Require Import rt.restructuring.model.arrival.arrival_curves.
+
+Require Import rt.restructuring.model.schedule.sequential.
+Require Import rt.restructuring.analysis.schedulability.
+Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
+Require Import rt.restructuring.analysis.basic_facts.workload.
+Require Import rt.restructuring.analysis.task_schedule.
+Require Import rt.restructuring.analysis.arrival.workload_bound.
+Require Import rt.restructuring.analysis.arrival.rbf.
+Require Import rt.restructuring.analysis.basic_facts.all.
+Require Import rt.restructuring.analysis.basic_facts.task_arrivals.
+
+Require Import rt.restructuring.analysis.abstract.core.definitions.
+Require Import rt.restructuring.analysis.abstract.core.reduction_of_search_space.
+Require Import rt.restructuring.analysis.abstract.core.sufficient_condition_for_run_to_completion_threshold.
+Require Import rt.restructuring.analysis.abstract.core.abstract_rta.
   
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

@@ -1,9 +1,11 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
 
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring Require Export analysis.basic_facts.ideal_schedule.
-From rt.restructuring.model.processor Require Export platform_properties.
-From rt.util Require Import tactics step_function sum.
+Require Export rt.restructuring.behavior.all.
+Require Export rt.restructuring.analysis.basic_facts.ideal_schedule.
+Require Export rt.restructuring.model.processor.platform_properties.
+Require Import rt.util.tactics.
+Require Import rt.util.step_function.
+Require Import rt.util.sum.
 
 (** In this file, we establish basic facts about the service received by
     jobs. *)
@@ -578,7 +580,7 @@ Section RelationToScheduled.
 
 End RelationToScheduled.
 
-From rt.restructuring.model Require Import processor.ideal.
+Require Import rt.restructuring.model.processor.ideal.
 
 (** * Incremental Service in Ideal Schedule *)
 (** In the following section we prove a few facts about service in ideal schedeule. *)

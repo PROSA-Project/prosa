@@ -1,5 +1,6 @@
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.analysis.basic_facts Require Export service completion.
+Require Export rt.restructuring.behavior.all.
+Require Export rt.restructuring.analysis.basic_facts.service.
+Require Export rt.restructuring.analysis.basic_facts.completion.
 
 (** In this file, we observe basic properties of the behavioral job
     model w.r.t. deadlines. *)

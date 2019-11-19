@@ -1,12 +1,18 @@
-From rt.util Require Import all.
-From rt.restructuring.behavior Require Import job schedule.
-From rt.restructuring Require Import model.job model.task.
-From rt.restructuring.model.preemption Require Import
-     rtc_threshold.valid_rtct valid_schedule
-     job.parameters task.parameters
-     job.instance.limited task.instance.limited rtc_threshold.instance.limited.
-From rt.restructuring.analysis.basic_facts.preemption Require Import
-     job.limited task.limited rtc_threshold.job_preemptable.
+Require Import rt.util.all.
+Require Import rt.restructuring.behavior.job.
+Require Import rt.restructuring.behavior.schedule.
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+Require Import rt.restructuring.model.preemption.valid_schedule.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.preemption.job.instance.limited.
+Require Import rt.restructuring.model.preemption.task.instance.limited.
+Require Import rt.restructuring.model.preemption.rtc_threshold.instance.limited.
+Require Import rt.restructuring.analysis.basic_facts.preemption.job.limited.
+Require Import rt.restructuring.analysis.basic_facts.preemption.task.limited.
+Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run

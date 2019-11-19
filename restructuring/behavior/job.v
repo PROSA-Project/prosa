@@ -1,4 +1,4 @@
-From rt.restructuring.behavior Require Export time.
+Require Export rt.restructuring.behavior.time.
 From mathcomp Require Export eqtype ssrnat.
 
 (** * Notion of a Job Type *)

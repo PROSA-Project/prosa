@@ -1,5 +1,5 @@
-From rt.restructuring.behavior Require Export all.
-From rt.restructuring.analysis.basic_facts Require Import completion.
+Require Export rt.restructuring.behavior.all.
+Require Import rt.restructuring.analysis.basic_facts.completion.
 
 (** We define the readiness indicator function for the classic Liu & Layland
    model without jitter and no self-suspensions, where jobs are always

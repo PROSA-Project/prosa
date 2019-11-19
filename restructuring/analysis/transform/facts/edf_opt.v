@@ -1,9 +1,12 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-From rt.restructuring.analysis Require Export basic_facts.all.
-From rt.restructuring.model Require Export schedule.edf.
-From rt.restructuring.analysis Require Export schedulability transform.edf_trans transform.facts.swaps.
+Require Export rt.restructuring.analysis.basic_facts.all.
+Require Export rt.restructuring.model.schedule.edf.
+Require Export rt.restructuring.analysis.schedulability.
+Require Export rt.restructuring.analysis.transform.edf_trans.
+Require Export rt.restructuring.analysis.transform.facts.swaps.
 
-From rt.util Require Import tactics nat.
+Require Import rt.util.tactics.
+Require Import rt.util.nat.
 
 (** This file contains the main argument of the EDF optimality proof,
     starting with an analysis of the individual functions that drive
@@ -12,9 +15,9 @@ From rt.util Require Import tactics nat.
     schedule. *)
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-From rt.restructuring.model.processor Require Import ideal.
+Require Import rt.restructuring.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-From rt.restructuring.model.readiness Require Import basic.
+Require Import rt.restructuring.model.readiness.basic.
 
 (** We start by analyzing the helper function [find_swap_candidate],
     which is a problem-specific wrapper around [search_arg]. *)

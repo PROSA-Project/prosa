@@ -1,16 +1,22 @@
-From rt.restructuring.model Require Export job task workload.
-From rt.restructuring.model.schedule Require Import
-     work_conserving sequential priority_based.priorities.
-From rt.restructuring.analysis.definitions Require Import busy_interval priority_inversion.
-From rt.restructuring.analysis.abstract.core Require Import definitions abstract_seq_rta.
+Require Export rt.restructuring.model.job.
+Require Export rt.restructuring.model.task.
+Require Export rt.restructuring.model.aggregate.workload.
+Require Import rt.restructuring.model.schedule.work_conserving.
+Require Import rt.restructuring.model.schedule.sequential.
+Require Import rt.restructuring.model.schedule.priority_based.priorities.
+Require Import rt.restructuring.analysis.definitions.busy_interval.
+Require Import rt.restructuring.analysis.definitions.priority_inversion.
+Require Import rt.restructuring.analysis.abstract.core.definitions.
+Require Import rt.restructuring.analysis.abstract.core.abstract_seq_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** In this file we consider an ideal uni-processor ... *)
-From rt.restructuring.model Require Import processor.ideal.
+Require Import rt.restructuring.model.processor.ideal.
 
 (** ... and classic model of readiness without jitter and no
     self-suspensions, where pending jobs are always ready. *)
-From rt.restructuring.model Require Import readiness.basic.  
+Require Import rt.restructuring.model.readiness.basic.
+ 
 
 (** * JLFP instantiation of Interference and Interfering Workload for ideal uni-processor. *)
 (** In this module we instantiate functions Interference and Interfering Workload 

@@ -1,8 +1,11 @@
-From rt.util Require Export all.
-From rt.restructuring.behavior Require Import all. 
-From rt.restructuring Require Import model.job model.task.
-From rt.restructuring.model.preemption Require Import
-     valid_model job.parameters task.parameters.
+Require Export rt.util.all.
+Require Import rt.restructuring.behavior.all.
+
+Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.task.parameters.
 
 (** * Platform for Fully Preemptive Model *)
 (** In this section, we instantiate function
