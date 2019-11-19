@@ -100,7 +100,7 @@ proof-state:
     - ln -s ../scripts/
     - ln -s ../_CoqProject
     - ../create_makefile.sh
-    - make
+    - make -j ${NJOBS}
     - make html -j ${NJOBS} COQDOCEXTRAFLAGS=--plain-comments
     - mv html ../with-proofs-and-proof-state
   artifacts:
