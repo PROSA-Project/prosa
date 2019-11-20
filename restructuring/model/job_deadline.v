@@ -1,5 +1,5 @@
-Require Import rt.restructuring.model.job.
-Require Import rt.restructuring.model.task.
+Require Export rt.restructuring.model.job.
+Require Export rt.restructuring.model.task.
 
 (** Given task deadlines and a mapping from jobs to tasks 
    we provide a generic definition of job_deadline. *)

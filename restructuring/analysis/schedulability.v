@@ -1,8 +1,5 @@
-Require Export rt.restructuring.behavior.all.
-Require Export rt.restructuring.model.task.
 Require Export rt.restructuring.model.job_deadline.
 Require Export rt.restructuring.analysis.basic_facts.completion.
-Require Export rt.util.seqset.
 
 Section Task.
   Context {Task : TaskType}.

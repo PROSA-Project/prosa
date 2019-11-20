@@ -1,6 +1,4 @@
-Require Export rt.restructuring.model.schedule.edf.
-Require Import rt.restructuring.analysis.schedulability.
-Require Import rt.restructuring.analysis.transform.facts.edf_opt.
+Require Export rt.restructuring.analysis.transform.facts.edf_opt.
 
 (** This file contains the theorem that states the famous EDF
     optimality result: if there is any way to meet all deadlines

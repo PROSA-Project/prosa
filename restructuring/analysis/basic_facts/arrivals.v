@@ -1,5 +1,5 @@
 Require Export rt.restructuring.behavior.all.
-Require Import rt.util.all.
+Require Export rt.util.all.
 
 (** In this section, we relate job readiness to [has_arrived]. *)
 Section Arrived.
