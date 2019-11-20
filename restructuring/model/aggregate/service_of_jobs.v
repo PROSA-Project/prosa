@@ -1,9 +1,5 @@
-Require Import rt.util.tactics.
-Require Import rt.util.sum.
-Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.task.
-Require Import rt.restructuring.model.schedule.priority_based.priorities.
-Require Import rt.restructuring.model.processor.ideal.
+Require Export rt.restructuring.model.schedule.priority_based.priorities.
+Require Export rt.restructuring.model.processor.ideal.
      
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
