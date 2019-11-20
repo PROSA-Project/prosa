@@ -8,10 +8,10 @@ Require Import rt.restructuring.analysis.transform.facts.edf_opt.
     schedule in which all deadlines are met. *)
 
 (** The following results assume ideal uniprocessor schedules... *)
-From rt.restructuring.model.processor Require ideal.
+Require rt.restructuring.model.processor.ideal.
 (** ... and the basic (i.e., Liu & Layland) readiness model under which any
     pending job is ready. *)
-From rt.restructuring.model.readiness Require basic.
+Require rt.restructuring.model.readiness.basic.
 
 Section Optimality.
   (** For any given type of jobs... *)

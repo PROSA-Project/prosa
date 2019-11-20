@@ -4,6 +4,7 @@ Require Export rt.restructuring.model.schedule.edf.
 Require Export rt.restructuring.analysis.schedulability.
 Require Export rt.restructuring.analysis.transform.edf_trans.
 Require Export rt.restructuring.analysis.transform.facts.swaps.
+Require Export rt.restructuring.analysis.facts.readiness.basic.
 
 Require Import rt.util.tactics.
 Require Import rt.util.nat.
