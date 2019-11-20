@@ -1,6 +1,5 @@
 Require Export rt.restructuring.analysis.transform.prefix.
 Require Export rt.restructuring.analysis.transform.swap.
-Require Export rt.util.search_arg.
 
 (** In this file we define the "EDF-ification" of a schedule, the
     operation at the core of the EDF optimality proof. *)
