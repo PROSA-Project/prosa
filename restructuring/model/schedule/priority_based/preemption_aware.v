@@ -1,8 +1,5 @@
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.schedule.priority_based.priorities.
-Require Import rt.restructuring.model.processor.ideal.
-Require Import rt.restructuring.model.preemption.preemption_time.
-Require Import rt.restructuring.model.preemption.job.parameters.
+Require Export rt.restructuring.model.schedule.priority_based.priorities.
+Require Export rt.restructuring.model.preemption.preemption_time.
 
 (** We now define what it means for a schedule to respect a priority
     in the presence of jobs with non-preemptive segments. *)

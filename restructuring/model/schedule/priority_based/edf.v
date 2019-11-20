@@ -1,6 +1,4 @@
-Require Import rt.restructuring.model.job.
-Require Import rt.restructuring.model.task.
-Require Import rt.restructuring.model.job_deadline.
+Require Export rt.restructuring.model.job_deadline.
 Require Import rt.restructuring.model.schedule.priority_based.priorities.
 From mathcomp Require Export seq.
 

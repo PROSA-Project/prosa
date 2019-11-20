@@ -1,4 +1,3 @@
-Require Export rt.restructuring.behavior.all.
 Require Export rt.restructuring.model.schedule.priority_based.priorities.
 
 (** We now define what it means for a schedule to respect a priority *)
