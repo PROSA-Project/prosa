@@ -1,6 +1,5 @@
-Require Import rt.util.all.
-Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.aggregate.task_arrivals.
+Require Export rt.util.rel.
+Require Export rt.restructuring.model.aggregate.task_arrivals.
 
 (** In this section, we define the notion of arrival curves, which
    can be used to reason about the frequency of job arrivals. *)

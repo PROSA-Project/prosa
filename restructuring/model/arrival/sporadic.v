@@ -1,4 +1,3 @@
-Require Export rt.restructuring.behavior.all.
 Require Export rt.restructuring.model.task.
 
 Section TaskMinInterArrivalTime.
