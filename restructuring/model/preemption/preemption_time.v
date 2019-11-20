@@ -1,6 +1,5 @@
 Require Import rt.util.all.
 Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
 Require Import rt.restructuring.model.job.
 Require Import rt.restructuring.model.task.
 Require Import rt.restructuring.model.processor.ideal.
@@ -50,41 +49,5 @@ Section PreemptionTime.
     if sched t is Some j then
       job_preemptable j (service sched j t)
     else true.
-  
-  (** In this section we prove a few basic properties of the preemption_time predicate. *)
-  Section Lemmas.
-
-    (** Consider a valid model with bounded nonpreemptive segments. *)
-    Hypothesis H_model_with_bounded_nonpreemptive_segments: 
-      valid_model_with_bounded_nonpreemptive_segments arr_seq sched. 
-
-    (** Then, we show that time 0 is a preemption time. *)
-    Lemma zero_is_pt: preemption_time 0.
-    Proof.
-      unfold preemption_time.
-      case SCHED: (sched 0) => [j | ]; last by done.
-      move: (SCHED) => /eqP; rewrite -scheduled_at_def; move => ARR. 
-      apply H_jobs_come_from_arrival_sequence in ARR.
-      rewrite /service /service_during big_geq; last by done.
-      destruct H_model_with_bounded_nonpreemptive_segments as [T1 T2].
-        by move: (T1 j ARR) => [PP _]. 
-    Qed.
-
-    (** Also, we show that the first instant of execution is a preemption time. *)
-    Lemma first_moment_is_pt:
-      forall j prt,
-        arrives_in arr_seq j ->
-        ~~ scheduled_at sched j prt ->
-        scheduled_at sched j prt.+1 ->
-        preemption_time prt.+1.
-    Proof. 
-      intros s pt ARR NSCHED SCHED.
-      unfold preemption_time.
-      move: (SCHED); rewrite scheduled_at_def; move => /eqP SCHED2; rewrite SCHED2; clear SCHED2.
-      destruct H_model_with_bounded_nonpreemptive_segments as [T1 T2].
-        by move: (T1 s ARR) => [_ [_ [_ P]]]; apply P.
-    Qed.
-
-  End Lemmas.
     
 End PreemptionTime.
