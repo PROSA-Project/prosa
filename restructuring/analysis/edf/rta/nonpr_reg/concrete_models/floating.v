@@ -15,6 +15,11 @@ Require Import rt.restructuring.model.schedule.priority_based.preemption_aware.
 Require Import rt.restructuring.analysis.arrival.workload_bound.
 Require Import rt.restructuring.analysis.arrival.rbf.
 Require Import rt.restructuring.analysis.edf.rta.nonpr_reg.response_time_bound.
+Require Export rt.restructuring.analysis.basic_facts.preemption.job.limited.
+Require Export rt.restructuring.analysis.basic_facts.preemption.task.floating.
+Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.floating.
+
+Require Export rt.restructuring.analysis.facts.priority_inversion_is_bounded.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

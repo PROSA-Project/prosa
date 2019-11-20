@@ -14,6 +14,9 @@ Require Import rt.restructuring.model.schedule.priority_based.preemption_aware.
 Require Import rt.restructuring.analysis.arrival.workload_bound.
 Require Import rt.restructuring.analysis.arrival.rbf.
 Require Import rt.restructuring.analysis.edf.rta.nonpr_reg.response_time_bound.
+Require Export rt.restructuring.analysis.basic_facts.preemption.job.nonpreemptive.
+Require Export rt.restructuring.analysis.basic_facts.preemption.task.nonpreemptive.
+Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.nonpreemptive.
 
 (** Assume we have a fully non-preemptive model. *)
 Require Import rt.restructuring.model.preemption.nonpreemptive.

@@ -4,10 +4,6 @@ Require Export rt.restructuring.behavior.all.
 Require Import rt.restructuring.model.task.
 Require Import rt.restructuring.model.schedule.priority_based.priorities.
 Require Import rt.restructuring.model.processor.ideal.
-Require Import rt.restructuring.analysis.basic_facts.workload.
-Require Import rt.restructuring.analysis.basic_facts.arrivals.
-Require Import rt.restructuring.analysis.basic_facts.completion.
-Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
      
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

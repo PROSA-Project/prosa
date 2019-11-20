@@ -7,7 +7,3 @@ Require Export rt.restructuring.model.preemption.task.parameters.
 Require Export rt.restructuring.model.preemption.job.instance.limited.
 Require Export rt.restructuring.model.preemption.task.instance.limited.
 Require Export rt.restructuring.model.preemption.rtc_threshold.instance.limited.
-
-Require Export rt.restructuring.analysis.basic_facts.preemption.job.limited.
-Require Export rt.restructuring.analysis.basic_facts.preemption.task.limited.
-Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.limited.

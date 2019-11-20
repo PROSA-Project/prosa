@@ -2,7 +2,6 @@ Require Import rt.util.all.
 Require Import rt.util.nondecreasing.
 Require Import rt.restructuring.model.job.
 Require Import rt.restructuring.model.task.
-Require Import rt.restructuring.analysis.basic_facts.all.
 Require Import rt.restructuring.model.preemption.valid_model.
 Require Import rt.restructuring.model.preemption.job.parameters.
 Require Import rt.restructuring.model.preemption.task.parameters.
