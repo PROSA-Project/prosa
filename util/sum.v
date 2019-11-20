@@ -1,7 +1,5 @@
-Require Import rt.util.tactics.
-Require Import rt.util.notation.
-Require Import rt.util.nat.
-Require Import rt.util.ssromega.
+Require Export rt.util.notation.
+Require Export rt.util.nat.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 

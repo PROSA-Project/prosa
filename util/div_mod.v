@@ -1,5 +1,4 @@
-Require Import rt.util.ssromega rt.util.nat.
-
+Require Export rt.util.nat.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 

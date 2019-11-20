@@ -1,8 +1,6 @@
-Require Import rt.util.epsilon.
-Require Import rt.util.nat.
-Require Import rt.util.list.
-Require Import rt.util.tactics.
-Require Import rt.util.ssromega.
+Require Export rt.util.epsilon.
+Require Export rt.util.nat.
+Require Export rt.util.list.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Non-Decreasing Sequence and Distances *)

@@ -1,4 +1,4 @@
-Require Import rt.util.tactics rt.util.ssromega.
+Require Export rt.util.tactics rt.util.ssromega.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 (* Additional lemmas about natural numbers. *)

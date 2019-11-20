@@ -1,4 +1,4 @@
-Require Import rt.util.tactics rt.util.notation rt.util.nat rt.util.list.
+Require Export rt.util.notation rt.util.nat rt.util.list.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Additional lemmas about max. *)
