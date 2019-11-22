@@ -5,7 +5,6 @@ Require Import rt.restructuring.model.task.concept.
 
 Require Import rt.restructuring.model.preemption.job.instance.preemptive.
 Require Import rt.restructuring.model.task.preemption.fully_preemptive.
-Require Import rt.restructuring.model.preemption.rtc_threshold.instance.preemptive.
 Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
 
 (** * Task's Run to Completion Threshold *)

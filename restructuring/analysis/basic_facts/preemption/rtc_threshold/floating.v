@@ -7,7 +7,6 @@ Require Import rt.restructuring.model.task.preemption.parameters.
 
 Require Import rt.restructuring.model.preemption.job.instance.limited.
 Require Import rt.restructuring.model.task.preemption.floating_nonpreemptive.
-Require Import rt.restructuring.model.preemption.rtc_threshold.instance.floating.
 Require Import rt.restructuring.analysis.basic_facts.preemption.job.limited.
 Require Import rt.restructuring.analysis.basic_facts.preemption.task.floating.
 Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
