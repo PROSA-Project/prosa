@@ -19,7 +19,8 @@ Require Export rt.restructuring.analysis.basic_facts.preemption.task.nonpreempti
 Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.nonpreemptive.
 
 (** Assume we have a fully non-preemptive model. *)
-Require Import rt.restructuring.model.preemption.nonpreemptive.
+Require Import rt.restructuring.model.schedule.nonpreemptive.
+Require Import rt.restructuring.model.task.preemption.fully_nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

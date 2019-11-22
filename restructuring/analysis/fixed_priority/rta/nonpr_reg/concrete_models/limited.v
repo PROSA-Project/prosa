@@ -7,7 +7,8 @@ Require Import rt.restructuring.model.aggregate.workload.
 Require Import rt.restructuring.model.processor.ideal.
 Require Import rt.restructuring.model.readiness.basic.
 Require Import rt.restructuring.model.arrival.arrival_curves.
-Require Import rt.restructuring.model.preemption.limited.
+Require Import rt.restructuring.model.schedule.limited_preemptive.
+Require Import rt.restructuring.model.task.preemption.limited_preemptive.
 Require Import rt.restructuring.model.schedule.work_conserving.
 Require Import rt.restructuring.model.priority.classes.
 Require Import rt.restructuring.model.schedule.priority_driven.
