@@ -1,10 +1,4 @@
-Require Export rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.job.
-Require Import rt.restructuring.model.task.
 Require Export rt.restructuring.model.preemption.valid_model.
-Require Export rt.restructuring.model.preemption.job.parameters.
-Require Export rt.restructuring.model.preemption.task.parameters.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

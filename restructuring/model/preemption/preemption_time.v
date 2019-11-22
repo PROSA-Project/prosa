@@ -1,11 +1,5 @@
-Require Import rt.util.all.
-Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.job.
-Require Import rt.restructuring.model.task.
-Require Import rt.restructuring.model.processor.ideal.
-Require Export rt.restructuring.model.preemption.job.parameters.
-Require Import rt.restructuring.model.preemption.task.parameters.
-Require Import rt.restructuring.model.preemption.valid_model.
+Require Export rt.restructuring.model.processor.ideal.
+Require Export rt.restructuring.model.preemption.valid_model.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Preemption Time in Ideal Uni-Processor Model *)

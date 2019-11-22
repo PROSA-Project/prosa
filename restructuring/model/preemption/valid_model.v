@@ -1,9 +1,5 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.job.
-Require Import rt.restructuring.model.task.
-Require Import rt.restructuring.model.preemption.job.parameters.
-Require Import rt.restructuring.model.preemption.task.parameters.
+Require Export rt.restructuring.model.preemption.job.parameters.
+Require Export rt.restructuring.model.preemption.task.parameters.
 
 (** * Platform with limited preemptions *)
 (** Since the notion of preemption points is based on an user-provided 

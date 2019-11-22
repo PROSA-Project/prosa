@@ -1,10 +1,4 @@
-Require Import rt.util.all.
-Require Import rt.util.nondecreasing.
-Require Import rt.restructuring.model.job.
-Require Import rt.restructuring.model.task.
-Require Import rt.restructuring.model.preemption.valid_model.
-Require Import rt.restructuring.model.preemption.job.parameters.
-Require Import rt.restructuring.model.preemption.task.parameters.
+Require Export rt.restructuring.model.preemption.valid_model.
 
 (** * Task's Run-to-Completion Threshold *)
 (** Since a task model may not provide exact information about

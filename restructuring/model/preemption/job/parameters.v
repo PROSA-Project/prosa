@@ -1,5 +1,5 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
+Require Export rt.util.all.
+Require Export rt.restructuring.behavior.all.
 
 (** * Job Preemptable *)
 (** There are many equivalent ways to represent preemption points of a job. *)

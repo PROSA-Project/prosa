@@ -1,4 +1,3 @@
-Require Export rt.restructuring.model.job.
 Require Export rt.restructuring.model.task.
 
 (** Given task deadlines and a mapping from jobs to tasks 

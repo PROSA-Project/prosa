@@ -1,5 +1,5 @@
-Require Export rt.restructuring.model.job.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export rt.restructuring.behavior.all.
 
 (** In this section we introduce the notion of a non-preemptive schedule. *)
 Section NonpreemptiveSchedule.
