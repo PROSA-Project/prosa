@@ -6,7 +6,7 @@ Require Import rt.restructuring.model.task.concept.
 Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
 Require Import rt.restructuring.model.preemption.valid_schedule.
 Require Import rt.restructuring.model.preemption.job.parameters.
-Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.task.preemption.parameters.
 Require Import rt.restructuring.model.preemption.job.instance.limited.
 Require Import rt.restructuring.model.preemption.task.instance.limited.
 Require Import rt.restructuring.model.preemption.rtc_threshold.instance.limited.

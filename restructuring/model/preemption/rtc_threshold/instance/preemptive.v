@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.preemption.task.parameters.
+Require Export rt.restructuring.model.task.preemption.parameters.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we instantiate function [task run to completion

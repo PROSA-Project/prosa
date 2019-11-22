@@ -4,7 +4,7 @@ Require Import rt.restructuring.model.task.concept.
 Require Import rt.restructuring.analysis.basic_facts.all.
 Require Import rt.restructuring.model.preemption.valid_model.
 Require Import rt.restructuring.model.preemption.job.parameters.
-Require Import rt.restructuring.model.preemption.task.parameters.
+Require Import rt.restructuring.model.task.preemption.parameters.
 
 (** * Run-to-Completion Threshold *) 
 (** In this section, we provide a few basic properties 

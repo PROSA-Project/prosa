@@ -1,5 +1,5 @@
 Require Export rt.restructuring.model.preemption.job.parameters.
-Require Export rt.restructuring.model.preemption.task.parameters.
+Require Export rt.restructuring.model.task.preemption.parameters.
 
 (** * Platform with limited preemptions *)
 (** Since the notion of preemption points is based on an user-provided 
