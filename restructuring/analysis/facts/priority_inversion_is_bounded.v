@@ -2,7 +2,7 @@ Require Import rt.util.all.
 Require Export rt.restructuring.behavior.all.
 Require Import rt.restructuring.analysis.basic_facts.all.
 Require Import rt.restructuring.model.preemption.valid_model.
-Require Import rt.restructuring.model.preemption.preemption_time.
+Require Import rt.restructuring.model.schedule.preemption_time.
 Require Import rt.restructuring.model.preemption.job.parameters.
 Require Import rt.restructuring.model.preemption.task.parameters.
 Require Import rt.restructuring.model.schedule.priority_driven.
