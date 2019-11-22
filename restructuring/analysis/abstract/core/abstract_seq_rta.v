@@ -9,7 +9,7 @@ Require Import rt.restructuring.model.preemption.task.parameters.
 Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
 Require Import rt.restructuring.model.arrival.arrival_curves.
 
-Require Import rt.restructuring.model.schedule.sequential.
+Require Import rt.restructuring.model.task.sequential.
 Require Import rt.restructuring.analysis.schedulability.
 Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
 Require Import rt.restructuring.analysis.basic_facts.workload.

@@ -2,7 +2,7 @@ Require Export rt.restructuring.analysis.definitions.job_properties.
 Require Export rt.restructuring.model.task.
 Require Export rt.restructuring.model.aggregate.workload.
 Require Import rt.restructuring.model.schedule.work_conserving.
-Require Import rt.restructuring.model.schedule.sequential.
+Require Import rt.restructuring.model.task.sequential.
 Require Import rt.restructuring.model.priority.classes.
 Require Import rt.restructuring.analysis.definitions.busy_interval.
 Require Import rt.restructuring.analysis.definitions.priority_inversion.
