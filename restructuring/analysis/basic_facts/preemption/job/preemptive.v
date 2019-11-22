@@ -1,7 +1,7 @@
 Require Import rt.util.all.
 Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.preemption.valid_model.
-Require Import rt.restructuring.model.preemption.job.parameters.
+
+Require Import rt.restructuring.model.preemption.parameter.
 Require Import rt.restructuring.model.task.preemption.parameters.
 Require Import rt.restructuring.model.preemption.job.instance.preemptive.
 

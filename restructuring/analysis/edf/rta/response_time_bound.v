@@ -8,8 +8,8 @@ Require Import rt.restructuring.model.processor.ideal.
 Require Import rt.restructuring.model.readiness.basic.
 Require Import rt.restructuring.model.aggregate.task_arrivals.
 Require Import rt.restructuring.model.arrival.arrival_curves.
-Require Import rt.restructuring.model.preemption.valid_model.
-Require Import rt.restructuring.model.preemption.job.parameters.
+
+Require Import rt.restructuring.model.preemption.parameter.
 Require Import rt.restructuring.model.task.preemption.parameters.
 
 Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.

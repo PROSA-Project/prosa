@@ -3,8 +3,8 @@ Require Import rt.util.nondecreasing.
 Require Import rt.restructuring.behavior.all.
 Require Import rt.restructuring.analysis.definitions.job_properties.
 Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.preemption.valid_model.
-Require Import rt.restructuring.model.preemption.job.parameters.
+
+Require Import rt.restructuring.model.preemption.parameter.
 Require Import rt.restructuring.model.task.preemption.parameters.
 
 Require Import rt.restructuring.model.preemption.job.instance.limited.
@@ -68,7 +68,7 @@ Section FloatingNonPremptiveRegionsModel.
     case: (posnP (job_cost j)) => [ZERO|POS].
     - split.
       rewrite /job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment /job_max_nonpreemptive_segment
-              /lengths_of_segments /parameters.job_preemption_points; rewrite ZERO; simpl.
+              /lengths_of_segments /parameter.job_preemption_points; rewrite ZERO; simpl.
       rewrite /job_preemptable /limited_preemptions_model; erewrite zero_in_preemption_points; eauto 2.
       + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.

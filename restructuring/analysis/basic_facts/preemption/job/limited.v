@@ -3,9 +3,9 @@ Require Import rt.restructuring.behavior.all.
 Require Import rt.restructuring.analysis.basic_facts.all.
 Require Import rt.restructuring.analysis.definitions.job_properties.
 Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.preemption.valid_model.
+Require Import rt.restructuring.model.preemption.parameter.
 Require Import rt.restructuring.model.schedule.limited_preemptive.
-Require Import rt.restructuring.model.preemption.job.parameters.
+Require Import rt.restructuring.model.preemption.parameter.
 Require Import rt.restructuring.model.task.preemption.parameters.
 
 Require Import rt.restructuring.model.preemption.job.instance.limited.
@@ -164,36 +164,36 @@ Section ModelWithLimitedPreemptions.
 
     (** Recall that file [job.parameters] also defines notion of
         preemption poins.  And note that
-        [job.parameters.job_preemption_points] cannot have a
+        [job.parameter.job_preemption_points] cannot have a
         duplicating preemption points. Therefore, we need additional
-        lemmas to relate [job.parameters.job_preemption_points] and
+        lemmas to relate [job.parameter.job_preemption_points] and
         [limited.job_preemption_points]]. *)
 
     (** First we show that the length of the last non-preemptive
-        segment of [job.parameters.job_preemption_points] is equal to
+        segment of [job.parameter.job_preemption_points] is equal to
         the length of the last non-empty non-preemptive segment of
         [limited.job_preemption_points]. *)
     Lemma job_parameters_last_np_to_job_limited:
-        last0 (distances (parameters.job_preemption_points j)) =
+        last0 (distances (parameter.job_preemption_points j)) =
         last0 (filter (fun x => 0 < x) (distances (job_preemption_points j))).
     Proof.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
-      unfold parameters.job_preemption_points, job_preemptable, limited_preemptions_model.
+      unfold parameter.job_preemption_points, job_preemptable, limited_preemptions_model.
       intros; rewrite distances_iota_filtered; eauto.
       rewrite -A2 //.
         by intros; apply last_is_max_in_nondecreasing_seq; eauto 2.
     Qed.
 
     (** Next we show that the length of the max non-preemptive
-        segment of [job.parameters.job_preemption_points] is equal to
+        segment of [job.parameter.job_preemption_points] is equal to
         the length of the max non-preemptive segment of
         [limited.job_preemption_points]. *)
     Lemma job_parameters_max_np_to_job_limited:
-      max0 (distances (parameters.job_preemption_points j)) =
+      max0 (distances (parameter.job_preemption_points j)) =
       max0 (distances (job_preemption_points j)).
     Proof.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
-      unfold parameters.job_preemption_points, job_preemptable, limited_preemptions_model.
+      unfold parameter.job_preemption_points, job_preemptable, limited_preemptions_model.
       intros; rewrite distances_iota_filtered; eauto 2.
       rewrite max0_rem0 //.
       rewrite -A2 //.

@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.preemption.job.parameters.
+Require Export rt.restructuring.model.preemption.parameter.
 Require Export rt.restructuring.model.task.preemption.parameters.
 
 (** Definition of a parameter relating a job

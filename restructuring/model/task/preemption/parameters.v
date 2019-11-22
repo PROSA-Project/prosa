@@ -1,6 +1,5 @@
 Require Export rt.util.all.
-Require Export rt.restructuring.model.preemption.job.parameters.
-Require Export rt.restructuring.model.preemption.valid_model.
+Require Export rt.restructuring.model.preemption.parameter.
 Require Export rt.restructuring.model.task.concept.
 (** * Static information about preemption points *)
 

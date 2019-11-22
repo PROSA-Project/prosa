@@ -1,5 +1,5 @@
 Require Export rt.restructuring.model.processor.ideal.
-Require Export rt.restructuring.model.preemption.job.parameters.
+Require Export rt.restructuring.model.preemption.parameter.
  
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
