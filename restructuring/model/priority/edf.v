@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.job_deadline.
+Require Export rt.restructuring.model.task.absolute_deadline.
 Require Import rt.restructuring.model.priority.classes.
 From mathcomp Require Export seq.
 

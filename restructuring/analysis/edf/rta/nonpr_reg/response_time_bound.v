@@ -1,7 +1,7 @@
 Require Import rt.util.all.
 Require Import rt.restructuring.behavior.all.
 Require Import rt.restructuring.analysis.basic_facts.all.
-Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.analysis.definitions.job_properties.
 Require Import rt.restructuring.model.task.
 Require Import rt.restructuring.model.aggregate.workload.
 Require Import rt.restructuring.model.processor.ideal.
@@ -192,7 +192,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         { have NINTSK: job_task j' != tsk.
           { apply/eqP; intros TSKj'.
             rewrite /EDF -ltnNge in NOTHEP.
-            rewrite /job_deadline /job_deadline.job_deadline_from_task_deadline in NOTHEP.
+            rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline in NOTHEP.
             rewrite TSKj' TSK ltn_add2r in NOTHEP.
             move: NOTHEP; rewrite ltnNge; move => /negP T; apply: T.
             apply leq_trans with t; last by done.
@@ -208,7 +208,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
             eapply in_arrivals_implies_arrived_between in JINB; last by eauto 2.
               by move: JINB; move => /andP [_ T].
           }
-          rewrite /job_deadline /job_deadline.job_deadline_from_task_deadline in NOTHEP.
+          rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline in NOTHEP.
           rewrite /D; ssromega.
         }
     Qed.

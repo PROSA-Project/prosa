@@ -1,7 +1,7 @@
 Require Export rt.util.all.
 Require Export rt.restructuring.behavior.all.
 Require Export rt.restructuring.analysis.basic_facts.all.
-Require Export rt.restructuring.model.job.
+Require Export rt.restructuring.analysis.definitions.job_properties.
 Require Export rt.restructuring.model.task.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.

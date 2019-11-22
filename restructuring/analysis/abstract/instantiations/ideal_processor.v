@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.job.
+Require Export rt.restructuring.analysis.definitions.job_properties.
 Require Export rt.restructuring.model.task.
 Require Export rt.restructuring.model.aggregate.workload.
 Require Import rt.restructuring.model.schedule.work_conserving.

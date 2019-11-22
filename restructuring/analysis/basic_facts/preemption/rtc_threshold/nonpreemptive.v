@@ -1,6 +1,6 @@
 Require Import rt.util.all.
 Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.job.
+Require Import rt.restructuring.analysis.definitions.job_properties.
 Require Import rt.restructuring.model.task.
 Require Import rt.restructuring.model.schedule.nonpreemptive.
 Require Import rt.restructuring.model.preemption.valid_model.
