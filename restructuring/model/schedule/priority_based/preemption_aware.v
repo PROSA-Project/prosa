@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.schedule.priority_based.priorities.
+Require Export rt.restructuring.model.priority.classes.
 Require Export rt.restructuring.model.preemption.preemption_time.
 
 (** We now define what it means for a schedule to respect a priority

@@ -4,7 +4,7 @@ Require Export rt.restructuring.analysis.basic_facts.all.
 Require Export rt.restructuring.model.job.
 Require Export rt.restructuring.model.task.
 Require Export rt.restructuring.model.schedule.work_conserving.
-Require Export rt.restructuring.model.schedule.priority_based.priorities.
+Require Export rt.restructuring.model.priority.classes.
 Require Export rt.restructuring.analysis.definitions.no_carry_in.
 Require Export rt.restructuring.analysis.definitions.busy_interval.
 Require Export rt.restructuring.analysis.definitions.priority_inversion.

@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.schedule.priority_based.priorities.
+Require Export rt.restructuring.model.priority.classes.
 Require Export rt.restructuring.model.processor.ideal.
      
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.

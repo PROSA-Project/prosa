@@ -6,7 +6,7 @@ Require Export rt.restructuring.model.aggregate.workload.
 Require Export rt.restructuring.model.aggregate.service_of_jobs.
 Require Export rt.restructuring.model.processor.ideal.
 Require Export rt.restructuring.model.processor.platform_properties.
-Require Import rt.restructuring.model.schedule.priority_based.priorities.
+Require Import rt.restructuring.model.priority.classes.
 
 Require Import rt.restructuring.analysis.basic_facts.arrivals.
 Require Import rt.restructuring.analysis.basic_facts.service.

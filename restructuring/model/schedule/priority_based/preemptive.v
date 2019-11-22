@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.schedule.priority_based.priorities.
+Require Export rt.restructuring.model.priority.classes.
 
 (** We now define what it means for a schedule to respect a priority *)
 (** We only define it for a JLDP policy since the definitions for JLDP and JLFP are the same
