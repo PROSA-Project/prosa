@@ -10,7 +10,7 @@ Require Import rt.restructuring.model.arrival.arrival_curves.
 Require Import rt.restructuring.model.preemption.limited.
 Require Import rt.restructuring.model.schedule.work_conserving.
 Require Import rt.restructuring.model.priority.classes.
-Require Import rt.restructuring.model.schedule.priority_based.edf.
+Require Import rt.restructuring.model.priority.edf.
 Require Import rt.restructuring.model.schedule.priority_based.preemption_aware.
 Require Import rt.restructuring.analysis.arrival.workload_bound.
 Require Import rt.restructuring.analysis.arrival.rbf.
