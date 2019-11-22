@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.preemption.job.instance.limited.
+Require Export rt.restructuring.model.preemption.limited_preemptive.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

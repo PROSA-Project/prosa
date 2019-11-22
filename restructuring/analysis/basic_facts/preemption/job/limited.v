@@ -8,7 +8,7 @@ Require Import rt.restructuring.model.schedule.limited_preemptive.
 Require Import rt.restructuring.model.preemption.parameter.
 Require Import rt.restructuring.model.task.preemption.parameters.
 
-Require Import rt.restructuring.model.preemption.job.instance.limited.
+Require Import rt.restructuring.model.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)
 (** In this section, we prove that instantiation of predicate

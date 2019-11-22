@@ -6,7 +6,7 @@ Require Import rt.restructuring.model.task.concept.
 Require Import rt.restructuring.model.schedule.nonpreemptive.
 
 Require Import rt.restructuring.model.preemption.parameter.
-Require Import rt.restructuring.model.preemption.job.instance.nonpreemptive.
+Require Import rt.restructuring.model.preemption.fully_nonpreemptive.
 
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
