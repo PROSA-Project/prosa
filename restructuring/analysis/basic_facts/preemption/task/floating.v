@@ -9,7 +9,7 @@ Require Import rt.restructuring.model.task.preemption.parameters.
 Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
 Require Import rt.restructuring.model.preemption.job.instance.limited.
 Require Import rt.restructuring.model.preemption.valid_schedule.
-Require Import rt.restructuring.model.preemption.task.instance.floating.
+Require Import rt.restructuring.model.task.preemption.floating_nonpreemptive.
 Require Import rt.restructuring.analysis.basic_facts.preemption.job.limited.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.

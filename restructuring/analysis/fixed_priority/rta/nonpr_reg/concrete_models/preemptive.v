@@ -121,7 +121,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Proof.
     have BLOCK: blocking_bound  higher_eq_priority ts tsk = 0.
     { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-               /preemptive.fully_preemptive_model subnn big1_eq. } 
+               /fully_preemptive.fully_preemptive_model subnn big1_eq. } 
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.      
     all: eauto 2 with basic_facts.
     - by rewrite BLOCK add0n.

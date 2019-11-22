@@ -4,7 +4,7 @@ Require Import rt.restructuring.analysis.definitions.job_properties.
 Require Import rt.restructuring.model.task.concept.
 Require Import rt.restructuring.model.preemption.valid_model.
 Require Import rt.restructuring.model.preemption.job.instance.preemptive.
-Require Import rt.restructuring.model.preemption.task.instance.preemptive.
+Require Import rt.restructuring.model.task.preemption.fully_preemptive.
 Require Import rt.restructuring.analysis.basic_facts.preemption.job.preemptive.
 
 (** * Platform for Fully Premptive Model *)
