@@ -3,7 +3,7 @@ Require Import rt.restructuring.behavior.job.
 Require Import rt.restructuring.behavior.schedule.
 Require Import rt.restructuring.analysis.definitions.job_properties.
 Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+
 Require Import rt.restructuring.model.schedule.limited_preemptive.
 Require Import rt.restructuring.model.preemption.job.parameters.
 Require Import rt.restructuring.model.task.preemption.parameters.

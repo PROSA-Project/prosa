@@ -7,7 +7,7 @@ Require Import rt.restructuring.model.schedule.nonpreemptive.
 Require Import rt.restructuring.model.preemption.valid_model.
 Require Import rt.restructuring.model.preemption.job.parameters.
 Require Import rt.restructuring.model.preemption.job.instance.nonpreemptive.
-Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

@@ -11,7 +11,7 @@ Require Import rt.restructuring.model.arrival.arrival_curves.
 Require Import rt.restructuring.model.preemption.valid_model.
 Require Import rt.restructuring.model.preemption.job.parameters.
 Require Import rt.restructuring.model.task.preemption.parameters.
-Require Import rt.restructuring.model.preemption.rtc_threshold.valid_rtct.
+
 Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
 Require Import rt.restructuring.model.schedule.work_conserving.
 Require Import rt.restructuring.model.priority.classes.
