@@ -5,7 +5,7 @@ Require Import rt.restructuring.model.preemption.valid_model.
 Require Import rt.restructuring.model.preemption.preemption_time.
 Require Import rt.restructuring.model.preemption.job.parameters.
 Require Import rt.restructuring.model.preemption.task.parameters.
-Require Import rt.restructuring.model.schedule.priority_based.preemption_aware.
+Require Import rt.restructuring.model.schedule.priority_driven.
 Require Export rt.restructuring.analysis.definitions.no_carry_in.
 Require Export rt.restructuring.analysis.definitions.busy_interval.
 Require Export rt.restructuring.analysis.definitions.priority_inversion.
