@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.preemption.valid_model.
+Require Export rt.restructuring.model.task.preemption.parameters.
 
 (** * Platform for Fully Preemptive Model *)
 (** In this section, we instantiate function

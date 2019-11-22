@@ -1,5 +1,6 @@
 Require Export rt.util.all.
 Require Export rt.restructuring.model.preemption.job.parameters.
+Require Export rt.restructuring.model.preemption.valid_model.
 Require Export rt.restructuring.model.task.concept.
 (** * Static information about preemption points *)
 
@@ -50,6 +51,84 @@ Section MaxAndLastNonpreemptiveSegment.
     
 End MaxAndLastNonpreemptiveSegment.
 
+
+(** * Validity of a Preemption Model *)
+
+Section PreemptionModel.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** In addition, we assume the existence of a function mapping a
+      task to its maximal non-preemptive segment ... *)
+  Context `{TaskMaxNonpreemptiveSegment Task}.
+
+  (** ... and the existence of a predicate mapping a job and
+      its progress to a boolean value saying whether this job is
+      preemptable at its current point of execution. *)
+  Context `{JobPreemptable Job}.
+
+  (** Consider any kind of processor state model, ... *)
+  Context {PState : Type}.
+  Context `{ProcessorState Job PState}.
+
+  (** ... any job arrival sequence, ... *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** ... and any given schedule. *)
+  Variable sched : schedule PState.
+
+  (** For analysis purposes, it is important that the distance between
+      preemption points of a job is bounded. To ensure that, next we define the
+      model with bounded nonpreemptive segment. *)
+  Section ModelWithBoundedNonpreemptiveSegments.
+
+    (** First we require that [task_max_nonpreemptive_segment] gives an
+        upper bound for values of the function
+        [job_max_nonpreemptive_segment]. *)
+    Definition job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment (j: Job) :=
+      job_max_nonpreemptive_segment j <= task_max_nonpreemptive_segment (job_task j).
+
+  (** Next, we require that all the segments of a job [j] have
+      bounded length. I.e., for any progress [ρ] of job [j] there
+      exists a preemption point [pp] such that [ρ <= pp <= ρ +
+      (job_max_nps j - ε)]. That is, in any time interval of length
+      [job_max_nps j], there exists a preeemption point which lies
+      in this interval. *)
+  Definition nonpreemptive_regions_have_bounded_length (j : Job) :=
+    forall (ρ : duration),
+      0 <= ρ <= job_cost j ->
+      exists (pp : duration),
+        ρ <= pp <= ρ + (job_max_nonpreemptive_segment j - ε) /\
+        job_preemptable j pp.
+
+    (** We say that the schedule enforces bounded nonpreemptive
+        segments iff the predicate [job_preemptable] satisfies the two
+        conditions above. *)
+    Definition model_with_bounded_nonpreemptive_segments :=
+      forall j,
+        arrives_in arr_seq j ->
+        job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment j
+        /\ nonpreemptive_regions_have_bounded_length j.
+
+    (** Finally, we say that the schedule enforces _valid_ bounded
+        nonpreemptive segments iff the predicate [job_preemptable]
+        defines a valid preemption model which has bounded
+        non-preemptive segments . *)
+    Definition valid_model_with_bounded_nonpreemptive_segments :=
+      valid_preemption_model arr_seq sched /\
+      model_with_bounded_nonpreemptive_segments.
+
+  End ModelWithBoundedNonpreemptiveSegments.
+
+End PreemptionModel.
 
 (** * Task's Run-to-Completion Threshold *)
 (** Since a task model may not provide exact information about
