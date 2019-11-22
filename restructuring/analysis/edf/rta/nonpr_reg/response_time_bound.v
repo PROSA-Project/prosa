@@ -15,7 +15,7 @@ Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.jo
 Require Import rt.restructuring.analysis.facts.priority_inversion_is_bounded.
 Require Import rt.restructuring.model.schedule.work_conserving.
 Require Import rt.restructuring.model.priority.classes.
-Require Import rt.restructuring.model.priority.edf.
+Require Import rt.restructuring.analysis.facts.edf.
 Require Import rt.restructuring.model.schedule.priority_driven.
 Require Import rt.restructuring.analysis.arrival.workload_bound.
 Require Import rt.restructuring.analysis.arrival.rbf.
@@ -57,7 +57,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
      Note that we do not relate the EDF policy with the scheduler. However, we 
      define functions for Interference and Interfering Workload that actively use
      the concept of priorities. *)
-  Let EDF := EDF Task Job.
+  Let EDF := EDF Job.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.

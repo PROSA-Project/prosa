@@ -10,7 +10,7 @@ Require Import rt.restructuring.model.arrival.arrival_curves.
 Require Import rt.restructuring.model.preemption.floating.
 Require Import rt.restructuring.model.schedule.work_conserving.
 Require Import rt.restructuring.model.priority.classes.
-Require Import rt.restructuring.model.priority.edf.
+Require Import rt.restructuring.analysis.facts.edf.
 Require Import rt.restructuring.model.schedule.priority_driven.
 Require Import rt.restructuring.analysis.arrival.workload_bound.
 Require Import rt.restructuring.analysis.arrival.rbf.
@@ -42,7 +42,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Let D tsk := task_deadline tsk.
 
   (** Consider the EDF policy that indicates a higher-or-equal priority relation. *)
-  Let EDF := EDF Task Job.
+  Let EDF := EDF Job.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
