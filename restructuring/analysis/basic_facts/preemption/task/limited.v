@@ -6,7 +6,7 @@ Require Import rt.restructuring.model.task.concept.
 Require Import rt.restructuring.model.preemption.valid_model.
 Require Import rt.restructuring.model.preemption.job.parameters.
 Require Import rt.restructuring.model.task.preemption.parameters.
-Require Import rt.restructuring.model.preemption.valid_schedule.
+Require Import rt.restructuring.model.schedule.limited_preemptive.
 Require Import rt.restructuring.model.preemption.job.instance.limited.
 Require Import rt.restructuring.model.task.preemption.limited_preemptive.
 Require Import rt.restructuring.analysis.basic_facts.preemption.job.limited.
