@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.task.
+Require Export rt.restructuring.model.task.concept.
 Require Export rt.restructuring.model.processor.ideal.
 Require Export rt.util.seqset.
 Require Export rt.util.rel.

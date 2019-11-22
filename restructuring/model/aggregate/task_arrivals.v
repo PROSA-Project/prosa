@@ -1,5 +1,4 @@
-Require Export rt.restructuring.model.task.
-
+Require Export rt.restructuring.model.task.concept.
 (** In this file we provide basic definitions related to tasks on arrival sequences. *)
 Section TaskArrivals.
 

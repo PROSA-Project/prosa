@@ -1,5 +1,4 @@
-Require Export rt.restructuring.model.task.
-
+Require Export rt.restructuring.model.task.concept.
 Section PropertyOfSequentiality.
 
   (** Consider any type of job associated with any type of tasks... *)

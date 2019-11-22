@@ -1,7 +1,7 @@
 Require Import rt.util.all.
 
 Require Import rt.restructuring.behavior.all.
-Require Export rt.restructuring.model.task.
+Require Export rt.restructuring.model.task.concept.
 Require Export rt.restructuring.model.aggregate.workload.
 Require Export rt.restructuring.model.aggregate.service_of_jobs.
 Require Export rt.restructuring.model.processor.ideal.

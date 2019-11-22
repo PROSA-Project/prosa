@@ -1,6 +1,6 @@
 Require Import rt.util.all.
 Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.task.concept.
 Require Import rt.restructuring.model.processor.ideal.
   
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

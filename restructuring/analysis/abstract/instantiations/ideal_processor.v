@@ -1,5 +1,5 @@
 Require Export rt.restructuring.analysis.definitions.job_properties.
-Require Export rt.restructuring.model.task.
+Require Export rt.restructuring.model.task.concept.
 Require Export rt.restructuring.model.aggregate.workload.
 Require Import rt.restructuring.model.schedule.work_conserving.
 Require Import rt.restructuring.model.task.sequential.

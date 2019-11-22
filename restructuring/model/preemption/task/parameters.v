@@ -1,6 +1,5 @@
 Require Export rt.util.all.
-Require Export rt.restructuring.model.task.
-
+Require Export rt.restructuring.model.task.concept.
 (** * Static information about preemption points *)
 
 (** Definition of a generic type of parameter relating a task 

@@ -1,6 +1,6 @@
 Require Import rt.util.sum.
 Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.task.
+Require Import rt.restructuring.model.task.concept.
 Require Import rt.restructuring.model.priority.classes.
 Require Import rt.restructuring.model.aggregate.task_arrivals.
 Require Import rt.restructuring.model.arrival.arrival_curves.

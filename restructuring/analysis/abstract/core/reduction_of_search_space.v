@@ -1,7 +1,6 @@
 Require Import rt.util.epsilon.
 Require Import rt.util.tactics.
-Require Import rt.restructuring.model.task.
-
+Require Import rt.restructuring.model.task.concept.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Reduction of the serach space for Abstract RTA *)
