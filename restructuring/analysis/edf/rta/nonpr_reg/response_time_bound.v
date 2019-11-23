@@ -1,6 +1,7 @@
 Require Export rt.restructuring.analysis.facts.priority_inversion_is_bounded.
 Require Export rt.restructuring.analysis.edf.rta.response_time_bound.
 Require Export rt.restructuring.analysis.arrival.rbf.
+Require Import rt.restructuring.model.priority.edf.
 
 Require Import rt.restructuring.model.processor.ideal.
 Require Import rt.restructuring.model.readiness.basic.

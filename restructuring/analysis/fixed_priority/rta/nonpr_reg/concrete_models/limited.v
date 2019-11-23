@@ -7,6 +7,7 @@ Require Import rt.restructuring.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
 
+Require Import rt.restructuring.model.preemption.limited_preemptive.
 Require Import rt.restructuring.model.task.preemption.limited_preemptive.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

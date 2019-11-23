@@ -3,6 +3,9 @@ Require Export rt.restructuring.model.schedule.priority_driven.
 Require Export rt.restructuring.analysis.facts.no_carry_in_exists.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
+
 (** Throughout the file we assume for the classic Liu & Layland model
     of readiness without jitter and no self-suspensions, where
     pending jobs are always ready. *)

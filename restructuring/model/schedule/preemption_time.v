@@ -1,6 +1,8 @@
-Require Export rt.restructuring.model.processor.ideal.
 Require Export rt.restructuring.model.preemption.parameter.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
 
 (** * Preemption Time in Ideal Uni-Processor Model *)
 (** In this section we define the notion of preemption _time_ for

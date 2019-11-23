@@ -2,6 +2,8 @@ Require Export rt.restructuring.analysis.facts.edf.
 Require Export rt.restructuring.model.schedule.priority_driven.
 Require Export rt.restructuring.analysis.facts.no_carry_in_exists.
 Require Export rt.restructuring.analysis.schedulability.
+Require Import rt.restructuring.model.priority.edf.
+Require Import rt.restructuring.model.task.absolute_deadline.
 
 Require Import rt.restructuring.model.processor.ideal.
 Require Import rt.restructuring.model.readiness.basic.

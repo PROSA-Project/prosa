@@ -2,7 +2,7 @@ Require Export rt.restructuring.analysis.basic_facts.all.
 Require Export rt.restructuring.analysis.definitions.job_properties.
 Require Export rt.restructuring.model.schedule.limited_preemptive.
 
-Require Export rt.restructuring.model.preemption.limited_preemptive.
+Require Import rt.restructuring.model.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)
 (** In this section, we prove that instantiation of predicate

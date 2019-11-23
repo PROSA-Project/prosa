@@ -4,6 +4,7 @@ Require Import rt.restructuring.model.readiness.basic.
 Require Import rt.restructuring.analysis.edf.rta.nonpr_reg.response_time_bound.
 Require Export rt.restructuring.analysis.basic_facts.preemption.task.preemptive.
 Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.preemptive.
+Require Import rt.restructuring.model.priority.edf.
 
 (** Assume we have a fully preemptive model. *)
 Require Import rt.restructuring.model.task.preemption.fully_preemptive.

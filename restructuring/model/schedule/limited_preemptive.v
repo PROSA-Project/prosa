@@ -1,7 +1,8 @@
-Require Export rt.restructuring.model.processor.ideal.
-Require Export rt.restructuring.model.preemption.parameter.
- 
+Require Export rt.restructuring.model.preemption.parameter. 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
 
 (** * Schedule with Limited Preemptions *)
 (** In this section we introduce the notion of preemptions-aware

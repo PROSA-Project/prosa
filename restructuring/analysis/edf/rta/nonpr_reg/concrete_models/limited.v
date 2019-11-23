@@ -1,8 +1,10 @@
 Require Export rt.restructuring.analysis.edf.rta.nonpr_reg.response_time_bound.
 Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.limited.
+Require Import rt.restructuring.model.priority.edf.
 
 Require Import rt.restructuring.model.processor.ideal.
 Require Import rt.restructuring.model.readiness.basic.
+Require Import rt.restructuring.model.preemption.limited_preemptive.
 Require Import rt.restructuring.model.task.preemption.limited_preemptive.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

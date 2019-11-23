@@ -1,5 +1,7 @@
-Require Export rt.restructuring.model.readiness.basic.
 Require Import rt.restructuring.analysis.basic_facts.completion.
+
+(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+Require Import rt.restructuring.model.readiness.basic.
 
 Section LiuAndLaylandReadiness.
   (** Consider any kind of jobs... *)

@@ -1,8 +1,10 @@
 Require Export rt.restructuring.model.task.concept.
-Require Export rt.restructuring.model.processor.ideal.
 Require Export rt.util.seqset.
 Require Export rt.util.rel.
 From mathcomp Require Export ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop div.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
 
 (** In this section, we define the TDMA policy.*)
 Section TDMAPolicy.

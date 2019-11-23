@@ -1,5 +1,5 @@
-Require Export rt.restructuring.model.priority.edf.
-Require Export rt.restructuring.model.task.absolute_deadline.
+Require Import rt.restructuring.model.priority.edf.
+Require Import rt.restructuring.model.task.absolute_deadline.
 
 (** In this section, we prove a few properties about EDF policy. *)
 Section PropertiesOfEDF.

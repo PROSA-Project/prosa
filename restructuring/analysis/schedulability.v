@@ -1,5 +1,5 @@
-Require Export rt.restructuring.model.task.absolute_deadline.
 Require Export rt.restructuring.analysis.basic_facts.completion.
+Require Import rt.restructuring.model.task.absolute_deadline.
 
 Section Task.
   Context {Task : TaskType}.
