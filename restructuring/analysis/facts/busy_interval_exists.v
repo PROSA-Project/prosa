@@ -2,14 +2,13 @@ Require Export rt.restructuring.analysis.definitions.job_properties.
 Require Export rt.restructuring.model.schedule.work_conserving.
 Require Export rt.restructuring.analysis.definitions.priority_inversion.
 Require Export rt.restructuring.analysis.basic_facts.all.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of

@@ -1,9 +1,8 @@
 Require Export rt.restructuring.model.task.concept.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import rt.restructuring.model.processor.ideal.
-  
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+Require Import rt.restructuring.model.processor.ideal.  
 
 (** * Definitions for Abstract Response-Time Analysis *)
 (** In this module, we propose a set of definitions for the general framework for response-time analysis (RTA) 

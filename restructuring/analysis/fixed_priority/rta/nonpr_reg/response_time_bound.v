@@ -2,14 +2,13 @@ Require Export rt.restructuring.analysis.schedulability.
 Require Export rt.restructuring.analysis.arrival.workload_bound.
 Require Export rt.restructuring.analysis.fixed_priority.rta.response_time_bound.
 Require Export rt.restructuring.analysis.facts.priority_inversion_is_bounded.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * RTA for FP-schedulers with Bounded Non-Preemprive Segments *)
 

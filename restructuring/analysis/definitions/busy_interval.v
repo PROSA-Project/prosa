@@ -1,10 +1,9 @@
 Require Export rt.restructuring.model.priority.classes.
 Require Export rt.restructuring.analysis.basic_facts.completion.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** * Busy Interval for JLFP-models *)
 (** In this file we define the notion of busy intervals for uniprocessor for JLFP schedulers. *)

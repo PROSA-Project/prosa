@@ -1,13 +1,12 @@
 Require Export rt.restructuring.analysis.definitions.no_carry_in.
 Require Export rt.restructuring.analysis.facts.busy_interval_exists.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** * Existence of No Carry-In Instant *)
 

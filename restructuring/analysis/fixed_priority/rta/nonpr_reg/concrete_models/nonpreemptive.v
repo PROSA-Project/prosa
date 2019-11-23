@@ -1,6 +1,7 @@
 Require Export rt.restructuring.analysis.fixed_priority.rta.nonpr_reg.response_time_bound.
 Require Export rt.restructuring.analysis.basic_facts.preemption.task.nonpreemptive.
 Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.nonpreemptive.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
@@ -8,9 +9,8 @@ Require Import rt.restructuring.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
 
+(** Throughout this file, we assume the fully non-preemptive task model. *)
 Require Import rt.restructuring.model.task.preemption.fully_nonpreemptive.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * RTA for Fully Non-Preemptive FP Model *)
 (** In this module we prove the RTA theorem for the fully non-preemptive FP model. *)

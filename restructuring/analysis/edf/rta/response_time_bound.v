@@ -4,12 +4,15 @@ Require Export rt.restructuring.analysis.facts.no_carry_in_exists.
 Require Export rt.restructuring.analysis.schedulability.
 Require Import rt.restructuring.model.priority.edf.
 Require Import rt.restructuring.model.task.absolute_deadline.
-
-Require Import rt.restructuring.model.processor.ideal.
-Require Import rt.restructuring.model.readiness.basic.
 Require Import rt.restructuring.analysis.abstract.instantiations.ideal_processor.
-
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
+
+(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+Require Import rt.restructuring.model.readiness.basic.
+
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis

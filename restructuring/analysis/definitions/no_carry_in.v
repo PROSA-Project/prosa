@@ -1,9 +1,8 @@
 Require Export rt.restructuring.model.priority.classes.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** * No Carry-In *)
 (** In this module we define the notion of no carry-in time for uniprocessor schedulers. *)

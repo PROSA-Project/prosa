@@ -2,11 +2,13 @@ Require Export rt.restructuring.analysis.facts.priority_inversion_is_bounded.
 Require Export rt.restructuring.analysis.edf.rta.response_time_bound.
 Require Export rt.restructuring.analysis.arrival.rbf.
 Require Import rt.restructuring.model.priority.edf.
-
-Require Import rt.restructuring.model.processor.ideal.
-Require Import rt.restructuring.model.readiness.basic.
-
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
+
+(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+Require Import rt.restructuring.model.readiness.basic.
 
 (** * RTA for EDF-schedulers with Bounded Non-Preemprive Segments *)
 

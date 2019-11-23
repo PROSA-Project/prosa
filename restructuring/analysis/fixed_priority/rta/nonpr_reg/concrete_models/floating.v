@@ -1,5 +1,6 @@
 Require Export rt.restructuring.analysis.fixed_priority.rta.nonpr_reg.response_time_bound.
 Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.floating.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
@@ -7,10 +8,9 @@ Require Import rt.restructuring.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
 
+(** Throughout this file, we assume the task model with floating non-preemptive regions. *)
 Require Import rt.restructuring.model.preemption.limited_preemptive.
 Require Import rt.restructuring.model.task.preemption.floating_nonpreemptive.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * RTA for Model with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating

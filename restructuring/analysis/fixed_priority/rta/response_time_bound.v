@@ -1,14 +1,13 @@
 Require Export rt.restructuring.model.schedule.priority_driven.
 Require Export rt.restructuring.analysis.facts.busy_interval_exists.
 Require Import rt.restructuring.analysis.abstract.instantiations.ideal_processor.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
