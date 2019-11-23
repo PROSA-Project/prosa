@@ -11,9 +11,11 @@ For example, a higher-level result can choose to assume either the classic Liu&L
 
 If there is a central concept (e.g., notion of readiness, processor model, arrival model, etc.) for which there are multiple reasonable competing definitions (e.g., different readiness models such as release jitter or self-suspensions, different uni- or multiprocessor models, or different arrival models such as periodic vs. sporadic tasks vs. arbitrary arrival curves), then:
 
-1. create a folder/module corresponding to the high-level concept (e.g., `readiness`, `processor`, `arrival`, etc.), and 
+1. create a folder/module corresponding to the high-level concept (e.g., `readiness`, `processor`, `arrival`, etc.), 
 
-2. provide different, mutually exclusive modelling assumptions as individual files/sub-modules (e.g., `readiness.basic` vs. `readiness.jitter`, `processor.ideal` vs. `processor.varspeed`, `arrival.sporadic` vs. `arrival.arrival_curves`).
+2. provide different, mutually exclusive modelling assumptions as individual files/sub-modules (e.g., `readiness.basic` vs. `readiness.jitter`, `processor.ideal` vs. `processor.varspeed`, `arrival.sporadic` vs. `arrival.arrival_curves`), and 
+
+3. when used in other files, modules that define new `Instance`s should be `Import`ed (not `Export`ed) to avoid adding implicit instantiations for generic concepts. 
 
 This allows higher-level results to clearly state assumptions in an elegant way. For instance, it is intuitively understandable what `From prosa.model Require Import processor.ideal` means.
 
