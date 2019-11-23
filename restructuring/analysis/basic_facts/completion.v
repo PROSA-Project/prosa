@@ -1,8 +1,5 @@
-Require Export rt.restructuring.behavior.all.
 Require Export rt.restructuring.analysis.basic_facts.service.
 Require Export rt.restructuring.analysis.basic_facts.arrivals.
-
-Require Export rt.util.nat.
 
 (** In this file, we establish basic facts about job completions. *)
 

@@ -1,6 +1,9 @@
 From mathcomp Require Import all_ssreflect.
+Require Export rt.restructuring.model.processor.platform_properties.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
-Require Import rt.restructuring.model.processor.platform_properties.
+
 (** Note: we do not re-export the basic definitions to avoid littering the global
    namespace with type class instances. *)
 

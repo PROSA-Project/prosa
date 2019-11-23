@@ -1,13 +1,7 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.basic_facts.all.
+Require Export rt.restructuring.analysis.basic_facts.preemption.job.nonpreemptive.
 
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.schedule.nonpreemptive.
 Require Import rt.restructuring.model.preemption.fully_nonpreemptive.
 Require Import rt.restructuring.model.task.preemption.fully_nonpreemptive.
-Require Import rt.restructuring.analysis.basic_facts.preemption.job.nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

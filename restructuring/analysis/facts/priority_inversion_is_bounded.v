@@ -1,15 +1,5 @@
-Require Import rt.util.all.
-Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.basic_facts.all.
-
-Require Import rt.restructuring.model.schedule.preemption_time.
-Require Import rt.restructuring.model.preemption.parameter.
-Require Import rt.restructuring.model.task.preemption.parameters.
-Require Import rt.restructuring.model.schedule.priority_driven.
-Require Export rt.restructuring.analysis.definitions.no_carry_in.
-Require Export rt.restructuring.analysis.definitions.busy_interval.
-Require Export rt.restructuring.analysis.definitions.priority_inversion.
-Require Export rt.restructuring.analysis.facts.busy_interval_exists.
+Require Export rt.restructuring.model.task.preemption.parameters.
+Require Export rt.restructuring.model.schedule.priority_driven.
 Require Export rt.restructuring.analysis.facts.no_carry_in_exists.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

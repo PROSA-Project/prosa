@@ -1,9 +1,8 @@
-Require Export rt.util.all.
-Require Export rt.restructuring.behavior.all.
-Require Export rt.restructuring.analysis.basic_facts.all.
-Require Export rt.restructuring.analysis.definitions.job_properties.
-Require Export rt.restructuring.model.task.concept.
-Require Export rt.restructuring.model.schedule.work_conserving.
+Require Export rt.restructuring.model.priority.classes.
+Require Export rt.restructuring.analysis.basic_facts.completion.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

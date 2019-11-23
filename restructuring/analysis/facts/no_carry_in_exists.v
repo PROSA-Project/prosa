@@ -1,18 +1,10 @@
-Require Export rt.util.all.
-Require Export rt.restructuring.behavior.all.
-Require Export rt.restructuring.analysis.basic_facts.all.
-Require Export rt.restructuring.analysis.definitions.job_properties.
-Require Export rt.restructuring.model.task.concept.
-Require Export rt.restructuring.model.schedule.work_conserving.
-Require Export rt.restructuring.model.priority.classes.
 Require Export rt.restructuring.analysis.definitions.no_carry_in.
-Require Export rt.restructuring.analysis.definitions.busy_interval.
-Require Export rt.restructuring.analysis.definitions.priority_inversion.
 Require Export rt.restructuring.analysis.facts.busy_interval_exists.
 
-(** Throughout the file we assume for the classic Liu & Layland model
-   of readiness without jitter and no self-suspensions, where prending
-   jobs are always ready. *)
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
+
+(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.

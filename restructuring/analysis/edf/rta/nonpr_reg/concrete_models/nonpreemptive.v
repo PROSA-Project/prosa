@@ -1,25 +1,11 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.basic_facts.all.
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.aggregate.workload.
 Require Import rt.restructuring.model.processor.ideal.
 Require Import rt.restructuring.model.readiness.basic.
-Require Import rt.restructuring.model.arrival.arrival_curves.
-Require Import rt.restructuring.model.schedule.work_conserving.
-Require Import rt.restructuring.model.priority.classes.
-Require Import rt.restructuring.analysis.facts.edf.
-Require Import rt.restructuring.model.schedule.priority_driven.
-Require Import rt.restructuring.analysis.arrival.workload_bound.
-Require Import rt.restructuring.analysis.arrival.rbf.
-Require Import rt.restructuring.analysis.edf.rta.nonpr_reg.response_time_bound.
-Require Export rt.restructuring.analysis.basic_facts.preemption.job.nonpreemptive.
+
+Require Export rt.restructuring.analysis.edf.rta.nonpr_reg.response_time_bound.
 Require Export rt.restructuring.analysis.basic_facts.preemption.task.nonpreemptive.
 Require Export rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.nonpreemptive.
 
 (** Assume we have a fully non-preemptive model. *)
-Require Import rt.restructuring.model.schedule.nonpreemptive.
 Require Import rt.restructuring.model.task.preemption.fully_nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

@@ -1,23 +1,13 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.basic_facts.all.
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.aggregate.workload.
-Require Import rt.restructuring.model.processor.ideal.
-Require Import rt.restructuring.model.readiness.basic.
-Require Import rt.restructuring.model.arrival.arrival_curves.
-
-Require Import rt.restructuring.model.preemption.parameter.
-Require Import rt.restructuring.model.task.preemption.parameters.
-
-Require Import rt.restructuring.model.schedule.work_conserving.
-Require Import rt.restructuring.model.priority.classes.
-Require Import rt.restructuring.model.schedule.priority_driven.
-Require Import rt.restructuring.analysis.arrival.workload_bound.
-Require Import rt.restructuring.analysis.arrival.rbf.
+Require Export rt.restructuring.analysis.schedulability.
+Require Export rt.restructuring.analysis.arrival.workload_bound.
 Require Export rt.restructuring.analysis.fixed_priority.rta.response_time_bound.
-Require Import rt.restructuring.analysis.facts.priority_inversion_is_bounded.
+Require Export rt.restructuring.analysis.facts.priority_inversion_is_bounded.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
+Require Import rt.restructuring.model.processor.ideal.
+
+(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+Require Import rt.restructuring.model.readiness.basic.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

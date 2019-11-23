@@ -1,15 +1,7 @@
-Require Import rt.util.all.
-Require Import rt.util.nondecreasing.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
+Require Export rt.restructuring.analysis.basic_facts.preemption.job.limited.
 
-Require Import rt.restructuring.model.preemption.parameter.
-Require Import rt.restructuring.model.task.preemption.parameters.
-Require Import rt.restructuring.model.schedule.limited_preemptive.
 Require Import rt.restructuring.model.preemption.limited_preemptive.
 Require Import rt.restructuring.model.task.preemption.limited_preemptive.
-Require Import rt.restructuring.analysis.basic_facts.preemption.job.limited.
 
 (** * Platform for Models with Limited Preemptions *)
 (** In this section, we prove that instantiation of functions

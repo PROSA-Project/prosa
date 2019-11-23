@@ -1,5 +1,3 @@
-Require Export rt.restructuring.behavior.all.
-Require Export rt.restructuring.analysis.basic_facts.service.
 Require Export rt.restructuring.analysis.basic_facts.completion.
 
 (** In this file, we observe basic properties of the behavioral job

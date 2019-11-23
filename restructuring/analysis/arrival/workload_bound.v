@@ -1,12 +1,6 @@
-Require Import rt.util.sum.
-Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.priority.classes.
-Require Import rt.restructuring.model.aggregate.task_arrivals.
-Require Import rt.restructuring.model.arrival.arrival_curves.
-Require Import rt.restructuring.analysis.basic_facts.workload.
-Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
-Require Import rt.restructuring.analysis.basic_facts.arrivals.
+Require Export rt.restructuring.analysis.basic_facts.workload.
+Require Export rt.restructuring.analysis.basic_facts.ideal_schedule.
+Require Export rt.restructuring.model.arrival.arrival_curves.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

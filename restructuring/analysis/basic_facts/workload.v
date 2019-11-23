@@ -1,7 +1,5 @@
-Require Export rt.restructuring.behavior.all.
 Require Export rt.restructuring.model.aggregate.workload.
-Require Export rt.restructuring.model.priority.classes.
-Require Import rt.restructuring.analysis.basic_facts.arrivals.
+Require Export rt.restructuring.analysis.basic_facts.arrivals.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

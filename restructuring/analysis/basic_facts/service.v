@@ -1,11 +1,7 @@
-From mathcomp Require Import ssrnat ssrbool fintype.
-
-Require Export rt.restructuring.behavior.all.
+Require Export rt.util.all.
 Require Export rt.restructuring.analysis.basic_facts.ideal_schedule.
-Require Export rt.restructuring.model.processor.platform_properties.
-Require Import rt.util.tactics.
-Require Import rt.util.step_function.
-Require Import rt.util.sum.
+
+From mathcomp Require Import ssrnat ssrbool fintype.
 
 (** In this file, we establish basic facts about the service received by
     jobs. *)

@@ -1,6 +1,6 @@
-Require Import rt.util.all.
-Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.model.task.concept.
+Require Export rt.restructuring.model.task.concept.
+
+(** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
   
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

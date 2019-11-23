@@ -1,11 +1,7 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
+Require Export rt.restructuring.analysis.definitions.job_properties.
+Require Export rt.restructuring.analysis.basic_facts.preemption.job.preemptive.
 
-Require Import rt.restructuring.model.preemption.fully_preemptive.
 Require Import rt.restructuring.model.task.preemption.fully_preemptive.
-Require Import rt.restructuring.analysis.basic_facts.preemption.job.preemptive.
 
 (** * Platform for Fully Premptive Model *)
 (** In this section, we prove that instantiation of functions

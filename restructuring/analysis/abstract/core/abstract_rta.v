@@ -1,17 +1,6 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
-
-Require Import rt.restructuring.model.preemption.parameter.
-Require Import rt.restructuring.model.task.preemption.parameters.
-
-Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
-Require Import rt.restructuring.analysis.schedulability.
-Require Import rt.restructuring.analysis.basic_facts.all.
-Require Import rt.restructuring.analysis.abstract.core.definitions.
-Require Import rt.restructuring.analysis.abstract.core.reduction_of_search_space.
-Require Import rt.restructuring.analysis.abstract.core.sufficient_condition_for_run_to_completion_threshold.
+Require Export rt.restructuring.analysis.schedulability.
+Require Export rt.restructuring.analysis.abstract.core.reduction_of_search_space.
+Require Export rt.restructuring.analysis.abstract.core.sufficient_condition_for_run_to_completion_threshold.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

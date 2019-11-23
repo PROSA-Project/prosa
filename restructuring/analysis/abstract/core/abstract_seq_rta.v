@@ -1,28 +1,7 @@
-Require Import rt.util.all.
-Require Import rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
-
-
-Require Import rt.restructuring.model.preemption.parameter.
-Require Import rt.restructuring.model.task.preemption.parameters.
-Require Import rt.restructuring.analysis.basic_facts.preemption.rtc_threshold.job_preemptable.
-Require Import rt.restructuring.model.arrival.arrival_curves.
-
-Require Import rt.restructuring.model.task.sequentiality.
-Require Import rt.restructuring.analysis.schedulability.
-Require Import rt.restructuring.analysis.basic_facts.ideal_schedule.
-Require Import rt.restructuring.analysis.basic_facts.workload.
-Require Import rt.restructuring.analysis.task_schedule.
-Require Import rt.restructuring.analysis.arrival.workload_bound.
-Require Import rt.restructuring.analysis.arrival.rbf.
-Require Import rt.restructuring.analysis.basic_facts.all.
-Require Import rt.restructuring.analysis.basic_facts.task_arrivals.
-
-Require Import rt.restructuring.analysis.abstract.core.definitions.
-Require Import rt.restructuring.analysis.abstract.core.reduction_of_search_space.
-Require Import rt.restructuring.analysis.abstract.core.sufficient_condition_for_run_to_completion_threshold.
-Require Import rt.restructuring.analysis.abstract.core.abstract_rta.
+Require Export rt.restructuring.analysis.task_schedule.
+Require Export rt.restructuring.analysis.arrival.rbf.
+Require Export rt.restructuring.analysis.basic_facts.task_arrivals.
+Require Export rt.restructuring.analysis.abstract.core.abstract_rta.
   
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

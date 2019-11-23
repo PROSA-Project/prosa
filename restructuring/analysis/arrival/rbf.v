@@ -1,10 +1,5 @@
-Require Import rt.util.all.
-Require Export rt.restructuring.behavior.all.
-Require Import rt.restructuring.analysis.definitions.job_properties.
-Require Import rt.restructuring.model.task.concept.
-Require Import rt.restructuring.model.aggregate.task_arrivals.
-Require Import rt.restructuring.model.arrival.arrival_curves.
-Require Import rt.restructuring.analysis.arrival.workload_bound.
+Require Export rt.restructuring.analysis.definitions.job_properties.
+Require Export rt.restructuring.analysis.arrival.workload_bound.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
