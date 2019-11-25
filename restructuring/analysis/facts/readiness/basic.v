@@ -1,4 +1,4 @@
-Require Import rt.restructuring.analysis.basic_facts.completion.
+Require Import rt.restructuring.analysis.facts.behavior.completion.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import rt.restructuring.model.readiness.basic.
