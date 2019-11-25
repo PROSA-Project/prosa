@@ -1,7 +1,5 @@
 Require Export rt.restructuring.model.task.preemption.parameters.
 
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
-
 (** * Platform for Fully Non-Preemptive Model *)
 (** In this section, we instantiate function
    [task_max_nonpreemptive_segment] for the fully non-preemptive
@@ -21,9 +19,6 @@ Section FullyNonPreemptiveModel.
     }.
                                                      
 End FullyNonPreemptiveModel.
-
-
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we instantiate function [task run to completion

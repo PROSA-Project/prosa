@@ -17,8 +17,6 @@ Section FullyPreemptiveModel.
   
 End FullyPreemptiveModel.
 
-Require Export rt.restructuring.model.task.preemption.parameters.
-
 (** * Task's Run to Completion Threshold *)
 (** In this section, we instantiate function [task run to completion
    threshold] for the fully preemptive model. *)
