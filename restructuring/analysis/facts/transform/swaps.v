@@ -295,11 +295,11 @@ Section SwappedScheduleProperties.
   Hypothesis H_order: t1 <= t2.
 
   (** We let [sched'] denote the schedule in which the allocations at
-     [t1] and [t2] have been swapped. *)
+      [t1] and [t2] have been swapped. *)
   Let sched' := swapped sched t1 t2.
 
-  (** First, we observe that if jobs never accomulate more service than
-     required, then that's still the case after the swap. *)
+  (** First, we observe that if jobs never accumulate more service than
+      required, then that's still the case after the swap. *)
   Lemma swapped_service_bound:
     (forall j t, service sched  j t <= job_cost j) ->
     (forall j t, service sched' j t <= job_cost j).

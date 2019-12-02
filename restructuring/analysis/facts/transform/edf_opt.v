@@ -7,9 +7,9 @@ Require Export rt.restructuring.analysis.facts.readiness.basic.
 
 (** This file contains the main argument of the EDF optimality proof,
     starting with an analysis of the individual functions that drive
-    the "EDF-ication" of a given reference schedule and ending with
-    the proofs of individual properties of the obtained EDF
-    schedule. *)
+    the piece-wise transformation of a given reference schedule in an
+    EDF schedule, and ending with proofs of individual properties of
+    the obtained EDF schedule. *)
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
@@ -170,7 +170,7 @@ End FindSwapCandidateFacts.
 
 
 (** In the next section, we analyze properties of [make_edf_at], which
-    we abbreviate as "mea" in the following. *)
+    we abbreviate as "[mea]" in the following. *)
 Section MakeEDFAtFacts.
 
   (** For any given type of jobs... *)
@@ -279,13 +279,14 @@ Section MakeEDFAtFacts.
 
   (** Next comes a big step in the optimality proof: we observe that
      [make_edf_at] indeed ensures that [EDF_at] holds at time [t_edf] in
-     sched'. As this is a larger argument, we proceed by case analysis and
+     [sched']. As this is a larger argument, we proceed by case analysis and
      first establish a couple of helper lemmas in the following section. *)
   Section GuaranteeCaseAnalysis.
 
-    (** Let j_orig denote the job scheduled in sched at time t_edf, let j_edf
-       denote the job scheduled in sched' at time t_edf, and let j' denote any
-       job scheduled in sched' at some time t' after t_edf...  *)
+    (** Let [j_orig] denote the job scheduled in [sched] at time
+        [t_edf], let [j_edf] denote the job scheduled in [sched'] at
+        time [t_edf], and let [j'] denote any job scheduled in
+        [sched'] at some time [t'] after [t_edf]...  *)
     Variable j_orig j_edf j': Job.
 
     Variable t': instant.
@@ -295,18 +296,18 @@ Section MakeEDFAtFacts.
     Hypothesis H_sched_edf: scheduled_at sched' j_edf t_edf.
     Hypothesis H_sched': scheduled_at sched' j' t'.
 
-    (** ... and that arrives before time t_edf. *)
+    (** ... and that arrives before time [t_edf]. *)
     Hypothesis H_arrival_j' : job_arrival j' <= t_edf.
 
     (** We begin by observing three simple facts that will be used repeatedly in
-       the case analysis. *)
+        the case analysis. *)
 
-    (** First, the deadline of j_orig is later than t_edf. *)
+    (** First, the deadline of [j_orig] is later than [t_edf]. *)
     Fact mea_guarantee_dl_orig: t_edf < job_deadline j_orig.
     Proof. by apply (scheduled_job_in_sched_has_later_deadline j_orig t_edf H_sched_orig). Qed.
 
-    (** Second, by the definition of sched', j_edf is scheduled in sched at the time
-       returned by [find_swap_candidate]. *)
+    (** Second, by the definition of [sched'], [j_edf] is scheduled in
+        [sched] at the time returned by [find_swap_candidate]. *)
     Fact mea_guarantee_fsc_is_j_edf: sched (find_swap_candidate sched t_edf j_orig) = Some j_edf.
     Proof.
       move: (H_sched_orig). rewrite scheduled_at_def => /eqP SCHED.
@@ -317,7 +318,8 @@ Section MakeEDFAtFacts.
       - by rewrite ifT // => /eqP.
     Qed.
 
-    (** Third, the deadline of j_edf is no later than the deadline of j_orig. *)
+    (** Third, the deadline of [j_edf] is no later than the deadline
+        of [j_orig]. *)
     Fact mea_guarantee_deadlines: job_deadline j_edf <= job_deadline j_orig.
     Proof.
       apply: (fsc_no_later_deadline sched _ _ t_edf) => //.
@@ -327,11 +329,12 @@ Section MakeEDFAtFacts.
 
     (** With the setup in place, we are now ready to begin the case analysis. *)
 
-    (** First, we consider the simpler case where t' is no earlier than the
-       deadline of j_orig. This case is simpler because t' being no earlier
-       than j_orig's deadline implies that j' has deadline no earlier than
-       j_orig (since no scheduled job in sched misses a deadline), which in
-       turn has a deadline no earlier than j_edf.  *)
+    (** First, we consider the simpler case where [t'] is no earlier
+        than the deadline of [j_orig]. This case is simpler because
+        [t'] being no earlier than [j_orig]'s deadline implies that
+        [j'] has deadline no earlier than [j_orig] (since no scheduled
+        job in [sched] misses a deadline), which in turn has a
+        deadline no earlier than [j_edf].  *)
     Lemma mea_guarantee_case_t'_past_deadline:
       job_deadline j_orig <= t' ->
       job_deadline j_edf <= job_deadline j'.
@@ -343,8 +346,8 @@ Section MakeEDFAtFacts.
       by apply ltnW.
     Qed.
 
-    (** Next, we consider the more difficult case, where t' is before the
-       deadline of j_orig. *)
+    (** Next, we consider the more difficult case, where [t'] is
+        before the deadline of [j_orig]. *)
     Lemma mea_guarantee_case_t'_before_deadline:
       t' < job_deadline j_orig ->
       job_deadline j_edf <= job_deadline j'.
@@ -378,8 +381,9 @@ Section MakeEDFAtFacts.
 
   End GuaranteeCaseAnalysis.
 
-  (** Finally, putting the preceding case analysis together, we obtain the
-     result that [make_edf_at] establishes [EDF_at] at time [t_edf]. *)
+  (** Finally, putting the preceding cases together, we obtain the
+      result that [make_edf_at] establishes [EDF_at] at time
+      [t_edf]. *)
   Lemma make_edf_at_guarantee:
     EDF_at sched' t_edf.
   Proof.
@@ -394,8 +398,8 @@ Section MakeEDFAtFacts.
       by apply: (mea_guarantee_case_t'_past_deadline j_orig j_edf j' t').
   Qed.
 
-  (** We observe that [make_edf_at] maintains the property that jobs must arrive
-     to execute. *)
+  (** We observe that [make_edf_at] maintains the property that jobs
+      must arrive to execute. *)
   Lemma mea_jobs_must_arrive:
     jobs_must_arrive_to_execute sched'.
   Proof.
@@ -535,7 +539,7 @@ Section EDFPrefixFacts.
   (** Consider any point in time, denoted [horizon], and... *)
   Variable horizon: instant.
 
-  (** ...let [sched'] denote the schedule obtained by EDF-ifying
+  (** ...let [sched'] denote the schedule obtained by transforming
      [sched] up to the horizon. *)
   Let sched' := edf_transform_prefix sched horizon.
 
@@ -707,8 +711,8 @@ Section EDFPrefixInclusion.
 End EDFPrefixInclusion.
 
 
-(** In the following section, we finally establish properties of the overall
-    EDF-ication operation [edf_transform]. *)
+(** In the following section, we finally establish properties of the
+    overall EDF transformation[edf_transform]. *)
 Section EDFTransformFacts.
 
   (** For any given type of jobs... *)

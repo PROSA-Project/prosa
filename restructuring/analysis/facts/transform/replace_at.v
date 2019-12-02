@@ -21,12 +21,12 @@ Section ReplaceAtFacts.
   (** ...and a replacement state [state]. *)
   Variable nstate: PState.
 
-  (** In the following, let sched' denote the schedule with replacement at time
+  (** In the following, let [sched'] denote the schedule with replacement at time
      t'. *)
   Let sched' := replace_at sched t' nstate.
 
   (** We begin with the trivial observation that the schedule doesn't change at
-     other times. *)
+      other times. *)
   Lemma rest_of_schedule_invariant:
     forall t, t <> t' -> sched' t = sched t.
   Proof.
@@ -36,8 +36,8 @@ Section ReplaceAtFacts.
     by move/eqP in TT; rewrite TT in DIFF; contradiction.
   Qed.
 
-  (** As a result, the service in intervals that do not intersect with t' is
-     invariant, too. *)
+  (** As a result, the service in intervals that do not intersect with
+      [t'] is invariant, too. *)
   Lemma service_at_other_times_invariant:
     forall t1 t2,
       t2 <= t' \/ t' < t1 ->
@@ -54,10 +54,10 @@ Section ReplaceAtFacts.
     apply /andP; by split.
   Qed.
 
-  (** Next, we consider the amount of service received in intervals that do span
-     across the replacement point.  We can relate the service received in the
-     original and the new schedules by adding the service in the respective
-     "missing" state... *)
+  (** Next, we consider the amount of service received in intervals
+      that do span across the replacement point.  We can relate the
+      service received in the original and the new schedules by adding
+      the service in the respective "missing" state... *)
   Lemma service_delta:
     forall t1 t2,
       t1 <= t' < t2 ->
@@ -82,10 +82,11 @@ Section ReplaceAtFacts.
         service_during sched  j t1 t2 + service_at sched' j t' - service_at sched j t'.
   Proof. move => t1 t2 ORDER j. by rewrite service_delta// addnK. Qed.
 
-  (** As another simple invariant (useful for case analysis), we observe that if
-     a job is scheduled neither in the replaced nor in the new state, then at
-     any time it receives exactly the same amount of service in the new
-     schedule with replacements as in the original schedule. *)
+  (** As another simple invariant (useful for case analysis), we
+      observe that if a job is scheduled neither in the replaced nor
+      in the new state, then at any time it receives exactly the same
+      amount of service in the new schedule with replacements as in
+      the original schedule. *)
   Lemma service_at_of_others_invariant (j: Job):
     ~~ scheduled_in j (sched' t') ->
     ~~ scheduled_in j (sched t') ->
@@ -99,9 +100,10 @@ Section ReplaceAtFacts.
     - rewrite rest_of_schedule_invariant//.
   Qed.
 
-  (** Based on the previous observation, we can trivially lift the invariant
-     that jobs not involved in the replacement receive equal service to the
-     cumulative service received in any interval. *)
+  (** Based on the previous observation, we can trivially lift the
+      invariant that jobs not involved in the replacement receive
+      equal service to the cumulative service received in any
+      interval. *)
   Corollary service_during_of_others_invariant (j: Job):
     ~~ scheduled_in j (sched' t') ->
     ~~ scheduled_in j (sched t') ->
