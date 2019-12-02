@@ -25,7 +25,7 @@ Class JobReady (Job : JobType) (PState : Type)
 (** Based on the general notion of readiness, we define what it means to be
    backlogged, i.e., ready to run but not executing. *)
 Section Backlogged.
-  (** Conside any kinds of jobs and any kind of processor state. *)
+  (** Consider any kinds of jobs and any kind of processor state. *)
   Context {Job : JobType} {PState : Type}.
   Context `{ProcessorState Job PState}.
 
@@ -79,7 +79,7 @@ Section ValidSchedule.
     jobs_must_be_ready_to_execute.
 
   (** Note that we do not explicitly require that a valid schedule satisfies
-     jobs_must_arrive_to_execute or completed_jobs_dont_execute because these
+     [jobs_must_arrive_to_execute] or [completed_jobs_dont_execute] because these
      properties are implied by jobs_must_be_ready_to_execute. *)
 
 End ValidSchedule.

@@ -6,7 +6,7 @@ Require Export rt.restructuring.behavior.arrival_sequence.
 (** Rather than choosing a specific schedule representation up front, we define
     the notion of a generic processor state, which allows us to state general
     definitions of core concepts (such as "how much service has a job
-    received") that work across many possble scenarios (e.g., ideal
+    received") that work across many possible scenarios (e.g., ideal
     uniprocessor schedules, schedules with overheads, variable-speed
     processors, multiprocessors, etc.).
 
