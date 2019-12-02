@@ -45,6 +45,12 @@ proof-length:
   script:
     - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
 
+spell-check:
+  stage: build
+  image: bbbrandenburg/aspell-ci
+  script:
+    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
+
 1.9.0-coq-8.9:
   extends: .build
 
