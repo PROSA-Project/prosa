@@ -37,7 +37,7 @@ Section ModelWithFixedPreemptionPoints.
     forall tsk, tsk \in ts -> last0 (task_preemption_points tsk) = task_cost tsk.
 
   (** (3) We require the sequence of preemption points 
-     to be a nondecreasing sequence. *)
+     to be a non-decreasing sequence. *)
   Definition task_preemption_points_is_nondecreasing_sequence :=
     forall tsk, tsk \in ts -> nondecreasing_sequence (task_preemption_points tsk).
 
@@ -51,7 +51,7 @@ Section ModelWithFixedPreemptionPoints.
       size (job_preemption_points j) = size (task_preemption_points (job_task j)).
 
   (** (5) We require lengths of nonpreemptive segments of a job to be bounded 
-     by lenghts of the corresponding segments of its task.  *)
+     by lengths of the corresponding segments of its task.  *)
   Definition lengths_of_task_segments_bound_length_of_job_segments :=
     forall j n,
       arrives_in arr_seq j -> 

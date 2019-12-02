@@ -12,7 +12,7 @@ Section LiuAndLaylandReadiness.
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (** Supose jobs have an arrival time and a cost. *)
+  (** Suppose jobs have an arrival time and a cost. *)
   Context `{JobArrival Job} `{JobCost Job}.
 
   (** In the basic Liu & Layland model, a job is ready iff it is pending. *)

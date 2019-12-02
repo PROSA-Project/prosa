@@ -23,7 +23,7 @@ Section ModelWithFloatingNonpreemptiveRegions.
   Variable arr_seq : arrival_sequence Job.
   
   (** We require [task_max_nonpreemptive_segment (job_task j)] to be
-     an upper bound of the lenght of the max nonpreemptive segment of
+     an upper bound of the length of the max nonpreemptive segment of
      job [j]. *)
   Definition job_max_np_segment_le_task_max_np_segment :=
     forall (j : Job),

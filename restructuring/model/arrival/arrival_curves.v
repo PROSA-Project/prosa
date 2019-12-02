@@ -1,8 +1,8 @@
 Require Export rt.util.rel.
 Require Export rt.restructuring.model.aggregate.task_arrivals.
 
-(** In this section, we define the notion of arrival curves, which
-   can be used to reason about the frequency of job arrivals. *)
+(** In this section, we define the notion of arrival curves, which can
+    be used to reason about the frequency of job arrivals. *)
 Section ArrivalCurves.
 
   (** Consider any type of tasks ... *)
@@ -18,15 +18,17 @@ Section ArrivalCurves.
   (** First, we define what constitutes an arrival bound for a task. *)
   Section ArrivalCurves.
 
-    (** We say that num_arrivals is a valid arrival curve for task tsk iff
-       [num_arrivals] is a monotonic function that equals 0 for the empty 
-       interval delta = 0. *)
+    (** We say that [num_arrivals] is a valid arrival curve for task
+        [tsk] iff [num_arrivals] is a monotonic function that equals 0
+        for the empty interval [delta = 0]. *)
     Definition valid_arrival_curve (tsk : Task) (num_arrivals : duration -> nat) :=
       num_arrivals 0 = 0 /\
       monotone num_arrivals leq.
 
-    (** We say that max_arrivals is an upper arrival bound for tsk iff, for any interval [t1, t2),
-       [max_arrivals (t2 - t1)] bounds the number of jobs of tsk that arrive in that interval. *)
+    (** We say that [max_arrivals] is an upper arrival bound for task
+        [tsk] iff, for any interval [[t1, t2)], [max_arrivals (t2 -
+        t1)] bounds the number of jobs of [tsk] that arrive in that
+        interval. *)
     Definition respects_max_arrivals (tsk : Task) (max_arrivals : duration -> nat) :=
       forall (t1 t2 : instant),
         t1 <= t2 ->
@@ -42,15 +44,16 @@ Section ArrivalCurves.
 
   Section SeparationBound.
 
-    (** Then, we say that min_separation is a lower separation bound iff, for any number of jobs
-       of tsk, min_separation lower-bounds the minimum interval length in which that number
-       of jobs can be spawned. *)
+    (** Then, we say that [min_separation] is a lower separation bound
+        iff, for any number of jobs of task [tsk], [min_separation]
+        lower-bounds the minimum interval length in which that number
+        of jobs can be spawned. *)
     Definition respects_min_separation (tsk : Task) (min_separation: nat -> duration) :=
       forall t1 t2,
           t1 <= t2 ->
           min_separation (number_of_task_arrivals arr_seq tsk t1 t2) <= t2 - t1.
 
-    (** We define in the same way upper separation bounds *)
+    (** We define in the same way upper separation bounds. *)
     Definition respects_max_separation (tsk : Task) (max_separation: nat -> duration):=
       forall t1 t2,
         t1 <= t2 ->
@@ -87,16 +90,17 @@ Section ArrivalCurvesModel.
           `{MaxSeparation Task}
           `{MinSeparation Task}.
 
-  (** Let ts be an arbitrary task set. *)
+  (** Let [ts] be an arbitrary task set. *)
   Variable ts : seq Task.
 
-  (** We say that arrivals is a valid arrival curve for a taskset if it is valid for any task
-     in the taskset *)
+  (** We say that [arrivals] is a valid arrival curve for a task set
+      if it is valid for any task in the task set *)
   Definition valid_taskset_arrival_curve (arrivals : Task -> duration -> nat) :=
     forall (tsk : Task), tsk \in ts -> valid_arrival_curve tsk (arrivals tsk).
 
-  (** We say that max_arrivals is an arrival bound for taskset ts *)
-  (** iff max_arrival is an arrival bound for any task from ts. *)
+  (** We say that [max_arrivals] is an arrival bound for a task set
+      [ts] iff [max_arrivals] is an arrival bound for any task in
+      [ts]. *)
   Definition taskset_respects_max_arrivals :=
     forall (tsk : Task), tsk \in ts -> respects_max_arrivals arr_seq tsk (max_arrivals tsk).
 

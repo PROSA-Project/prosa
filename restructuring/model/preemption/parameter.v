@@ -76,8 +76,8 @@ Section MaxAndLastNonpreemptiveSegment.
 End MaxAndLastNonpreemptiveSegment. 
 
 (** * Platform with limited preemptions *)
-(** In the follwoing, we define properties that any reasonable job preemption
-    model must satisfy. *)
+(** In the following, we define properties that any reasonable job
+    preemption model must satisfy. *)
 Section PreemptionModel.
 
   (**  Consider any type of jobs... *)

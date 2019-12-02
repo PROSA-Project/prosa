@@ -3,7 +3,7 @@ Require Export rt.restructuring.model.task.concept.
 (** * Static information about preemption points *)
 
 (** Definition of a generic type of parameter relating a task 
-    to the length of the maximum nonpreeptive segment. *)
+    to the length of the maximum nonpreemptive segment. *)
 Class TaskMaxNonpreemptiveSegment (Task : TaskType) :=
   task_max_nonpreemptive_segment : Task -> work.
 
@@ -98,7 +98,7 @@ Section PreemptionModel.
       bounded length. I.e., for any progress [ρ] of job [j] there
       exists a preemption point [pp] such that [ρ <= pp <= ρ +
       (job_max_nps j - ε)]. That is, in any time interval of length
-      [job_max_nps j], there exists a preeemption point which lies
+      [job_max_nps j], there exists a preemption point which lies
       in this interval. *)
   Definition nonpreemptive_regions_have_bounded_length (j : Job) :=
     forall (ρ : duration),
@@ -148,7 +148,7 @@ Section ValidTaskRunToCompletionThreshold.
   Context `{JobCost Job}.
 
   (** In addition, we assume existence of a function
-     maping jobs to theirs preemption points ... *)
+      mapping jobs to theirs preemption points ... *)
   Context `{JobPreemptable Job}.
 
   (** ...and a function mapping tasks to theirs
@@ -169,10 +169,10 @@ Section ValidTaskRunToCompletionThreshold.
   Definition task_run_to_completion_threshold_le_task_cost tsk :=
     task_run_to_completion_threshold tsk <= task_cost tsk.
   
-  (** We say that the run-to-completion threshold of a task tsk bounds
-      the job run-to-completionthreshold iff for any job j of task tsk
-      the job run-to-completion threshold is less than or equal to the
-      task run-to-completion threshold. *) 
+  (** We say that the run-to-completion threshold of a task [tsk]
+      bounds the job run-to-completion threshold iff for any job [j]
+      of task [tsk] the job's run-to-completion threshold is less than
+      or equal to the task's run-to-completion threshold. *) 
   Definition task_run_to_completion_threshold_bounds_job_run_to_completion_threshold tsk :=
     forall j,
       arrives_in arr_seq j ->
@@ -180,11 +180,11 @@ Section ValidTaskRunToCompletionThreshold.
       job_run_to_completion_threshold j <= task_run_to_completion_threshold tsk.
 
   (** We say that task_run_to_completion_threshold is a valid task
-      run-to-completion threshold for a task tsk iff
+      run-to-completion threshold for a task [tsk] iff
       [task_run_to_completion_threshold tsk] is (1) no bigger than
-      tsk's cost, (2) for any job of task tsk
-      job_run_to_completion_threshold is bounded by
-      task_run_to_completion_threshold. *)
+      [tsk]'s cost, (2) for any job of task [tsk]
+      [job_run_to_completion_threshold] is bounded by
+      [task_run_to_completion_threshold]. *)
   Definition valid_task_run_to_completion_threshold tsk :=
     task_run_to_completion_threshold_le_task_cost tsk /\
     task_run_to_completion_threshold_bounds_job_run_to_completion_threshold tsk.

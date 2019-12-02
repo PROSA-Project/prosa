@@ -17,7 +17,7 @@ Section ReadinessOfJitteryJobs.
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (** Supose jobs have an arrival time, a cost, and a release jitter bound. *)
+  (** Suppose jobs have an arrival time, a cost, and a release jitter bound. *)
   Context `{JobArrival Job} `{JobCost Job} `{JobJitter Job}.
 
   (** We say that a job is released at a time after its arrival if the job's

@@ -59,13 +59,15 @@ Section ServiceOfJobs.
     (** Let jobs denote any (finite) set of jobs. *)
     Variable jobs : seq Job.
 
-    (** Let tsk be the task to be analyzed. *)
+    (** Let [tsk] be the task to be analyzed. *)
     Variable tsk : Task.
 
-    (** Based on the definition of jobs of higher or equal priority (with respect to tsk), ... *)
+    (** Based on the definition of jobs of higher or equal priority
+        (with respect to task [tsk]), ... *)
     Let of_higher_or_equal_priority j := higher_eq_priority (job_task j) tsk.
     
-    (** ...we define the service received during [t1, t2) by jobs of higher or equal priority. *)
+    (** ...we define the service received during [[t1, t2)] by jobs of
+        higher or equal priority. *)
     Definition service_of_higher_or_equal_priority_tasks (t1 t2 : instant) :=
       service_of_jobs of_higher_or_equal_priority jobs t1 t2.
 
@@ -87,7 +89,7 @@ Section ServiceOfJobs.
     (** Based on the definition of jobs of higher or equal priority, ... *)
     Let of_higher_or_equal_priority j_hp := higher_eq_priority j_hp j.
     
-    (** ...we define the service received during [t1, t2) by jobs of higher or equal priority. *)
+    (** ...we define the service received during [[t1, t2)] by jobs of higher or equal priority. *)
     Definition service_of_higher_or_equal_priority_jobs (t1 t2 : instant) :=
       service_of_jobs of_higher_or_equal_priority jobs t1 t2.
 
@@ -96,14 +98,14 @@ Section ServiceOfJobs.
   (** In this section, we define the notion of workload for sets of jobs. *)  
   Section ServiceOfTask.
     
-    (** Let tsk be the task to be analyzed... *)
+    (** Let [tsk] be the task to be analyzed... *)
     Variable tsk : Task. 
 
     (** ... and let jobs denote any (finite) set of jobs. *)
     Variable jobs : seq Job.
 
-    (** We define the cumulative task service received by 
-       the jobs from the task within time interval [t1, t2). *)
+    (** We define the cumulative task service received by the jobs
+       from the task within time interval [[t1, t2)]. *)
     Definition task_service_of_jobs_in t1 t2 :=
       service_of_jobs (job_of_task tsk) jobs t1 t2.
 

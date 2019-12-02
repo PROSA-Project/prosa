@@ -12,22 +12,24 @@ Section TaskArrivals.
 
   Section Definitions.
 
-    (** Let tsk be any task. *)
+    (** Let [tsk] be any task. *)
     Variable tsk : Task.
 
-    (** We define the sequence of jobs of tsk arriving at time t. *)
+    (** We define the sequence of jobs of task [tsk] arriving at time t. *)
     Definition task_arrivals_at (t : instant) : seq Job :=
       [seq j <- arrivals_at arr_seq t | job_task j == tsk].
 
-    (** By concatenation, we construct the list of jobs of tsk that arrived in the
-       interval [t1, t2). *)
+    (** By concatenation, we construct the list of jobs of task [tsk]
+        that arrived in the interval [[t1, t2)]. *)
     Definition task_arrivals_between (t1 t2 : instant) :=
       [seq j <- arrivals_between arr_seq t1 t2 | job_task j == tsk].
 
-    (** Based on that, we define the list of jobs of tsk that arrived up to time t, ...*)
+    (** Based on that, we define the list of jobs of task [tsk] that
+        arrived up to time t, ...*)
     Definition task_arrivals_up_to (t : instant) := task_arrivals_between 0 t.+1.
 
-    (** ...and the list of jobs of tsk that arrived strictly before time t ... *)
+    (** ...and the list of jobs of task [tsk] that arrived strictly
+        before time t ... *)
     Definition task_arrivals_before (t : instant) := task_arrivals_between 0 t.
 
     (** ... and also count the number of job arrivals. *)
@@ -36,7 +38,8 @@ Section TaskArrivals.
     
   End Definitions.
 
-  (** We define a predicate for arrival sequences for which jobs come from a taskset. *)
+  (** We define a predicate for arrival sequences in which all jobs
+      come from a given task set. *)
   Definition arrivals_come_from_taskset (ts : seq Task) :=
     forall j, arrives_in arr_seq j -> job_task j \in ts.
 

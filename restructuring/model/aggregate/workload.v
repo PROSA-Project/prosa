@@ -41,7 +41,7 @@ Section WorkloadOfJobs.
        higher or equal priority. *)
     Variable higher_eq_priority : FP_policy Task.
 
-    (** Let tsk be the task to be analyzed. *)
+    (** Let [tsk] be the task to be analyzed. *)
     Variable tsk : Task.
 
     (** Recall the notion of a job of higher or equal priority. *)
@@ -49,7 +49,7 @@ Section WorkloadOfJobs.
       higher_eq_priority (job_task j) tsk.
     
     (** Then, we define the workload of all jobs of tasks with
-       higher-or-equal priority than tsk. *)
+        higher-or-equal priority than task [tsk]. *)
     Definition workload_of_higher_or_equal_priority_tasks :=
       workload_of_jobs of_higher_or_equal_priority.
 
@@ -60,7 +60,7 @@ Section WorkloadOfJobs.
   Section PerJobPriority.
 
     (** Consider any JLFP policy that indicates whether a job has
-       higher or equal priority. *)
+        higher or equal priority. *)
     Variable higher_eq_priority : JLFP_policy Job.
 
     (** Let j be the job to be analyzed. *)
@@ -79,13 +79,15 @@ Section WorkloadOfJobs.
   (** We also define workload of a task. *)
   Section TaskWorkload.
     
-    (** Let tsk be the task to be analyzed. *)
+    (** Let [tsk] be the task to be analyzed. *)
     Variable tsk : Task.
     
-    (** We define the task workload as the workload of jobs of task tsk. *)
+    (** We define the task workload as the workload of jobs of task
+        [tsk]. *)
     Definition task_workload jobs := workload_of_jobs (job_of_task tsk) jobs.
 
-    (** Next, we recall the definition of the task workload in interval [t1, t2). *)
+    (** Next, we recall the definition of the task workload in
+        interval [[t1, t2)]. *)
     Definition task_workload_between (t1 t2 : instant) :=
       task_workload (arrivals_between arr_seq t1 t2).
     

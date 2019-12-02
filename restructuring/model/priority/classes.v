@@ -86,7 +86,7 @@ Section Priorities.
     (** Consider any FP policy. *)
     Context `{FP_policy Task}.
 
-    (** We define whether the policy is antisymmetric over a taskset ts. *)
+    (** We define whether the policy is antisymmetric over a task set [ts]. *)
     Definition antisymmetric_over_taskset (ts : seq Task) :=
       antisymmetric_over_list hep_task ts.    
     

@@ -1,6 +1,6 @@
 Require Export rt.restructuring.model.preemption.parameter.
 
-(** * Platform for Fully Premptive Model *)
+(** * Fully Preemptive Model *)
 (** In this section, we instantiate [job_preemptable] for the fully
    preemptive model. *)
 Section FullyPreemptiveModel.

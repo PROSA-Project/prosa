@@ -20,10 +20,12 @@ Section SameTask.
   Context {Task : TaskType}.
   Context `{JobTask Job Task}.
 
-  (** ... we say that two jobs j1 and j2 are from the same task iff job_task j1 is equal to job_task j2, ... *)
+  (** ... we say that two jobs [j1] and [j2] are from the same task iff
+      [job_task j1] is equal to [job_task j2], ... *)
   Definition same_task (j1 j2 : Job) := job_task j1 == job_task j2.
   
-  (** ... we also say that job j is a job of task tsk iff job_task j is equal to tsk. *)
+  (** ... we also say that job [j] is a job of task [tsk] iff
+      [job_task j] is equal to [tsk]. *)
   Definition job_of_task (tsk : Task) (j : Job) := job_task j == tsk.
 
 End SameTask.
@@ -36,7 +38,7 @@ Section PropertesOfTask.
   Context `{TaskCost Task}.
   Context `{TaskDeadline Task}.
 
-  (** Next we intrdoduce attributes of a valid sporadic task. *)
+  (** Next we introduce attributes of a valid sporadic task. *)
   Section ValidTask.
     
     (** Consider an arbitrary task. *)
@@ -115,7 +117,7 @@ Section PropertesOfTaskSet.
       tsk \in ts ->
       task_cost_positive tsk. 
 
-  (** All jobs in the arrival sequence come from the taskset. *)
+  (** All jobs in the arrival sequence come from the task set. *)
   Definition all_jobs_from_taskset :=
     forall j,
       arrives_in arr_seq j ->
