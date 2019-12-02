@@ -12,7 +12,7 @@ Section SeqSet.
     _ : uniq _set_seq (* no duplicates *)
   }.
 
-  (* Now we add the ssreflect boilerplate code. *)
+  (* Now we add the [ssreflect] boilerplate code. *)
   Canonical Structure setSubType := [subType for _set_seq].
   Definition set_eqMixin := [eqMixin of set by <:].
   Canonical Structure set_eqType := EqType set set_eqMixin.

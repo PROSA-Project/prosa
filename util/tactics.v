@@ -1,6 +1,6 @@
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype bigop.
 
-(** Lemmas & tactics adopted (with permission) from V. Vafeiadis' Vbase.v. *)
+(** Lemmas & tactics adopted (with permission) from [V. Vafeiadis' Vbase.v]. *)
 
 Lemma neqP: forall (T: eqType) (x y: T), reflect (x <> y) (x != y).
 Proof. intros; case eqP; constructor; auto. Qed.
@@ -11,7 +11,7 @@ Ltac ins := simpl in *; try done; intros.
 (** ** Exploiting a hypothesis *)
 (* ************************************************************************** *)
 
-(** Exploit an assumption (adapted from CompCert). *)
+(** Exploit an assumption (adapted from [CompCert]). *)
 
 Ltac exploit x :=
     refine ((fun x y => y x) (x _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _) _)

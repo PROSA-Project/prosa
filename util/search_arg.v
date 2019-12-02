@@ -1,16 +1,16 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype.
 Require Import rt.util.tactics.
 
-(** This file introduces a function called search_arg that allows finding the
+(** This file introduces a function called [search_arg] that allows finding the
     argument within a given range for which a function is minimal w.r.t. to a
     given order while satisfying a given predicate, along with lemmas
-    establishing the basic properties of search_arg.
+    establishing the basic properties of [search_arg].
 
     Note that while this is quite similar to [arg min ...] / [arg max ...] in
-    ssreflect (fintype), this function is subtly different in that it possibly
+    [ssreflect] ([fintype]), this function is subtly different in that it possibly
     returns None and that it does not require the last element in the given
-    range to satisfy the predicate. In contrast, ssreflect's notion of
-    extremum in fintype uses the upper bound of the search space as the
+    range to satisfy the predicate. In contrast, [ssreflect]'s notion of
+    extremum in [fintype] uses the upper bound of the search space as the
     default value, which is rather unnatural when searching through a schedule.
 *)
 
@@ -42,7 +42,7 @@ Section ArgSearch.
 
   (** In the following, we establish basic properties of [search_arg]. *)
 
-  (* To begin, we observe that the search yields None iff predicate [P] does
+  (* To begin, we observe that the search yields [None] iff predicate [P] does
      not hold for any of the points in the search interval. *)
   Lemma search_arg_none:
     forall a b,
@@ -151,7 +151,7 @@ Section ArgSearch.
   Hypothesis R_total: total R.
 
   (* ...then [search_arg] yields an extremum w.r.t. to [a, b), that is, if
-     [search_arg] yields a point x, then [R (f x) (f y)] holds for any y in the
+     [search_arg] yields a point x, then [R (f x) (f y)] holds for any [y] in the
      search range [a, b) that satisfies [P]. *)
   Lemma search_arg_extremum:
     forall a b x,

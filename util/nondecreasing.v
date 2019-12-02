@@ -13,8 +13,8 @@ Section NondecreasingSequence.
   (** In this section we provide the notion of a non-decreasing sequence. *)
   Section Definitions. 
     
-    (** We say that a sequence xs is non-decincreasing iff for any two indices n1 and n2 
-       such that [n1 <= n2 < size xs] condition [xs[n1] <= xs[n2]] holds. *)
+    (** We say that a sequence [xs] is non-decreasing iff for any two indices [n1] and [n2] 
+       such that [n1 <= n2 < size [xs]] condition [[xs][n1] <= [xs][n2]] holds. *)
     Definition nondecreasing_sequence (xs : seq nat) :=
       forall n1 n2,
         n1 <= n2 < size xs ->
@@ -29,7 +29,7 @@ Section NondecreasingSequence.
     (** For a non-decreasing sequence we define the notion of 
         distances between neighboring elements of the sequence. *)
     (** Example:
-        Consider the following sequence of natural numbers: xs = [:: 1; 10; 10; 17; 20; 41]. 
+        Consider the following sequence of natural numbers: [xs] = [:: 1; 10; 10; 17; 20; 41]. 
         Then [drop 1 xs] is equal to [:: 10; 10; 17; 20; 41].
         Then [zip xs (drop 1 xs)] is equal to [:: (1,10); (10,10); (10,17); (17,20); (20,41)]
         And after the mapping [map (fun '(x1, x2) => x2 - x1)] we end up with [:: 9; 0; 7; 3; 21]. *)
@@ -254,8 +254,8 @@ Section NondecreasingSequence.
     Qed.
     
     (** Alternatively, consider an arbitrary natural number x that is 
-       bounded by the first and the last element of a sequence xs. Then 
-       there is an index n such that xs[n] <= x < x[n+1]. *)
+       bounded by the first and the last element of a sequence [xs]. Then 
+       there is an index n such that [xs[n] <= x < x[n+1]]. *)
     Lemma belonging_to_segment_of_seq_is_total:
       forall (xs : seq nat) (x : nat), 
         2 <= size xs -> 
@@ -293,7 +293,7 @@ Section NondecreasingSequence.
       }
     Qed.
 
-    (** Note that the last element of a nondecreasing sequence is the max element. *)
+    (** Note that the last element of a non-decreasing sequence is the max element. *)
     Lemma last_is_max_in_nondecreasing_seq:
       forall (xs : seq nat) (x : nat),
         nondecreasing_sequence xs ->
@@ -324,8 +324,8 @@ Section NondecreasingSequence.
     
   End NonDecreasingSequence.
 
-  (** * Properties of Undup of Non-Decreasing Sequence *)
-  (** In this section we prove a few lemmas about undup of non-decreasing sequences. *)
+  (** * Properties of [Undup] of Non-Decreasing Sequence *)
+  (** In this section we prove a few lemmas about [undup] of non-decreasing sequences. *)
   Section Undup.
 
     (** First we prove that [undup x::x::xs] is equal to [undup x::xs]. *)
@@ -443,7 +443,7 @@ Section NondecreasingSequence.
   (** In this section we prove a few lemmas about function [distances]. *)
   Section Distances.
 
-    (** We beging with a simple lemma that helps us unfold [distances]
+    (** We begin with a simple lemma that helps us unfold [distances]
         of lists with two consecutive cons [x0::x1::xs]. *)
     Lemma distances_unfold_2cons:
       forall x0 x1 xs, 
@@ -546,8 +546,8 @@ Section NondecreasingSequence.
     Qed.
 
     (** Note that the distances-function has the expected behavior indeed. I.e. an element 
-       on the n-th position of the distance-sequence is equal to the difference between
-       n+1-th and n-th elements. *)
+       on the position [n] of the distance-sequence is equal to the difference between
+       elements on positions [n+1] and [n]. *)
     Lemma function_of_distances_is_correct:
       forall (xs : seq nat) (n : nat),
         (distances xs)[|n|] = xs[|n.+1|] - xs[|n|].
@@ -689,9 +689,9 @@ Section NondecreasingSequence.
       - eapply L with (indx := indy) (indy := indx) (x := y) (y := x); eauto. 
     Qed.  
 
-    (** Given a nondecreasing sequence xs with length n, we show that the difference 
-       between the last element of xs and the last element of the distances-sequence 
-       of xs is equal to the (n-2)'th element of xs. *)
+    (** Given a non-decreasing sequence [xs] with length n, we show that the difference 
+       between the last element of [xs] and the last element of the distances-sequence 
+       of [xs] is equal to [xs[n-2]]. *)
     Lemma last_seq_minus_last_distance_seq:
       forall (xs : seq nat),
         nondecreasing_sequence xs ->
@@ -718,8 +718,8 @@ Section NondecreasingSequence.
         by rewrite addn1.
     Qed.
 
-    (** The max element of the distances-sequence of a sequence xs is bounded 
-       by the last element of xs. Note that all elements of xs are positive.
+    (** The max element of the distances-sequence of a sequence [xs] is bounded 
+       by the last element of [xs]. Note that all elements of [xs] are positive.
        Thus they all lie within the interval [0, last xs]. *)
     Lemma max_distance_in_seq_le_last_element_of_seq:
       forall (xs : seq nat),
@@ -765,7 +765,7 @@ Section NondecreasingSequence.
       }
     Qed.
 
-    (** Let xs be a non-decreasing sequence. We prove that 
+    (** Let [xs] be a non-decreasing sequence. We prove that 
         distances of sequence [[seq ρ <- index_iota 0 k.+1 | ρ \in xs]] 
         coincide with sequence [[seq x <- distances xs | 0 < x]]]. *)
     Lemma distances_iota_filtered:
@@ -810,7 +810,7 @@ Section NondecreasingSequence.
       }
     Qed.
 
-    (** Let xs again be a non-decreasing sequence. We prove that 
+    (** Let [xs] again be a non-decreasing sequence. We prove that 
         distances of sequence [undup xs] coincide with 
         sequence of positive distances of [xs]. *)
     Lemma distances_positive_undup:
@@ -847,10 +847,10 @@ Section NondecreasingSequence.
     Qed.
 
   
-    (** Consider two nondecreasing sequences xs and ys and assume that 
-       (1) first element of xs is at most the first element of ys and 
-       (2) distances-sequences of xs is dominated by distances-sequence of 
-       ys. Then xs is dominated by ys.  *)
+    (** Consider two non-decreasing sequences [xs] and [ys] and assume that 
+       (1) first element of [xs] is at most the first element of [ys] and 
+       (2) distances-sequences of [xs] is dominated by distances-sequence of 
+       [ys]. Then [xs] is dominated by [ys].  *)
     Lemma domination_of_distances_implies_domination_of_seq:
       forall (xs ys : seq nat),
         first0 xs <= first0 ys ->

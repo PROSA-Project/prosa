@@ -43,7 +43,7 @@ Section Last0.
   Proof. by intros; rewrite nth_last. Qed.
   
   (** We prove that for any non-empty sequence [xs] there is a sequence [xsh]
-      such that [xsh ++ [::last0 x] = xs]. *)
+      such that [xsh ++ [::last0 x] = [xs]]. *)
   Lemma last0_ex_cat:
     forall x xs,
       xs <> [::] ->
@@ -81,7 +81,7 @@ End Last0.
 (** Additional lemmas about max0. *)
 Section Max0.
   
-  (** We prove that max0 (x::xs) is equal to max {x, max0 xs}. *)
+  (** We prove that [max0 (x::xs)] is equal to [max {x, max0 xs}]. *)
   Lemma max0_cons: forall x xs, max0 (x :: xs) = maxn x (max0 xs).
   Proof.
     have L: forall s x xs, foldl maxn s (x::xs) = maxn x (foldl maxn s xs).
@@ -206,9 +206,9 @@ Section Max0.
   (** Let's introduce the notion of the nth element of a sequence. *)
   Notation "xs [| n |]" := (nth 0 xs n) (at level 30).
   
-  (** If any n'th element of a sequence xs is less-than-or-equal-to
-      n'th element of ys, then max of xs is less-than-or-equal-to max
-      of ys. *)
+  (** If any element of a sequence [xs] is less-than-or-equal-to
+      the corresponding element of a sequence [ys], then max of 
+      [xs] is less-than-or-equal-to max of [ys]. *)
   Lemma max_of_dominating_seq:
     forall (xs ys : seq nat),
       (forall n, xs[|n|] <= ys[|n|]) ->
@@ -254,7 +254,7 @@ End Max0.
 (* Additional lemmas about rem for lists. *)
 Section RemList.
   
-  (* We prove that if x lies in xs excluding y, then x also lies in xs. *)
+  (* We prove that if [x] lies in [xs] excluding [y], then [x] also lies in [xs]. *)
   Lemma rem_in:
     forall (T: eqType) (x y: T) (xs: seq T),
       x \in rem y xs -> x \in xs.
@@ -272,8 +272,8 @@ Section RemList.
     }
   Qed.
 
-  (* We prove that if we remove an element x for which P x from 
-     a filter, then the size of the filter decreases by 1. *)
+  (* We prove that if we remove an element [x] for which [P x] from 
+     a filter, then the size of the filter decreases by [1]. *)
   Lemma filter_size_rem: 
     forall (T: eqType) (x:T) (xs: seq T) (P: T -> bool), 
       (x \in xs) ->
@@ -300,8 +300,7 @@ End RemList.
 (* Additional lemmas about sequences. *)
 Section AdditionalLemmas.
 
-  (* First, we show that if [n > 0], then [n]'th element of a sequence
-     [x::xs] is equal to [n-1]'th element of sequence [xs]. *)
+  (* First, we show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
   Lemma nth0_cons:
     forall x xs n,
       n > 0 ->
@@ -332,8 +331,8 @@ Section AdditionalLemmas.
         by apply eq_S.
   Qed.
   
-  (* Next, we prove that x ∈ xs implies that xs can be split 
-     into two parts such that xs = xsl ++ [::x] ++ xsr. *)
+  (* Next, we prove that [x ∈ xs] implies that [xs] can be split 
+     into two parts such that [xs = xsl ++ [::x] ++ [xsr]]. *)
   Lemma in_cat:
     forall {X : eqType} (x : X) (xs : list X),
       x \in xs -> exists xsl xsr, xs = xsl ++ [::x] ++ xsr.
@@ -347,8 +346,8 @@ Section AdditionalLemmas.
         by subst; exists (a::xsl), xsr.
   Qed.  
 
-  (* We prove that for any two sequences xs and ys the fact that xs is a subsequence 
-     of ys implies that the size of xs is at most the size of ys. *)
+  (* We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence 
+     of [ys] implies that the size of [xs] is at most the size of [ys]. *)
   Lemma subseq_leq_size:
     forall {X : eqType} (xs ys: seq X),
       uniq xs ->
@@ -413,7 +412,7 @@ Section AdditionalLemmas.
 
 End AdditionalLemmas.
 
-(** Function [rem] from ssreflect removes only the first occurrence of
+(** Function [rem] from [ssreflect] removes only the first occurrence of
     an element in a sequence.  We define function [rem_all] which
     removes all occurrences of an element in a sequence. *)
 Fixpoint rem_all {X : eqType} (x : X) (xs : seq X) :=
@@ -423,7 +422,7 @@ Fixpoint rem_all {X : eqType} (x : X) (xs : seq X) :=
     if a == x then rem_all x xs else a :: rem_all x xs
   end.
 
-(** Additional lemmas about rem_all for lists. *)
+(** Additional lemmas about [rem_all] for lists. *)
 Section RemAllList.
 
   (** First we prove that [x ∉ rem_all x xs]. *)

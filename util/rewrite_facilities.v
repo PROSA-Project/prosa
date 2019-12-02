@@ -78,27 +78,27 @@ Section RewriteFacilities.
     (*
     (* Simplifying some relatively sophisticated 
        expressions can be quite tedious. *)
-    Goal f ((a == b) && f false) = f false.
-    Proof.
-      (* Things like simpl/compute make no sense here. *)
+    [Goal f ((a == b) && f false) = f false.]
+    [Proof.]
+      (* Things like [simpl/compute] make no sense here. *)
       (* One can use [replace] to generate a new goal. *)
-      replace (a == b) with false; last first.
+      [replace (a == b) with false; last first.]
       (* However, this leads to a "loss of focus". Moreover, 
          the resulting goal is not so trivial to prove. *)
-      { apply/eqP; rewrite eq_sym eqbF_neg.
-          by apply/eqP; intros EQ; subst b; apply H_npb. }
-        by rewrite Bool.andb_false_l.
-    Abort.
+      [{ apply/eqP; rewrite eq_sym eqbF_neg.]
+      [    by apply/eqP; intros EQ; subst b; apply H_npb. }]
+      [  by rewrite Bool.andb_false_l.]
+    [Abort.]
      *)
     
     (*
     (* The second attempt. *)
-    Goal f ((a == b) && f false) = f false.
+    [Goal f ((a == b) && f false) = f false.]
       (* With the lemmas above one can compose multiple 
          transformations in a single rewrite. *)
-        by rewrite (eqbool_false (neq_sym (neqprop_to_neqbool (diseq _ _ _ H_npb H_pa))))
-              Bool.andb_false_l.
-    Qed.
+      [  by rewrite (eqbool_false (neq_sym (neqprop_to_neqbool (diseq _ _ _ H_npb H_pa))))]
+      [        Bool.andb_false_l.]
+    [Qed.]
     *)
     
   End Example.

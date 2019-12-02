@@ -107,7 +107,7 @@ Section ExtraLemmas.
       by apply sum0.
   Qed.
 
-  (* We prove that if any element of a set r is bounded by constant const, 
+  (* We prove that if any element of a set r is bounded by constant [const], 
      then the sum of the whole set is bounded by [const * size r]. *)
   Lemma sum_majorant_constant:
     forall (T: eqType) (r: seq T) (P: pred T) F const,
@@ -138,10 +138,10 @@ Section ExtraLemmas.
     }
   Qed.
 
-  (* We prove that if for any element x of a set xs the following two statements hold 
+  (* We prove that if for any element x of a set [xs] the following two statements hold 
      (1) [F1 x] is less than or equal to [F2 x] and (2) the sum [F1 x_1, ..., F1 x_n] 
      is equal to the sum of [F2 x_1, ..., F2 x_n], then [F1 x] is equal to [F2 x] for 
-     any element x of xs. *)
+     any element x of [xs]. *)
   Lemma sum_majorant_eqn:
     forall (T: eqType) xs F1 F2 (P: pred T),
       (forall x, x \in xs -> P x -> F1 x <= F2 x) -> 
