@@ -3,7 +3,7 @@ Require Export rt.restructuring.analysis.facts.preemption.task.nonpreemptive.
 Require Export rt.restructuring.analysis.facts.preemption.rtc_threshold.nonpreemptive.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
@@ -42,14 +42,14 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task tsk in ts [max_arrival tsk] is (1) an arrival bound of
-      tsk, and (2) it is a monotonic function that equals 0 for the
-      empty interval delta = 0. *)
+      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
+      [tsk], and (2) it is a monotonic function that equals [0] for the
+      empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
-  (** Let tsk be any task in ts that is to be analyzed. *)
+  (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 

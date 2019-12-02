@@ -2,7 +2,7 @@ Require Export rt.restructuring.results.fixed_priority.rta.bounded_nps.
 Require Export rt.restructuring.analysis.facts.preemption.rtc_threshold.limited.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
@@ -13,7 +13,7 @@ Require Import rt.restructuring.model.preemption.limited_preemptive.
 Require Import rt.restructuring.model.task.preemption.limited_preemptive.
 
 
-(** * RTA for FP-schedulers with Fixed Premption Points *)
+(** * RTA for FP-schedulers with Fixed Preemption Points *)
 (** In this module we prove the RTA theorem for FP-schedulers with fixed preemption points. *)
 Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
 
@@ -43,25 +43,25 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
   (** First, we assume we have the model with fixed preemption points.
-      I.e., each task is divided into a number of nonpreemptive segments 
-      by inserting staticaly predefined preemption points. *)
+      I.e., each task is divided into a number of non-preemptive segments 
+      by inserting statically predefined preemption points. *)
   Context `{JobPreemptionPoints Job}
           `{TaskPreemptionPoints Task}.
   Hypothesis H_valid_model_with_fixed_preemption_points:
     valid_fixed_preemption_points_model arr_seq ts.
 
-  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task tsk in ts 
-     [max_arrival tsk] is (1) an arrival bound of tsk, and (2) it is a monotonic function 
-     that equals 0 for the empty interval delta = 0. *)
+  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task [tsk] in ts 
+     [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function 
+     that equals 0 for the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
-  (** Let tsk be any task in ts that is to be analyzed. *)
+  (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Next, consider any ideal uniprocessor schedule  with limited preemptionsof this arrival sequence ... *)
+  (** Next, consider any ideal uni-processor schedule  with limited preemptions of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
@@ -85,8 +85,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
-  (** ... and the schedule respects the policy defined by thejob_preemptable 
-     function (i.e., jobs have bounded nonpreemptive segments). *)
+  (** ... and the schedule respects the policy defined by the [job_preemptable]
+     function (i.e., jobs have bounded non-preemptive segments). *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.  
 
   (** Let's define some local names for clarity. *)
@@ -121,7 +121,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
                 + total_ohep_rbf (A + F) /\
         F + (task_last_nonpr_segment tsk - ε) <= R.
         
-  (** Now, we can reuse the results for the abstract model with bounded nonpreemptive segments
+  (** Now, we can reuse the results for the abstract model with bounded non-preemptive segments
      to establish a response-time bound for the more concrete model of fixed preemption points. *)
   Theorem uniprocessor_response_time_bound_fp_with_fixed_preemption_points:
     response_time_bounded_by tsk R.  

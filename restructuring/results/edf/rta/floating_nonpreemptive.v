@@ -3,7 +3,7 @@ Require Export rt.restructuring.analysis.facts.preemption.rtc_threshold.floating
 Require Import rt.restructuring.model.priority.edf.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
@@ -39,10 +39,10 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (** Assume we have the model with floating nonpreemptive regions.
-      I.e., for each task only the length of the maximal nonpreemptive
+  (** Assume we have the model with floating non-preemptive regions.
+      I.e., for each task only the length of the maximal non-preemptive
       segment is known _and_ each job level is divided into a number
-      of nonpreemptive segments by inserting preemption points. *)
+      of non-preemptive segments by inserting preemption points. *)
   Context `{JobPreemptionPoints Job}
           `{TaskMaxNonpreemptiveSegment Task}.
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions:
@@ -59,18 +59,18 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
     cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task tsk in ts [max_arrival tsk] is (1) an arrival bound of
-      tsk, and (2) it is a monotonic function that equals 0 for the
+      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
+      [tsk], and (2) it is a monotonic function that equals 0 for the
       empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
-  (** Let tsk be any task in ts that is to be analyzed. *)
+  (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Next, consider any ideal uniprocessor schedule with limited
+  (** Next, consider any ideal uni-processor schedule with limited
       preemptions of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
@@ -90,7 +90,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
   (** ... and the schedule respects the policy defined by the
-      job_preemptable function (i.e., jobs have bounded nonpreemptive
+      job_preemptable function (i.e., jobs have bounded non-preemptive
       segments). *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
 
@@ -101,12 +101,12 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Let bound_on_total_hep_workload_changes_at :=
     bound_on_total_hep_workload_changes_at ts tsk.
   
-  (** We introduce the abbreviation "rbf" for the task request bound function,
+  (** We introduce the abbreviation [rbf] for the task request bound function,
        which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
   Let rbf := task_request_bound_function.
 
-  (** Next, we introduce task_rbf as an abbreviation
-      for the task request bound function of task tsk. *)
+  (** Next, we introduce [task_rbf] as an abbreviation
+      for the task request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
 
   (** Using the sum of individual request bound functions, we define the request bound 

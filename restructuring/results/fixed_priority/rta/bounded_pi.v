@@ -3,7 +3,7 @@ Require Export rt.restructuring.analysis.facts.busy_interval.
 Require Import rt.restructuring.analysis.abstract.ideal_jlfp_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
@@ -77,14 +77,14 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** Next, we assume that all jobs come from the task set. *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
  
-  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task tsk in ts 
-     [max_arrival tsk] is (1) an arrival bound of tsk, and (2) it is a monotonic function 
+  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task [tsk] in ts 
+     [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function 
      that equals 0 for the empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
     
-  (** Let tsk be any task in ts that is to be analyzed. *)
+  (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
@@ -93,8 +93,8 @@ Section AbstractRTAforFPwithArrivalCurves.
     valid_preemption_model arr_seq sched.
 
   (** ...and a valid task run-to-completion threshold function. That is, 
-     [task_run_to_completion_threshold tsk] is (1) no bigger than tsk's 
-     cost, (2) for any job of task tsk job_run_to_completion_threshold 
+     [task_run_to_completion_threshold tsk] is (1) no bigger than [tsk]'s 
+     cost, (2) for any job of task [tsk] job_run_to_completion_threshold 
      is bounded by task_run_to_completion_threshold. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
@@ -115,22 +115,22 @@ Section AbstractRTAforFPwithArrivalCurves.
   Let job_backlogged_at := backlogged sched.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
-  (** We introduce task_rbf as an abbreviation of the task request bound function,
+  (** We introduce [task_rbf] as an abbreviation of the task request bound function,
      which is defined as [task_cost(tsk) × max_arrivals(tsk,Δ)]. *)
   Let task_rbf := task_request_bound_function tsk.
 
   (** Using the sum of individual request bound functions, we define the request bound 
-     function of all tasks with higher-or-equal priority (with respect to tsk). *)
+     function of all tasks with higher-or-equal priority (with respect to [tsk]). *)
   Let total_hep_rbf := total_hep_request_bound_function_FP higher_eq_priority ts tsk.
  
   (** Similarly, we define the request bound function of all tasks other 
-     than tsk with higher-or-equal priority (with respect to tsk). *)
+     than [tsk] with higher-or-equal priority (with respect to [tsk]). *)
   Let total_ohep_rbf :=
     total_ohep_request_bound_function_FP higher_eq_priority ts tsk.
   
-  (** Assume that there eixsts a constant priority_inversion_bound that bounds 
-     the length of any priority inversion experienced by any job of tsk. 
-     Sinse we analyze only task tsk, we ignore the lengths of priority 
+  (** Assume that there exists a constant priority_inversion_bound that bounds 
+     the length of any priority inversion experienced by any job of [tsk]. 
+     Since we analyze only task [tsk], we ignore the lengths of priority 
      inversions incurred by any other tasks. *)
   Variable priority_inversion_bound : duration.
   Hypothesis H_priority_inversion_is_bounded:
@@ -183,7 +183,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   Section FillingOutHypothesesOfAbstractRTATheorem.
 
     (** First, we prove that in the instantiation of interference and interfering workload, 
-       we really take into account everything that can interfere with tsk's jobs, and thus, 
+       we really take into account everything that can interfere with [tsk]'s jobs, and thus, 
        the scheduler satisfies the abstract notion of work conserving schedule. *) 
     Lemma instantiated_i_and_w_are_consistent_with_schedule:
       work_conserving_ab tsk interference interfering_workload.
@@ -256,7 +256,7 @@ Section AbstractRTAforFPwithArrivalCurves.
        and the length of the interval to the maximum amount of interference (for more details see 
        files limited.abstract_RTA.definitions and limited.abstract_RTA.abstract_seq_rta).
 
-       However, in this module we analyze only one task -- tsk, therefore it is “hardcoded” 
+       However, in this module we analyze only one task -- [tsk], therefore it is “hard-coded” 
        inside the interference bound function IBF. Moreover, in case of a model with fixed 
        priorities, interference that some job j incurs from higher-or-equal priority jobs does not
        depend on the relative arrival time of job j. Therefore, in order for the IBF signature to
@@ -300,21 +300,21 @@ Section AbstractRTAforFPwithArrivalCurves.
     Qed.
 
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
-    Section SolutionOfResponseTimeReccurenceExists.
+    Section SolutionOfResponseTimeRecurrenceExists.
 
-      (** Consider any job j of tsk. *)
+      (** Consider any job [j] of [tsk]. *)
       Variable j : Job.
       Hypothesis H_j_arrives : arrives_in arr_seq j.
       Hypothesis H_job_of_tsk : job_task j = tsk.
       Hypothesis H_job_cost_positive: job_cost_positive j.
 
-      (** Given any job j of task tsk that arrives exactly A units after the beginning of 
+      (** Given any job j of task [tsk] that arrives exactly A units after the beginning of 
          the busy interval, the bound of the total interference incurred by j within an 
          interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF Δ]. *)
       Let total_interference_bound tsk A Δ :=
         task_rbf (A + ε) - task_cost tsk + IBF Δ.
 
-      (** Next, consider any A from the search space (in the abstract sence). *)
+      (** Next, consider any A from the search space (in the abstract sense). *)
       Variable A : duration.
       Hypothesis H_A_is_in_abstract_search_space :
         search_space.is_in_search_space tsk L total_interference_bound A. 
@@ -353,13 +353,13 @@ Section AbstractRTAforFPwithArrivalCurves.
           by rewrite addnA [_ + priority_inversion_bound]addnC -!addnA.
       Qed.
 
-    End SolutionOfResponseTimeReccurenceExists.
+    End SolutionOfResponseTimeRecurrenceExists.
 
   End FillingOutHypothesesOfAbstractRTATheorem.
 
   (** ** Final Theorem *)
   (** Based on the properties established above, we apply the abstract analysis 
-     framework to infer that R is a response-time bound for tsk. *) 
+     framework to infer that [R] is a response-time bound for [tsk]. *) 
   Theorem uniprocessor_response_time_bound_fp:
     response_time_bounded_by tsk R.
   Proof.

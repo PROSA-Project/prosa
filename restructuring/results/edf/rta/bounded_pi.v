@@ -8,7 +8,7 @@ Require Import rt.restructuring.model.task.absolute_deadline.
 Require Import rt.restructuring.analysis.abstract.ideal_jlfp_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
@@ -94,14 +94,14 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** Next, we assume that all jobs come from the task set. *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
-  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task tsk in ts 
-     [max_arrival tsk] is (1) an arrival bound of tsk, and (2) it is a monotonic function 
+  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task [tsk] in ts 
+     [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function 
      that equals 0 for the empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
-  (** Let tsk be any task in ts that is to be analyzed. *)
+  (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
@@ -110,18 +110,18 @@ Section AbstractRTAforEDFwithArrivalCurves.
     valid_preemption_model arr_seq sched.
 
   (** ...and a valid task run-to-completion threshold function. That is, 
-     [task_run_to_completion_threshold tsk] is (1) no bigger than tsk's 
-     cost, (2) for any job of task tsk job_run_to_completion_threshold 
+     [task_run_to_completion_threshold tsk] is (1) no bigger than [tsk]'s 
+     cost, (2) for any job of task [tsk] job_run_to_completion_threshold 
      is bounded by task_run_to_completion_threshold. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
 
-  (** We introduce "rbf" as an abbreviation of the task request bound function,
+  (** We introduce [rbf] as an abbreviation of the task request bound function,
      which is defined as [task_cost(T) × max_arrivals(T,Δ)] for some task T. *)
   Let rbf  := task_request_bound_function.
   
-  (** Next, we introduce task_rbf as an abbreviation 
-     of the task request bound function of task tsk. *)
+  (** Next, we introduce [task_rbf] as an abbreviation 
+     of the task request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
 
   (** Using the sum of individual request bound functions, we define the request bound 
@@ -133,8 +133,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Let number_of_task_arrivals := number_of_task_arrivals arr_seq.
 
   (** Assume that there exists a constant priority_inversion_bound that bounds 
-     the length of any priority inversion experienced by any job of tsk. 
-     Since we analyze only task tsk, we ignore the lengths of priority 
+     the length of any priority inversion experienced by any job of [tsk]. 
+     Since we analyze only task [tsk], we ignore the lengths of priority 
      inversions incurred by any other tasks. *)
   Variable priority_inversion_bound : duration.
   Hypothesis H_priority_inversion_is_bounded:
@@ -159,19 +159,19 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** In case of search space for EDF we ask whether [task_rbf A ≠ task_rbf (A + ε)]... *)
   Definition task_rbf_changes_at (A : duration) := task_rbf A != task_rbf (A + ε).
 
-  (** ...or there exists a task tsko from ts such that [tsko ≠ tsk] and 
+  (** ...or there exists a task [tsko] from ts such that [tsko ≠ tsk] and 
      [rbf(tsko, A + D tsk - D tsko) ≠ rbf(tsko, A + ε + D tsk - D tsko)].
      Note that we use a slightly uncommon notation [has (λ tsko ⇒ P tskₒ) ts] 
-     which can be interpreted as follows: task-set ts contains a task tsko such 
-     that a predicate P holds for tsko. *)
+     which can be interpreted as follows: task-set ts contains a task [tsko] such 
+     that a predicate [P] holds for [tsko]. *)
   Definition bound_on_total_hep_workload_changes_at A :=
     has (fun tsko =>
            (tsk != tsko)
              && (rbf tsko (A + D tsk - D tsko)
                      != rbf tsko ((A + ε) + D tsk - D tsko))) ts.
   
-  (** The final search space for EDF is a set of offsets that are less than L 
-     and where task_rbf or bound_on_total_hep_workload changes. *)
+  (** The final search space for EDF is a set of offsets that are less than [L] 
+     and where [task_rbf] or [bound_on_total_hep_workload] changes. *)
   Let is_in_search_space (A : duration) :=
     (A < L) && (task_rbf_changes_at A || bound_on_total_hep_workload_changes_at A).
   
@@ -214,7 +214,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Section FillingOutHypothesesOfAbstractRTATheorem.
 
     (** First, we prove that in the instantiation of interference and interfering workload, 
-       we really take into account everything that can interfere with tsk's jobs, and thus, 
+       we really take into account everything that can interfere with [tsk]'s jobs, and thus, 
        the scheduler satisfies the abstract notion of work conserving schedule. *)
     Lemma instantiated_i_and_w_are_coherent_with_schedule:
       work_conserving_ab tsk interference interfering_workload.
@@ -300,7 +300,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           constructing a sequence of inequalities. *) 
       Section Inequalities.
 
-        (* Consider an arbitrary job j of tsk. *)
+        (* Consider an arbitrary job j of [tsk]. *)
         Variable j : Job.
         Hypothesis H_j_arrives : arrives_in arr_seq j.
         Hypothesis H_job_of_tsk : job_task j = tsk.
@@ -408,7 +408,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
         (** Next we focus on one task [tsk_o ≠ tsk] and consider two cases. *)
         
-        (** Case 1: Δ ≤ A + ε + D tsk - D tsk_o. *)
+        (** Case 1: [Δ ≤ A + ε + D tsk - D tsk_o]. *)
         Section Case1.
 
           (** Consider an arbitrary task [tsk_o ≠ tsk] from [ts]. *)
@@ -445,7 +445,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
         End Case1.
 
-        (** Case 2: A + ε + D tsk - D tsk_o ≤ Δ. *)
+        (** Case 2: [A + ε + D tsk - D tsk_o ≤ Δ]. *)
         Section Case2.
 
           (** Consider an arbitrary task [tsk_o ≠ tsk] from [ts]. *)
@@ -561,8 +561,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
         task t, and the length of the interval to the maximum amount
         of interference.
 
-        However, in this module we analyze only one task -- tsk,
-        therefore it is “hardcoded” inside the interference bound
+        However, in this module we analyze only one task -- [tsk],
+        therefore it is “hard-coded” inside the interference bound
         function IBF. Therefore, in order for the IBF signature to
         match the required signature in module abstract_seq_RTA, we
         wrap the IBF function in a function that accepts, but simply
@@ -594,13 +594,13 @@ Section AbstractRTAforEDFwithArrivalCurves.
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
     Section SolutionOfResponseTimeReccurenceExists.
 
-      (** Consider any job j of tsk. *)
+      (** Consider any job j of [tsk]. *)
       Variable j : Job.
       Hypothesis H_j_arrives : arrives_in arr_seq j.
       Hypothesis H_job_of_tsk : job_of_task tsk j.
       Hypothesis H_job_cost_positive : job_cost_positive j.
 
-      (** Given any job j of task tsk that arrives exactly A units after the beginning of 
+      (** Given any job j of task [tsk] that arrives exactly A units after the beginning of 
          the busy interval, the bound of the total interference incurred by j within an 
          interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF(A, Δ)]. *)
       Let total_interference_bound tsk (A Δ : duration) :=
@@ -675,7 +675,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
   (** ** Final Theorem *)
   (** Based on the properties established above, we apply the abstract analysis 
-     framework to infer that R is a response-time bound for tsk. *)
+     framework to infer that R is a response-time bound for [tsk]. *)
   Theorem uniprocessor_response_time_bound_edf:
     response_time_bounded_by tsk R.
   Proof.

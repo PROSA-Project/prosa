@@ -3,7 +3,7 @@ Require Export rt.restructuring.analysis.facts.preemption.task.preemptive.
 Require Export rt.restructuring.analysis.facts.preemption.rtc_threshold.preemptive.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
@@ -42,14 +42,14 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task tsk in ts [max_arrival tsk] is (1) an arrival bound of
-      tsk, and (2) it is a monotonic function that equals 0 for the
-      empty interval delta = 0. *)
+      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
+      [tsk], and (2) it is a monotonic function that equals 0 for the
+      empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
-  (** Let tsk be any task in ts that is to be analyzed. *)
+  (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
@@ -75,8 +75,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
-  (** ... and the schedule respects the policy defined by thejob_preemptable 
-     function (i.e., jobs have bounded nonpreemptive segments). *)
+  (** ... and the schedule respects the policy defined by the [job_preemptable] 
+     function (i.e., jobs have bounded non-preemptive segments). *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.  
 
   (** Let's define some local names for clarity. *)
@@ -104,7 +104,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
         A + F = task_rbf (A + ε) + total_ohep_rbf (A + F) /\
         F <= R.
 
-  (** Now, we can leverage the results for the abstract model with bounded nonpreemptive segments
+  (** Now, we can leverage the results for the abstract model with bounded non-preemptive segments
        to establish a response-time bound for the more concrete model of fully preemptive scheduling. *)
   Theorem uniprocessor_response_time_bound_fully_preemptive_fp:
     response_time_bounded_by tsk R.
