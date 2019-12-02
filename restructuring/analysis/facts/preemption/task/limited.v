@@ -28,7 +28,7 @@ Section LimitedPreemptionsModel.
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   
-  (** Next, consider any ideal uniprocessor preemption-aware schedule
+  (** Next, consider any ideal uni-processor preemption-aware schedule
       of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_valid_schedule_with_limited_preemptions:
@@ -47,7 +47,7 @@ Section LimitedPreemptionsModel.
     valid_fixed_preemption_points_model arr_seq ts.
 
   (** Then we prove that functions [job_preemptable and
-      task_preemption_points] define a model with bounded nonpremtive
+      task_preemption_points] define a model with bounded non-preemptive
       regions. *)       
   Lemma fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions:
     model_with_bounded_nonpreemptive_segments arr_seq .

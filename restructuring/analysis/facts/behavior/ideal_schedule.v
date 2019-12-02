@@ -3,13 +3,13 @@ Require Export rt.util.all.
 Require Export rt.restructuring.model.processor.platform_properties.
 Require Export rt.restructuring.analysis.facts.behavior.service.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Note: we do not re-export the basic definitions to avoid littering the global
    namespace with type class instances. *)
 
-(** In this section we estlish the classes to which an ideal schedule belongs. *)
+(** In this section we establish the classes to which an ideal schedule belongs. *)
 Section ScheduleClass.
 
   Local Transparent service_in scheduled_in scheduled_on.
@@ -18,7 +18,7 @@ Section ScheduleClass.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.  
 
-  (** We note that the ideal processor model is indeed a uniprocessor
+  (** We note that the ideal processor model is indeed a uni-processor
      model. *)
   Lemma ideal_proc_model_is_a_uniprocessor_model:
     uniprocessor_model (processor_state Job).
@@ -96,8 +96,8 @@ Hint Resolve ideal_proc_model_is_a_uniprocessor_model
 
 (** We also provide tactics for case analysis on ideal processor state. *)
 
-(** The first tactic generates two subgoals: one with idle processor and 
-    the other with processor executing a job named JobName. *)
+(** The first tactic generates two sub-goals: one with idle processor and 
+    the other with processor executing a job named [JobName]. *)
 Ltac ideal_proc_model_sched_case_analysis sched t JobName :=
   let Idle := fresh "Idle" in
   let Sched := fresh "Sched_" JobName in
@@ -115,7 +115,7 @@ Ltac ideal_proc_model_sched_case_analysis_eq sched t JobName :=
   | move: (Sched); simpl; move => /eqP SchedEq; rewrite ?SchedEq].
 
 (** * Incremental Service in Ideal Schedule *)
-(** In the following section we prove a few facts about service in ideal schedeule. *)
+(** In the following section we prove a few facts about service in ideal schedule. *)
 (* Note that these lemmas can be generalized to an arbitrary scheduler. *)
 Section IncrementalService.
 
@@ -127,7 +127,7 @@ Section IncrementalService.
   (** ... any arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
+  (** ... and any ideal uni-processor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).  
 
   (** As a base case, we prove that if a job j receives service in

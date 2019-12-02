@@ -31,7 +31,7 @@ Section JLFPInstantiation.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set: arrival_sequence_uniq arr_seq. 
   
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
+  (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
@@ -55,7 +55,7 @@ Section JLFPInstantiation.
      earlier-arrived jobs of the same task. *)
   Hypothesis H_JLFP_respects_sequential_tasks : policy_respects_sequential_tasks.
 
-  (** Let tsk be any task in ts that is to be analyzed. *)
+  (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
 
   (** For simplicity, let's define some local names. *)
@@ -72,13 +72,13 @@ Section JLFPInstantiation.
      of a job, we need to distinguish interference received from other
      jobs of the same task and jobs of other tasks. In that regard, we
      introduce two additional relations. The first relation defines
-     whether job j1 has a higher-than-or-equal-priority than job j2
-     and j1 is not equal to j2... *)
+     whether job [j1] has a higher-than-or-equal-priority than job [j2]
+     and [j1] is not equal to [j2]... *)
   Let another_hep_job: JLFP_policy Job :=
     fun j1 j2 => higher_eq_priority j1 j2 && (j1 != j2).
 
-  (** ...and the second relation defines whether a job j1 has a higher-or-equal-priority than 
-     job j2 and the task of j1 is not equal to task of j2. *)
+  (** ...and the second relation defines whether a job [j1] has a higher-or-equal-priority than 
+     job [j2] and the task of [j1] is not equal to task of [j2]. *)
   Let hep_job_from_another_task: JLFP_policy Job :=
     fun j1 j2 => higher_eq_priority j1 j2 && (job_task j1 != job_task j2).
 
@@ -99,7 +99,7 @@ Section JLFPInstantiation.
     is_priority_inversion sched higher_eq_priority j t.
   
   (** Next, we say that job j is incurring interference from another job with higher or equal 
-     priority at time t, if there exists job jhp (different from j) with a higher or equal priority 
+     priority at time t, if there exists job [jhp] (different from j) with a higher or equal priority 
      that executes at time t. *)
   Definition is_interference_from_another_hep_job (j : Job) (t : instant) :=
     if sched t is Some jhp then
@@ -107,7 +107,7 @@ Section JLFPInstantiation.
     else false.
   
   (** Similarly, we say that job j is incurring interference from a job with higher or 
-     equal priority of another task at time t, if there exists a job jhp (of a different task) 
+     equal priority of another task at time t, if there exists a job [jhp] (of a different task) 
      with higher or equal priority that executes at time t. *)
   Definition is_interference_from_hep_job_from_another_task (j : Job) (t : instant) :=
     if sched t is Some jhp then
@@ -182,7 +182,7 @@ Section JLFPInstantiation.
       interfering workload) and definitions corresponding to the conventional concepts.
       
       As it was mentioned previously, instantiated functions of interference and 
-      interfering workload usually do not have any useful lemmas about them. Hovewer,
+      interfering workload usually do not have any useful lemmas about them. However,
       it is possible to prove their equivalence to the more conventional notions like 
       service or workload. Next we prove the equivalence between the instantiations 
       and conventional notions. *)
@@ -214,10 +214,10 @@ Section JLFPInstantiation.
       }
     Qed.          
     
-    (** Let j be any job of task tsk, and let upp_t be any time instant after job j's arrival.
-       Then for any time interval lying before upp_t, the cumulative interference received by tsk 
-       is equal to the sum of the cumulative priority inversion of job j and the cumulative interference
-       incurred by task tsk due to other tasks. *)
+    (** Let [j] be any job of task [tsk], and let [upp_t] be any time instant after job [j]'s arrival.
+       Then for any time interval lying before [upp_t], the cumulative interference received by [tsk] 
+       is equal to the sum of the cumulative priority inversion of job [j] and the cumulative interference
+       incurred by task [tsk] due to other tasks. *)
     Lemma cumulative_task_interference_split: 
       forall j t1 t2 upp_t, 
         job_task j = tsk ->
@@ -275,7 +275,7 @@ Section JLFPInstantiation.
       (** Let [t1,t2) be any time interval. *)
       Variables t1 t2 : instant.
       
-      (** Consider any job j of tsk. *)
+      (** Consider any job j of [tsk]. *)
       Variable j : Job.
       Hypothesis H_j_arrives : arrives_in arr_seq j.
       Hypothesis H_job_of_tsk : job_of_task tsk j.
@@ -424,7 +424,7 @@ Section JLFPInstantiation.
          the conventional, concrete definition of busy interval for JLFP scheduling. *)
       Section BusyIntervalEquivalence.
 
-        (** Consider any job j of tsk. *)
+        (** Consider any job j of [tsk]. *)
         Variable j : Job.
         Hypothesis H_j_arrives : arrives_in arr_seq j.
         Hypothesis H_job_of_tsk : job_task j = tsk.

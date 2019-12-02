@@ -6,9 +6,9 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 
 (** * Abstract Response-Time Analysis *)
 (** In this module, we propose the general framework for response-time analysis (RTA) 
-    of uniprocessor scheduling of real-time tasks with arbitrary arrival models. *)
+    of uni-processor scheduling of real-time tasks with arbitrary arrival models. *)
 (** We prove that the maximum (with respect to the set of offsets) among the solutions
-   of the response-time bound recurrence is a response time bound for tsk. Note that
+   of the response-time bound recurrence is a response time bound for [tsk]. Note that
    in this section we do not rely on any hypotheses about job sequentiality. *)
 Section Abstract_RTA.
  
@@ -29,7 +29,7 @@ Section Abstract_RTA.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (** Next, consider any uniprocessor schedule of this arrival sequence...*)
+  (** Next, consider any uni-processor schedule of this arrival sequence...*)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
   
@@ -44,7 +44,7 @@ Section Abstract_RTA.
   (** Consider a task set ts... *)
   Variable ts : list Task.
 
-  (** ... and a task tsk of ts that is to be analyzed. *)
+  (** ... and a task [tsk] of ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
@@ -53,8 +53,8 @@ Section Abstract_RTA.
     valid_preemption_model arr_seq sched.
   
   (** ...and a valid task run-to-completion threshold function. That is, 
-     [task_run_to_completion_threshold tsk] is (1) no bigger than tsk's 
-     cost, (2) for any job of task tsk job_run_to_completion_threshold 
+     [task_run_to_completion_threshold tsk] is (1) no bigger than [tsk]'s 
+     cost, (2) for any job of task [tsk] job_run_to_completion_threshold 
      is bounded by task_run_to_completion_threshold. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
@@ -77,13 +77,13 @@ Section Abstract_RTA.
   Let busy_interval := busy_interval sched interference interfering_workload.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
   
-  (** Let L be a constant which bounds any busy interval of task tsk. *)
+  (** Let L be a constant which bounds any busy interval of task [tsk]. *)
   Variable L : duration.
   Hypothesis H_busy_interval_exists:
     busy_intervals_are_bounded_by interference interfering_workload L.
 
   (** Next, assume that interference_bound_function is a bound on 
-     the interference incurred by jobs of task tsk. *)
+     the interference incurred by jobs of task [tsk]. *)
   Variable interference_bound_function : Task -> duration -> duration -> duration.
   Hypothesis H_job_interference_is_bounded:
     job_interference_is_bounded_by
@@ -92,9 +92,9 @@ Section Abstract_RTA.
   (** For simplicity, let's define a local name for the search space. *)
   Let is_in_search_space A := is_in_search_space tsk L interference_bound_function A.
 
-  (** Consider any value R that upper-bounds the solution of each response-time recurrence, 
+  (** Consider any value [R] that upper-bounds the solution of each response-time recurrence, 
      i.e., for any relative arrival time A in the search space, there exists a corresponding 
-     solution F such that F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R. *)
+     solution [F] such that [F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R]. *)
   Variable R: nat.
   Hypothesis H_R_is_maximum:
     forall A,
@@ -105,10 +105,10 @@ Section Abstract_RTA.
         F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
 
   (** In this section we show a detailed proof of the main theorem 
-     that establishes that R is a response-time bound of task tsk. *) 
+     that establishes that R is a response-time bound of task [tsk]. *) 
   Section ProofOfTheorem.
 
-    (** Consider any job j of tsk with positive cost. *)
+    (** Consider any job j of [tsk] with positive cost. *)
     Variable j: Job. 
     Hypothesis H_j_arrives: arrives_in arr_seq j.
     Hypothesis H_job_of_tsk: job_task j = tsk.
@@ -123,29 +123,29 @@ Section Abstract_RTA.
 
     (** In order to prove that R is a response-time bound of job j, we use hypothesis H_R_is_maximum. 
        Note that the relative arrival time (A) is not necessarily from the search space. However, 
-       earlier we have proven that for any A there exists another A_sp from the search space that
-       shares the same IBF value. Moreover, we've also shown that there exists an F_sp such that
-       F_sp is a solution of the response time recurrence for parameter A_sp. Thus, despite the 
+       earlier we have proven that for any A there exists another [A_sp] from the search space that
+       shares the same IBF value. Moreover, we've also shown that there exists an [F_sp] such that
+       [F_sp] is a solution of the response time recurrence for parameter [A_sp]. Thus, despite the 
        fact that the relative arrival time may not lie in the search space, we can still use
        the assumption H_R_is_maximum. *)
     
-    (** More formally, consider any A_sp and F_sp such that:.. *)
+    (** More formally, consider any [A_sp] and [F_sp] such that:.. *)
     Variable A_sp F_sp : duration.
     
-    (** (a) A_sp is less than or equal to A... *)
+    (** (a) [A_sp] is less than or equal to [A]... *)
     Hypothesis H_A_gt_Asp : A_sp <= A.
     
-    (** (b) interference_bound_function(A, x) is equal to
-       interference_bound_function(A_sp, x) for all x less than L... *)
+    (** (b) [interference_bound_function(A, x)] is equal to
+       [interference_bound_function(A_sp, x)] for all [x] less than [L]... *)
     Hypothesis H_equivalent :
       are_equivalent_at_values_less_than
         (interference_bound_function tsk A)
         (interference_bound_function tsk A_sp) L.
     
-    (** (c) A_sp is in the search space, ... *)
+    (** (c) [A_sp] is in the search space, ... *)
     Hypothesis H_Asp_is_in_search_space : is_in_search_space A_sp.
    
-    (** (d) [A_sp + F_sp] is a solution of the response time reccurence... *)
+    (** (d) [A_sp + F_sp] is a solution of the response time recurrence... *)
     Hypothesis H_Asp_Fsp_fixpoint :
       A_sp + F_sp = task_run_to_completion_threshold tsk + interference_bound_function tsk A_sp (A_sp + F_sp).
 
@@ -162,7 +162,7 @@ Section Abstract_RTA.
       (** By assumption, suppose that t2 is less than or equal to [t1 + A_sp + F_sp]. *)
       Hypothesis H_big_fixpoint_solution : t2 <= t1 + (A_sp + F_sp).
 
-      (** Then we prove that [job_arrival j + R] is no less than t2. *)
+      (** Then we prove that [job_arrival j + R] is no less than [t2]. *)
       Lemma t2_le_arrival_plus_R:
         t2 <= job_arrival j + R.
       Proof.
@@ -197,32 +197,32 @@ Section Abstract_RTA.
       Hypothesis H_small_fixpoint_solution : t1 + (A_sp + F_sp) < t2.
 
       (** Next, let's consider two other cases: *)
-      (** CASE 1: the value of the fixpoint is no less than the relative arrival time of job j. *)
+      (** CASE 1: the value of the fix-point is no less than the relative arrival time of job [j]. *)
       Section FixpointIsNoLessThanArrival.
         
-        (** Suppose that [A_sp + F_sp] is no less than relative arrival of job j. *)
+        (** Suppose that [A_sp + F_sp] is no less than relative arrival of job [j]. *)
         Hypothesis H_fixpoint_is_no_less_than_relative_arrival_of_j : A <= A_sp + F_sp.
  
-        (** In this section, we prove that the fact that job j is not completed by 
+        (** In this section, we prove that the fact that job [j] is not completed by 
            time [job_arrival j + R] leads to a contradiction. Which in turn implies
-           that the opposite is true -- job j completes by time [job_arrival j + R]. *)
+           that the opposite is true -- job [j] completes by time [job_arrival j + R]. *)
         Section ProofByContradiction.
             
-          (** Recall that by lemma "solution_for_A_exists" there is a solution F 
-             of the response-time recurrence for the given relative arrival time A 
+          (** Recall that by lemma "solution_for_A_exists" there is a solution [F] 
+             of the response-time recurrence for the given relative arrival time [A] 
              (which is not necessarily from the search space). *)
 
-          (** Thus, consider a constant F such that:.. *)
+          (** Thus, consider a constant [F] such that:.. *)
           Variable F : duration.
-          (** (a) the sum of A_sp and F_sp is equal to the sum of A and F... *)
+          (** (a) the sum of [A_sp] and [F_sp] is equal to the sum of [A] and [F]... *)
           Hypothesis H_Asp_Fsp_eq_A_F : A_sp + F_sp = A + F.
-          (** (b) F is at most F_sp... *)
+          (** (b) [F] is at mo1st [F_sp]... *)
           Hypothesis H_F_le_Fsp : F <= F_sp.
-          (** (c) and [A + F] is a solution for the response-time recurrence for A. *)
+          (** (c) and [A + F] is a solution for the response-time recurrence for [A]. *)
           Hypothesis H_A_F_fixpoint:
             A + F = task_run_to_completion_threshold tsk + interference_bound_function tsk A (A + F).
  
-          (** Next, we assume that job j is not completed by time [job_arrival j + R]. *)
+          (** Next, we assume that job [j] is not completed by time [job_arrival j + R]. *)
           Hypothesis H_j_not_completed : ~~ completed_by sched j (job_arrival j + R).
 
           (** Some additional reasoning is required since the term [task_cost tsk - task_run_to_completion_threshold tsk]
@@ -233,25 +233,25 @@ Section Abstract_RTA.
              in the case of floating non-preemptive sections). 
 
              In this case we cannot directly apply lemma "j_receives_at_least_run_to_completion_threshold". Therefore
-             we introduce two temporal notions of the last nonpreemptive region of job j and an execution 
+             we introduce two temporal notions of the last non-preemptive region of job j and an execution 
              optimism. We use these notions inside this proof, so we define them only locally. *)
 
-          (** Let the last nonpreemptive region of job j (last) be the difference between the cost of the job 
-             and the j's run-to-completion threshold (i.e. [job_cost j - job_run_to_completion_threshold j]). 
+          (** Let the last non-preemptive region of job [j] (last) be the difference between the cost of the job 
+             and the [j]'s run-to-completion threshold (i.e. [job_cost j - job_run_to_completion_threshold j]). 
              We know that after j has reached its run-to-completion threshold, it will additionally be executed
              [job_last j] units of time. *)          
           Let job_last := job_cost j - job_run_to_completion_threshold j.
 
-          (** And let execution optimism (optimism) be the difference between the tsk's 
-             run-to-completion threshold and the j's run-to-completion threshold (i.e. 
+          (** And let execution optimism (optimism) be the difference between the [tsk]'s 
+             run-to-completion threshold and the [j]'s run-to-completion threshold (i.e. 
              [task_run_to_completion_threshold -  job_run_to_completion_threshold]).
              Intuitively, optimism is how much earlier job j has received its 
              run-to-completion threshold than it could at worst.  *)
           Let optimism := task_run_to_completion_threshold tsk - job_run_to_completion_threshold j.
           
-          (** From lemma "j_receives_at_least_run_to_completion_threshold" with parametetrs [progress_of_job :=
-             job_run_to_completion_threshold j] and [delta := (A + F) - optimism)] we know that service of j
-             by time [t1 + (A + F) - optimism] is no less than [job_run_to_completion_threshold j]. Hence, job j
+          (** From lemma "j_receives_at_least_run_to_completion_threshold" with parameters [progress_of_job :=
+             job_run_to_completion_threshold j] and [delta := (A + F) - optimism)] we know that service of [j]
+             by time [t1 + (A + F) - optimism] is no less than [job_run_to_completion_threshold j]. Hence, job [j]
              is completed by time [t1 + (A + F) - optimism + last]. *)
           Lemma j_is_completed_by_t1_A_F_optimist_last :
             completed_by sched j (t1 + (A + F - optimism) + job_last).
@@ -295,10 +295,10 @@ Section Abstract_RTA.
              So, for example [a + (b - c) = a + b - c] only if [b ≥ c]. *) 
           Section AuxiliaryInequalities.
             
-            (** Recall that we consider a busy interval of a job j, and j has arrived A time units 
+            (** Recall that we consider a busy interval of a job [j], and [j] has arrived [A] time units 
                after the beginning the busy interval. From basic properties of a busy interval it 
-               follows that job j incurrs interference at any time instant t ∈ [t1, t1 + A). 
-               Therefore interference_bound_function(tsk, A, A + F) is at least A. *)
+               follows that job [j] incurs interference at any time instant t ∈ [t1, t1 + A). 
+               Therefore [interference_bound_function(tsk, A, A + F)] is at least [A]. *)
             Lemma relative_arrival_le_interference_bound:
               A <= interference_bound_function tsk A (A + F).
             Proof.
@@ -342,7 +342,7 @@ Section Abstract_RTA.
             Qed.
             
             (** As two trivial corollaries, we show that 
-               tsk's run-to-completion threshold is at most F_sp... *)
+               [tsk]'s run-to-completion threshold is at most [F_sp]... *)
             Corollary tsk_run_to_completion_threshold_le_Fsp :
               task_run_to_completion_threshold tsk <= F_sp.
             Proof.
@@ -354,7 +354,7 @@ Section Abstract_RTA.
               apply leq_trans with F; auto.
             Qed.
             
-            (** ... and optimism is at most F. *)
+            (** ... and optimism is at most [F]. *)
             Corollary optimism_le_F :
               optimism <= F.
             Proof.
@@ -371,13 +371,13 @@ Section Abstract_RTA.
           (** Next we show that [t1 + (A + F) - optimism + last] is at most [job_arrival j + R], 
              which is easy to see from the following sequence of inequalities:
 
-             t1 + (A + F) - optimism + last 
-             ≤ job_arrival j + (F - optimism) + job_last 
-             ≤ job_arrival j + (F_sp - optimism) + job_last 
-             ≤ job_arrival j + F_sp + (job_last - optimism)
-             ≤ job_arrival j + F_sp + job_cost j - task_run_to_completion_threshold tsk 
-             ≤ job_arrival j + F_sp + task_cost tsk - task_run_to_completion_threshold tsk
-             ≤ job_arrival j + R. *)
+             [t1 + (A + F) - optimism + last]
+             [≤ job_arrival j + (F - optimism) + job_last]
+             [≤ job_arrival j + (F_sp - optimism) + job_last]
+             [≤ job_arrival j + F_sp + (job_last - optimism)]
+             [≤ job_arrival j + F_sp + job_cost j - task_run_to_completion_threshold tsk]
+             [≤ job_arrival j + F_sp + task_cost tsk - task_run_to_completion_threshold tsk]
+             [≤ job_arrival j + R]. *)
           Lemma t1_A_F_optimist_last_le_arrival_R :
             t1 + (A + F - optimism) + job_last <= job_arrival j + R.
           Proof.
@@ -406,7 +406,7 @@ Section Abstract_RTA.
             }
           Qed.
           
-          (** ... which contradicts the initial assumption about j is not 
+          (** ... which contradicts the initial assumption about [j] is not 
              completed by time [job_arrival j + R]. *)
           Lemma j_is_completed_earlier_contradiction : False.
           Proof.
@@ -417,7 +417,7 @@ Section Abstract_RTA.
           
         End ProofByContradiction.
 
-        (** Putting everything together, we conclude that j is completed by [job_arrival j + R]. *) 
+        (** Putting everything together, we conclude that [j] is completed by [job_arrival j + R]. *) 
         Lemma job_completed_by_arrival_plus_R_2:
           completed_by sched j (job_arrival j + R).
         Proof.
@@ -445,9 +445,9 @@ Section Abstract_RTA.
         
       End FixpointIsNoLessThanArrival.
 
-      (** CASE 2: the value of the fixpoint is less than the relative arrival time of 
-         job j (which turns out to be impossible, i.e. the solution of the responce-time 
-         recurrense is always equal to or greater than the relative arrival time). *)
+      (** CASE 2: the value of the fix-point is less than the relative arrival time of 
+         job j (which turns out to be impossible, i.e. the solution of the response-time 
+         recurrence is always equal to or greater than the relative arrival time). *)
       Section FixpointCannotBeSmallerThanArrival.
 
         (** Assume that [A_sp + F_sp] is less than A. *)
@@ -497,8 +497,8 @@ Section Abstract_RTA.
             by rewrite {2}H_Asp_Fsp_fixpoint leq_add //; apply H_valid_run_to_completion_threshold.
         Qed.
 
-        (** However, this is a contradiction. Since job j has not yet arrived, its service 
-           is equal to 0. However, run-to-completion threshold is always positive. *)
+        (** However, this is a contradiction. Since job [j] has not yet arrived, its service 
+           is equal to [0]. However, run-to-completion threshold is always positive. *)
         Lemma relative_arrival_time_is_no_less_than_fixpoint:
           False.
         Proof.
@@ -518,7 +518,7 @@ Section Abstract_RTA.
     
   End ProofOfTheorem.
 
-  (** Using the lemmas above, we prove that R is a response-time bound. *)  
+  (** Using the lemmas above, we prove that [R] is a response-time bound. *)  
   Theorem uniprocessor_response_time_bound:
     response_time_bounded_by tsk R. 
   Proof. 

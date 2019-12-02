@@ -5,7 +5,7 @@ Require Import rt.restructuring.model.task.preemption.fully_nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
-(** * Platform for Fully Non-Premptive Model *)
+(** * Platform for Fully Non-Preemptive Model *)
 (** In this section, we prove that instantiation of functions
     [job_preemptable and task_max_nonpreemptive_segment] to the fully
     non-preemptive model indeed defines a valid preemption model with
@@ -26,7 +26,7 @@ Section FullyNonPreemptiveModel.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   
-  (** Next, consider any ideal non-preemptive uniprocessor schedule of this arrival sequence... *)
+  (** Next, consider any ideal non-preemptive uni-processor schedule of this arrival sequence... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_nonpreemptive_sched : is_nonpreemptive_schedule sched.
   
@@ -39,7 +39,7 @@ Section FullyNonPreemptiveModel.
     cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
   (** Then we prove that [fully_nonpreemptive_model] function
-      defines a model with bounded nonpremtive regions.*) 
+      defines a model with bounded non-preemptive regions.*) 
   Lemma fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions: 
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof. 

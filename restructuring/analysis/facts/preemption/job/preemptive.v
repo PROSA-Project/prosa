@@ -1,7 +1,7 @@
 Require Export rt.restructuring.model.task.preemption.parameters.
 Require Import rt.restructuring.model.preemption.fully_preemptive.
 
-(** * Preemptions in Fully Premptive Model *)
+(** * Preemptions in Fully Preemptive Model *)
 (** In this section, we prove that instantiation of predicate
     [job_preemptable] to the fully preemptive model indeed defines
     a valid preemption model. *)

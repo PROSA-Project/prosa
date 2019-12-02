@@ -1,7 +1,7 @@
 Require Export rt.restructuring.model.arrival.arrival_curves.
 Require Export rt.restructuring.model.priority.classes.
 
-(** The following definitions assume ideal uniprocessor schedules.  This
+(** The following definitions assume ideal uni-processor schedules.  This
     restriction exists for historic reasons; the defined concepts could be
     generalized in future work. *)
 Require Import rt.restructuring.analysis.facts.behavior.ideal_schedule.
@@ -25,24 +25,24 @@ Section TaskWorkloadBoundedByArrivalCurves.
   Context `{JobTask Job Task}.
   Context `{JobCost Job}.
 
-  (** Consider any ideal uniprocessor schedule of these jobs... *)
+  (** Consider any ideal uni-processor schedule of these jobs... *)
   Variable sched : schedule (ideal.processor_state Job).
 
   (** ... and an FP policy that indicates a higher-or-equal priority
       relation. *)
   Variable higher_eq_priority : FP_policy Task.
 
-  (** Let MaxArrivals denote any function that takes a task and an interval length
+  (** Let [MaxArrivals] denote any function that takes a task and an interval length
       and returns the associated number of job arrivals of the task. *)
   Context `{MaxArrivals Task}.
 
   (** ** RBF of a Single Task *)
 
   (** In this section, we define a bound for the workload of a single task
-      under uniprocessor FP scheduling. *)
+      under uni-processor FP scheduling. *)
   Section SingleTask.
 
-    (** Consider any task tsk that is to be scheduled in an interval of length delta. *)
+    (** Consider any task [tsk] that is to be scheduled in an interval of length delta. *)
     Variable tsk : Task.
     Variable delta : duration.
 
@@ -59,7 +59,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
     (** Consider a task set ts... *)
     Variable ts : list Task.
 
-    (** ...and let tsk be any task in task set. *)
+    (** ...and let [tsk] be any task in task set. *)
     Variable tsk : Task.
 
     (** Let delta be the length of the interval of interest. *)
@@ -77,14 +77,14 @@ Section TaskWorkloadBoundedByArrivalCurves.
       \sum_(tsk <- ts) task_request_bound_function tsk delta.
 
     (** Similarly, we define the following bound for the total workload of
-        tasks of higher-or-equal priority (with respect to tsk) in any interval
+        tasks of higher-or-equal priority (with respect to [tsk]) in any interval
         of length delta. *)
     Definition total_hep_request_bound_function_FP :=
       \sum_(tsk_other <- ts | is_hep_task tsk_other)
        task_request_bound_function tsk_other delta.
 
     (** We also define a bound for the total workload of higher-or-equal
-        priority tasks other than tsk in any interval of length delta. *)
+        priority tasks other than [tsk] in any interval of length delta. *)
     Definition total_ohep_request_bound_function_FP :=
       \sum_(tsk_other <- ts | is_other_hep_task tsk_other)
        task_request_bound_function tsk_other delta.

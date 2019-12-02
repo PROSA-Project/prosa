@@ -5,13 +5,13 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 
 (** * Run-to-Completion Threshold of a job *)
 (** In this module, we provide a sufficient condition under which a job
-    receives enough service to become nonpreemptive. *)
+    receives enough service to become non-preemptive. *)
 (** Previously we defined the notion of run-to-completion threshold (see file
    abstract.run_to_completion_threshold.v). Run-to-completion threshold is the
    amount of service after which a job cannot be preempted until its completion.
    In this section we prove that if cumulative interference inside a busy interval
    is bounded by a certain constant then a job executes long enough to reach its
-   run-to-completion threshold and become nonpreemptive. *)
+   run-to-completion threshold and become non-preemptive. *)
 Section AbstractRTARunToCompletionThreshold.
 
   (** Consider any type of tasks ... *)
@@ -25,20 +25,20 @@ Section AbstractRTARunToCompletionThreshold.
   Context `{JobCost Job}.
 
   (** In addition, we assume existence of a function
-     maping jobs to their preemption points. *)
+     mapping jobs to their preemption points. *)
   Context `{JobPreemptable Job}.
 
   (** Consider any arrival sequence with consistent arrivals... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
+  (** Next, consider any ideal uni-processor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
 
   (** Assume that the job costs are no larger than the task costs. *)
   Hypothesis H_jobs_respect_taskset_costs : cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
 
-  (** Let tsk be any task that is to be analyzed. *)
+  (** Let [tsk] be any task that is to be analyzed. *)
   Variable tsk : Task.
 
   (** Assume we are provided with abstract functions for interference and interfering workload. *)
@@ -54,17 +54,17 @@ Section AbstractRTARunToCompletionThreshold.
   (** We assume that the schedule is work-conserving. *)
   Hypothesis H_work_conserving: work_conserving interference interfering_workload.
 
-  (** Let j be any job of task tsk with positive cost. *)
+  (** Let [j] be any job of task [tsk] with positive cost. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_task j = tsk.
   Hypothesis H_job_cost_positive : job_cost_positive j.
 
-  (** Next, consider any busy interval [t1, t2) of job j. *)
+  (** Next, consider any busy interval [t1, t2) of job [j]. *)
   Variable t1 t2 : instant.
   Hypothesis H_busy_interval : busy_interval j t1 t2.
 
-  (** First, we prove that job j completes by the end of the busy interval.
+  (** First, we prove that job [j] completes by the end of the busy interval.
      Note that the busy interval contains the execution of job j, in addition
      time instant t2 is a quiet time. Thus by the definition of a quiet time
      the job should be completed before time t2. *)
@@ -79,10 +79,10 @@ Section AbstractRTARunToCompletionThreshold.
   Qed.
 
   (** In this section we show that the cumulative interference is a complement to
-     the total time where job j is scheduled inside the busy interval. *)
+     the total time where job [j] is scheduled inside the busy interval. *)
   Section InterferenceIsComplement.
 
-    (** Consider any subinterval [t, t + delta) inside the busy interval [t1, t2). *)
+    (** Consider any sub-interval [t, t + delta) inside the busy interval [t1, t2). *)
     Variables (t : instant) (delta : duration).
     Hypothesis H_greater_than_or_equal : t1 <= t.
     Hypothesis H_less_or_equal: t + delta <= t2.
@@ -108,7 +108,7 @@ Section AbstractRTARunToCompletionThreshold.
 
   End InterferenceIsComplement.
 
-  (** In this section, we prove a sufficient condition under which job j receives enough service. *)
+  (** In this section, we prove a sufficient condition under which job [j] receives enough service. *)
   Section InterferenceBoundedImpliesEnoughService.
 
     (** Let progress_of_job be the desired service of job j. *)
@@ -162,7 +162,7 @@ Section AbstractRTARunToCompletionThreshold.
     Hypothesis H_valid_preemption_model:
       valid_preemption_model arr_seq sched.
 
-    (** Then, job j must complete in [job_cost j - job_run_to_completion_threshold j] time
+    (** Then, job [j] must complete in [job_cost j - job_run_to_completion_threshold j] time
        units after it reaches run-to-completion threshold. *)
     Lemma job_completes_after_reaching_run_to_completion_threshold:
       forall t,

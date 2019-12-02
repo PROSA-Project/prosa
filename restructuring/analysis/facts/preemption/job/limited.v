@@ -27,7 +27,7 @@ Section ModelWithLimitedPreemptions.
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   
-  (** Next, consider any limited ideal uniprocessor schedule of this arrival sequence ... *)
+  (** Next, consider any limited ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_valid_schedule_with_limited_preemptions:
     valid_schedule_with_limited_preemptions arr_seq sched.
@@ -84,8 +84,8 @@ Section ModelWithLimitedPreemptions.
         by apply list_of_preemption_point_is_not_empty.
     Qed.
 
-    (** As a corollary, we prove that the sequence of nonpreemptive
-        points of a job with poisitive cost contains at least 2
+    (** As a corollary, we prove that the sequence of non-preemptive
+        points of a job with positive cost contains at least 2
         points. *)
     Corollary number_of_preemption_points_at_least_two:
       job_cost_positive j ->
@@ -107,8 +107,8 @@ Section ModelWithLimitedPreemptions.
       - by rewrite EQ; apply job_cost_in_nonpreemptive_points.
     Qed.
 
-    (** Next we prove that "antidensity" property (from
-        preemption.util file) holds for [job_preemption_point j]. *)
+    (** Next we prove that "anti-density" property (from
+        [preemption.util] file) holds for [job_preemption_point j]. *)
     Lemma antidensity_of_preemption_points:
       forall (ρ : work),
         ρ <= job_cost j -> 
@@ -157,7 +157,7 @@ Section ModelWithLimitedPreemptions.
     Qed.
 
     (** Recall that file [job.parameters] also defines notion of
-        preemption poins.  And note that
+        preemption points.  And note that
         [job.parameter.job_preemption_points] cannot have a
         duplicating preemption points. Therefore, we need additional
         lemmas to relate [job.parameter.job_preemption_points] and

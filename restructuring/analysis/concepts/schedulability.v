@@ -17,14 +17,14 @@ Section Task.
   (** ...and any schedule of these jobs. *)
   Variable sched: schedule PState.
 
-  (** Let tsk be any task that is to be analyzed. *)
+  (** Let [tsk] be any task that is to be analyzed. *)
   Variable tsk: Task.
 
-  (** Then, we say that R is a response-time bound of tsk in this schedule ... *)
+  (** Then, we say that R is a response-time bound of [tsk] in this schedule ... *)
   Variable R: duration.
 
-  (** ... iff any job j of tsk in this arrival sequence has
-         completed by (job_arrival j + R). *)
+  (** ... iff any job [j] of [tsk] in this arrival sequence has
+         completed by [job_arrival j + R]. *)
   Definition task_response_time_bound :=
     forall j,
       arrives_in arr_seq j ->
@@ -83,16 +83,16 @@ Section Schedulability.
   (** Assume that jobs don't execute after completion. *)
   Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
 
-  (** Let tsk be any task that is to be analyzed. *)
+  (** Let [tsk] be any task that is to be analyzed. *)
   Variable tsk: Task.
 
-  (** Given  a response-time bound of tsk in this schedule no larger than its deadline, ... *)
+  (** Given  a response-time bound of [tsk] in this schedule no larger than its deadline, ... *)
   Variable R: duration.
 
   Hypothesis H_R_le_deadline: R <= task_deadline tsk.
   Hypothesis H_response_time_bounded: task_response_time_bound arr_seq sched tsk R.
 
-  (** ...then tsk is schedulable. *)
+  (** ...then [tsk] is schedulable. *)
   Lemma schedulability_from_response_time_bound:
     schedulable_task arr_seq sched tsk.
   Proof.

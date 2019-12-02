@@ -4,7 +4,7 @@ Require Export rt.restructuring.analysis.concepts.priority_inversion.
 Require Export rt.restructuring.analysis.facts.behavior.all.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
@@ -12,7 +12,7 @@ Require Import rt.restructuring.model.readiness.basic.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of
-    busy intervals for uniprocessor for JLFP schedulers. *)
+    busy intervals for uni-processor for JLFP schedulers. *)
 Section ExistsBusyIntervalJLFP.
   
   (** Consider any type of tasks ... *)
@@ -29,7 +29,7 @@ Section ExistsBusyIntervalJLFP.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
+  (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
@@ -95,7 +95,7 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_not_quiet : ~ quiet_time t2.
     
     (** Then, we prove that there is a job pending at time t2
-         that has higher or equal priority (with respect of tsk). *)
+         that has higher or equal priority (with respect of [tsk]). *)
     Lemma not_quiet_implies_exists_pending_job:
       exists j_hp,
         arrives_in arr_seq j_hp /\
@@ -141,7 +141,7 @@ Section ExistsBusyIntervalJLFP.
     Variable t1 t2 : instant.
     Hypothesis H_busy_interval_prefix : busy_interval_prefix t1 t2.
 
-    (** We prove that if the processot is idle at a time instant t, then 
+    (** We prove that if the processor is idle at a time instant t, then 
            the next time instant [t+1] will be a quiet time. *)
     Lemma idle_time_implies_quiet_time_at_the_next_time_instant:
       forall (t : instant),
@@ -337,7 +337,7 @@ Section ExistsBusyIntervalJLFP.
   End QuietTimeAndServiceOfJobs.
 
   (** In this section, we show that the length of any busy interval
-      is bounded, as long as there is enough supply to accomodate
+      is bounded, as long as there is enough supply to accommodate
       the workload of tasks with higher or equal priority. *)
   Section BoundingBusyInterval.
 

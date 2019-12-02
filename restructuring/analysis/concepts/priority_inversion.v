@@ -3,7 +3,7 @@ Require Export rt.restructuring.analysis.concepts.busy_interval.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** * Cumulative Priority Inversion for JLFP-models *)
-(** In this module we define the notion of cumulative priority inversion for uniprocessor for JLFP schedulers. *)
+(** In this module we define the notion of cumulative priority inversion for uni-processor for JLFP schedulers. *)
 Section CumulativePriorityInversion.
   
   (** Consider any type of tasks ... *)
@@ -32,7 +32,7 @@ Section CumulativePriorityInversion.
     (** Consider an arbitrary task [tsk]. *)
     Variable tsk : Task.
 
-    (** Consider any job j of tsk. *)
+    (** Consider any job j of [tsk]. *)
     Variable j : Job.
     Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
     Hypothesis H_job_task : job_of_task tsk j. 
@@ -52,8 +52,8 @@ Section CumulativePriorityInversion.
     Definition cumulative_priority_inversion (t1 t2 : instant) :=
       \sum_(t1 <= t < t2) is_priority_inversion t.
 
-    (** We say that priority inversion of job j is bounded by a constant B iff cumulative 
-         priority inversion within any busy inverval prefix is bounded by B. *)
+    (** We say that priority inversion of job [j] is bounded by a constant [B] iff cumulative 
+         priority inversion within any busy interval prefix is bounded by [B]. *)
     Definition priority_inversion_of_job_is_bounded_by (B : duration) :=
       forall (t1 t2 : instant),
         busy_interval_prefix arr_seq sched higher_eq_priority j t1 t2 ->
@@ -64,10 +64,10 @@ Section CumulativePriorityInversion.
   (** In this section, we define a notion of the bounded priority inversion for task. *)
   Section TaskPriorityInversionBound.
 
-    (** Consider an arbitrary task tsk. *)
+    (** Consider an arbitrary task [tsk]. *)
     Variable tsk : Task.
 
-    (** We say that task tsk has bounded priority inversion if all 
+    (** We say that task [tsk] has bounded priority inversion if all 
          its jobs have bounded cumulative priority inversion. *)
     Definition priority_inversion_is_bounded_by (B : duration) :=
       forall (j : Job),

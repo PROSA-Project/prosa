@@ -5,7 +5,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 Require Import rt.restructuring.model.processor.ideal.
 
 (** * No Carry-In *)
-(** In this module we define the notion of no carry-in time for uniprocessor schedulers. *)
+(** In this module we define the notion of no carry-in time for uni-processor schedulers. *)
 Section NoCarryIn.
   
   (** Consider any type of tasks ... *)
@@ -22,7 +22,7 @@ Section NoCarryIn.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
+  (** Next, consider any ideal uni-processor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
 
   (** The processor has no carry-in at time t iff every job (regardless of priority) 

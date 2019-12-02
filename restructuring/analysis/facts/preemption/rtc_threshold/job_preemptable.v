@@ -4,7 +4,7 @@ Require Export rt.restructuring.model.task.preemption.parameters.
 
 (** * Run-to-Completion Threshold *) 
 (** In this section, we provide a few basic properties 
-    of run-to-completion-threshold-compilant schedules. *)
+    of run-to-completion-threshold-compliant schedules. *)
 Section RunToCompletionThreshold.
 
   (**  Consider any type of jobs. *)
@@ -13,7 +13,7 @@ Section RunToCompletionThreshold.
   Context `{JobCost Job}.
 
   (** In addition, we assume existence of a function
-      maping jobs to theirs preemption points. *)
+      mapping jobs to theirs preemption points. *)
   Context `{JobPreemptable Job}.
 
   (** Consider any kind of processor state model, ... *)
@@ -117,7 +117,7 @@ Section RunToCompletionThreshold.
       + by apply A2.
     Qed.
     
-    (** Last nonpreemptive segment of a positive-cost job has positive length. *)
+    (** Last non-preemptive segment of a positive-cost job has positive length. *)
     Lemma job_last_nonpreemptive_segment_positive:
       job_cost_positive j ->
       0 < job_last_nonpreemptive_segment j.

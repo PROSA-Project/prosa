@@ -42,8 +42,8 @@ Section Composition.
     rewrite /service service_during_geq //.
   Qed.
 
-  (** Trivially, an interval consiting of one time unit is equivalent to
-     service_at.  *)
+  (** Trivially, an interval consisting of one time unit is equivalent to
+     [service_at].  *)
   Lemma service_during_instant:
     forall t,
       service_during sched j t t.+1 = service_at sched j t.
@@ -375,7 +375,7 @@ Section RelationToScheduled.
       by apply (IS_ZERO t); apply /andP; split => //.
     Qed.
 
-    (** If a job is scheduled at some point in an interval, it receivees
+    (** If a job is scheduled at some point in an interval, it receives
        positive cumulative service during the interval... *)
     Lemma scheduled_implies_cumulative_service:
       forall t1 t2,
@@ -407,7 +407,7 @@ Section RelationToScheduled.
   End GuaranteedService.
 
   Section AfterArrival.
-    (** Futhermore, if we know that jobs are not released early, then we can
+    (** Furthermore, if we know that jobs are not released early, then we can
        narrow the interval during which they must have been scheduled. *)
 
     Context `{JobArrival Job}.

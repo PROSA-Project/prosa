@@ -50,7 +50,7 @@ Section GenericModelLemmas.
     (** Let jobs denote any (finite) set of jobs. *)
     Variable jobs : seq Job.
 
-    (** Assume that the processor model is a unit service moodel. I.e.,
+    (** Assume that the processor model is a unit service model. I.e.,
        no job ever receives more than one unit of service at any time. *)
     Hypothesis H_unit_service : unit_service_proc_model PState.
 
@@ -122,7 +122,7 @@ Section GenericModelLemmas.
 End GenericModelLemmas.
 
 (** In this section, we prove some properties about service
-   of sets of jobs for ideal uniprocessor model. *)
+   of sets of jobs for ideal uni-processor model. *)
 Section IdealModelLemmas.
 
   (** Consider any type of tasks ... *)
@@ -138,7 +138,7 @@ Section IdealModelLemmas.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
+  (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
@@ -192,13 +192,13 @@ Section IdealModelLemmas.
      is upper-bounded by the corresponding interval length. *)
   Section ServiceOfJobsIsBoundedByLength.
 
-    (** Let jobs denote any (finite) set of jobs. *)
+    (** Let [jobs] denote any (finite) set of jobs. *)
     Variable jobs : seq Job.
 
-    (** Assume that the sequence of jobs is a set. *)
+    (** Assume that the sequence of [jobs] is a set. *)
     Hypothesis H_no_duplicate_jobs : uniq jobs.
 
-    (** We prove that the overall service of jobs at a single time instant is at most 1. *)
+    (** We prove that the overall service of [jobs] at a single time instant is at most [1]. *)
     Lemma service_of_jobs_le_1:
       forall t, \sum_(j <- jobs | P j) service_at sched j t <= 1.
     Proof.
@@ -282,13 +282,13 @@ Section IdealModelLemmas.
     Variable t_compl : instant.
 
     (** And state the proposition that all jobs are completed by time
-       t_compl. Next we show that this proposition is equivalent to
+       [t_compl]. Next we show that this proposition is equivalent to
        the fact that [workload of jobs = service of jobs]. *)
     Let all_jobs_completed_by t_compl :=
       forall j, j \in jobs -> P j -> completed_by j t_compl.
 
     (** First, we prove that if the workload of [jobs] is equal to the service
-       of [jobs], then any job in [jobs] is completed by time t_compl. *)
+       of [jobs], then any job in [jobs] is completed by time [t_compl]. *)
     Lemma workload_eq_service_impl_all_jobs_have_completed:
       workload_of_jobs P jobs =
       service_of_jobs sched P jobs t1 t_compl ->
@@ -318,7 +318,7 @@ Section IdealModelLemmas.
       }
     Qed.
 
-    (** And vice versa, the fact that any job in [jobs] is completed by time t_compl
+    (** And vice versa, the fact that any job in [jobs] is completed by time [t_compl]
        implies that the workload of [jobs] is equal to the service of [jobs]. *)
     Lemma all_jobs_have_completed_impl_workload_eq_service:
       all_jobs_completed_by t_compl ->

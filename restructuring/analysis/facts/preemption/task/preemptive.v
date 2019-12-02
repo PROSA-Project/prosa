@@ -3,7 +3,7 @@ Require Export rt.restructuring.analysis.facts.preemption.job.preemptive.
 
 Require Import rt.restructuring.model.task.preemption.fully_preemptive.
 
-(** * Platform for Fully Premptive Model *)
+(** * Platform for Fully Preemptive Model *)
 (** In this section, we prove that instantiation of functions
     [job_preemptable and task_max_nonpreemptive_segment] to the fully
     preemptive model indeed defines a valid preemption model with
@@ -31,7 +31,7 @@ Section FullyPreemptiveModel.
   Variable sched : schedule PState.
 
   (** We prove that [fully_preemptive_model] function
-      defines a model with bounded nonpremtive regions.*)
+      defines a model with bounded non-preemptive regions.*)
   Lemma fully_preemptive_model_is_model_with_bounded_nonpreemptive_regions:
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof.

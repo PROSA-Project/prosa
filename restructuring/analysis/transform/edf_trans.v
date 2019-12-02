@@ -9,7 +9,7 @@ Section EDFTransformation.
   (** Consider any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
-  (** ... and ideal uniprocessor schedules. *)
+  (** ... and ideal uni-processor schedules. *)
   Let PState := ideal.processor_state Job.
   Let SchedType := schedule (PState).
 

@@ -11,7 +11,7 @@ Section TaskArrivals.
   (** Consider any job arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** Let tsk be any task. *)
+  (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
   (** We show that the number of arrivals of task can be split into disjoint intervals. *) 

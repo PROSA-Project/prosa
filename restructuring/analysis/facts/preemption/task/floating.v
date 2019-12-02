@@ -5,12 +5,12 @@ Require Import rt.restructuring.model.task.preemption.floating_nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
-(** * Platform for Floating Non-Premptive Regions Model *)
+(** * Platform for Floating Non-Preemptive Regions Model *)
 (** In this section, we prove that instantiation of functions
     [job_preemptable and task_max_nonpreemptive_segment] to the model
     with floating non-preemptive regions indeed defines a valid
     preemption model with bounded non-preemptive regions. *)
-Section FloatingNonPremptiveRegionsModel.
+Section FloatingNonPreemptiveRegionsModel.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -33,7 +33,7 @@ Section FloatingNonPremptiveRegionsModel.
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   
-  (** Next, consider any ideal uniprocessor preemption-aware schedule
+  (** Next, consider any ideal uni-processor preemption-aware schedule
       of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_preemption_aware_schedule:
@@ -44,13 +44,13 @@ Section FloatingNonPremptiveRegionsModel.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Next, we assume that preemption points are defined by the model
-      with floating nonpreemptive regions. *)
+      with floating non-preemptive regions. *)
   Hypothesis H_valid_model_with_floating_nonpreemptive_regions:
     valid_model_with_floating_nonpreemptive_regions arr_seq.
 
   (** Then, we prove that the [job_preemptable and
       task_max_nonpreemptive_segment] functions define 
-      a model with bounded nonpremtive regions. *)       
+      a model with bounded non-preemptive regions. *)       
   Lemma floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions:
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof.
@@ -105,7 +105,7 @@ Section FloatingNonPremptiveRegionsModel.
     - apply floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions.
   Qed.
 
-End FloatingNonPremptiveRegionsModel.
+End FloatingNonPreemptiveRegionsModel.
 
 Hint Resolve
      valid_fixed_preemption_points_model_lemma

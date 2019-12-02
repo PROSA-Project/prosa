@@ -7,7 +7,7 @@ Require Export rt.restructuring.analysis.concepts.busy_interval.
 Require Export rt.restructuring.analysis.facts.busy_interval.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import rt.restructuring.model.processor.ideal.
 
 (** Throughout the file we assume for the classic Liu & Layland model
@@ -144,11 +144,11 @@ Section PriorityInversionIsBounded.
   Let job_completed_by := completed_by sched.
 
   (** Finally, we introduce the notion of the maximal length of
-       (potential) priority inversion at a time instant t, which is
+       (potential) priority inversion at a time instant [t], which is
        defined as the maximum length of nonpreemptive segments among
        all jobs that arrived so far. Note that the value
-       [job_max_nonpreemptive_segment j_lp] is at least ε for any job
-       j_lp, so the maximal length of priority inversion cannot be
+       [job_max_nonpreemptive_segment j_lp] is at least [ε] for any job
+       [j_lp], so the maximal length of priority inversion cannot be
        negative. *)
   Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
     \max_(j_lp <- arrivals_before arr_seq t | ~~ higher_eq_priority j_lp j)
@@ -163,7 +163,7 @@ Section PriorityInversionIsBounded.
       different scheduler and/or task models. Thus, we don't define
       such a bound in this module. *)
 
-  (** Consider any job j of tsk with positive job cost. *)
+  (** Consider any job [j] of [tsk] with positive job cost. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
@@ -196,9 +196,6 @@ Section PriorityInversionIsBounded.
         intros Idle.
           by exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2.
       Qed.
-
-      (** Note for Björn: This should be a local lemma, but
-          "gallinahtml" removes all "Local" lemmas (html and htmlpretty are fine). *)
       
       (** Next we consider two cases: (1) when [t] is less than [t2 - 1] and (2) [t] is equal to [t2 - 1]. *)
       Lemma t_lt_t2_or_t_eq_t2:
@@ -250,7 +247,7 @@ Section PriorityInversionIsBounded.
       Qed.
       
       (** In case when [t = t2 - 1], we cannot use the same proof
-          sinse [t+1 = t2], but [t2] is a quiet time. So we do a
+          since [t+1 = t2], but [t2] is a quiet time. So we do a
           similar case analysis on the fact that [t1 = t ∨ t1 < t]. *)
       Lemma scheduled_at_preemption_time_implies_higher_or_equal_priority_eq:
         t = t2.-1 ->
@@ -310,9 +307,9 @@ Section PriorityInversionIsBounded.
         - by apply scheduled_at_preemption_time_implies_higher_or_equal_priority_eq. 
       Qed.
 
-      (** Sinse a job that is scheduled at time [t] has higher-or-equal priority, 
+      (** Since a job that is scheduled at time [t] has higher-or-equal priority, 
           by properties of a busy interval it cannot arrive before time instant [t1]. *)
-      Lemma scheduled_at_preemption_time_implies_arriwed_between_within_busy_interval:
+      Lemma scheduled_at_preemption_time_implies_arrived_between_within_busy_interval:
         forall jhp, 
           scheduled_at sched jhp t ->
           arrived_between jhp t1 t2.
@@ -347,7 +344,7 @@ Section PriorityInversionIsBounded.
         { by exfalso; apply instant_t_is_not_idle. }
         exists jhp.
         repeat split.
-        - by apply scheduled_at_preemption_time_implies_arriwed_between_within_busy_interval.
+        - by apply scheduled_at_preemption_time_implies_arrived_between_within_busy_interval.
         - by apply scheduled_at_preemption_time_implies_higher_or_equal_priority.
         - by done.
       Qed.        
@@ -481,7 +478,7 @@ Section PriorityInversionIsBounded.
   (** * Preemption Time Exists *)
   (** In this section we prove that the function [max_length_of_priority_inversion] 
      indeed upper bounds the priority inversion length. *)
-  Section PreemprionTimeExists.
+  Section PreemptionTimeExists.
 
     (** First we prove that if a job with higher-or-equal priority is scheduled at 
        a quiet time [t+1] then this is the first time when this job is scheduled. *)
@@ -563,7 +560,7 @@ Section PriorityInversionIsBounded.
     (** Thus, there must be a preemption time in the interval [t1, t1
         + max_priority_inversion t1]. That is, if a job with
         higher-or-equal priority is scheduled at time instant t1, then
-        t1 is a preemprion time. Otherwise, if a job with lower
+        t1 is a preemption time. Otherwise, if a job with lower
         priority is scheduled at time t1, then this jobs also should
         be scheduled before the beginning of the busy interval. So,
         the next preemption time will be no more than
@@ -645,7 +642,7 @@ Section PriorityInversionIsBounded.
               job_preemptable jlp ρ ->
               service sched jlp t1 + fpt <= ρ.
 
-          (** For convinience we also assume the following inequality holds. *)
+          (** For convenience we also assume the following inequality holds. *)
           Hypothesis H_progr_le_max_nonp_segment:
             progr_t1 <= progr_t1 + fpt <= progr_t1 + (job_max_nonpreemptive_segment jlp - ε).
 
@@ -666,7 +663,7 @@ Section PriorityInversionIsBounded.
           Qed.
 
           (** Thanks to the fact that the scheduler respects the notion of preemption points
-              we show that [jlp] is continuously scheduled in time interval [t1, t1 + fpt). *)
+              we show that [jlp] is continuously scheduled in time interval [[t1, t1 + fpt)]. *)
           Lemma continuously_scheduled_between_preemption_points:
             forall t',
               t1 <= t' < t1 + fpt ->
@@ -819,6 +816,6 @@ Section PriorityInversionIsBounded.
             by rewrite -eqbF_neg; apply /eqP.
     Qed.
     
-  End PreemprionTimeExists.
+  End PreemptionTimeExists.
 
 End PriorityInversionIsBounded.

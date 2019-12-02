@@ -7,9 +7,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 
 (** * Facts about Request Bound Functions (RBFs) *)
 
-
 (** In this file, we prove some lemmas about request bound functions. *)
-
 
 (** ** RBF is a Bound on Workload *)
 
@@ -32,7 +30,7 @@ Section ProofWorkloadBound.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (** ... and any ideal uniprocessor schedule of this arrival sequence.*)
+  (** ... and any ideal uni-processor schedule of this arrival sequence.*)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
@@ -43,7 +41,7 @@ Section ProofWorkloadBound.
   (** Consider a task set ts... *)
   Variable ts : list Task.
 
-  (** ...and let tsk be any task in ts. *)
+  (** ...and let [tsk] be any task in ts. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
@@ -54,7 +52,7 @@ Section ProofWorkloadBound.
   (** Next, we assume that all jobs come from the task set. *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
-  (** Let max_arrivals be any arrival bound for taskset ts. *)
+  (** Let max_arrivals be any arrival bound for task-set [ts]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
 
@@ -64,13 +62,13 @@ Section ProofWorkloadBound.
   Let total_hep_rbf := total_hep_request_bound_function_FP higher_eq_priority ts tsk.
   Let total_ohep_rbf := total_ohep_request_bound_function_FP higher_eq_priority ts tsk.
 
-  (** Next, we consider any job j of tsk. *)
+  (** Next, we consider any job [j] of [tsk]. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_task j = tsk.
 
-  (** Next, we say that two jobs j1 and j2 are in relation
-      other_higher_eq_priority, iff j1 has higher or equal priority than j2 and
+  (** Next, we say that two jobs [j1] and [j2] are in relation
+      [other_higher_eq_priority], iff [j1] has higher or equal priority than [j2] and
       is produced by a different task. *)
   Let other_higher_eq_priority j1 j2 := jlfp_higher_eq_priority j1 j2 && (~~ same_task j1 j2).
 
@@ -97,7 +95,7 @@ Section ProofWorkloadBound.
     Variable t : instant.
     Variable delta : instant.
 
-    (** First, we show that workload of task tsk is bounded by the number of
+    (** First, we show that workload of task [tsk] is bounded by the number of
         arrivals of the task times the cost of the task. *)
     Lemma task_workload_le_num_of_arrivals_times_cost:
       task_workload t (t + delta)
@@ -252,11 +250,11 @@ Section RequestBoundFunctions.
   Hypothesis H_arrival_times_are_consistent:
     consistent_arrival_times arr_seq.
 
-  (** Let tsk be any task. *)
+  (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task tsk in ts
-     [max_arrival tsk] is (1) an arrival bound of tsk, and (2) it is a monotonic function
+  (** Let max_arrivals be a family of valid arrival curves, i.e., for any task [tsk] in ts
+     [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function
      that equals 0 for the empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_arrival_curve tsk (max_arrivals tsk).
@@ -274,7 +272,7 @@ Section RequestBoundFunctions.
       by move: H_valid_arrival_curve => [T1 T2].
   Qed.
 
-  (** We prove that task_rbf is monotone. *)
+  (** We prove that [task_rbf] is monotone. *)
   Lemma task_rbf_monotone:
     monotone task_rbf leq.
   Proof.
@@ -284,13 +282,13 @@ Section RequestBoundFunctions.
       by move: H_valid_arrival_curve => [_ T]; apply T.
   Qed.
 
-  (** Consider any job j of tsk. This guarantees that there exists at least one
-      job of task tsk. *)
+  (** Consider any job j of [tsk]. This guarantees that there exists at least one
+      job of task [tsk]. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_task j = tsk.
 
-  (** Then we prove that task_rbf 1 is greater than or equal to task cost. *)
+  (** Then we prove that [task_rbf 1] is greater than or equal to task cost. *)
   Lemma task_rbf_1_ge_task_cost:
     task_rbf 1 >= task_cost tsk.
   Proof.
