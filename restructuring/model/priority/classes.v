@@ -16,6 +16,11 @@ Class JLFP_policy (Job: JobType) := hep_job : rel Job.
 (** ... a JLDP policy as a relation among jobs that may vary over time. *)
 Class JLDP_policy (Job: JobType) := hep_job_at : instant -> rel Job.
 
+(** NB: The preceding definitions currently make it difficult to express
+        priority policies in which the priority of a job at a given time varies
+        depending on the preceding schedule prefix (e.g., least-laxity
+        first). *)
+
 (** Since FP policies are also JLFP and JLDP policies, we define
    conversions that express the generalization. *)
 Instance FP_to_JLFP (Job: JobType) (Task: TaskType)

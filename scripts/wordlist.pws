@@ -25,6 +25,8 @@ preemptable
 preemptions
 EDF
 FP
+DM
+POSIX
 JLFP
 JLDP
 TDMA
