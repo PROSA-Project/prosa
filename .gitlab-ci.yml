@@ -6,16 +6,21 @@ stages:
   stage: build
   image: mathcomp/mathcomp:${CI_JOB_NAME}
   script:
-    - ./create_makefile.sh
+    - ./create_makefile.sh --without-classic
     - make -j ${NJOBS}
 
-1.9.0-coq-8.10:
-  extends: .build
+.build-classic:
+  stage: build
+  image: mathcomp/mathcomp:1.9.0-coq-8.10
+  script:
+    - ./create_makefile.sh --only-classic
+    - make -j ${NJOBS}
+
+.collect-vo-files: 
   # Keep track of all compiled output and the build infrastructure
   artifacts:
     name: prosa-build-files
     paths:
-    - _CoqProject
     - Makefile
     - Makefile.conf
     # Ugly hack around https://gitlab.com/gitlab-org/gitlab-runner/issues/2620
@@ -39,6 +44,16 @@ stages:
     - "*/*/*/*/*/*/*/*/*/*.glob"
     expire_in: 1 week
 
+1.9.0-coq-8.10:
+  extends:
+    - .build
+    - .collect-vo-files
+
+1.9.0-coq-8.10-classic:
+  extends:
+    - .build-classic
+    - .collect-vo-files
+
 proof-length:
   stage: build
   image: python:3-alpine
@@ -55,12 +70,14 @@ spell-check:
   extends: .build
 
 1.9.0-coq-dev:
-  extends: .build
+  extends:
+    - .build
   # it's ok to fail with an unreleased version of Coq
   allow_failure: true
 
 latest-coq-8.10:
-  extends: .build
+  extends:
+    - .build
   # it's ok to fail with an unreleased version of ssreflect
   allow_failure: true
 
@@ -72,12 +89,17 @@ validate:
     - 1.9.0-coq-8.10
   script: make validate
 
-doc:
+validate-classic:
   stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.10
-  needs: ["1.9.0-coq-8.10"]  
+  needs: ["1.9.0-coq-8.10-classic"]
   dependencies:
-    - 1.9.0-coq-8.10
+    - 1.9.0-coq-8.10-classic
+  script: make validate
+
+.doc: 
+  stage: process
+  image: mathcomp/mathcomp:1.9.0-coq-8.10
   script:
     - make html -j ${NJOBS}
     - mv html with-proofs
@@ -85,8 +107,29 @@ doc:
     - mv html without-proofs
     - make htmlpretty -j ${NJOBS}
     - mv html pretty
+
+doc:
+  extends:
+    - .doc
+  needs: ["1.9.0-coq-8.10"]  
+  dependencies:
+    - 1.9.0-coq-8.10
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
+    paths:
+      - "with-proofs/"
+      - "without-proofs/"
+      - "pretty/"
+    expire_in: 1 week
+
+doc-classic:
+  extends:
+    - .doc
+  needs: ["1.9.0-coq-8.10-classic"]  
+  dependencies:
+    - 1.9.0-coq-8.10-classic
+  artifacts:
+    name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
     paths:
       - "with-proofs/"
       - "without-proofs/"
