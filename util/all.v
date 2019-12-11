@@ -13,5 +13,6 @@ Require Export rt.util.epsilon.
 Require Export rt.util.search_arg.
 Require Export rt.util.rel.
 Require Export rt.util.minmax.
+Require Export rt.util.supremum.
 Require Export rt.util.nondecreasing.
 Require Export rt.util.rewrite_facilities.
