@@ -41,11 +41,17 @@ Section Properties.
     by move=> PRIO_yx PRIO_zy; apply leq_trans with (n := task_priority (job_task y)).
   Qed.
 
+  (** The resulting priority policy is total. *)
+  Lemma NFP_is_total : total_priorities.
+  Proof. by move=> t j1 j2; apply leq_total. Qed.
+
 End Properties.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
 Hint Resolve
      NFP_is_reflexive
-     NFP_is_transitive: basic_facts.
+     NFP_is_transitive
+     NFP_is_total
+  : basic_facts.
 

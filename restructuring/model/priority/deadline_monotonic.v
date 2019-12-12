@@ -29,11 +29,17 @@ Section Properties.
   Lemma DM_is_transitive : transitive_priorities.
   Proof. by intros t y x z; apply leq_trans. Qed.
 
+  (** DM is total. *)
+  Lemma DM_is_total : total_priorities.
+ Proof. by move=> t j1 j2; apply leq_total. Qed.
+
 End Properties.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
 Hint Resolve
      DM_is_reflexive
-     DM_is_transitive: basic_facts.
+     DM_is_transitive
+     DM_is_total
+  : basic_facts.
 

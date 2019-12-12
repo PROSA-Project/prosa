@@ -25,11 +25,17 @@ Section Properties.
   Lemma FIFO_is_transitive : transitive_priorities.
   Proof. by intros t y x z; apply leq_trans. Qed.
 
+  (** FIFO is total. *)
+  Lemma FIFO_is_total : total_priorities.
+  Proof. by move=> t j1 j2; apply leq_total. Qed.
+
 End Properties.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
 Hint Resolve
      FIFO_is_reflexive
-     FIFO_is_transitive: basic_facts.
+     FIFO_is_transitive
+     FIFO_is_total
+  : basic_facts.
 

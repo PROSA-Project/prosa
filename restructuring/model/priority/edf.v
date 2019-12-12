@@ -28,11 +28,17 @@ Section PropertiesOfEDF.
   Lemma EDF_is_transitive : transitive_priorities.
   Proof. by intros t y x z; apply leq_trans. Qed.
 
+  (** EDF is total. *)
+  Lemma EDF_is_total : total_priorities.
+  Proof. by move=> t j1 j2; apply leq_total. Qed.
+
 End PropertiesOfEDF.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
 Hint Resolve
      EDF_is_reflexive
-     EDF_is_transitive: basic_facts.
+     EDF_is_transitive
+     EDF_is_total
+  : basic_facts.
 
