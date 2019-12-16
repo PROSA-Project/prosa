@@ -38,8 +38,8 @@ Section Abstract_RTA.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume that the job costs are no larger than the task costs. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
   
   (** Consider a task set ts... *)
   Variable ts : list Task.
@@ -402,7 +402,7 @@ Section Abstract_RTA.
               rewrite addnBA; last by apply PRT1.
               rewrite subh1; last by done.
               rewrite leq_sub2r // leq_add2l.
-                by rewrite -H_job_of_tsk; apply H_job_cost_le_task_cost.
+                by rewrite -H_job_of_tsk; apply H_valid_job_cost.
             }
           Qed.
           

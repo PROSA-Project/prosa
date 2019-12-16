@@ -1,29 +1,31 @@
 Require Export rt.restructuring.model.preemption.parameter. 
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import rt.restructuring.model.processor.ideal.
+(** * Preemption Model Compliance *)
 
-(** * Schedule with Limited Preemptions *)
-(** In this section we introduce the notion of preemptions-aware
-    schedule. *)
+(** A preemption model restricts when jobs can be preempted. In this
+    module, we specify the corresponding semantics, i.e., how a valid
+    schedule must be restricted to be compliant with a given
+    preemption model. *)
 Section ScheduleWithLimitedPreemptions.
 
-  (**  Consider any type of jobs. *)
+  (**  Consider any type of jobs, ... *)
   Context {Job : JobType}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+
+  (** ... any processor model, ... *)
+  Context {PState : Type} `{ProcessorState Job PState}.
+  
+  (** ... and any preemption model. *)
   Context `{JobPreemptable Job}.
 
-  (** Consider any arrival sequence. *)
+  (** Consider any arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
   
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... and a schedule of the jobs in the arrival sequence. *)
+  Variable sched : schedule PState.
   
-  (** Based on the definition of the model with preemption points, 
-      we define a valid schedule with limited preemptions. *)
-  Definition valid_schedule_with_limited_preemptions :=
+  (** We say that a schedule respects the preemption model given by
+      [job_preemptable] if non-preemptable jobs remain scheduled. *)
+  Definition schedule_respects_preemption_model :=
     forall j t,
       arrives_in arr_seq j ->
       ~~ job_preemptable j (service sched j t) ->

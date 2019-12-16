@@ -28,7 +28,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
   (** Next, consider any ideal non-preemptive uniprocessor schedule of
       this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_nonpreemptive_sched : is_nonpreemptive_schedule sched.
+  Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -70,7 +70,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
     valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
     intros; split.
-    - by unfold task_run_to_completion_threshold_le_task_cost.
+    - by unfold task_rtc_bounded_by_cost.
     - intros j ARR TSK.
       rewrite -TSK /task_run_to_completion_threshold /fully_nonpreemptive.
       edestruct (posnP (job_cost j)) as [ZERO|POS].

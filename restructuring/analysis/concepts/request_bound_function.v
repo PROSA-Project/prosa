@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.arrival.arrival_curves.
+Require Export rt.restructuring.model.task.arrival.curves.
 Require Export rt.restructuring.model.priority.classes.
 
 (** The following definitions assume ideal uni-processor schedules.  This

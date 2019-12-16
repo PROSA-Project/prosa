@@ -3,11 +3,20 @@ Require Export rt.restructuring.behavior.all.
 
 Require Import rt.util.nat.
 
-(** We define the readiness indicator function for models with release jitter
-   (and no self-suspensions). *)
 
-(** Definition of a generic type of release jitter parameter. *)
+(** * Job Model Parameter for Jobs Exhibiting Release Jitter *)
+
+(** If a job exhibits release jitter, it is not immediately available for
+    execution upon arrival, and can be scheduled only after its release, which
+    occurs some (bounded) time after its arrival. We model this with the
+    [job_jitter] parameter, which maps each job to its jitter duration. *)
+
 Class JobJitter (Job : JobType) := job_jitter : Job -> duration.
+
+(** * Readiness of Jobs with Release Jitter *)
+
+(** Based on the job model's jitter parameter, we define the readiness
+   predicate for jogs with release jitter (and no self-suspensions). *)
 
 Section ReadinessOfJitteryJobs.
   (** Consider any kind of jobs... *)
@@ -17,15 +26,16 @@ Section ReadinessOfJitteryJobs.
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (** Suppose jobs have an arrival time, a cost, and a release jitter bound. *)
+  (** Suppose jobs have an arrival time, a cost, and exhibit release jitter. *)
   Context `{JobArrival Job} `{JobCost Job} `{JobJitter Job}.
 
-  (** We say that a job is released at a time after its arrival if the job's
-     release jitter has passed. *)
+  (** We say that a job is released at a time [t] after its arrival if the
+      job's release jitter has passed. *)
   Definition is_released (j : Job) (t : instant) := job_arrival j + job_jitter j <= t.
 
-  (** A job that experiences jitter is ready only when the jitter-induced delay
-     has passed after its arrival and if it is not yet complete. *)
+  (** Based on the predicate [is_released], it is easy to state the notion of
+      readiness for jobs subject to release jitter: a job is ready only if it
+      is released and not yet complete. *)
   Global Program Instance jitter_ready_instance : JobReady Job PState :=
     {
       job_ready sched j t := is_released j t && ~~ completed_by sched j t

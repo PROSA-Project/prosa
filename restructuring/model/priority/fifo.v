@@ -2,9 +2,9 @@ Require Export rt.restructuring.model.priority.classes.
 
 (** * FIFO Priority Policy *)
 
-(** We define the notion of FIFO priorities, i.e., jobs are prioritized in
-    order of their arrival times. The FIFO policy belongs to the class of JLFP
-    policies. *)
+(** We define the basic FIFO priority policy, under which jobs are prioritized
+    in order of their arrival times. The FIFO policy belongs to the class of
+    JLFP policies. *)
 Instance FIFO (Job : JobType) `{JobArrival Job} : JLFP_policy Job :=
 {
   hep_job (j1 j2 : Job) := job_arrival j1 <= job_arrival j2

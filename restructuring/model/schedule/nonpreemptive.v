@@ -1,23 +1,24 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 Require Export rt.restructuring.behavior.all.
 
-(** In this section we introduce the notion of a non-preemptive schedule. *)
+(** * Nonpreemptive Schedules  *)
+
+(** In this module, we introduce a simple alternative definition of
+    nonpreemptive schedules. Take also note of the fully nonpreemptive
+    preemption model in model.preemption.fully_nonpreemptive. *)
+
 Section NonpreemptiveSchedule.
 
-  (** Consider any type of jobs ... *)
+  (** Consider any type of jobs with execution costs ... *)
   Context {Job : JobType}.
-  Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** ... and any kind of processor state model. *)
+  (** ... and any kind of processor model. *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
   
-  (** Consider any uniprocessor schedule. *)
-  Variable sched : schedule PState.
-
-  (** We define a schedule to be nonpreemptive iff every job remains scheduled until completion. *)
-  Definition is_nonpreemptive_schedule := 
+  (** We say that a given schedule is _nonpreemptive_ if every job,
+      once it is scheduled, remains scheduled until completion. *)
+  Definition nonpreemptive_schedule (sched : schedule PState) := 
     forall (j : Job) (t t' : instant),
       t <= t' -> 
       scheduled_at sched j t ->

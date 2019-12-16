@@ -12,7 +12,8 @@ Class TaskTotalSuspension (Task : TaskType) := task_total_suspension : Task -> d
 
 (** In the following section, we specify the semantics of the dynamic
     self-suspension model: each job self-suspends in total no longer than
-    specified by its associated task. *)
+    specified by the cumulative self-suspension bound of its associated
+    task. *)
 
 Section ValidDynamicSuspensions.
 

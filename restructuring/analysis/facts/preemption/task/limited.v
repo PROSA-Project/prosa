@@ -31,8 +31,8 @@ Section LimitedPreemptionsModel.
   (** Next, consider any ideal uni-processor preemption-aware schedule
       of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_valid_schedule_with_limited_preemptions:
-    valid_schedule_with_limited_preemptions arr_seq sched.  
+  Hypothesis H_schedule_respects_preemption_model:
+    schedule_respects_preemption_model arr_seq sched.  
     
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -57,14 +57,14 @@ Section LimitedPreemptionsModel.
     move: (LIM) => [BEG [END NDEC]]; move: (FIX) => [A1 [A2 [A3 [A4 A5]]]].
     case: (posnP (job_cost j)) => [ZERO|POS].
     - split.
-      rewrite /job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment /job_max_nonpreemptive_segment
+      rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
               /lengths_of_segments /parameter.job_preemption_points; rewrite ZERO; simpl.
       rewrite /job_preemptable /limited_preemptions_model; erewrite zero_in_preemption_points; eauto 2.
       + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.
           by eapply zero_in_preemption_points; eauto 2.
     - split; last (move => progr /andP [_ LE]; destruct (progr \in job_preemption_points j) eqn:NotIN).
-      + rewrite /job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment
+      + rewrite /job_respects_max_nonpreemptive_segment
                 /job_max_nonpreemptive_segment /lengths_of_segments; erewrite job_parameters_max_np_to_job_limited; eauto.
           by apply max_of_dominating_seq; intros; apply A5.
       + exists progr; split; first apply/andP; first split; rewrite ?leq_addr; by done. 

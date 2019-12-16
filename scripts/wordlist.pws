@@ -1,6 +1,7 @@
 personal_ws-1.1 en 0
 Prosa
 Coq
+ssreflect
 typeclass
 iff
 schedulability
@@ -35,9 +36,13 @@ RTA
 IBF
 RBF
 RBFs
+WCET
+WCETs
 Layland
 Liu
 sequentiality
 equalities
 extremum
 supremum
+runtime
+bursty

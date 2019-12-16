@@ -46,8 +46,8 @@ Section ProofWorkloadBound.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Assume that the job costs are no larger than the task costs. *)
-  Hypothesis H_job_cost_le_task_cost :
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost :
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Next, we assume that all jobs come from the task set. *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
@@ -106,7 +106,7 @@ Section ProofWorkloadBound.
       rewrite /same_task -H_job_of_tsk muln1.
       apply leq_sum_seq; move => j0 IN0 /eqP EQ.
       rewrite -EQ; apply in_arrivals_implies_arrived in IN0; auto.
-        by apply H_job_cost_le_task_cost.
+        by apply H_valid_job_cost.
     Qed.
 
     (** As a corollary, we prove that workload of task is no larger the than
@@ -149,7 +149,7 @@ Section ProofWorkloadBound.
         rewrite /workload_of_jobs.
         rewrite  muln1 /l /arrivals_between /arrival_sequence.arrivals_between.
         apply leq_sum_seq; move => j0 IN0 /eqP EQ.
-          by rewrite -EQ; apply H_job_cost_le_task_cost; apply in_arrivals_implies_arrived in IN0.
+          by rewrite -EQ; apply H_valid_job_cost; apply in_arrivals_implies_arrived in IN0.
       }
       { rewrite leq_mul2l; apply/orP; right.
         rewrite -{2}[delta](addKn t).
@@ -183,7 +183,7 @@ Section ProofWorkloadBound.
         rewrite muln1.
         apply leq_sum_seq; move => j0 IN0 /eqP EQ.
         rewrite -EQ.
-        apply H_job_cost_le_task_cost.
+        apply H_valid_job_cost.
           by apply in_arrivals_implies_arrived in IN0.
       }
       { rewrite leq_mul2l; apply/orP; right.
@@ -219,7 +219,7 @@ Section ProofWorkloadBound.
         rewrite muln1.
         apply leq_sum_seq; move => j0 IN0 /eqP EQ.
         rewrite -EQ.
-        apply H_job_cost_le_task_cost.
+        apply H_valid_job_cost.
           by apply in_arrivals_implies_arrived in IN0.
       }
       { rewrite leq_mul2l; apply/orP; right.

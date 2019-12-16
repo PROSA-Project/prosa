@@ -28,8 +28,8 @@ Section TaskRTCThresholdLimitedPreemptions.
 
   (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_valid_schedule_with_limited_preemptions:
-    valid_schedule_with_limited_preemptions arr_seq sched.
+  Hypothesis H_schedule_respects_preemption_model:
+    schedule_respects_preemption_model arr_seq sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -39,8 +39,8 @@ Section TaskRTCThresholdLimitedPreemptions.
   Variable ts : seq Task.
   
   (** Assume that a job cost cannot be larger than a task cost. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Consider the model with fixed preemption points. I.e., each task
       is divided into a number of non-preemptive segments by inserting
@@ -97,7 +97,7 @@ Section TaskRTCThresholdLimitedPreemptions.
   Lemma limited_valid_task_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
-    split; first by rewrite /task_run_to_completion_threshold_le_task_cost leq_subr.
+    split; first by rewrite /task_rtc_bounded_by_cost leq_subr.
     intros ? ARR__j TSK__j. move: (H_valid_fixed_preemption_points_model) => [LJ LT].
     move: (LJ) (LT) => [ZERO__job [COST__job SORT__job]] [ZERO__task [COST__task [SORT__task [T4 [T5 T6]]]]].
     rewrite /job_run_to_completion_threshold /task_run_to_completion_threshold /limited_preemptions
@@ -106,7 +106,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     have J_RTCT__pos : 0 < job_last_nonpreemptive_segment j
       by eapply job_last_nonpreemptive_segment_positive; eauto using valid_fixed_preemption_points_model_lemma.
     have T_RTCT__pos : 0 < task_last_nonpr_segment tsk.
-    { unfold lengths_of_task_segments_bound_length_of_job_segments, task_last_nonpr_segment in *.
+    { unfold job_respects_segment_lengths, task_last_nonpr_segment in *.
       rewrite last0_nth; apply T6; eauto 2.
       have F: 1 <= size (distances (task_preemption_points tsk)).
       { apply leq_trans with (size (task_preemption_points tsk) - 1). 

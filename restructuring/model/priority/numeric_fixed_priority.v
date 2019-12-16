@@ -5,12 +5,11 @@ Require Export rt.restructuring.model.priority.classes.
 (** We define the notion of arbitrary numeric fixed task priorities, i.e.,
     tasks are prioritized in order of user-provided numeric priority values,
     where numerically smaller values indicate lower priorities (as for instance
-    it is the case in POSIX). *)
+    it is the case in Linux). *)
 
 (** First, we define a new task parameter [task_priority] that maps each task
     to a numeric priority value. *)
 Class TaskPriority (Task : TaskType) := task_priority : Task -> nat.
-
 
 (** Based on this parameter, we define the corresponding FP policy. *)
 Instance NumericFP (Task : TaskType) `{TaskPriority Task} : FP_policy Task :=

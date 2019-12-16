@@ -1,7 +1,12 @@
 Require Export rt.restructuring.model.task.concept.
+
+(** In this module, we give a precise definition of the common notion of
+    "sequential tasks", which is commonly understood to mean that the jobs of a
+    sequential task execute in sequence and in a non-overlapping fashion. *)
+
 Section PropertyOfSequentiality.
 
-  (** Consider any type of job associated with any type of tasks... *)
+  (** Consider any type of jobs stemming from any type of tasks ... *)
   Context {Job : JobType}.
   Context {Task : TaskType}.
   Context `{JobTask Job Task}.
@@ -10,15 +15,15 @@ Section PropertyOfSequentiality.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** ... and any kind of processor state model. *)
+  (** ... and any kind of processor model. *)
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
-  (** Given a schedule ... *)
+  (** Given a schedule of such jobs ... *)
   Variable sched: schedule PState.
 
-  (** ...we say that tasks are sequential if each task's jobs
-     are executed in the order they arrived. *)
+  (** ... we say that the tasks execute sequentially if each task's jobs are
+     executed in arrival order and in a non-overlapping fashion. *)
   Definition sequential_tasks :=
     forall (j1 j2: Job) (t: instant),
       same_task j1 j2 ->

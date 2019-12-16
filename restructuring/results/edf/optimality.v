@@ -30,7 +30,7 @@ Section Optimality.
     exists edf_sched : schedule (ideal.processor_state Job),
         valid_schedule edf_sched arr_seq /\
         all_deadlines_of_arrivals_met arr_seq edf_sched /\
-        is_EDF_schedule edf_sched.
+        EDF_schedule edf_sched.
   Proof.
     move=> [sched [[COME READY] DL_ARR_MET]].
     have ARR  := jobs_must_arrive_to_be_ready sched READY.
@@ -68,7 +68,7 @@ Section WeakOptimality.
       jobs_must_arrive_to_execute edf_sched /\
       completed_jobs_dont_execute edf_sched /\
       all_deadlines_met edf_sched /\
-      is_EDF_schedule edf_sched /\
+      EDF_schedule edf_sched /\
       forall j,
           (exists t,  scheduled_at any_sched j t) <->
           (exists t', scheduled_at edf_sched j t').

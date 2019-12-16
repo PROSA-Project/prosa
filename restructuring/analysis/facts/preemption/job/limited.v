@@ -29,8 +29,8 @@ Section ModelWithLimitedPreemptions.
   
   (** Next, consider any limited ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_valid_schedule_with_limited_preemptions:
-    valid_schedule_with_limited_preemptions arr_seq sched.
+  Hypothesis H_schedule_respects_preemption_model:
+    schedule_respects_preemption_model arr_seq sched.
   
   (** ...where jobs do not execute after their completion. *)
   Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
@@ -204,7 +204,7 @@ Section ModelWithLimitedPreemptions.
     intros j ARR; repeat split. 
     { by apply zero_in_preemption_points. }
     { by apply job_cost_in_nonpreemptive_points. }
-    { by move => t NPP; apply H_valid_schedule_with_limited_preemptions. }
+    { by move => t NPP; apply H_schedule_respects_preemption_model. }
     { intros t NSCHED SCHED. 
       have SERV: service sched j t = service sched j t.+1.
       { rewrite -[service sched j t]addn0 /service /service_during; apply/eqP. 
@@ -215,7 +215,7 @@ Section ModelWithLimitedPreemptions.
       rewrite -[job_preemptable _ _]Bool.negb_involutive.
       apply/negP; intros CONTR.
       move: NSCHED => /negP NSCHED; apply: NSCHED.
-      apply H_valid_schedule_with_limited_preemptions; first by done.
+      apply H_schedule_respects_preemption_model; first by done.
         by rewrite SERV.
     }            
   Qed.

@@ -46,8 +46,8 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** ... and the cost of a job cannot be larger than the task cost. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of

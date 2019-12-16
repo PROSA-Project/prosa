@@ -1,5 +1,6 @@
 Require Export rt.restructuring.model.schedule.tdma.
 Require Import rt.util.all.
+From mathcomp Require Import div.
 
 (** In this section, we define the properties of TDMA and prove some basic lemmas. *)
 Section TDMAFacts.

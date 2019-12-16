@@ -1,8 +1,10 @@
 Require Export rt.restructuring.behavior.all.
 
-(** We define the readiness indicator function for the classic Liu & Layland
-   model without jitter and no self-suspensions, where jobs are always
-   ready. *)
+(** * Liu & Layland Readiness Model *)
+
+(** In this module, we define the notion of job readiness for the classic Liu &
+    Layland model without jitter or self-suspensions, where pending jobs are
+    simply always ready. *)
 
 Section LiuAndLaylandReadiness.
   (** Consider any kind of jobs... *)

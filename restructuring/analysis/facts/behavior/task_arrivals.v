@@ -1,4 +1,4 @@
-Require Export rt.restructuring.model.aggregate.task_arrivals.
+Require Export rt.restructuring.model.task.arrivals.
 
 (** In this file we provide basic properties related to tasks on arrival sequences. *)
 Section TaskArrivals.

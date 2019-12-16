@@ -1,12 +1,12 @@
 Require Export rt.restructuring.model.priority.classes.
-Require Export rt.restructuring.model.arrival.sporadic.
+Require Export rt.restructuring.model.task.arrival.sporadic.
 
 
 (** * Rate-Monotonic Fixed-Priority Policy *)
 
-(** We define the notion of rate-monotonic task priorities, i.e., tasks are
-    prioritized in order of their minimum inter-arrival times (or periods). The
-    RM policy belongs to the class of FP policies. *)
+(** We define the notion of rate-monotonic task priorities for sporadic tasks,
+    i.e., the classic FP policy in which sporadic tasks are prioritized in
+    order of their minimum inter-arrival times (or periods). *)
 Instance RM (Task : TaskType) `{SporadicModel Task} : FP_policy Task :=
 {
   hep_task (tsk1 tsk2 : Task) := task_min_inter_arrival_time tsk1 <= task_min_inter_arrival_time tsk2

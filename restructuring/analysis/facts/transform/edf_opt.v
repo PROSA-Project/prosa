@@ -735,9 +735,9 @@ Section EDFTransformFacts.
   (** We begin with the first key property: the resulting schedule is actually
      an EDF schedule. *)
   Theorem edf_transform_ensures_edf:
-    is_EDF_schedule sched_edf.
+    EDF_schedule sched_edf.
   Proof.
-    rewrite /is_EDF_schedule /sched_edf  /edf_transform => t.
+    rewrite /EDF_schedule /sched_edf  /edf_transform => t.
     rewrite /EDF_at //=  => j SCHED_j t' j' LE_t_t' SCHED_j' ARR_j'.
     move: SCHED_j.
     rewrite scheduled_at_def.

@@ -45,8 +45,8 @@ Section Sequential_Abstract_RTA.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume that the job costs are no larger than the task costs. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Consider an arbitrary task set. *)
   Variable ts : list Task.
@@ -611,7 +611,7 @@ Section Sequential_Abstract_RTA.
         rewrite mulnDr mulnC muln1 -addnBA // subnn addn0 mulnC.
         apply sum_majorant_constant.
         move => j' ARR' /eqP TSK2.
-          by rewrite -TSK2; apply H_job_cost_le_task_cost; exists (t1 + A); apply rem_in in ARR'.
+          by rewrite -TSK2; apply H_valid_job_cost; exists (t1 + A); apply rem_in in ARR'.
       Qed.
 
       (** Finally, we use the lemmas above to obtain the bound on

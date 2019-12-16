@@ -37,7 +37,7 @@ Section FloatingNonPreemptiveRegionsModel.
       of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_preemption_aware_schedule:
-    valid_schedule_with_limited_preemptions arr_seq sched.  
+    schedule_respects_preemption_model arr_seq sched.  
     
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -58,7 +58,7 @@ Section FloatingNonPreemptiveRegionsModel.
     move: (H_valid_model_with_floating_nonpreemptive_regions) => LIM; move: LIM (LIM) => [LIM L] [[BEG [END NDEC]] MAX].
     case: (posnP (job_cost j)) => [ZERO|POS].
     - split.
-      rewrite /job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment /job_max_nonpreemptive_segment
+      rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
               /lengths_of_segments /parameter.job_preemption_points; rewrite ZERO; simpl.
       rewrite /job_preemptable /limited_preemptions_model; erewrite zero_in_preemption_points; eauto 2.
       + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].

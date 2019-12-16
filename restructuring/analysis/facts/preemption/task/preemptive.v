@@ -37,8 +37,8 @@ Section FullyPreemptiveModel.
   Proof.
     intros j ARR; split.
     - case: (posnP (job_cost j)) => [ZERO|POS].
-      + by rewrite /job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment job_max_nps_is_0. 
-      + by rewrite /job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment job_max_nps_is_ε. 
+      + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_0. 
+      + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_ε. 
     - intros t; exists t; split.
       + by apply/andP; split; [ done | rewrite leq_addr]. 
       + by done.

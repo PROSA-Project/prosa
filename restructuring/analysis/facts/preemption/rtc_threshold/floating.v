@@ -22,8 +22,8 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
   Variable arr_seq : arrival_sequence Job.
 
   (** Assume that a job cost cannot be larger than a task cost. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Then, we prove that [task_run_to_completion_threshold] function
       defines a valid task's run to completion threshold. *)   
@@ -31,10 +31,10 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
     forall tsk, valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
     intros; split.
-    - by rewrite /task_run_to_completion_threshold_le_task_cost.
+    - by rewrite /task_rtc_bounded_by_cost.
     - intros j ARR TSK.
       apply leq_trans with (job_cost j); eauto 2 with basic_facts.
-        by rewrite-TSK; apply H_job_cost_le_task_cost.
+        by rewrite-TSK; apply H_valid_job_cost.
   Qed.
   
 End TaskRTCThresholdFloatingNonPreemptiveRegions.

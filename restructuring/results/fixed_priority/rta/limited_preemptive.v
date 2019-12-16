@@ -39,8 +39,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
   
   (** ... and the cost of a job cannot be larger than the task cost. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** First, we assume we have the model with fixed preemption points.
       I.e., each task is divided into a number of non-preemptive segments 
@@ -65,8 +65,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
-  Hypothesis H_valid_schedule_with_limited_preemptions:
-    valid_schedule_with_limited_preemptions arr_seq sched.
+  Hypothesis H_schedule_respects_preemption_model:
+    schedule_respects_preemption_model arr_seq sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -130,8 +130,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     move: (MLP) => [BEGj [ENDj _]].
     edestruct (posnP (task_cost tsk)) as [ZERO|POSt].
     { intros j ARR TSK.
-      move: (H_job_cost_le_task_cost _ ARR) => POSt.
-      move: POSt; rewrite /job_cost_le_task_cost TSK ZERO leqn0; move => /eqP Z.
+      move: (H_valid_job_cost _ ARR) => POSt.
+      move: POSt; rewrite /valid_job_cost TSK ZERO leqn0; move => /eqP Z.
         by rewrite /job_response_time_bound /completed_by Z.
     }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments

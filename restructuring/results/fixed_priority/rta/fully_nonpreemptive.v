@@ -38,8 +38,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
   
   (** ... and the cost of a job cannot be larger than the task cost. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
       any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
@@ -58,7 +58,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
-  Hypothesis H_nonpreemptive_sched : is_nonpreemptive_schedule sched.
+  Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -123,8 +123,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     move: (posnP (@task_cost _ H tsk)) => [ZERO|POS].
     { intros j ARR TSK.
       have ZEROj: job_cost j = 0.
-      { move: (H_job_cost_le_task_cost j ARR) => NEQ.
-        rewrite /job_cost_le_task_cost TSK ZERO in NEQ.
+      { move: (H_valid_job_cost j ARR) => NEQ.
+        rewrite /valid_job_cost TSK ZERO in NEQ.
           by apply/eqP; rewrite -leqn0.
       }
         by rewrite /job_response_time_bound /completed_by ZEROj.

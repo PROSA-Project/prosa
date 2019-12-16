@@ -28,15 +28,15 @@ Section FullyNonPreemptiveModel.
   
   (** Next, consider any ideal non-preemptive uni-processor schedule of this arrival sequence... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_nonpreemptive_sched : is_nonpreemptive_schedule sched.
+  Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
   
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
   
   (** Assume that a job cost cannot be larger than a task cost. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Then we prove that [fully_nonpreemptive_model] function
       defines a model with bounded non-preemptive regions.*) 
@@ -45,7 +45,7 @@ Section FullyNonPreemptiveModel.
   Proof. 
     have F: forall n, n = 0 \/ n > 0  by intros n; destruct n; [left | right]. 
     intros j; split.
-    { rewrite /job_max_nonpreemptive_segment_le_task_max_nonpreemptive_segment; eauto 2.
+    { rewrite /job_respects_max_nonpreemptive_segment; eauto 2.
       erewrite job_max_nps_is_job_cost; eauto 2.
     }
     move => progr /andP [_ GE].

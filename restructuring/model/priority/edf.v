@@ -2,8 +2,9 @@ Require Export rt.restructuring.model.priority.classes.
 
 (** * EDF Priority Policy *)
 
-(** We introduce the notion of EDF priorities, wherein jobs are scheduled in
-    order of their urgency. The EDF policy belongs to the class of JLFP
+(** We introduce the classic EDF priority policy, under which jobs are
+    scheduled in order of their urgency, i.e., jobs are ordered according to
+    their absolute deadlines. The EDF policy belongs to the class of JLFP
     policies. *)
 Instance EDF (Job : JobType) `{JobDeadline Job} : JLFP_policy Job :=
 {

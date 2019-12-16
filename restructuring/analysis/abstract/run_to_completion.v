@@ -36,7 +36,7 @@ Section AbstractRTARunToCompletionThreshold.
   Variable sched : schedule (ideal.processor_state Job).
 
   (** Assume that the job costs are no larger than the task costs. *)
-  Hypothesis H_jobs_respect_taskset_costs : cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_jobs_respect_taskset_costs : arrivals_have_valid_job_costs arr_seq.
 
   (** Let [tsk] be any task that is to be analyzed. *)
   Variable tsk : Task.

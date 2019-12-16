@@ -85,8 +85,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_sequential_tasks : sequential_tasks sched.
   
   (** Assume that a job cost cannot be larger than a task cost. *)
-  Hypothesis H_job_cost_le_task_cost:
-    cost_of_jobs_from_arrival_sequence_le_task_cost arr_seq.
+  Hypothesis H_valid_job_cost:
+    arrivals_have_valid_job_costs arr_seq.
 
   (** Consider an arbitrary task set ts. *)
   Variable ts : list Task.
@@ -431,10 +431,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
                                      job_cost j0).
               { rewrite big_mkcond [X in _ <= X]big_mkcond //= leq_sum //.
                   by intros s _; case (job_task s == tsk_o); case (EDF s j). }
-              { rewrite /number_of_task_arrivals /task_arrivals.number_of_task_arrivals
+              { rewrite /number_of_task_arrivals /task.arrivals.number_of_task_arrivals
                 -sum1_size big_distrr /= big_filter  muln1.
                 apply leq_sum_seq; move => jo IN0 /eqP EQ.
-                  by rewrite -EQ; apply H_job_cost_le_task_cost; apply in_arrivals_implies_arrived in IN0.
+                  by rewrite -EQ; apply H_valid_job_cost; apply in_arrivals_implies_arrived in IN0.
               }
             }
             { rewrite leq_mul2l; apply/orP; right.
@@ -519,12 +519,12 @@ Section AbstractRTAforEDFwithArrivalCurves.
                + rewrite big_mkcond [X in _ <= X]big_mkcond //=.
                  rewrite leq_sum //; intros s _.
                    by case (EDF s j).
-               + rewrite /number_of_task_arrivals /task_arrivals.number_of_task_arrivals
+               + rewrite /number_of_task_arrivals /task.arrivals.number_of_task_arrivals
                  -sum1_size big_distrr /= big_filter.
                  rewrite  muln1.
                  apply leq_sum_seq; move => j0 IN0 /eqP EQ.
                  rewrite -EQ.
-                 apply H_job_cost_le_task_cost.
+                 apply H_valid_job_cost.
                    by apply in_arrivals_implies_arrived in IN0.
             - unfold V in *; clear V.
               set (V := A + ε + D tsk - D tsk_o) in *.
@@ -622,7 +622,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           rewrite /task_rbf /rbf; erewrite task_rbf_0_zero; eauto 2.
           rewrite add0n /task_rbf; apply leq_trans with (task_cost tsk).
           - by eapply leq_trans; eauto 2;
-              rewrite -(eqbool_to_eqprop H_job_of_tsk); apply H_job_cost_le_task_cost. 
+              rewrite -(eqbool_to_eqprop H_job_of_tsk); apply H_valid_job_cost. 
           - by eapply task_rbf_1_ge_task_cost; eauto using eqbool_to_eqprop.
         }
         { apply/andP; split; first by done.
