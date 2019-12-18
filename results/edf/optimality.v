@@ -1,18 +1,23 @@
 Require Export prosa.analysis.facts.transform.edf_opt.
 
-(** This file contains the theorem that states the famous EDF
-    optimality result: if there is any way to meet all deadlines
-    (assuming an ideal uniprocessor), then there is also an EDF
-    schedule in which all deadlines are met. *)
+(** * Optimality of EDF on Ideal Uniprocessors *)
+
+(** This module provides the famous EDF optimality theorem: if there
+    is any way to meet all deadlines (assuming an ideal uniprocessor
+    schedule), then there is also an (ideal) EDF schedule in which all
+    deadlines are met. *)
 
 (** The following results assume ideal uniprocessor schedules... *)
 Require prosa.model.processor.ideal.
 (** ... and the basic (i.e., Liu & Layland) readiness model under which any
-    pending job is ready. *)
+    pending job is always ready. *)
 Require prosa.model.readiness.basic.
 
+(** ** Optimality Theorem *)
+
 Section Optimality.
-  (** For any given type of jobs... *)
+  (** For any given type of jobs, each characterized by execution
+      costs, an arrival time, and an absolute deadline,... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... and any valid job arrival sequence. *)
@@ -45,24 +50,30 @@ Section Optimality.
 
 End Optimality.
 
-(** We further state a weaker notion of the above optimality claim that avoids
-    a dependency on a given arrival sequence. Specifically, it establishes
-    that, given a reference schedule without deadline misses, there exists an
-    EDF schedule of the same jobs in which no deadlines are missed. *)
+(** ** Weak Optimality Theorem *)
+
+(** We further state a weaker notion of the above optimality result
+    that avoids a dependency on a given arrival
+    sequence. Specifically, it establishes that, given a reference
+    schedule without deadline misses, there exists an EDF schedule of
+    the same jobs in which no deadlines are missed. *)
 Section WeakOptimality.
 
-  (** For any given type of jobs,... *)
+  (** For any given type of jobs, each characterized by execution
+      costs, an arrival time, and an absolute deadline,... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
-  (** ...if we have a well-behaved schedule in which no deadlines are missed,... *)
+  (** ... if we have a well-behaved reference schedule ... *)
   Variable any_sched: schedule (ideal.processor_state Job).
   Hypothesis H_must_arrive: jobs_must_arrive_to_execute any_sched.
   Hypothesis H_completed_dont_execute: completed_jobs_dont_execute any_sched.
+
+  (**  ... in which no deadlines are missed, ... *)
   Hypothesis H_all_deadlines_met: all_deadlines_met any_sched.
 
-  (** ...then there also exists a corresponding EDF schedule in which
-     no deadlines are missed (and in which exactly the same set of
-     jobs is scheduled, as ensured by the last clause). *)
+  (** ...then there also exists an EDF schedule in which no deadlines
+      are missed (and in which exactly the same set of jobs is
+      scheduled, as ensured by the last clause). *)
   Theorem weak_EDF_optimality:
     exists edf_sched : schedule (ideal.processor_state Job),
       jobs_must_arrive_to_execute edf_sched /\
