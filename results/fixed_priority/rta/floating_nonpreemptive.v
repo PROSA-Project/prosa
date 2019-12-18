@@ -1,20 +1,23 @@
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
+
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+(** * RTA for Model with Floating Non-Preemptive Regions *)
+(** In this module we prove the RTA theorem for floating non-preemptive regions FP model. *)
+
+(** Throughout this file, we assume the FP priority policy, ideal uni-processor 
+    schedules, and the basic (i.e., Liu & Layland) readiness model. *)
+Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.basic.
 
-(** Throughout this file, we assume the task model with floating non-preemptive regions. *)
+(** Furthermore, we assume the task model with floating non-preemptive regions. *)
 Require Import prosa.model.preemption.limited_preemptive.
 Require Import prosa.model.task.preemption.floating_nonpreemptive.
 
-(** * RTA for Model with Floating Non-Preemptive Regions *)
-(** In this module we prove the RTA theorem for floating
-    non-preemptive regions FP model. *)
+(** ** Setup and Assumptions *)
+
 Section RTAforFloatingModelwithArrivalCurves.
 
   (** Consider any type of tasks ... *)
@@ -89,12 +92,25 @@ Section RTAforFloatingModelwithArrivalCurves.
   (** ... and the schedule respects the policy defined by the [job_preemptable] 
      function (i.e., jobs have bounded non-preemptive segments). *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
-  
-  (** Let's define some local names for clarity. *)
-  Let task_rbf := task_request_bound_function tsk.
+
+  (** ** Total Workload and Length of Busy Interval *)
+
+  (** We introduce the abbreviation [rbf] for the task request bound function,
+       which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
+  Let rbf := task_request_bound_function.
+
+  (** Next, we introduce [task_rbf] as an abbreviation
+      for the task request bound function of task [tsk]. *)
+  Let task_rbf := rbf tsk.
+
+  (** Using the sum of individual request bound functions, we define
+      the request bound function of all tasks with higher priority
+      ... *)
   Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
+
+  (** ... and the request bound function of all tasks with higher
+      priority other than task [tsk]. *)
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
-  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
   (** Next, we define a bound for the priority inversion caused by tasks of lower priority. *)
   Let blocking_bound :=
@@ -107,11 +123,14 @@ Section RTAforFloatingModelwithArrivalCurves.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = blocking_bound + total_hep_rbf L.
 
+  (** ** Response-Time Bound *)
+
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space (A : duration) := (A < L) && (task_rbf A != task_rbf (A + ε)).
   
-  (** Next, consider any value R, and assume that for any given arrival A from search space
-     there is a solution of the response-time bound recurrence which is bounded by R. *)    
+  (** Next, consider any value R, and assume that for any given
+      arrival A from search space there is a solution of the
+      response-time bound recurrence which is bounded by R. *)    
   Variable R : duration.
   Hypothesis H_R_is_maximum:
     forall (A : duration),
@@ -120,8 +139,13 @@ Section RTAforFloatingModelwithArrivalCurves.
         A + F = blocking_bound + task_rbf (A + ε) + total_ohep_rbf (A + F) /\
         F <= R.
   
-  (** Now, we can reuse the results for the abstract model with bounded nonpreemptive segments
-     to establish a response-time bound for the more concrete model with floating nonpreemptive regions.  *)
+  (** Now, we can reuse the results for the abstract model with
+      bounded nonpreemptive segments to establish a response-time
+      bound for the more concrete model with floating nonpreemptive
+      regions.  *)
+
+  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
+
   Theorem uniprocessor_response_time_bound_fp_with_floating_nonpreemptive_regions:
     response_time_bounded_by tsk R.  
   Proof.
