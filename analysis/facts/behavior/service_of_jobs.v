@@ -1,8 +1,8 @@
-Require Export rt.model.aggregate.workload.
-Require Export rt.model.aggregate.service_of_jobs.
-Require Export rt.analysis.facts.behavior.completion.
-Require Export rt.analysis.facts.behavior.ideal_schedule.
-Require Import rt.model.processor.ideal.
+Require Export prosa.model.aggregate.workload.
+Require Export prosa.model.aggregate.service_of_jobs.
+Require Export prosa.analysis.facts.behavior.completion.
+Require Export prosa.analysis.facts.behavior.ideal_schedule.
+Require Import prosa.model.processor.ideal.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

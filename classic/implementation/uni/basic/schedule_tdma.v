@@ -1,16 +1,16 @@
-Require Import rt.classic.util.all rt.classic.util.find_seq
+Require Import prosa.classic.util.all prosa.classic.util.find_seq
                Arith.
-Require Import rt.classic.model.arrival.basic.job
-               rt.classic.model.arrival.basic.arrival_sequence
-               rt.classic.model.schedule.uni.basic.platform_tdma
-               rt.classic.model.arrival.basic.task rt.classic.model.policy_tdma.
-Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
-Require Import rt.classic.model.priority
-               rt.classic.analysis.uni.basic.tdma_rta_theory
-               rt.classic.model.schedule.uni.transformation.construction.
-Require Import rt.classic.implementation.job rt.classic.implementation.task
-               rt.classic.implementation.arrival_sequence
-               rt.classic.implementation.uni.basic.schedule.
+Require Import prosa.classic.model.arrival.basic.job
+               prosa.classic.model.arrival.basic.arrival_sequence
+               prosa.classic.model.schedule.uni.basic.platform_tdma
+               prosa.classic.model.arrival.basic.task prosa.classic.model.policy_tdma.
+Require Import prosa.classic.model.schedule.uni.schedule prosa.classic.model.schedule.uni.schedulability.
+Require Import prosa.classic.model.priority
+               prosa.classic.analysis.uni.basic.tdma_rta_theory
+               prosa.classic.model.schedule.uni.transformation.construction.
+Require Import prosa.classic.implementation.job prosa.classic.implementation.task
+               prosa.classic.implementation.arrival_sequence
+               prosa.classic.implementation.uni.basic.schedule.
 
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 

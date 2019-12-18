@@ -1,12 +1,12 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority.
-Require Import rt.classic.model.arrival.basic.task.
-Require Import rt.classic.model.arrival.jitter.job rt.classic.model.arrival.jitter.arrival_sequence
-               rt.classic.model.arrival.jitter.task_arrival.
-Require Import rt.classic.model.schedule.uni.schedulability
-               rt.classic.model.schedule.uni.response_time.
-Require Import rt.classic.model.schedule.uni.jitter.schedule rt.classic.model.schedule.uni.jitter.platform.
-Require Import rt.classic.analysis.uni.jitter.workload_bound_fp rt.classic.analysis.uni.jitter.fp_rta_theory.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority.
+Require Import prosa.classic.model.arrival.basic.task.
+Require Import prosa.classic.model.arrival.jitter.job prosa.classic.model.arrival.jitter.arrival_sequence
+               prosa.classic.model.arrival.jitter.task_arrival.
+Require Import prosa.classic.model.schedule.uni.schedulability
+               prosa.classic.model.schedule.uni.response_time.
+Require Import prosa.classic.model.schedule.uni.jitter.schedule prosa.classic.model.schedule.uni.jitter.platform.
+Require Import prosa.classic.analysis.uni.jitter.workload_bound_fp prosa.classic.analysis.uni.jitter.fp_rta_theory.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path ssrfun.
 
 Module ResponseTimeIterationFP.

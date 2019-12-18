@@ -1,10 +1,10 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.priority.
-Require Import rt.classic.model.arrival.jitter.job
-               rt.classic.model.arrival.jitter.task_arrival
-               rt.classic.model.arrival.jitter.arrival_bounds.
-Require Import rt.classic.model.schedule.uni.workload.
-Require Import rt.classic.model.schedule.uni.jitter.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.priority.
+Require Import prosa.classic.model.arrival.jitter.job
+               prosa.classic.model.arrival.jitter.task_arrival
+               prosa.classic.model.arrival.jitter.arrival_bounds.
+Require Import prosa.classic.model.schedule.uni.workload.
+Require Import prosa.classic.model.schedule.uni.jitter.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 (* In this file, we define the workload bound for jitter-aware FP scheduling. *)

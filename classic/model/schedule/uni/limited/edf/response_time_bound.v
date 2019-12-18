@@ -1,22 +1,22 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job
-               rt.classic.model.arrival.basic.task_arrival
-               rt.classic.model.priority.
-Require Import rt.classic.model.schedule.uni.service
-               rt.classic.model.schedule.uni.workload
-               rt.classic.model.schedule.uni.schedule
-               rt.classic.model.schedule.uni.response_time
-               rt.classic.model.schedule.uni.schedule_of_task.
-Require Import rt.classic.model.schedule.uni.limited.platform.definitions
-               rt.classic.model.schedule.uni.limited.schedule
-               rt.classic.model.schedule.uni.limited.busy_interval
-               rt.classic.model.schedule.uni.limited.rbf
-               rt.classic.model.schedule.uni.limited.abstract_RTA.definitions
-               rt.classic.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space
-               rt.classic.model.schedule.uni.limited.abstract_RTA.abstract_seq_rta
-               rt.classic.model.schedule.uni.limited.jlfp_instantiation.
-Require Import rt.classic.model.arrival.curves.bounds. 
-Require Import rt.classic.analysis.uni.arrival_curves.workload_bound.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job
+               prosa.classic.model.arrival.basic.task_arrival
+               prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.uni.service
+               prosa.classic.model.schedule.uni.workload
+               prosa.classic.model.schedule.uni.schedule
+               prosa.classic.model.schedule.uni.response_time
+               prosa.classic.model.schedule.uni.schedule_of_task.
+Require Import prosa.classic.model.schedule.uni.limited.platform.definitions
+               prosa.classic.model.schedule.uni.limited.schedule
+               prosa.classic.model.schedule.uni.limited.busy_interval
+               prosa.classic.model.schedule.uni.limited.rbf
+               prosa.classic.model.schedule.uni.limited.abstract_RTA.definitions
+               prosa.classic.model.schedule.uni.limited.abstract_RTA.reduction_of_search_space
+               prosa.classic.model.schedule.uni.limited.abstract_RTA.abstract_seq_rta
+               prosa.classic.model.schedule.uni.limited.jlfp_instantiation.
+Require Import prosa.classic.model.arrival.curves.bounds. 
+Require Import prosa.classic.analysis.uni.arrival_curves.workload_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Abstract RTA for EDF-schedulers *)

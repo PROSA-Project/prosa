@@ -1,4 +1,4 @@
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 From mathcomp Require Export eqtype ssrnat.
 
 (** In this section, we introduce properties of a job. *)

@@ -1,7 +1,7 @@
-Require Import rt.classic.model.time rt.classic.model.arrival.basic.task.
+Require Import prosa.classic.model.time prosa.classic.model.arrival.basic.task.
 From mathcomp Require Import ssrnat ssrbool eqtype.  
 
-Require Export rt.classic.model.arrival.basic.job.
+Require Export prosa.classic.model.arrival.basic.job.
 
 (* In this file, we define properties of jobs with jitter. *)
 Module JobWithJitter.

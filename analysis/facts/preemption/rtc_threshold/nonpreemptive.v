@@ -1,7 +1,7 @@
-Require Export rt.analysis.facts.preemption.job.nonpreemptive.
+Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
 
-Require Import rt.model.preemption.fully_nonpreemptive.
-Require Import rt.model.task.preemption.fully_nonpreemptive.
+Require Import prosa.model.preemption.fully_nonpreemptive.
+Require Import prosa.model.task.preemption.fully_nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
  

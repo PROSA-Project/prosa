@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** * The Ideal Uniprocessor Model *)
 

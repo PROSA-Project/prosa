@@ -1,13 +1,13 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task
-               rt.classic.model.arrival.basic.job
-               rt.classic.model.arrival.basic.arrival_sequence
-               rt.classic.model.priority
-               rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.schedule.uni.service
-               rt.classic.model.schedule.uni.workload
-               rt.classic.model.schedule.uni.schedule.
-Require Import rt.classic.model.schedule.uni.limited.platform.definitions.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task
+               prosa.classic.model.arrival.basic.job
+               prosa.classic.model.arrival.basic.arrival_sequence
+               prosa.classic.model.priority
+               prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.schedule.uni.service
+               prosa.classic.model.schedule.uni.workload
+               prosa.classic.model.schedule.uni.schedule.
+Require Import prosa.classic.model.schedule.uni.limited.platform.definitions.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
@@ -96,7 +96,7 @@ Module BusyIntervalJLFP.
 
       (* We say that the job incurs priority inversion if it has higher priority than the scheduled
          job. Note that this definition implicitly assumes that the scheduler is work-conserving in 
-         the sense of the definition given in rt.classic.model.schedule.uni.basic.platform. Therefore, it 
+         the sense of the definition given in prosa.classic.model.schedule.uni.basic.platform. Therefore, it 
          cannot be applied to models with jitter or self-suspensions. *)
       Definition is_priority_inversion t :=
         if sched t is Some jlp then

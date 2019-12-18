@@ -1,6 +1,6 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.time rt.classic.model.arrival.basic.task.
-Require Import rt.classic.model.schedule.apa.affinity.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.time prosa.classic.model.arrival.basic.task.
+Require Import prosa.classic.model.schedule.apa.affinity.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
 
 Module ConcreteTask.

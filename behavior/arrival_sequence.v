@@ -1,6 +1,6 @@
 From mathcomp Require Export ssreflect seq ssrnat ssrbool bigop eqtype ssrfun.
-Require Export rt.behavior.job.
-Require Export rt.util.notation.
+Require Export prosa.behavior.job.
+Require Export prosa.util.notation.
 
 (** This module contains basic definitions and properties of job arrival
     sequences. *)

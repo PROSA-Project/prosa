@@ -1,5 +1,5 @@
-Require Export rt.analysis.transform.prefix.
-Require Export rt.analysis.transform.swap.
+Require Export prosa.analysis.transform.prefix.
+Require Export prosa.analysis.transform.swap.
 
 (** In this file we define the EDF transformation of a schedule, which turns a
     (finite prefix of a) schedule into an EDF schedule. This operation is at

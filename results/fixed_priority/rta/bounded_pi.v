@@ -1,13 +1,13 @@
-Require Export rt.model.schedule.priority_driven.
-Require Export rt.analysis.facts.busy_interval.
-Require Import rt.analysis.abstract.ideal_jlfp_rta.
+Require Export prosa.model.schedule.priority_driven.
+Require Export prosa.analysis.facts.busy_interval.
+Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis

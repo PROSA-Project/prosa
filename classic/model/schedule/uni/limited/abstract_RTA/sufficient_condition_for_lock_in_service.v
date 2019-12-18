@@ -1,9 +1,9 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job.
-Require Import rt.classic.model.schedule.uni.service
-               rt.classic.model.schedule.uni.schedule.
-Require Import rt.classic.model.schedule.uni.limited.schedule
-               rt.classic.model.schedule.uni.limited.abstract_RTA.definitions.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job.
+Require Import prosa.classic.model.schedule.uni.service
+               prosa.classic.model.schedule.uni.schedule.
+Require Import prosa.classic.model.schedule.uni.limited.schedule
+               prosa.classic.model.schedule.uni.limited.abstract_RTA.definitions.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

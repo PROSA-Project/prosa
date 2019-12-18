@@ -1,13 +1,13 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
-Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
-Require Import rt.classic.model.schedule.uni.susp.suspension_intervals.
-Require Import rt.classic.analysis.uni.basic.workload_bound_fp.
-Require Import rt.classic.analysis.uni.susp.dynamic.oblivious.fp_rta.
-Require Import rt.classic.implementation.uni.susp.dynamic.job
-               rt.classic.implementation.uni.susp.dynamic.task
-               rt.classic.implementation.uni.susp.dynamic.arrival_sequence.
-Require Import rt.classic.implementation.uni.susp.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.uni.schedule prosa.classic.model.schedule.uni.schedulability.
+Require Import prosa.classic.model.schedule.uni.susp.suspension_intervals.
+Require Import prosa.classic.analysis.uni.basic.workload_bound_fp.
+Require Import prosa.classic.analysis.uni.susp.dynamic.oblivious.fp_rta.
+Require Import prosa.classic.implementation.uni.susp.dynamic.job
+               prosa.classic.implementation.uni.susp.dynamic.task
+               prosa.classic.implementation.uni.susp.dynamic.arrival_sequence.
+Require Import prosa.classic.implementation.uni.susp.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

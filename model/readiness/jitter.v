@@ -1,7 +1,7 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
-Require Import rt.util.nat.
+Require Import prosa.util.nat.
 
 
 (** * Job Model Parameter for Jobs Exhibiting Release Jitter *)

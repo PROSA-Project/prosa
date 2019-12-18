@@ -1,11 +1,11 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.time rt.classic.model.arrival.basic.job
-               rt.classic.model.arrival.basic.task_arrival
-               rt.classic.model.priority
-               rt.classic.model.arrival.basic.arrival_sequence.
-Require Import rt.classic.model.schedule.uni.schedule.
-Require Import rt.classic.model.arrival.curves.bounds.
-Require Import rt.classic.analysis.uni.arrival_curves.workload_bound.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.time prosa.classic.model.arrival.basic.job
+               prosa.classic.model.arrival.basic.task_arrival
+               prosa.classic.model.priority
+               prosa.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.model.schedule.uni.schedule.
+Require Import prosa.classic.model.arrival.curves.bounds.
+Require Import prosa.classic.analysis.uni.arrival_curves.workload_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 Module RBF.

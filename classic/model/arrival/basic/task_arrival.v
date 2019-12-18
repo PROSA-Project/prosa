@@ -1,5 +1,5 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path bigop.
 
 (* Properties of job arrival. *)

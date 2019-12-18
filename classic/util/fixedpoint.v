@@ -1,4 +1,4 @@
-Require Import rt.classic.util.tactics rt.classic.util.induction.
+Require Import prosa.classic.util.tactics prosa.classic.util.induction.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Section FixedPoint.

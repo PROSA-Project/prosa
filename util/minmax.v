@@ -1,4 +1,4 @@
-Require Export rt.util.notation rt.util.nat rt.util.list.
+Require Export prosa.util.notation prosa.util.nat prosa.util.list.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Additional lemmas about max. *)

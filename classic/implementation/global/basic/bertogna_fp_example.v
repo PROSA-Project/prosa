@@ -1,13 +1,13 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
-Require Import rt.classic.model.schedule.global.schedulability.
-Require Import rt.classic.model.schedule.global.basic.schedule rt.classic.model.schedule.global.basic.platform.
-Require Import rt.classic.analysis.global.basic.workload_bound
-               rt.classic.analysis.global.basic.interference_bound_fp
-               rt.classic.analysis.global.basic.bertogna_fp_comp.
-Require Import rt.classic.implementation.job rt.classic.implementation.task
-               rt.classic.implementation.arrival_sequence.
-Require Import rt.classic.implementation.global.basic.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.global.schedulability.
+Require Import prosa.classic.model.schedule.global.basic.schedule prosa.classic.model.schedule.global.basic.platform.
+Require Import prosa.classic.analysis.global.basic.workload_bound
+               prosa.classic.analysis.global.basic.interference_bound_fp
+               prosa.classic.analysis.global.basic.bertogna_fp_comp.
+Require Import prosa.classic.implementation.job prosa.classic.implementation.task
+               prosa.classic.implementation.arrival_sequence.
+Require Import prosa.classic.implementation.global.basic.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

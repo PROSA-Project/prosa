@@ -1,10 +1,10 @@
 From mathcomp Require Import all_ssreflect.
-Require Export rt.util.all.
-Require Export rt.model.processor.platform_properties.
-Require Export rt.analysis.facts.behavior.service.
+Require Export prosa.util.all.
+Require Export prosa.model.processor.platform_properties.
+Require Export prosa.analysis.facts.behavior.service.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Note: we do not re-export the basic definitions to avoid littering the global
    namespace with type class instances. *)

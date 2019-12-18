@@ -1,4 +1,4 @@
-Require Export rt.analysis.facts.transform.edf_opt.
+Require Export prosa.analysis.facts.transform.edf_opt.
 
 (** This file contains the theorem that states the famous EDF
     optimality result: if there is any way to meet all deadlines
@@ -6,10 +6,10 @@ Require Export rt.analysis.facts.transform.edf_opt.
     schedule in which all deadlines are met. *)
 
 (** The following results assume ideal uniprocessor schedules... *)
-Require rt.model.processor.ideal.
+Require prosa.model.processor.ideal.
 (** ... and the basic (i.e., Liu & Layland) readiness model under which any
     pending job is ready. *)
-Require rt.model.readiness.basic.
+Require prosa.model.readiness.basic.
 
 Section Optimality.
   (** For any given type of jobs... *)

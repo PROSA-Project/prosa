@@ -1,9 +1,9 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority.
-Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task.
-Require Import rt.classic.model.schedule.global.basic.schedule.
-Require Import rt.classic.model.schedule.apa.affinity rt.classic.model.schedule.apa.platform.
-Require Import rt.classic.model.schedule.global.transformation.construction.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.arrival.basic.task.
+Require Import prosa.classic.model.schedule.global.basic.schedule.
+Require Import prosa.classic.model.schedule.apa.affinity prosa.classic.model.schedule.apa.platform.
+Require Import prosa.classic.model.schedule.global.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype bigop seq path.
 
 Module ConcreteScheduler.

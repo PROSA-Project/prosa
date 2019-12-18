@@ -1,4 +1,4 @@
-Require Import rt.util.tactics rt.util.notation.
+Require Import prosa.util.tactics prosa.util.notation.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat.
 
 Section StepFunction.

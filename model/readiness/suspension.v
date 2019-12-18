@@ -1,6 +1,6 @@
-Require Export rt.behavior.all.
-Require Export rt.analysis.definitions.progress.
-Require Export rt.util.nat.
+Require Export prosa.behavior.all.
+Require Export prosa.analysis.definitions.progress.
+Require Export prosa.util.nat.
 
 (** * Job Model Parameter for Jobs Exhibiting Self-Suspensions *)
 

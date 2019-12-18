@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-Require Export rt.analysis.facts.behavior.all.
+Require Export prosa.analysis.facts.behavior.all.
 
 (** This file provides an operation that transforms a finite prefix of
     a given schedule by applying a point-wise transformation to each

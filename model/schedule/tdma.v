@@ -1,10 +1,10 @@
-Require Export rt.model.task.concept.
-Require Export rt.util.seqset.
-Require Export rt.util.rel.
+Require Export prosa.model.task.concept.
+Require Export prosa.util.seqset.
+Require Export prosa.util.rel.
 From mathcomp Require Import div.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require rt.model.processor.ideal.
+Require prosa.model.processor.ideal.
 
 (** * TDMA Scheduling *)
 

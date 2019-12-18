@@ -1,14 +1,14 @@
-Require Export rt.analysis.definitions.job_properties.
-Require Export rt.model.schedule.work_conserving.
-Require Export rt.analysis.concepts.priority_inversion.
-Require Export rt.analysis.facts.behavior.all.
+Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.analysis.concepts.priority_inversion.
+Require Export prosa.analysis.facts.behavior.all.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of

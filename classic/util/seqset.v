@@ -1,4 +1,4 @@
-Require Export rt.util.seqset.
+Require Export prosa.util.seqset.
 
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq fintype.
 

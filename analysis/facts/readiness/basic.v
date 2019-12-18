@@ -1,7 +1,7 @@
-Require Import rt.analysis.facts.behavior.completion.
+Require Import prosa.analysis.facts.behavior.completion.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 Section LiuAndLaylandReadiness.
   (** Consider any kind of jobs... *)

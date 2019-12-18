@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-Require Export rt.behavior.schedule.
+Require Export prosa.behavior.schedule.
 
 Section Service.
 

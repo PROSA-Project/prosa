@@ -1,5 +1,5 @@
-Require Export rt.model.readiness.suspension.
-Require Export rt.model.task.concept.
+Require Export prosa.model.readiness.suspension.
+Require Export prosa.model.task.concept.
 
 (** * Task Parameter for the Dynamic Self-Suspension Model *)
 

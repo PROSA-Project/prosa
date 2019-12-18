@@ -1,5 +1,5 @@
 From mathcomp Require Import all_ssreflect.
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** In the following, we define a processor state that includes the possibility
     of spinning, where spinning jobs do not progress (= don't get any service).

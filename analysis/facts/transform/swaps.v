@@ -1,5 +1,5 @@
-Require Export rt.analysis.facts.transform.replace_at.
-Require Export rt.analysis.facts.behavior.deadlines.
+Require Export prosa.analysis.facts.transform.replace_at.
+Require Export prosa.analysis.facts.behavior.deadlines.
 
 (** In this file, we establish invariants about schedules in which two
     allocations have been swapped, as for instance it is done in the

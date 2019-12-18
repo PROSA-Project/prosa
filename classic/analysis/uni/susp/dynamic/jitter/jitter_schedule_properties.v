@@ -1,20 +1,20 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority rt.classic.model.suspension.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task
-               rt.classic.model.arrival.basic.arrival_sequence.
-Require Import rt.classic.model.arrival.jitter.job.
-Require Import rt.classic.model.schedule.uni.schedulability rt.classic.model.schedule.uni.service
-               rt.classic.model.schedule.uni.workload
-               rt.classic.model.schedule.uni.response_time.
-Require Import rt.classic.model.schedule.uni.jitter.schedule
-               rt.classic.model.schedule.uni.jitter.valid_schedule
-               rt.classic.model.schedule.uni.jitter.platform.
-Require Import rt.classic.model.schedule.uni.susp.suspension_intervals
-               rt.classic.model.schedule.uni.susp.schedule
-               rt.classic.model.schedule.uni.susp.valid_schedule
-               rt.classic.model.schedule.uni.susp.platform.
-Require Import rt.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule.
-Require Import rt.classic.model.schedule.uni.transformation.construction.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority prosa.classic.model.suspension.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task
+               prosa.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.model.arrival.jitter.job.
+Require Import prosa.classic.model.schedule.uni.schedulability prosa.classic.model.schedule.uni.service
+               prosa.classic.model.schedule.uni.workload
+               prosa.classic.model.schedule.uni.response_time.
+Require Import prosa.classic.model.schedule.uni.jitter.schedule
+               prosa.classic.model.schedule.uni.jitter.valid_schedule
+               prosa.classic.model.schedule.uni.jitter.platform.
+Require Import prosa.classic.model.schedule.uni.susp.suspension_intervals
+               prosa.classic.model.schedule.uni.susp.schedule
+               prosa.classic.model.schedule.uni.susp.valid_schedule
+               prosa.classic.model.schedule.uni.susp.platform.
+Require Import prosa.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule.
+Require Import prosa.classic.model.schedule.uni.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 (* In this file, we prove several properties about the constructed jitter-aware schedule. *)
@@ -67,7 +67,7 @@ Module JitterScheduleProperties.
     Variable job_suspension_duration: job_suspension Job.
       
     (* Next, consider any valid suspension-aware schedule of this arrival sequence.
-       (Note: see rt.classic.model.schedule.uni.susp.valid_schedule.v for details) *)
+       (Note: see prosa.classic.model.schedule.uni.susp.valid_schedule.v for details) *)
     Variable sched_susp: schedule Job.
     Hypothesis H_valid_schedule:
       valid_suspension_aware_schedule job_arrival arr_seq job_higher_eq_priority

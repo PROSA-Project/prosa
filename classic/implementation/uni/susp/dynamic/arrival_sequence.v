@@ -1,7 +1,7 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.task_arrival rt.classic.model.arrival.basic.job.
-Require Import rt.classic.implementation.uni.susp.dynamic.task
-               rt.classic.implementation.uni.susp.dynamic.job.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.task_arrival prosa.classic.model.arrival.basic.job.
+Require Import prosa.classic.implementation.uni.susp.dynamic.task
+               prosa.classic.implementation.uni.susp.dynamic.job.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq div.
 
 Module ConcreteArrivalSequence.

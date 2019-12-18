@@ -1,6 +1,6 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task_arrival
-               rt.classic.model.priority.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task_arrival
+               prosa.classic.model.priority.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path div.
 
 (* Properties of job arrival. *)

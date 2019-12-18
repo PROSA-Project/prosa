@@ -1,5 +1,5 @@
-Require Export rt.model.priority.classes.
-Require Export rt.model.task.arrival.sporadic.
+Require Export prosa.model.priority.classes.
+Require Export prosa.model.task.arrival.sporadic.
 
 
 (** * Rate-Monotonic Fixed-Priority Policy *)

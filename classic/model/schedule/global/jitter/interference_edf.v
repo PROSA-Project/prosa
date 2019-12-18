@@ -1,9 +1,9 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.schedule.global.jitter.job
-               rt.classic.model.schedule.global.jitter.schedule
-               rt.classic.model.schedule.global.jitter.interference
-               rt.classic.model.schedule.global.jitter.platform.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.priority prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.schedule.global.jitter.job
+               prosa.classic.model.schedule.global.jitter.schedule
+               prosa.classic.model.schedule.global.jitter.interference
+               prosa.classic.model.schedule.global.jitter.platform.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 Module InterferenceEDF.

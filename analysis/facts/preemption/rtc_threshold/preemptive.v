@@ -1,6 +1,6 @@
-Require Import rt.model.preemption.fully_preemptive.
-Require Import rt.model.task.preemption.fully_preemptive.
-Require Import rt.analysis.facts.preemption.rtc_threshold.job_preemptable.
+Require Import prosa.model.preemption.fully_preemptive.
+Require Import prosa.model.task.preemption.fully_preemptive.
+Require Import prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run

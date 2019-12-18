@@ -1,6 +1,6 @@
-Require Import rt.util.epsilon.
-Require Import rt.util.tactics.
-Require Import rt.model.task.concept.
+Require Import prosa.util.epsilon.
+Require Import prosa.util.tactics.
+Require Import prosa.model.task.concept.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Reduction of the search space for Abstract RTA *)

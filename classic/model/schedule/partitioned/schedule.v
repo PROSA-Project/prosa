@@ -1,14 +1,14 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.time rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job.
-Require Import rt.classic.model.schedule.global.schedulability.
-Require Import rt.classic.model.schedule.global.basic.schedule.
-Require rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.time prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job.
+Require Import prosa.classic.model.schedule.global.schedulability.
+Require Import prosa.classic.model.schedule.global.basic.schedule.
+Require prosa.classic.model.schedule.uni.schedule prosa.classic.model.schedule.uni.schedulability.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module Partitioned.
 
-  Module uni := rt.classic.model.schedule.uni.schedule.UniprocessorSchedule.
-  Module uni_sched := rt.classic.model.schedule.uni.schedulability.Schedulability.
+  Module uni := prosa.classic.model.schedule.uni.schedule.UniprocessorSchedule.
+  Module uni_sched := prosa.classic.model.schedule.uni.schedulability.Schedulability.
   Import SporadicTaskset Schedule Schedulability.
   Export Time.
   

@@ -1,12 +1,12 @@
-Require Export rt.analysis.definitions.carry_in.
-Require Export rt.analysis.facts.busy_interval.
+Require Export prosa.analysis.definitions.carry_in.
+Require Export prosa.analysis.facts.busy_interval.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** * Existence of No Carry-In Instant *)
 

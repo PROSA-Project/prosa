@@ -1,4 +1,4 @@
-Require Export rt.analysis.facts.behavior.completion.
+Require Export prosa.analysis.facts.behavior.completion.
 
 (** In this file, we observe basic properties of the behavioral job
     model w.r.t. deadlines. *)

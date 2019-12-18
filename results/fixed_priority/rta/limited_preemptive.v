@@ -1,16 +1,16 @@
-Require Export rt.results.fixed_priority.rta.bounded_nps.
-Require Export rt.analysis.facts.preemption.rtc_threshold.limited.
+Require Export prosa.results.fixed_priority.rta.bounded_nps.
+Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** Throughout this file, we assume the task model with fixed preemption points. *)
-Require Import rt.model.preemption.limited_preemptive.
-Require Import rt.model.task.preemption.limited_preemptive.
+Require Import prosa.model.preemption.limited_preemptive.
+Require Import prosa.model.task.preemption.limited_preemptive.
 
 
 (** * RTA for FP-schedulers with Fixed Preemption Points *)

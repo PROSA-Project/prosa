@@ -1,6 +1,6 @@
-Require Export rt.analysis.concepts.schedulability.
-Require Export rt.analysis.abstract.search_space.
-Require Export rt.analysis.abstract.run_to_completion.
+Require Export prosa.analysis.concepts.schedulability.
+Require Export prosa.analysis.abstract.search_space.
+Require Export prosa.analysis.abstract.run_to_completion.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

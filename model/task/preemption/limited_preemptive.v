@@ -1,5 +1,5 @@
-Require Export rt.model.task.preemption.parameters.
-Require Import rt.model.preemption.limited_preemptive.
+Require Export prosa.model.task.preemption.parameters.
+Require Import prosa.model.preemption.limited_preemptive.
 
 (** * Limited-Preemptive Task Model *)
 

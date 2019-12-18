@@ -1,9 +1,9 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-Require Export rt.model.schedule.edf.
-Require Export rt.analysis.concepts.schedulability.
-Require Export rt.analysis.transform.edf_trans.
-Require Export rt.analysis.facts.transform.swaps.
-Require Export rt.analysis.facts.readiness.basic.
+Require Export prosa.model.schedule.edf.
+Require Export prosa.analysis.concepts.schedulability.
+Require Export prosa.analysis.transform.edf_trans.
+Require Export prosa.analysis.facts.transform.swaps.
+Require Export prosa.analysis.facts.readiness.basic.
 
 (** This file contains the main argument of the EDF optimality proof,
     starting with an analysis of the individual functions that drive
@@ -12,9 +12,9 @@ Require Export rt.analysis.facts.readiness.basic.
     the obtained EDF schedule. *)
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** We start by analyzing the helper function [find_swap_candidate],
     which is a problem-specific wrapper around [search_arg]. *)

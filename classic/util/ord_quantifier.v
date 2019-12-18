@@ -1,4 +1,4 @@
-Require Import rt.classic.util.tactics.
+Require Import prosa.classic.util.tactics.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype.
 
 (* Lemmas about the exists for Ordinals: [exists x, P x]. *)

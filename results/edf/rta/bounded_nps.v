@@ -1,14 +1,14 @@
-Require Export rt.analysis.facts.priority_inversion.
-Require Export rt.results.edf.rta.bounded_pi.
-Require Export rt.analysis.facts.rbf.
-Require Import rt.model.priority.edf.
+Require Export prosa.analysis.facts.priority_inversion.
+Require Export prosa.results.edf.rta.bounded_pi.
+Require Export prosa.analysis.facts.rbf.
+Require Import prosa.model.priority.edf.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** * RTA for EDF-schedulers with Bounded Non-Preemptive Segments *)
 

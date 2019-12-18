@@ -1,4 +1,4 @@
-Require Export rt.util.tactics rt.util.notation.
+Require Export prosa.util.tactics prosa.util.notation.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Lemmas about the big concatenation operator. *)

@@ -1,11 +1,11 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.arrival_sequence
-               rt.classic.model.priority rt.classic.model.suspension rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
-Require Import rt.classic.model.schedule.uni.susp.suspension_intervals
-               rt.classic.model.schedule.uni.susp.schedule rt.classic.model.schedule.uni.susp.platform.
-Require Import rt.classic.analysis.uni.basic.fp_rta_comp.
-Require Import rt.classic.analysis.uni.susp.dynamic.oblivious.reduction.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.arrival_sequence
+               prosa.classic.model.priority prosa.classic.model.suspension prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.schedule.uni.schedule prosa.classic.model.schedule.uni.schedulability.
+Require Import prosa.classic.model.schedule.uni.susp.suspension_intervals
+               prosa.classic.model.schedule.uni.susp.schedule prosa.classic.model.schedule.uni.susp.platform.
+Require Import prosa.classic.analysis.uni.basic.fp_rta_comp.
+Require Import prosa.classic.analysis.uni.susp.dynamic.oblivious.reduction.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module SuspensionObliviousFP.

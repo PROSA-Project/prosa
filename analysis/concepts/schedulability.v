@@ -1,5 +1,5 @@
-Require Export rt.analysis.facts.behavior.completion.
-Require Import rt.model.task.absolute_deadline.
+Require Export prosa.analysis.facts.behavior.completion.
+Require Import prosa.model.task.absolute_deadline.
 
 Section Task.
   Context {Task : TaskType}.

@@ -1,4 +1,4 @@
-Require Export rt.model.task.sequentiality.
+Require Export prosa.model.task.sequentiality.
 
 Section ExecutionOrder.
   (** Consider any type of job associated with any type of tasks... *)

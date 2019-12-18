@@ -1,8 +1,8 @@
-Require Export rt.analysis.facts.behavior.all.
-Require Export rt.analysis.definitions.job_properties.
-Require Export rt.model.schedule.limited_preemptive.
+Require Export prosa.analysis.facts.behavior.all.
+Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.model.schedule.limited_preemptive.
 
-Require Import rt.model.preemption.limited_preemptive.
+Require Import prosa.model.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)
 (** In this section, we prove that instantiation of predicate

@@ -1,5 +1,5 @@
 From mathcomp Require Export fintype.
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** * Multiprocessor State *)
 

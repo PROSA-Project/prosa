@@ -1,6 +1,6 @@
-Require Export rt.util.nat.
+Require Export prosa.util.nat.
 
-Require Import rt.classic.util.tactics rt.util.ssromega.
+Require Import prosa.classic.util.tactics prosa.util.ssromega.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 (* Additional lemmas about natural numbers. *)

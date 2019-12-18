@@ -1,4 +1,4 @@
-Require Export rt.model.task.arrivals.
+Require Export prosa.model.task.arrivals.
 
 (** In this file we provide basic properties related to tasks on arrival sequences. *)
 Section TaskArrivals.

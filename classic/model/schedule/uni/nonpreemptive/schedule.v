@@ -1,6 +1,6 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job.
-Require Import rt.classic.model.schedule.uni.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job.
+Require Import prosa.classic.model.schedule.uni.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module NonpreemptiveSchedule.

@@ -1,5 +1,5 @@
-Require Export rt.model.task.preemption.parameters.
-Require Import rt.model.preemption.fully_preemptive.
+Require Export prosa.model.task.preemption.parameters.
+Require Import prosa.model.preemption.fully_preemptive.
 
 (** * Preemptions in Fully Preemptive Model *)
 (** In this section, we prove that instantiation of predicate

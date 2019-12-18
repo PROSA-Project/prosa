@@ -1,7 +1,7 @@
-Require Export rt.analysis.definitions.job_properties.
-Require Export rt.analysis.facts.preemption.job.preemptive.
+Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.analysis.facts.preemption.job.preemptive.
 
-Require Import rt.model.task.preemption.fully_preemptive.
+Require Import prosa.model.task.preemption.fully_preemptive.
 
 (** * Platform for Fully Preemptive Model *)
 (** In this section, we prove that instantiation of functions

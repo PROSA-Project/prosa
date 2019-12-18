@@ -1,7 +1,7 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job.
-Require Import rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.arrival.jitter.arrival_sequence.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job.
+Require Import prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.arrival.jitter.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path.
 
 (* In this file, we provide definitions and lemmas about task arrivals

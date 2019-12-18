@@ -1,4 +1,4 @@
-Require Export rt.model.task.concept.
+Require Export prosa.model.task.concept.
 
 (** In this module, we give a precise definition of the common notion of
     "sequential tasks", which is commonly understood to mean that the jobs of a

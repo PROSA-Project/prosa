@@ -1,9 +1,9 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority.
-Require Import rt.classic.model.schedule.global.workload.
-Require Import rt.classic.model.schedule.global.basic.schedule.
-Require Import rt.classic.model.schedule.apa.interference rt.classic.model.schedule.apa.affinity.
-Require Import rt.classic.analysis.apa.workload_bound rt.classic.analysis.apa.interference_bound.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.global.workload.
+Require Import prosa.classic.model.schedule.global.basic.schedule.
+Require Import prosa.classic.model.schedule.apa.interference prosa.classic.model.schedule.apa.affinity.
+Require Import prosa.classic.analysis.apa.workload_bound prosa.classic.analysis.apa.interference_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module InterferenceBoundFP.

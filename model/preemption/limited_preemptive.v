@@ -1,4 +1,4 @@
-Require Export rt.model.preemption.parameter.
+Require Export prosa.model.preemption.parameter.
 
 (** * Job Model Parameter for Preemption Points *)
 

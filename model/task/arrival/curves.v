@@ -1,5 +1,5 @@
-Require Export rt.util.rel.
-Require Export rt.model.task.arrivals.
+Require Export prosa.util.rel.
+Require Export prosa.model.task.arrivals.
 
 (** * The Arbitrary Arrival Curves Model *)
 

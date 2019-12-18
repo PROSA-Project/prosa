@@ -1,4 +1,4 @@
-Require Export rt.model.task.concept.
+Require Export prosa.model.task.concept.
 
 (** Given relative task deadlines and a mapping from jobs to tasks, we provide
     the canonical definition of each job's absolute deadline, i.e.,

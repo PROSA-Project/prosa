@@ -1,5 +1,5 @@
-Require Import rt.model.priority.edf.
-Require Import rt.model.task.absolute_deadline.
+Require Import prosa.model.priority.edf.
+Require Import prosa.model.task.absolute_deadline.
 
 (** In this section, we prove a few properties about EDF policy. *)
 Section PropertiesOfEDF.

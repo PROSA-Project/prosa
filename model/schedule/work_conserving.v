@@ -1,4 +1,4 @@
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** * Definition of Work Conservation *)
 

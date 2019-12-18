@@ -1,5 +1,5 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.analysis.global.parallel.bertogna_fp_theory.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.analysis.global.parallel.bertogna_fp_theory.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop div path.
 
 Module ResponseTimeIterationFP.

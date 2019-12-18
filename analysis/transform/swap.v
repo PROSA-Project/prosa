@@ -1,4 +1,4 @@
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** This file defines simple allocation substitutions and a swapping operation
     as used for instance in the classic EDF optimality proof. *)

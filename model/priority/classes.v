@@ -1,6 +1,6 @@
-Require Export rt.model.task.concept.
-Require Export rt.util.rel.
-Require Export rt.util.list.
+Require Export prosa.model.task.concept.
+Require Export prosa.util.rel.
+Require Export prosa.util.list.
 
 From mathcomp Require Export seq.
 

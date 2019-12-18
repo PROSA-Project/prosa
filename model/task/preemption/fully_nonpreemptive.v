@@ -1,4 +1,4 @@
-Require Export rt.model.task.preemption.parameters.
+Require Export prosa.model.task.preemption.parameters.
 
 (** * Fully Non-Preemptive Task Model *)
 

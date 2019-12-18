@@ -1,4 +1,4 @@
-Require Import rt.classic.util.tactics.
+Require Import prosa.classic.util.tactics.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop tuple.
 
 Section PowerSet.

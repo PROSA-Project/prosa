@@ -1,6 +1,6 @@
-Require Export rt.util.all.
-Require Export rt.behavior.all.
-Require Export rt.model.processor.platform_properties.
+Require Export prosa.util.all.
+Require Export prosa.behavior.all.
+Require Export prosa.model.processor.platform_properties.
 
 From mathcomp Require Import ssrnat ssrbool fintype.
 

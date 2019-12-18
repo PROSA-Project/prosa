@@ -1,6 +1,6 @@
-Require Export rt.util.counting.
+Require Export prosa.util.counting.
 
-Require Import rt.classic.util.tactics rt.classic.util.ord_quantifier.
+Require Import prosa.classic.util.tactics prosa.classic.util.ord_quantifier.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Additional lemmas about counting. *)

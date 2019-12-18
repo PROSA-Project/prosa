@@ -1,4 +1,4 @@
-Require Import rt.classic.util.tactics rt.classic.util.induction rt.classic.util.list.
+Require Import prosa.classic.util.tactics prosa.classic.util.induction prosa.classic.util.list.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 (** * Sorting *)

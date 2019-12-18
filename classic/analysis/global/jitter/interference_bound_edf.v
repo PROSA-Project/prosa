@@ -1,11 +1,11 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.schedule.global.response_time rt.classic.model.schedule.global.workload
-               rt.classic.model.schedule.global.schedulability.
-Require Import rt.classic.model.schedule.global.jitter.job rt.classic.model.schedule.global.jitter.schedule
-               rt.classic.model.schedule.global.jitter.platform rt.classic.model.schedule.global.jitter.interference
-               rt.classic.model.schedule.global.jitter.interference_edf.
-Require Import rt.classic.analysis.global.jitter.workload_bound rt.classic.analysis.global.jitter.interference_bound.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.priority prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.schedule.global.response_time prosa.classic.model.schedule.global.workload
+               prosa.classic.model.schedule.global.schedulability.
+Require Import prosa.classic.model.schedule.global.jitter.job prosa.classic.model.schedule.global.jitter.schedule
+               prosa.classic.model.schedule.global.jitter.platform prosa.classic.model.schedule.global.jitter.interference
+               prosa.classic.model.schedule.global.jitter.interference_edf.
+Require Import prosa.classic.analysis.global.jitter.workload_bound prosa.classic.analysis.global.jitter.interference_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div path.
 
 Module InterferenceBoundEDFJitter.

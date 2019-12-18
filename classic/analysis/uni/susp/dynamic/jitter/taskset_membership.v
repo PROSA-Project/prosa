@@ -1,16 +1,16 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority rt.classic.model.suspension.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job
-               rt.classic.model.arrival.basic.arrival_sequence.
-Require Import rt.classic.model.arrival.jitter.job.
-Require Import rt.classic.model.schedule.uni.response_time.
-Require Import rt.classic.model.schedule.uni.susp.schedule
-               rt.classic.model.schedule.uni.susp.platform
-               rt.classic.model.schedule.uni.susp.valid_schedule.
-Require Import rt.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule
-               rt.classic.analysis.uni.susp.dynamic.jitter.jitter_taskset_generation.
-Require Import rt.classic.analysis.uni.susp.sustainability.singlecost.reduction
-               rt.classic.analysis.uni.susp.sustainability.singlecost.reduction_properties.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority prosa.classic.model.suspension.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job
+               prosa.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.model.arrival.jitter.job.
+Require Import prosa.classic.model.schedule.uni.response_time.
+Require Import prosa.classic.model.schedule.uni.susp.schedule
+               prosa.classic.model.schedule.uni.susp.platform
+               prosa.classic.model.schedule.uni.susp.valid_schedule.
+Require Import prosa.classic.analysis.uni.susp.dynamic.jitter.jitter_schedule
+               prosa.classic.analysis.uni.susp.dynamic.jitter.jitter_taskset_generation.
+Require Import prosa.classic.analysis.uni.susp.sustainability.singlecost.reduction
+               prosa.classic.analysis.uni.susp.sustainability.singlecost.reduction_properties.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* In this file we prove that the jitter-aware schedule sched_jitter used in the
@@ -74,7 +74,7 @@ Module TaskSetMembership.
                                       job_suspension_duration.
     
     (* Next, consider any valid suspension-aware schedule of this arrival sequence.
-       (Note: see rt.classic.model.schedule.uni.susp.valid_schedule.v for details) *)
+       (Note: see prosa.classic.model.schedule.uni.susp.valid_schedule.v for details) *)
     Variable sched_susp: schedule Job.
     Hypothesis H_valid_schedule:
       valid_suspension_aware_schedule job_arrival arr_seq job_higher_eq_priority

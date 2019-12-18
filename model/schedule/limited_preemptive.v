@@ -1,4 +1,4 @@
-Require Export rt.model.preemption.parameter. 
+Require Export prosa.model.preemption.parameter. 
 
 (** * Preemption Model Compliance *)
 

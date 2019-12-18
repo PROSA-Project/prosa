@@ -1,8 +1,8 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.priority.
-Require Import rt.classic.model.arrival.jitter.job
-               rt.classic.model.arrival.jitter.arrival_sequence
-               rt.classic.model.arrival.jitter.task_arrival.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.priority.
+Require Import prosa.classic.model.arrival.jitter.job
+               prosa.classic.model.arrival.jitter.arrival_sequence
+               prosa.classic.model.arrival.jitter.task_arrival.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path div.
 
 (* In this file, we prove bounds on the number of actual task arrivals, i.e,

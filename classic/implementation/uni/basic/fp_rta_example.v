@@ -1,11 +1,11 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
-Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability.
-Require Import rt.classic.analysis.uni.basic.workload_bound_fp
-               rt.classic.analysis.uni.basic.fp_rta_comp.
-Require Import rt.classic.implementation.job rt.classic.implementation.task
-               rt.classic.implementation.arrival_sequence.
-Require Import rt.classic.implementation.uni.basic.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.uni.schedule prosa.classic.model.schedule.uni.schedulability.
+Require Import prosa.classic.analysis.uni.basic.workload_bound_fp
+               prosa.classic.analysis.uni.basic.fp_rta_comp.
+Require Import prosa.classic.implementation.job prosa.classic.implementation.task
+               prosa.classic.implementation.arrival_sequence.
+Require Import prosa.classic.implementation.uni.basic.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

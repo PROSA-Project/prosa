@@ -1,8 +1,8 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.suspension
-               rt.classic.model.priority.
-Require Import rt.classic.model.schedule.uni.schedule.
-Require Import rt.classic.model.schedule.uni.susp.suspension_intervals.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.suspension
+               prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.uni.schedule.
+Require Import prosa.classic.model.schedule.uni.susp.suspension_intervals.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module ScheduleWithSuspensions.

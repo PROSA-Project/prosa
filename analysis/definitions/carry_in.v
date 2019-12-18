@@ -1,8 +1,8 @@
-Require Export rt.model.priority.classes.
+Require Export prosa.model.priority.classes.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** * No Carry-In *)
 (** In this module we define the notion of no carry-in time for uni-processor schedulers. *)

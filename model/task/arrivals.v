@@ -1,4 +1,4 @@
-Require Export rt.model.task.concept.
+Require Export prosa.model.task.concept.
 
 (** In this module, we provide basic definitions concerning the job
     arrivals of a given task. *)

@@ -1,6 +1,6 @@
-Require Export rt.util.epsilon.
-Require Export rt.util.nat.
-Require Export rt.util.list.
+Require Export prosa.util.epsilon.
+Require Export prosa.util.nat.
+Require Export prosa.util.list.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Non-Decreasing Sequence and Distances *)

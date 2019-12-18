@@ -1,16 +1,16 @@
-Require Export rt.results.fixed_priority.rta.bounded_nps.
-Require Export rt.analysis.facts.preemption.task.preemptive.
-Require Export rt.analysis.facts.preemption.rtc_threshold.preemptive.
+Require Export prosa.results.fixed_priority.rta.bounded_nps.
+Require Export prosa.analysis.facts.preemption.task.preemptive.
+Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** Throughout this file, we assume the fully preemptive task model. *)
-Require Import rt.model.task.preemption.fully_preemptive.
+Require Import prosa.model.task.preemption.fully_preemptive.
 
 (** * RTA for Fully Preemptive FP Model *)
 (** In this module we prove the RTA theorem for fully preemptive FP model. *)

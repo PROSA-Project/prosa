@@ -1,4 +1,4 @@
-Require Export rt.model.priority.classes.
+Require Export prosa.model.priority.classes.
 
 (** * Deadline-Monotonic Fixed-Priority Policy *)
 

@@ -1,6 +1,6 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.schedule.global.basic.schedule.
-Require Import rt.classic.analysis.global.basic.workload_bound.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.schedule.global.basic.schedule.
+Require Import prosa.classic.analysis.global.basic.workload_bound.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module InterferenceBoundGeneric.

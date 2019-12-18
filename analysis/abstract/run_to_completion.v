@@ -1,5 +1,5 @@
-Require Export rt.analysis.facts.preemption.rtc_threshold.job_preemptable.
-Require Export rt.analysis.abstract.definitions.
+Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
+Require Export prosa.analysis.abstract.definitions.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

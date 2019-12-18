@@ -1,5 +1,5 @@
-Require Import rt.classic.model.time rt.classic.util.all.
-Require Import rt.classic.implementation.task.
+Require Import prosa.classic.model.time prosa.classic.util.all.
+Require Import prosa.classic.implementation.task.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
 
 Module ConcreteJob.

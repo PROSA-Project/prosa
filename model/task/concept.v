@@ -1,5 +1,5 @@
 From mathcomp Require Export ssrbool.
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** * Task Type *)
 

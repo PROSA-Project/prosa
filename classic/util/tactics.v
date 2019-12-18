@@ -1,4 +1,4 @@
-Require Export rt.util.tactics.
+Require Export prosa.util.tactics.
 
 (* *********************************************************************)
 (*                                                                     *)

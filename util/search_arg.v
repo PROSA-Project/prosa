@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype.
-Require Import rt.util.tactics.
+Require Import prosa.util.tactics.
 
 (** This file introduces a function called [search_arg] that allows finding the
     argument within a given range for which a function is minimal w.r.t. to a

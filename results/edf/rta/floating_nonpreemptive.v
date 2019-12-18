@@ -1,17 +1,17 @@
-Require Export rt.results.edf.rta.bounded_nps.
-Require Export rt.analysis.facts.preemption.rtc_threshold.floating.
-Require Import rt.model.priority.edf.
+Require Export prosa.results.edf.rta.bounded_nps.
+Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
+Require Import prosa.model.priority.edf.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** Throughout this file, we assume the task model with floating non-preemptive regions. *)
-Require Import rt.model.preemption.limited_preemptive.
-Require Import rt.model.task.preemption.floating_nonpreemptive.
+Require Import prosa.model.preemption.limited_preemptive.
+Require Import prosa.model.task.preemption.floating_nonpreemptive.
 
 (** * RTA for Model with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating non-preemptive regions EDF model. *)

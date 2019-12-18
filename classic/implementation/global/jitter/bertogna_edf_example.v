@@ -1,15 +1,15 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.priority.
-Require Import rt.classic.model.schedule.global.schedulability.
-Require Import rt.classic.model.schedule.global.jitter.job rt.classic.model.schedule.global.jitter.schedule
-               rt.classic.model.schedule.global.jitter.platform.
-Require Import rt.classic.analysis.global.jitter.workload_bound
-               rt.classic.analysis.global.jitter.interference_bound_edf
-               rt.classic.analysis.global.jitter.bertogna_edf_comp.
-Require Import rt.classic.implementation.global.jitter.job
-               rt.classic.implementation.global.jitter.task
-               rt.classic.implementation.global.jitter.schedule
-               rt.classic.implementation.global.jitter.arrival_sequence.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.global.schedulability.
+Require Import prosa.classic.model.schedule.global.jitter.job prosa.classic.model.schedule.global.jitter.schedule
+               prosa.classic.model.schedule.global.jitter.platform.
+Require Import prosa.classic.analysis.global.jitter.workload_bound
+               prosa.classic.analysis.global.jitter.interference_bound_edf
+               prosa.classic.analysis.global.jitter.bertogna_edf_comp.
+Require Import prosa.classic.implementation.global.jitter.job
+               prosa.classic.implementation.global.jitter.task
+               prosa.classic.implementation.global.jitter.schedule
+               prosa.classic.implementation.global.jitter.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisEDF.

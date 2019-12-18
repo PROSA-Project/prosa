@@ -1,8 +1,8 @@
-Require Import rt.classic.util.all.  
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task.
-Require Import rt.classic.model.schedule.uni.schedule. 
-Require Export rt.classic.model.schedule.uni.limited.platform.definitions.
-Require Export rt.util.nondecreasing.
+Require Import prosa.classic.util.all.  
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task.
+Require Import prosa.classic.model.schedule.uni.schedule. 
+Require Export prosa.classic.model.schedule.uni.limited.platform.definitions.
+Require Export prosa.util.nondecreasing.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

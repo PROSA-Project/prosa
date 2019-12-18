@@ -1,5 +1,5 @@
-Require Export rt.model.preemption.parameter.
-Require Export rt.model.task.concept.
+Require Export prosa.model.preemption.parameter.
+Require Export prosa.model.task.concept.
 
 (** * Task Preemption Model *)
 

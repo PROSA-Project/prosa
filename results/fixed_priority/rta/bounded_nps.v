@@ -1,14 +1,14 @@
-Require Export rt.analysis.concepts.schedulability.
-Require Export rt.analysis.concepts.request_bound_function.
-Require Export rt.results.fixed_priority.rta.bounded_pi.
-Require Export rt.analysis.facts.priority_inversion.
+Require Export prosa.analysis.concepts.schedulability.
+Require Export prosa.analysis.concepts.request_bound_function.
+Require Export prosa.results.fixed_priority.rta.bounded_pi.
+Require Export prosa.analysis.facts.priority_inversion.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)
 

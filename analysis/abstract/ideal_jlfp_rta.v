@@ -1,13 +1,13 @@
-Require Export rt.analysis.concepts.priority_inversion.
-Require Export rt.analysis.abstract.abstract_seq_rta.
+Require Export prosa.analysis.concepts.priority_inversion.
+Require Export prosa.analysis.abstract.abstract_seq_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** In this file we consider an ideal uni-processor ... *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** ... and classic model of readiness without jitter and no
     self-suspensions, where pending jobs are always ready. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** * JLFP instantiation of Interference and Interfering Workload for ideal uni-processor. *)
 (** In this module we instantiate functions Interference and Interfering Workload 

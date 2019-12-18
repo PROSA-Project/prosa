@@ -1,4 +1,4 @@
-Require Import rt.util.ssromega rt.util.tactics.
+Require Import prosa.util.ssromega prosa.util.tactics.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** We define a few simple operations on 

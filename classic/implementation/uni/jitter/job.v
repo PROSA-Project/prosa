@@ -1,5 +1,5 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.implementation.uni.jitter.task.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.implementation.uni.jitter.task.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
 
 Module ConcreteJob.

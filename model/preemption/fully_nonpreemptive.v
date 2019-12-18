@@ -1,4 +1,4 @@
-Require Export rt.model.preemption.parameter.
+Require Export prosa.model.preemption.parameter.
 
 (** * Preemption Model: Fully Non-Preemptive Jobs *)
 (** In this section, we instantiate [job_preemptable] for the fully

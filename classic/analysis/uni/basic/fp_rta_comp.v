@@ -1,9 +1,9 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.priority
-               rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.schedule.uni.schedule rt.classic.model.schedule.uni.schedulability rt.classic.model.schedule.uni.response_time.
-Require Import rt.classic.model.schedule.uni.basic.platform.
-Require Import rt.classic.analysis.uni.basic.workload_bound_fp rt.classic.analysis.uni.basic.fp_rta_theory.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.priority
+               prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.schedule.uni.schedule prosa.classic.model.schedule.uni.schedulability prosa.classic.model.schedule.uni.response_time.
+Require Import prosa.classic.model.schedule.uni.basic.platform.
+Require Import prosa.classic.analysis.uni.basic.workload_bound_fp prosa.classic.analysis.uni.basic.fp_rta_theory.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path ssrfun.
 
 Module ResponseTimeIterationFP.

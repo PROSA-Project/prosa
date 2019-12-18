@@ -1,4 +1,4 @@
-Require Export rt.util.tactics rt.util.ssromega.
+Require Export prosa.util.tactics prosa.util.ssromega.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 (* Additional lemmas about natural numbers. *)

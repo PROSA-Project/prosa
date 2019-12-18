@@ -1,5 +1,5 @@
-Require Export rt.model.task.concept.
-Require Export rt.analysis.facts.behavior.ideal_schedule.
+Require Export prosa.model.task.concept.
+Require Export prosa.analysis.facts.behavior.ideal_schedule.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

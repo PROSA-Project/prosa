@@ -1,6 +1,6 @@
-Require Export rt.util.bigcat.
+Require Export prosa.util.bigcat.
 
-Require Import rt.classic.util.tactics rt.classic.util.notation rt.classic.util.bigord.
+Require Import prosa.classic.util.tactics prosa.classic.util.notation prosa.classic.util.bigord.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* Lemmas about the big concatenation operator. *)

@@ -1,5 +1,5 @@
-Require Export rt.analysis.transform.swap.
-Require Export rt.analysis.facts.behavior.completion.
+Require Export prosa.analysis.transform.swap.
+Require Export prosa.analysis.facts.behavior.completion.
 
 (** In this file, we make a few simple observations about schedules with
     replacements. *)

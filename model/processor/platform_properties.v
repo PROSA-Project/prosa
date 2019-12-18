@@ -1,4 +1,4 @@
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** To reason about classes of schedule types / processor models, we define the
     following properties that group processor models into classes of similar

@@ -1,11 +1,11 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task_arrival rt.classic.model.priority.
-Require Import rt.classic.model.schedule.global.workload rt.classic.model.schedule.global.schedulability
-               rt.classic.model.schedule.global.response_time.
-Require Import rt.classic.model.schedule.global.basic.schedule rt.classic.model.schedule.global.basic.platform
-               rt.classic.model.schedule.global.basic.interference rt.classic.model.schedule.global.basic.platform
-               rt.classic.model.schedule.global.basic.constrained_deadlines.
-Require Import rt.classic.analysis.global.basic.workload_bound rt.classic.analysis.global.basic.interference_bound_edf.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task_arrival prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.global.workload prosa.classic.model.schedule.global.schedulability
+               prosa.classic.model.schedule.global.response_time.
+Require Import prosa.classic.model.schedule.global.basic.schedule prosa.classic.model.schedule.global.basic.platform
+               prosa.classic.model.schedule.global.basic.interference prosa.classic.model.schedule.global.basic.platform
+               prosa.classic.model.schedule.global.basic.constrained_deadlines.
+Require Import prosa.classic.analysis.global.basic.workload_bound prosa.classic.analysis.global.basic.interference_bound_edf.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div path.
 
 Module ResponseTimeAnalysisEDF.

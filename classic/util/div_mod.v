@@ -1,7 +1,7 @@
-Require Export rt.util.div_mod.
+Require Export prosa.util.div_mod.
 
 Require Import Arith Omega Nat.
-Require Import rt.classic.util.tactics rt.util.ssromega rt.classic.util.nat.
+Require Import prosa.classic.util.tactics prosa.util.ssromega prosa.classic.util.nat.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 

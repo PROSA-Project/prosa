@@ -1,4 +1,4 @@
-Require Export rt.model.preemption.parameter.
+Require Export prosa.model.preemption.parameter.
 
 (** * Preemption Times *)
 
@@ -14,7 +14,7 @@ Require Export rt.model.preemption.parameter.
     ideal uniprocessor schedules. Lifting this assumption is future work. *)
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require rt.model.processor.ideal.
+Require prosa.model.processor.ideal.
 
 Section PreemptionTime.
 

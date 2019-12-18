@@ -1,12 +1,12 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.schedule.global.response_time rt.classic.model.schedule.global.schedulability
-               rt.classic.model.schedule.global.workload.
-Require Import rt.classic.model.schedule.global.basic.schedule.
-Require Import rt.classic.model.schedule.apa.platform rt.classic.model.schedule.apa.constrained_deadlines
-               rt.classic.model.schedule.apa.interference rt.classic.model.schedule.apa.affinity.
-Require Import rt.classic.analysis.apa.workload_bound
-               rt.classic.analysis.apa.interference_bound_fp.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job prosa.classic.model.priority prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.schedule.global.response_time prosa.classic.model.schedule.global.schedulability
+               prosa.classic.model.schedule.global.workload.
+Require Import prosa.classic.model.schedule.global.basic.schedule.
+Require Import prosa.classic.model.schedule.apa.platform prosa.classic.model.schedule.apa.constrained_deadlines
+               prosa.classic.model.schedule.apa.interference prosa.classic.model.schedule.apa.affinity.
+Require Import prosa.classic.analysis.apa.workload_bound
+               prosa.classic.analysis.apa.interference_bound_fp.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div path.
 
 Module ResponseTimeAnalysisFP.

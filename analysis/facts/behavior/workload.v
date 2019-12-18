@@ -1,5 +1,5 @@
-Require Export rt.model.aggregate.workload.
-Require Export rt.analysis.facts.behavior.arrivals.
+Require Export prosa.model.aggregate.workload.
+Require Export prosa.analysis.facts.behavior.arrivals.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

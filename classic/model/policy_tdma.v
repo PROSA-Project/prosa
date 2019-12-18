@@ -1,7 +1,7 @@
-Require Import  rt.classic.util.all.
-Require Import  rt.classic.model.time
-                rt.classic.model.arrival.basic.task 
-                rt.classic.model.arrival.basic.job.
+Require Import  prosa.classic.util.all.
+Require Import  prosa.classic.model.time
+                prosa.classic.model.arrival.basic.task 
+                prosa.classic.model.arrival.basic.job.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop div.
 
 Module PolicyTDMA.

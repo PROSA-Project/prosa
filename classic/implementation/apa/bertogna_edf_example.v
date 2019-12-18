@@ -1,15 +1,15 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority.
-Require Import rt.classic.model.schedule.global.schedulability.
-Require Import rt.classic.model.schedule.global.basic.schedule.
-Require Import rt.classic.model.schedule.apa.affinity rt.classic.model.schedule.apa.interference rt.classic.model.schedule.apa.platform.
-Require Import rt.classic.analysis.apa.workload_bound
-               rt.classic.analysis.apa.interference_bound_edf
-               rt.classic.analysis.apa.bertogna_edf_comp.
-Require Import rt.classic.implementation.apa.job
-               rt.classic.implementation.apa.task
-               rt.classic.implementation.apa.schedule
-               rt.classic.implementation.apa.arrival_sequence.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.global.schedulability.
+Require Import prosa.classic.model.schedule.global.basic.schedule.
+Require Import prosa.classic.model.schedule.apa.affinity prosa.classic.model.schedule.apa.interference prosa.classic.model.schedule.apa.platform.
+Require Import prosa.classic.analysis.apa.workload_bound
+               prosa.classic.analysis.apa.interference_bound_edf
+               prosa.classic.analysis.apa.bertogna_edf_comp.
+Require Import prosa.classic.implementation.apa.job
+               prosa.classic.implementation.apa.task
+               prosa.classic.implementation.apa.schedule
+               prosa.classic.implementation.apa.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq fintype bigop div.
 
 Module ResponseTimeAnalysisEDF.

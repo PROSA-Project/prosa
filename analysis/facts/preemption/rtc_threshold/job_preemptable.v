@@ -1,6 +1,6 @@
-Require Export rt.analysis.definitions.job_properties.
-Require Export rt.analysis.facts.behavior.all.
-Require Export rt.model.task.preemption.parameters.
+Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.analysis.facts.behavior.all.
+Require Export prosa.model.task.preemption.parameters.
 
 (** * Run-to-Completion Threshold *) 
 (** In this section, we provide a few basic properties 

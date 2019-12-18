@@ -1,15 +1,15 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task.
-Require Import rt.classic.model.schedule.global.jitter.job rt.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task.
+Require Import prosa.classic.model.schedule.global.jitter.job prosa.classic.model.arrival.basic.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
-Require rt.classic.model.schedule.global.basic.schedule.
+Require prosa.classic.model.schedule.global.basic.schedule.
 
 (* Definition, properties and lemmas about schedules. *)
 Module ScheduleWithJitter.
 
   (* We import the original schedule module and redefine whatever is required. *)
-  Export rt.classic.model.schedule.global.basic.schedule.
+  Export prosa.classic.model.schedule.global.basic.schedule.
   Export ArrivalSequence Schedule.
   
   (* We need to redefine the properties of a job that depend on the arrival time. *)

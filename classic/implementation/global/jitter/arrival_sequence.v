@@ -1,7 +1,7 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.task_arrival.
-Require Import rt.classic.model.schedule.global.jitter.job.
-Require Import rt.classic.implementation.global.jitter.task rt.classic.implementation.global.jitter.job.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.task_arrival.
+Require Import prosa.classic.model.schedule.global.jitter.job.
+Require Import prosa.classic.implementation.global.jitter.task prosa.classic.implementation.global.jitter.job.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq div.
 
 Module ConcreteArrivalSequence.

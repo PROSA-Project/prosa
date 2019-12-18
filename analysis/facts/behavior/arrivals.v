@@ -1,5 +1,5 @@
-Require Export rt.behavior.all.
-Require Export rt.util.all.
+Require Export prosa.behavior.all.
+Require Export prosa.util.all.
 
 (** In this section, we relate job readiness to [has_arrived]. *)
 Section Arrived.

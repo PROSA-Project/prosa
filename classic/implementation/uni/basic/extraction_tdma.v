@@ -1,5 +1,5 @@
 (* Require Import Extraction. *) (* Required for Coq 8.7 *)
-Require Import rt.classic.analysis.uni.basic.tdma_wcrt_analysis.
+Require Import prosa.classic.analysis.uni.basic.tdma_wcrt_analysis.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Set Implicit Arguments.

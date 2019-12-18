@@ -1,8 +1,8 @@
-Require Export rt.analysis.facts.behavior.all.
-Require Export rt.analysis.definitions.job_properties.
-Require Export rt.model.schedule.nonpreemptive.
+Require Export prosa.analysis.facts.behavior.all.
+Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.model.schedule.nonpreemptive.
 
-Require Import rt.model.preemption.fully_nonpreemptive.
+Require Import prosa.model.preemption.fully_nonpreemptive.
 
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 

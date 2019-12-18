@@ -1,11 +1,11 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.task rt.classic.model.priority rt.classic.model.arrival.basic.task_arrival
-               rt.classic.model.arrival.basic.arrival_bounds.
-Require Import rt.classic.model.schedule.uni.schedule_of_task rt.classic.model.schedule.uni.workload
-               rt.classic.model.schedule.uni.schedulability rt.classic.model.schedule.uni.response_time
-               rt.classic.model.schedule.uni.service.
-Require Import rt.classic.model.schedule.uni.limited.busy_interval rt.classic.model.schedule.uni.basic.platform.
-Require Import rt.classic.analysis.uni.basic.workload_bound_fp.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.task prosa.classic.model.priority prosa.classic.model.arrival.basic.task_arrival
+               prosa.classic.model.arrival.basic.arrival_bounds.
+Require Import prosa.classic.model.schedule.uni.schedule_of_task prosa.classic.model.schedule.uni.workload
+               prosa.classic.model.schedule.uni.schedulability prosa.classic.model.schedule.uni.response_time
+               prosa.classic.model.schedule.uni.service.
+Require Import prosa.classic.model.schedule.uni.limited.busy_interval prosa.classic.model.schedule.uni.basic.platform.
+Require Import prosa.classic.analysis.uni.basic.workload_bound_fp.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Module ResponseTimeAnalysisFP.

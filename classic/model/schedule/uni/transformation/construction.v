@@ -1,6 +1,6 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence.
-Require Import rt.classic.model.schedule.uni.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.model.schedule.uni.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype bigop seq path finfun.
 
 Module ScheduleConstruction.

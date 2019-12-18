@@ -1,5 +1,5 @@
-Require Export rt.analysis.facts.behavior.service.
-Require Export rt.analysis.facts.behavior.arrivals.
+Require Export prosa.analysis.facts.behavior.service.
+Require Export prosa.analysis.facts.behavior.arrivals.
 
 (** In this file, we establish basic facts about job completions. *)
 

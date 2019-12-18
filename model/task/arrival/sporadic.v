@@ -1,4 +1,4 @@
-Require Export rt.model.task.concept.
+Require Export prosa.model.task.concept.
 
 (** * The Sporadic Task Model *)
 

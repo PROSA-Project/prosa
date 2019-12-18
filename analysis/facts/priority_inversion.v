@@ -1,19 +1,19 @@
-Require Export rt.model.task.preemption.parameters.
-Require Export rt.model.schedule.priority_driven.
-Require Export rt.analysis.facts.behavior.ideal_schedule.
-Require Export rt.model.schedule.work_conserving.
-Require Export rt.analysis.definitions.job_properties.
-Require Export rt.analysis.concepts.busy_interval.
-Require Export rt.analysis.facts.busy_interval.
+Require Export prosa.model.task.preemption.parameters.
+Require Export prosa.model.schedule.priority_driven.
+Require Export prosa.analysis.facts.behavior.ideal_schedule.
+Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.analysis.concepts.busy_interval.
+Require Export prosa.analysis.facts.busy_interval.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout the file we assume for the classic Liu & Layland model
     of readiness without jitter and no self-suspensions, where
     pending jobs are always ready. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 (** In preparation of the derivation of the priority inversion bound, we
     establish two basic facts on preemption times. *)
@@ -83,7 +83,7 @@ End PreemptionTimes.
 
 (** * Priority inversion is bounded *)
 (** In this module we prove that any priority inversion that occurs in the model with bounded 
-    nonpreemptive segments defined in module rt.model.schedule.uni.limited.platform.definitions 
+    nonpreemptive segments defined in module prosa.model.schedule.uni.limited.platform.definitions 
     is bounded. *)
 Section PriorityInversionIsBounded.
 

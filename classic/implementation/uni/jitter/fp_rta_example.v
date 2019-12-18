@@ -1,15 +1,15 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority.
-Require Import rt.classic.model.arrival.basic.task.
-Require Import rt.classic.model.schedule.uni.schedulability.
-Require Import rt.classic.model.arrival.jitter.job.
-Require Import rt.classic.model.schedule.uni.jitter.schedule.
-Require Import rt.classic.analysis.uni.jitter.workload_bound_fp
-               rt.classic.analysis.uni.jitter.fp_rta_comp.
-Require Import rt.classic.implementation.uni.jitter.job
-               rt.classic.implementation.uni.jitter.task
-               rt.classic.implementation.uni.jitter.arrival_sequence
-               rt.classic.implementation.uni.jitter.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority.
+Require Import prosa.classic.model.arrival.basic.task.
+Require Import prosa.classic.model.schedule.uni.schedulability.
+Require Import prosa.classic.model.arrival.jitter.job.
+Require Import prosa.classic.model.schedule.uni.jitter.schedule.
+Require Import prosa.classic.analysis.uni.jitter.workload_bound_fp
+               prosa.classic.analysis.uni.jitter.fp_rta_comp.
+Require Import prosa.classic.implementation.uni.jitter.job
+               prosa.classic.implementation.uni.jitter.task
+               prosa.classic.implementation.uni.jitter.arrival_sequence
+               prosa.classic.implementation.uni.jitter.schedule.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq bigop div.
 
 Module ResponseTimeAnalysisFP.

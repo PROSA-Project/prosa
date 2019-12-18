@@ -1,10 +1,10 @@
-Require Export rt.util.sum.
-Require Export rt.util.ssromega.
+Require Export prosa.util.sum.
+Require Export prosa.util.ssromega.
 
-Require Import rt.classic.util.tactics.
-Require Import rt.classic.util.notation.
-Require Import rt.classic.util.sorting.
-Require Import rt.classic.util.nat.
+Require Import prosa.classic.util.tactics.
+Require Import prosa.classic.util.notation.
+Require Import prosa.classic.util.sorting.
+Require Import prosa.classic.util.nat.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 (* Lemmas about sum. *)

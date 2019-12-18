@@ -1,4 +1,4 @@
-Require Import rt.classic.util.all rt.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.util.all prosa.classic.model.arrival.basic.arrival_sequence.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (* In this file we provide extra definitions for job arrival sequences with jitter. *)

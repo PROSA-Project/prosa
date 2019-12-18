@@ -1,18 +1,18 @@
-Require Export rt.analysis.facts.edf.
-Require Export rt.model.schedule.priority_driven.
-Require Export rt.analysis.facts.priority_inversion.
-Require Export rt.analysis.facts.carry_in.
-Require Export rt.analysis.concepts.schedulability.
-Require Import rt.model.priority.edf.
-Require Import rt.model.task.absolute_deadline.
-Require Import rt.analysis.abstract.ideal_jlfp_rta.
+Require Export prosa.analysis.facts.edf.
+Require Export prosa.model.schedule.priority_driven.
+Require Export prosa.analysis.facts.priority_inversion.
+Require Export prosa.analysis.facts.carry_in.
+Require Export prosa.analysis.concepts.schedulability.
+Require Import prosa.model.priority.edf.
+Require Import prosa.model.task.absolute_deadline.
+Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import rt.model.readiness.basic.
+Require Import prosa.model.readiness.basic.
 
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)

@@ -1,9 +1,9 @@
 Require Import Arith Nat. 
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task 
-               rt.classic.model.arrival.basic.job 
-               rt.classic.model.schedule.uni.schedule
-               rt.classic.model.schedule.uni.response_time.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task 
+               prosa.classic.model.arrival.basic.job 
+               prosa.classic.model.schedule.uni.schedule
+               prosa.classic.model.schedule.uni.response_time.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Set Bullet Behavior "Strict Subproofs".

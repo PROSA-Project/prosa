@@ -1,6 +1,6 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.suspension.
-Require Import rt.classic.model.schedule.uni.susp.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.suspension.
+Require Import prosa.classic.model.schedule.uni.susp.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq bigop fintype.
 
 (* In this file, we take any predicate that defines whether a job

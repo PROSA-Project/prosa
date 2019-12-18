@@ -1,5 +1,5 @@
-Require Export rt.model.priority.classes.
-Require Export rt.model.schedule.preemption_time.
+Require Export prosa.model.priority.classes.
+Require Export prosa.model.schedule.preemption_time.
 
 (** * Priority-Driven Schedules *)
 
@@ -13,7 +13,7 @@ Require Export rt.model.schedule.preemption_time.
         uniprocessor schedules. Removal of this limitation is future work. *)
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require rt.model.processor.ideal.
+Require prosa.model.processor.ideal.
 
 Section Priority.
 

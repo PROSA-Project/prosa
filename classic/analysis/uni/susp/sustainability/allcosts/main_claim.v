@@ -1,16 +1,16 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority rt.classic.model.suspension.
-Require Import rt.classic.model.arrival.basic.arrival_sequence.
-Require Import rt.classic.model.schedule.uni.response_time
-               rt.classic.model.schedule.uni.sustainability.
-Require Import rt.classic.model.schedule.uni.susp.suspension_intervals
-               rt.classic.model.schedule.uni.susp.schedule
-               rt.classic.model.schedule.uni.susp.valid_schedule
-               rt.classic.model.schedule.uni.susp.build_suspension_table
-               rt.classic.model.schedule.uni.susp.platform.
-Require Import rt.classic.analysis.uni.susp.sustainability.allcosts.reduction
-               rt.classic.analysis.uni.susp.sustainability.allcosts.reduction_properties.
-Require Import rt.classic.model.schedule.uni.transformation.construction.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority prosa.classic.model.suspension.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.model.schedule.uni.response_time
+               prosa.classic.model.schedule.uni.sustainability.
+Require Import prosa.classic.model.schedule.uni.susp.suspension_intervals
+               prosa.classic.model.schedule.uni.susp.schedule
+               prosa.classic.model.schedule.uni.susp.valid_schedule
+               prosa.classic.model.schedule.uni.susp.build_suspension_table
+               prosa.classic.model.schedule.uni.susp.platform.
+Require Import prosa.classic.analysis.uni.susp.sustainability.allcosts.reduction
+               prosa.classic.analysis.uni.susp.sustainability.allcosts.reduction_properties.
+Require Import prosa.classic.model.schedule.uni.transformation.construction.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

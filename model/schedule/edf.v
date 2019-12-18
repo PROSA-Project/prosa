@@ -1,5 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
-Require Export rt.behavior.all.
+Require Export prosa.behavior.all.
 
 (** * Fully-Preemptive EDF Schedules *)
 

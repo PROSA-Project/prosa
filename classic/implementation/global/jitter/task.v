@@ -1,5 +1,5 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.task.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.task.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq.
 
 Module ConcreteTask.

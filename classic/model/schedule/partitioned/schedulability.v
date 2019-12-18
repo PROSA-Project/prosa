@@ -1,15 +1,15 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.arrival.basic.task rt.classic.model.arrival.basic.job.
-Require Import rt.classic.model.schedule.global.schedulability.
-Require Import rt.classic.model.schedule.global.basic.schedule.
-Require Import rt.classic.model.schedule.partitioned.schedule.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.arrival.basic.task prosa.classic.model.arrival.basic.job.
+Require Import prosa.classic.model.schedule.global.schedulability.
+Require Import prosa.classic.model.schedule.global.basic.schedule.
+Require Import prosa.classic.model.schedule.partitioned.schedule.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
-Require rt.classic.model.schedule.uni.schedule.
+Require prosa.classic.model.schedule.uni.schedule.
 
 Module PartitionSchedulability.
   
-  Module uni_sched := rt.classic.model.schedule.uni.schedulability.Schedulability.
+  Module uni_sched := prosa.classic.model.schedule.uni.schedulability.Schedulability.
   Import ArrivalSequence Partitioned Schedule Schedulability.
 
   Section PartitionedAsUniprocessor.

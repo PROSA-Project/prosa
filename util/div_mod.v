@@ -1,4 +1,4 @@
-Require Export rt.util.nat.
+Require Export prosa.util.nat.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 

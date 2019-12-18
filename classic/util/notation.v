@@ -1,4 +1,4 @@
-Require Export rt.util.notation.
+Require Export prosa.util.notation.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

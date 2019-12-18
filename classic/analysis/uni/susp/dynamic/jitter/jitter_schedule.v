@@ -1,8 +1,8 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.priority rt.classic.model.suspension.
-Require Import rt.classic.model.arrival.basic.arrival_sequence.
-Require Import rt.classic.model.schedule.uni.jitter.schedule.
-Require Import rt.classic.model.schedule.uni.transformation.construction.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.priority prosa.classic.model.suspension.
+Require Import prosa.classic.model.arrival.basic.arrival_sequence.
+Require Import prosa.classic.model.schedule.uni.jitter.schedule.
+Require Import prosa.classic.model.schedule.uni.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq.
 
 (* In this file, we formalize a reduction from a suspension-aware schedule

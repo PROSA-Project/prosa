@@ -1,9 +1,9 @@
-Require Export rt.model.priority.classes.
-Require Export rt.analysis.facts.behavior.completion.
+Require Export prosa.model.priority.classes.
+Require Export prosa.analysis.facts.behavior.completion.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import rt.model.processor.ideal.
+Require Import prosa.model.processor.ideal.
 
 (** * Busy Interval for JLFP-models *)
 (** In this file we define the notion of busy intervals for uniprocessor for JLFP schedulers. *)

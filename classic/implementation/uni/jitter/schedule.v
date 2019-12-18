@@ -1,8 +1,8 @@
-Require Import rt.classic.util.all.
-Require Import rt.classic.model.arrival.basic.job rt.classic.model.arrival.basic.arrival_sequence rt.classic.model.priority.
-Require Import rt.classic.model.schedule.uni.jitter.schedule
-               rt.classic.model.schedule.uni.jitter.platform.
-Require Import rt.classic.model.schedule.uni.transformation.construction.
+Require Import prosa.classic.util.all.
+Require Import prosa.classic.model.arrival.basic.job prosa.classic.model.arrival.basic.arrival_sequence prosa.classic.model.priority.
+Require Import prosa.classic.model.schedule.uni.jitter.schedule
+               prosa.classic.model.schedule.uni.jitter.platform.
+Require Import prosa.classic.model.schedule.uni.transformation.construction.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat fintype bigop seq path.
 
 Module ConcreteScheduler.
