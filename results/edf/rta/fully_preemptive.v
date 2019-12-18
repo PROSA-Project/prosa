@@ -1,20 +1,22 @@
 Require Import prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
-Require Import prosa.model.priority.edf.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.
+(** * RTA for Fully Preemptive EDF *)
+(** In this section we prove the RTA theorem for the fully preemptive EDF model *)
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+(** Throughout this file, we assume the EDF priority policy, ideal uni-processor 
+    schedules, and the basic (i.e., Liu & Layland) readiness model. *)
+Require Import prosa.model.priority.edf.
+Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.basic.
 
-(** Throughout this file, we assume the fully preemptive task model. *)
+(** Furthermore, we assume the fully preemptive task model. *)
 Require Import prosa.model.task.preemption.fully_preemptive.
 
-(** * RTA for Fully Preemptive EDF Model *)
-(** In this section we prove the RTA theorem for the fully preemptive EDF model *)
+(** ** Setup and Assumptions *)
+
 Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
 
   (** Consider any type of tasks ... *)
@@ -27,12 +29,6 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
-
-  (** For clarity, let's denote the relative deadline of a task as D. *)
-  Let D tsk := task_deadline tsk.
-
-  (** Consider the EDF policy that indicates a higher-or-equal priority relation. *)
-  Let EDF := EDF Job.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
@@ -81,13 +77,8 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       [job_preemptable] function (i.e., jobs have bounded non-preemptive
       segments). *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
-      
-  (** Let's define some local names for clarity. *)
-  Let response_time_bounded_by :=
-    task_response_time_bound arr_seq sched.
-  Let task_rbf_changes_at A := task_rbf_changes_at tsk A.
-  Let bound_on_total_hep_workload_changes_at :=
-    bound_on_total_hep_workload_changes_at ts tsk.
+
+  (** ** Total Workload and Length of Busy Interval *)
 
   (** We introduce the abbreviation [rbf] for the task request bound function,
       which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
@@ -105,14 +96,21 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       of other tasks with higher-than-or-equal priority. *)
   Let bound_on_total_hep_workload A Δ :=
     \sum_(tsk_o <- ts | tsk_o != tsk)
-     rbf tsk_o (minn ((A + ε) + D tsk - D tsk_o) Δ).
+     rbf tsk_o (minn ((A + ε) + task_deadline tsk - task_deadline tsk_o) Δ).
 
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_rbf L.
 
+  (** ** Response-Time Bound *)
+  
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
+      
+  Let task_rbf_changes_at A := task_rbf_changes_at tsk A.
+  Let bound_on_total_hep_workload_changes_at :=
+    bound_on_total_hep_workload_changes_at ts tsk.
+
   Let is_in_search_space A :=
     (A < L) && (task_rbf_changes_at A || bound_on_total_hep_workload_changes_at A).
   
@@ -128,6 +126,9 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
 
   (** Now, we can leverage the results for the abstract model with bounded non-preemptive segments
       to establish a response-time bound for the more concrete model of fully preemptive scheduling. *)
+
+  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
+
   Theorem uniprocessor_response_time_bound_fully_preemptive_edf:
     response_time_bounded_by tsk R.
   Proof.

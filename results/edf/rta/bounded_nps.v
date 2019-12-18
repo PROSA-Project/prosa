@@ -10,7 +10,7 @@ Require Import prosa.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import prosa.model.readiness.basic.
 
-(** * RTA for EDF-schedulers with Bounded Non-Preemptive Segments *)
+(** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
 (** In this section we instantiate the Abstract RTA for EDF-schedulers
     with Bounded Priority Inversion to EDF-schedulers for ideal
