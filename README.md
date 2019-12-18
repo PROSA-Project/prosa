@@ -16,12 +16,21 @@ Please see the [list of publications](http://prosa.mpi-sws.org/documentation.htm
 
 ## Directory and Module Structure
 
-The directory and module structure is currently undergoing a fundamental reorganization. 
+The directory and module structure is organized as follows. First, the main parts, of which there are currently four.
+
+- [behavior/](behavior/): The `behavior` namespace collects basic definitions and properties of system behavior (i.e., it defines Prosa's **trace-based semantics**). There are *no* proofs here. This module is mandatory: *all* results in Prosa rely on the basic trace-based semantics defined in this module. 
+- [model/](model/): The `model` namespace collects all definitions and basic properties of various **system models** (e.g., sporadic tasks, arrival curves, various scheduling policies, etc.). There are only few proofs here. This module contains multiple, mutually exclusive alternatives (e.g., periodic vs. sporadic tasks, uni- vs. multiprocessor models, constrained vs. arbitrary deadlines, etc.), and higher-level results are expected "pick and choose" whatever definitions and assumptions are appropriate.
+- [analysis/](analysis/): The `analysis` namespace collects all definitions and proof libraries needed to establish **system properties** (e.g., schedulability, response time, etc.). This includes a substantial library of *basic facts* that follow directly from the trace-based semantics or specific modelling assumptions. Virtually all intermediate steps and low-level proofs will be found here.
+- [results/](results/): The `results` namespace contains all **high-level analysis results**. 
+
+
+In future work, there will also (again) be an `implementation` or `examples` namespace in which important high-level results are instantiated (i.e., applied) in an assumption-free environment for concrete job and task types to establish the absence of any contradiction in assumptions.
+
+Furthermore, there are a couple of additional folders and namespaces.
 
 - [classic/](classic/): This module contains the "classic" version of Prosa as first presented at ECRTS'16.  
 All results published prior to 2020 build on this "classic" version of Prosa.
 - [util/](util/): A collection of miscellaneous "helper" lemmas and tactics. Used throughout the rest of Prosa.
-- [restructuring/](restructuring/): The new, refactored version of Prosa. Currently still under heavy development. This part of Prosa will soon move out of the `restructuring` namespace. 
 - [scripts/](scripts/): Scripts and supporting resources required for continuous integration and documentation generation.
 
 ## Dependencies 

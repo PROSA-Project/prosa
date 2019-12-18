@@ -10,7 +10,7 @@ do
             FIND_OPTS+=( ! -path './classic/*' )
             ;;
         --only-classic)
-            FIND_OPTS+=( ! -path './restructuring/*' )
+            FIND_OPTS+=( ! -path './analysis/*' ! -path './behavior/*' ! -path './model/*'  ! -path './results/*')
             ;;
         *)
             echo "Unrecognized option: $1"
