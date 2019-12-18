@@ -62,7 +62,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** Consider an FP policy that indicates a higher-or-equal priority
       relation, and assume that the relation is reflexive and
       transitive. *)
-  Variable higher_eq_priority : FP_policy Task.
+  Context `{FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
   
@@ -112,15 +112,15 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   
   (** Let's define some local names for clarity. *)
   Let max_length_of_priority_inversion :=
-    max_length_of_priority_inversion arr_seq _.
+    max_length_of_priority_inversion arr_seq.
   Let task_rbf := task_request_bound_function tsk.
-  Let total_hep_rbf := total_hep_request_bound_function_FP _ ts tsk.
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP _ ts tsk.
+  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
+  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
   
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
   Definition blocking_bound :=
-    \max_(tsk_other <- ts | ~~ higher_eq_priority tsk_other tsk)
+    \max_(tsk_other <- ts | ~~ hep_task tsk_other tsk)
      (task_max_nonpreemptive_segment tsk_other - ε).
   
   (** ** Priority inversion is bounded *)
@@ -142,9 +142,9 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
               /priority_inversion.max_length_of_priority_inversion.
       apply leq_trans with
           (\max_(j_lp <- arrivals_between arr_seq 0 t
-                | ~~ higher_eq_priority (job_task j_lp) tsk)
+                | ~~ hep_task (job_task j_lp) tsk)
             (task_max_nonpreemptive_segment (job_task j_lp) - ε)).
-      { rewrite TSK.
+      { rewrite /hep_job TSK.
         apply leq_big_max.
         intros j' JINB NOTHEP.
         rewrite leq_sub2r //.
@@ -164,7 +164,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     (** Using the above lemma, we prove that the priority inversion of the task is bounded by blocking_bound. *) 
     Lemma priority_inversion_is_bounded:
       priority_inversion_is_bounded_by
-        arr_seq sched _ tsk blocking_bound.
+        arr_seq sched tsk blocking_bound.
     Proof.
       intros j ARR TSK POS t1 t2 PREF.
       case NEQ: (t2 - t1 <= blocking_bound). 
@@ -172,11 +172,11 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         rewrite /cumulative_priority_inversion /is_priority_inversion.
         rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat leq_sum //. 
         intros t _; case: (sched t); last by done.
-          by intros s; case: (FP_to_JLFP Job Task s j). 
+          by intros s; case: (hep_job s j). 
       } 
       move: NEQ => /negP /negP; rewrite -ltnNge; move => BOUND.
       edestruct (@preemption_time_exists) as [ppt [PPT NEQ]]; eauto 2; move: NEQ => /andP [GE LE].
-      apply leq_trans with (cumulative_priority_inversion sched _ j t1 ppt);
+      apply leq_trans with (cumulative_priority_inversion sched j t1 ppt);
         last apply leq_trans with (ppt - t1); first last.
       - rewrite leq_subLR.
         apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
@@ -184,7 +184,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       - rewrite /cumulative_priority_inversion /is_priority_inversion.
         rewrite -[X in _ <= X]addn0 -[ppt - t1]mul1n -iter_addn -big_const_nat. 
         rewrite leq_sum //; intros t _; case: (sched t); last by done.
-          by intros s; case: (FP_to_JLFP Job Task s j).
+          by intros s; case: (hep_job s j).
       - rewrite /cumulative_priority_inversion /is_priority_inversion. 
         rewrite (@big_cat_nat _ _ _ ppt) //=; last first.
         { rewrite ltn_subRL in BOUND.

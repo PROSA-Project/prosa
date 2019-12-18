@@ -24,7 +24,7 @@ Section CumulativePriorityInversion.
   Variable sched : schedule (ideal.processor_state Job).
 
   (** Assume a given JLFP policy. *)
-  Variable higher_eq_priority : JLFP_policy Job. 
+  Context `{JLFP_policy Job}. 
 
   (** In this section, we define a notion of bounded priority inversion experienced by a job. *)
   Section JobPriorityInversionBound.
@@ -44,7 +44,7 @@ Section CumulativePriorityInversion.
         with jitter or self-suspensions. *)
     Definition is_priority_inversion (t : instant) :=
       if sched t is Some jlp then
-        ~~ higher_eq_priority jlp j
+        ~~ hep_job jlp j
       else false.
     
     (** Then we compute the cumulative priority inversion incurred by
@@ -56,7 +56,7 @@ Section CumulativePriorityInversion.
          priority inversion within any busy interval prefix is bounded by [B]. *)
     Definition priority_inversion_of_job_is_bounded_by (B : duration) :=
       forall (t1 t2 : instant),
-        busy_interval_prefix arr_seq sched higher_eq_priority j t1 t2 ->
+        busy_interval_prefix arr_seq sched j t1 t2 ->
         cumulative_priority_inversion t1 t2 <= B.
 
   End JobPriorityInversionBound.

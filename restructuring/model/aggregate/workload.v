@@ -40,16 +40,13 @@ Section WorkloadOfJobs.
 
     (** Consider any JLFP policy that indicates whether a job has
         higher or equal priority. *)
-    (* [FIXME]: should be a context declaration! *)
-    Variable higher_eq_priority : JLFP_policy Job.
+    Context `{JLFP_policy Job}.
 
     (** Let j be the job to be analyzed. *)
     Variable j : Job.
 
     (** Recall the notion of a job of higher or equal priority. *)
-    Let of_higher_or_equal_priority j_hp :=
-      (* [FIXME]: should be using [hep_job]! *)
-      higher_eq_priority j_hp j.
+    Let of_higher_or_equal_priority j_hp := hep_job j_hp j.
     
     (** Then, we define the workload of higher or equal priority of all jobs
        with higher-or-equal priority than j. *)

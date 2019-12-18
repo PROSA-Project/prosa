@@ -30,7 +30,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
 
   (** ... and an FP policy that indicates a higher-or-equal priority
       relation. *)
-  Variable higher_eq_priority : FP_policy Task.
+  Context `{FP_policy Task}.
 
   (** Let [MaxArrivals] denote any function that takes a task and an interval length
       and returns the associated number of job arrivals of the task. *)
@@ -67,8 +67,8 @@ Section TaskWorkloadBoundedByArrivalCurves.
 
     (** Recall the definition of higher-or-equal-priority task and the per-task
         workload bound for FP scheduling. *)
-    Let is_hep_task tsk_other := higher_eq_priority tsk_other tsk.
-    Let is_other_hep_task tsk_other := higher_eq_priority tsk_other tsk && (tsk_other != tsk).
+    Let is_hep_task tsk_other := hep_task tsk_other tsk.
+    Let is_other_hep_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk).
 
     (** Using the sum of individual workload bounds, we define the following
         bound for the total workload of tasks in any interval of length

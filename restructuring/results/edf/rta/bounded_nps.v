@@ -134,7 +134,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
   (** Let's define some local names for clarity. *)
   Let max_length_of_priority_inversion :=
-    max_length_of_priority_inversion arr_seq EDF.
+    max_length_of_priority_inversion arr_seq.
   Let task_rbf_changes_at A := task_rbf_changes_at tsk A.
   Let bound_on_total_hep_workload_changes_at :=
     bound_on_total_hep_workload_changes_at ts tsk.
@@ -203,7 +203,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     (** Using the lemma above, we prove that the priority inversion of the task is bounded by 
        the maximum length of a nonpreemptive section of lower-priority tasks. *)
     Lemma priority_inversion_is_bounded:
-      priority_inversion_is_bounded_by arr_seq sched _ tsk blocking_bound.
+      priority_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
     Proof.
       move => j ARR TSK POS t1 t2 PREF; move: (PREF) => [_ [_ [_ /andP [T _]]]].
       destruct (leqP (t2 - t1) blocking_bound) as [NEQ|NEQ].
@@ -212,11 +212,11 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat. 
         rewrite leq_sum //.
         intros t _; case: (sched t); last by done.
-          by intros s; case: edf.EDF.
+          by intros s; destruct (hep_job s j).
       }
       edestruct @preemption_time_exists as [ppt [PPT NEQ2]]; eauto 2 with basic_facts.
       move: NEQ2 => /andP [GE LE].
-      apply leq_trans with (cumulative_priority_inversion sched _ j t1 ppt);
+      apply leq_trans with (cumulative_priority_inversion sched j t1 ppt);
         last apply leq_trans with (ppt - t1).
       - rewrite /cumulative_priority_inversion /is_priority_inversion. 
         rewrite (@big_cat_nat _ _ _ ppt) //=; last first.
@@ -239,10 +239,10 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         rewrite -[X in _ <= X]addn0 -[ppt - t1]mul1n -iter_addn -big_const_nat. 
         rewrite leq_sum //.
         intros t _; case: (sched t); last by done.
-          by intros s; case: edf.EDF.
+          by intros s; destruct (hep_job s j).
       -  rewrite leq_subLR.
          apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
-         rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
+           by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
     Qed.
       
   End PriorityInversionIsBounded.

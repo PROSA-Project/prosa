@@ -75,7 +75,7 @@ Section RTAforFloatingModelwithArrivalCurves.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
-  Variable higher_eq_priority : FP_policy Task.
+  Context `{FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
 
@@ -92,13 +92,13 @@ Section RTAforFloatingModelwithArrivalCurves.
   
   (** Let's define some local names for clarity. *)
   Let task_rbf := task_request_bound_function tsk.
-  Let total_hep_rbf := total_hep_request_bound_function_FP _ ts tsk.
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP _ ts tsk.
+  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
+  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
   (** Next, we define a bound for the priority inversion caused by tasks of lower priority. *)
   Let blocking_bound :=
-    \max_(tsk_other <- ts | ~~ higher_eq_priority tsk_other tsk)
+    \max_(tsk_other <- ts | ~~ hep_task tsk_other tsk)
      (task_max_nonpreemptive_segment tsk_other - ε).
   
   (** Let L be any positive fixed point of the busy interval recurrence, determined by 

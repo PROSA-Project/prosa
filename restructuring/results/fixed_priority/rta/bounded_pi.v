@@ -105,7 +105,7 @@ Section AbstractRTAforFPwithArrivalCurves.
      Interference and Interfering Workload that actively use the concept of 
      priorities. We require the FP policy to be reflexive, so a job cannot 
      cause lower-priority interference (i.e. priority inversion) to itself. *)
-  Variable higher_eq_priority : FP_policy Task.
+  Context `{FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   
   (** For clarity, let's define some local names. *)
@@ -121,12 +121,12 @@ Section AbstractRTAforFPwithArrivalCurves.
 
   (** Using the sum of individual request bound functions, we define the request bound 
      function of all tasks with higher-or-equal priority (with respect to [tsk]). *)
-  Let total_hep_rbf := total_hep_request_bound_function_FP higher_eq_priority ts tsk.
+  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
  
   (** Similarly, we define the request bound function of all tasks other 
      than [tsk] with higher-or-equal priority (with respect to [tsk]). *)
   Let total_ohep_rbf :=
-    total_ohep_request_bound_function_FP higher_eq_priority ts tsk.
+    total_ohep_request_bound_function_FP ts tsk.
   
   (** Assume that there exists a constant priority_inversion_bound that bounds 
      the length of any priority inversion experienced by any job of [tsk]. 
@@ -135,7 +135,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   Variable priority_inversion_bound : duration.
   Hypothesis H_priority_inversion_is_bounded:
     priority_inversion_is_bounded_by
-      arr_seq sched hep_job tsk priority_inversion_bound.
+      arr_seq sched tsk priority_inversion_bound.
 
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
@@ -164,15 +164,14 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** We say that job j incurs interference at time t iff it cannot execute due to 
      a higher-or-equal-priority job being scheduled, or if it incurs a priority inversion. *)
   Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference sched hep_job j t.
+    ideal_jlfp_rta.interference sched j t.
 
   (** Instantiation of Interfering Workload *)
   (** The interfering workload, in turn, is defined as the sum of the
       priority inversion function and interfering workload of jobs
       with higher or equal priority. *)
   Let interfering_workload (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interfering_workload
-      arr_seq sched (@FP_to_JLFP Job Task H1 higher_eq_priority) j t.
+    ideal_jlfp_rta.interfering_workload arr_seq sched j t.
   
   (** Finally, we define the interference bound function as the sum of the priority 
       interference bound and the higher-or-equal-priority workload. *)
@@ -226,8 +225,8 @@ Section AbstractRTAforFPwithArrivalCurves.
       apply QT.
       - by apply in_arrivals_implies_arrived in ARRs.
       - move: TSKs => /eqP TSKs.
-        rewrite /FP_to_JLFP TSK -TSKs; eauto 2.
-          by eapply H_priority_is_reflexive with (t := 0).
+        rewrite /hep_job /FP_to_JLFP TSK -TSKs; eauto 2.
+          by eapply (H_priority_is_reflexive 0); eauto.
       - by eapply in_arrivals_implies_arrived_before; eauto 2.
     Qed.
 
@@ -274,11 +273,10 @@ Section AbstractRTAforFPwithArrivalCurves.
       { move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _].
           by eapply arrived_between_implies_in_arrivals; eauto 2. }
       unfold IBF, interference.
-      apply respects_sequential_tasks; by done.
       rewrite leq_add; try done. 
       { move: (H_priority_inversion_is_bounded j ARR TSK) => BOUND.
-        apply leq_trans with (cumulative_priority_inversion sched _ j t1 (t1 + R0)); first by done.
-        apply leq_trans with (cumulative_priority_inversion sched _ j t1 t2); last first.
+        apply leq_trans with (cumulative_priority_inversion sched j t1 (t1 + R0)); first by done.
+        apply leq_trans with (cumulative_priority_inversion sched j t1 t2); last first.
         { by apply BOUND; move: BUSY => [PREF QT2]. }
         rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + R0)) //=.
         - by rewrite leq_addr.

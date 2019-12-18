@@ -48,10 +48,9 @@ Section ServiceOfJobs.
   (** Next, we define the service received by jobs with higher or
      equal priority under JLFP policies. *)
   Section PerJobPriority.
-
+    
     (** Consider any JLDP policy. *)
-    (* [FIXME]: This should be a nameless context declaration! *) 
-    Variable higher_eq_priority : JLFP_policy Job.
+    Context `{JLFP_policy Job}.
     
     (** Let jobs denote any (finite) set of jobs. *)
     Variable jobs : seq Job.
@@ -60,8 +59,7 @@ Section ServiceOfJobs.
     Variable j : Job.
 
     (** Based on the definition of jobs of higher or equal priority, ... *)
-    (* [FIXME]: this should use [hep_job], not the named type class directly. *)
-    Let of_higher_or_equal_priority j_hp := higher_eq_priority j_hp j.
+    Let of_higher_or_equal_priority j_hp := hep_job j_hp j.
     
     (** ...we define the service received during [[t1, t2)] by jobs of higher or equal priority. *)
     Definition service_of_higher_or_equal_priority_jobs (t1 t2 : instant) :=

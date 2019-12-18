@@ -112,7 +112,7 @@ Section PriorityInversionIsBounded.
       
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
-  Variable higher_eq_priority : JLFP_policy Job.
+  Context `{JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive: reflexive_priorities.
   Hypothesis H_priority_is_transitive: transitive_priorities.
 
@@ -151,7 +151,7 @@ Section PriorityInversionIsBounded.
        [j_lp], so the maximal length of priority inversion cannot be
        negative. *)
   Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
-    \max_(j_lp <- arrivals_before arr_seq t | ~~ higher_eq_priority j_lp j)
+    \max_(j_lp <- arrivals_before arr_seq t | ~~ hep_job j_lp j)
      (job_max_nonpreemptive_segment j_lp - ε).
 
   (** Next we prove that a priority inversion of a job is bounded by 
@@ -171,7 +171,7 @@ Section PriorityInversionIsBounded.
   (** Consider any busy interval prefix [t1, t2) of job j. *)
   Variable t1 t2 : instant.
   Hypothesis H_busy_interval_prefix:
-    busy_interval_prefix arr_seq sched higher_eq_priority j t1 t2.
+    busy_interval_prefix arr_seq sched j t1 t2.
 
   (** * Processor Executes HEP jobs after Preemption Point *)
   (** In this section, we prove that at any time instant after any preemption point
@@ -220,7 +220,7 @@ Section PriorityInversionIsBounded.
         t < t2.-1 -> 
         forall jhp, 
           scheduled_at sched jhp t ->
-          higher_eq_priority jhp j.
+          hep_job jhp j.
       Proof.
         intros LTt2m1 jhp Sched_jhp.
         move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]]. 
@@ -253,7 +253,7 @@ Section PriorityInversionIsBounded.
         t = t2.-1 ->
         forall jhp, 
           scheduled_at sched jhp t ->
-          higher_eq_priority jhp j.
+          hep_job jhp j.
       Proof.
         intros EQUALt2m1 jhp Sched_jhp.
         move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]]. 
@@ -299,7 +299,7 @@ Section PriorityInversionIsBounded.
       Corollary scheduled_at_preemption_time_implies_higher_or_equal_priority:
         forall jhp, 
           scheduled_at sched jhp t ->
-          higher_eq_priority jhp j.
+          hep_job jhp j.
       Proof.
         move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]]. 
         destruct t_lt_t2_or_t_eq_t2.
@@ -335,7 +335,7 @@ Section PriorityInversionIsBounded.
       Corollary not_quiet_implies_exists_scheduled_hp_job_at_preemption_point:
         exists j_hp,
           arrived_between j_hp t1 t2 /\
-          higher_eq_priority j_hp j /\
+          hep_job j_hp j /\
           job_scheduled_at j_hp t.
       Proof.
         move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET INBI]]]. 
@@ -404,7 +404,7 @@ Section PriorityInversionIsBounded.
         tp <= t < t2 ->
         exists j_hp,
           arrived_between j_hp t1 t.+1 /\ 
-          higher_eq_priority j_hp j /\
+          hep_job j_hp j /\
           job_scheduled_at j_hp t.
     Proof.
       move: (H_jobs_come_from_arrival_sequence) (H_work_conserving) => CONS WORK.
@@ -414,7 +414,7 @@ Section PriorityInversionIsBounded.
       { exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2.
           by apply/andP; split; first apply leq_trans with tp. }
       exists jhp.
-      have HP: higher_eq_priority jhp j.
+      have HP: hep_job jhp j.
       { intros.
         have SOAS := scheduling_of_any_segment_starts_with_preemption_time _ _ Sched_jhp.
         move: SOAS => [prt [/andP [_ LE] [PR SCH]]].
@@ -460,7 +460,7 @@ Section PriorityInversionIsBounded.
         t1 + K <= t < t2 ->
         exists j_hp,
           arrived_between j_hp t1 t.+1 /\ 
-          higher_eq_priority j_hp j /\
+          hep_job j_hp j /\
           job_scheduled_at j_hp t.
     Proof. 
       move => t /andP [GE LT].
@@ -484,9 +484,9 @@ Section PriorityInversionIsBounded.
        a quiet time [t+1] then this is the first time when this job is scheduled. *)
     Lemma hp_job_not_scheduled_before_quiet_time:
       forall jhp t,
-        quiet_time arr_seq sched higher_eq_priority j t.+1 ->
+        quiet_time arr_seq sched j t.+1 ->
         job_scheduled_at jhp t.+1 ->
-        higher_eq_priority jhp j ->
+        hep_job jhp j ->
         ~~ job_scheduled_at jhp t.
     Proof.
       intros jhp t QT SCHED1 HP.            
@@ -503,7 +503,7 @@ Section PriorityInversionIsBounded.
       forall jlp t,
         t1 <= t < t2 ->
         job_scheduled_at jlp t ->
-        ~~ higher_eq_priority jlp j ->
+        ~~ hep_job jlp j ->
         job_arrival jlp < t1.
     Proof.
       move => jlp t /andP [GE LT] SCHED LP.
@@ -530,7 +530,7 @@ Section PriorityInversionIsBounded.
       forall jlp t,
         t1 <= t < t2 ->
         job_scheduled_at jlp t ->
-        ~~ higher_eq_priority jlp j ->
+        ~~ hep_job jlp j ->
         exists t', t' < t1 /\ job_scheduled_at jlp t'.
     Proof.
       move => jlp t NEQ SCHED LP; move: (NEQ) => /andP [GE LT].
@@ -597,7 +597,7 @@ Section PriorityInversionIsBounded.
         (** Assume that a job [jhp] with higher-or-equal priority is scheduled at time [t1]. *)
         Variable jhp : Job.
         Hypothesis H_jhp_is_scheduled : scheduled_at sched jhp t1. 
-        Hypothesis H_jhp_hep_priority : higher_eq_priority jhp j.
+        Hypothesis H_jhp_hep_priority : hep_job jhp j.
 
         (** Then time instant [t1] is a preemption time. *)
         Lemma preemption_time_exists_case2: 
@@ -624,7 +624,7 @@ Section PriorityInversionIsBounded.
         (** Assume that a job [jhp] with lower priority is scheduled at time [t1]. *)
         Variable jlp : Job.
         Hypothesis H_jlp_is_scheduled : scheduled_at sched jlp t1.
-        Hypothesis H_jlp_low_priority : ~~ higher_eq_priority jlp j.
+        Hypothesis H_jlp_low_priority : ~~ hep_job jlp j.
 
         (** To prove the lemma in this case we need a few auxiliary
             facts about the first preemption point of job [jlp]. *)
@@ -810,7 +810,7 @@ Section PriorityInversionIsBounded.
       move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]].
       ideal_proc_model_sched_case_analysis sched t1 s.
       - by apply preemption_time_exists_case1.
-      - case PRIO: (higher_eq_priority s j).
+      - destruct (hep_job s j) eqn:PRIO.
         + by eapply preemption_time_exists_case2; eauto.
         + eapply preemption_time_exists_case3 with s; eauto.
             by rewrite -eqbF_neg; apply /eqP.

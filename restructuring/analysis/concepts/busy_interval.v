@@ -22,7 +22,7 @@ Section BusyIntervalJLFP.
   Variable sched : schedule (ideal.processor_state Job).
   
   (** Assume a given JLFP policy. *)
-  Variable higher_eq_priority : JLFP_policy Job. 
+  Context `{JLFP_policy Job}. 
 
   (** In this section, we define the notion of a busy interval. *)
   Section BusyInterval.
@@ -36,7 +36,7 @@ Section BusyIntervalJLFP.
     Definition quiet_time (t : instant) :=
       forall (j_hp : Job),
         arrives_in arr_seq j_hp ->
-        higher_eq_priority j_hp j ->
+        hep_job j_hp j ->
         arrived_before j_hp t ->
         completed_by sched j_hp t.
     
@@ -67,7 +67,7 @@ Section BusyIntervalJLFP.
          the arrival sequence that arrived before t has completed by that time. *)
     Definition quiet_time_dec (j : Job) (t : instant) :=
       all
-        (fun j_hp => higher_eq_priority j_hp j ==> (completed_by sched j_hp t))
+        (fun j_hp => hep_job j_hp j ==> (completed_by sched j_hp t))
         (arrivals_before arr_seq t).
 
     (** We also show that the computational and propositional definitions are equivalent. *)

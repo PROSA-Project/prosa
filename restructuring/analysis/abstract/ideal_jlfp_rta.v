@@ -46,7 +46,7 @@ Section JLFPInstantiation.
 
   (** Consider a JLFP-policy that indicates a higher-or-equal priority relation,
      and assume that this relation is reflexive and transitive. *)             
-  Variable higher_eq_priority : JLFP_policy Job.
+  Context `{JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
   
@@ -75,12 +75,12 @@ Section JLFPInstantiation.
      whether job [j1] has a higher-than-or-equal-priority than job [j2]
      and [j1] is not equal to [j2]... *)
   Let another_hep_job: JLFP_policy Job :=
-    fun j1 j2 => higher_eq_priority j1 j2 && (j1 != j2).
+    fun j1 j2 => hep_job j1 j2 && (j1 != j2).
 
   (** ...and the second relation defines whether a job [j1] has a higher-or-equal-priority than 
      job [j2] and the task of [j1] is not equal to task of [j2]. *)
   Let hep_job_from_another_task: JLFP_policy Job :=
-    fun j1 j2 => higher_eq_priority j1 j2 && (job_task j1 != job_task j2).
+    fun j1 j2 => hep_job j1 j2 && (job_task j1 != job_task j2).
 
   (** In order to introduce the interference, first we need to recall the definition 
      of priority inversion introduced in module limited.fixed_priority.busy_interval: 
@@ -96,7 +96,7 @@ Section JLFPInstantiation.
      problems, as each job is analyzed only within the corresponding busy
      interval where the priority inversion behaves in the expected way. *)
   Let is_priority_inversion (j : Job) (t : instant) :=
-    is_priority_inversion sched higher_eq_priority j t.
+    is_priority_inversion sched j t.
   
   (** Next, we say that job j is incurring interference from another job with higher or equal 
      priority at time t, if there exists job [jhp] (different from j) with a higher or equal priority 
@@ -200,16 +200,15 @@ Section JLFPInstantiation.
       intros; rewrite -big_split //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split; rewrite leq_sum; try done.
       { intros t _; unfold is_priority_inversion, priority_inversion.is_priority_inversion.
-        
         ideal_proc_model_sched_case_analysis_eq sched t s; first by done.
-        case HP: (higher_eq_priority s j); simpl; rewrite ?addn0 ?add0n.
-        all: by move: Sched_s; rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ HP.
+        destruct (hep_job s j) eqn:MM; simpl; rewrite ?addn0 ?add0n.
+        all: by move: Sched_s; rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ MM.
       }              
       { intros t _; unfold is_priority_inversion, priority_inversion.is_priority_inversion,
                     is_interference_from_another_hep_job.
         ideal_proc_model_sched_case_analysis_eq sched t s; first by done.
         unfold another_hep_job.
-        case HP: (higher_eq_priority s j); simpl; rewrite ?addn0 ?add0n.
+        destruct (hep_job s j) eqn:HP; simpl; rewrite ?addn0 ?add0n.
         all: by move: Sched_s; rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ HP.
       }
     Qed.          
@@ -237,7 +236,7 @@ Section JLFPInstantiation.
                 /is_interference_from_hep_job_from_another_task
                 /is_interference_from_another_hep_job /hep_job_from_another_task.
         ideal_proc_model_sched_case_analysis_eq sched t s; first by rewrite has_pred0 addn0 leqn0 eqb0. 
-        case HP: (higher_eq_priority s j); simpl.
+        destruct (hep_job s j) eqn:HP; simpl.
         1-2: move: Sched_s; rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ HP.
         + rewrite add0n TSK.
           by case: (job_task s != tsk); first rewrite Bool.andb_true_l leq_b1.
@@ -263,7 +262,7 @@ Section JLFPInstantiation.
           apply/hasP; exists j.
           * rewrite mem_filter; apply/andP; split; first by done.
               by eapply arrivals_between_sub with (t2 := 0) (t3 := upp); eauto 2.
-          * case HP: (higher_eq_priority s j); apply/orP; [right|left]; last by done.
+          * destruct (hep_job s j) eqn:HP; apply/orP; [right|left]; last by done.
               by rewrite /is_interference_from_another_hep_job EQ
                          /another_hep_job NEQ Bool.andb_true_r. 
     Qed.
@@ -315,11 +314,11 @@ Section JLFPInstantiation.
         time in the _classical_ sense as [quiet_time_cl], and the
         notion of quiet time in the _abstract_ sense as
         [quiet_time_ab]. *)
-    Let quiet_time_cl := busy_interval.quiet_time arr_seq sched higher_eq_priority.
+    Let quiet_time_cl := busy_interval.quiet_time arr_seq sched.
     Let quiet_time_ab := definitions.quiet_time sched interference interfering_workload.
 
     (** Same for the two notions of a busy interval. *)
-    Let busy_interval_cl := busy_interval.busy_interval arr_seq sched higher_eq_priority.
+    Let busy_interval_cl := busy_interval.busy_interval arr_seq sched.
     Let busy_interval_ab := definitions.busy_interval sched interference interfering_workload.
     
     (** In this section we prove that the (abstract) cumulative interference of jobs with higher or 
@@ -453,9 +452,9 @@ Section JLFPInstantiation.
             rewrite eq_sym; apply/eqP. 
             apply all_jobs_have_completed_equiv_workload_eq_service; try done.
             intros; apply QT.
-            - by apply in_arrivals_implies_arrived in H3.
-            - by move: H4 => /andP [H6 H7]. 
-            - by apply in_arrivals_implies_arrived_between in H3.
+            - by apply in_arrivals_implies_arrived in H4.
+            - by move: H5 => /andP [H6 H7]. 
+            - by apply in_arrivals_implies_arrived_between in H4.
           }
           { rewrite negb_and Bool.negb_involutive; apply/orP.
             case ARR: (arrived_before j t); [right | by left]. 
@@ -473,15 +472,14 @@ Section JLFPInstantiation.
           rewrite /cumulative_interference /service_of_other_hep_jobs in CIS, IC1.
           intros t [T0 T1]; intros jhp ARR HP ARB.
           eapply all_jobs_have_completed_equiv_workload_eq_service with
-              (P := fun jhp => higher_eq_priority jhp j) (t1 := 0) (t2 := t);
+              (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t);
             eauto 2; last eapply arrived_between_implies_in_arrivals; try done.
           move: T0; rewrite /cumul_interference /cumul_interfering_workload.
           rewrite CIS !big_split //=; move => /eqP; rewrite eqn_add2l.
           rewrite IC1; last by apply zero_is_quiet_time.
           have L2 := instantiated_cumulative_workload_of_hep_jobs_equal_total_workload_of_hep_jobs;
                        rewrite /cumulative_interfering_workload_of_hep_jobs in L2.
-          rewrite L2. move => T2. 
-          apply/eqP; rewrite eq_sym.
+          rewrite L2. move => T2. apply/eqP; rewrite eq_sym.
           move: T1; rewrite negb_and Bool.negb_involutive -leqNgt; move => /orP [T1 | T1].
           - have NOTIN: j \notin arrivals_between 0 t.
             { apply/memPn; intros jo IN; apply/negP; intros EQ; move: EQ => /eqP EQ.
@@ -502,7 +500,8 @@ Section JLFPInstantiation.
             rewrite big_mkcond //= (bigD1_seq j) //= -big_mkcondl //=.
             move: T2; rewrite /service_of_jobs; move => /eqP T2; rewrite T2.
             rewrite [X in _ == X]big_mkcond //= [X in _ == X](bigD1_seq j) //= -big_mkcondl //=.
-            rewrite eqn_add2r. erewrite H_priority_is_reflexive; eauto 2.
+            rewrite eqn_add2r; unfold hep_job.
+            erewrite H_priority_is_reflexive; eauto 2.
             rewrite eqn_leq; apply/andP; split; try eauto 2.
               by apply service_at_most_cost; eauto with basic_facts.
         Qed.

@@ -64,7 +64,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
      and assume that the relation is reflexive and transitive. *)
-  Variable higher_eq_priority : FP_policy Task.
+  Context `{FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
 
@@ -81,8 +81,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** Let's define some local names for clarity. *)
   Let task_rbf := task_request_bound_function tsk.
-  Let total_hep_rbf := total_hep_request_bound_function_FP _ ts tsk.
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP _ ts tsk.
+  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
+  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
   
   (** Let L be any positive fixed point of the busy interval recurrence, determined by 
@@ -109,7 +109,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Theorem uniprocessor_response_time_bound_fully_preemptive_fp:
     response_time_bounded_by tsk R.
   Proof.
-    have BLOCK: blocking_bound  higher_eq_priority ts tsk = 0.
+    have BLOCK: blocking_bound ts tsk = 0.
     { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
                /fully_preemptive.fully_preemptive_model subnn big1_eq. } 
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.      

@@ -35,7 +35,7 @@ Section ProofWorkloadBound.
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation. *)
-  Variable higher_eq_priority : FP_policy Task.
+  Context `{FP_policy Task}.
   Let jlfp_higher_eq_priority := FP_to_JLFP Job Task.
 
   (** Consider a task set ts... *)
@@ -59,8 +59,8 @@ Section ProofWorkloadBound.
   (** Let's define some local names for clarity. *)
   Let task_rbf := task_request_bound_function tsk.
   Let total_rbf := total_request_bound_function ts.
-  Let total_hep_rbf := total_hep_request_bound_function_FP higher_eq_priority ts tsk.
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP higher_eq_priority ts tsk.
+  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
+  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
 
   (** Next, we consider any job [j] of [tsk]. *)
   Variable j : Job.
@@ -128,14 +128,13 @@ Section ProofWorkloadBound.
       total_ohep_workload t (t + delta) <= total_ohep_rbf delta.
     Proof.
       set l := arrivals_between arr_seq t (t + delta).
-      set hep := higher_eq_priority.
       apply leq_trans with
-          (\sum_(tsk' <- ts | hep tsk' tsk && (tsk' != tsk))
+          (\sum_(tsk' <- ts | hep_task tsk' tsk && (tsk' != tsk))
             (\sum_(j0 <- l | job_task j0 == tsk') job_cost j0)).
       { intros.
         rewrite /total_ohep_workload /workload_of_jobs /other_higher_eq_priority.
         rewrite /jlfp_higher_eq_priority /FP_to_JLFP /same_task H_job_of_tsk.
-        have EXCHANGE := exchange_big_dep (fun x => hep (job_task x) tsk && (job_task x != tsk)).
+        have EXCHANGE := exchange_big_dep (fun x => hep_task (job_task x) tsk && (job_task x != tsk)).
         rewrite EXCHANGE /=; last by move => tsk0 j0 HEP /eqP JOB0; rewrite JOB0.
         rewrite /workload_of_jobs -/l big_seq_cond [X in _ <= X]big_seq_cond.
         apply leq_sum; move => j0 /andP [IN0 HP0].
@@ -163,12 +162,11 @@ Section ProofWorkloadBound.
       total_hep_workload t (t + delta) <= total_hep_rbf delta.
     Proof.
       set l := arrivals_between arr_seq t (t + delta).
-      set hep := higher_eq_priority.
       apply leq_trans with
-          (n := \sum_(tsk' <- ts | hep tsk' tsk)
+          (n := \sum_(tsk' <- ts | hep_task tsk' tsk)
                  (\sum_(j0 <- l | job_task j0 == tsk') job_cost j0)).
       { rewrite /total_hep_workload /jlfp_higher_eq_priority /FP_to_JLFP H_job_of_tsk.
-        have EXCHANGE := exchange_big_dep (fun x => hep (job_task x) tsk).
+        have EXCHANGE := exchange_big_dep (fun x => hep_task (job_task x) tsk).
         rewrite EXCHANGE /=; clear EXCHANGE; last by move => tsk0 j0 HEP /eqP JOB0; rewrite JOB0.
         rewrite /workload_of_jobs -/l big_seq_cond [X in _ <= X]big_seq_cond.
         apply leq_sum; move => j0 /andP [IN0 HP0].

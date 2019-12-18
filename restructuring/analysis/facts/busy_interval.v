@@ -39,7 +39,7 @@ Section ExistsBusyIntervalJLFP.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume a given JLFP policy. *)
-  Variable higher_eq_priority : JLFP_policy Job. 
+  Context `{JLFP_policy Job}. 
   
   (** For simplicity, let's define some local names. *)
   Let job_pending_at := pending sched.
@@ -56,11 +56,11 @@ Section ExistsBusyIntervalJLFP.
   Hypothesis H_job_cost_positive : job_cost_positive j.
   
   (** Recall the list of jobs that arrive in any interval. *)
-  Let quiet_time t1 := quiet_time arr_seq sched higher_eq_priority j t1.
-  Let quiet_time_dec t1 := quiet_time_dec arr_seq sched higher_eq_priority j t1.
-  Let busy_interval_prefix t1 t2 := busy_interval_prefix arr_seq sched higher_eq_priority j t1 t2.
-  Let busy_interval t1 t2 := busy_interval arr_seq sched higher_eq_priority j t1 t2.
-  Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by arr_seq sched higher_eq_priority j K.
+  Let quiet_time t1 := quiet_time arr_seq sched j t1.
+  Let quiet_time_dec t1 := quiet_time_dec arr_seq sched j t1.
+  Let busy_interval_prefix t1 t2 := busy_interval_prefix arr_seq sched j t1 t2.
+  Let busy_interval t1 t2 := busy_interval arr_seq sched j t1 t2.
+  Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by arr_seq sched j K.
   
   (** We begin by proving a basic lemma about completion of the job within its busy interval. *)
   Section BasicLemma.
@@ -100,11 +100,11 @@ Section ExistsBusyIntervalJLFP.
       exists j_hp,
         arrives_in arr_seq j_hp /\
         arrived_between j_hp t1 t2 /\
-        higher_eq_priority j_hp j /\
+        hep_job j_hp j /\
         ~ job_completed_by j_hp t2. 
     Proof.
       rename H_quiet into QUIET, H_not_quiet into NOTQUIET.
-      destruct (has (fun j_hp => (~~ job_completed_by j_hp t2) && higher_eq_priority j_hp j)
+      destruct (has (fun j_hp => (~~ job_completed_by j_hp t2) && hep_job j_hp j)
                     (arrivals_between t1 t2)) eqn:COMP.
       { move: COMP => /hasP [j_hp ARR /andP [NOTCOMP HP]].
         move: (ARR) => INarr.
@@ -173,7 +173,7 @@ Section ExistsBusyIntervalJLFP.
         exists jhp,
           arrives_in arr_seq jhp /\
           job_pending_at jhp t /\
-          higher_eq_priority jhp j.
+          hep_job jhp j.
     Proof.
       move => t /andP [GE LT]; move: (H_busy_interval_prefix) => [_ [QTt [NQT REL]]].
       move: (ltngtP t1.+1 t2) => [GT|CONTR|EQ]; first last.
@@ -186,8 +186,8 @@ Section ExistsBusyIntervalJLFP.
         + by apply (H_priority_is_reflexive 0).
       - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
       - have EX: exists hp__seq: seq Job,
-        forall j__hp, j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ job_pending_at j__hp t /\ higher_eq_priority j__hp j.
-        { exists (filter (fun jo => (job_pending_at jo t) && (higher_eq_priority jo j)) (arrivals_between 0 t.+1)).
+        forall j__hp, j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ job_pending_at j__hp t /\ hep_job j__hp j.
+        { exists (filter (fun jo => (job_pending_at jo t) && (hep_job jo j)) (arrivals_between 0 t.+1)).
           intros; split; intros T.
           - move: T; rewrite mem_filter; move => /andP [/andP [PEN HP] IN].
             repeat split; eauto using in_arrivals_implies_arrived.
@@ -257,7 +257,7 @@ Section ExistsBusyIntervalJLFP.
            time interval [t_beg, t_end) during the time interval [t1, t1 + Δ). *)
     Let service_received_by_hep_jobs_released_during t_beg t_end :=
       service_of_higher_or_equal_priority_jobs
-        sched higher_eq_priority (arrivals_between t_beg t_end) j t1 (t1 + Δ).
+        sched (arrivals_between t_beg t_end) j t1 (t1 + Δ).
 
     (** We prove that jobs with higher-than-or-equal priority that
            released before time instant t1 receive no service after 
@@ -355,15 +355,14 @@ Section ExistsBusyIntervalJLFP.
     (** Next, we recall the notion of workload of all jobs released in a given interval
            [t1, t2) that have higher-or-equal priority w.r.t the job j being analyzed. *)
     Let hp_workload t1 t2 :=
-      workload_of_higher_or_equal_priority_jobs
-        higher_eq_priority j (arrivals_between t1 t2).
+      workload_of_higher_or_equal_priority_jobs j (arrivals_between t1 t2).
 
     (** With regard to the jobs with higher-or-equal priority that are released
            in a given interval [t1, t2), we also recall the service received by these
            jobs in the same interval [t1, t2). *)
     Let hp_service t1 t2 :=
       service_of_higher_or_equal_priority_jobs
-        sched higher_eq_priority (arrivals_between t1 t2) j t1 t2.
+        sched (arrivals_between t1 t2) j t1 t2.
 
     (** Now we begin the proof. First, we show that the busy interval is bounded. *)
     Section BoundingBusyInterval.
@@ -467,11 +466,11 @@ Section ExistsBusyIntervalJLFP.
             destruct (delta <= priority_inversion_bound) eqn:KLEΔ.
             { by apply leq_trans with priority_inversion_bound; last rewrite leq_addr. }
             apply negbT in KLEΔ; rewrite -ltnNge in KLEΔ. 
-            apply leq_trans with (cumulative_priority_inversion sched higher_eq_priority j t1 (t1 + delta) + hp_service t1 (t1 + delta)).
+            apply leq_trans with (cumulative_priority_inversion sched j t1 (t1 + delta) + hp_service t1 (t1 + delta)).
             { rewrite /hp_service hep_jobs_receive_no_service_before_quiet_time //.
               rewrite /service_of_higher_or_equal_priority_jobs /service_of_jobs sum_pred_diff. 
               rewrite addnBA; last first.
-              { by rewrite big_mkcond //= leq_sum //; intros j' _; case (higher_eq_priority j' j). } 
+              { by rewrite big_mkcond //= leq_sum //; intros j' _; case (hep_job j' j). } 
               rewrite addnC -addnBA.
               { intros. have TT := no_idle_time_within_non_quiet_time_interval.
                   by unfold service_of_jobs in TT; rewrite TT // leq_addr.
@@ -481,7 +480,7 @@ Section ExistsBusyIntervalJLFP.
                 rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
                 case SCHED: (sched t) => [j1 | ]; simpl; first last.
                 { rewrite leqn0 big1_seq //. }
-                { case PRIO1: (higher_eq_priority j1 j); simpl; first last.
+                { case PRIO1: (hep_job j1 j); simpl; first last.
                   - rewrite <- SCHED.
                     have SCH := service_of_jobs_le_1 sched _ _ _ t; eauto using arrivals_uniq. 
                   - rewrite leqn0 big1_seq; first by done.
@@ -492,7 +491,7 @@ Section ExistsBusyIntervalJLFP.
                         by inversion CONTR; clear CONTR; subst j2; rewrite PRIO1 in PRIO2. } } }
             { rewrite leq_add2r.
               destruct (t1 + delta <= t_busy.+1) eqn:NEQ; [ | apply negbT in NEQ; rewrite -ltnNge in NEQ].
-              - apply leq_trans with (cumulative_priority_inversion  sched higher_eq_priority j t1 t_busy.+1); last eauto 2.
+              - apply leq_trans with (cumulative_priority_inversion sched j t1 t_busy.+1); last eauto 2.
                   by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + delta)) //=; rewrite leq_addr.
               -  apply H_priority_inversion_is_bounded; repeat split; try done.
                  + by rewrite -addn1 leq_add2l.
@@ -512,7 +511,7 @@ Section ExistsBusyIntervalJLFP.
             rename H_no_quiet_time into NOTQUIET, 
             H_is_busy_prefix into PREFIX.
             set l := arrivals_between t1 (t1 + delta).
-            set hep := higher_eq_priority.
+            set hep := hep_job.
             unfold hp_service, service_of_higher_or_equal_priority_jobs, service_of_jobs,
             hp_workload, workload_of_higher_or_equal_priority_jobs, workload_of_jobs.
             fold arrivals_between l hep.
@@ -536,7 +535,7 @@ Section ExistsBusyIntervalJLFP.
             apply leq_add; last first.
             {
               apply leq_sum; intros j1 NEQ.
-              destruct (higher_eq_priority j1 j); last by done.
+              destruct (hep_job j1 j); last by done.
                 by apply cumulative_service_le_job_cost, ideal_proc_model_provides_unit_service.
             }
             rewrite ignore_service_before_arrival; rewrite //; [| by apply ltnW].

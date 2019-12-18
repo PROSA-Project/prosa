@@ -42,14 +42,14 @@ Section ExistsNoCarryIn.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume a given JLFP policy. *)
-  Variable higher_eq_priority : JLFP_policy Job. 
+  Context `{JLFP_policy Job}.
   
   (** For simplicity, let's define some local names. *)
   Let job_pending_at := pending sched.
   Let job_completed_by := completed_by sched.
   Let arrivals_between := arrivals_between arr_seq.
   Let no_carry_in := no_carry_in arr_seq sched.
-  Let quiet_time := quiet_time arr_seq sched higher_eq_priority.
+  Let quiet_time := quiet_time arr_seq sched.
 
   (** The fact that there is no carry-in at time instant t
          trivially implies that t is a quiet time. *)
@@ -273,17 +273,17 @@ Section ExistsNoCarryIn.
     exists t1 t2, 
       t1 <= job_arrival j < t2 /\
       t2 <= t1 + Δ /\
-      busy_interval arr_seq sched higher_eq_priority j t1 t2.
+      busy_interval arr_seq sched j t1 t2.
   Proof.
     rename H_from_arrival_sequence into ARR, H_job_cost_positive into POS.
     edestruct (exists_busy_interval_prefix
-                 arr_seq H_arrival_times_are_consistent sched higher_eq_priority j ARR H_priority_is_reflexive (job_arrival j))
+                 arr_seq H_arrival_times_are_consistent sched j ARR H_priority_is_reflexive (job_arrival j))
       as [t1 [PREFIX GE]].
     apply job_pending_at_arrival; auto. 
     move: GE => /andP [GE1 _].
     exists t1; move: (processor_is_not_too_busy t1.+1) => [δ [LE QT]].
     apply no_carry_in_implies_quiet_time with (j := j) in QT.
-    have EX: exists t2, ((t1 < t2 <= t1.+1 + δ) && quiet_time_dec arr_seq sched higher_eq_priority j t2).
+    have EX: exists t2, ((t1 < t2 <= t1.+1 + δ) && quiet_time_dec arr_seq sched j t2).
     { exists (t1.+1 + δ); apply/andP; split.
       - by apply/andP; split; first rewrite addSn ltnS leq_addr. 
       - by apply/quiet_time_P. }

@@ -139,7 +139,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Variable priority_inversion_bound : duration.
   Hypothesis H_priority_inversion_is_bounded:
     priority_inversion_is_bounded_by
-      arr_seq sched _ tsk priority_inversion_bound.
+      arr_seq sched tsk priority_inversion_bound.
 
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
@@ -196,13 +196,13 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** We say that job j incurs interference at time t iff it cannot execute due to 
      a higher-or-equal-priority job being scheduled, or if it incurs a priority inversion. *)
   Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference sched EDF j t.
+    ideal_jlfp_rta.interference sched j t.
 
   (** Instantiation of Interfering Workload *)
   (** The interfering workload, in turn, is defined as the sum of the priority inversion 
      function and interfering workload of jobs with higher or equal priority. *)
   Let interfering_workload (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interfering_workload arr_seq sched EDF j t.
+    ideal_jlfp_rta.interfering_workload arr_seq sched j t.
 
   (** Finally, we define the interference bound function as the sum of the priority 
      interference bound and the higher-or-equal-priority workload. *)
@@ -246,7 +246,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           rewrite /interference /ideal_jlfp_rta.interference /is_priority_inversion
                   /is_interference_from_another_hep_job 
                   HYP negb_or; apply/andP; split.
-        - by rewrite Bool.negb_involutive /edf.EDF.
+        - by rewrite Bool.negb_involutive; eapply (EDF_is_reflexive 0).
         - by rewrite negb_and Bool.negb_involutive; apply/orP; right.
       }
     Qed.
@@ -270,7 +270,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       apply QT; try done.
       - eapply in_arrivals_implies_arrived; eauto 2.
       - unfold edf.EDF, EDF; move: TSKs => /eqP TSKs.
-        rewrite /job_deadline /job_deadline_from_task_deadline TSK TSKs leq_add2r.
+        rewrite /job_deadline /job_deadline_from_task_deadline /hep_job TSK TSKs leq_add2r.
           by apply leq_trans with t1; [apply ltnW | ].
     Qed.
 
@@ -336,10 +336,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
             [priority_inversion_bound] bounds cumulative priority inversion 
             follows from assumption [H_priority_inversion_is_bounded]. *)
         Lemma cumulative_priority_inversion_is_bounded:
-          cumulative_priority_inversion sched EDF j t1 (t1 + Δ) <= priority_inversion_bound.
+          cumulative_priority_inversion sched j t1 (t1 + Δ) <= priority_inversion_bound.
         Proof.
           unfold priority_inversion_is_bounded_by, EDF in *.
-          apply leq_trans with (cumulative_priority_inversion sched _ j t1 t2).
+          apply leq_trans with (cumulative_priority_inversion sched j t1 t2).
           - rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1  + Δ)) //=.
             + by rewrite leq_addr.
             + by rewrite /is_priority_inversion leq_addr.
@@ -360,15 +360,16 @@ Section AbstractRTAforEDFwithArrivalCurves.
             other tasks. Which in turn means that cumulative
             interference is bounded by service. *)
         Lemma cumulative_interference_is_bounded_by_total_service:
-          cumulative_interference_from_hep_jobs_from_other_tasks sched EDF j t1 (t1 + Δ)
+          cumulative_interference_from_hep_jobs_from_other_tasks sched j t1 (t1 + Δ)
           <= service_of_jobs sched (EDF_not_from tsk) jobs t1 (t1 + Δ).
         Proof.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _]. 
           erewrite instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks;
             eauto 2 with basic_facts.
           - by rewrite -H_job_of_tsk /jobs.
-          - by rewrite /edf.EDF /EDF instantiated_quiet_time_equivalent_quiet_time //;
-                       eauto 2 with basic_facts.
+          - rewrite /edf.EDF /EDF instantiated_quiet_time_equivalent_quiet_time //.
+            + by apply EDF_is_reflexive.
+            + by apply EDF_respects_sequential_tasks.
         Qed.
 
         (** By lemma [service_of_jobs_le_workload], the total
@@ -577,7 +578,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
             by rewrite /completed_by /completed_by ZERO. 
         - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _]. 
-          rewrite (cumulative_task_interference_split arr_seq sched _ _ _ tsk j);
+          rewrite (cumulative_task_interference_split arr_seq sched _ _ tsk j);
             eauto 2 with basic_facts; last first.
           { by eapply arrived_between_implies_in_arrivals; eauto. }
           rewrite /I leq_add //.  
