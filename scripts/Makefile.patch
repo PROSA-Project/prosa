@@ -29,3 +29,14 @@
  # FIXME: not quite right, since the output name is different
  gallinahtml: GAL=-g
  gallinahtml: html
+@@ -587,6 +593,10 @@
+ 	$(HIDE)rm -f $(CMOFILES:%.cmo=%.cmx)
+ .PHONY: archclean
+ 
++vacuum:: cleanall
++	$(SHOW)'VACUUMING *.vo *.glob .*.aux <empty directories>'
++	$(HIDE)find . -depth \( -iname '*.vo' -or  -iname '*.glob' -or -iname '.*.aux' \)  ! -path './.git/*' -delete
++	$(HIDE)find . -depth -type d -empty ! -path './.git/*' -delete
+ 
+ # Compilation rules ###########################################################
+ 
