@@ -1,6 +1,6 @@
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.work_conserving.
-Require Export prosa.analysis.concepts.priority_inversion.
+Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.behavior.all.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

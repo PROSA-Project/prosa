@@ -1,4 +1,4 @@
-Require Export prosa.analysis.concepts.priority_inversion.
+Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.abstract.abstract_seq_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

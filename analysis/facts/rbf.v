@@ -1,6 +1,6 @@
 Require Export prosa.analysis.facts.behavior.workload.
 Require Export prosa.analysis.definitions.job_properties.
-Require Export prosa.analysis.concepts.request_bound_function.
+Require Export prosa.analysis.definitions.request_bound_function.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 

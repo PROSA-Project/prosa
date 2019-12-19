@@ -1,4 +1,4 @@
-Require Export prosa.analysis.concepts.schedulability.
+Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.abstract.search_space.
 Require Export prosa.analysis.abstract.run_to_completion.
 

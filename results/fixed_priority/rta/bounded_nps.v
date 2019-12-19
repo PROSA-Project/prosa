@@ -1,5 +1,5 @@
-Require Export prosa.analysis.concepts.schedulability.
-Require Export prosa.analysis.concepts.request_bound_function.
+Require Export prosa.analysis.definitions.schedulability.
+Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 Require Export prosa.analysis.facts.priority_inversion.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

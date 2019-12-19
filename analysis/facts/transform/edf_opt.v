@@ -1,6 +1,6 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
 Require Export prosa.model.schedule.edf.
-Require Export prosa.analysis.concepts.schedulability.
+Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.transform.edf_trans.
 Require Export prosa.analysis.facts.transform.swaps.
 Require Export prosa.analysis.facts.readiness.basic.

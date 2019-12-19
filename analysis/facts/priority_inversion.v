@@ -3,7 +3,7 @@ Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.analysis.facts.behavior.ideal_schedule.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.job_properties.
-Require Export prosa.analysis.concepts.busy_interval.
+Require Export prosa.analysis.definitions.busy_interval.
 Require Export prosa.analysis.facts.busy_interval.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
