@@ -23,7 +23,7 @@ done
 FIND_OPTS+=( -print )
 
 # Compile all relevant *.v files
-coq_makefile -f _CoqProject $(find "${FIND_OPTS[@]}" ) -o Makefile
+coq_makefile -f _CoqProject $(find "${FIND_OPTS[@]}" | scripts/module-toc-order.py ) -o Makefile
 
 # Patch HTML target to switch out color, and 
 # so that it parses comments and has links to ssreflect.
