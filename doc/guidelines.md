@@ -84,14 +84,15 @@ Generally try to make proofs as robust to (minor) changes in definitions as poss
 1. Make use of the `by` tactical to stop the proof script early in case of any changes in assumptions.
 2. General principle: **Rewrite with equalities, do not unfold definitions.**   
 Avoid unfolding definitions in anything but “basic facts” files. Main proofs should not unfold low-level definitions, processor models, etc. Rather, they should rely exclusively on basic facts so that we can change representations without breaking high-level proofs.
-3. In particular, for case analysis, prefer basic facts that express all possible cases as a disjunction. Do not destruct the actual definitions directly.  
+3. In particular, for case analysis, prefer basic facts that express all possible cases as a disjunction. Do not destruct the actual definitions directly.
+    - Aside: Sometimes, it is more convenient to use a specific inductive type rather than a disjunction. See for instance `PeanoNat.Nat.compare_spec` in the Coq standard library or Section 4.2.1 of the [Mathcomp book](https://math-comp.github.io/mcb/book.pdf) for more details. However, we generally prefer disjunctions for readability whenever possible and reasonable. 
 4. Do not explicitly reference proof terms in type classes (because they might change with the representation). Instead, introduce lemmas that restate the proof term in a general, abstract way that is unlikely to change and rely on those.  
 Guideline: do not name proof terms in type classes to prevent explicit dependencies.
 
 ### Tactics
 
-- Document the tactics that you use in the [list of tactics](doc/tactics.md). For new users, it can be quite difficult to identify the right tactics to use. This list ist intended to give novices a starting to point in the search for the "right" tools.
+- Document the tactics that you use in the [list of tactics](doc/tactics.md). For new users, it can be quite difficult to identify the right tactics to use. This list is intended to give novices a starting to point in the search for the "right" tools.
 
 
-*To be continued… please feel free to propose new advice and better guidelines.*
+*To be continued… Merge requests welcome: please feel free to propose new advice and better guidelines.*
 
