@@ -3,6 +3,7 @@ Require Export prosa.util.all.
 
 (** In this section, we relate job readiness to [has_arrived]. *)
 Section Arrived.
+  
   (** Consider any kinds of jobs and any kind of processor state. *)
   Context {Job : JobType} {PState : Type}.
   Context `{ProcessorState Job PState}.
@@ -14,9 +15,7 @@ Section Arrived.
      readiness. *)
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
-  (* We give the readiness typeclass instance a name here because we rely on it
-     explicitly in proofs. *)
-  Context {ReadyParam : JobReady Job PState}.
+  Context `{JobReady Job PState}.
 
   (** First, we note that readiness models are by definition consistent
       w.r.t. [pending]. *)
@@ -24,7 +23,7 @@ Section Arrived.
     forall j t,
       job_ready sched j t -> pending sched j t.
   Proof.
-    move: ReadyParam => [is_ready CONSISTENT].
+    move: H5 => [is_ready CONSISTENT].
     move=> j t READY.
     apply CONSISTENT.
     by exact READY.
@@ -202,4 +201,4 @@ Section ArrivalSequencePrefix.
 
   End Lemmas.
 
-End ArrivalSequencePrefix.
+End ArrivalSequencePrefix. 
