@@ -1,9 +1,8 @@
 Require Export prosa.analysis.facts.preemption.job.limited.
 
+(** Furthermore, we assume the task model with floating non-preemptive regions. *)
 Require Import prosa.model.preemption.limited_preemptive.
 Require Import prosa.model.task.preemption.floating_nonpreemptive.
-
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Platform for Floating Non-Preemptive Regions Model *)
 (** In this section, we prove that instantiation of functions
@@ -107,6 +106,7 @@ Section FloatingNonPreemptiveRegionsModel.
 
 End FloatingNonPreemptiveRegionsModel.
 
+(** We add the above lemma into a "Hint Database" basic_facts, so Coq will be able to apply them automatically. *)
 Hint Resolve
      valid_fixed_preemption_points_model_lemma
      floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions

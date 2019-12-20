@@ -1,6 +1,7 @@
 Require Export prosa.model.task.sequentiality.
 
 Section ExecutionOrder.
+  
   (** Consider any type of job associated with any type of tasks... *)
   Context {Job: JobType}.
   Context {Task: TaskType}.
@@ -22,7 +23,7 @@ Section ExecutionOrder.
 
 
   (** A simple corollary of this hypothesis is that the scheduler
-     executes a job with the earliest arrival time. *)
+      executes a job with the earliest arrival time. *)
   Corollary scheduler_executes_job_with_earliest_arrival:
     forall j1 j2 t,
       same_task j1 j2 ->

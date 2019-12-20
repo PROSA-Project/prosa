@@ -1,6 +1,7 @@
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.preemption.job.preemptive.
 
+(** Furthermore, we assume the fully non-preemptive task model. *)
 Require Import prosa.model.task.preemption.fully_preemptive.
 
 (** * Platform for Fully Preemptive Model *)
@@ -57,6 +58,7 @@ Section FullyPreemptiveModel.
     
 End FullyPreemptiveModel.
 
+(** We add the above lemma into a "Hint Database" basic_facts, so Coq will be able to apply them automatically. *)
 Hint Resolve
      valid_fully_preemptive_model
      fully_preemptive_model_is_model_with_bounded_nonpreemptive_regions

@@ -1,8 +1,6 @@
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.analysis.facts.behavior.arrivals.
 
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-
 (** * Lemmas about Workload of Sets of Jobs *)
 (** In this file, we establish basic facts about the workload of sets of jobs. *)  
 Section WorkloadFacts.

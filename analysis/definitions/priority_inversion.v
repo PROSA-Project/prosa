@@ -1,7 +1,5 @@
 Require Export prosa.analysis.definitions.busy_interval.
 
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-
 (** * Cumulative Priority Inversion for JLFP-models *)
 (** In this module we define the notion of cumulative priority inversion for uni-processor for JLFP schedulers. *)
 Section CumulativePriorityInversion.

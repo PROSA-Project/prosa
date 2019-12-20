@@ -6,6 +6,7 @@ Require Export prosa.analysis.facts.behavior.all.
     instant up to a given horizon. *)
 
 Section SchedulePrefixMap.
+  
   (** For any type of jobs and... *)
   Context {Job : JobType}.
 

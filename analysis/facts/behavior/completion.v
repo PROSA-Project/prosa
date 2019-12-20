@@ -1,9 +1,11 @@
 Require Export prosa.analysis.facts.behavior.service.
 Require Export prosa.analysis.facts.behavior.arrivals.
 
-(** In this file, we establish basic facts about job completions. *)
+(** * Completion *)
 
+(** In this file, we establish basic facts about job completions. *)
 Section CompletionFacts.
+  
   (** Consider any job type,...*)
   Context {Job: JobType}.
   Context `{JobCost Job}.
@@ -35,8 +37,7 @@ Section CompletionFacts.
   Lemma less_service_than_cost_is_incomplete:
     forall t,
       service sched j t < job_cost j
-      <->
-      ~~ completed_by sched j t.
+      <-> ~~ completed_by sched j t.
   Proof.
     move=> t. by split; rewrite /completed_by; [rewrite -ltnNge // | rewrite ltnNge //].
   Qed.
@@ -45,8 +46,7 @@ Section CompletionFacts.
   Lemma incomplete_is_positive_remaining_cost:
     forall t,
       ~~ completed_by sched j t
-      <->
-      remaining_cost sched j t > 0.
+      <-> remaining_cost sched j t > 0.
   Proof.
     move=> t. by split; rewrite /remaining_cost -less_service_than_cost_is_incomplete subn_gt0 //.
   Qed.
@@ -112,11 +112,10 @@ Section CompletionFacts.
 
 End CompletionFacts.
 
-
-Section ServiceAndCompletionFacts.
-  (** In this section, we establish some facts that are really about service,
-      but are also related to completion and rely on some of the above lemmas.
-      Hence they are in this file rather than in the service facts file. *)
+(** In this section, we establish some facts that are really about service,
+    but are also related to completion and rely on some of the above lemmas.
+    Hence they are in this file rather than in the service facts file. *)
+Section ServiceAndCompletionFacts.  
 
   (** Consider any job type,...*)
   Context {Job: JobType}.
@@ -133,7 +132,7 @@ Section ServiceAndCompletionFacts.
   Hypothesis H_completed_jobs:
     completed_jobs_dont_execute sched.
 
-  (** Let j be any job that is to be scheduled. *)
+  (** Let [j] be any job that is to be scheduled. *)
   Variable j: Job.
 
   (** Assume that a scheduled job receives exactly one time unit of service. *)
@@ -171,7 +170,7 @@ Section ServiceAndCompletionFacts.
     by apply service_at_most_cost.
   Qed.
 
-  (** We show that the service received by job j in any interval is no larger
+  (** We show that the service received by job [j] in any interval is no larger
      than its cost. *)
   Lemma cumulative_service_le_job_cost:
     forall t t',
@@ -183,8 +182,8 @@ Section ServiceAndCompletionFacts.
     rewrite /service. rewrite -(service_during_cat sched j 0 t t') // leq_addl //.
   Qed.
 
-  (** If a job isn't complete at time t, it can't be completed at time (t +
-     remaining_cost j t - 1). *)
+  (** If a job isn't complete at time [t], it can't be completed at time [t +
+     remaining_cost j t - 1]. *)
   Lemma job_doesnt_complete_before_remaining_cost:
     forall t,
       ~~ completed_by sched j t ->
@@ -227,9 +226,9 @@ Section ServiceAndCompletionFacts.
 
 End ServiceAndCompletionFacts.
 
+(** In this section, we establish facts that on jobs with non-zero costs that
+    must arrive to execute. *)
 Section PositiveCost.
-  (** In this section, we establish facts that on jobs with non-zero costs that
-      must arrive to execute. *)
 
   (** Consider any type of jobs with cost and arrival-time attributes,...*)
   Context {Job: JobType}.
@@ -243,11 +242,11 @@ Section PositiveCost.
   (** ...and a given schedule. *)
   Variable sched: schedule PState.
 
-  (** Let j be any job that is to be scheduled. *)
+  (** Let [j] be any job that is to be scheduled. *)
   Variable j: Job.
 
-  (** We assume that job j has positive cost, from which we can
-     infer that there always is a time in which j is pending, ... *)
+  (** We assume that job [j] has positive cost, from which we can
+     infer that there always is a time in which [j] is pending, ... *)
   Hypothesis H_positive_cost: job_cost j > 0.
 
   (** ...and that jobs must arrive to execute. *)
@@ -283,6 +282,7 @@ Section PositiveCost.
 End PositiveCost.
 
 Section CompletedJobs.
+  
   (** Consider any kinds of jobs and any kind of processor state. *)
   Context {Job : JobType} {PState : Type}.
   Context `{ProcessorState Job PState}.

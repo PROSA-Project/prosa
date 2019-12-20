@@ -3,6 +3,7 @@ Require Export prosa.analysis.facts.model.ideal_schedule.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.nonpreemptive.
 
+(** Furthermore, we assume the fully non-preemptive job model. *)
 Require Import prosa.model.preemption.fully_nonpreemptive.
 
 (** * Platform for Fully Non-Preemptive model *)

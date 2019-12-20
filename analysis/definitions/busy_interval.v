@@ -59,11 +59,11 @@ Section BusyIntervalJLFP.
   End BusyInterval.
 
   (** In this section we define the computational
-       version of the notion of quiet time. *)
+      version of the notion of quiet time. *)
   Section DecidableQuietTime.
 
     (** We say that t is a quiet time for j iff every higher-priority job from
-         the arrival sequence that arrived before t has completed by that time. *)
+        the arrival sequence that arrived before t has completed by that time. *)
     Definition quiet_time_dec (j : Job) (t : instant) :=
       all
         (fun j_hp => hep_job j_hp j ==> (completed_by sched j_hp t))

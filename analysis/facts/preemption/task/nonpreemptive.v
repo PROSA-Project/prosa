@@ -1,9 +1,8 @@
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
 
+(** Furthermore, we assume the fully non-preemptive task model. *)
 Require Import prosa.model.preemption.fully_nonpreemptive.
 Require Import prosa.model.task.preemption.fully_nonpreemptive.
-
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Platform for Fully Non-Preemptive Model *)
 (** In this section, we prove that instantiation of functions
@@ -86,6 +85,7 @@ Section FullyNonPreemptiveModel.
     
 End FullyNonPreemptiveModel.
 
+(** We add the above lemma into a "Hint Database" basic_facts, so Coq will be able to apply them automatically. *)
 Hint Resolve
      valid_fully_nonpreemptive_model
      fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions

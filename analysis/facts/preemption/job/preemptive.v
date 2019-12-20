@@ -1,4 +1,6 @@
 Require Export prosa.model.task.preemption.parameters.
+
+(** Furthermore, we assume the fully preemptive job model. *)
 Require Import prosa.model.preemption.fully_preemptive.
 
 (** * Preemptions in Fully Preemptive Model *)

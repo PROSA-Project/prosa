@@ -1,11 +1,14 @@
 Require Export prosa.analysis.facts.behavior.completion.
 
+(** * Deadlines *)
+
 (** In this file, we observe basic properties of the behavioral job
     model w.r.t. deadlines. *)
-
 Section DeadlineFacts.
+  
   (** Consider any given type of jobs with costs and deadlines... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job}.
+
   (** ... any given type of processor states. *)
   Context {PState: eqType}.
   Context `{ProcessorState Job PState}.

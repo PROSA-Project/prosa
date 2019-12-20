@@ -1,3 +1,4 @@
+(** Furthermore, we assume the fully preemptive task model. *)
 Require Import prosa.model.preemption.fully_preemptive.
 Require Import prosa.model.task.preemption.fully_preemptive.
 Require Import prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.

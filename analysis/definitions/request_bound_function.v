@@ -6,8 +6,6 @@ Require Export prosa.model.priority.classes.
     could be generalized in future work. *)
 Require Import prosa.analysis.facts.model.ideal_schedule.
 
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
-
 (** * Request Bound Function (RBF) *)
 
 (** We define the notion of a task's request-bound function (RBF), as well as
@@ -47,7 +45,8 @@ Section TaskWorkloadBoundedByArrivalCurves.
     Variable delta : duration.
 
     (** We define the following workload bound for the task. *)
-    Definition task_request_bound_function := task_cost tsk * max_arrivals tsk delta.
+    Definition task_request_bound_function :=
+      task_cost tsk * max_arrivals tsk delta.
 
   End SingleTask.
 

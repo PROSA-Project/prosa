@@ -2,15 +2,15 @@ Require Export prosa.util.all.
 Require Export prosa.behavior.all.
 Require Export prosa.model.processor.platform_properties.
 
-From mathcomp Require Import ssrnat ssrbool fintype.
+(** * Service *)
 
 (** In this file, we establish basic facts about the service received by
     jobs. *)
 
-Section Composition.
-  (** To begin with, we provide some simple but handy rewriting rules for
+(** To begin with, we provide some simple but handy rewriting rules for
       [service] and [service_during]. *)
-
+Section Composition.
+  
   (** Consider any job type and any processor state. *)
   Context {Job: JobType}.
   Context {PState: Type}.
@@ -130,10 +130,9 @@ Section Composition.
 
 End Composition.
 
-
+(** As a common special case, we establish facts about schedules in which a
+    job receives either 1 or 0 service units at all times. *)
 Section UnitService.
-  (** As a common special case, we establish facts about schedules in which a
-      job receives either 1 or 0 service units at all times. *)
 
   (** Consider any job type and any processor state. *)
   Context {Job: JobType}.
@@ -146,7 +145,7 @@ Section UnitService.
   (** ...and a given schedule. *)
   Variable sched: schedule PState.
 
-  (** Let j be any job that is to be scheduled. *)
+  (** Let [j] be any job that is to be scheduled. *)
   Variable j: Job.
 
   (** First, we prove that the instantaneous service cannot be greater than 1, ... *)
@@ -156,7 +155,7 @@ Section UnitService.
       by move=> t; rewrite /service_at.
   Qed.
 
-  (** ...which implies that the cumulative service received by job j in any
+  (** ...which implies that the cumulative service received by job [j] in any
      interval of length delta is at most delta. *)
   Lemma cumulative_service_le_delta:
     forall t delta,
@@ -170,7 +169,7 @@ Section UnitService.
 
   Section ServiceIsAStepFunction.
 
-    (** We show that the service received by any job j is a step function. *)
+    (** We show that the service received by any job [j] is a step function. *)
     Lemma service_is_a_step_function:
       is_step_function (service sched j).
     Proof.
@@ -179,15 +178,15 @@ Section UnitService.
       apply service_at_most_one.
     Qed.
 
-    (** Next, consider any time t... *)
+    (** Next, consider any time [t]... *)
     Variable t: instant.
 
-    (** ...and let s0 be any value less than the service received
-       by job j by time t. *)
+    (** ...and let [s0] be any value less than the service received
+       by job [j] by time [t]. *)
     Variable s0: duration.
     Hypothesis H_less_than_s: s0 < service sched j t.
 
-    (** Then, we show that there exists an earlier time t0 where job j had s0
+    (** Then, we show that there exists an earlier time [t0] where job [j] had [s0]
        units of service. *)
     Corollary exists_intermediate_service:
       exists t0,
@@ -205,8 +204,8 @@ Section UnitService.
 
 End UnitService.
 
+(** We establish a basic fact about the monotonicity of service. *)
 Section Monotonicity.
-  (** We establish a basic fact about the monotonicity of service. *)
 
   (** Consider any job type and any processor model. *)
   Context {Job: JobType}.
@@ -231,8 +230,9 @@ Section Monotonicity.
 
 End Monotonicity.
 
+(** Consider any job type and any processor model. *)
 Section RelationToScheduled.
-  (** Consider any job type and any processor model. *)
+
   Context {Job: JobType}.
   Context {PState: Type}.
   Context `{ProcessorState Job PState}.
@@ -313,7 +313,7 @@ Section RelationToScheduled.
   Qed.
 
   (** Thus, any job that receives some service during an interval must be
-     scheduled at some point during the interval... *)
+      scheduled at some point during the interval... *)
   Corollary cumulative_service_implies_scheduled:
     forall t1 t2,
       service_during sched j t1 t2 > 0 ->
@@ -339,12 +339,12 @@ Section RelationToScheduled.
     have EX_SCHED := cumulative_service_implies_scheduled 0 t2 NONZERO.
     by move: EX_SCHED => [t [TIMES SCHED_AT]]; exists t; split.
   Qed.
-
+ 
+  (** If we can assume that a scheduled job always receives service,
+      we can further prove the converse. *)
   Section GuaranteedService.
-    (** If we can assume that a scheduled job always receives service, we can
-       further prove the converse. *)
 
-    (** Assume j always receives some positive service. *)
+    (** Assume [j] always receives some positive service. *)
     Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
     (** In other words, not being scheduled is equivalent to receiving zero
@@ -406,9 +406,9 @@ Section RelationToScheduled.
 
   End GuaranteedService.
 
+  (** Furthermore, if we know that jobs are not released early, then we can
+      narrow the interval during which they must have been scheduled. *)
   Section AfterArrival.
-    (** Furthermore, if we know that jobs are not released early, then we can
-       narrow the interval during which they must have been scheduled. *)
 
     Context `{JobArrival Job}.
 
@@ -440,8 +440,8 @@ Section RelationToScheduled.
       rewrite /has_arrived -ltnNge //.
    Qed.
 
-    (** We show that job j does not receive service at any time t prior to its
-       arrival. *)
+    (** We show that job [j] does not receive service at any time [t] prior to its
+        arrival. *)
     Lemma service_before_job_arrival_zero:
       forall t,
         t < job_arrival j ->
@@ -492,17 +492,17 @@ Section RelationToScheduled.
 
   End AfterArrival.
 
+  (** In this section, we prove some lemmas about time instants with same
+      service. *)
   Section TimesWithSameService.
-    (** In this section, we prove some lemmas about time instants with same
-        service. *)
 
-    (** Consider any time instants t1 and t2... *)
+    (** Consider any time instants [t1] and [t2]... *)
     Variable t1 t2: instant.
 
-    (** ...where t1 is no later than t2... *)
+    (** ...where [t1] is no later than [t2]... *)
     Hypothesis H_t1_le_t2: t1 <= t2.
 
-    (** ...and where job j has received the same amount of service. *)
+    (** ...and where job [j] has received the same amount of service. *)
     Hypothesis H_same_service: service sched j t1 = service sched j t2.
 
     (** First, we observe that this means that the job receives no service
@@ -527,8 +527,8 @@ Section RelationToScheduled.
       apply IS_ZERO. apply /andP; split => //.
     Qed.
 
-    (** We show that job j receives service at some point t < t1 iff j receives
-       service at some point t' < t2. *)
+    (** We show that job [j] receives service at some point [t < t1]
+       iff [j] receives service at some point [t' < t2]. *)
     Lemma same_service_implies_serviced_at_earlier_times:
       [exists t: 'I_t1, service_at sched j t > 0] =
       [exists t': 'I_t2, service_at sched j t' > 0].
@@ -550,14 +550,15 @@ Section RelationToScheduled.
       }
     Qed.
 
-    (** Then, under the assumption that scheduled jobs receives service,
-       we can translate this into a claim about scheduled_at. *)
 
-    (** Assume j always receives some positive service. *)
+    (** Then, under the assumption that scheduled jobs receives service,
+        we can translate this into a claim about scheduled_at. *)
+
+    (** Assume [j] always receives some positive service. *)
     Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
-    (** We show that job j is scheduled at some point t < t1 iff j is scheduled
-       at some point t' < t2.  *)
+    (** We show that job [j] is scheduled at some point [t < t1] iff [j] is scheduled
+       at some point [t' < t2].  *)
     Lemma same_service_implies_scheduled_at_earlier_times:
       [exists t: 'I_t1, scheduled_at sched j t] =
       [exists t': 'I_t2, scheduled_at sched j t'].

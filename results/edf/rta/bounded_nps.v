@@ -2,6 +2,7 @@ Require Import prosa.model.priority.edf.
 Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.results.edf.rta.bounded_pi.
+Require Export prosa.analysis.facts.busy_interval.priority_inversion.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.

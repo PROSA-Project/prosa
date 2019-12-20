@@ -1,9 +1,8 @@
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
 
+(** Furthermore, we assume the fully non-preemptive task model. *)
 Require Import prosa.model.preemption.fully_nonpreemptive.
 Require Import prosa.model.task.preemption.fully_nonpreemptive.
-
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
  
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run

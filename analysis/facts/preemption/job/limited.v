@@ -4,7 +4,8 @@ Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.model.ideal_schedule.
 
-(** *)
+(** Throughout this file, we assume the job model with limited
+    preemption points. *)
 Require Import prosa.model.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)

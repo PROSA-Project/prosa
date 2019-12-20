@@ -1,13 +1,23 @@
 Require Export prosa.analysis.facts.behavior.completion.
 Require Import prosa.model.task.absolute_deadline.
 
+(** * Schedulability *)
+
+(** In the following section we define the notion of schedulable
+    task. *)
 Section Task.
+  
+  (** Consider any type of tasks, ... *)
   Context {Task : TaskType}.
+
+  (** ... any type of jobs associated with these tasks, ... *)
   Context {Job: JobType}.
-
-  Context `{JobArrival Job} `{JobCost Job} `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
   Context `{JobDeadline Job}.
+  Context `{JobTask Job Task}.
 
+  (** ... and any kind of processor state. *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
@@ -37,43 +47,27 @@ Section Task.
       arrives_in arr_seq j ->
       job_task j = tsk ->
       job_meets_deadline sched j.
+  
 End Task.
 
-Section TaskSet.
+(** In this section we infer schedulability from a response-time bound
+    of a task. *)
+Section Schedulability.  
+
+  (** Consider any type of tasks, ... *)
   Context {Task : TaskType}.
-  Context {Job: JobType}.
-
-  Context `{JobArrival Job} `{JobCost Job} `{JobTask Job Task}.
-  Context `{JobDeadline Job}.
-
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
-
-  Variable ts : {set Task}.
-
-  (** Consider any job arrival sequence... *)
-  Variable arr_seq: arrival_sequence Job.
-
-  (** ...and any schedule of these jobs. *)
-  Variable sched: schedule PState.
-
-  (** We say that a task set is schedulable if all its tasks are schedulable *)
-  Definition schedulable_taskset :=
-    forall tsk, tsk \in ts -> schedulable_task arr_seq sched tsk.
-End TaskSet.
-
-Section Schedulability.
-  (** We can infer schedulability from a response-time bound of a task. *)
-
-  Context {Task : TaskType}.
-  Context {Job: JobType}.
-
   Context `{TaskDeadline Task}.
-  Context `{JobArrival Job} `{JobCost Job} `{JobTask Job Task}.
 
+  (** ... any type of jobs associated with these tasks, ... *)
+  Context {Job: JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+  Context `{JobTask Job Task}.
+
+  (** ... and any kind of processor state. *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
-
+  
   (** Consider any job arrival sequence... *)
   Variable arr_seq: arrival_sequence Job.
 
@@ -112,9 +106,12 @@ End Schedulability.
     given schedule and one w.r.t. all jobs that arrive in a given
     arrival sequence. *)
 Section AllDeadlinesMet.
-
+  
   (** Consider any given type of jobs... *)
-  Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+  Context `{JobDeadline Job}.
 
   (** ... any given type of processor states. *)
   Context {PState: eqType}.
@@ -151,8 +148,8 @@ Section AllDeadlinesMet.
   End DeadlinesOfArrivals.
 
   (** We observe that the latter definition, assuming a schedule in
-     which all jobs come from the arrival sequence, implies the former
-     definition. *)
+      which all jobs come from the arrival sequence, implies the
+      former definition. *)
   Lemma all_deadlines_met_in_valid_schedule:
     forall arr_seq sched,
       jobs_come_from_arrival_sequence sched arr_seq ->
