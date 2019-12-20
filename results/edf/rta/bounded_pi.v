@@ -1,7 +1,7 @@
 Require Export prosa.analysis.facts.edf.
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.priority_inversion.
-Require Export prosa.analysis.facts.carry_in.
+Require Export prosa.analysis.facts.busy_interval.priority_inversion.
+Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.

@@ -1,7 +1,7 @@
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.facts.sequential.
-Require Export prosa.analysis.facts.priority_inversion.
+Require Export prosa.analysis.facts.busy_interval.priority_inversion.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)

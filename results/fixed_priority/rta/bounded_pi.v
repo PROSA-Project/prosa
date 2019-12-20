@@ -1,7 +1,6 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.busy_interval.
+Require Export prosa.analysis.facts.busy_interval.busy_interval.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.

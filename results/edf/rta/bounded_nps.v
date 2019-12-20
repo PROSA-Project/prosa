@@ -1,9 +1,7 @@
 Require Import prosa.model.priority.edf.
 Require Export prosa.analysis.facts.rbf.
 Require Export prosa.analysis.facts.sequential.
-Require Export prosa.analysis.facts.priority_inversion.
 Require Export prosa.results.edf.rta.bounded_pi.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.

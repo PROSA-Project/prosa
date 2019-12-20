@@ -1,7 +1,6 @@
 Require Export prosa.analysis.facts.workload.
 Require Export prosa.analysis.definitions.carry_in.
-Require Export prosa.analysis.facts.busy_interval.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export prosa.analysis.facts.busy_interval.busy_interval.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import prosa.model.processor.ideal.
