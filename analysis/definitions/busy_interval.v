@@ -1,6 +1,5 @@
 Require Export prosa.model.priority.classes.
 Require Export prosa.analysis.facts.behavior.completion.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import prosa.model.processor.ideal.

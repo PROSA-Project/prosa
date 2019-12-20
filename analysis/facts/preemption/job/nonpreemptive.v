@@ -1,10 +1,9 @@
 Require Export prosa.analysis.facts.behavior.all.
+Require Export prosa.analysis.facts.model.ideal_schedule.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.nonpreemptive.
 
 Require Import prosa.model.preemption.fully_nonpreemptive.
-
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Platform for Fully Non-Preemptive model *)
 (** In this section, we prove that instantiation of predicate

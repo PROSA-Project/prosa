@@ -1,8 +1,8 @@
-Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.behavior.all.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export prosa.analysis.facts.service_of_jobs.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.

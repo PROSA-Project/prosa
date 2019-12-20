@@ -1,6 +1,7 @@
 Require Export prosa.analysis.definitions.task_schedule.
 Require Export prosa.analysis.facts.rbf.
-Require Export prosa.analysis.facts.behavior.task_arrivals.
+Require Export prosa.analysis.facts.task_arrivals.
+Require Export prosa.analysis.facts.sequential.
 Require Export prosa.analysis.abstract.abstract_rta.
   
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.

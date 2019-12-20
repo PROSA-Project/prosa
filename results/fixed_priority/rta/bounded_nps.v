@@ -1,8 +1,8 @@
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.definitions.request_bound_function.
-Require Export prosa.results.fixed_priority.rta.bounded_pi.
+Require Export prosa.analysis.facts.sequential.
 Require Export prosa.analysis.facts.priority_inversion.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+Require Export prosa.results.fixed_priority.rta.bounded_pi.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.

@@ -1,3 +1,4 @@
+Require Export prosa.analysis.facts.service_of_jobs.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
 Require Export prosa.analysis.abstract.definitions.
 

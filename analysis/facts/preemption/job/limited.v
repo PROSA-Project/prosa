@@ -1,6 +1,8 @@
-Require Export prosa.analysis.facts.behavior.all.
-Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.limited_preemptive.
+Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.analysis.facts.behavior.all.
+Require Export prosa.analysis.facts.sequential.
+Require Export prosa.analysis.facts.model.ideal_schedule.
 
 Require Import prosa.model.preemption.limited_preemptive.
 

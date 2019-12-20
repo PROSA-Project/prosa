@@ -1,4 +1,4 @@
-Require Export prosa.analysis.facts.behavior.workload.
+Require Export prosa.analysis.facts.workload.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.request_bound_function.
 

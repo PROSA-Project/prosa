@@ -1,7 +1,5 @@
 Require Export prosa.model.task.concept.
-Require Export prosa.analysis.facts.behavior.ideal_schedule.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export prosa.model.processor.ideal.
 
 (** Due to historical reasons this file defines the notion of a schedule of 
    a task for the ideal uni-processor model. This is not a fundamental limitation

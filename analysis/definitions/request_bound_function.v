@@ -1,10 +1,10 @@
 Require Export prosa.model.task.arrival.curves.
 Require Export prosa.model.priority.classes.
 
-(** The following definitions assume ideal uni-processor schedules.  This
-    restriction exists for historic reasons; the defined concepts could be
-    generalized in future work. *)
-Require Import prosa.analysis.facts.behavior.ideal_schedule.
+(** The following definitions assume ideal uni-processor schedules.
+    This restriction exists for historic reasons; the defined concepts
+    could be generalized in future work. *)
+Require Import prosa.analysis.facts.model.ideal_schedule.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
