@@ -2,7 +2,7 @@ Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.behavior.all.
-Require Export prosa.analysis.facts.service_of_jobs.
+Require Export prosa.analysis.facts.model.service_of_jobs.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.

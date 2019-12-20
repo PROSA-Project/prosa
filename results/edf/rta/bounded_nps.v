@@ -1,6 +1,6 @@
 Require Import prosa.model.priority.edf.
-Require Export prosa.analysis.facts.rbf.
-Require Export prosa.analysis.facts.sequential.
+Require Export prosa.analysis.facts.model.rbf.
+Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.results.edf.rta.bounded_pi.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
