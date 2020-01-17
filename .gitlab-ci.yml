@@ -2,12 +2,21 @@ stages:
   - build
   - process
 
-.build:
+.build-common:
   stage: build
-  image: mathcomp/mathcomp:${CI_JOB_NAME}
   script:
-    - ./create_makefile.sh --without-classic
-    - make -j ${NJOBS}
+    - opam update -y
+    - opam remove -y coq-mathcomp-algebra coq-mathcomp-character coq-mathcomp-field coq-mathcomp-fingroup coq-mathcomp-solvable  # Check coq-mathcomp-ssreflect is enough
+    - opam pin add -n -y -k path coq-prosa .
+    - opam install -y -v -j ${NJOBS} coq-prosa
+
+.build:
+  image: mathcomp/mathcomp:${CI_JOB_NAME}
+  extends: .build-common
+
+.build-dev:
+  image: mathcomp/mathcomp-dev:${CI_JOB_NAME}
+  extends: .build-common
 
 .build-classic:
   stage: build
@@ -44,7 +53,28 @@ stages:
     - "*/*/*/*/*/*/*/*/*/*.glob"
     expire_in: 1 week
 
+1.9.0-coq-8.9:
+  extends: .build
+
 1.9.0-coq-8.10:
+  extends:
+    - .build
+    - .collect-vo-files
+
+1.9.0-coq-8.11:
+  extends:
+    - .build
+    - .collect-vo-files
+
+1.10.0-coq-8.9:
+  extends: .build
+
+1.10.0-coq-8.10:
+  extends:
+    - .build
+    - .collect-vo-files
+
+1.10.0-coq-8.11:
   extends:
     - .build
     - .collect-vo-files
@@ -66,28 +96,26 @@ spell-check:
   script:
     - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
 
-1.9.0-coq-8.9:
-  extends: .build
-
-1.10.0-coq-dev:
+coq-8.10:
   extends:
-    - .build
-  # it's ok to fail with an unreleased version of Coq
+    - .build-dev
+  # it's ok to fail with an unreleased version of ssreflect
   allow_failure: true
 
-latest-coq-8.10:
+coq-dev:
   extends:
-    - .build
-  # it's ok to fail with an unreleased version of ssreflect
+    - .build-dev
+  # it's ok to fail with an unreleased version of ssreflect and Coq
   allow_failure: true
 
 validate:
   stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.10
   needs: ["1.9.0-coq-8.10"]
-  dependencies:
-    - 1.9.0-coq-8.10
-  script: make validate
+  script:
+    - ./create_makefile.sh
+    - make -j ${NJOBS}
+    - make validate
 
 validate-classic:
   stage: process
@@ -101,6 +129,7 @@ validate-classic:
   stage: process
   image: mathcomp/mathcomp:1.9.0-coq-8.10
   script:
+    - ./create_makefile.sh
     - make html -j ${NJOBS}
     - mv html with-proofs
     - make gallinahtml -j ${NJOBS}

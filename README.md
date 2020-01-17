@@ -33,13 +33,28 @@ All results published prior to 2020 build on this "classic" version of Prosa.
 - [util/](util/): A collection of miscellaneous "helper" lemmas and tactics. Used throughout the rest of Prosa.
 - [scripts/](scripts/): Scripts and supporting resources required for continuous integration and documentation generation.
 
-## Dependencies 
+## Installation
+
+### With OPAM
+
+Prosa can be installed using the [OPAM package manager](https://opam.ocaml.org/) (>= 2.0)
+
+```
+opam repo add coq-released https://coq.inria.fr/opam/released
+# or for the dev version (git master): https://coq.inria.fr/opam/extra-dev
+opam update
+opam install coq-prosa
+```
+
+### From sources
+
+#### Dependencies
 
 Besides Coq itself, Prosa's only external dependency is the ssreflect library of the [Mathematical Components project](https://math-comp.github.io).
 
 Prosa always tracks the latest stable versions of Coq and ssreflect. We do not maintain compatibility with older versions of either Coq or ssreflect.
 
-## Compiling Prosa
+#### Compiling Prosa
 
 Assuming ssreflect is available (either via OPAM or compiled from source, see the [Prosa setup instructions](http://prosa.mpi-sws.org/setup-instructions.html)), compiling Prosa consists of only two steps.
 
