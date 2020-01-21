@@ -223,7 +223,7 @@ Module RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
               rewrite addn1 addnS in H.
               rewrite -subn_gt0 in H0.
               apply ltn_trans with (a - c + b); last by done.
-              apply ltn_subLR.
+              apply util.nat.ltn_subLR.
               have EQ: b - b = 0. apply/eqP. rewrite subn_eq0. by done.
                 by rewrite EQ.
             }

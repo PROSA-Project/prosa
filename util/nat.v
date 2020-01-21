@@ -54,6 +54,7 @@ Section NatLemmas.
     induction b;induction c;intros;try ssromega.
   Qed.
 
+  (* TODO: remove when mathcomp minimum required version becomes 1.10.0 *)
   Lemma ltn_subLR:
     forall a b c,
       a - c < b ->
