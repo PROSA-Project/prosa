@@ -1,6 +1,8 @@
 *.d
 *.glob
 *.vo
+*.vos
+*.vok
 *.html
 /html
 *.aux

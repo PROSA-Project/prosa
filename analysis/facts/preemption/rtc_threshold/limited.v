@@ -2,8 +2,8 @@ Require Export prosa.analysis.facts.preemption.task.limited.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
 
 (** Furthermore, we assume the task model with fixed preemption points. *)
-Require Import prosa.model.preemption.limited_preemptive.
 Require Import prosa.model.task.preemption.limited_preemptive.
+Require Import prosa.model.preemption.limited_preemptive.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run
