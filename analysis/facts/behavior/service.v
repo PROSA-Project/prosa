@@ -374,6 +374,18 @@ Section RelationToScheduled.
       rewrite /service_during big_nat_eq0 => IS_ZERO.
       by apply (IS_ZERO t); apply /andP; split => //.
     Qed.
+    
+    (** Conversely, if a job is not scheduled during an interval, then
+        it does not receive any service in that interval *)
+    Lemma not_scheduled_during_implies_zero_service:
+      forall t1 t2,
+        (forall t, t1 <= t < t2 -> ~~ scheduled_at sched j t) -> 
+        service_during sched j t1 t2 = 0.
+    Proof.
+      intros t1 t2 NSCHED.
+      apply big_nat_eq0; move=> t NEQ.
+      by apply no_service_not_scheduled, NSCHED.
+    Qed.
 
     (** If a job is scheduled at some point in an interval, it receives
        positive cumulative service during the interval... *)
@@ -578,3 +590,56 @@ Section RelationToScheduled.
 
 End RelationToScheduled.
 
+Section ServiceInTwoSchedules.
+  
+  (** Consider any job type and any processor model. *)
+  Context {Job: JobType}.
+  Context {PState: Type}.
+  Context `{ProcessorState Job PState}.
+
+  (** Consider any two given schedules... *)
+  Variable sched1 sched2: schedule PState.
+  
+  (** Given an interval in which the schedules provide the same service 
+      to a job at each instant, we can prove that the cumulative service 
+      received during the interval has to be the same. *)
+  Section ServiceDuringEquivalentInterval.
+    
+    (** Consider two time instants...  *)
+    Variable t1 t2 : instant.
+
+    (** ...and a given job that is to be scheduled. *)
+    Variable j: Job.
+
+    (** Assume that, in any instant between [t1] and [t2] the service 
+        provided to [j] from the two schedules is the same. *)
+    Hypothesis H_sched1_sched2_same_service_at:
+      forall t, t1 <= t < t2 ->
+           service_at sched1 j t = service_at sched2 j t.
+
+    (** It follows that the service provided during [t1] and [t2]
+        is also the same. *)
+    Lemma same_service_during:
+      service_during sched1 j t1 t2 = service_during sched2 j t1 t2.
+    Proof.
+      rewrite /service_during.
+      apply eq_big_nat.
+      by apply H_sched1_sched2_same_service_at.
+    Qed.
+
+  End ServiceDuringEquivalentInterval.
+
+  (** We can leverage the previous lemma to conclude that two schedules
+      that match in a given interval will also have the same cumulative
+      service across the interval. *)
+  Corollary equal_prefix_implies_same_service_during:
+    forall t1 t2,
+      (forall t, t1 <= t < t2 -> sched1 t = sched2 t) ->
+      forall j, service_during sched1 j t1 t2 = service_during sched2 j t1 t2.
+  Proof.
+    move=> t1 t2 SCHED_EQ j.
+    apply same_service_during => t' RANGE.
+    by rewrite /service_at SCHED_EQ.
+  Qed.
+
+End ServiceInTwoSchedules.
