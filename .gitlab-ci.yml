@@ -18,9 +18,16 @@ stages:
   image: mathcomp/mathcomp-dev:${CI_JOB_NAME}
   extends: .build-common
 
-.build-classic:
+.build-for-process:
   stage: build
-  image: mathcomp/mathcomp:1.9.0-coq-8.10
+  image: mathcomp/mathcomp:1.10.0-coq-8.11
+  script:
+    - ./create_makefile.sh --without-classic
+    - make -j ${NJOBS}
+
+.build-for-process-classic:
+  stage: build
+  image: mathcomp/mathcomp:1.10.0-coq-8.11
   script:
     - ./create_makefile.sh --only-classic
     - make -j ${NJOBS}
@@ -57,31 +64,28 @@ stages:
   extends: .build
 
 1.9.0-coq-8.10:
-  extends:
-    - .build
-    - .collect-vo-files
+  extends: .build
 
 1.9.0-coq-8.11:
-  extends:
-    - .build
-    - .collect-vo-files
+  extends: .build
 
 1.10.0-coq-8.9:
   extends: .build
 
 1.10.0-coq-8.10:
-  extends:
-    - .build
-    - .collect-vo-files
+  extends: .build
 
 1.10.0-coq-8.11:
+  extends: .build
+
+build-for-process:
   extends:
-    - .build
+    - .build-for-process
     - .collect-vo-files
 
-1.9.0-coq-8.10-classic:
+build-for-process-classic:
   extends:
-    - .build-classic
+    - .build-for-process-classic
     - .collect-vo-files
 
 proof-length:
@@ -110,26 +114,24 @@ coq-dev:
 
 validate:
   stage: process
-  image: mathcomp/mathcomp:1.9.0-coq-8.10
-  needs: ["1.9.0-coq-8.10"]
-  script:
-    - ./create_makefile.sh
-    - make -j ${NJOBS}
-    - make validate
+  image: mathcomp/mathcomp:1.10.0-coq-8.11
+  needs: ["build-for-process"]
+  dependencies:
+    - build-for-process
+  script: make validate
 
 validate-classic:
   stage: process
-  image: mathcomp/mathcomp:1.9.0-coq-8.10
-  needs: ["1.9.0-coq-8.10-classic"]
+  image: mathcomp/mathcomp:1.10.0-coq-8.11
+  needs: ["build-for-process-classic"]
   dependencies:
-    - 1.9.0-coq-8.10-classic
+    - build-for-process-classic
   script: make validate
 
 .doc: 
   stage: process
-  image: mathcomp/mathcomp:1.9.0-coq-8.10
+  image: mathcomp/mathcomp:1.10.0-coq-8.11
   script:
-    - ./create_makefile.sh
     - make html -j ${NJOBS}
     - mv html with-proofs
     - make gallinahtml -j ${NJOBS}
@@ -140,9 +142,9 @@ validate-classic:
 doc:
   extends:
     - .doc
-  needs: ["1.9.0-coq-8.10"]  
+  needs: ["build-for-process"]
   dependencies:
-    - 1.9.0-coq-8.10
+    - build-for-process
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -154,9 +156,9 @@ doc:
 doc-classic:
   extends:
     - .doc
-  needs: ["1.9.0-coq-8.10-classic"]  
+  needs: ["build-for-process-classic"]
   dependencies:
-    - 1.9.0-coq-8.10-classic
+    - build-for-process-classic
   artifacts:
     name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -167,10 +169,10 @@ doc-classic:
 
 proof-state:
   stage: process
-  image: mathcomp/mathcomp:1.9.0-coq-8.10
-  needs: ["1.9.0-coq-8.10"]  
+  image: mathcomp/mathcomp:1.10.0-coq-8.11
+  needs: ["build-for-process"]
   dependencies:
-    - 1.9.0-coq-8.10
+    - build-for-process
   script:
     - find . -iname *.v ! -path './classic/*' | xargs -P ${NJOBS} -n 1 scripts/record-proof-state.py -c '-R . prosa -w -notation-overriden,-parsing' --timeout 20
     - scripts/intersperse-proof-state.py `find . -iname *.v ! -path './classic/*'`
