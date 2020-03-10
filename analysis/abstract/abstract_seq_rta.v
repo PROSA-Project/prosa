@@ -683,6 +683,8 @@ Section Sequential_Abstract_RTA.
           (interference_bound_function :=
              fun tsk A R => task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A R)
           (interfering_workload0 := interfering_workload); eauto 2.
+      apply ideal_proc_model_ensures_ideal_progress.
+      apply ideal_proc_model_provides_unit_service.
       { clear ARR TSK H_R_is_maximum_seq R j.
         intros t1 t2 R j BUSY NEQ ARR TSK COMPL.
         move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].

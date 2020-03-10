@@ -27,12 +27,18 @@ Section AbstractRTARunToCompletionThreshold.
      mapping jobs to their preemption points. *)
   Context `{JobPreemptable Job}.
 
-  (** Consider any arrival sequence with consistent arrivals... *)
+  (** Consider any kind of uni-service ideal processor state model. *)
+  Context {PState : Type}.
+  Context `{ProcessorState Job PState}.
+  Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
+  Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
+
+  (** Consider any arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  
+  (** ... and any schedule of this arrival sequence. *)
+  Variable sched : schedule PState.
 
   (** Assume that the job costs are no larger than the task costs. *)
   Hypothesis H_jobs_respect_taskset_costs : arrivals_have_valid_job_costs arr_seq.
@@ -99,10 +105,14 @@ Section AbstractRTARunToCompletionThreshold.
       move: (H_work_conserving j t1 t2 x) => Workj.
       feed_n 5 Workj; try done.
       { by apply/andP; split; eapply leq_trans; eauto 2. }
-      rewrite -/(service_at sched j x) service_at_is_scheduled_at.
-      have->: scheduled_at sched j x = ~~ interference j x.
-      { by apply/idP/negP; intuition. }
-      exact: addn_negb.
+      destruct interference.
+      - replace (service_in _ _) with 0; auto; symmetry.
+        apply no_service_not_scheduled; auto.
+        now apply/negP; intros SCHED; apply Workj in SCHED; apply SCHED.
+      - replace (service_in _ _) with 1; auto; symmetry.
+        apply/eqP; rewrite eqn_leq; apply/andP; split.
+        + apply H_unit_service_proc_model.
+        + now apply H_ideal_progress_proc_model, Workj.
     Qed.
 
   End InterferenceIsComplement.
@@ -188,11 +198,10 @@ Section AbstractRTARunToCompletionThreshold.
         rewrite big_nat_cond [in X in _ <= X]big_nat_cond.
         rewrite leq_sum //.
         move => t' /andP [NEQ _].
-        rewrite service_at_is_scheduled_at.
-          by rewrite lt0b; apply SCHED; rewrite addn1 addnS ltnS in NEQ.
+        apply H_ideal_progress_proc_model; apply SCHED.
+          by rewrite addn1 addnS ltnS in NEQ.
       }
-      eapply service_at_most_cost with (j0 := j) (t0 := t + job_last.+1) in H_completed_jobs_dont_execute; last first.
-      { by apply ideal_proc_model_provides_unit_service. }
+      eapply service_at_most_cost with (j0 := j) (t0 := t + job_last.+1) in H_completed_jobs_dont_execute; auto.
       move: H_completed_jobs_dont_execute; rewrite leqNgt; move => /negP T; apply: T.
       rewrite /service -(service_during_cat _ _ _ t); last by (apply/andP; split; last rewrite leq_addr).
       apply leq_trans with (job_run_to_completion_threshold j + service_during sched j t (t + job_last.+1));

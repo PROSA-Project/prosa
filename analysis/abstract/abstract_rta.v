@@ -23,14 +23,20 @@ Section Abstract_RTA.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobPreemptable Job}.
+
+  (** Consider any kind of uni-service ideal processor state model. *)
+  Context {PState : Type}.
+  Context `{ProcessorState Job PState}.
+  Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
+  Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.  
   
   (** Consider any arrival sequence with consistent, non-duplicate arrivals... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
-
-  (** Next, consider any uni-processor schedule of this arrival sequence...*)
-  Variable sched : schedule (ideal.processor_state Job).
+  
+  (** Next, consider any schedule of this arrival sequence...*)
+  Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
   
   (** ... where jobs do not execute before their arrival nor after completion. *) 
@@ -260,9 +266,9 @@ Section Abstract_RTA.
             move: H_busy_interval => [[/andP [GT LT] _] _].
             have ESERV :=
               @j_receives_at_least_run_to_completion_threshold
-                _ _ H1 H2 H3 arr_seq sched tsk interference interfering_workload
+                _ _ H1 H2 H3 PState H5 _ _  arr_seq sched tsk interference interfering_workload
                 _ j _ _ _ t1 t2 _ (job_run_to_completion_threshold j) _ ((A + F) - optimism). 
-            feed_n 5 ESERV; eauto 2.
+            feed_n 7 ESERV; eauto 2.
             specialize (ESERV H3 H4).
             feed_n 2 ESERV.
             { eapply job_run_to_completion_threshold_le_job_cost; eauto. }
@@ -489,9 +495,9 @@ Section Abstract_RTA.
           simpl in IB; rewrite H_equivalent in IB; last by apply ltn_trans with A.
           have ESERV :=
             @j_receives_at_least_run_to_completion_threshold
-              _ _ H1 H2 H3 arr_seq sched tsk
+              _ _ H1 H2 H3 PState H5 _ _ arr_seq sched tsk
               interference interfering_workload _ j _ _ _ t1 t2 _ (job_run_to_completion_threshold j) _ (A_sp + F_sp). 
-          feed_n 5 ESERV; eauto 2.
+          feed_n 7 ESERV; eauto 2.
           specialize (ESERV H3 H4).
           feed_n 2 ESERV; eauto using job_run_to_completion_threshold_le_job_cost.
             by rewrite {2}H_Asp_Fsp_fixpoint leq_add //; apply H_valid_run_to_completion_threshold.
@@ -541,4 +547,4 @@ Section Abstract_RTA.
                    with (j := j) (t1 := t1) (t2 := t2) (A_sp := A1) (F_sp := F1); auto.
   Qed.
 
-End Abstract_RTA.  
+End Abstract_RTA. 

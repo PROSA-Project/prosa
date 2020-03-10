@@ -21,11 +21,15 @@ Section AbstractRTADefinitions.
     Context `{JobArrival Job}.
     Context `{JobCost Job}.
 
+    (** Consider any kind of processor state model. *)
+    Context {PState : Type}.
+    Context `{ProcessorState Job PState}.
+    
     (** Consider any arrival sequence... *) 
     Variable arr_seq : arrival_sequence Job.
 
-    (** ... and any ideal uni-processor schedule of this arrival sequence. *)
-    Variable sched : schedule (ideal.processor_state Job).
+    (** ... and any schedule of this arrival sequence. *)
+    Variable sched : schedule PState.
 
     (** Let [tsk] be any task that is to be analyzed *)
     Variable tsk : Task.
