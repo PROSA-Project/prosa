@@ -111,7 +111,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** ** Response-Time Bound *)
   
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-  Let is_in_search_space (A : duration) := (A < L) && (task_rbf A != task_rbf (A + ε)).
+  Let is_in_search_space := is_in_search_space tsk L.
   
   (** Next, consider any value R, and assume that for any given
        arrival A from search space there is a solution of the

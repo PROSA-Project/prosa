@@ -105,14 +105,8 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
 
   (** ** Response-Time Bound *)
   
-  (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-      
-  Let task_rbf_changes_at A := task_rbf_changes_at tsk A.
-  Let bound_on_total_hep_workload_changes_at :=
-    bound_on_total_hep_workload_changes_at ts tsk.
-
-  Let is_in_search_space A :=
-    (A < L) && (task_rbf_changes_at A || bound_on_total_hep_workload_changes_at A).
+  (** To reduce the time complexity of the analysis, recall the notion of search space. *)      
+  Let is_in_search_space := is_in_search_space ts tsk L.
   
   (** Consider any value R, and assume that for any given arrival offset A in the search space,
       there is a solution of the response-time bound recurrence which is bounded by R. *)
@@ -124,8 +118,10 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
         A + F = task_rbf (A + ε) + bound_on_total_hep_workload A (A + F) /\
         F <= R.
 
-  (** Now, we can leverage the results for the abstract model with bounded non-preemptive segments
-      to establish a response-time bound for the more concrete model of fully preemptive scheduling. *)
+  (** Now, we can leverage the results for the abstract model with
+      bounded non-preemptive segments to establish a response-time
+      bound for the more concrete model of fully preemptive
+      scheduling. *)
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 

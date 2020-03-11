@@ -144,7 +144,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** To reduce the time complexity of the analysis, recall the notion of search space.
      Intuitively, this corresponds to all "interesting" arrival offsets that the job under
      analysis might have with regard to the beginning of its busy-window. *)
-  Let is_in_search_space A := (A < L) && (task_rbf A != task_rbf (A + ε)).
+  Definition is_in_search_space A := (A < L) && (task_rbf A != task_rbf (A + ε)).
 
   (** Let R be a value that upper-bounds the solution of each response-time recurrence, 
      i.e., for any relative arrival time A in the search space, there exists a corresponding 

@@ -123,13 +123,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   (** ** Response-Time Bound *)
   
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-
-  Let task_rbf_changes_at A := task_rbf_changes_at tsk A.
-  Let bound_on_total_hep_workload_changes_at :=
-    bound_on_total_hep_workload_changes_at ts tsk.  
-
-  Let is_in_search_space (A : duration) :=
-    (A < L) && (task_rbf_changes_at A || bound_on_total_hep_workload_changes_at A).
+  Let is_in_search_space := is_in_search_space ts tsk L.
   
   (** Consider any value R, and assume that for any given arrival offset A in the search space,
       there is a solution of the response-time bound recurrence which is bounded by R. *)

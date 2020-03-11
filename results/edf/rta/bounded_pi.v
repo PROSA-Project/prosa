@@ -171,7 +171,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   
   (** The final search space for EDF is a set of offsets that are less than [L] 
      and where [task_rbf] or [bound_on_total_hep_workload] changes. *)
-  Let is_in_search_space (A : duration) :=
+  Definition is_in_search_space (A : duration) :=
     (A < L) && (task_rbf_changes_at A || bound_on_total_hep_workload_changes_at A).
   
   (** Let R be a value that upper-bounds the solution of each response-time recurrence, 

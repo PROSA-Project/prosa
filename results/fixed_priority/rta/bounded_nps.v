@@ -218,7 +218,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Hypothesis H_fixed_point : L = blocking_bound + total_hep_rbf L.
 
     (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-    Let is_in_search_space (A : duration) := (A < L) && (task_rbf A != task_rbf (A + ε)).
+    Let is_in_search_space := is_in_search_space tsk L.
     
     (** Next, consider any value R, and assume that for any given arrival offset A from the search 
        space there is a solution of the response-time bound recurrence that is bounded by R. *)

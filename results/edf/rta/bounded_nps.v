@@ -139,7 +139,8 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Let bound_on_total_hep_workload_changes_at :=
     bound_on_total_hep_workload_changes_at ts tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-  
+  Let is_in_search_space := is_in_search_space ts tsk.
+                         
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
   Definition blocking_bound :=
     \max_(tsk_o <- ts | (tsk_o != tsk) && (D tsk < D tsk_o))
@@ -257,16 +258,13 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Hypothesis H_L_positive : L > 0.
     Hypothesis H_fixed_point : L = total_rbf L.
     
-    (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-    Let is_in_search_space A :=
-      (A < L) && (task_rbf_changes_at A || bound_on_total_hep_workload_changes_at A).
-    
-    (** Consider any value R, and assume that for any given arrival offset  A in the search space,
-         there is a solution of the response-time bound recurrence which is bounded by R. *)
+    (** Consider any value [R], and assume that for any given arrival
+        offset [A] in the search space, there is a solution of the
+        response-time bound recurrence which is bounded by [R]. *)
     Variable R : duration.
     Hypothesis H_R_is_maximum:
       forall (A : duration),
-        is_in_search_space A -> 
+        is_in_search_space L A -> 
         exists (F : duration),
           A + F = blocking_bound
                   + (task_rbf (A + ε) - (task_cost tsk - task_run_to_completion_threshold tsk))
