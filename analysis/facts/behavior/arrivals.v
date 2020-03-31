@@ -3,6 +3,37 @@ Require Export prosa.util.all.
 
 (** * Arrival Sequence *)
 
+(** First, we relate the stronger to the weaker arrival predicates. *)
+Section ArrivalPredicates.
+
+  (** Consider any kinds of jobs with arrival times. *)
+  Context {Job : JobType} `{JobArrival Job}.
+
+  (** A job that arrives in some interval <<[t1, t2)>> certainly arrives before
+      time [t2]. *)
+  Lemma arrived_between_before:
+    forall j t1 t2,
+      arrived_between j t1 t2 ->
+      arrived_before j t2.
+  Proof.
+    move=> j t1 t2.
+    now rewrite /arrived_before /arrived_between => /andP [_ CLAIM].
+  Qed.
+
+  (** A job that arrives before a time [t] certainly has arrived by time
+      [t]. *)
+  Lemma arrived_before_has_arrived:
+    forall j t,
+      arrived_before j t ->
+      has_arrived j t.
+  Proof.
+    move=> j t.
+    rewrite /arrived_before /has_arrived.
+    now apply ltnW.
+  Qed.
+
+End ArrivalPredicates.
+
 (** In this section, we relate job readiness to [has_arrived]. *)
 Section Arrived.
   
@@ -49,6 +80,16 @@ Section Arrived.
     move=> READY_IF_SCHED j t SCHED.
     move: (READY_IF_SCHED j t SCHED) => READY.
     by apply ready_implies_arrived.
+  Qed.
+
+  (** Since backlogged jobs are by definition ready, any backlogged job must have arrived. *)
+  Corollary backlogged_implies_arrived:
+    forall j t,
+      backlogged sched j t -> has_arrived j t.
+  Proof.
+    rewrite /backlogged.
+    move=> j t /andP [READY _].
+    now apply ready_implies_arrived.
   Qed.
 
 End Arrived.
