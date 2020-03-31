@@ -40,5 +40,11 @@ Section WorkConserving.
       backlogged sched j t ->
       exists j_other, scheduled_at sched j_other t.
 
+  (** Related to this, we define the set of all jobs that are backlogged at a
+      given time [t], i.e., the set of jobs that could be scheduled, and which
+      a work-conserving scheduler must hence consider. *)
+  Definition jobs_backlogged_at (t : instant): seq Job :=
+    [seq j <- arrivals_up_to arr_seq t | backlogged sched j t].
+
 End WorkConserving.
 

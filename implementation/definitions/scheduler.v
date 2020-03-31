@@ -22,9 +22,6 @@ Section UniprocessorSchedule.
 
     Variable sched_prefix : schedule (ideal.processor_state Job).
 
-    Definition jobs_backlogged_at (t : instant): seq Job :=
-      [seq j <- arrivals_up_to arr_seq t | backlogged sched_prefix j t].
-
     Definition prev_job_nonpreemptive (t : instant) : bool:=
       match t with
       | 0 => false
@@ -40,7 +37,7 @@ Section UniprocessorSchedule.
       if prev_job_nonpreemptive t then
         sched_prefix t.-1
       else
-        supremum (hep_job_at t) (jobs_backlogged_at t).
+        supremum (hep_job_at t) (jobs_backlogged_at arr_seq sched_prefix t).
 
   End JobAllocation.
 
