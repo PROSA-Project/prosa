@@ -65,7 +65,7 @@ Section ArrivalCurves.
       monotone num_arrivals leq.
 
     (** We say that [max_arrivals] is an upper arrival bound for task [tsk]
-        iff, for any interval [[t1, t2)], [max_arrivals (t2 - t1)] bounds the
+        iff, for any interval <<[t1, t2)>>, [max_arrivals (t2 - t1)] bounds the
         number of jobs of [tsk] that arrive in that interval. *)
     Definition respects_max_arrivals (tsk : Task) (max_arrivals : duration -> nat) :=
       forall (t1 t2 : instant),

@@ -65,7 +65,7 @@ Section AbstractRTARunToCompletionThreshold.
   Hypothesis H_job_of_tsk : job_task j = tsk.
   Hypothesis H_job_cost_positive : job_cost_positive j.
 
-  (** Next, consider any busy interval [t1, t2) of job [j]. *)
+  (** Next, consider any busy interval <<[t1, t2)>> of job [j]. *)
   Variable t1 t2 : instant.
   Hypothesis H_busy_interval : busy_interval j t1 t2.
 
@@ -87,13 +87,13 @@ Section AbstractRTARunToCompletionThreshold.
      the total time where job [j] is scheduled inside the busy interval. *)
   Section InterferenceIsComplement.
 
-    (** Consider any sub-interval [t, t + delta) inside the busy interval [t1, t2). *)
+    (** Consider any sub-interval <<[t, t + delta)>> inside the busy interval [t1, t2). *)
     Variables (t : instant) (delta : duration).
     Hypothesis H_greater_than_or_equal : t1 <= t.
     Hypothesis H_less_or_equal: t + delta <= t2.
 
     (** We prove that sum of cumulative service and cumulative interference
-       in the interval [t, t + delta) is equal to delta. *)
+       in the interval <<[t, t + delta)>> is equal to delta. *)
     Lemma interference_is_complement_to_schedule:
       service_during sched j t (t + delta) + cumul_interference j t (t + delta) = delta.
     Proof.

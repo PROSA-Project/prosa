@@ -112,11 +112,11 @@ Section ExistsNoCarryIn.
   (** Let the priority relation be reflexive. *)
   Hypothesis H_priority_is_reflexive: reflexive_priorities.
   
-  (** Recall the notion of workload of all jobs released in a given interval [t1, t2)... *)
+  (** Recall the notion of workload of all jobs released in a given interval <<[t1, t2)>>... *)
   Let total_workload t1 t2 :=
     workload_of_jobs predT (arrivals_between t1 t2).
 
-  (** ... and total service of jobs within some time interval [t1, t2). *)
+  (** ... and total service of jobs within some time interval <<[t1, t2)>>. *)
   Let total_service t1 t2 :=
     service_of_jobs sched predT (arrivals_between 0 t2) t1 t2.
   
@@ -155,7 +155,7 @@ Section ExistsNoCarryIn.
       Hypothesis H_no_carry_in: no_carry_in t.
 
       (** First, recall that the total service is bounded by the total workload. Therefore
-             the total service of jobs in the interval [t, t + Δ) is bounded by Δ. *)
+             the total service of jobs in the interval <<[t, t + Δ)>> is bounded by Δ. *)
       Lemma total_service_is_bounded_by_Δ :
         total_service t (t + Δ) <= Δ.
       Proof.
@@ -198,7 +198,7 @@ Section ExistsNoCarryIn.
             by apply idle_instant_implies_no_carry_in_at_t.
       Qed.
       
-      (** In the second case, the total service within the time interval [t, t + Δ) is equal to Δ. 
+      (** In the second case, the total service within the time interval <<[t, t + Δ)>> is equal to Δ. 
              On the other hand, we know that the total workload is lower-bounded by the total service
              and upper-bounded by Δ. Therefore, the total workload is equal to total service this
              implies completion of all jobs by time [t + Δ] and hence no carry-in at time [t + Δ]. *)
@@ -267,7 +267,7 @@ Section ExistsNoCarryIn.
   Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
   Hypothesis H_job_cost_positive : job_cost_positive j.    
 
-  (** We show that there must exist a busy interval [t1, t2) that
+  (** We show that there must exist a busy interval <<[t1, t2)>> that
          contains the arrival time of j. *)
   Corollary exists_busy_interval_from_total_workload_bound :
     exists t1 t2, 

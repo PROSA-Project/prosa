@@ -271,7 +271,7 @@ Section JLFPInstantiation.
        conventional workload, i.e., the one defined with concrete schedule parameters. *)
     Section InstantiatedWorkloadEquivalence.
 
-      (** Let [t1,t2) be any time interval. *)
+      (** Let <<[t1,t2)>> be any time interval. *)
       Variables t1 t2 : instant.
       
       (** Consider any job j of [tsk]. *)
@@ -330,7 +330,7 @@ Section JLFPInstantiation.
       Hypothesis H_j_arrives : arrives_in arr_seq j.
       Hypothesis H_job_of_tsk : job_of_task tsk j.
       
-      (** We consider an arbitrary time interval [t1, t) that starts with a quiet time. *)
+      (** We consider an arbitrary time interval <<[t1, t)>> that starts with a quiet time. *)
       Variable t1 t : instant.
       Hypothesis H_quiet_time : quiet_time_cl j t1.
 

@@ -109,7 +109,7 @@ Section ArrivalSequencePrefix.
   Variable arr_seq: arrival_sequence Job.
 
   (** By concatenation, we construct the list of jobs that arrived in the
-     interval [t1, t2). *)
+     interval <<[t1, t2)>>. *)
   Definition arrivals_between (t1 t2 : instant) :=
     \cat_(t1 <= t < t2) arrivals_at arr_seq t.
 

@@ -17,7 +17,7 @@ Section TaskArrivals.
   Variable tsk : Task.
 
   (** First, we construct the list of jobs of task [tsk] that arrive
-      in a given half-open interval [[t1, t2)]. *)
+      in a given half-open interval <<[t1, t2)>>. *)
   Definition task_arrivals_between (t1 t2 : instant) :=
     [seq j <- arrivals_between arr_seq t1 t2 | job_task j == tsk].
 

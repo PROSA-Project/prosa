@@ -68,7 +68,7 @@ Section ExistsBusyIntervalJLFP.
     (** Assume that the priority relation is reflexive. *)
     Hypothesis H_priority_is_reflexive : reflexive_priorities.
 
-    (** Consider any busy interval [t1, t2) of job [j]. *)
+    (** Consider any busy interval <<[t1, t2)>> of job [j]. *)
     Variable t1 t2 : instant.
     Hypothesis H_busy_interval : busy_interval t1 t2.
     
@@ -137,7 +137,7 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_priority_is_reflexive : reflexive_priorities. 
     Hypothesis H_priority_is_transitive : transitive_priorities.
     
-    (** Consider any busy interval prefix [t1, t2). *)
+    (** Consider any busy interval prefix <<[t1, t2)>>. *)
     Variable t1 t2 : instant.
     Hypothesis H_busy_interval_prefix : busy_interval_prefix t1 t2.
 
@@ -216,7 +216,7 @@ Section ExistsBusyIntervalJLFP.
             by exists jhp; apply SE1; rewrite in_cons; apply/orP; left.
     Qed.
     
-    (** We prove that at any time instant [t] within [t1, t2) the processor is not idle. *)
+    (** We prove that at any time instant [t] within <<[t1, t2)>> the processor is not idle. *)
     Lemma not_quiet_implies_not_idle:
       forall t,
         t1 <= t < t2 ->
@@ -254,7 +254,7 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_no_quiet_time : forall t, t1 < t <= t1 + Δ -> ~ quiet_time t.
 
     (** For clarity, we introduce a notion of the total service of jobs released in 
-           time interval [t_beg, t_end) during the time interval [t1, t1 + Δ). *)
+           time interval <<[t_beg, t_end)>> during the time interval [t1, t1 + Δ). *)
     Let service_received_by_hep_jobs_released_during t_beg t_end :=
       service_of_higher_or_equal_priority_jobs
         sched (arrivals_between t_beg t_end) j t1 (t1 + Δ).
@@ -289,7 +289,7 @@ Section ExistsBusyIntervalJLFP.
     Qed.
     
     (** Next we prove that the total service within a "non-quiet" 
-        time interval [t1, t1 + Δ) is exactly Δ. *)
+        time interval <<[t1, t1 + Δ)>> is exactly Δ. *)
     Lemma no_idle_time_within_non_quiet_time_interval:
       service_of_jobs sched predT (arrivals_between 0 (t1 + Δ)) t1 (t1 + Δ) = Δ.
     Proof.
@@ -353,12 +353,12 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_priority_is_transitive: transitive_priorities.
     
     (** Next, we recall the notion of workload of all jobs released in a given interval
-           [t1, t2) that have higher-or-equal priority w.r.t the job j being analyzed. *)
+           <<[t1, t2)>> that have higher-or-equal priority w.r.t the job j being analyzed. *)
     Let hp_workload t1 t2 :=
       workload_of_higher_or_equal_priority_jobs j (arrivals_between t1 t2).
 
     (** With regard to the jobs with higher-or-equal priority that are released
-           in a given interval [t1, t2), we also recall the service received by these
+           in a given interval <<[t1, t2)>>, we also recall the service received by these
            jobs in the same interval [t1, t2). *)
     Let hp_service t1 t2 :=
       service_of_higher_or_equal_priority_jobs
@@ -457,7 +457,7 @@ Section ExistsBusyIntervalJLFP.
 
           (** Since the interval is always non-quiet, the processor is always busy
                  with tasks of higher-or-equal priority or some lower priority job which was scheduled,
-                 i.e., the sum of service done by jobs with actual arrival time in [t1, t1 + delta) 
+                 i.e., the sum of service done by jobs with actual arrival time in <<[t1, t1 + delta)>> 
                  and priority inversion equals delta. *)
           Lemma busy_interval_has_uninterrupted_service: 
             delta <= priority_inversion_bound + hp_service t1 (t1 + delta).
@@ -628,7 +628,7 @@ Section ExistsBusyIntervalJLFP.
              infer that there is a time in which j is pending. *)
       Hypothesis H_positive_cost: job_cost j > 0.
 
-      (** Therefore there must exists a busy interval [t1, t2) that
+      (** Therefore there must exists a busy interval <<[t1, t2)>> that
              contains the arrival time of j. *)
       Corollary exists_busy_interval:
         exists t1 t2, 

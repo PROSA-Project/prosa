@@ -70,7 +70,7 @@ Section GenericModelLemmas.
      the total service of a set of jobs. *)
   Section ServiceCat.
 
-    (** We show that the total service of jobs released in a time interval [t1,t2)
+    (** We show that the total service of jobs released in a time interval <<[t1,t2)>>
        during [t1,t2) is equal to the sum of:
        (1) the total service of jobs released in time interval [t1, t) during time [t1, t)
        (2) the total service of jobs released in time interval [t1, t) during time [t, t2)
@@ -100,7 +100,7 @@ Section GenericModelLemmas.
         by move: ARR => /andP [N1 N2]; apply leq_trans with t.
     Qed.
 
-    (** We show that the total service of jobs released in a time interval [t1,t2)
+    (** We show that the total service of jobs released in a time interval <<[t1,t2)>>
        during [t,t2) is equal to the sum of:
        (1) the total service of jobs released in a time interval [t1,t) during [t,t2)
        and (2) the total service of jobs released in a time interval [t,t2) during [t,t2). *)
@@ -154,7 +154,7 @@ Section IdealModelLemmas.
   Let arrivals_between := arrivals_between arr_seq.
   Let completed_by := completed_by sched.
 
-  (** We prove that if the total service within some time interval [[t1,t2)] 
+  (** We prove that if the total service within some time interval <<[t1,t2)>> 
       is smaller than [t2-t1], then there is an idle time instant t ∈ [[t1,t2)]. *)
   Lemma low_service_implies_existence_of_idle_time :
     forall t1 t2,
@@ -272,10 +272,10 @@ Section IdealModelLemmas.
      service, cumulative workload, and completion of jobs. *)
   Section WorkloadServiceAndCompletion.
 
-    (** Consider an arbitrary time interval [t1, t2). *)
+    (** Consider an arbitrary time interval <<[t1, t2)>>. *)
     Variables t1 t2 : instant.
 
-    (** Let jobs be a set of all jobs arrived during [t1, t2). *)
+    (** Let jobs be a set of all jobs arrived during <<[t1, t2)>>. *)
     Let jobs := arrivals_between t1 t2.
 
     (** Next, we consider some time instant [t_compl]. *)

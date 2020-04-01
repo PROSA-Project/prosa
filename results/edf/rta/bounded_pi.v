@@ -305,7 +305,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         Hypothesis H_job_of_tsk : job_task j = tsk.
         Hypothesis H_job_cost_positive: job_cost_positive j.
 
-        (** Consider any busy interval [t1, t2) of job [j]. *)
+        (** Consider any busy interval <<[t1, t2)>> of job [j]. *)
         Variable t1 t2 : duration.
         Hypothesis H_busy_interval :
           definitions.busy_interval sched interference interfering_workload j t1 t2.

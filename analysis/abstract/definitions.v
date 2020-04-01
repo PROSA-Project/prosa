@@ -98,7 +98,7 @@ Section AbstractRTADefinitions.
         cumul_interference j 0 t = cumul_interfering_workload j 0 t /\
         ~~ job_pending_earlier_and_at j t.
       
-      (** Based on the definition of quiet time, we say that interval [t1, t2) is 
+      (** Based on the definition of quiet time, we say that interval <<[t1, t2)>> is 
          a (potentially unbounded) busy-interval prefix w.r.t. job [j] iff the 
          interval (a) contains the arrival of job j, (b) starts with a quiet
          time and (c) remains non-quiet. *)
@@ -107,7 +107,7 @@ Section AbstractRTADefinitions.
         quiet_time j t1 /\
         (forall t, t1 < t < t2 -> ~ quiet_time j t). 
 
-      (** Next, we say that an interval [t1, t2) is a busy interval iff
+      (** Next, we say that an interval <<[t1, t2)>> is a busy interval iff
          [t1, t2) is a busy-interval prefix and t2 is a quiet time. *)
       Definition busy_interval (j : Job) (t1 t2 : instant) :=
         busy_interval_prefix j t1 t2 /\
@@ -205,7 +205,7 @@ Section AbstractRTADefinitions.
           (** First, we require [j] to be a job of task [tsk]. *)
           arrives_in arr_seq j ->
           job_task j = tsk ->
-          (** Next, we require the IBF to bound the interference only within the interval [t1, t1 + delta). *)
+          (** Next, we require the IBF to bound the interference only within the interval <<[t1, t1 + delta)>>. *)
           busy_interval j t1 t2 ->
           t1 + delta < t2 ->
           (** Next, we require the IBF to bound the interference only until the job is 

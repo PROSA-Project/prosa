@@ -167,7 +167,7 @@ Section PriorityInversionIsBounded.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
   
-  (** Consider any busy interval prefix [t1, t2) of job j. *)
+  (** Consider any busy interval prefix <<[t1, t2)>> of job j. *)
   Variable t1 t2 : instant.
   Hypothesis H_busy_interval_prefix:
     busy_interval_prefix arr_seq sched j t1 t2.
@@ -182,7 +182,7 @@ Section PriorityInversionIsBounded.
         busy scheduling a job with higher or equal priority. *)     
     Section ProcessorBusyWithHEPJobAtPreemptionPoints.
 
-      (** Consider an arbitrary preemption time t ∈ [t1,t2). *)
+      (** Consider an arbitrary preemption time t ∈ <<[t1,t2)>>. *)
       Variable t : instant.
       Hypothesis H_t_in_busy_interval : t1 <= t < t2.
       Hypothesis H_t_preemption_time : preemption_time sched t.
@@ -497,7 +497,7 @@ Section PriorityInversionIsBounded.
     Qed.
 
     (** Also, we show that lower-priority jobs that are scheduled inside the
-       busy-interval prefix [t1,t2) must arrive before that interval. *)
+       busy-interval prefix <<[t1,t2)>> must arrive before that interval. *)
     Lemma low_priority_job_arrives_before_busy_interval_prefix:
       forall jlp t,
         t1 <= t < t2 ->
@@ -523,7 +523,7 @@ Section PriorityInversionIsBounded.
     Qed.
 
     (** Moreover, we show that lower-priority jobs that are scheduled
-        inside the busy-interval prefix [t1,t2) must be scheduled
+        inside the busy-interval prefix <<[t1,t2)>> must be scheduled
         before that interval. *)
     Lemma low_priority_job_scheduled_before_busy_interval_prefix:
       forall jlp t,
@@ -662,7 +662,7 @@ Section PriorityInversionIsBounded.
           Qed.
 
           (** Thanks to the fact that the scheduler respects the notion of preemption points
-              we show that [jlp] is continuously scheduled in time interval [[t1, t1 + fpt)]. *)
+              we show that [jlp] is continuously scheduled in time interval <<[t1, t1 + fpt)>>. *)
           Lemma continuously_scheduled_between_preemption_points:
             forall t',
               t1 <= t' < t1 + fpt ->

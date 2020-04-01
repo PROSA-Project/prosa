@@ -58,7 +58,7 @@ Section AbstractRTAReduction.
   (** Recall the definition of [ε], which defines the neighborhood of a point in the timeline.
      Note that [ε = 1] under discrete time. *)
   (** To ensure that the search converges more quickly, we only check values of [A] in the interval 
-     [[0, B)] for which the interference bound function changes, i.e., every point [x] in which 
+     <<[0, B)>> for which the interference bound function changes, i.e., every point [x] in which 
      [interference_bound_function (A - ε, x)] is not equal to [interference_bound_function (A, x)]. *)
   Definition is_in_search_space A :=
     A = 0 \/

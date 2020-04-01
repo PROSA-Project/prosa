@@ -53,7 +53,7 @@ Section Composition.
   Qed.
 
   (** Next, we observe that we can look at the service received during an
-     interval [t1, t3) as the sum of the service during [t1, t2) and [t2, t3)
+     interval <<[t1, t3)>> as the sum of the service during [t1, t2) and [t2, t3)
      for any t2 \in [t1, t3]. (The "_cat" suffix denotes the concatenation of
      the two intervals.) *)
   Lemma service_during_cat:
@@ -114,7 +114,7 @@ Section Composition.
     rewrite /service. rewrite -service_during_last_plus_before //.
   Qed.
 
-  (** Finally, we deconstruct the service received during an interval [t1, t3)
+  (** Finally, we deconstruct the service received during an interval <<[t1, t3)>>
      into the service at a midpoint t2 and the service in the intervals before
      and after. *)
   Lemma service_split_at_point:
@@ -518,7 +518,7 @@ Section RelationToScheduled.
     Hypothesis H_same_service: service sched j t1 = service sched j t2.
 
     (** First, we observe that this means that the job receives no service
-       during [t1, t2)... *)
+       during <<[t1, t2)>>... *)
     Lemma constant_service_implies_no_service_during:
       service_during sched j t1 t2 = 0.
     Proof.

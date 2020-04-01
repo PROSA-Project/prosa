@@ -46,7 +46,7 @@ Section CumulativePriorityInversion.
       else false.
     
     (** Then we compute the cumulative priority inversion incurred by
-         a job within some time interval [t1, t2). *)
+         a job within some time interval <<[t1, t2)>>. *)
     Definition cumulative_priority_inversion (t1 t2 : instant) :=
       \sum_(t1 <= t < t2) is_priority_inversion t.
 

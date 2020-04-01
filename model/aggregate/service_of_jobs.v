@@ -39,7 +39,7 @@ Section ServiceOfJobs.
       \sum_(j <- jobs | P j) service_at sched j t.
     
     (** ... and the cumulative service received during the interval
-        [[t1, t2)] by jobs that satisfy predicate [P]. *)
+        <<[t1, t2)>> by jobs that satisfy predicate [P]. *)
     Definition service_of_jobs (t1 t2 : instant) :=
       \sum_(j <- jobs | P j) service_during sched j t1 t2.
 
@@ -61,7 +61,7 @@ Section ServiceOfJobs.
     (** Based on the definition of jobs of higher or equal priority, ... *)
     Let of_higher_or_equal_priority j_hp := hep_job j_hp j.
     
-    (** ...we define the service received during [[t1, t2)] by jobs of higher or equal priority. *)
+    (** ...we define the service received during <<[t1, t2)>> by jobs of higher or equal priority. *)
     Definition service_of_higher_or_equal_priority_jobs (t1 t2 : instant) :=
       service_of_jobs of_higher_or_equal_priority jobs t1 t2.
 
@@ -78,7 +78,7 @@ Section ServiceOfJobs.
     Variable jobs : seq Job.
 
     (** We define the cumulative task service received by the jobs of
-        task [tsk] within time interval [[t1, t2)]. *)
+        task [tsk] within time interval <<[t1, t2)>>. *)
     Definition task_service_of_jobs_in t1 t2 :=
       service_of_jobs (job_of_task tsk) jobs t1 t2.
 

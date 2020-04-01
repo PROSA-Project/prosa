@@ -103,7 +103,7 @@ Section IncrementalService.
   Variable sched : schedule (ideal.processor_state Job).  
 
   (** As a base case, we prove that if a job j receives service in
-      some time interval [t1,t2), then there exists a time instant t
+      some time interval <<[t1,t2)>>, then there exists a time instant t
       ∈ [t1,t2) such that j is scheduled at time t and t is the first
       instant where j receives service. *)
   Lemma positive_service_during:
@@ -141,7 +141,7 @@ Section IncrementalService.
     }
   Qed.
 
-  (** Next, we prove that if in some time interval [t1,t2) a job j
+  (** Next, we prove that if in some time interval <<[t1,t2)>> a job j
      receives k units of service, then there exists a time instant t ∈
      [t1,t2) such that j is scheduled at time t and service of job j
      within interval [t1,t) is equal to k. *)

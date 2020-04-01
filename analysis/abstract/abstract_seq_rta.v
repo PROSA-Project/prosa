@@ -221,7 +221,7 @@ Section Sequential_Abstract_RTA.
       Hypothesis H_j2_from_tsk: job_task j2 = tsk.
       Hypothesis H_j1_cost_positive: job_cost_positive j1.
 
-      (** Consider the busy interval [t1, t2) of job j1. *)
+      (** Consider the busy interval <<[t1, t2)>> of job j1. *)
       Variable t1 t2 : instant.
       Hypothesis H_busy_interval : busy_interval j1 t1 t2.
 
@@ -242,7 +242,7 @@ Section Sequential_Abstract_RTA.
       Qed.
 
       (** Next we prove that if a job is pending after the beginning
-         of the busy interval [t1, t2) then it arrives after t1. *)
+         of the busy interval <<[t1, t2)>> then it arrives after t1. *)
       Lemma arrives_after_beginning_of_busy_interval:
         forall t,
           t1 <= t ->
@@ -277,7 +277,7 @@ Section Sequential_Abstract_RTA.
       Hypothesis H_job_of_tsk : job_task j = tsk.
       Hypothesis H_job_cost_positive : job_cost_positive j.
 
-      (** Consider the busy interval [t1, t2) of job j. *)
+      (** Consider the busy interval <<[t1, t2)>> of job j. *)
       Variable t1 t2 : instant.
       Hypothesis H_busy_interval : busy_interval j t1 t2.
 
@@ -291,7 +291,7 @@ Section Sequential_Abstract_RTA.
       (** ... and job j is not completed by time (t1 + x). *)
       Hypothesis H_job_j_is_not_completed : ~~ completed_by sched j (t1 + x).
 
-      (** In this section, we show that the cumulative interference of job j in the interval [t1, t1 + x)
+      (** In this section, we show that the cumulative interference of job j in the interval <<[t1, t1 + x)>>
          is bounded by the sum of the task workload in the interval [t1, t1 + A + ε) and the cumulative
          interference of [j]'s task in the interval [t1, t1 + x). Note that the task workload is computed
          only on the interval [t1, t1 + A + ε). Thanks to the hypothesis about sequential tasks, jobs of
@@ -299,14 +299,14 @@ Section Sequential_Abstract_RTA.
       Section TaskInterferenceBoundsInterference.
 
         (** We start by proving a simpler analog of the lemma which states that at
-           any time instant t ∈ [t1, t1 + x) the sum of [interference j t] and
+           any time instant t ∈ <<[t1, t1 + x)>> the sum of [interference j t] and
            [scheduled_at j t] is no larger than the sum of [the service received
            by jobs of task tsk at time t] and [task_iterference tsk t]. *)
 
         (** Next we consider 4 cases. *)
         Section CaseAnalysis.
 
-          (** Consider an arbitrary time instant t ∈ [t1, t1 + x). *)
+          (** Consider an arbitrary time instant t ∈ <<[t1, t1 + x)>>. *)
           Variable t : instant.
           Hypothesis H_t_in_interval : t1 <= t < t1 + x.
 
@@ -476,7 +476,7 @@ Section Sequential_Abstract_RTA.
           End Case4.
 
           (** We use the above case analysis to prove that any time instant
-             t ∈ [t1, t1 + x) the sum of [interference j t] and [scheduled_at j t]
+             t ∈ <<[t1, t1 + x)>> the sum of [interference j t] and [scheduled_at j t]
              is no larger than the sum of [the service received by jobs of task
              tsk at time t] and [task_iterference tsk t]. *)
           Lemma interference_plus_sched_le_serv_of_task_plus_task_interference:
@@ -547,7 +547,7 @@ Section Sequential_Abstract_RTA.
             by apply service_of_jobs_le_workload; auto using ideal_proc_model_provides_unit_service.
         Qed.
 
-        (** Finally, we show that the cumulative interference of job j in the interval [t1, t1 + x)
+        (** Finally, we show that the cumulative interference of job j in the interval <<[t1, t1 + x)>>
            is bounded by the sum of the task workload in the interval [t1, t1 + A + ε) and
            the cumulative interference of [j]'s task in the interval [t1, t1 + x). *)
         Lemma cumulative_job_interference_le_task_interference_bound:

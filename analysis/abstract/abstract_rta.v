@@ -120,7 +120,7 @@ Section Abstract_RTA.
     Hypothesis H_job_of_tsk: job_task j = tsk.
     Hypothesis H_job_cost_positive: job_cost_positive j.
     
-    (** Assume we have a busy interval [t1, t2) of job j that is bounded by L. *)
+    (** Assume we have a busy interval <<[t1, t2)>> of job j that is bounded by L. *)
     Variable t1 t2: instant.
     Hypothesis H_busy_interval: busy_interval j t1 t2.
     
@@ -303,7 +303,7 @@ Section Abstract_RTA.
             
             (** Recall that we consider a busy interval of a job [j], and [j] has arrived [A] time units 
                after the beginning the busy interval. From basic properties of a busy interval it 
-               follows that job [j] incurs interference at any time instant t ∈ [t1, t1 + A). 
+               follows that job [j] incurs interference at any time instant t ∈ <<[t1, t1 + A)>>. 
                Therefore [interference_bound_function(tsk, A, A + F)] is at least [A]. *)
             Lemma relative_arrival_le_interference_bound:
               A <= interference_bound_function tsk A (A + F).

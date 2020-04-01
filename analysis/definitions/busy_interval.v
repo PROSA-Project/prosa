@@ -40,7 +40,7 @@ Section BusyIntervalJLFP.
         completed_by sched j_hp t.
     
     (** Based on the definition of quiet time, we say that interval
-         [t1, t_busy) is a (potentially unbounded) busy-interval prefix
+         <<[t1, t_busy)>> is a (potentially unbounded) busy-interval prefix
          iff the interval starts with a quiet time where a higher or equal 
          priority job is released and remains non-quiet. We also require
          job j to be released in the interval. *)    
@@ -50,7 +50,7 @@ Section BusyIntervalJLFP.
       (forall t, t1 < t < t_busy -> ~ quiet_time t) /\
       t1 <= job_arrival j < t_busy.
 
-    (** Next, we say that an interval [t1, t2) is a busy interval iff
+    (** Next, we say that an interval <<[t1, t2)>> is a busy interval iff
          [t1, t2) is a busy-interval prefix and t2 is a quiet time. *)
     Definition busy_interval (t1 t2 : instant) :=
       busy_interval_prefix t1 t2 /\
