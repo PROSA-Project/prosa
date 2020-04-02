@@ -25,8 +25,16 @@ Section ReplaceAtFacts.
      t'. *)
   Let sched' := replace_at sched t' nstate.
 
-  (** We begin with the trivial observation that the schedule doesn't change at
-      other times. *)
+  (** We begin with the trivial observation that [replace_at sched t' nstate]
+      indeed returns [nstate] at time [t']. *)
+  Lemma replace_at_def:
+    sched' t' = nstate.
+  Proof.
+    rewrite /sched' /replace_at.
+    now apply ifT.
+  Qed.
+
+  (** Equally trivially, the schedule doesn't change at other times. *)
   Lemma rest_of_schedule_invariant:
     forall t, t <> t' -> sched' t = sched t.
   Proof.
