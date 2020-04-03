@@ -29,7 +29,7 @@
  # FIXME: not quite right, since the output name is different
  gallinahtml: GAL=-g
  gallinahtml: html
-@@ -585,6 +591,14 @@
+@@ -585,6 +591,17 @@
  	$(HIDE)rm -f $(CMOFILES:%.cmo=%.cmx)
  .PHONY: archclean
  
@@ -41,6 +41,9 @@
 +macos-clean::
 +	$(SHOW)'CLEAN .DS_Store'
 +	$(HIDE)find . -depth -iname '.DS_Store' ! -path './.git/*' -delete
- 
++
++spell::
++	./scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
+
  # Compilation rules ###########################################################
  
