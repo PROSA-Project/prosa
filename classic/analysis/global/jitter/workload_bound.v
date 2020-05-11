@@ -241,7 +241,7 @@ Module WorkloadBoundJitter.
            \sum_(i <- sorted_jobs) service_during sched i t1 t2.
         Proof.
           unfold workload_joblist; fold scheduled_jobs.
-          rewrite (eq_big_perm sorted_jobs) /= //.
+          rewrite (perm_big sorted_jobs) /= //.
           by rewrite -(perm_sort earlier_arrival).
         Qed.
 
@@ -250,7 +250,7 @@ Module WorkloadBoundJitter.
           forall j,
             (j \in scheduled_jobs) = (j \in sorted_jobs).
         Proof.
-          by apply perm_eq_mem; rewrite -(perm_sort earlier_arrival).
+          by apply perm_mem; rewrite -(perm_sort earlier_arrival).
         Qed.
 
         (* Remember that all jobs in the sorted sequence is an

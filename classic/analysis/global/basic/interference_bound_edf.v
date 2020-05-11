@@ -260,7 +260,7 @@ Module InterferenceBoundEDF.
           \sum_(j <- interfering_jobs) interference_caused_by j t1 t2 =
            \sum_(j <- sorted_jobs) interference_caused_by j t1 t2.
         Proof.
-          by rewrite (eq_big_perm sorted_jobs) /=; last by rewrite -(perm_sort earlier_arrival).
+          by rewrite (perm_big sorted_jobs) /=; last by rewrite -(perm_sort earlier_arrival).
         Qed.
 
         (* Note that both sequences have the same set of elements. *)
@@ -268,7 +268,7 @@ Module InterferenceBoundEDF.
           forall j,
             (j \in interfering_jobs) = (j \in sorted_jobs).
         Proof.
-          by apply perm_eq_mem; rewrite -(perm_sort earlier_arrival).
+          by apply perm_mem; rewrite -(perm_sort earlier_arrival).
         Qed.
 
         (* Also recall that all jobs in the sorted sequence is an interfering job of tsk_k, ... *)
