@@ -97,7 +97,7 @@ Lemma vlib__eqb_split : forall b1 b2 : bool, (b1 -> b2) -> (b2 -> b1) -> b1 = b2
 Proof. intros [] [] H H'; unfold is_true in *; auto using sym_eq. Qed.
 
 Lemma vlib__beq_rewrite : forall (T : eqType) (x1 x2 : T), x1 == x2 -> x1 = x2.
-Proof. by intros until 0; case eqP. Qed.
+Proof. by intros *; case eqP. Qed.
 
 Lemma vlib__leq_split : forall x1 x2 x3, x1 <= x2 -> x2 <= x3 -> x1 <= x2 <= x3.
 Proof. by intros; apply/andP; split. Qed.
@@ -115,7 +115,7 @@ Create HintDb vlib_refl discriminated.
 Hint Resolve andP orP nandP norP negP vlib__internal_eqP neqP : vlib_refl.
 
 (* Add x <= y <= z splitting to the core hint database. *)
-Hint Immediate vlib__leq_split vlib__ltn_split1 vlib__ltn_split2.
+Hint Immediate vlib__leq_split vlib__ltn_split1 vlib__ltn_split2 : core.
 
 
 Ltac vlib__complaining_inj f H :=
