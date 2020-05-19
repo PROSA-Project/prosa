@@ -215,7 +215,7 @@ Module SustainabilitySingleCostProperties.
         }
         destruct (sched_susp t) eqn:SCHEDs; last by case: SCHED => SAME; subst.
         move: SCHEDs => /eqP SCHEDs; apply FROM in SCHEDs.
-        case: SCHED; case: ifP; first by move => /andP [PEND _]; case => <-.
+        case: ifP SCHED; first by move => /andP [PEND _]; case => <-.
         by move => NOTPEND; case => <-.
       Qed.
 
@@ -236,7 +236,7 @@ Module SustainabilitySingleCostProperties.
           by eapply in_arrivals_implies_arrived_before in IN; eauto.
         }
         destruct (sched_susp t) eqn:SCHEDs; last by case: SCHED => SAME; subst.
-        case: SCHED; case: ifP;
+        case: ifP SCHED;
           first by move => /andP [PEND _]; case => <-; apply MUST; apply/eqP.
         by move => NOTPEND; case => <-.
       Qed.
@@ -364,7 +364,7 @@ Module SustainabilitySingleCostProperties.
         }
         destruct (sched_susp t) eqn:SCHEDs;
           last by case: SCHED => SAME; subst; rewrite SUSP in NOTSUSP.
-        case: SCHED; case: ifP; last by move => _; case => SAME; subst; rewrite SUSP in NOTSUSP.
+        case: ifP SCHED; last by move => _; case => SAME; subst; rewrite SUSP in NOTSUSP.
         move: SCHEDs; move => /eqP SCHEDs /andP [/andP [PEND NOTSUSPs] _]; case => SAME; subst.
         by rewrite -/suspended SUSP in NOTSUSPs.
       Qed.
