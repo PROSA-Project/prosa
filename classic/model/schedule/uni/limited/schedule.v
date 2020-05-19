@@ -3,6 +3,10 @@ Require Import prosa.classic.model.arrival.basic.job.
 Require Import prosa.classic.model.schedule.uni.service
                prosa.classic.model.schedule.uni.schedule.
 
+(* Let's import definition of nonpreemptive schedule. *)
+Require Import prosa.classic.model.schedule.uni.nonpreemptive.schedule.
+
+
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (* In this file, we provide additional definitions and 
@@ -131,9 +135,6 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
       (* In fully nonpreemptive model any job becomes nonpreemptive as soon as it receives one unit of service. *)
       Let job_lock_in_service (j: Job) := ε.
-
-      (* Let's import definition of nonpreemptive schedule. *)
-      Require Import prosa.classic.model.schedule.uni.nonpreemptive.schedule.
 
       (* Next, we assume that the schedule is fully nonpreemptive. *) 
       Hypothesis H_is_nonpreemptive_schedule: 
