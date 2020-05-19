@@ -226,7 +226,7 @@ Module Schedule.
         {
           move: SCHED => /existsP [cpu SCHED]; des.
           rewrite -big_filter (bigD1_seq cpu);
-            [simpl | | by rewrite filter_index_enum enum_uniq];
+            [simpl | | by have [e _ [UNIQ _ ] _] := big_enumP];
               last by rewrite mem_filter; apply/andP; split.
           rewrite -big_filter -filter_predI big_filter.
           rewrite -> eq_bigr with (F2 := fun cpu => 0);
