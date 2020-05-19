@@ -170,7 +170,7 @@ Section ArgSearch.
       destruct (P (f n)) eqn:Pfn => //=.
     - rewrite <- REC in IND.
       destruct (R (f n) (f q)) eqn:REL => some_x_is;
-        move => y [/andP [a_le_y y_lt_Sn] Pfy];
+        move=> y /andP [a_le_y y_lt_Sn] Pfy;
         injection some_x_is => x_is; rewrite -{}x_is //;
         move: y_lt_Sn; rewrite ltnS;
         rewrite leq_eqVlt => /orP [/eqP EQ | y_lt_n].
@@ -185,13 +185,13 @@ Section ArgSearch.
       + move: (IND q REC y) => HOLDS.
         apply HOLDS => //.
         by apply /andP; split.
-    - move=> some_q_is y [/andP [a_le_y y_lt_Sn] Pfy].
+    - move=> some_q_is y /andP [a_le_y y_lt_Sn] Pfy.
       move: y_lt_Sn. rewrite ltnS.
       rewrite leq_eqVlt => /orP [/eqP EQ | y_lt_n].
       + exfalso. move: Pfn => /negP Pfn. by subst.
       + apply IND => //. by apply /andP; split.
     - move=> some_n_is. injection some_n_is => n_is.
-      move=> y [/andP [a_le_y y_lt_Sn] Pfy].
+      move=> y /andP [a_le_y y_lt_Sn] Pfy.
       move: y_lt_Sn. rewrite ltnS.
       rewrite leq_eqVlt => /orP [/eqP EQ | y_lt_n].
       + by rewrite -n_is EQ; apply (R_reflexive (f n)).
