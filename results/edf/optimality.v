@@ -1,4 +1,5 @@
 Require Export prosa.analysis.facts.transform.edf_opt.
+Require Export prosa.analysis.facts.transform.edf_wc.
 
 (** * Optimality of EDF on Ideal Uniprocessors *)
 
@@ -47,6 +48,44 @@ Section Optimality.
     - by apply edf_schedule_meets_all_deadlines_wrt_arrivals.
     - by apply edf_transform_ensures_edf.
   Qed.
+
+  (** Moreover, we note that, since EDF maintains work conservation, if there
+      exists a schedule in which all jobs of [arr_seq] meet their deadline,
+      then there also exists a work-conserving EDF in which all deadlines are
+      met. *)
+  Theorem EDF_WC_optimality :
+    (exists any_sched : schedule (ideal.processor_state Job),
+        valid_schedule any_sched arr_seq /\
+        all_deadlines_of_arrivals_met arr_seq any_sched) ->
+    exists edf_wc_sched : schedule (ideal.processor_state Job),
+      valid_schedule edf_wc_sched arr_seq /\
+      all_deadlines_of_arrivals_met arr_seq edf_wc_sched /\
+      work_conserving arr_seq edf_wc_sched /\
+      EDF_schedule edf_wc_sched.
+  Proof.
+    move=> [sched [[COME READY] DL_ARR_MET]].
+    move: (all_deadlines_met_in_valid_schedule _ _ COME DL_ARR_MET) => DL_MET.
+    set wc_sched := wc_transform arr_seq sched.
+    have wc_COME : jobs_come_from_arrival_sequence wc_sched arr_seq
+      by apply wc_jobs_come_from_arrival_sequence.
+    have wc_READY : jobs_must_be_ready_to_execute wc_sched
+      by apply wc_jobs_must_be_ready_to_execute.
+    have wc_ARR := jobs_must_arrive_to_be_ready wc_sched wc_READY.
+    have wc_COMP := completed_jobs_are_not_ready wc_sched wc_READY.
+    have wc_DL_ARR_MET : all_deadlines_of_arrivals_met arr_seq wc_sched
+      by apply wc_all_deadlines_of_arrivals_met; apply DL_ARR_MET.
+    move: (all_deadlines_met_in_valid_schedule _ _ wc_COME wc_DL_ARR_MET) => wc_DL_MET.
+    set sched' := edf_transform wc_sched.
+    exists sched'. split; last split; last split.
+    - by apply edf_schedule_is_valid.
+    - by apply edf_schedule_meets_all_deadlines_wrt_arrivals.
+    - apply edf_transform_maintains_work_conservation; by [ | apply wc_is_work_conserving ].
+    - by apply edf_transform_ensures_edf.
+  Qed.
+
+  (** Remark: [EDF_optimality] is of course an immediate corollary of
+      [EDF_WC_optimality]. We nonetheless have two separate proofs for historic
+      reasons as [EDF_optimality] predates [EDF_WC_optimality] (in Prosa). *)
 
 End Optimality.
 
