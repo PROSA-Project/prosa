@@ -96,6 +96,43 @@ Guideline: do not name proof terms in type classes to prevent explicit dependenc
 
 - Document the tactics that you use in the [list of tactics](doc/tactics.md). For new users, it can be quite difficult to identify the right tactics to use. This list is intended to give novices a starting to point in the search for the "right" tools.
 
+### Forward vs backward reasoning
+Although the primary focus of Prosa is on the quality of the overall structure and the specifications, good proofs are short and readable. Since Coq tends to favor backward reasoning, try to adhere to it. Forward reasoning tends to be more verbose and to generate needlessly convoluted proof trees. To get an idea, read the following snippet:
+```
+(* Let's say A->B->C->D *)
+  Variable A B C D : Prop.
+  Hypothesis AB : A->B.
+  Hypothesis BC : B->C.
+  Hypothesis CD : C->D.
+
+  (* And we want to prove A->D *)
+  Lemma AD_backward:
+    A->D.
+  Proof.
+    intros.
+    apply CD.
+    apply BC.
+    now apply AB.
+  Qed.
+
+  Lemma AD_forward:
+    A->D.
+  Proof.
+    intros.
+    (* hmm, I have C->D. If only I had C... *) 
+    have I_need_C: C.
+    { (* hmm, I have B->C. If only I had B... *)
+      have I_need_B: B by apply AB.
+      feed BC.
+      apply I_need_B.
+      now apply BC.
+    }
+    feed CD.
+    apply I_need_C.
+    now apply CD.
+  Qed.
+  ```
+
 
 *To be continued… Merge requests welcome: please feel free to propose new advice and better guidelines.*
 
