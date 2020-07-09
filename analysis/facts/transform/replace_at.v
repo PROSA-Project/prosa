@@ -9,7 +9,7 @@ Section ReplaceAtFacts.
   Context {Job : JobType}.
 
   (** ... and any given type of processor states, ... *)
-  Context {PState: eqType}.
+  Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
   (** ...consider any given reference schedule. *)

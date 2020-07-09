@@ -9,7 +9,7 @@ Section SwappedFacts.
   (** For any given type of jobs... *)
   Context {Job : JobType}.
   (** ... any given type of processor states: *)
-  Context {PState: eqType}.
+  Context {PState: Type}.
   Context `{ProcessorState Job PState}.
 
   (** ...consider any given reference schedule. *)
