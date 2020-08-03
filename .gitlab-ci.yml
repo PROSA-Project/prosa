@@ -10,6 +10,9 @@ stages:
     - opam pin add -n -y -k path coq-prosa .
     - opam install -y -v -j ${NJOBS} coq-prosa
 
+.preferred-stable-version:
+    image: mathcomp/mathcomp:1.10.0-coq-8.11
+
 .build:
   image: mathcomp/mathcomp:${CI_JOB_NAME}
   extends: .build-common
@@ -113,24 +116,27 @@ coq-dev:
   allow_failure: true
 
 validate:
+  extends:
+    - .preferred-stable-version
   stage: process
-  image: mathcomp/mathcomp:1.10.0-coq-8.11
   needs: ["build-for-process"]
   dependencies:
     - build-for-process
   script: make validate
 
 validate-classic:
+  extends:
+    - .preferred-stable-version
   stage: process
-  image: mathcomp/mathcomp:1.10.0-coq-8.11
   needs: ["build-for-process-classic"]
   dependencies:
     - build-for-process-classic
   script: make validate
 
 .doc: 
+  extends:
+    - .preferred-stable-version
   stage: process
-  image: mathcomp/mathcomp:1.10.0-coq-8.11
   script:
     - make html -j ${NJOBS}
     - mv html with-proofs
@@ -168,8 +174,9 @@ doc-classic:
     expire_in: 1 week
 
 proof-state:
+  extends:
+    - .preferred-stable-version
   stage: process
-  image: mathcomp/mathcomp:1.10.0-coq-8.11
   needs: ["build-for-process"]
   dependencies:
     - build-for-process
