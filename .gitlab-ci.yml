@@ -81,6 +81,12 @@ stages:
 1.10.0-coq-8.11:
   extends: .build
 
+1.11.0-coq-8.11:
+  extends: .build
+
+1.11.0-coq-8.12:
+  extends: .build
+
 build-for-process:
   extends:
     - .build-for-process
@@ -103,7 +109,7 @@ spell-check:
   script:
     - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
 
-coq-8.10:
+coq-8.12:
   extends:
     - .build-dev
   # it's ok to fail with an unreleased version of ssreflect
