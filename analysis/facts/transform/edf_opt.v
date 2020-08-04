@@ -52,7 +52,7 @@ Section FindSwapCandidateFacts.
     move: H_not_idle. rewrite scheduled_at_def => /eqP ->.
     rewrite /relevant_pstate -/(has_arrived j1 t1).
     move: (H_jobs_must_arrive_to_execute j1 t1) => SCHED_ARR.
-      by apply SCHED_ARR.
+    now apply SCHED_ARR.
   Qed.
 
   (** Since [t1] is relevant, we conclude that a search for a relevant
@@ -73,7 +73,7 @@ Section FindSwapCandidateFacts.
     search_arg sched (relevant_pstate t1) earlier_deadline t1 (job_deadline j1) = Some (find_swap_candidate sched t1 j1).
   Proof.
     move: fsc_search_successful => [t FOUND].
-    by rewrite /find_swap_candidate FOUND.
+    now rewrite /find_swap_candidate FOUND.
   Qed.
 
   (** There is a job that is scheduled at the time that
@@ -90,7 +90,7 @@ Section FindSwapCandidateFacts.
     exists j'. split => //.
     rewrite /find_swap_candidate FOUND.
     rewrite scheduled_at_def //.
-      by apply /eqP.
+    now apply /eqP.
   Qed.
 
   (** Since we are considering a uniprocessor model, only one job is
@@ -104,7 +104,7 @@ Section FindSwapCandidateFacts.
   Proof.
     move=> j2 SCHED_j2.
     move: fsc_not_idle => [j' [SCHED_j' ARR]].
-    by rewrite -(ideal_proc_model_is_a_uniprocessor_model _ _ _ _ SCHED_j' SCHED_j2).
+    now rewrite -(ideal_proc_model_is_a_uniprocessor_model _ _ _ _ SCHED_j' SCHED_j2).
   Qed.
 
   (** We observe that [find_swap_candidate] returns a value within a
@@ -148,7 +148,7 @@ Section FindSwapCandidateFacts.
       - by apply /andP; split.
       - by rewrite /relevant_pstate SCHED_j.
     }
-    by move: ED; rewrite /earlier_deadline /oapp SCHED_j SCHED_j2.
+    now move: ED; rewrite /earlier_deadline /oapp SCHED_j SCHED_j2.
   Qed.
 
   (** As a special case of the above lemma, we observe that the job
@@ -222,7 +222,7 @@ Section MakeEDFAtFacts.
       by rewrite scheduled_at_def; apply /eqP.
     apply swapped_completed_jobs_dont_execute => //.
     apply fsc_range1 => //.
-    by apply scheduled_job_in_sched_has_later_deadline.
+    now apply scheduled_job_in_sched_has_later_deadline.
   Qed.
 
   (** Importantly, [make_edf_at] does not introduce any deadline
@@ -237,7 +237,7 @@ Section MakeEDFAtFacts.
     {
       apply (H_no_deadline_misses _ t).
       move: SCHED.
-      by rewrite /sched' /make_edf_at SCHED_orig.
+      now rewrite /sched' /make_edf_at SCHED_orig.
     }
     {
       have SCHED': scheduled_at sched j_orig t_edf
@@ -253,14 +253,14 @@ Section MakeEDFAtFacts.
       - move=> j1 SCHED_j1.
         move: (fsc_not_idle sched H_jobs_must_arrive_to_execute j_orig t_edf SCHED' DL_orig) => [j' [SCHED_j' ARR_j']].
         exists j'. split => //.
-        by apply scheduled_job_in_sched_has_later_deadline.
+        now apply scheduled_job_in_sched_has_later_deadline.
       - have EX: (exists t', scheduled_at sched j t').
         {
           apply swap_job_scheduled with (t1 := t_edf) (t2 := find_swap_candidate sched t_edf j_orig) (t0 := t).
-          by move: SCHED; rewrite /sched' /make_edf_at SCHED_orig.
+          now move: SCHED; rewrite /sched' /make_edf_at SCHED_orig.
         }
         move: EX => [t' SCHED_t'].
-        by apply H_no_deadline_misses with (t := t').
+        now apply H_no_deadline_misses with (t := t').
     }
   Qed.
 
@@ -343,7 +343,7 @@ Section MakeEDFAtFacts.
       apply leq_trans with (n := job_deadline j_orig) => // ;
         first by exact mea_guarantee_deadlines.
       apply leq_trans with (n := t') => //.
-      by apply ltnW.
+      now apply ltnW.
     Qed.
 
     (** Next, we consider the more difficult case, where [t'] is
@@ -360,23 +360,23 @@ Section MakeEDFAtFacts.
         - exists (find_swap_candidate sched t_edf j_orig).
           split; last by apply fsc_range => //; exact mea_guarantee_dl_orig.
           subst. rewrite -(ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_sched_edf H_sched').
-          by rewrite scheduled_at_def FSC //=.
+          now rewrite scheduled_at_def FSC //=.
         - case: (boolP(find_swap_candidate sched t_edf j_orig == t')) => [/eqP EQ' | /eqP NEQ'].
           + exists t_edf.
             split; last by apply /andP; split => //; exact mea_guarantee_dl_orig.
             rewrite -(swap_job_scheduled_t2 _  _ (find_swap_candidate sched t_edf j_orig) _).
             move: H_sched'. rewrite /sched' /make_edf_at SCHED.
-            by rewrite EQ'.
+            now rewrite EQ'.
           + move: NEQ NEQ' => /eqP NEQ /eqP NEQ'. exists t'.
             split; last by  apply /andP; split.
             rewrite -(swap_job_scheduled_other_times _ t_edf (find_swap_candidate sched t_edf j_orig)) //.
             move: H_sched'.
-            by rewrite /sched' /make_edf_at SCHED.
+            now rewrite /sched' /make_edf_at SCHED.
       }
       move: EX => [t'' [SCHED'' RANGE]].
       apply: (fsc_found_job_deadline sched _ j_orig t_edf _ _ _ _ _ t'') => // ;
         first by exact mea_guarantee_dl_orig.
-      by rewrite scheduled_at_def FSC //=.
+      now rewrite scheduled_at_def FSC //=.
     Qed.
 
   End GuaranteeCaseAnalysis.
@@ -395,7 +395,7 @@ Section MakeEDFAtFacts.
     case: (boolP (t' < job_deadline j_orig)).
     - by apply mea_guarantee_case_t'_before_deadline.
     - rewrite -leqNgt => BOUND_t'.
-      by apply: (mea_guarantee_case_t'_past_deadline j_orig j_edf j' t').
+      now  apply: (mea_guarantee_case_t'_past_deadline j_orig j_edf j' t').
   Qed.
 
   (** We observe that [make_edf_at] maintains the property that jobs
@@ -420,10 +420,10 @@ Section MakeEDFAtFacts.
     - case (boolP(t_edf == t)) => [/eqP EQ'| /eqP NEQ'].
       + move=> SCHED_j.
         have ARR_j: job_arrival j <= t_edf by apply fsc_found_job_arrival with (sched0 := sched) (j1 := j_orig) => //; rewrite scheduled_at_def.
-        by rewrite -EQ'.
+        now rewrite -EQ'.
       + move=> SCHED_j.
         apply H_jobs_must_arrive_to_execute.
-        by rewrite scheduled_at_def /scheduled_in /pstate_instance.
+        now rewrite scheduled_at_def /scheduled_in /pstate_instance.
   Qed.
 
   (** We connect the fact that a job is scheduled in [sched'] to the
@@ -438,7 +438,7 @@ Section MakeEDFAtFacts.
     move=> j t SCHED_j.
     destruct (sched t_edf) as [j_orig|] eqn:SCHED_orig; last by exists t.
     eapply swap_job_scheduled.
-    by exact SCHED_j.
+    now exact SCHED_j.
   Qed.
 
   (** Conversely, if a job is scheduled in [sched], it is also
@@ -454,7 +454,7 @@ Section MakeEDFAtFacts.
     destruct (sched t_edf) as [j_orig|] eqn:SCHED_orig;
       last by exists t.
     eapply swap_job_scheduled_original.
-    by exact SCHED_j.
+    now exact SCHED_j.
   Qed.
 
   (** Next, we observe that if all jobs in [sched] come from a given
@@ -474,7 +474,7 @@ Section MakeEDFAtFacts.
       rewrite /sched' /make_edf_at.
       destruct (sched t_edf) as [j_orig|] eqn:SCHED_orig;
         last by done.
-      by apply swapped_jobs_come_from_arrival_sequence.
+      now apply swapped_jobs_come_from_arrival_sequence.
     Qed.
 
   End ArrivalSequence.
@@ -503,7 +503,7 @@ Section MakeEDFAtFacts.
     {
       apply ltn_leq_trans with (n := t_edf) => //.
       apply fsc_range1 => //.
-      by apply scheduled_job_in_sched_has_later_deadline.
+      now apply scheduled_job_in_sched_has_later_deadline.
     }
     move: SCHED_j.
     have ->: scheduled_at (swapped sched t_edf (find_swap_candidate sched t_edf j_orig)) j t = scheduled_at sched j t
@@ -597,7 +597,7 @@ Section EDFPrefixFacts.
       last by move=> t SCHED; exists t.
     move=> sched'' t'' EX t''' SCHED_mea.
     move: (mea_job_scheduled _ _ _ _ SCHED_mea) => [t'''' SCHED''''].
-      by apply: (EX t'''' SCHED'''').
+    now apply: (EX t'''' SCHED'''').
   Qed.
 
   (** Conversely, if a job is scheduled in the original schedule, it is
@@ -612,7 +612,7 @@ Section EDFPrefixFacts.
     apply prefix_map_property_invariance; last by exists t.
     move=> schedX tx [t' SCHEDX_j].
     eapply mea_job_scheduled'.
-    by exact SCHEDX_j.
+    now exact SCHEDX_j.
   Qed.
 
   (** Next, we note that [edf_transform_prefix] maintains the
@@ -633,7 +633,7 @@ Section EDFPrefixFacts.
       rewrite /sched' /edf_transform_prefix.
       apply prefix_map_property_invariance; last by done.
       move => schedX t ARR.
-      by apply mea_jobs_come_from_arrival_sequence.
+      now apply mea_jobs_come_from_arrival_sequence.
     Qed.
 
   End ArrivalSequence.
@@ -661,7 +661,7 @@ Section EDFPrefixFacts.
       + by apply mea_jobs_must_arrive => //.
       + by apply mea_no_deadline_misses => //.
     - move=> schedX t_ref [COMP [ARR DL]].
-      by apply mea_EDF_widen.
+      now apply mea_EDF_widen.
   Qed.
 
 End EDFPrefixFacts.
@@ -688,11 +688,9 @@ Section EDFPrefixInclusion.
   Lemma edf_prefix_inclusion:
     forall h1 h2,
       h1 <= h2 ->
-      forall t,
-        t < h1 ->
-        (edf_transform_prefix sched h1) t = (edf_transform_prefix sched h2) t.
+      identical_prefix (edf_transform_prefix sched h1) (edf_transform_prefix sched h2) h1.
   Proof.
-    move=> h1 h2 LE_h1_h2 t LT_t_h1.
+    move=> h1 h2 LE_h1_h2. rewrite /identical_prefix => t LT_t_h1.
     induction h2; first by move: (ltn_leq_trans LT_t_h1 LE_h1_h2).
     move: LE_h1_h2. rewrite leq_eqVlt => /orP [/eqP ->|LT]; first by done.
     move: LT. rewrite ltnS => LE_h1_h2.
@@ -732,44 +730,46 @@ Section EDFTransformFacts.
      transforming the given reference schedule. *)
   Let sched_edf := edf_transform sched.
 
-  (** We begin with the first key property: the resulting schedule is actually
-     an EDF schedule. *)
+  (** We begin with a simple lemma relating [sched_edf] to its definition that
+      allows us to easily look at any finite prefix of the EDF-transformed
+      scheduled. *)
+  Lemma edf_finite_prefix:
+    forall h,
+      identical_prefix sched_edf (edf_transform_prefix sched h) h.
+  Proof.
+    move=> h. rewrite /sched_edf/edf_transform /identical_prefix => t LT_h.
+    now apply edf_prefix_inclusion.
+  Qed.
+
+  (** From this, we move on to the defining property of the transformation: the
+      resulting schedule is actually an EDF schedule. *)
   Theorem edf_transform_ensures_edf:
     EDF_schedule sched_edf.
   Proof.
-    rewrite /EDF_schedule /sched_edf  /edf_transform => t.
+    rewrite /EDF_schedule => t.
     rewrite /EDF_at //=  => j SCHED_j t' j' LE_t_t' SCHED_j' ARR_j'.
-    move: SCHED_j.
-    rewrite scheduled_at_def.
-    have ->: edf_transform_prefix sched t.+1 t = edf_transform_prefix sched t'.+1 t
-      by apply edf_prefix_inclusion.
-    rewrite -scheduled_at_def.
-    move=> SCHED_j.
-    move: (edf_prefix_guarantee sched H_jobs_must_arrive_to_execute H_completed_jobs_dont_execute H_no_deadline_misses t'.+1 t) => EDF.
-    feed EDF; first by done.
-    by apply (EDF j SCHED_j t' j' LE_t_t').
+    set S := (edf_transform_prefix sched t'.+1).
+    have EDF: EDF_at S t by apply edf_prefix_guarantee.
+    apply EDF with (t' := t') => //.
+    rewrite -(identical_prefix_scheduled_at sched_edf _ t'.+1) //.
+    now apply edf_finite_prefix.
   Qed.
 
   (** Next, we observe that completed jobs still don't execute in the resulting
-     EDF schedule. This observation is needed to establish that the resulting
-     EDF schedule is valid. *)
+      EDF schedule. This observation is needed to establish that the resulting
+      EDF schedule is valid. *)
   Lemma edf_transform_completed_jobs_dont_execute:
     completed_jobs_dont_execute sched_edf.
   Proof.
     move=> j t.
-    rewrite /sched_edf /edf_transform /service /service_during.
-    have ->: \sum_(0 <= t0 < t) service_at (fun t1 : instant => edf_transform_prefix sched t1.+1 t1) j t0 =
-             \sum_(0 <= t0 < t) service_at (edf_transform_prefix sched t.+1) j t0.
-    {
-      apply eq_big_nat => t' /andP [_ LT_t].
-      rewrite /service_at.
-      rewrite (edf_prefix_inclusion _ _ _ _ t'.+1 t.+1) => //.
-      by apply ltn_trans with (n := t).
-    }
     set S := (edf_transform_prefix sched t.+1).
-    rewrite -/(service_during S j 0 t) -/(service S j t) {}/S.
-    move: (edf_prefix_well_formedness sched H_jobs_must_arrive_to_execute H_completed_jobs_dont_execute H_no_deadline_misses t.+1) => [COMP _].
-    by apply COMP.
+    rewrite (identical_prefix_scheduled_at _ S t.+1) //;
+            last by apply edf_finite_prefix.
+    rewrite (identical_prefix_service _ S t) //;
+            last by apply (identical_prefix_inclusion _ _ t.+1) => //; apply edf_finite_prefix.
+    move: (edf_prefix_well_formedness sched H_jobs_must_arrive_to_execute
+                                      H_completed_jobs_dont_execute H_no_deadline_misses t.+1) => [COMP _].
+    now apply COMP.
   Qed.
 
   (** Similarly, we observe that no job is scheduled prior to its arrival. *)
@@ -779,7 +779,7 @@ Section EDFTransformFacts.
     move=> j t.
     rewrite /sched_edf /edf_transform.
     move: (edf_prefix_well_formedness sched H_jobs_must_arrive_to_execute H_completed_jobs_dont_execute H_no_deadline_misses t.+1) => [_ [ARR _]].
-    by apply ARR.
+    now apply ARR.
   Qed.
 
   (** We next establish the second key property: in the transformed EDF
@@ -788,22 +788,17 @@ Section EDFTransformFacts.
     all_deadlines_met sched_edf.
   Proof.
     move=> j t.
-    rewrite /sched_edf /edf_transform /job_meets_deadline /completed_by /service /service_during  => SCHED.
-    have LT_t_dl: t < job_deadline j
-      by apply edf_prefix_scheduled_job_has_later_deadline with (sched0 := sched) (horizon := t.+1).
+    rewrite /sched_edf /job_meets_deadline.
     set t_dl := (job_deadline j).
-    have ->: \sum_(0 <= t0 < t_dl) service_at (fun t1 : instant => edf_transform_prefix sched t1.+1 t1) j t0 =
-             \sum_(0 <= t0 < t_dl) service_at (edf_transform_prefix sched t_dl) j t0.
-    {
-      apply eq_big_nat => t' /andP [_ LT_t].
-      rewrite /service_at.
-      by rewrite (edf_prefix_inclusion _ _ _ _ t'.+1 t_dl).
-    }
-    move: SCHED. rewrite scheduled_at_def (edf_prefix_inclusion _ _ _ _ t.+1 t_dl) => // SCHED.
-    move: (edf_prefix_well_formedness sched H_jobs_must_arrive_to_execute H_completed_jobs_dont_execute H_no_deadline_misses t_dl) => [_ [_ DL]]. move: DL.
-    rewrite /all_deadlines_met /job_meets_deadline /completed_by /service /service_during => DL.
-    apply: (DL j t)=>//=.
-      by rewrite scheduled_at_def.
+    rewrite (identical_prefix_completed_by _ (edf_transform_prefix sched t_dl.+1) t_dl) //;
+            last by apply (identical_prefix_inclusion _ _ t_dl.+1) => //; apply edf_finite_prefix.
+    move=> SCHED_AT; move: (SCHED_AT).
+    rewrite (identical_prefix_scheduled_at _ (edf_transform_prefix sched t_dl.+1) t_dl).
+    - move: (edf_prefix_well_formedness sched H_jobs_must_arrive_to_execute
+                                        H_completed_jobs_dont_execute H_no_deadline_misses t_dl.+1) => [_ [_ DL]].
+      now apply (DL j t).
+    - by apply (identical_prefix_inclusion _ _ t_dl.+1) => //; apply edf_finite_prefix.
+    - by apply edf_prefix_scheduled_job_has_later_deadline with (sched0 := sched) (horizon := t.+1).
   Qed.
 
   (** We observe that no new jobs are introduced: any job scheduled in the EDF
@@ -828,7 +823,7 @@ Section EDFTransformFacts.
     exists t'.
     rewrite /sched_edf /edf_transform scheduled_at_def.
     rewrite (edf_prefix_inclusion _ _ _ _ t'.+1 (job_deadline j)) -?scheduled_at_def=> //.
-    by apply edf_prefix_scheduled_job_has_later_deadline with (sched0 := sched) (horizon := job_deadline j).
+    now apply edf_prefix_scheduled_job_has_later_deadline with (sched0 := sched) (horizon := job_deadline j).
   Qed.
 
   (** Next, we note that [edf_transform] maintains the property that all jobs
@@ -849,7 +844,7 @@ Section EDFTransformFacts.
       rewrite /sched_edf /edf_transform.
       move=> j t.
       rewrite scheduled_at_def - scheduled_at_def.
-      by apply (edf_prefix_jobs_come_from_arrival_sequence sched t.+1 arr_seq H_from_arr_seq).
+      now apply (edf_prefix_jobs_come_from_arrival_sequence sched t.+1 arr_seq H_from_arr_seq).
     Qed.
 
   End ArrivalSequence.
@@ -902,7 +897,7 @@ Section Optimality.
       move: H_sched_valid => [COME READY].
       have ARR  := jobs_must_arrive_to_be_ready sched READY.
       have COMP := completed_jobs_are_not_ready sched READY.
-      by apply edf_transform_deadlines_met.
+      now apply edf_transform_deadlines_met.
     Qed.
 
   End AllDeadlinesMet.
@@ -928,14 +923,14 @@ Section Optimality.
       destruct (job_cost j ==  0) eqn:COST.
       - move: COST => /eqP COST.
         rewrite /job_meets_deadline /completed_by COST.
-        by apply leq0n.
+        now apply leq0n.
       - move: (neq0_lt0n COST) => NONZERO.
         move: (H_no_deadline_misses_of_arrivals j ARR_j). rewrite {1}/job_meets_deadline => COMP_j.
         move: (completed_implies_scheduled_before sched j NONZERO ARR (job_deadline j) COMP_j) => [t' [_ SCHED']].
         move: (all_deadlines_met_in_valid_schedule arr_seq sched COME H_no_deadline_misses_of_arrivals) => NO_MISSES.
         move: (edf_transform_job_scheduled' sched ARR COMP NO_MISSES j t' SCHED') => [t'' SCHED''].
         move: (edf_schedule_meets_all_deadlines NO_MISSES) => DL_MET.
-        by apply: (DL_MET j t'' SCHED'').
+        now apply: (DL_MET j t'' SCHED'').
     Qed.
 
   End AllDeadlinesOfArrivalsMet.
