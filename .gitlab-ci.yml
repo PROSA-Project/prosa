@@ -63,21 +63,6 @@ stages:
     - "*/*/*/*/*/*/*/*/*/*.glob"
     expire_in: 1 week
 
-1.9.0-coq-8.9:
-  extends: .build
-
-1.9.0-coq-8.10:
-  extends: .build
-
-1.9.0-coq-8.11:
-  extends: .build
-
-1.10.0-coq-8.9:
-  extends: .build
-
-1.10.0-coq-8.10:
-  extends: .build
-
 1.10.0-coq-8.11:
   extends: .build
 
