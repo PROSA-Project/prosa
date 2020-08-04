@@ -1,6 +1,7 @@
 Require Export prosa.util.all.
 Require Export prosa.behavior.all.
 Require Export prosa.model.processor.platform_properties.
+Require Export prosa.analysis.definitions.schedule_prefix.
 
 (** * Service *)
 
@@ -599,19 +600,19 @@ Section ServiceInTwoSchedules.
 
   (** Consider any two given schedules... *)
   Variable sched1 sched2: schedule PState.
-  
-  (** Given an interval in which the schedules provide the same service 
-      to a job at each instant, we can prove that the cumulative service 
+
+  (** Given an interval in which the schedules provide the same service
+      to a job at each instant, we can prove that the cumulative service
       received during the interval has to be the same. *)
   Section ServiceDuringEquivalentInterval.
-    
+
     (** Consider two time instants...  *)
     Variable t1 t2 : instant.
 
     (** ...and a given job that is to be scheduled. *)
     Variable j: Job.
 
-    (** Assume that, in any instant between [t1] and [t2] the service 
+    (** Assume that, in any instant between [t1] and [t2] the service
         provided to [j] from the two schedules is the same. *)
     Hypothesis H_sched1_sched2_same_service_at:
       forall t, t1 <= t < t2 ->
@@ -641,5 +642,14 @@ Section ServiceInTwoSchedules.
     apply same_service_during => t' RANGE.
     by rewrite /service_at SCHED_EQ.
   Qed.
+
+  (** For convenience, we restate the corollary also at the level of
+      [service] for identical prefixes. *)
+  Corollary identical_prefix_service:
+    forall h,
+      identical_prefix sched1 sched2 h ->
+      forall j, service sched1 j h = service sched2 j h.
+  Proof.
+    move=> h IDENT j; by apply equal_prefix_implies_same_service_during. Qed.
 
 End ServiceInTwoSchedules.

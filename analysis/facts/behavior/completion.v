@@ -1,5 +1,6 @@
 Require Export prosa.analysis.facts.behavior.service.
 Require Export prosa.analysis.facts.behavior.arrivals.
+Require Export prosa.analysis.definitions.schedule_prefix.
 
 (** * Completion *)
 
@@ -334,3 +335,40 @@ Section CompletedJobs.
   Qed.
 
 End CompletedJobs.
+
+(** Next, we relate the completion of jobs in schedules with identical prefixes. *)
+Section CompletionInTwoSchedules.
+  (** Consider any processor model and any type of jobs with costs, arrival times, and a notion of readiness. *)
+  Context {PState: Type} {Job: JobType} `{ProcessorState Job PState} `{JobReady Job PState}.
+
+  (** If two schedules share a common prefix, then (in the prefix) jobs
+      complete in one schedule iff they complete in the other. *)
+  Lemma identical_prefix_completed_by:
+    forall sched1 sched2 h,
+      identical_prefix sched1 sched2 h ->
+      forall j t,
+        t <= h ->
+        completed_by sched1 j t = completed_by sched2 j t.
+  Proof.
+    move=> sched1 sched2 h PREFIX j t LE_h.
+    rewrite /completed_by.
+    rewrite (identical_prefix_service sched1 sched2) //.
+    now apply (identical_prefix_inclusion _ _ h).
+  Qed.
+
+  (** For convenience, we restate the previous lemma in terms of [pending]. *)
+  Corollary identical_prefix_pending:
+    forall sched1 sched2 h,
+      identical_prefix sched1 sched2 h ->
+      forall j t,
+        t <= h ->
+        pending sched1 j t = pending sched2 j t.
+  Proof.
+    move=> sched1 sched2 h PREFIX j t LE_h.
+    now rewrite /pending (identical_prefix_completed_by _ sched2 h).
+  Qed.
+
+
+End CompletionInTwoSchedules.
+
+
