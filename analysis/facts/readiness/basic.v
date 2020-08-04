@@ -1,4 +1,5 @@
-Require Import prosa.analysis.facts.behavior.completion.
+Require Export prosa.analysis.facts.behavior.completion.
+Require Export prosa.analysis.definitions.readiness.
 
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import prosa.model.readiness.basic.
@@ -30,6 +31,15 @@ Section LiuAndLaylandReadiness.
     - by apply ARR.
     - rewrite -less_service_than_cost_is_incomplete.
       by apply COMP.
+  Qed.
+
+  (** The Liu & Layland readiness model is trivially non-clairvoyant. *)
+  Fact basic_readiness_nonclairvoyance:
+    nonclairvoyant_readiness basic_ready_instance.
+  Proof.
+    move=> sched sched' j h PREFIX t IN.
+    rewrite /job_ready /basic_ready_instance.
+    now apply (identical_prefix_pending _ _ h).
   Qed.
 
 End LiuAndLaylandReadiness.
