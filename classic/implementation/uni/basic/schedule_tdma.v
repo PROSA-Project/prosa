@@ -56,7 +56,7 @@ Module ConcreteSchedulerTDMA.
 
 
         Definition job_to_schedule :=
-          findP job_in_time_slot pending_jobs.
+          find_seq.findP job_in_time_slot pending_jobs.
 
       Section Lemmas.
 
