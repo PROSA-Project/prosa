@@ -1,5 +1,5 @@
 Require Export prosa.util.sum.
-Require Export prosa.util.ssromega.
+Require Export prosa.util.ssrlia.
 
 Require Import prosa.classic.util.tactics.
 Require Import prosa.classic.util.notation.

@@ -17,4 +17,4 @@ Require Export prosa.classic.util.minmax.
 Require Export prosa.classic.util.seqset.
 Require Export prosa.classic.util.step_function.
 Require Export prosa.util.epsilon.
-Require Export prosa.util.ssromega.
+Require Export prosa.util.ssrlia.

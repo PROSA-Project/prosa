@@ -197,7 +197,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
               by move: JINB; move => /andP [_ T].
           }
           rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline in NOTHEP.
-          rewrite /D; ssromega.
+          rewrite /D; ssrlia.
         }
     Qed.
     

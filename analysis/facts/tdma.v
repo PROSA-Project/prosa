@@ -135,10 +135,10 @@ Section TDMAFacts.
       have SO1:O1 + task_time_slot tsk1 <= cycle by apply (Offset_add_slot_leq_cycle tsk1).
       have SO2:O2 + task_time_slot tsk2 <= cycle by apply (Offset_add_slot_leq_cycle tsk2).
       repeat rewrite mod_elim;auto.
-      case (O1 <= t%%cycle)eqn:O1T;case (O2 <= t %%cycle)eqn:O2T;intros G1 G2;try ssromega.
+      case (O1 <= t%%cycle)eqn:O1T;case (O2 <= t %%cycle)eqn:O2T;intros G1 G2;try ssrlia.
       apply ltn_subLR in G1;apply ltn_subLR in G2. case (tsk1==tsk2) eqn:NEQ;move/eqP in NEQ;auto.
       destruct (slot_order_total tsk1 tsk2) as [order |order];auto;apply relation_offset in order;
-      fold O1 O2 in order;try ssromega;auto. by move/eqP in NEQ. apply /eqP;auto.
+      fold O1 O2 in order;try ssrlia;auto. by move/eqP in NEQ. apply /eqP;auto.
     Qed.
 
   End TimeSlotOrderFacts.

@@ -14,7 +14,7 @@ Proof.
   intros* CP BC.
   have G: a%%c < c by apply ltn_pmod.
   case (b <= a %% c)eqn:CASE;rewrite -addnBA;auto;rewrite -modnDml.
-  - rewrite add_subC;auto. rewrite -modnDmr modnn addn0 modn_small;auto;ssromega.
-  - rewrite modn_small;try ssromega.
+  - rewrite add_subC;auto. rewrite -modnDmr modnn addn0 modn_small;auto;ssrlia.
+  - rewrite modn_small;try ssrlia.
 Qed.
 

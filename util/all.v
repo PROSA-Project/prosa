@@ -5,7 +5,7 @@ Require Export prosa.util.counting.
 Require Export prosa.util.div_mod.
 Require Export prosa.util.list.
 Require Export prosa.util.nat.
-Require Export prosa.util.ssromega.
+Require Export prosa.util.ssrlia.
 Require Export prosa.util.sum.
 Require Export prosa.util.seqset.
 Require Export prosa.util.step_function.

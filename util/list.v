@@ -1,4 +1,4 @@
-Require Import prosa.util.ssromega prosa.util.tactics.
+Require Import prosa.util.ssrlia prosa.util.tactics.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** We define a few simple operations on 
@@ -526,7 +526,7 @@ Section IotaRange.
     induction k.
     { move => x a b BO /andP [GE LT]; exfalso.
       move: BO; rewrite leqn0 subn_eq0; move => BO.
-        by ssromega.
+        by ssrlia.
     } 
     { move => x a b BO /andP [GE LT].
       destruct a.
@@ -536,15 +536,15 @@ Section IotaRange.
         - move: EQ => /eqP EQ; subst x.
           rewrite filter_in_pred0 //.
             by intros x; rewrite mem_index_iota -lt0n; move => /andP [T1 _]. 
-        - by apply IHk; ssromega. 
+        - by apply IHk; ssrlia. 
       }
-      rewrite index_iota_lt_step; last by ssromega.
+      rewrite index_iota_lt_step; last by ssrlia.
       simpl; destruct (a.+1 == x) eqn:EQ. 
       - move: EQ => /eqP EQ; subst x.
         rewrite filter_in_pred0 //.
         intros x; rewrite mem_index_iota; move => /andP [T1 _].
           by rewrite neq_ltn; apply/orP; right.
-      - by rewrite IHk //; ssromega. 
+      - by rewrite IHk //; ssrlia. 
     } 
   Qed.
   
@@ -579,7 +579,7 @@ Section IotaRange.
     destruct (y == y') eqn:EQ1, (y' == x) eqn:EQ2; auto.
     - exfalso.
       move: EQ1 EQ2 => /eqP EQ1 /eqP EQ2; subst.
-        by ssromega.
+        by ssrlia.
     - move: EQ1 => /eqP EQ1; subst.
         by rewrite in_cons eq_refl.
     - by rewrite in_cons EQ1.
@@ -601,7 +601,7 @@ Section IotaRange.
     { exists (b-a); now simpl. } destruct EX as [k BO].
     revert x xs a b B MIN BO.
     induction k; move => x xs a b /andP [LE GT] MIN BO.
-    - by move_neq_down BO; ssromega.
+    - by move_neq_down BO; ssrlia.
     - move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
       + subst.
         rewrite index_iota_lt_step //.
@@ -615,7 +615,7 @@ Section IotaRange.
         replace (@in_mem nat x (@mem nat (seq_predType nat_eqType) (@rem_all nat_eqType x xs))) with false; last first.
         apply/eqP; rewrite eq_sym eqbF_neg. apply/negP; apply nin_rem_all.
         reflexivity.
-      + rewrite index_iota_lt_step //; last by ssromega.
+      + rewrite index_iota_lt_step //; last by ssrlia.
         replace ([seq ρ <- a :: index_iota a.+1 b | ρ \in x :: xs])
           with ([seq ρ <- index_iota a.+1 b | ρ \in x :: xs]); last first.
         { simpl; replace (@in_mem nat a (@mem nat (seq_predType nat_eqType) (@cons nat x xs))) with false; first by done.
@@ -631,7 +631,7 @@ Section IotaRange.
           apply in_rem_all in C.
             by move_neq_down LT; apply MIN.
         } 
-          by rewrite IHk //; ssromega.
+          by rewrite IHk //; ssrlia.
   Qed.
 
   (** For convenience, we define a special case of
@@ -669,9 +669,9 @@ Section IotaRange.
       + rewrite index_iota_lt_step; last by done.
         simpl in *; destruct (P a) eqn:PA.
         * destruct idx; simpl; first by done.
-          apply IHk; try ssromega.
+          apply IHk; try ssrlia.
             by rewrite index_iota_lt_step // //= PA //= in LT2.
-        * apply IHk; try ssromega.
+        * apply IHk; try ssrlia.
             by rewrite index_iota_lt_step // //= PA //= in LT2.
   Qed.
   

@@ -65,10 +65,10 @@ Section NondecreasingSequence.
           + destruct n1, n2; try done; simpl.
             * apply iota_filter_gt; first by done.
               rewrite index_iota_lt_step // //= PA //= in LT.
-            * apply IHk; try ssromega.
+            * apply IHk; try ssrlia.
               apply/andP; split; first by done.
               rewrite index_iota_lt_step // //= PA //= in LT.
-          + apply IHk; try ssromega.
+          + apply IHk; try ssrlia.
             apply/andP; split; first by done.
             rewrite index_iota_lt_step // //= PA //= in LT.
       } 
@@ -660,10 +660,10 @@ Section NondecreasingSequence.
         { rewrite ltnNge; apply/negP; intros CONTR.
           subst x y; move: LT; rewrite ltnNge; move => /negP T; apply: T.
             by apply SIZE; apply/andP. } 
-        have EQ: exists Δ, indy = indx + Δ. exists (indy - indx); ssromega. move: EQ => [Δ EQ]; subst indy.
+        have EQ: exists Δ, indy = indx + Δ. exists (indy - indx); ssrlia. move: EQ => [Δ EQ]; subst indy.
         have F: exists ind, indx <= ind < indx + Δ /\ xs[|ind|] < xs[|ind.+1|].
         { subst x y; clear SIZEx SIZEy; revert xs indx LTind SIZE LT.
-          induction Δ; intros; first by ssromega.
+          induction Δ; intros; first by ssrlia.
           destruct (posnP Δ) as [ZERO|POS].
           { by subst Δ; exists indx; split; [rewrite addn1; apply/andP | rewrite addn1 in LT]; auto. }
           have ALT: xs[|indx + Δ|] == xs[|indx + Δ.+1|] \/ xs[|indx + Δ|] < xs[|indx + Δ.+1|].
@@ -809,7 +809,7 @@ Section NondecreasingSequence.
             rewrite {1}range_iota_filter_step //. rewrite distances_unfold_2cons. rewrite {1}range_iota_filter_step //. 
       }
     Qed.
-
+    
     (** Let [xs] again be a non-decreasing sequence. We prove that 
         distances of sequence [undup xs] coincide with 
         sequence of positive distances of [xs]. *)
@@ -820,8 +820,7 @@ Section NondecreasingSequence.
     Proof.
       intros ? NonDec.
       rewrite -(distances_iota_filtered _ (max0 xs)); [ | by apply in_max0_le | by done].
-      have T: forall {X Y : Type} (x y : X) (f : X -> Y), x = y -> f x = f y.
-      { by intros; subst. } apply T; clear T.
+      enough ([seq ρ <- index_iota 0 (max0 xs).+1 | ρ \in xs] = (undup xs)) as IN; first by rewrite IN.
       have EX: exists len, size xs <= len.
       { exists (size xs); now simpl. } destruct EX as [n BO].
       revert xs NonDec BO; induction n.

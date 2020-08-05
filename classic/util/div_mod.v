@@ -1,7 +1,7 @@
 Require Export prosa.util.div_mod.
 
 Require Import Arith Omega Nat.
-Require Import prosa.classic.util.tactics prosa.util.ssromega prosa.classic.util.nat.
+Require Import prosa.classic.util.tactics prosa.util.ssrlia prosa.classic.util.nat.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
@@ -160,7 +160,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
     rewrite -(modnn (n.+1)).
     change (a.+1) with (1+a).
     change (n.+1) with (1+n).
-    assert (X:n<n.+1) by ssromega.
+    assert (X:n<n.+1) by ssrlia.
     apply modn_small in X.
     split; intros* G.
     - apply eq_modDl in G.
@@ -179,7 +179,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
       by rewrite -G -addn1 -modnDml addn1.
     - destruct n.
       + left. reflexivity.
-      + assert (X: a%%n.+1 < n.+1). by apply ltn_pmod. ssromega.
+      + assert (X: a%%n.+1 < n.+1). by apply ltn_pmod. ssrlia.
     - right. destruct n.
       + discriminate G.
       + apply modnS_eq. by injection G. 
@@ -191,8 +191,8 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
     destruct (ltngtP ((a%%n.+1).+1) (n.+1)) as [G|G|G].
     - left. apply modn_small in G.
       by rewrite -G -addn1 -modnDml addn1.
-    - assert (X: a%%n.+1 < n.+1). by apply ltn_pmod. ssromega.
-    - right. apply modnS_eq. ssromega. 
+    - assert (X: a%%n.+1 < n.+1). by apply ltn_pmod. ssrlia.
+    - right. apply modnS_eq. ssrlia. 
   Qed.
 
   (* Old version of the lemma which is now covered by modnSor and modnS_eq *)
@@ -211,14 +211,14 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
     rewrite leq_eqVlt. move/orP => [G2|G2].
     - move/eqP :G2 => G2. subst.
       rewrite dvdnn. rewrite divnn. 
-      destruct c; ssromega.
+      destruct c; ssrlia.
     - rewrite gtnNdvd // divn_small //.
   Qed.
 
   Lemma ceil_suba: forall a c, c > 0 -> a > c -> div_ceil a c = (div_ceil (a-c) c).+1.
   Proof.
     intros* G1 G2. unfold div_ceil.
-    assert (X:a=a-c+c) by (rewrite subnK //; ssromega).
+    assert (X:a=a-c+c) by (rewrite subnK //; ssrlia).
     case E1:(c %| a); case E2:(c %| a - c); rewrite {1} X.  
     - rewrite divnDl //. rewrite divnn. by rewrite G1 addn1.
     - rewrite X in E1. apply dvdn_add_eq in E1. 
@@ -232,5 +232,5 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
   Proof.
     intros.
     rewrite {2}(divn_eq a b).
-    ssromega.
+    ssrlia.
   Qed.

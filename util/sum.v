@@ -161,7 +161,7 @@ Section ExtraLemmas.
         by rewrite in_cons; apply/orP; right. }
     rewrite big_cons [RHS]big_cons in H2.
     have EqLeq: forall a b c d, a + b = c + d -> a <= c -> b >= d.
-    { clear; intros; ssromega. } 
+    { clear; intros; ssrlia. } 
     move: IN; rewrite in_cons; move => /orP [/eqP EQ | IN]. 
     { subst a.
       rewrite PX in H2.

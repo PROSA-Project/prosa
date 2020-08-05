@@ -355,7 +355,7 @@ Section Abstract_RTA.
               have HH : task_run_to_completion_threshold tsk <= F.
               { move: H_A_F_fixpoint => EQ.
                 have L1 := relative_arrival_le_interference_bound.
-                ssromega.
+                ssrlia.
               }
               apply leq_trans with F; auto.
             Qed.
@@ -367,7 +367,7 @@ Section Abstract_RTA.
               have HH : task_run_to_completion_threshold tsk <= F.
               { move: H_A_F_fixpoint => EQ.
                 have L1 := relative_arrival_le_interference_bound.
-                ssromega.
+                ssrlia.
               }
                 by apply leq_trans with (task_run_to_completion_threshold tsk); first rewrite /optimism leq_subr.
             Qed.

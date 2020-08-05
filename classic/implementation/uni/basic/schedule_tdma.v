@@ -97,7 +97,7 @@ Module ConcreteSchedulerTDMA.
         have BIGJ': j' \in [seq j <- \big[cat/[::]]_(arrj.+1 <= i < t.+1)
                     jobs_arriving_at arr_seq i | is_pending j t]
         by rewrite mem_filter;apply /andP.
-        rewrite ->big_cat_nat with (n:=arrj.+1) in LEQ;try ssromega.
+        rewrite ->big_cat_nat with (n:=arrj.+1) in LEQ;try ssrlia.
         rewrite filter_cat find_cat /=in LEQ.
         rewrite find_cat /= in LEQ.
         have F: (has (fun job : Job => job == j')
@@ -109,7 +109,7 @@ Module ConcreteSchedulerTDMA.
                        jobs_arriving_at arr_seq i
              | is_pending j t]);auto.
         rewrite -filter_cat -big_cat_nat;auto. apply pending_jobs_uniq.
-        ssromega.
+        ssrlia.
         have TT: (has (fun job : Job => job == j)
           [seq j <- \big[cat/[::]]_(0 <= i < arrj.+1)
                        jobs_arriving_at arr_seq i
@@ -121,7 +121,7 @@ Module ConcreteSchedulerTDMA.
           [seq j <- \big[cat/[::]]_(0 <= t < arrj.+1)
                        jobs_arriving_at arr_seq t
              | is_pending j t]). by rewrite -has_find.
-       rewrite F TT in LEQ. ssromega.
+       rewrite F TT in LEQ. ssrlia.
         Qed.
       
         Lemma pending_job_in_penging_list:

@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
-Require Import Omega.
+Require Import Lia.
 
 (* Adopted from http://github.com/pi8027/formalized-postscript/blob/master/stdlib_ext.v *)
 
@@ -24,7 +24,7 @@ Ltac arith_goal_ssrnat2coqnat :=
     | |- is_true (_ < _) => try apply/ltP
   end.
 
-Ltac ssromega :=
+Ltac ssrlia :=
   repeat arith_hypo_ssrnat2coqnat;
   arith_goal_ssrnat2coqnat; simpl;
-  omega.
+  lia.

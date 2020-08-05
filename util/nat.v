@@ -1,4 +1,4 @@
-Require Export prosa.util.tactics prosa.util.ssromega.
+Require Export prosa.util.tactics prosa.util.ssrlia.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 (* Additional lemmas about natural numbers. *)
@@ -8,14 +8,14 @@ Section NatLemmas.
     forall m n p,
       m >= n ->
       m - n + p = m + p - n.
-  Proof. by ins; ssromega. Qed.
+  Proof. by ins; ssrlia. Qed.
 
   Lemma subh2 :
     forall m1 m2 n1 n2,
       m1 >= m2 ->
       n1 >= n2 ->
       (m1 + n1) - (m2 + n2) = m1 - m2 + (n1 - n2).
-  Proof. by ins; ssromega. Qed.
+  Proof. by ins; ssrlia. Qed.
   
   Lemma subh3:
     forall m n p,
@@ -51,7 +51,7 @@ Section NatLemmas.
       a + (b - c ) = a - c + b.
   Proof.
     intros* AgeC BgeC.
-    induction b;induction c;intros;try ssromega.
+    induction b;induction c;intros;try ssrlia.
   Qed.
 
   (* TODO: remove when mathcomp minimum required version becomes 1.10.0 *)
@@ -60,7 +60,7 @@ Section NatLemmas.
       a - c < b ->
       a < b + c.
   Proof.
-    intros* AC. ssromega.
+    intros* AC. ssrlia.
   Qed.
 
   (* We can drop additive terms on the lesser side of an inequality. *)
