@@ -543,14 +543,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
         Proof.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
           apply leq_sum_seq; intros tsko INtsko NEQT.
-          edestruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; [ | apply ltnW in NEQ].
-          - move: (NEQ) => /minn_idPl => MIN.
-            rewrite minnC in MIN; rewrite MIN; clear MIN.
-              by apply workload_le_rbf.
-          - move: (NEQ) => /minn_idPr => MIN.
-            rewrite minnC in MIN; rewrite MIN; clear MIN.
-            eapply leq_trans. eapply total_workload_shorten_range; eauto 2.
-              by eapply workload_le_rbf'; eauto 2.
+          destruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; first by apply workload_le_rbf.
+          apply ltnW in NEQ.
+          eapply leq_trans. eapply total_workload_shorten_range; eauto 2.
+          now eapply workload_le_rbf'; eauto 2.
         Qed.
         
     End Inequalities.
@@ -640,19 +636,16 @@ Section AbstractRTAforEDFwithArrivalCurves.
               have CASE2: A + D tsk - D tsk_o <= x
                 by apply leq_trans with (A + ε + D tsk - D tsk_o);
                   first (apply leq_sub2r; rewrite leq_add2r leq_addr).
-                by move: CASE2; rewrite -subn_eq0; move => /eqP CASE2; rewrite CASE2 subn0.
+                now move: CASE2; rewrite -subn_eq0; move => /eqP CASE2; rewrite CASE2 subn0.
             } 
-            have ->: minn (A + ε + D tsk - D tsk_o) x = A + ε + D tsk - D tsk_o
-              by rewrite minnE; move: CASE; rewrite -subn_eq0; move => /eqP CASE; rewrite CASE subn0.
-              by apply/eqP. 
+            now apply/eqP. 
           - have ->: minn (A + D tsk - D tsk_o) x = x.
             { rewrite minnE; rewrite subKn //; rewrite -(leq_add2r 1) !addn1 -subSn.
-              + by rewrite -[in X in _ <= X]addn1 -addnA [_ + 1]addnC addnA.
+              + now rewrite -[in X in _ <= X]addn1 -addnA [_ + 1]addnC addnA.
               + enough (POS: 0 < A + ε + D tsk - D tsk_o); last eapply leq_ltn_trans with x; eauto 2.
-                  by rewrite subn_gt0 -addnA [1 + _]addnC addnA addn1 ltnS in POS.
+                now rewrite subn_gt0 -addnA [1 + _]addnC addnA addn1 ltnS in POS.
             } 
-            have ->: minn (A + ε + D tsk - D tsk_o) x = x by rewrite minnE; rewrite subKn // ltnW.
-              by apply/eqP. 
+            now apply/eqP. 
         }
       Qed.
 
