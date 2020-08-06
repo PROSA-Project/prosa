@@ -543,10 +543,14 @@ Section AbstractRTAforEDFwithArrivalCurves.
         Proof.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
           apply leq_sum_seq; intros tsko INtsko NEQT.
-          destruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; first by apply workload_le_rbf.
-          apply ltnW in NEQ.
-          eapply leq_trans. eapply total_workload_shorten_range; eauto 2.
-          now eapply workload_le_rbf'; eauto 2.
+          case: (leqP Δ (A + ε + D tsk - D tsko)) => NEQ.
+          { try (move: (NEQ); move=> /minn_idPr  ->). (* legacy: needed for mathcomp 1.10 & Coq 8.11 *)
+            now apply workload_le_rbf. }
+          {
+            apply ltnW in NEQ.
+            try (move: (NEQ); move=> /minn_idPl ->). (* legacy: needed for mathcomp 1.10 & Coq 8.11 *)
+            eapply leq_trans. eapply total_workload_shorten_range; eauto 2.
+            now eapply workload_le_rbf'; eauto 2. }
         Qed.
         
     End Inequalities.
@@ -638,6 +642,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
                   first (apply leq_sub2r; rewrite leq_add2r leq_addr).
                 now move: CASE2; rewrite -subn_eq0; move => /eqP CASE2; rewrite CASE2 subn0.
             } 
+            try (move: (CASE); move=> /minn_idPl ->). (* legacy: needed for mathcomp 1.10 & Coq 8.11 *)
             now apply/eqP. 
           - have ->: minn (A + D tsk - D tsk_o) x = x.
             { rewrite minnE; rewrite subKn //; rewrite -(leq_add2r 1) !addn1 -subSn.
@@ -645,6 +650,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
               + enough (POS: 0 < A + ε + D tsk - D tsk_o); last eapply leq_ltn_trans with x; eauto 2.
                 now rewrite subn_gt0 -addnA [1 + _]addnC addnA addn1 ltnS in POS.
             } 
+            try (apply ltnW in CASE; move: CASE; move=> /minn_idPl; rewrite minnC => ->). (* legacy: needed for mathcomp 1.10 & Coq 8.11 *)
             now apply/eqP. 
         }
       Qed.
