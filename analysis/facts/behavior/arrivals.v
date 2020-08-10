@@ -1,5 +1,6 @@
 Require Export prosa.behavior.all.
 Require Export prosa.util.all.
+Require Export prosa.model.task.arrivals.
 
 (** * Arrival Sequence *)
 
@@ -97,9 +98,11 @@ End Arrived.
 (** In this section, we establish useful facts about arrival sequence prefixes. *)
 Section ArrivalSequencePrefix.
 
-  (** Assume that job arrival times are known. *)
+  (** Consider any kind of tasks and jobs. *)
   Context {Job: JobType}.
+  Context {Task : TaskType}.
   Context `{JobArrival Job}.
+  Context `{JobTask Job Task}.
 
   (** Consider any job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
@@ -107,7 +110,7 @@ Section ArrivalSequencePrefix.
   (** We begin with basic lemmas for manipulating the sequences. *)
   Section Composition.
 
-    (** First, we show that the set of arriving jobs can be split
+    (** We show that the set of arriving jobs can be split
          into disjoint intervals. *)
     Lemma arrivals_between_cat:
       forall t1 t t2,
@@ -120,7 +123,20 @@ Section ArrivalSequencePrefix.
         by rewrite (@big_cat_nat _ _ _ t).
     Qed.
 
-    (** Second, the same observation applies to membership in the set of
+    (** We also prove a stronger version of the above lemma 
+     in the case of arrivals that satisfy a predicate [P]. *)
+    Lemma arrivals_P_cat:
+      forall P t t1 t2,
+        t1 <= t < t2 -> 
+        arrivals_between_P arr_seq P t1 t2 =
+        arrivals_between_P arr_seq P t1 t ++ arrivals_between_P arr_seq P t t2.
+    Proof.
+      intros P t t1 t2 INEQ.
+      rewrite -filter_cat.
+      now rewrite -arrivals_between_cat => //; ssrlia.
+    Qed.
+    
+    (** The same observation applies to membership in the set of
          arrived jobs. *)
     Lemma arrivals_between_mem_cat:
       forall j t1 t t2,
@@ -132,7 +148,7 @@ Section ArrivalSequencePrefix.
         by intros j t1 t t2 GE LE; rewrite (arrivals_between_cat _ t).
     Qed.
 
-    (** Third, we observe that we can grow the considered interval without
+    (** We observe that we can grow the considered interval without
          "losing" any arrived jobs, i.e., membership in the set of arrived jobs
          is monotonic. *)
     Lemma arrivals_between_sub:
@@ -153,7 +169,7 @@ Section ArrivalSequencePrefix.
     Qed.
 
   End Composition.
-
+  
   (** Next, we relate the arrival prefixes with job arrival times. *)
   Section ArrivalTimes.
 
@@ -173,6 +189,17 @@ Section ArrivalSequencePrefix.
       apply mem_bigcat_nat_exists in IN.
       move: IN => [arr [IN _]].
         by exists arr.
+    Qed.
+    
+    (** We also prove a weaker version of the above lemma. *)
+    Lemma in_arrseq_implies_arrives:
+      forall t j,
+        j \in arr_seq t ->
+        arrives_in arr_seq j.
+    Proof.
+      move => t j J_ARR.
+      exists t.
+      now rewrite /arrivals_at.
     Qed.
 
     (** Next, we prove that if a job belongs to the prefix
@@ -203,7 +230,7 @@ Section ArrivalSequencePrefix.
     Qed.
 
     (** Similarly, we prove that if a job from the arrival sequence arrives
-         before t, then it belongs to the sequence (jobs_arrived_before t). *)
+        before t, then it belongs to the sequence (jobs_arrived_before t). *)
     Lemma arrived_between_implies_in_arrivals:
       forall j t1 t2,
         arrives_in arr_seq j ->
@@ -213,12 +240,41 @@ Section ArrivalSequencePrefix.
       rename H_consistent_arrival_times into CONS.
       move => j t1 t2 [a_j ARRj] BEFORE.
       have SAME := ARRj; apply CONS in SAME; subst a_j.
-        by apply mem_bigcat_nat with (j := (job_arrival j)).
+      now apply mem_bigcat_nat with (j := (job_arrival j)).
     Qed.
-
+    
+    (** Any job in arrivals between time instants [t1] and [t2] must arrive
+       in the interval <<[t1,t2)>>. *)
+    Lemma job_arrival_between:
+      forall j P t1 t2,
+        j \in arrivals_between_P arr_seq P t1 t2 ->
+        t1 <= job_arrival j < t2.
+    Proof.
+      intros * ARR.
+      move: ARR; rewrite mem_filter => /andP [PJ JARR].
+      apply mem_bigcat_nat_exists in JARR.
+      move : JARR => [i [ARR INEQ]].
+      apply H_consistent_arrival_times in ARR.
+      now rewrite ARR.
+    Qed.
+    
+    (** Any job [j] is in the sequence [arrivals_between t1 t2] given
+     that [j] arrives in the interval <<[t1,t2)>>. *)
+    Lemma job_in_arrivals_between:
+      forall j t1 t2,
+        arrives_in arr_seq j ->
+        t1 <= job_arrival j < t2 ->
+        j \in arrivals_between arr_seq t1 t2.
+    Proof.
+      intros * ARR INEQ.
+      apply mem_bigcat_nat with (j := job_arrival j) => //.
+      move : ARR => [t J_IN].
+      now rewrite -> H_consistent_arrival_times with (t := t).
+    Qed.
+    
     (** Next, we prove that if the arrival sequence doesn't contain duplicate
-         jobs, the same applies for any of its prefixes. *)
-    Lemma arrivals_uniq :
+        jobs, the same applies for any of its prefixes. *)
+    Lemma arrivals_uniq:
       arrival_sequence_uniq arr_seq ->
       forall t1 t2, uniq (arrivals_between arr_seq t1 t2).
     Proof.
@@ -229,7 +285,7 @@ Section ArrivalSequencePrefix.
         by apply CONS in IN1; apply CONS in IN2; subst.
     Qed.
 
-    (** Also note there can't by any arrivals in an empty time interval. *)
+    (** Also note that there can't by any arrivals in an empty time interval. *)
     Lemma arrivals_between_geq:
       forall t1 t2,
         t1 >= t2 ->
@@ -238,6 +294,25 @@ Section ArrivalSequencePrefix.
         by intros ? ? GE; rewrite /arrivals_between big_geq.
     Qed.
     
+    (** Given jobs [j1] and [j2] in [arrivals_between_P arr_seq P t1 t2], the fact that
+        [j2] arrives strictly before [j1] implies that [j2] also belongs in the sequence
+        [arrivals_between_P arr_seq P t1 (job_arrival j1)]. *)
+    Lemma arrival_lt_implies_job_in_arrivals_between_P:
+      forall (j1 j2 : Job) (P : Job -> bool) (t1 t2 : instant),
+        (j1 \in arrivals_between_P arr_seq P t1 t2) -> 
+        (j2 \in arrivals_between_P arr_seq P t1 t2) ->
+        job_arrival j2 < job_arrival j1 ->
+        j2 \in arrivals_between_P arr_seq P t1 (job_arrival j1).
+    Proof.
+      intros * J1_IN J2_IN ARR_LT.
+      rewrite mem_filter in J2_IN; move : J2_IN => /andP [PJ2 J2ARR] => //.
+      rewrite mem_filter; apply /andP; split => //.
+      apply mem_bigcat_nat_exists in J2ARR; move : J2ARR => [i [J2_IN INEQ]].
+      apply mem_bigcat_nat with (j := i) => //.
+      apply H_consistent_arrival_times in J2_IN; rewrite J2_IN in ARR_LT.
+      now ssrlia.
+    Qed.
+
   End ArrivalTimes.
 
 End ArrivalSequencePrefix. 

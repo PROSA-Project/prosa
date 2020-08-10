@@ -345,7 +345,7 @@ Section AdditionalLemmas.
       clear IN; move: IHxs => [xsl [xsr EQ]].
         by subst; exists (a::xsl), xsr.
   Qed.  
-
+  
   (* We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence 
      of [ys] implies that the size of [xs] is at most the size of [ys]. *)
   Lemma subseq_leq_size:
@@ -408,6 +408,55 @@ Section AdditionalLemmas.
         move: EQ => /eqP; rewrite eqb_id -[P a]Bool.negb_involutive; move => /negP T.
         exfalso; apply: T.
           by apply F; apply/orP; left.
+  Qed.
+
+  (** We show that any two elements having the same index 
+      in a unique sequence must be equal. *)
+  Lemma eq_ind_in_seq:
+    forall (T : eqType) a b (xs : seq T),
+      index a xs = index b xs ->
+      uniq xs -> 
+      a \in xs ->
+      b \in xs ->
+      a = b.
+  Proof.
+    move=> T a b xs EQ UNIQ IN_a IN_b.
+    move: (nth_index a IN_a) => EQ_a.
+    move: (nth_index a IN_b) => EQ_b.
+    now rewrite -EQ_a -EQ_b EQ.
+  Qed.
+
+  (** We show that the nth element in a sequence lies in the
+      sequence or is the default element. *)
+  Lemma default_or_in:
+    forall (T : eqType) (n : nat) (d : T) (xs : seq T),
+      nth d xs n = d \/ nth d xs n \in xs.
+  Proof.
+    clear; intros.
+    destruct (leqP (size xs) n).
+    - now left; apply nth_default.
+    - now right; apply mem_nth.
+  Qed.
+
+  (** We show that in a unique sequence of size greater than one
+      there exist two unique elements.  *)
+  Lemma exists_two:
+    forall (T : eqType) (xs : seq T),
+      size xs > 1 ->
+      uniq xs ->
+      exists a b, a <> b /\ a \in xs /\ b \in xs.
+  Proof.
+    move=> T xs GT1 UNIQ.
+    (* get an element of [T] so that we can use nth *)
+    have HEAD: exists x, ohead xs = Some x
+        by elim: xs GT1 UNIQ => // a l _ _ _; exists a => //.
+    move: (HEAD) => [x0 _].
+    have GT0: 0 < size xs by apply ltn_trans with (n := 1).
+    exists (nth x0 xs 0).
+    exists (nth x0 xs 1).
+    repeat split; try apply mem_nth => //.
+    apply /eqP; apply contraNneq with (b := (0 == 1)) => // /eqP.
+    now rewrite nth_uniq.
   Qed.
 
 End AdditionalLemmas.
@@ -676,3 +725,14 @@ Section IotaRange.
   Qed.
   
 End IotaRange. 
+
+(** A sequence [xs] is a prefix of another sequence [ys] iff
+    there exists a sequence [xs_tail] such that [ys] is a 
+    concatenation of [xs] and [xs_tail]. *)
+Definition prefix (T : eqType) (xs ys : seq T) := exists xs_tail, xs ++ xs_tail = ys.
+
+(** Furthermore, every prefix of a sequence is said to be 
+    strict if it is not equal to the sequence itself. *)
+Definition strict_prefix (T : eqType) (xs ys : seq T) :=
+  exists xs_tail, xs_tail <> [::] /\ xs ++ xs_tail = ys.
+
