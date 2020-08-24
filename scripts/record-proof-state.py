@@ -39,7 +39,7 @@ try:
 except:
     have_yaml = False
 
-def statement_end_offsets(src):
+def statement_end_offsets(opts, src):
     """A naive splitter for Coq .v files.
     Pays attention to nested comments and considers each period followed
     by whitespace to be the end of something that should be sent to coqtop.
@@ -81,15 +81,6 @@ def statement_end_offsets(src):
                 return True
         return True
 
-    def only_whitespace_since_period(i):
-        while i > 0:
-            i -= 1
-            if src[i] != '.' and not src[i].isspace():
-                return False
-            if src[i] == '.':
-                return True
-        return False
-
     def end_of_bullet(i):
         while i < len(src) and cur_is_bullet(i):
             i += 1
@@ -111,15 +102,33 @@ def statement_end_offsets(src):
         return src[:i].endswith("Qed") \
                or (in_proof and src[:i].endswith("Defined"))
 
-    for i in range(len(src)):
+    last = -1
+    seen_non_whitespace_since_last = False
+    i = 0
+    while i < len(src):
+        comment_just_ended = False
+        if opts.parse_only and opts.verbose:
+            print("%7d [%s]  comment:%d  proof:%d  ns:%d  nsnl:%d  bullet:%d  last:%d" % (
+                i,
+                src[i].replace('\n', '\\n'),
+                in_comment,
+                in_proof,
+                seen_non_whitespace_since_last,
+                not only_whitespace_since_newline(i),
+                cur_is_bullet(i),
+                last
+            ))
         assert in_comment >= 0
         assert in_proof >= 0
         # comment starting?
         if cur_is(i, '(') and next_is(i, '*'):
             in_comment += 1
+            i += 1 # skip next
         # comment ending?
         elif cur_is(i, '*') and next_is(i, ')'):
             in_comment -= 1
+            i += 1 # skip next
+            comment_just_ended = True
         # look for statements ending in a period
         elif not in_comment and cur_is(i, '.') and next_is_whitespace(i):
             if start_of_proof(i):
@@ -127,25 +136,38 @@ def statement_end_offsets(src):
             elif end_of_proof(i):
                 in_proof -= 1
             yield i + 1
+            last = i + 1
         # look for closing braces -- this is a brittle heuristic, but
         # we need to catch sub-proofs because coqtop in emacs mode
         # produces a prompt every time we enter a sub-proof
         elif not in_comment and in_proof and cur_is(i, '}') \
              and next_is_whitespace(i) and prev_is_whitespace(i):
             yield i + 1
+            last = i + 1
         # similarly, look for opening braces
         elif not in_comment and in_proof and cur_is(i, '{') \
              and next_is_whitespace(i) and prev_is_whitespace(i):
             yield i + 1
+            last = i + 1
         # detect bulleted sub-proofs for the same reason
         elif not in_comment and in_proof and cur_is_bullet(i) \
              and only_whitespace_since_newline(i) \
-             and only_whitespace_since_period(i):
+             and not seen_non_whitespace_since_last:
             # bullets can consist of multiple characters
             end = end_of_bullet(i)
             if not end is False:
                 yield end
+                last = end
+                i = end # skip over entire bullet
             # otherwise just skip over this
+
+        # reset flags
+        if i == last:
+            seen_non_whitespace_since_last = False
+        elif not (in_comment or comment_just_ended) and not src[i].isspace():
+            seen_non_whitespace_since_last = True
+        # advance to next character
+        i += 1
 
 def launch_coqtop(opts):
     # Let the shell figure out where coqtop is and resolve the options.
@@ -157,14 +179,15 @@ START_OF_PROMPT = "<prompt>"
 END_OF_PROMPT   = "</prompt>"
 END_OF_PROMPT_BYTES = bytes(END_OF_PROMPT, 'utf-8')
 
-def read_from_pipe(pipe, timeout, seen_enough = lambda _: False):
+def read_from_pipe(pipe, timeout, seen_enough = lambda _: False, expect_timeout=False):
     output = bytearray()
     while not seen_enough(output):
         (readable, writable, exceptional) = select([pipe], [], [], timeout)
         if not readable:
             # we timed out, nothing to read
             if timeout > 0:
-                print('=' * 30 + "[ TIMEOUT ]" + '=' * 30)
+                if not expect_timeout:
+                    print('=' * 30 + "[ TIMEOUT ]" + '=' * 30)
             break
         else:
             data = readable[0].read(512)
@@ -180,9 +203,10 @@ def wait_for_prompt(opts, pipe, timeout):
     output = read_from_pipe(pipe, timeout, seen_enough)
 
     while True:
-        more = read_from_pipe(pipe, 0, seen_enough)
+        more = read_from_pipe(pipe, 0, seen_enough, expect_timeout=True)
         output += more
         if more:
+            print("unexpected:", more)
             assert False # we lost sync; this should not be happening
         else:
             break
@@ -258,10 +282,10 @@ def interact(opts, coqtop, src, start, end):
 
     return interaction
 
-def report(interaction):
+def report(n, interaction):
     print("+" * 80)
     if 'input' in interaction:
-        print("INPUT: [%s]" % "\n".join(interaction['input']))
+        print("INPUT < %d : [%s]" % (n, "\n".join(interaction['input'])))
     if 'output' in interaction:
         print("OUTPUT:\n%s" % "\n".join(interaction['output']))
     else:
@@ -277,17 +301,17 @@ def feed_to_coqtop(opts, src):
     # wait for coqtop startup to finish
     interaction = wait_for_coqtop(opts, coqtop)
     if opts.verbose:
-        report(interaction)
+        report(0, interaction)
     interactions.append(interaction)
 
     # feed statements
     last = 0
-    for end in statement_end_offsets(src):
+    for end in statement_end_offsets(opts, src):
         interaction = interact(opts, coqtop, src, last, end)
         interactions.append(interaction)
         last = end + 1
         if opts.verbose:
-            report(interaction)
+            report(len(interactions), interaction)
 
     # signal end of input
     coqtop.stdin.close()
@@ -300,7 +324,7 @@ def feed_to_coqtop(opts, src):
             trailing_interactions += 1
             interactions.append(interaction)
             if opts.verbose:
-                report(interaction)
+                report(len(interactions), interaction)
 
     assert trailing_interactions <= 1
 
@@ -322,6 +346,16 @@ def process(opts, fname):
         json.dump(interactions, out, sort_keys=False, indent=4)
     out.close()
 
+def dump_structure(opts, fname):
+    print("=" * 80)
+    print("Statements in %s: \n" % fname)
+    print("-" * 80)
+    src = open(fname, 'r').read()
+    last = 0
+    for end in statement_end_offsets(opts, src):
+        print("%s" % src[last:end+1].replace('\n', ' '))
+        last = end + 1
+        print("-" * 80)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -349,6 +383,10 @@ def parse_args():
     parser.add_argument('--verbose', default=False, action='store_true',
                         help='report on interaction with coqtop')
 
+    parser.add_argument('--parse-only', default=False, action='store_true',
+                        help='report how the script splits the input '
+                             '(--verbose for per-character info)')
+
     return parser.parse_args()
 
 def main():
@@ -363,7 +401,10 @@ def main():
     had_problem = False
     for f in opts.input_files:
         try:
-            process(opts, f)
+            if opts.parse_only:
+                dump_structure(opts, f)
+            else:
+                process(opts, f)
         except OSError as e:
             print(e, file=sys.stderr)
             had_problem = True
