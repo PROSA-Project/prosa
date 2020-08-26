@@ -10,7 +10,8 @@ Section TaskArrivals.
   Context {Task : TaskType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
-  
+  Context `{JobCost Job}.
+
   (** Consider any job arrival sequence ...  *)
   Variable arr_seq : arrival_sequence Job.
 
@@ -39,7 +40,11 @@ Section TaskArrivals.
   (** ... and finally count the number of job arrivals. *)
   Definition number_of_task_arrivals (t1 t2 : instant) :=
     size (task_arrivals_between t1 t2).
-    
+
+  (** ... and also count the cost of job arrivals. *)
+  Definition cost_of_task_arrivals (t1 t2 : instant) :=
+    \sum_(j <- task_arrivals_between t1 t2 | job_task j == tsk) job_cost j.
+
 End TaskArrivals.
 
 (** In this section we introduce a few definitions
