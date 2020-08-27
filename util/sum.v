@@ -265,5 +265,36 @@ Section SumArithmetic.
     intros t _.
       by case (P t).
   Qed.
-  
+
+  (** Summing natural numbers over a superset can only yields a greater sum.
+      Requiring the absence of duplicate in r1 is a simple way to
+      guarantee that the set inclusion r1 <= r2 implies the actually
+      required multiset inclusion. *)
+  Lemma leq_sum_sub_uniq :
+    forall (T: eqType) (r1 r2: seq T) F,
+      uniq r1 ->
+      {subset r1 <= r2} ->
+      \sum_(i <- r1) F i <= \sum_(i <- r2) F i.
+  Proof.
+    intros T r1 r2 F UNIQ SUB; generalize dependent r2.
+    induction r1 as [| x r1' IH]; first by ins; rewrite big_nil.
+    {
+      intros r2 SUB.
+      assert (IN: x \in r2).
+      by apply SUB; rewrite in_cons eq_refl orTb.
+      simpl in UNIQ; move: UNIQ => /andP [NOTIN UNIQ]; specialize (IH UNIQ).
+      destruct (splitPr IN).
+      rewrite big_cat 2!big_cons /= addnA [_ + F x]addnC -addnA leq_add2l.
+      rewrite mem_cat in_cons eq_refl in IN.
+      rewrite -big_cat /=.
+      apply IH; red; intros x0 IN0.
+      rewrite mem_cat.
+      feed (SUB x0); first by rewrite in_cons IN0 orbT.
+      rewrite mem_cat in_cons in SUB.
+      move: SUB => /orP [SUB1 | /orP [/eqP EQx | SUB2]];
+        [by rewrite SUB1 | | by rewrite SUB2 orbT].
+      by rewrite -EQx IN0 in NOTIN.
+    }
+  Qed.
+
 End SumArithmetic.

@@ -53,7 +53,22 @@ Section BigCatLemmas.
         exists n; split; first by done.
         apply/andP; split; [by done | by apply ltnSn]. }
     Qed.
-    
+
+    Lemma mem_bigcat_ord:
+      forall x n (j: 'I_n) (f: 'I_n -> list T),
+        j < n ->
+        x \in (f j) ->
+        x \in \cat_(i < n) (f i).
+    Proof.
+      move=> x; elim=> [//|n IHn] j f' Hj Hx.
+      rewrite big_ord_recr /= mem_cat; apply /orP.
+      move: Hj; rewrite ltnS leq_eqVlt => /orP [/eqP Hj|Hj].
+      { by right; rewrite (_ : ord_max = j); [|apply ord_inj]. }
+      left.
+      apply (IHn (Ordinal Hj)); [by []|].
+      by set j' := widen_ord _ _; have -> : j' = j; [apply ord_inj|].
+    Qed.
+
   End BigCatElements.
 
   (** In this section, we show how we can preserve uniqueness of the elements 
@@ -88,7 +103,47 @@ Section BigCatLemmas.
       apply H_no_elements_in_common with (i1 := i) in INx; last by done.
       by rewrite INx ltnn in LTi.
     Qed.
-    
+
+    (** Conversely, if the concatenation of the sequences has no duplicates, any
+        element can only belong to a single sequence. *)
+    Lemma bigcat_ord_uniq_reverse :
+      forall n (f: 'I_n -> list T),
+        uniq (\cat_(i < n) (f i)) ->
+        (forall x i1 i2,
+           x \in (f i1) -> x \in (f i2) -> i1 = i2).
+    Proof.
+      case=> [|n]; [by move=> f' Huniq x; case|].
+      elim: n => [|n IHn] f' Huniq x i1 i2 Hi1 Hi2.
+      { move: i1 i2 {Hi1 Hi2}; case; case=> [i1|//]; case; case=> [i2|//].
+        apply f_equal, eq_irrelevance. }
+      move: (leq_ord i1); rewrite leq_eqVlt => /orP [H'i1|H'i1];
+        move: (leq_ord i2); rewrite leq_eqVlt => /orP [H'i2|H'i2].
+      { by apply ord_inj; move: H'i1 H'i2 => /eqP -> /eqP ->. }
+      { exfalso.
+        move: Huniq; rewrite big_ord_recr cat_uniq => /andP [_ /andP [H _]].
+        move: H; apply /negP; rewrite Bool.negb_involutive.
+        apply /hasP; exists x => /=.
+        { set o := ord_max; suff -> : o = i1; [by []|].
+          by apply ord_inj; move: H'i1 => /eqP ->. }
+        apply (mem_bigcat_ord _ _ (Ordinal H'i2)) => //.
+        by set o := widen_ord _ _; suff -> : o = i2; [|apply ord_inj]. }
+      { exfalso.
+        move: Huniq; rewrite big_ord_recr cat_uniq => /andP [_ /andP [H _]].
+        move: H; apply /negP; rewrite Bool.negb_involutive.
+        apply /hasP; exists x => /=.
+        { set o := ord_max; suff -> : o = i2; [by []|].
+          by apply ord_inj; move: H'i2 => /eqP ->. }
+        apply (mem_bigcat_ord _ _ (Ordinal H'i1)) => //.
+        by set o := widen_ord _ _; suff -> : o = i1; [|apply ord_inj]. }
+      move: Huniq; rewrite big_ord_recr cat_uniq => /andP [Huniq _].
+      apply ord_inj; rewrite -(inordK H'i1) -(inordK H'i2); apply f_equal.
+      apply (IHn _ Huniq x).
+      { set i1' := widen_ord _ _; suff -> : i1' = i1; [by []|].
+        by apply ord_inj; rewrite /= inordK. }
+      set i2' := widen_ord _ _; suff -> : i2' = i2; [by []|].
+      by apply ord_inj; rewrite /= inordK.
+    Qed.
+
   End BigCatDistinctElements.
-  
+
 End BigCatLemmas.
