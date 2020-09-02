@@ -89,7 +89,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
   Hypothesis H_j1_task: job_task j1 = tsk.
   Hypothesis H_j2_task: job_task j2 = tsk.
 
-  (** We observe that unequal jobs cannot have equal arrival times. *)
+  (** We observe that distinct jobs cannot have equal arrival times. *)
   Lemma uneq_job_uneq_arr:
       j1 <> j2 ->
       job_arrival j1 <> job_arrival j2.
@@ -99,7 +99,22 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     move /neqP: UNEQ; rewrite neq_ltn => /orP [LT|LT].
     all: now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia.
   Qed.
-  
+
+  (** We prove a stronger version of the above lemma by showing 
+   that jobs [j1] and [j2] are equal if and only if they arrive at the
+   same time. *)
+  Lemma same_jobs_iff_same_arr:
+    j1 = j2 <->
+    job_arrival j1 = job_arrival j2.
+  Proof.
+    split; first by apply congr1.
+    intro EQ_ARR.
+    case: (boolP (j1 == j2)) => [/eqP EQ | /eqP NEQ]; first by auto.
+    rewrite -> diff_jobs_iff_diff_indices in NEQ => //; auto; last by rewrite H_j1_task.
+    move /neqP: NEQ; rewrite neq_ltn => /orP [LT|LT].
+    all: now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia.
+  Qed.
+    
 End DifferentJobsImplyDifferentArrivalTimes.
 
 (** In this section we prove a few properties regarding task arrivals
@@ -157,8 +172,8 @@ Section SporadicArrivals.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
     have EQ_ARR_A : (job_arrival a = job_arrival j) by apply H_consistent_arrivals.
     have EQ_ARR_B : (job_arrival b = job_arrival j) by apply H_consistent_arrivals.
-    apply (uneq_job_uneq_arr arr_seq) with (tsk0 := job_task a) in NEQ => //; try by rewrite TSKA.
-    now ssrlia.
+    apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j) in NEQ => //.
+    now rewrite EQ_ARR_A EQ_ARR_B in NEQ.
   Qed.
 
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
@@ -181,6 +196,20 @@ Section SporadicArrivals.
       apply size_task_arrivals_at_leq_one.
       exists j1.
       now repeat split => //; try rewrite H_j1_task.
+  Qed.
+
+  (** We show that no jobs of the task [tsk] other than [j1] arrive at
+      the same time as [j1], and thus the task arrivals at [job arrival j1]
+      consists only of job [j1]. *) 
+  Lemma only_j_at_job_arrival_j:
+    forall t,
+      job_arrival j1 = t ->
+      task_arrivals_at arr_seq tsk t = [::j1]. 
+  Proof.
+    intros t ARR.
+    rewrite -ARR.
+    specialize (only_j_in_task_arrivals_at_j) => J_AT.
+    now rewrite /task_arrivals_at_job_arrival H_j1_task in J_AT.
   Qed.
   
   (** We show that a job [j1] is the first job that arrives 

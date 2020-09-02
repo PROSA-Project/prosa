@@ -18,3 +18,16 @@ Proof.
   - rewrite modn_small;try ssrlia.
 Qed.
 
+(** We show that for any two integers [a] and [c], 
+    [a] is less than [a %/ c * c + c] given that [c] is positive. *)
+Lemma div_floor_add_g:
+  forall a c,
+    c > 0 ->
+    a < a %/ c * c + c.
+Proof.
+  intros * POS.
+  specialize (divn_eq a c) => DIV.
+  rewrite [in X in X < _]DIV.
+  rewrite ltn_add2l.
+  now apply ltn_pmod.
+Qed.    

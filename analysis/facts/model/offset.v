@@ -1,7 +1,7 @@
 Require Export prosa.model.task.offset.
 Require Export prosa.analysis.facts.job_index.
 
-(** In this module, we'll prove a property of task offsets. *)
+(** In this module, we prove some properties of task offsets. *)
 Section OffsetLemmas.
   
   (** Consider any type of tasks with an offset ... *)
@@ -13,12 +13,13 @@ Section OffsetLemmas.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
 
-  (** Consider any arrival sequence with consistent and non-duplicate arrivals, ... *)
+  (** Consider any arrival sequence with consistent and non-duplicate arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
   Hypothesis H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
 
-  (** ... and any job [j] of any task [tsk] with a valid offset. *)
+  (** ... and any job [j] (that stems from the arrival sequence) of any 
+      task [tsk] with a valid offset. *)
   Variable tsk : Task.
   Variable j : Job.
   Hypothesis H_job_of_task: job_task j = tsk.
@@ -43,5 +44,20 @@ Section OffsetLemmas.
       now apply/eqP; rewrite eqn_leq; apply/andP; split;
         [ssrlia | apply H_valid_offset].
   Qed.
-  
+
+  (** Consider any task set [ts]. *)
+  Variable ts : TaskSet Task.
+
+  (** If task [tsk] is in [ts], then its offset
+   is less than or equal to the maximum offset of all tasks 
+   in [ts]. *)
+  Lemma max_offset_g:
+    tsk \in ts ->
+    task_offset tsk <= max_task_offset ts.
+  Proof.
+    intros TSK_IN.
+    apply in_max0_le.
+    now apply map_f.
+  Qed.
+
 End OffsetLemmas.

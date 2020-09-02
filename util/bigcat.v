@@ -1,5 +1,6 @@
 Require Export prosa.util.tactics prosa.util.notation.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export prosa.util.tactics prosa.util.ssrlia.
 
 (** In this section, we introduce useful lemmas about the concatenation operation performed
     over an arbitrary range of sequences. *)
@@ -34,7 +35,7 @@ Section BigCatLemmas.
 
     (** Conversely, we prove that any element belonging to a concatenation of sequences 
         must come from one of the sequences. *)
-    Lemma mem_bigcat_nat_exists :
+    Lemma mem_bigcat_nat_exists:
       forall x m n,
         x \in \cat_(m <= i < n) (f i) ->
         exists i,
@@ -84,7 +85,7 @@ Section BigCatLemmas.
       forall x i1 i2, x \in f i1 -> x \in f i2 -> i1 = i2.
     
     (** We prove that the concatenation will yield a sequence with unique elements. *)
-    Lemma bigcat_nat_uniq :
+    Lemma bigcat_nat_uniq:
       forall n1 n2,
         uniq (\cat_(n1 <= i < n2) (f i)).
     Proof.
@@ -146,4 +147,43 @@ Section BigCatLemmas.
 
   End BigCatDistinctElements.
 
+  (**  We show that filtering a concatenated sequence by any predicate [P] 
+   is the same as concatenating the elements of the sequence that satisfy [P]. *) 
+  Lemma cat_filter_eq_filter_cat:
+    forall {X : Type} (F : nat -> seq X) (P : X -> bool) (t1 t2 : nat),
+      [seq x <- \cat_(t1<=t<t2) F t | P x] = \cat_(t1<=t<t2)[seq x <- F t | P x].
+  Proof.
+    intros.
+    specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
+    + have EX: exists Δ, t2 = t1 + Δ by exists (t2 - t1); ssrlia.
+      move: EX => [Δ EQ]; subst t2.
+      induction Δ.
+      { now rewrite addn0 !big_geq => //. }
+      { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
+        rewrite filter_cat IHΔ => //.
+        now ssrlia.
+      }
+    + now rewrite !big_geq => //.
+  Qed.
+
+  (** We show that the size of a concatenated sequence is the same as 
+   summation of sizes of each element of the sequence. *)
+  Lemma size_big_nat: 
+    forall {X : Type} (F : nat -> seq X) (t1 t2 : nat),
+      \sum_(t1 <= t < t2) size (F t) =
+      size (\cat_(t1 <= t < t2) F t).
+  Proof.
+    intros.
+    specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
+    + have EX: exists Δ, t2 = t1 + Δ by exists (t2 - t1); ssrlia.
+      move: EX => [Δ EQ]; subst t2.
+      induction Δ.
+      { now rewrite addn0 !big_geq => //. }
+      { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
+        rewrite size_cat IHΔ => //.
+        now ssrlia.
+      }         
+    + now rewrite !big_geq => //.
+  Qed.      
+      
 End BigCatLemmas.

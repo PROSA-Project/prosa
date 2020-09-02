@@ -198,7 +198,7 @@ Section ExtraLemmas.
 
   (* We show that the fact that the sum is smaller than the range 
      of the summation implies the existence of a zero element. *)
-  Lemma sum_le_summation_range :
+  Lemma sum_le_summation_range:
     forall f t Δ,
       \sum_(t <= x < t + Δ) f x < Δ ->
       exists x, t <= x < t + Δ /\ f x = 0.
@@ -216,6 +216,27 @@ Section ExtraLemmas.
       apply/andP; split; first by done.
         by rewrite ltnS ltnW.
     }
+  Qed.
+
+  (** If a function [F] gives same values at [t1 + g] and [t2 + g] for all [g] strictly
+      less than an integer [d] and for any [t1] and [t2], then summation of [F] over
+      the intervals <<[t1, t1 + d)>> and <<[t2, t2 + d)>> is equal. *)
+  Lemma big_sum_eq_in_eq_sized_intervals:
+    forall t1 t2 d (F1 F2 : nat -> nat),
+      (forall g, g < d -> F1 (t1 + g) = F2 (t2 + g)) -> 
+      \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
+  Proof.
+    intros * P.
+    induction d.
+    now rewrite !addn0 !big_geq => //.
+    feed_n 1 IHd.
+    { intros g G_LT.
+      now specialize (P g); feed_n 1 P; ssrlia.
+    }
+    rewrite !addnS !big_nat_recr => //; try by ssrlia.
+    rewrite IHd.
+    specialize (P d); feed_n 1 P. ssrlia.
+    now rewrite P.
   Qed.
   
 End ExtraLemmas.

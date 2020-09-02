@@ -49,5 +49,47 @@ Section PeriodicArrivalTimes.
       rewrite ARRIVAL IHn; ssrlia.
     }
   Qed.
+
+  (** We show that for every job [j] of task [tsk] there exists a number 
+   [n] such that [j] arrives at the instant [task_offset tsk + n * task_period tsk]. *)
+  Lemma job_arrival_times:
+    forall j,
+      arrives_in arr_seq j ->
+      job_task j = tsk ->
+      exists n, job_arrival j = task_offset tsk + n * task_period tsk.
+  Proof.
+    intros * ARR TSK.
+    exists (job_index arr_seq j).
+    specialize (periodic_arrival_times (job_index arr_seq j) j) => J_ARR.
+    now feed_n 3 J_ARR => //.
+  Qed.
+
+  (** If a job [j] of task [tsk] arrives at [task_offset tsk + n * task_period tsk] 
+   then the [job_index] of [j] is equal to [n]. *)
+  Lemma job_arr_index:
+    forall n j,
+      arrives_in arr_seq j ->
+      job_task j = tsk ->
+      job_arrival j = task_offset tsk + n * task_period tsk ->
+      job_index arr_seq j = n.
+  Proof.
+    have F : task_period tsk > 0 by auto.
+    induction n.
+    + intros * ARR_J TSK ARR.
+      destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]] => //. 
+      now apply periodic_arrival_times in SUCC => //; ssrlia.
+    + intros * ARR_J TSK ARR.
+      specialize (H_task_respects_periodic_model j); feed_n 3 H_task_respects_periodic_model => //.
+      { rewrite lt0n; apply /eqP; intro EQ.
+        apply first_job_arrival with (tsk0 := tsk) in EQ => //.
+        now rewrite EQ in ARR; ssrlia.
+      }
+      move : H_task_respects_periodic_model => [j' [ARR' [IND' [TSK' [ARRIVAL']]]]].
+      specialize (IHn j'); feed_n 3 IHn => //; first by rewrite ARR in ARRIVAL'; ssrlia.
+      rewrite IHn in IND'.
+      destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]]; last by ssrlia.
+      apply first_job_arrival with (tsk0 := tsk) in Z => //.
+      now rewrite Z in ARR; ssrlia.
+  Qed.
   
 End PeriodicArrivalTimes.

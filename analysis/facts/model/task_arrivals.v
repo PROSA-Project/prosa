@@ -13,7 +13,7 @@ Section TaskArrivals.
   
   (** Consider any job arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals : consistent_arrival_times arr_seq.
+  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
   
   (** We show that the number of arrivals of task can be split into disjoint intervals. *) 
   Lemma num_arrivals_of_task_cat:
@@ -133,19 +133,30 @@ Section TaskArrivals.
     now apply arrived_between_implies_in_arrivals.
   Qed.
 
+  (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] arrives 
+      in the arrival sequence [arr_seq]. *)
+  Lemma arrives_in_task_arrivals_implies_arrived:
+    forall t1 t2 j,
+      j \in (task_arrivals_between arr_seq tsk t1 t2) ->
+      arrives_in arr_seq j.
+  Proof.
+    intros * JB_IN.
+    move : JB_IN; rewrite mem_filter; move => /andP [/eqP TSK JB_IN].
+    now apply in_arrivals_implies_arrived in JB_IN.
+  Qed.
+    
   (** An arrival sequence with non-duplicate arrivals implies that the 
       task arrivals also contain non-duplicate arrivals. *)
   Lemma uniq_task_arrivals:
-    forall j,
-      arrives_in arr_seq j ->
+    forall t,
       arrival_sequence_uniq arr_seq ->
-      uniq (task_arrivals_up_to arr_seq (job_task j) (job_arrival j)).
+      uniq (task_arrivals_up_to arr_seq tsk t).
   Proof.
-    intros j ARR UNQ_ARR.
+    intros * UNQ_SEQ.
     apply filter_uniq.
     now apply arrivals_uniq.
   Qed.
-
+  
   (** A job cannot arrive before it's arrival time. *) 
   Lemma job_notin_task_arrivals_before:
     forall j t, 
@@ -180,5 +191,58 @@ Section TaskArrivals.
     - rewrite /task_arrivals_up_to_job_arrival TSK1 TSK2.
       now rewrite -task_arrivals_cat; try by ssrlia.
   Qed.
-  
+
+  (** For any job [j2] with [job_index] equal to [n], the nth job 
+   in the sequence [task_arrivals_up_to arr_seq tsk t] is [j2], given that
+   [t] is not less than [job_arrival j2]. *)
+  (** Note that [j_def] is used as a default job for the access function and
+   has nothing to do with the lemma. *)
+  Lemma nth_job_of_task_arrivals:
+    forall n j_def j t,
+      arrives_in arr_seq j ->
+      job_task j = tsk ->
+      job_index arr_seq j = n ->
+      t >= job_arrival j ->
+      nth j_def (task_arrivals_up_to arr_seq tsk t) n = j.
+  Proof.
+    intros * ARR TSK IND T_G.
+    rewrite -IND.
+    have EQ_IND : index j (task_arrivals_up_to_job_arrival arr_seq j) = index j (task_arrivals_up_to arr_seq tsk t).
+    { have CAT : exists xs, task_arrivals_up_to_job_arrival arr_seq j ++ xs = task_arrivals_up_to arr_seq tsk t.
+      { rewrite /task_arrivals_up_to_job_arrival TSK.
+        exists (task_arrivals_between arr_seq tsk ((job_arrival j).+1) t.+1).
+        now rewrite -task_arrivals_cat.
+      }
+      move : CAT => [xs ARR_CAT].
+      now rewrite -ARR_CAT index_cat ifT; last by apply arrives_in_task_arrivals_up_to.
+    }
+    rewrite /job_index EQ_IND nth_index => //.
+    rewrite mem_filter; apply /andP.
+    split; first by apply /eqP.
+    now apply job_in_arrivals_between => //.
+  Qed.
+
+  (** We show that task arrivals in the interval <<[t1, t2)>> 
+   is the same as concatenation of task arrivals at each instant in <<[t1, t2)>>. *)
+  Lemma task_arrivals_between_is_cat_of_task_arrivals_at:
+    forall t1 t2,
+      task_arrivals_between arr_seq tsk t1 t2 = \cat_(t1 <= t < t2) task_arrivals_at arr_seq tsk t.
+  Proof.
+    intros *.
+    rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
+    now apply cat_filter_eq_filter_cat.
+  Qed.
+
+  (** The number of jobs of a task [tsk] in the interval <<[t1, t2)>> is the same 
+   as sum of the number of jobs of the task [tsk] at each instant in <<[t1, t2)>>. *)
+  Lemma size_of_task_arrivals_between:
+    forall t1 t2,
+      size (task_arrivals_between arr_seq tsk t1 t2)
+      = \sum_(t1 <= t < t2) size (task_arrivals_at arr_seq tsk t). 
+  Proof.
+    intros *.
+    rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
+    now rewrite size_big_nat cat_filter_eq_filter_cat.
+  Qed.
+    
 End TaskArrivals.

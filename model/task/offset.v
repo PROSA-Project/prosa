@@ -51,5 +51,21 @@ Section ValidTaskOffset.
   
 End ValidTaskOffset.
 
+(** In this section we define the notion of a maximum task offset. *)
+Section MaxTaskOffset.
 
+  (** Consider any type of tasks with offsets, ... *)
+  Context {Task : TaskType}.
+  Context `{TaskOffset Task}.
+  
+  (** ... and any task set. *)
+  Variable ts : TaskSet Task.
+
+  (** We define the sequence of task offsets of all tasks in [ts], ... *)
+  Definition task_offsets := map task_offset ts.
+
+  (** ... and the maximum among all the task offsets. *)
+  Definition max_task_offset := max0 task_offsets.
+    
+End MaxTaskOffset.
 
