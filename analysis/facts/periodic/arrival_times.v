@@ -84,7 +84,7 @@ Section PeriodicArrivalTimes.
         apply first_job_arrival with (tsk0 := tsk) in EQ => //.
         now rewrite EQ in ARR; ssrlia.
       }
-      move : H_task_respects_periodic_model => [j' [ARR' [IND' [TSK' [ARRIVAL']]]]].
+      move : H_task_respects_periodic_model => [j' [ARR' [IND' [TSK' ARRIVAL']]]].
       specialize (IHn j'); feed_n 3 IHn => //; first by rewrite ARR in ARRIVAL'; ssrlia.
       rewrite IHn in IND'.
       destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]]; last by ssrlia.
