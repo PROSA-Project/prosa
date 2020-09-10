@@ -27,6 +27,7 @@ import argparse
 import sys
 import os
 import re
+import time
 from subprocess import Popen, PIPE
 from select import select
 
@@ -327,6 +328,8 @@ def feed_to_coqtop(opts, src):
     # feed statements
     last = 0
     for end in statement_end_offsets(opts, src):
+        if opts.pause:
+            time.sleep(0.1)
         interaction = interact(opts, coqtop, src, last, end)
         interactions.append(interaction)
         last = end + 1
@@ -403,6 +406,9 @@ def parse_args():
 
     parser.add_argument('--verbose', default=False, action='store_true',
                         help='report on interaction with coqtop')
+
+    parser.add_argument('--pause', default=False, action='store_true',
+                        help='pause briefly before feeding data to coqtop')
 
     parser.add_argument('--parse-only', default=False, action='store_true',
                         help='report how the script splits the input '
