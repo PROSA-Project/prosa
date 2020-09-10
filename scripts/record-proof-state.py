@@ -198,6 +198,8 @@ def read_from_pipe(pipe, timeout, seen_enough = lambda _: False, expect_timeout=
                 output += data
     return output.decode("utf-8")
 
+COQ_PROMPT_RE = re.compile(r"<prompt>\S* < ([0-9]+) ")
+
 def wait_for_prompt(opts, pipe, timeout):
     seen_enough = lambda output: output.endswith(END_OF_PROMPT_BYTES)
     output = read_from_pipe(pipe, timeout, seen_enough)
@@ -211,13 +213,16 @@ def wait_for_prompt(opts, pipe, timeout):
         else:
             break
 
+    # check for interaction number in output
+    m = COQ_PROMPT_RE.search(output)
+    prompt_number = int(m.group(1)) if m else -1
     # remove any prompts; we don't want to record those
     if output.endswith(END_OF_PROMPT) and not opts.verbose:
         idx = output.find(START_OF_PROMPT)
         assert not START_OF_PROMPT in output[:idx] # only one prompt expected
-        return output[:idx]
+        return (prompt_number, output[:idx])
     else:
-        return output
+        return (prompt_number, output)
 
 INFO_MSG_PATTERN = re.compile(
 r"""
@@ -235,7 +240,7 @@ def extract_info_messages(output):
 
 def wait_for_coqtop(opts, coqtop):
     # wait until prompt (re-)appears
-    error = wait_for_prompt(opts, coqtop.stderr, opts.timeout)
+    num, error = wait_for_prompt(opts, coqtop.stderr, opts.timeout)
     # read output produced so far
     # FIXME: this only works if all output fits into the OS's pipe buffer
     output = read_from_pipe(coqtop.stdout, 0)
@@ -246,6 +251,8 @@ def wait_for_coqtop(opts, coqtop):
     error  = error.rstrip()
     if error:
         interaction['error'] = error
+    if num >= 0:
+        interaction['prompt_number'] = num
     return interaction
 
 def interact(opts, coqtop, src, start, end):
@@ -255,7 +262,7 @@ def interact(opts, coqtop, src, start, end):
     coqtop.stdin.write(bytes(input.replace('\n', ' ') + '\n', "utf-8"))
     coqtop.stdin.flush()
     # wait until prompt (re-)appears
-    error = wait_for_prompt(opts, coqtop.stderr, opts.timeout)
+    num, error = wait_for_prompt(opts, coqtop.stderr, opts.timeout)
     # read output produced so far
     # FIXME: this only works if all output fits into the OS's pipe buffer
     output = read_from_pipe(coqtop.stdout, 0)
@@ -280,6 +287,9 @@ def interact(opts, coqtop, src, start, end):
     if error:
         interaction['error'] = error
 
+    if num >= 0:
+        interaction['prompt_number'] = num
+
     return interaction
 
 def report(n, interaction):
@@ -293,6 +303,16 @@ def report(n, interaction):
     if 'error' in interaction:
         print("PROMPT: [%s]" % interaction['error'].strip())
     print("-" * 80)
+
+
+def check_sync(opts, input_number, interaction):
+    if 'prompt_number' in interaction:
+        if interaction['prompt_number'] != input_number:
+            print("Out of sync: prompt %d in response to input %d" %
+                   (interaction['prompt_number'], input_number))
+            if not opts.verbose:
+                report(input_number, interaction)
+            assert False # out of sync: we missed an answer somewhere
 
 def feed_to_coqtop(opts, src):
     coqtop = launch_coqtop(opts)
@@ -310,6 +330,7 @@ def feed_to_coqtop(opts, src):
         interaction = interact(opts, coqtop, src, last, end)
         interactions.append(interaction)
         last = end + 1
+        check_sync(opts, len(interactions), interaction)
         if opts.verbose:
             report(len(interactions), interaction)
 
