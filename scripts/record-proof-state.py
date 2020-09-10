@@ -319,14 +319,32 @@ def report(n, interaction):
     print("-" * 80)
 
 
-def check_sync(opts, input_number, interaction):
+def prompt_out_of_sync(opts, input_number, interaction):
     if 'prompt_number' in interaction:
         if interaction['prompt_number'] != input_number:
-            print("Out of sync: prompt %d in response to input %d" %
-                   (interaction['prompt_number'], input_number))
-            if not opts.verbose:
-                report(input_number, interaction)
-            assert False # out of sync: we missed an answer somewhere
+            print("[%s] Out of sync: prompt %d in response to input %d" %
+                   (opts.fname, interaction['prompt_number'], input_number))
+            return True
+    return False
+
+def output_out_of_sync(opts, cmd, interactions):
+    if cmd == 'Qed.':
+        # QED: there should be no more proof obligations.
+        if 'output' in interactions[-2] and \
+           interactions[-2]['output'] != ['No more subgoals.']:
+            print("[%s] Out of sync: 'Qed.' before 'No more subgoals.'" % opts.fname)
+            return True
+        # QED: there should be no output.
+        if 'output' in interactions[-1]:
+            print("[%s] Out of sync: 'Qed.' produced output.'"  % opts.fname)
+            return True
+    elif cmd.startswith('End '):
+        # End of section.
+        if 'output' in interactions[-1]:
+            print("[%s] Out of sync: 'End' produced output.'"  % opts.fname)
+            return True
+    return False
+
 
 # Some vernacular commands that we need to check for because they change
 # coqtop's prompt counter. This list is likely incomplete.
@@ -349,14 +367,22 @@ def feed_to_coqtop(opts, src):
     for end in statement_end_offsets(opts, src):
         if opts.pause:
             time.sleep(0.1)
-        if VERNACULAR_COMMANDS_RE.match(src[last:end+1].strip()):
+        cmd = src[last:end+1].strip()
+        if VERNACULAR_COMMANDS_RE.match(cmd):
             coq_prompt_offset += 1
         interaction = interact(opts, coqtop, src, last, end)
         interactions.append(interaction)
         last = end + 1
-        check_sync(opts, len(interactions) + coq_prompt_offset, interaction)
-        if opts.verbose:
+
+        sync_failure = False
+        sync_failure |= prompt_out_of_sync(opts, len(interactions) + coq_prompt_offset, interaction)
+        sync_failure |= output_out_of_sync(opts, cmd, interactions)
+
+        if opts.verbose or sync_failure:
             report(len(interactions) + coq_prompt_offset, interaction)
+
+        assert not sync_failure
+
 
     # signal end of input
     coqtop.stdin.close()
@@ -377,6 +403,7 @@ def feed_to_coqtop(opts, src):
 
 def process(opts, fname):
     print("Collecting proof state for %s..." % fname)
+    opts.fname = fname
     src = open(fname, 'r').read()
     interactions = feed_to_coqtop(opts, src)
     ext = '.proofstate.yaml' if opts.yaml else '.proofstate.json'
