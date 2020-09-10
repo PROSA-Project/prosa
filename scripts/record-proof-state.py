@@ -209,7 +209,7 @@ def wait_for_prompt(opts, pipe, timeout):
         more = read_from_pipe(pipe, 0, seen_enough, expect_timeout=True)
         output += more
         if more:
-            print("unexpected:", more)
+            print("Unexpected coqtop output:", more)
             assert False # we lost sync; this should not be happening
         else:
             break
@@ -220,7 +220,9 @@ def wait_for_prompt(opts, pipe, timeout):
     # remove any prompts; we don't want to record those
     if output.endswith(END_OF_PROMPT) and not opts.verbose:
         idx = output.find(START_OF_PROMPT)
-        assert not START_OF_PROMPT in output[:idx] # only one prompt expected
+        if START_OF_PROMPT in output[idx+1:]:
+            print("Unexpected number of prompts in coqtop output: \n", output)
+            assert False # only one prompt expected
         return (prompt_number, output[:idx])
     else:
         return (prompt_number, output)
