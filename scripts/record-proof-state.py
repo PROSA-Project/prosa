@@ -328,6 +328,10 @@ def check_sync(opts, input_number, interaction):
                 report(input_number, interaction)
             assert False # out of sync: we missed an answer somewhere
 
+# Some vernacular commands that we need to check for because they change
+# coqtop's prompt counter. This list is likely incomplete.
+VERNACULAR_COMMANDS_RE = re.compile(r"(Opaque|Transparent) \S+\.")
+
 def feed_to_coqtop(opts, src):
     coqtop = launch_coqtop(opts)
     interactions = []
@@ -338,17 +342,21 @@ def feed_to_coqtop(opts, src):
         report(0, interaction)
     interactions.append(interaction)
 
+    coq_prompt_offset = 0
+
     # feed statements
     last = 0
     for end in statement_end_offsets(opts, src):
         if opts.pause:
             time.sleep(0.1)
+        if VERNACULAR_COMMANDS_RE.match(src[last:end+1].strip()):
+            coq_prompt_offset += 1
         interaction = interact(opts, coqtop, src, last, end)
         interactions.append(interaction)
         last = end + 1
-        check_sync(opts, len(interactions), interaction)
+        check_sync(opts, len(interactions) + coq_prompt_offset, interaction)
         if opts.verbose:
-            report(len(interactions), interaction)
+            report(len(interactions) + coq_prompt_offset, interaction)
 
     # signal end of input
     coqtop.stdin.close()
