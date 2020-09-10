@@ -57,6 +57,12 @@ def statement_end_offsets(opts, src):
         else:
             return False
 
+    def prev_is(i, c):
+        if i > 0:
+            return src[i - 1] == c
+        else:
+            return False
+
     def next_is_whitespace(i):
         if i + 1 < len(src):
             return src[i + 1].isspace()
@@ -141,10 +147,15 @@ def statement_end_offsets(opts, src):
         # look for closing braces -- this is a brittle heuristic, but
         # we need to catch sub-proofs because coqtop in emacs mode
         # produces a prompt every time we enter a sub-proof
-        elif not in_comment and in_proof and cur_is(i, '}') \
-             and next_is_whitespace(i) and prev_is_whitespace(i):
-            yield i + 1
-            last = i + 1
+        elif not in_comment and in_proof and cur_is(i, '}') and \
+             (next_is_whitespace(i) or next_is (i, '}')) and \
+             (prev_is_whitespace(i) or prev_is(i, '}')):
+            if next_is_whitespace(i):
+                yield i + 1
+                last = i + 1
+            else:
+                yield i
+                last = i
         # similarly, look for opening braces
         elif not in_comment and in_proof and cur_is(i, '{') \
              and next_is_whitespace(i) and prev_is_whitespace(i):
