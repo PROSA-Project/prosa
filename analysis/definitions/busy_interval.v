@@ -13,12 +13,16 @@ Section BusyIntervalJLFP.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.    
 
-  (** Consider any arrival sequence with consistent arrivals. *)
+  (** Consider any kind of processor state model. *)
+  Context {PState : Type}.
+  Context `{ProcessorState Job PState}.  
+
+  (** Consider any arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... and a schedule of this arrival sequence. *)
+  Variable sched : schedule PState.
   
   (** Assume a given JLFP policy. *)
   Context `{JLFP_policy Job}. 
