@@ -3,26 +3,25 @@ Require Export prosa.model.task.concept.
 
 (** * Task Preemption Model *)
 
-(** In this module, we define the abstract interface for task-level preemption
+(** In this file, we define the abstract interface for task-level preemption
     models. Specific preemption models are instantiated in the sibling files in
     this directory. *)
 
 (** ** Preemption-Related Task Parameters *)
 
-(** We define three parameters to express the preemption behavior of a given
-    task. *)
+(** We define three parameters to express the preemption behavior of a given task. *)
 
 (** First, we define [task_max_nonpreemptive_segment] to denote a bound on the
     maximum length of a task's non-preemptive segment. *)
 Class TaskMaxNonpreemptiveSegment (Task : TaskType) :=
   task_max_nonpreemptive_segment : Task -> work.
 
-(** Second, [task_run_to_completion_threshold] indicates a progress bound with
-    the interpretation that, once a job of a task [tsk] has received at least
-    [task_run_to_completion_threshold tsk] time units of service, it will
+(** Second, run-to-completion threshold (RTCT) indicates a progress
+    bound with the interpretation that, once a job of a task [tsk] has
+    received at least [task_rtct tsk] time units of service, it will
     remain nonpreemptive until the end and run to completion. *)
 Class TaskRunToCompletionThreshold (Task : TaskType) :=
-  task_run_to_completion_threshold : Task -> work.
+  task_rtct : Task -> work.
 
 (** Third, the parameter [task_preemption_points] indicates the non-preemptive
     segments of a task. Obviously, not all preemption models use this parameter. *)
@@ -163,7 +162,7 @@ Section ValidTaskRunToCompletionThreshold.
   (** A task's run-to-completion threshold must not exceed the WCET of the
       task. *)
   Definition task_rtc_bounded_by_cost tsk :=
-    task_run_to_completion_threshold tsk <= task_cost tsk.
+    task_rtct tsk <= task_cost tsk.
 
   (** We say that the run-to-completion threshold of a task [tsk] bounds the
       job-level run-to-completion threshold iff, for any job [j] of task [tsk],
@@ -173,7 +172,7 @@ Section ValidTaskRunToCompletionThreshold.
     forall j,
       arrives_in arr_seq j ->
       job_task j = tsk ->
-      job_run_to_completion_threshold j <= task_run_to_completion_threshold tsk.
+      job_rtct j <= task_rtct tsk.
 
   (** Finally, we require that a valid run-to-completion threshold parameter
       will satisfy the two above definitions. *)

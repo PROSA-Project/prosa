@@ -171,15 +171,15 @@ Section AbstractRTARunToCompletionThreshold.
     Hypothesis H_valid_preemption_model:
       valid_preemption_model arr_seq sched.
 
-    (** Then, job [j] must complete in [job_cost j - job_run_to_completion_threshold j] time
+    (** Then, job [j] must complete in [job_cost j - job_rtct j] time
        units after it reaches run-to-completion threshold. *)
     Lemma job_completes_after_reaching_run_to_completion_threshold:
       forall t,
-        job_run_to_completion_threshold j <= service sched j t ->
-        completed_by sched j (t + (job_cost j - job_run_to_completion_threshold j)).
+        job_rtct j <= service sched j t ->
+        completed_by sched j (t + (job_cost j - job_rtct j)).
     Proof.
       move => t ES.
-      set (job_cost j - job_run_to_completion_threshold j) as job_last.
+      set (job_cost j - job_rtct j) as job_last.
       have LSNP := @job_nonpreemptive_after_run_to_completion_threshold
                      Job H2 H3 _ _ arr_seq sched _ j _ t.
       apply negbNE; apply/negP; intros CONTR.
@@ -204,9 +204,9 @@ Section AbstractRTARunToCompletionThreshold.
       eapply service_at_most_cost with (j0 := j) (t0 := t + job_last.+1) in H_completed_jobs_dont_execute; auto.
       move: H_completed_jobs_dont_execute; rewrite leqNgt; move => /negP T; apply: T.
       rewrite /service -(service_during_cat _ _ _ t); last by (apply/andP; split; last rewrite leq_addr).
-      apply leq_trans with (job_run_to_completion_threshold j + service_during sched j t (t + job_last.+1));
+      apply leq_trans with (job_rtct j + service_during sched j t (t + job_last.+1));
         last by rewrite leq_add2r.
-      apply leq_trans with  (job_run_to_completion_threshold j + job_last.+1); last by rewrite leq_add2l /service_during -addn1.
+      apply leq_trans with  (job_rtct j + job_last.+1); last by rewrite leq_add2l /service_during -addn1.
         by rewrite addnS ltnS subnKC //; eapply job_run_to_completion_threshold_le_job_cost; eauto.
     Qed.
 

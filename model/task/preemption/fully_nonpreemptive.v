@@ -35,7 +35,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
       to ε. *)
   Global Program Instance fully_nonpreemptive : TaskRunToCompletionThreshold Task :=
     {
-      task_run_to_completion_threshold (tsk : Task) := ε
+      task_rtct (tsk : Task) := ε
     }.
 
 End TaskRTCThresholdFullyNonPreemptive.

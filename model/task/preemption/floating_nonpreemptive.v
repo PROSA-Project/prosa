@@ -61,7 +61,7 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
       the only safe run-to-completion threshold is [task cost]. *)
   Global Program Instance fully_preemptive : TaskRunToCompletionThreshold Task :=
     {
-      task_run_to_completion_threshold (tsk : Task) := task_cost tsk
+      task_rtct (tsk : Task) := task_cost tsk
     }.
 
 End TaskRTCThresholdFloatingNonPreemptiveRegions.

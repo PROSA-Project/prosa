@@ -32,10 +32,11 @@ Section TaskRTCThresholdFullyPreemptiveModel.
   Context `{TaskCost Task}.
 
   (** In the fully preemptive model, any job can be preempted at any
-      time. Thus, the only safe run-to-completion threshold for a task is its WCET. *)
+      time. Thus, the only safe run-to-completion threshold for a task
+      is its WCET. *)
   Global Program Instance fully_preemptive : TaskRunToCompletionThreshold Task :=
     {
-      task_run_to_completion_threshold (tsk : Task) := task_cost tsk
+      task_rtct (tsk : Task) := task_cost tsk
     }.
 
 End TaskRTCThresholdFullyPreemptiveModel.

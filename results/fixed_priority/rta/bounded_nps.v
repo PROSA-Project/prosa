@@ -103,10 +103,9 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_valid_preemption_model:
     valid_preemption_model arr_seq sched.
 
-  (** ...and a valid task run-to-completion threshold function. That is, 
-     [task_run_to_completion_threshold tsk] is (1) no bigger than [tsk]'s 
-     cost, (2) for any job of task [tsk] job_run_to_completion_threshold 
-     is bounded by task_run_to_completion_threshold. *)
+  (** ...and a valid task run-to-completion threshold function. That
+     is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
+     any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
   
@@ -228,9 +227,9 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         is_in_search_space A -> 
         exists (F : duration),
           A + F = blocking_bound
-                  + (task_rbf (A + ε) - (task_cost tsk - task_run_to_completion_threshold tsk))
+                  + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                   + total_ohep_rbf (A + F) /\
-          F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
+          F + (task_cost tsk - task_rtct tsk) <= R.
 
     (** Then, using the results for the general RTA for FP-schedulers, we establish a 
        response-time bound for the more concrete model of bounded nonpreemptive segments. 

@@ -57,10 +57,9 @@ Section Sequential_Abstract_RTA.
   Hypothesis H_valid_preemption_model:
     valid_preemption_model arr_seq sched.
 
-  (** ...and a valid task run-to-completion threshold function. That is,
-     [task_run_to_completion_threshold tsk] is (1) no bigger than [tsk]'s
-     cost, (2) for any job of task [tsk] [job_run_to_completion_threshold]
-     is bounded by [task_run_to_completion_threshold]. *)
+  (** ...and a valid task run-to-completion threshold function. That
+     is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
+     any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
 
@@ -205,9 +204,9 @@ Section Sequential_Abstract_RTA.
       forall (A : duration),
         is_in_search_space_seq A ->
         exists (F : duration),
-          A + F = (task_rbf (A + ε) - (task_cost tsk - task_run_to_completion_threshold tsk))
+          A + F = (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                   + task_interference_bound_function tsk A (A + F) /\
-          F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
+          F + (task_cost tsk - task_rtct tsk) <= R.
 
     (** In this section we prove a few simple lemmas about the completion of jobs from the task
        considering the busy interval of the job under consideration. *)
@@ -649,9 +648,9 @@ Section Sequential_Abstract_RTA.
         forall (A : duration),
           is_in_search_space A ->
           exists (F : duration),
-            A + F = task_run_to_completion_threshold tsk +
+            A + F = task_rtct tsk +
                     (task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A (A + F)) /\
-            F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
+            F + (task_cost tsk - task_rtct tsk) <= R.
       Proof.
         move: H_valid_run_to_completion_threshold => [PRT1 PRT2].
         intros A INSP.

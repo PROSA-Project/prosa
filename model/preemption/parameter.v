@@ -72,10 +72,11 @@ Section MaxAndLastNonpreemptiveSegment.
 
   (** * Run-to-Completion Threshold of a Job *)
 
-  (** Finally, we define the notion of a job's run-to-completion threshold: the
-      run-to-completion threshold is the amount of service after which a job
-      cannot be preempted until its completion. *)
-  Definition job_run_to_completion_threshold (j : Job) :=
+  (** Finally, we define the notion of a job's run-to-completion
+      threshold (RTCT): the run-to-completion threshold is the amount
+      of service after which a job cannot be preempted until its
+      completion. *)
+  Definition job_rtct (j : Job) :=
     job_cost j - (job_last_nonpreemptive_segment j - ε).
 
 End MaxAndLastNonpreemptiveSegment.

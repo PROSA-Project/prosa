@@ -91,10 +91,9 @@ Section AbstractRTAforFPwithArrivalCurves.
   Hypothesis H_valid_preemption_model:
     valid_preemption_model arr_seq sched.
 
-  (** ...and a valid task run-to-completion threshold function. That is, 
-     [task_run_to_completion_threshold tsk] is (1) no bigger than [tsk]'s 
-     cost, (2) for any job of task [tsk] job_run_to_completion_threshold 
-     is bounded by task_run_to_completion_threshold. *)
+  (** ...and a valid task run-to-completion threshold function. That
+     is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
+     any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
   
@@ -155,9 +154,9 @@ Section AbstractRTAforFPwithArrivalCurves.
       is_in_search_space A -> 
       exists (F : duration),
         A + F = priority_inversion_bound
-                + (task_rbf (A + ε) - (task_cost tsk - task_run_to_completion_threshold tsk))
+                + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                 + total_ohep_rbf (A + F) /\
-        F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
+        F + (task_cost tsk - task_rtct tsk) <= R.
 
   (** Instantiation of Interference *)
   (** We say that job j incurs interference at time t iff it cannot execute due to 
@@ -339,8 +338,8 @@ Section AbstractRTAforFPwithArrivalCurves.
       (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
       Corollary correct_search_space:
         exists (F : duration),
-          A + F = task_rbf (A + ε) - (task_cost tsk - task_run_to_completion_threshold tsk) + IBF (A + F) /\
-          F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
+          A + F = task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF (A + F) /\
+          F + (task_cost tsk - task_rtct tsk) <= R.
       Proof.
         move: (H_R_is_maximum A) => FIX.
         feed FIX; first by apply A_is_in_concrete_search_space. 

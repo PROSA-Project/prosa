@@ -58,10 +58,9 @@ Section Abstract_RTA.
   Hypothesis H_valid_preemption_model:
     valid_preemption_model arr_seq sched.
   
-  (** ...and a valid task run-to-completion threshold function. That is, 
-     [task_run_to_completion_threshold tsk] is (1) no bigger than [tsk]'s 
-     cost, (2) for any job of task [tsk] job_run_to_completion_threshold 
-     is bounded by task_run_to_completion_threshold. *)
+  (** ...and a valid task run-to-completion threshold function. That
+     is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
+     any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
 
@@ -100,15 +99,15 @@ Section Abstract_RTA.
 
   (** Consider any value [R] that upper-bounds the solution of each response-time recurrence, 
      i.e., for any relative arrival time A in the search space, there exists a corresponding 
-     solution [F] such that [F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R]. *)
+     solution [F] such that [F + (task_cost tsk - task_rtct tsk) <= R]. *)
   Variable R: nat.
   Hypothesis H_R_is_maximum:
     forall A,
       is_in_search_space A -> 
       exists F,
-        A + F = task_run_to_completion_threshold tsk
+        A + F = task_rtct tsk
                 + interference_bound_function tsk A (A + F) /\
-        F + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
+        F + (task_cost tsk - task_rtct tsk) <= R.
 
   (** In this section we show a detailed proof of the main theorem 
      that establishes that R is a response-time bound of task [tsk]. *) 
@@ -153,10 +152,10 @@ Section Abstract_RTA.
    
     (** (d) [A_sp + F_sp] is a solution of the response time recurrence... *)
     Hypothesis H_Asp_Fsp_fixpoint :
-      A_sp + F_sp = task_run_to_completion_threshold tsk + interference_bound_function tsk A_sp (A_sp + F_sp).
+      A_sp + F_sp = task_rtct tsk + interference_bound_function tsk A_sp (A_sp + F_sp).
 
     (** (e) and finally, [F_sp + (task_last - ε)] is no greater than R. *)
-    Hypothesis H_R_gt_Fsp : F_sp + (task_cost tsk - task_run_to_completion_threshold tsk) <= R.
+    Hypothesis H_R_gt_Fsp : F_sp + (task_cost tsk - task_rtct tsk) <= R.
 
     (** In this section, we consider the case where the solution is so large 
        that the value of [t1 + A_sp + F_sp] goes beyond the busy interval. 
@@ -178,7 +177,7 @@ Section Abstract_RTA.
         { by rewrite !addnA leq_add2r leq_add2l. }
         rewrite /A subnKC; last by done.
         rewrite leq_add2l.
-          by apply leq_trans with (F_sp + (task_cost tsk - task_run_to_completion_threshold tsk));
+          by apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk));
             first rewrite leq_addr.
       Qed.
       
@@ -226,39 +225,44 @@ Section Abstract_RTA.
           Hypothesis H_F_le_Fsp : F <= F_sp.
           (** (c) and [A + F] is a solution for the response-time recurrence for [A]. *)
           Hypothesis H_A_F_fixpoint:
-            A + F = task_run_to_completion_threshold tsk + interference_bound_function tsk A (A + F).
+            A + F = task_rtct tsk + interference_bound_function tsk A (A + F).
  
           (** Next, we assume that job [j] is not completed by time [job_arrival j + R]. *)
           Hypothesis H_j_not_completed : ~~ completed_by sched j (job_arrival j + R).
 
-          (** Some additional reasoning is required since the term [task_cost tsk - task_run_to_completion_threshold tsk]
-             does not necessarily bound the term [job_cost j - job_run_to_completion_threshold j]. That is, a job can 
+          (** Some additional reasoning is required since the term [task_cost tsk - task_rtct tsk]
+             does not necessarily bound the term [job_cost j - job_rtct j]. That is, a job can 
              have a small run-to-completion threshold, thereby becoming non-preemptive much earlier than guaranteed 
              according to task run-to-completion threshold, while simultaneously executing the last non-preemptive 
-             segment that is longer than [task_cost tsk - task_run_to_completion_threshold tsk] (e.g., this is possible 
+             segment that is longer than [task_cost tsk - task_rtct tsk] (e.g., this is possible 
              in the case of floating non-preemptive sections). 
 
              In this case we cannot directly apply lemma "j_receives_at_least_run_to_completion_threshold". Therefore
              we introduce two temporal notions of the last non-preemptive region of job j and an execution 
              optimism. We use these notions inside this proof, so we define them only locally. *)
 
-          (** Let the last non-preemptive region of job [j] (last) be the difference between the cost of the job 
-             and the [j]'s run-to-completion threshold (i.e. [job_cost j - job_run_to_completion_threshold j]). 
-             We know that after j has reached its run-to-completion threshold, it will additionally be executed
-             [job_last j] units of time. *)          
-          Let job_last := job_cost j - job_run_to_completion_threshold j.
+          (** Let the last non-preemptive region of job [j] (last) be
+             the difference between the cost of the job and the [j]'s
+             run-to-completion threshold (i.e. [job_cost j - job_rtct j]). 
+             We know that after j has reached its
+             run-to-completion threshold, it will additionally be
+             executed [job_last j] units of time. *)          
+          Let job_last := job_cost j - job_rtct j.
 
-          (** And let execution optimism (optimism) be the difference between the [tsk]'s 
-             run-to-completion threshold and the [j]'s run-to-completion threshold (i.e. 
-             [task_run_to_completion_threshold -  job_run_to_completion_threshold]).
-             Intuitively, optimism is how much earlier job j has received its 
-             run-to-completion threshold than it could at worst.  *)
-          Let optimism := task_run_to_completion_threshold tsk - job_run_to_completion_threshold j.
+          (** And let execution optimism (optimism) be the difference
+             between the [tsk]'s run-to-completion threshold and the
+             [j]'s run-to-completion threshold (i.e.  [task_rtct -
+             job_rtct]).  Intuitively, optimism is how much earlier
+             job j has received its run-to-completion threshold than
+             it could at worst.  *)
+          Let optimism := task_rtct tsk - job_rtct j.
           
-          (** From lemma "j_receives_at_least_run_to_completion_threshold" with parameters [progress_of_job :=
-             job_run_to_completion_threshold j] and [delta := (A + F) - optimism)] we know that service of [j]
-             by time [t1 + (A + F) - optimism] is no less than [job_run_to_completion_threshold j]. Hence, job [j]
-             is completed by time [t1 + (A + F) - optimism + last]. *)
+          (** From lemma "j_receives_at_least_run_to_completion_threshold" 
+              with parameters [progress_of_job := job_rtct j] and [delta :=
+              (A + F) - optimism)] we know that service of [j] by time
+              [t1 + (A + F) - optimism] is no less than [job_rtct
+              j]. Hence, job [j] is completed by time [t1 + (A + F) -
+              optimism + last]. *)
           Lemma j_is_completed_by_t1_A_F_optimist_last :
             completed_by sched j (t1 + (A + F - optimism) + job_last).
           Proof.
@@ -267,7 +271,7 @@ Section Abstract_RTA.
             have ESERV :=
               @j_receives_at_least_run_to_completion_threshold
                 _ _ H1 H2 H3 PState H5 _ _  arr_seq sched tsk interference interfering_workload
-                _ j _ _ _ t1 t2 _ (job_run_to_completion_threshold j) _ ((A + F) - optimism). 
+                _ j _ _ _ t1 t2 _ (job_rtct j) _ ((A + F) - optimism). 
             feed_n 7 ESERV; eauto 2.
             specialize (ESERV H3 H4).
             feed_n 2 ESERV.
@@ -289,7 +293,7 @@ Section Abstract_RTA.
                   apply completion_monotonic with (t1 + (A + F)); try done.
                   rewrite addnA subnKC // leq_add2l.
                   apply leq_trans with F_sp; first by done.
-                    by apply leq_trans with (F_sp + (task_cost tsk - task_run_to_completion_threshold tsk)).
+                    by apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)).
               }
             }
             eapply job_completes_after_reaching_run_to_completion_threshold with (arr_seq0 := arr_seq); eauto 2.
@@ -343,16 +347,16 @@ Section Abstract_RTA.
                   apply completion_monotonic with (t1 + (A + F)); last by done. 
                   rewrite !addnA subnKC // leq_add2l.
                   apply leq_trans with F_sp; first by done.
-                    by apply leq_trans with (F_sp + (task_cost tsk - task_run_to_completion_threshold tsk)).
+                    by apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)).
               }
             Qed.
             
             (** As two trivial corollaries, we show that 
                [tsk]'s run-to-completion threshold is at most [F_sp]... *)
             Corollary tsk_run_to_completion_threshold_le_Fsp :
-              task_run_to_completion_threshold tsk <= F_sp.
+              task_rtct tsk <= F_sp.
             Proof.
-              have HH : task_run_to_completion_threshold tsk <= F.
+              have HH : task_rtct tsk <= F.
               { move: H_A_F_fixpoint => EQ.
                 have L1 := relative_arrival_le_interference_bound.
                 ssrlia.
@@ -364,12 +368,12 @@ Section Abstract_RTA.
             Corollary optimism_le_F :
               optimism <= F.
             Proof.
-              have HH : task_run_to_completion_threshold tsk <= F.
+              have HH : task_rtct tsk <= F.
               { move: H_A_F_fixpoint => EQ.
                 have L1 := relative_arrival_le_interference_bound.
                 ssrlia.
               }
-                by apply leq_trans with (task_run_to_completion_threshold tsk); first rewrite /optimism leq_subr.
+                by apply leq_trans with (task_rtct tsk); first rewrite /optimism leq_subr.
             Qed.
             
           End AuxiliaryInequalities.
@@ -381,8 +385,8 @@ Section Abstract_RTA.
              [≤ job_arrival j + (F - optimism) + job_last]
              [≤ job_arrival j + (F_sp - optimism) + job_last]
              [≤ job_arrival j + F_sp + (job_last - optimism)]
-             [≤ job_arrival j + F_sp + job_cost j - task_run_to_completion_threshold tsk]
-             [≤ job_arrival j + F_sp + task_cost tsk - task_run_to_completion_threshold tsk]
+             [≤ job_arrival j + F_sp + job_cost j - task_rtct tsk]
+             [≤ job_arrival j + F_sp + task_cost tsk - task_rtct tsk]
              [≤ job_arrival j + R]. *)
           Lemma t1_A_F_optimist_last_le_arrival_R :
             t1 + (A + F - optimism) + job_last <= job_arrival j + R.
@@ -398,7 +402,7 @@ Section Abstract_RTA.
             { move: H_valid_run_to_completion_threshold => [PRT1 PRT2]. 
               rewrite -addnA leq_add2l.
               apply leq_trans with (F_sp - optimism + job_last ); first by rewrite leq_add2r leq_sub2r. 
-              apply leq_trans with (F_sp + (task_cost tsk - task_run_to_completion_threshold tsk)); last by done. 
+              apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)); last by done. 
               rewrite /optimism subnBA; last by apply PRT2.
               rewrite -subh1 //.
               rewrite /job_last.
@@ -430,7 +434,7 @@ Section Abstract_RTA.
           have HelpAuto: forall m n, n <= n + m; first by intros; rewrite leq_addr.
           move: H_busy_interval => [[/andP [GT LT] _] _].
           have L1 := solution_for_A_exists
-                       tsk L (fun tsk A R => task_run_to_completion_threshold tsk
+                       tsk L (fun tsk A R => task_rtct tsk
                                           + interference_bound_function tsk A R) A_sp F_sp.
           specialize (L1 H0).
           feed_n 2 L1; try done.
@@ -474,7 +478,7 @@ Section Abstract_RTA.
         (** We can use [j_receives_at_least_run_to_completion_threshold] to prove that the service 
            received by j by time [t1 + (A_sp + F_sp)] is no less than run-to-completion threshold. *)
         Lemma service_of_job_ge_run_to_completion_threshold:
-          service sched j (t1 + (A_sp + F_sp)) >= job_run_to_completion_threshold j.
+          service sched j (t1 + (A_sp + F_sp)) >= job_rtct j.
         Proof.
           move: (H_busy_interval) => [[NEQ [QT1 NTQ]] QT2].
           move: (NEQ) => /andP [GT LT]. 
@@ -496,7 +500,7 @@ Section Abstract_RTA.
           have ESERV :=
             @j_receives_at_least_run_to_completion_threshold
               _ _ H1 H2 H3 PState H5 _ _ arr_seq sched tsk
-              interference interfering_workload _ j _ _ _ t1 t2 _ (job_run_to_completion_threshold j) _ (A_sp + F_sp). 
+              interference interfering_workload _ j _ _ _ t1 t2 _ (job_rtct j) _ (A_sp + F_sp). 
           feed_n 7 ESERV; eauto 2.
           specialize (ESERV H3 H4).
           feed_n 2 ESERV; eauto using job_run_to_completion_threshold_le_job_cost.

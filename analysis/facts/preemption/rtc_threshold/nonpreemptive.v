@@ -33,16 +33,15 @@ Section TaskRTCThresholdFullyNonPreemptive.
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
-  (** First we prove that if the cost of a job j is equal to 0, then 
-      [job_run_to_completion_threshold j = 0] ...  *)
+  (** First we prove that if the cost of a job j is equal to 0, then [job_rtct j = 0] ...  *)
   Fact job_rtc_threshold_is_0:
     forall j,
       job_cost j = 0 -> 
-      job_run_to_completion_threshold j = 0.
+      job_rtct j = 0.
   Proof.
     intros.
     apply/eqP; rewrite eqn_leq; apply/andP; split; last by done.
-    unfold job_run_to_completion_threshold.
+    unfold job_rtct.
       by rewrite H3; compute.
   Qed.
   
@@ -51,10 +50,10 @@ Section TaskRTCThresholdFullyNonPreemptive.
     forall j,
       job_cost j > 0 ->
       arrives_in arr_seq j ->
-      job_run_to_completion_threshold j = ε.
+      job_rtct j = ε.
   Proof.
     intros ? ARRj POSj; unfold ε in *.
-    unfold job_run_to_completion_threshold.
+    unfold job_rtct.
     rewrite job_last_nps_is_job_cost.
       by rewrite subKn.
   Qed.
@@ -63,15 +62,15 @@ Section TaskRTCThresholdFullyNonPreemptive.
   Variable tsk : Task.
   Hypothesis H_positive_cost : 0 < task_cost tsk.
                 
-  (** Then, we prove that [task_run_to_completion_threshold] function
-      defines a valid task's run to completion threshold. *)     
+  (** Then, we prove that [task_rtct] function defines a valid task's
+      run to completion threshold. *)     
   Lemma fully_nonpreemptive_valid_task_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
     intros; split.
     - by unfold task_rtc_bounded_by_cost.
     - intros j ARR TSK.
-      rewrite -TSK /task_run_to_completion_threshold /fully_nonpreemptive.
+      rewrite -TSK /fully_nonpreemptive.
       edestruct (posnP (job_cost j)) as [ZERO|POS].
       + by rewrite job_rtc_threshold_is_0.
       + by erewrite job_rtc_threshold_is_ε; eauto 2. 

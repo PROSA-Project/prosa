@@ -195,9 +195,9 @@ Section RunToCompletionThreshold.
         service. *)
   Lemma job_run_to_completion_threshold_positive:
     job_cost_positive j ->
-    0 < job_run_to_completion_threshold j.
+    0 < job_rtct j.
   Proof.
-    intros COST; unfold job_run_to_completion_threshold, ε.
+    intros COST; unfold job_rtct, ε.
     have N1 := job_last_nonpreemptive_segment_positive COST.
     have N2 := job_last_nonpreemptive_segment_le_job_cost.
     ssrlia.
@@ -206,7 +206,7 @@ Section RunToCompletionThreshold.
   (** Next we show that the run-to-completion threshold is at most
         the cost of a job. *)
   Lemma job_run_to_completion_threshold_le_job_cost:
-    job_run_to_completion_threshold j <= job_cost j.
+    job_rtct j <= job_cost j.
   Proof. by apply leq_subr. Qed.
 
   
@@ -214,13 +214,13 @@ Section RunToCompletionThreshold.
         during execution of the last segment. *)
   Lemma job_cannot_be_preempted_within_last_segment:
     forall (ρ : duration), 
-      job_run_to_completion_threshold j <= ρ < job_cost j ->
+      job_rtct j <= ρ < job_cost j ->
       ~~ job_preemptable j ρ.
   Proof.
     move => ρ /andP [GE LT].
     apply/negP; intros C.
     have POS : 0 < job_cost j; first by ssrlia.
-    rewrite /job_run_to_completion_threshold subnBA in GE; last by apply job_last_nonpreemptive_segment_positive.
+    rewrite /job_rtct subnBA in GE; last by apply job_last_nonpreemptive_segment_positive.
     rewrite -subh1 in GE; [rewrite addn1 in GE | by apply job_last_nonpreemptive_segment_le_job_cost]. 
     rewrite job_cost_is_last_element_of_preemption_points in LT, GE.
     rewrite last_seq_minus_last_distance_seq in GE; last by apply preemption_points_nondecreasing.
@@ -246,7 +246,7 @@ Section RunToCompletionThreshold.
   Lemma job_nonpreemptive_after_run_to_completion_threshold: 
     forall t t',
       t <= t' ->
-      job_run_to_completion_threshold j <= service sched j t ->
+      job_rtct j <= service sched j t ->
       ~~ completed_by sched j t' ->
       scheduled_at sched j t'.
   Proof.
