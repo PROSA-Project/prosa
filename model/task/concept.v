@@ -26,6 +26,10 @@ Class TaskDeadline (Task : TaskType) := task_deadline : Task -> duration.
     execution cost (WCET). *)
 Class TaskCost (Task : TaskType) := task_cost : Task -> duration.
 
+(** And finally, we define a task-model parameter to express each task's best-case
+    execution cost (BCET). *)
+Class TaskMinCost (Task : TaskType) := task_min_cost : Task -> duration.
+
 
 (** * Task Model Validity *)
 
@@ -33,9 +37,10 @@ Class TaskCost (Task : TaskType) := task_cost : Task -> duration.
     model must satisfy. *)
 Section ModelValidity.
 
-  (** Consider any type of tasks with WCETs and relative deadlines. *)
+  (** Consider any type of tasks with WCETs/BCETs and relative deadlines. *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
+  Context `{TaskMinCost Task}.
   Context `{TaskDeadline Task}.
 
   (** First, we constrain the possible WCET values of a valid task. *)
@@ -67,7 +72,11 @@ Section ModelValidity.
     Definition valid_job_cost j :=
       job_cost j <= task_cost (job_task j).
 
-    (** ... and any arrival sequence. *)
+    (** Every job have a valid job cost *)
+    Definition jobs_have_valid_job_costs :=
+      forall j, valid_job_cost j.
+
+    (** Next, consider any arrival sequence. *)
     Variable arr_seq : arrival_sequence Job.
 
     (** The cost of a job from the arrival sequence cannot
@@ -78,6 +87,36 @@ Section ModelValidity.
         valid_job_cost j.
 
   End ValidJobCost.
+  
+  (** Third, we relate the cost of a task's jobs to its BCET. *)
+  Section ValidMinJobCost.
+
+    (** Consider any type of jobs associated with the tasks ... *)
+    Context {Job : JobType}.
+    Context `{JobTask Job Task}.
+    (** ... and consider the cost of each job. *)
+    Context `{JobCost Job}.
+
+    (** The cost of any job [j] cannot be less than the BCET of its respective
+        task. *)
+    Definition valid_min_job_cost j :=
+      task_min_cost (job_task j) <= job_cost j.
+    
+    (** Every job have a valid job cost *)
+    Definition jobs_have_valid_min_job_costs :=
+      forall j, valid_min_job_cost j.
+
+    (** Next, consider any arrival sequence. *)
+    Variable arr_seq : arrival_sequence Job.
+
+    (** The cost of a job from the arrival sequence cannot
+       be less than the task cost. *)
+    Definition arrivals_have_valid_min_job_costs :=
+      forall j,
+        arrives_in arr_seq j ->
+        valid_min_job_cost j.
+
+  End ValidMinJobCost.
 
 End ModelValidity.
 

@@ -60,7 +60,7 @@ Section ArrivalCurves.
     (** We say that a given curve [num_arrivals] is a valid arrival curve for
         task [tsk] iff [num_arrivals] is a monotonic function that equals 0 for
         the empty interval [delta = 0]. *)
-    Definition valid_arrival_curve (tsk : Task) (num_arrivals : duration -> nat) :=
+    Definition valid_arrival_curve (num_arrivals : duration -> nat) :=
       num_arrivals 0 = 0 /\
       monotone num_arrivals leq.
 
@@ -134,7 +134,7 @@ Section ArrivalCurvesModel.
   (** We say that [arrivals] is a valid arrival curve for a task set
       if it is valid for any task in the task set *)
   Definition valid_taskset_arrival_curve (arrivals : Task -> duration -> nat) :=
-    forall (tsk : Task), tsk \in ts -> valid_arrival_curve tsk (arrivals tsk).
+    forall (tsk : Task), tsk \in ts -> valid_arrival_curve (arrivals tsk).
 
   (** Finally, we lift the per-task semantics of the respective arrival and
   separation curves to the entire task set.  *)

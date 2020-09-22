@@ -252,7 +252,7 @@ Section RequestBoundFunctions.
      [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function
      that equals 0 for the empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
-  Hypothesis H_valid_arrival_curve : valid_arrival_curve tsk (max_arrivals tsk).
+  Hypothesis H_valid_arrival_curve : valid_arrival_curve (max_arrivals tsk).
   Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
 
   (** Let's define some local names for clarity. *)

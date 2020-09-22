@@ -43,7 +43,7 @@ Section TaskArrivals.
 
   (** ... and also count the cost of job arrivals. *)
   Definition cost_of_task_arrivals (t1 t2 : instant) :=
-    \sum_(j <- task_arrivals_between t1 t2 | job_task j == tsk) job_cost j.
+    \sum_(j <- task_arrivals_between t1 t2) job_cost j.
 
 End TaskArrivals.
 
