@@ -64,7 +64,7 @@ Section AbstractRTAforFPwithArrivalCurves.
 
   (** Assume we have sequential tasks, i.e, jobs from the 
      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks sched.
+  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
   (** Assume that a job cost cannot be larger than a task cost. *)
   Hypothesis H_valid_job_cost:

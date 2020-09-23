@@ -16,16 +16,21 @@ Section PropertyOfSequentiality.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor model. *)
-  Context {PState: Type}.
+  Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
-  (** Given a schedule of such jobs ... *)
-  Variable sched: schedule PState.
-
-  (** ... we say that the tasks execute sequentially if each task's jobs are
-     executed in arrival order and in a non-overlapping fashion. *)
+  (** Consider any arrival sequence ... *) 
+  Variable arr_seq : arrival_sequence Job.
+  
+  (** ... and any schedule of this arrival sequence. *)
+  Variable sched : schedule PState.
+  
+  (** We say that the tasks execute sequentially if each task's jobs are
+      executed in arrival order and in a non-overlapping fashion. *)
   Definition sequential_tasks :=
-    forall (j1 j2: Job) (t: instant),
+    forall (j1 j2 : Job) (t : instant),
+      arrives_in arr_seq j1 -> 
+      arrives_in arr_seq j2 -> 
       same_task j1 j2 ->
       job_arrival j1 < job_arrival j2 ->
       scheduled_at sched j2 t ->

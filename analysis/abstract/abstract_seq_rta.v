@@ -160,7 +160,7 @@ Section Sequential_Abstract_RTA.
     (** Unlike the previous theorem [uniprocessor_response_time_bound], we assume
        that (1) tasks are sequential, moreover (2) functions interference and
        interfering_workload are consistent with the hypothesis of sequential tasks. *)
-    Hypothesis H_sequential_tasks : sequential_tasks sched.
+    Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
     Hypothesis H_interference_and_workload_consistent_with_sequential_tasks:
       interference_and_workload_consistent_with_sequential_tasks.
 
@@ -429,7 +429,7 @@ Section Sequential_Abstract_RTA.
                 { exfalso.
                   apply negbT in ARRNEQ; rewrite -ltnNge in ARRNEQ.
                   move: (H_sequential_tasks j j' t) => CONTR.
-                  feed_n 3 CONTR; try done.
+                  feed_n 5 CONTR; try done.
                   { by rewrite /same_task eq_sym H_job_of_tsk. }
                   { by move: H_sched => /eqP SCHEDt; rewrite scheduled_at_def. }
                   move: H_job_j_is_not_completed => /negP T; apply: T.

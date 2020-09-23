@@ -81,7 +81,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
   (** Assume we have sequential tasks, i.e, jobs from the 
      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks sched.
+  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
   
   (** Assume that a job cost cannot be larger than a task cost. *)
   Hypothesis H_valid_job_cost:
@@ -577,7 +577,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
             by rewrite /completed_by /completed_by ZERO. 
         - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _]. 
-          rewrite (cumulative_task_interference_split arr_seq sched _ _ tsk j);
+          rewrite (cumulative_task_interference_split arr_seq sched _ _ _ tsk j);
             eauto 2 with basic_facts; last first.
           { by eapply arrived_between_implies_in_arrivals; eauto. }
           rewrite /I leq_add //.  

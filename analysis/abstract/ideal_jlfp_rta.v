@@ -42,7 +42,7 @@ Section JLFPInstantiation.
 
   (** Assume we have sequential tasks, i.e., jobs of the 
      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks sched.
+  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
   (** Consider a JLFP-policy that indicates a higher-or-equal priority relation,
      and assume that this relation is reflexive and transitive. *)             
@@ -218,7 +218,8 @@ Section JLFPInstantiation.
        is equal to the sum of the cumulative priority inversion of job [j] and the cumulative interference
        incurred by task [tsk] due to other tasks. *)
     Lemma cumulative_task_interference_split: 
-      forall j t1 t2 upp_t, 
+      forall j t1 t2 upp_t,
+        arrives_in arr_seq j -> 
         job_task j = tsk ->
         j \in arrivals_before arr_seq upp_t ->
         ~~ job_completed_by j t2 ->
@@ -227,7 +228,7 @@ Section JLFPInstantiation.
         cumulative_interference_from_hep_jobs_from_other_tasks j t1 t2.
     Proof.
       rewrite /cumulative_task_interference /cumul_task_interference.
-      intros j t1 R upp TSK ARR NCOMPL.
+      intros j t1 R upp ARRin TSK ARR NCOMPL.
       rewrite -big_split //= big_nat_cond [X in _ = X]big_nat_cond. 
       apply/eqP; rewrite eqn_leq; apply/andP; split.
       all: rewrite /interference /is_priority_inversion /priority_inversion.is_priority_inversion.
@@ -253,7 +254,7 @@ Section JLFPInstantiation.
           apply completion_monotonic with t; [ by apply ltnW | ].
           apply/negP; intros NCOMPL; move: NCOMPL => /negP NCOMPL.
           move: NEQ => /negP NEQ; apply: NEQ; apply H_JLFP_respects_sequential_tasks; eauto 2. 
-            by eapply scheduler_executes_job_with_earliest_arrival; eauto 2.
+          by eapply scheduler_executes_job_with_earliest_arrival; eauto 2.
         + have NEQ: s != j.
           { apply/negP; intros EQ2; move: EQ2 => /eqP EQ2.
               by move: TSKEQ => /eqP TSKEQ; apply: TSKEQ; rewrite EQ2. } 

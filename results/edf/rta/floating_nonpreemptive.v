@@ -80,7 +80,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
 
   (** Assume we have sequential tasks, i.e, jobs from the 
      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks sched.
+  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
