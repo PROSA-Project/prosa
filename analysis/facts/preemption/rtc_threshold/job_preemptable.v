@@ -13,7 +13,7 @@ Section RunToCompletionThreshold.
   Context `{JobCost Job}.
 
   (** In addition, we assume existence of a function
-      mapping jobs to theirs preemption points. *)
+      mapping jobs to their preemption points. *)
   Context `{JobPreemptable Job}.
 
   (** Consider any kind of processor state model, ... *)

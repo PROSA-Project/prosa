@@ -3,12 +3,10 @@ Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.analysis.facts.model.service_of_jobs.
+Require Export prosa.analysis.definitions.work_bearing_readiness.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
-
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import prosa.model.readiness.basic.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of
@@ -22,8 +20,8 @@ Section ExistsBusyIntervalJLFP.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.    
+  Context {Arrival: JobArrival Job}.
+  Context {Cost : JobCost Job}.
 
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
@@ -39,8 +37,12 @@ Section ExistsBusyIntervalJLFP.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume a given JLFP policy. *)
-  Context `{JLFP_policy Job}. 
-  
+  Context `{JLFP_policy Job}.
+
+  (** Further, allow for any work-bearing notion of job readiness. *)
+  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+
   (** For simplicity, let's define some local names. *)
   Let job_pending_at := pending sched.
   Let job_completed_by := completed_by sched.
@@ -150,15 +152,15 @@ Section ExistsBusyIntervalJLFP.
     Proof.
       intros t IDLE jhp ARR HP AB.
       apply negbNE; apply/negP; intros NCOMP.
-      rewrite /arrived_before ltnS in AB.
-      move:(H_work_conserving _ t ARR) => WC.
-      feed WC.
-      { apply/andP. split.
-        - apply/negPn/negP; rewrite negb_and; intros COMP.
-          move: COMP => /orP; rewrite Bool.negb_involutive; move => [/negP CON|COM]; auto.
-          move: NCOMP => /negP NCOMP; apply: NCOMP.
-            by apply completion_monotonic with t.
-        - by move: IDLE => /eqP IDLE; rewrite /scheduled_at scheduled_in_def IDLE. 
+      have PEND : job_pending_at jhp t.
+      { apply/andP; split; first by done. 
+        by move: NCOMP; apply contra, completion_monotonic.
+      }
+      apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' _]]].
+      move:(H_work_conserving j' t) => WC.
+      feed_n 2 WC; first by done.
+      { apply/andP; split; first by done.
+        by move: IDLE => /eqP IDLE; rewrite /scheduled_at scheduled_in_def IDLE. 
       }
       move: IDLE WC => /eqP IDLE [jo SCHED].
       by rewrite scheduled_at_def IDLE in SCHED.
@@ -224,8 +226,8 @@ Section ExistsBusyIntervalJLFP.
     Proof.
       intros t NEQ IDLE.
       move: (pending_hp_job_exists _ NEQ) => [jhp [ARR [PEND HP]]].
-      unfold work_conserving in *.
-      feed (H_work_conserving _ t ARR).
+      apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' _]]].
+      feed (H_work_conserving _ t ARR').
       apply/andP; split; first by done.
       move: IDLE => /eqP IDLE; rewrite scheduled_at_def IDLE; by done.
       move: (H_work_conserving) => [jo SCHED].
@@ -288,42 +290,38 @@ Section ExistsBusyIntervalJLFP.
       - by eapply in_arrivals_implies_arrived; eauto 2.
       - by eapply in_arrivals_implies_arrived_before; eauto 2.
     Qed.
-    
+
     (** Next we prove that the total service within a "non-quiet" 
-        time interval <<[t1, t1 + Δ)>> is exactly Δ. *)
+        time interval <<[t1, t1 + Δ)>> is exactly [Δ]. *)
     Lemma no_idle_time_within_non_quiet_time_interval:
       service_of_jobs sched predT (arrivals_between 0 (t1 + Δ)) t1 (t1 + Δ) = Δ.
     Proof.
-      intros; unfold service_of_jobs, service_of_higher_or_equal_priority_jobs.
+      intros; unfold service_of_jobs, service_of_higher_or_equal_priority_jobs. 
       rewrite -{3}[Δ](sum_of_ones t1) exchange_big //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split.
-      { rewrite leq_sum //.
-        move => t' _.
-        have SCH := service_of_jobs_le_1 sched predT (arrivals_between 0 (t1 + Δ)) _ t'. 
-          by eauto using arrivals_uniq.
-      }
-      { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=; rewrite leq_sum //.
-        move => t' /andP [/andP [LT GT] _].
-        apply/sum_seq_gt0P.
+      { rewrite leq_sum // => t' _.
+        have SCH := @service_of_jobs_le_1 _ _ _ _ _ sched predT (arrivals_between 0 (t1 + Δ)).        
+        eapply leq_trans; last apply SCH; eauto using arrivals_uniq with basic_facts.
+        by rewrite leq_sum // => i _; rewrite -scheduled_at_def service_at_is_scheduled_at. }
+      { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=
+                leq_sum // => t' /andP [/andP [LT GT] _]; apply/sum_seq_gt0P.
         ideal_proc_model_sched_case_analysis_eq sched t' jo.
         { exfalso; move: LT; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
           { subst t'.
             feed (H_no_quiet_time t1.+1); first by apply/andP; split.
-            apply: H_no_quiet_time.
-              by apply idle_time_implies_quiet_time_at_the_next_time_instant.
-          }
+            by apply H_no_quiet_time, idle_time_implies_quiet_time_at_the_next_time_instant. }
           { feed (H_no_quiet_time t'); first by apply/andP; split; last rewrite ltnW.
             apply: H_no_quiet_time; intros j_hp IN HP ARR.
-            apply contraT; intros NOTCOMP.
-            destruct (scheduled_at sched j_hp t') eqn:SCHEDhp;
-              first by rewrite scheduled_at_def EqIdle in SCHEDhp.
-            apply negbT in SCHEDhp.
-            feed (H_work_conserving j_hp t' IN);
-              first by repeat (apply/andP; split); first by apply ltnW.
+            apply contraT; intros NCOMP.
+            have PEND : job_pending_at j_hp t'.
+            { apply/andP; split.
+              - by rewrite /has_arrived ltnW.
+              - by move: NCOMP; apply contra, completion_monotonic. }
+            apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' _]]].
+            feed (H_work_conserving _ t' ARR').
+            { by apply/andP; split; last rewrite scheduled_at_def EqIdle. }
             move: H_work_conserving => [j_other SCHEDother].
-              by rewrite scheduled_at_def EqIdle in SCHEDother.
-          }              
-        }
+            by rewrite scheduled_at_def EqIdle in SCHEDother. } }
         { exists jo; split.
           - apply arrived_between_implies_in_arrivals; try done.
             apply H_jobs_come_from_arrival_sequence with t'; try done.
@@ -472,12 +470,10 @@ Section ExistsBusyIntervalJLFP.
             apply leq_trans with (cumulative_priority_inversion sched j t1 (t1 + delta) + hp_service t1 (t1 + delta)).
             { rewrite /hp_service hep_jobs_receive_no_service_before_quiet_time //.
               rewrite /service_of_higher_or_equal_priority_jobs /service_of_jobs sum_pred_diff. 
-              rewrite addnBA; last first.
-              { by rewrite big_mkcond //= leq_sum //; intros j' _; case (hep_job j' j). } 
+              rewrite addnBA; last by rewrite big_mkcond //= leq_sum //; intros j' _; case (hep_job j' j).
               rewrite addnC -addnBA.
-              { intros. have TT := no_idle_time_within_non_quiet_time_interval.
-                  by unfold service_of_jobs in TT; rewrite TT // leq_addr.
-              } 
+              { have TT := no_idle_time_within_non_quiet_time_interval.
+                by unfold service_of_jobs in TT; rewrite TT // leq_addr. } 
               { rewrite /cumulative_priority_inversion /is_priority_inversion exchange_big //=.
                 apply leq_sum_seq; move => t II _.
                 rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
@@ -485,7 +481,9 @@ Section ExistsBusyIntervalJLFP.
                 { by rewrite leqn0 big1_seq //. }
                 { case PRIO1: (hep_job j1 j); simpl; first last.
                   - rewrite <- SCHED.
-                    have SCH := service_of_jobs_le_1 sched _ _ _ t; eauto using arrivals_uniq. 
+                    have SCH := @service_of_jobs_le_1 _ _ _ _ _ _ (fun i => ~~ hep_job i j) (arrivals_between 0 (t1 + delta)).
+                    eapply leq_trans; last eapply SCH; eauto using arrivals_uniq with basic_facts.
+                    by rewrite leq_sum // => i _; rewrite -scheduled_at_def service_at_is_scheduled_at.
                   - rewrite leqn0 big1_seq; first by done.
                     move => j2 /andP [PRIO2 ARRj2].
                     case EQ: (j1 == j2).
@@ -691,7 +689,7 @@ Section ExistsBusyIntervalJLFP.
         job_completed_by j (job_arrival j + delta).
       Proof.
         have BUSY := exists_busy_interval priority_inversion_bound _ delta.
-        move: (posnP (@job_cost _ H2 j)) => [ZERO|POS].
+        move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         { by rewrite /job_completed_by /completed_by ZERO. }
         feed_n 4 BUSY; try by done.
         move: BUSY => [t1 [t2 [/andP [GE1 LT2] [GE2 BUSY]]]].

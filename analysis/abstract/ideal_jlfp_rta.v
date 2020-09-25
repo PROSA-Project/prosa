@@ -2,12 +2,8 @@ Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.abstract.abstract_seq_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** In this file we consider an ideal uni-processor ... *)
+(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
-
-(** ... and classic model of readiness without jitter and no
-    self-suspensions, where pending jobs are always ready. *)
-Require Import prosa.model.readiness.basic.
 
 (** * JLFP instantiation of Interference and Interfering Workload for ideal uni-processor. *)
 (** In this module we instantiate functions Interference and Interfering Workload 
@@ -372,9 +368,11 @@ Section JLFPInstantiation.
         { ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (another_hep_job jo j) eqn:PRIO.
-          - rewrite -EQ. have SCH := service_of_jobs_le_1 sched _ (arrivals_between t1 t) _ x.
-            eapply leq_trans; last by apply SCH; eauto using arrivals_uniq.
-            erewrite leq_sum; eauto 2.
+          - rewrite -EQ. have SCH := service_of_jobs_le_1 _ _ sched _ (arrivals_between t1 t) _ x.
+            eapply leq_trans; last first. 
+            + apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
+                            ideal_proc_model_is_a_uniprocessor_model.
+            + by erewrite leq_sum.
           - rewrite leqn0 big1 //; intros joo PRIO2.
             apply/eqP; rewrite eqb0; apply/eqP; intros C.
             inversion C; subst joo; clear C.
@@ -413,9 +411,11 @@ Section JLFPInstantiation.
         { ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (hep_job_from_another_task jo j) eqn:PRIO.
-          - rewrite -EQ. have SCH := service_of_jobs_le_1 sched _ (arrivals_between t1 t) _ x.
-            eapply leq_trans; last by apply SCH; eauto using arrivals_uniq.
-            erewrite leq_sum; eauto 2.
+          - rewrite -EQ. have SCH := service_of_jobs_le_1 _ _ sched _ (arrivals_between t1 t) _ x.
+            eapply leq_trans; last first. 
+            + by apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
+                            ideal_proc_model_is_a_uniprocessor_model.
+            + by erewrite leq_sum.
           - rewrite leqn0 big1 //; intros joo PRIO2.
             apply/eqP; rewrite eqb0; apply/eqP; intros C.
             inversion C; subst joo; clear C.
@@ -455,8 +455,9 @@ Section JLFPInstantiation.
               last by apply zero_is_quiet_time.
             have L2 := instantiated_cumulative_workload_of_hep_jobs_equal_total_workload_of_hep_jobs.
             rewrite /cumulative_interfering_workload_of_hep_jobs in L2; rewrite L2; clear L2.
-            rewrite eq_sym; apply/eqP. 
-            apply all_jobs_have_completed_equiv_workload_eq_service; try done.
+            rewrite eq_sym; apply/eqP.
+            apply all_jobs_have_completed_equiv_workload_eq_service;
+              eauto using ideal_proc_model_provides_unit_service.
             intros; apply QT.
             - by apply in_arrivals_implies_arrived in H4.
             - by move: H5 => /andP [H6 H7]. 
@@ -479,7 +480,7 @@ Section JLFPInstantiation.
           intros t [T0 T1]; intros jhp ARR HP ARB.
           eapply all_jobs_have_completed_equiv_workload_eq_service with
               (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t);
-            eauto 2; last eapply arrived_between_implies_in_arrivals; try done.
+            eauto using arrived_between_implies_in_arrivals, ideal_proc_model_provides_unit_service.
           move: T0; rewrite /cumul_interference /cumul_interfering_workload.
           rewrite CIS !big_split //=; move => /eqP; rewrite eqn_add2l.
           rewrite IC1; last by apply zero_is_quiet_time.

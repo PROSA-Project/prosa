@@ -231,13 +231,13 @@ Section Sequential_Abstract_RTA.
         completed_by sched j2 t1.
       Proof.
         move => JA; move: (H_j2_from_tsk) => /eqP TSK2eq.
-        move: (posnP (@job_cost _ H3 j2)) => [ZERO|POS].
-        { by rewrite /completed_by /service.completed_by ZERO. }
-        move: (H_interference_and_workload_consistent_with_sequential_tasks
-                 j1 t1 t2 H_j1_arrives H_j1_from_tsk H_j1_cost_positive H_busy_interval) => SWEQ.
-        eapply all_jobs_have_completed_equiv_workload_eq_service
-          with (j := j2) in SWEQ; eauto 2; try done.
-          by apply arrived_between_implies_in_arrivals.
+        rewrite /completed_by.
+        move: (posnP (@job_cost _ H3 j2)) => [-> | POS]; first by done.
+        move: (H_interference_and_workload_consistent_with_sequential_tasks j1 t1 t2) => SWEQ.
+        feed_n 4 SWEQ; try by done.
+        apply all_jobs_have_completed_equiv_workload_eq_service with (j := j2) in SWEQ => //.
+        - by apply ideal_proc_model_provides_unit_service.
+        - by apply arrived_between_implies_in_arrivals.
       Qed.
 
       (** Next we prove that if a job is pending after the beginning

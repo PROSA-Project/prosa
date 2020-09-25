@@ -1,4 +1,5 @@
 Require Export prosa.model.task.concept.
+Require Export prosa.analysis.facts.model.ideal_schedule.
 
 (** Due to historical reasons this file defines the notion of a
     schedule of a task for the ideal uni-processor model. This is not

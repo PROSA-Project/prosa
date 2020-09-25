@@ -67,3 +67,7 @@ Section LiuAndLaylandReadiness.
   Qed.
 
 End LiuAndLaylandReadiness.
+
+(** We add the above lemma into a "Hint Database" basic_facts, so Coq
+    will be able to apply it automatically. *)
+Global Hint Resolve basic_readiness_is_work_bearing_readiness : basic_facts.

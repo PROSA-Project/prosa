@@ -9,11 +9,6 @@ Require Export prosa.analysis.facts.busy_interval.busy_interval.
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
 
-(** Throughout the file we assume for the classic Liu & Layland model
-    of readiness without jitter and no self-suspensions, where
-    pending jobs are always ready. *)
-Require Import prosa.model.readiness.basic.
-
 (** In preparation of the derivation of the priority inversion bound, we
     establish two basic facts on preemption times. *)
 Section PreemptionTimes.
@@ -93,8 +88,8 @@ Section PriorityInversionIsBounded.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+  Context `{Arrival : JobArrival Job}.
+  Context `{Cost : JobCost Job}.
   
   (** Consider any arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -129,6 +124,10 @@ Section PriorityInversionIsBounded.
   Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
+  (** Further, allow for any work-bearing notion of job readiness. *)
+  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+  
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
@@ -221,29 +220,34 @@ Section PriorityInversionIsBounded.
           scheduled_at sched jhp t ->
           hep_job jhp j.
       Proof.
-        intros LTt2m1 jhp Sched_jhp.
-        move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]]. 
-        apply contraT; move => /negP NOTHP; exfalso. 
-        apply NOTQUIET with (t := t.+1).
+        intros LTt2m1 jlp Sched_jlp; apply contraT; move => /negP NOTHP; exfalso.
+        move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]].
+        apply NOTQUIET with (t := t.+1). 
         { apply/andP; split.
           - by apply leq_ltn_trans with t1.
           - rewrite -subn1 ltn_subRL addnC in LTt2m1.
-              by rewrite -[t.+1]addn1.
+            by rewrite -[t.+1]addn1.
         }
-        intros j_hp' IN HP ARR.
-        apply contraT; move => /negP NOTCOMP'; exfalso.
-        have BACK: backlogged sched j_hp' t.
-        { apply/andP; split; last first.
-          { apply/negP; intro SCHED'.
-            move: (ideal_proc_model_is_a_uniprocessor_model jhp j_hp' sched t Sched_jhp SCHED') => EQ; subst.
-              by apply: NOTHP.
-          } 
-          apply/andP; split. unfold arrived_before, has_arrived in *. by done. 
-          apply/negP; intro COMP; apply NOTCOMP'.
-            by apply completion_monotonic with (t0 := t).
+        intros j_hp ARR HP BEF.
+        apply contraT => NCOMP'; exfalso. 
+        have PEND : pending sched j_hp t.
+        { apply/andP; split.
+          - by rewrite /has_arrived.
+          - by move: NCOMP'; apply contra, completion_monotonic.
         }
-        apply NOTHP, (H_priority_is_transitive t j_hp'); eauto 2.
+        apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' HEP']]].
+        have HEP : hep_job j' j by apply (H_priority_is_transitive t j_hp). 
+        clear HEP' NCOMP' BEF HP ARR j_hp.
+        have BACK: backlogged sched j' t.
+        { apply/andP; split; first by done.
+          apply/negP; intro SCHED'.
+          move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
+          by subst; apply: NOTHP.
+        }
+        apply NOTHP, (H_priority_is_transitive t j'); last by eapply HEP.
+        by eapply H_respects_policy; eauto .
       Qed.
+
       
       (** In case when [t = t2 - 1], we cannot use the same proof
           since [t+1 = t2], but [t2] is a quiet time. So we do a
@@ -254,43 +258,46 @@ Section PriorityInversionIsBounded.
           scheduled_at sched jhp t ->
           hep_job jhp j.
       Proof.
-        intros EQUALt2m1 jhp Sched_jhp.
-        move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]]. 
-        apply contraT; move => /negP NOTHP; exfalso. 
+        intros EQUALt2m1 jlp Sched_jlp; apply contraT; move => /negP NOTHP; exfalso.
+        move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]].
         rewrite leq_eqVlt in GEt; first move: GEt => /orP [/eqP EQUALt1 | LARGERt1].
-        - subst t; clear LEt.
-          rewrite -EQUALt1 in Sched_jhp; move: EQUALt1 => /eqP EQUALt1.
-          destruct (job_scheduled_at j t1) eqn:SCHEDj.
-          + apply NOTHP; erewrite (ideal_proc_model_is_a_uniprocessor_model j jhp); eauto.
-              by apply (H_priority_is_reflexive 0).
-          + eapply NOTHP, (H_respects_policy _ _ t2.-1); auto;
-              last by rewrite -(eqbool_to_eqprop EQUALt1).
-            apply/andP; split; last first.
-            * by rewrite -(eqbool_to_eqprop EQUALt1); unfold job_scheduled_at in *; rewrite SCHEDj.
-            * have EQ: t1 = job_arrival j.
-              { rewrite -eqSS in EQUALt1.
-                have EQ: t2 = t1.+1.
-                { rewrite prednK in EQUALt1; first by apply/eqP; rewrite eq_sym.
-                  apply negbNE; rewrite -eqn0Ngt; apply/neqP; intros EQ0.
-                  move: INBI; rewrite EQ0; move => /andP [_ CONTR].
-                    by rewrite ltn0 in CONTR.
-                } clear EQUALt1.
-                  by move: INBI; rewrite EQ ltnS -eqn_leq; move => /eqP INBI.
-              }
-                by rewrite -(eqbool_to_eqprop EQUALt1) EQ; eapply job_pending_at_arrival; eauto 2.                  
-        - feed (NOTQUIET t); first by apply/andP; split.
+        { subst t t1; clear LEt SL. 
+          have ARR : job_arrival j = t2.-1.
+          { apply/eqP; rewrite eq_sym eqn_leq. 
+            destruct t2; first by done.
+            rewrite ltnS -pred_Sn in INBI.
+            now rewrite -pred_Sn.
+          }
+          have PEND := job_pending_at_arrival sched _ H_job_cost_positive H_jobs_must_arrive_to_execute.
+          rewrite ARR in PEND.
+          apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [PENDhp HEPhp]]].
+          eapply NOTHP, (H_priority_is_transitive 0); last by apply HEPhp.
+          apply (H_respects_policy _ _ t2.-1); auto.
+          apply/andP; split; first by done.
+          apply/negP; intros SCHED.
+          move: (ideal_proc_model_is_a_uniprocessor_model _ _ sched _ SCHED Sched_jlp) => EQ.
+          by subst; apply: NOTHP.
+        }        
+        { feed (NOTQUIET t); first by apply/andP; split.
           apply NOTQUIET; intros j_hp' IN HP ARR.
-          apply contraT; move => /negP NOTCOMP'; exfalso.
-          have BACK: backlogged sched j_hp' t.
+          apply contraT => NOTCOMP'; exfalso.
+          have PEND : pending sched j_hp' t.
           { apply/andP; split.
-            - apply/andP; split. unfold arrived_before, has_arrived in *. by rewrite ltnW. 
-              apply/negP; intro COMP; apply NOTCOMP'.
-                by apply completion_monotonic with (t0 := t).
-            - apply/negP; intro SCHED'.
-              move: (ideal_proc_model_is_a_uniprocessor_model jhp j_hp' sched t Sched_jhp SCHED') => EQ; subst.
-                by apply: NOTHP.
-          } 
-          apply NOTHP, (H_priority_is_transitive t j_hp'); eauto 2.
+            - by rewrite /has_arrived ltnW.
+            - by move: NOTCOMP'; apply contra, completion_monotonic.
+          }          
+          apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' HEP']]].
+          have HEP : hep_job j' j by apply (H_priority_is_transitive t j_hp'). 
+          clear ARR HP IN HEP' NOTCOMP' j_hp'.
+          have BACK: backlogged sched j' t.
+          { apply/andP; split; first by done.
+            apply/negP; intro SCHED'.
+            move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
+              by subst; apply: NOTHP.
+          }
+          apply NOTHP, (H_priority_is_transitive t j'); last by eapply HEP.
+          by eapply H_respects_policy; eauto .
+        }
       Qed.
 
       (** By combining the above facts we conclude that a job that is
@@ -410,8 +417,8 @@ Section PriorityInversionIsBounded.
       move: (H_respects_policy) => PRIO.              
       move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
       ideal_proc_model_sched_case_analysis_eq sched t jhp.
-      { exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2.
-          by apply/andP; split; first apply leq_trans with tp. }
+      { apply instant_t_is_not_idle in Idle; first by done.
+        by apply/andP; split; first apply leq_trans with tp. } 
       exists jhp.
       have HP: hep_job jhp j.
       { intros.
