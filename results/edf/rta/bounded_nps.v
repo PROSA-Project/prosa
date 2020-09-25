@@ -37,8 +37,8 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+  Context `{Arrival : JobArrival Job}.
+  Context `{Cost : JobCost Job}.
 
   (** For clarity, let's denote the relative deadline of a task as [D]. *)
   Let D tsk := task_deadline tsk.
@@ -54,29 +54,23 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
   
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
+  (** Next, consider any valid ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
-
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
+  
   (** In addition, we assume the existence of a function mapping jobs
-      to theirs preemption points ... *)
+      to their preemption points ... *)
   Context `{JobPreemptable Job}.
 
-  (** ... and assume that it defines a valid preemption
-     model with bounded non-preemptive segments. *)
+  (** ... and assume that it defines a valid preemption model with
+      bounded non-preemptive segments. *)
   Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
-    valid_model_with_bounded_nonpreemptive_segments
-      arr_seq sched.
-  
-  (** Assume we have sequential tasks, i.e, jobs from the 
-     same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
-  
+    valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
+
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
@@ -209,6 +203,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       priority_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
     Proof.
       move => j ARR TSK POS t1 t2 PREF; move: (PREF) => [_ [_ [_ /andP [T _]]]].
+      move: H_sched_valid => [COARR MBR].
       destruct (leqP (t2 - t1) blocking_bound) as [NEQ|NEQ].
       { apply leq_trans with (t2 - t1); last by done. 
         rewrite /cumulative_priority_inversion /is_priority_inversion. 
@@ -283,7 +278,9 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       response_time_bounded_by tsk R.
     Proof.
       eapply uniprocessor_response_time_bound_edf; eauto 2.
-        by apply priority_inversion_is_bounded. 
+      - eapply EDF_implies_sequential_tasks; eauto 2.
+        + by apply basic.basic_readiness_is_work_bearing_readiness, EDF_is_reflexive.
+      - by apply priority_inversion_is_bounded. 
     Qed.
            
   End ResponseTimeBound.

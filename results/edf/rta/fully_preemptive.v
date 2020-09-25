@@ -1,13 +1,15 @@
 Require Import prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
+Require Export prosa.analysis.facts.readiness.basic.
+
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * RTA for Fully Preemptive EDF *)
 (** In this section we prove the RTA theorem for the fully preemptive EDF model *)
 
 (** Throughout this file, we assume the EDF priority policy, ideal uni-processor 
-    schedules, and the basic (i.e., Liu & Layland) readiness model. *)
+    schedules, and the basic readiness model. *)
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.basic.
@@ -57,18 +59,15 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Next, consider any ideal uniprocessor schedule of the arrival sequence ... *)
+  (** Next, consider any valid ideal uniprocessor schedule of the arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
+  Hypothesis H_sched_valid: valid_schedule sched arr_seq.
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
-  (** Assume we have sequential tasks, i.e, jobs from the 
-      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.

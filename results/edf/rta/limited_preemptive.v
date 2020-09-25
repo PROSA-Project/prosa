@@ -1,5 +1,7 @@
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
+Require Export prosa.analysis.facts.readiness.basic.
+
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * RTA for EDF with Fixed Preemption Points *)
@@ -67,21 +69,16 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Next, consider any ideal uni-processor schedule with limited
+  (** Next, consider any valid ideal uni-processor schedule with limited
       preemptions of this arrival sequence ...  *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_sched_valid: valid_schedule sched arr_seq.
   Hypothesis H_schedule_with_limited_preemptions:
     schedule_respects_preemption_model arr_seq sched.
   
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
-  (** Assume we have sequential tasks, i.e, jobs from the 
-      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
@@ -156,23 +153,20 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     }
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L).
     all: eauto 2 with basic_facts.
-    { rewrite subKn; first by done.
-      rewrite /task_last_nonpr_segment  -(leq_add2r 1) subn1 !addn1 prednK; last first.
-      {  rewrite /last0 -nth_last.
-        apply HYP3; try by done. 
-        rewrite -(ltn_add2r 1) !addn1 prednK //.
-        move: (number_of_preemption_points_in_task_at_least_two
-                 _ _ H_valid_model_with_fixed_preemption_points _ H_tsk_in_ts POSt) => Fact2.
-        move: (Fact2) => Fact3.
-          by rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2.
-      }        
-      { apply leq_trans with (task_max_nonpreemptive_segment tsk).
-        - by apply last_of_seq_le_max_of_seq. 
-        - rewrite -END; last by done.
-          apply ltnW; rewrite ltnS; try done.
-            by apply max_distance_in_seq_le_last_element_of_seq; eauto 2. 
-      }
-    }
+    rewrite subKn; first by done.
+    rewrite /task_last_nonpr_segment  -(leq_add2r 1) subn1 !addn1 prednK; last first.
+    - rewrite /last0 -nth_last.
+      apply HYP3; try by done. 
+      rewrite -(ltn_add2r 1) !addn1 prednK //.
+      move: (number_of_preemption_points_in_task_at_least_two
+               _ _ H_valid_model_with_fixed_preemption_points _ H_tsk_in_ts POSt) => Fact2.
+      move: (Fact2) => Fact3.
+      by rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2.
+    - apply leq_trans with (task_max_nonpreemptive_segment tsk).
+      + by apply last_of_seq_le_max_of_seq. 
+      + rewrite -END; last by done.
+        apply ltnW; rewrite ltnS; try done.
+        by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
   Qed.
-      
+  
 End RTAforFixedPreemptionPointsModelwithArrivalCurves.

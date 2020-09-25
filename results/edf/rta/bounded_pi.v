@@ -1,10 +1,11 @@
 Require Export prosa.analysis.facts.edf.
-Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
+Require Import prosa.analysis.facts.busy_interval.carry_in.
+Require Import prosa.analysis.facts.readiness.basic.
+
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules ... *)
@@ -44,8 +45,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+  Context {Arrival : JobArrival Job}.
+  Context {Cost : JobCost Job}.
   Context `{JobPreemptable Job}. 
   
   (** For clarity, let's denote the relative deadline of a task as D. *)
@@ -62,10 +63,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
+  (** Next, consider any valid ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -80,15 +80,15 @@ Section AbstractRTAforEDFwithArrivalCurves.
      in the _classical_ sense, and later prove that the hypothesis 
      about abstract work-conservation also holds. *)
   Hypothesis H_work_conserving : work_conserving_cl.
-
-  (** Assume we have sequential tasks, i.e, jobs from the 
-     same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
   
   (** Assume that a job cost cannot be larger than a task cost. *)
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
-
+  
+  (** Assume we have sequential tasks, i.e, jobs from the 
+      same task execute in the order of their arrival. *)
+  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
+  
   (** Consider an arbitrary task set ts. *)
   Variable ts : list Task.
 
@@ -221,6 +221,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       unfold EDF in *.
       intros j t1 t2 t ARR TSK POS BUSY NEQ; split; intros HYP;
         [move: HYP => /negP | rewrite scheduled_at_def in HYP; move: HYP => /eqP HYP ].
+      move: H_sched_valid => [CARR MBR].
       { rewrite negb_or /is_priority_inversion /is_priority_inversion
                 /is_interference_from_another_hep_job. 
         move => /andP [HYP1 HYP2].
@@ -256,7 +257,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
         arr_seq sched tsk interference interfering_workload.          
     Proof.
       unfold EDF in *.
-      intros j t1 t2 ARR TSK POS BUSY. 
+      intros j t1 t2 ARR TSK POS BUSY.
+      move: H_sched_valid => [CARR MBR].
       eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto 2 with basic_facts.
       eapply all_jobs_have_completed_equiv_workload_eq_service; eauto 2 with basic_facts.
       intros s INs TSKs.
@@ -283,6 +285,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
     Proof.
       unfold EDF in *.
       intros j ARR TSK POS.
+      move: H_sched_valid => [CARR MBR].
       edestruct exists_busy_interval_from_total_workload_bound
         with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; eauto 2 with basic_facts.
       { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf''. }
@@ -337,6 +340,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           cumulative_priority_inversion sched j t1 (t1 + Δ) <= priority_inversion_bound.
         Proof.
           unfold priority_inversion_is_bounded_by, EDF in *.
+          move: H_sched_valid => [CARR MBR].
           apply leq_trans with (cumulative_priority_inversion sched j t1 t2).
           - rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1  + Δ)) //=.
             + by rewrite leq_addr.
@@ -361,7 +365,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
           cumulative_interference_from_hep_jobs_from_other_tasks sched j t1 (t1 + Δ)
           <= service_of_jobs sched (EDF_not_from tsk) jobs t1 (t1 + Δ).
         Proof.
-          move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _]. 
+          move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
+          move: H_sched_valid => [CARR MBR].
           erewrite instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks;
             eauto 2 with basic_facts.
           - by rewrite -H_job_of_tsk /jobs.
@@ -572,7 +577,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
       Proof.
         unfold EDF in *.
         intros j R2 t1 t2 ARR TSK N NCOMPL BUSY.
-        move: (posnP (@job_cost _ H4 j)) => [ZERO|POS].
+        move: H_sched_valid => [CARR MBR].
+        move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
             by rewrite /completed_by /completed_by ZERO. 
         - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _]. 
@@ -678,7 +684,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
     response_time_bounded_by tsk R.
   Proof.
     intros js ARRs TSKs.
-    move: (posnP (@job_cost _ H4 js)) => [ZERO|POS].
+    move: H_sched_valid => [CARR MBR].
+    move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }    
     eapply uniprocessor_response_time_bound_seq with
         (interference0 := interference) (interfering_workload0 := interfering_workload)
