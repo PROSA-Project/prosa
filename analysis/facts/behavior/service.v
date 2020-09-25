@@ -156,17 +156,46 @@ Section UnitService.
     by move=> t; rewrite /service_at.
   Qed.
 
-  (** ...which implies that the cumulative service received by job [j] in any
-     interval of length delta is at most delta. *)
+  (** ... which implies that the instantaneous service always equals to 0 or 1.  *)
+  Corollary service_is_zero_or_one:
+    forall t, service_at sched j t = 0 \/ service_at sched j t = 1.
+  Proof.
+    intros. 
+    have Lewf := service_at_most_one t.
+    remember (service_at sched j t) as ρ.
+    by destruct ρ; last destruct ρ; [left| right | exfalso]. 
+  Qed.
+
+  (** Next we prove that the cumulative service received by job [j] in
+      any interval of length [delta] is at most [delta]. *)
   Lemma cumulative_service_le_delta:
-    forall t delta,
-      service_during sched j t (t + delta) <= delta.
+    forall t delta, service_during sched j t (t + delta) <= delta.
   Proof.
     unfold service_during; intros t delta.
     apply leq_trans with (n := \sum_(t <= t0 < t + delta) 1);
       last by rewrite sum_of_ones.
     by apply: leq_sum => t' _; apply: service_at_most_one.
   Qed.
+
+  (** Conversely, we prove that if the cumulative service received by
+      job [j] in an interval of length [delta] is greater than or
+      equal to [ρ], then [ρ ≤ delta]. *)
+  Lemma cumulative_service_ge_delta :
+    forall t delta ρ,
+      ρ <= service_during sched j t (t + delta) ->
+      ρ <= delta.
+  Proof.
+    induction delta; intros ? LE.
+    - by rewrite service_during_geq in LE; ssrlia.
+    - rewrite addnS -service_during_last_plus_before in LE; last by ssrlia.
+      destruct (service_is_zero_or_one (t + delta)) as [EQ|EQ]; rewrite EQ in LE.
+      + rewrite addn0 in LE.
+        by apply IHdelta in LE; rewrite (leqRW LE).
+      + rewrite addn1 in LE.
+        destruct ρ; first by done.
+        by rewrite ltnS in LE; apply IHdelta in LE; rewrite (leqRW LE).
+  Qed.
+  
 
   Section ServiceIsAStepFunction.
 
