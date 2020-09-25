@@ -1,5 +1,6 @@
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
+Require Export prosa.analysis.facts.readiness.sequential.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
@@ -8,9 +9,9 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 (** In this module we prove the RTA theorem for floating non-preemptive regions FP model. *)
 
 (** Throughout this file, we assume the FP priority policy, ideal uni-processor 
-    schedules, and the basic (i.e., Liu & Layland) readiness model. *)
+    schedules, and the sequential readiness model. *)
 Require Import prosa.model.processor.ideal.
-Require Import prosa.model.readiness.basic.
+Require Import prosa.model.readiness.sequential.
 
 (** Furthermore, we assume the task model with floating non-preemptive regions. *)
 Require Import prosa.model.preemption.limited_preemptive.
@@ -64,13 +65,16 @@ Section RTAforFloatingModelwithArrivalCurves.
   (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
+  
+  (** Recall that we assume sequential readiness. *)
+  Instance sequential_readiness : JobReady _ _ :=
+    sequential_ready_instance arr_seq.
 
-  (** Next, consider any ideal uni-processor schedule with limited preemptions of this arrival sequence ... *)
+  (** Next, consider any valid ideal uni-processor schedule with with
+      limited preemptions of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
-  Hypothesis H_schedule_with_limited_preemptions:
-    schedule_respects_preemption_model arr_seq sched.
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_schedule_with_limited_preemptions : schedule_respects_preemption_model arr_seq sched.
   
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
@@ -81,11 +85,7 @@ Section RTAforFloatingModelwithArrivalCurves.
   Context `{FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
-
-  (** Assume we have sequential tasks, i.e, jobs from the 
-      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
-
+  
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
@@ -153,10 +153,12 @@ Section RTAforFloatingModelwithArrivalCurves.
     move: (LIMJ) => [BEG [END _]].
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.
     all: eauto 2 with basic_facts.
-    intros A SP.
-    rewrite subnn subn0.
-    destruct (H_R_is_maximum _ SP) as [F [EQ LE]].
+    - by apply sequential_readiness_implies_work_bearing_readiness.
+    - by apply sequential_readiness_implies_sequential_tasks.
+    - intros A SP.
+      rewrite subnn subn0.
+      destruct (H_R_is_maximum _ SP) as [F [EQ LE]].
       by exists F; rewrite addn0; split.
   Qed.
-
+           
 End RTAforFloatingModelwithArrivalCurves.

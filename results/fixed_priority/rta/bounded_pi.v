@@ -1,12 +1,10 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.busy_interval.busy_interval.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
+Require Export prosa.analysis.facts.busy_interval.busy_interval.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import prosa.model.readiness.basic.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
@@ -34,21 +32,35 @@ Section AbstractRTAforFPwithArrivalCurves.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+  Context {Arrival : JobArrival Job}.
+  Context {Cost : JobCost Job}.
   Context `{JobPreemptable Job}.
-
+  
+  (** Consider an FP policy that indicates a higher-or-equal priority relation,
+     and assume that the relation is reflexive. Note that we do not relate 
+     the FP policy with the scheduler. However, we define functions for 
+     Interference and Interfering Workload that actively use the concept of 
+     priorities. We require the FP policy to be reflexive, so a job cannot 
+     cause lower-priority interference (i.e. priority inversion) to itself. *)
+  Context `{FP_policy Task}.
+  Hypothesis H_priority_is_reflexive : reflexive_priorities.
+  
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
-  
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
 
-  (** ... where jobs do not execute before their arrival or after completion. *)
+  (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
+  Variable sched : schedule (ideal.processor_state Job).
+  
+  (** ... allow for any work-bearing notion of job readiness, ... *)
+  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+
+  (** ... and assume that the schedule is valid.  *)
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+
+  (** We also assume that jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
   
@@ -63,9 +75,9 @@ Section AbstractRTAforFPwithArrivalCurves.
   Hypothesis H_work_conserving : work_conserving_cl.
 
   (** Assume we have sequential tasks, i.e, jobs from the 
-     same task execute in the order of their arrival. *)
+      same task execute in the order of their arrival. *)
   Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
-
+  
   (** Assume that a job cost cannot be larger than a task cost. *)
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
@@ -96,15 +108,7 @@ Section AbstractRTAforFPwithArrivalCurves.
      any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
-  
-  (** Consider an FP policy that indicates a higher-or-equal priority relation,
-     and assume that the relation is reflexive. Note that we do not relate 
-     the FP policy with the scheduler. However, we define functions for 
-     Interference and Interfering Workload that actively use the concept of 
-     priorities. We require the FP policy to be reflexive, so a job cannot 
-     cause lower-priority interference (i.e. priority inversion) to itself. *)
-  Context `{FP_policy Task}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities.
+
   
   (** For clarity, let's define some local names. *)
   Let job_pending_at := pending sched.
@@ -190,6 +194,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         rewrite negb_or /is_priority_inversion /is_priority_inversion
                 /is_interference_from_another_hep_job.
         move => /andP [HYP1 HYP2].
+        move: H_sched_valid => [CARR MBR].
         case SCHED: (sched t) => [s | ].
         + rewrite SCHED in HYP1, HYP2.
           move: HYP1 HYP2. 
@@ -216,9 +221,11 @@ Section AbstractRTAforFPwithArrivalCurves.
       interference_and_workload_consistent_with_sequential_tasks
         arr_seq sched tsk interference interfering_workload.
     Proof.
-      intros j t1 t2 ARR TSK POS BUSY. 
+      intros j t1 t2 ARR TSK POS BUSY.
+      move: H_sched_valid => [CARR MBR].
       eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto with basic_facts.
-      eapply all_jobs_have_completed_equiv_workload_eq_service; eauto 2; intros s ARRs TSKs.
+      eapply all_jobs_have_completed_equiv_workload_eq_service; eauto with basic_facts.
+      intros s ARRs TSKs.
       move: (BUSY) => [[_ [QT _]] _].
       apply QT.
       - by apply in_arrivals_implies_arrived in ARRs.
@@ -238,6 +245,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
     Proof.
       intros j ARR TSK POS.
+      move: H_sched_valid => [CARR MBR].
       edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]]; eauto 2.
       { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_rbf'. }
       exists t1, t2; split; first by done.
@@ -263,7 +271,8 @@ Section AbstractRTAforFPwithArrivalCurves.
         arr_seq sched tsk interference interfering_workload (fun t A R => IBF R).
     Proof.
       intros ? ? ? ? ARR TSK ? NCOMPL BUSY; simpl.
-      move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
+      move: H_sched_valid => [CARR MBR].
+      move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
       eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto 2 with basic_facts.
       rewrite /interference; erewrite cumulative_task_interference_split; eauto 2 with basic_facts; last first.
@@ -285,11 +294,10 @@ Section AbstractRTAforFPwithArrivalCurves.
         apply leq_trans with
             (workload_of_jobs
                (fun jhp : Job => (FP_to_JLFP _ _) jhp j && (job_task jhp != job_task j))
-               (arrivals_between arr_seq t1 (t1 + R0))
-            ).
-        { by apply service_of_jobs_le_workload; last apply ideal_proc_model_provides_unit_service.  }
-        { rewrite  /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
-            by rewrite -TSK; apply total_workload_le_total_rbf.
+               (arrivals_between arr_seq t1 (t1 + R0))).
+        { by apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service. } 
+        { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
+          by rewrite -TSK; apply total_workload_le_total_rbf.
         }
       }
     Qed.
@@ -359,7 +367,8 @@ Section AbstractRTAforFPwithArrivalCurves.
     response_time_bounded_by tsk R.
   Proof.
     intros js ARRs TSKs.
-    move: (posnP (@job_cost _ H3 js)) => [ZERO|POS].
+    move: H_sched_valid => [CARR MBR].
+    move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
     eapply uniprocessor_response_time_bound_seq; eauto 3.
     - by apply instantiated_i_and_w_are_consistent_with_schedule. 

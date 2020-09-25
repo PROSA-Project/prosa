@@ -7,9 +7,6 @@ Require Export prosa.results.fixed_priority.rta.bounded_pi.
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import prosa.model.readiness.basic.
-
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)
 
 (** In this section we instantiate the Abstract RTA for FP-schedulers
@@ -33,31 +30,8 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
-  
-  (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
-  Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
-
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
-
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-  
-  (** In addition, we assume the existence of a function mapping jobs
-      to theirs preemption points ... *)
-  Context `{JobPreemptable Job}.
-
-  (** ... and assume that it defines a valid preemption
-      model with bounded non-preemptive segments. *)
-  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
-    valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
+  Context `{Arrival : JobArrival Job}.
+  Context `{Cost : JobCost Job}.
 
   (** Consider an FP policy that indicates a higher-or-equal priority
       relation, and assume that the relation is reflexive and
@@ -66,9 +40,33 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
   
-  (** Assume we have sequential tasks, i.e, jobs from the same task
-      execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
+  (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
+  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+
+  (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
+  Variable sched : schedule (ideal.processor_state Job).
+  
+  (** ... allow for any work-bearing notion of job readiness, ... *)
+  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+
+  (** ... and assume that the schedule is valid.  *)
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+
+  (** We also assume that jobs do not execute before their arrival or after completion. *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
+  
+  (** In addition, we assume the existence of a function mapping jobs
+      to their preemption points ... *)
+  Context `{JobPreemptable Job}.
+
+  (** ... and assume that it defines a valid preemption
+      model with bounded non-preemptive segments. *)
+  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
+    valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
@@ -76,6 +74,10 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** ... and the schedule respects the policy defined by the [job_preemptable]
      function (i.e., jobs have bounded non-preemptive segments). *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
+
+  (** Assume we have sequential tasks, i.e, jobs from the 
+      same task execute in the order of their arrival. *)
+  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
   
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
@@ -166,6 +168,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         arr_seq sched tsk blocking_bound.
     Proof.
       intros j ARR TSK POS t1 t2 PREF.
+      move: H_sched_valid => [CARR MBR].
       case NEQ: (t2 - t1 <= blocking_bound). 
       { apply leq_trans with (t2 - t1); last by done.
         rewrite /cumulative_priority_inversion /is_priority_inversion.

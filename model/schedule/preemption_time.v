@@ -11,7 +11,8 @@ Require Export prosa.model.preemption.parameter.
     progress of the currently scheduled job.
 
     NB: For legacy reasons, the following definition are currently specific to
-    ideal uniprocessor schedules. Lifting this assumption is future work. *)
+    ideal uniprocessor schedules. Lifting this assumption is future work
+    (https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/issues/76). *)
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require prosa.model.processor.ideal.

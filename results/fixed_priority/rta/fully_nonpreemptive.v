@@ -1,6 +1,7 @@
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.nonpreemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.nonpreemptive.
+Require Export prosa.analysis.facts.readiness.sequential.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
@@ -9,9 +10,9 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 (** In this module we prove the RTA theorem for the fully non-preemptive FP model. *)
 
 (** Throughout this file, we assume the FP priority policy, ideal uni-processor 
-    schedules, and the basic (i.e., Liu & Layland) readiness model. *)
+    schedules, and the sequential readiness model. *)
 Require Import prosa.model.processor.ideal.
-Require Import prosa.model.readiness.basic.
+Require Import prosa.model.readiness.sequential.
 
 (** Furthermore, we assume the fully non-preemptive task model. *)
 Require Import prosa.model.task.preemption.fully_nonpreemptive.
@@ -57,11 +58,14 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
+  (** Recall that we assume sequential readiness. *)
+  Instance sequential_readiness : JobReady _ _ :=
+    sequential_ready_instance arr_seq.
+  
   (** Next, consider any ideal non-preemptive uniprocessor schedule of
       this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -74,10 +78,6 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
   
-  (** Assume we have sequential tasks, i.e, tasks from the same task
-      execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
-
   (** Next, we assume that the schedule is a work-conserving schedule ... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
@@ -153,7 +153,9 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with
         (L0 := L).
-    all: eauto 2 with basic_facts. 
+    all: eauto 2 with basic_facts.
+    - by apply sequential_readiness_implies_work_bearing_readiness.
+    - by apply sequential_readiness_implies_sequential_tasks.
   Qed.
 
 End RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
