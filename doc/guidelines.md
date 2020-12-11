@@ -31,7 +31,7 @@ This project targets Coq *non*-experts. Accordingly, great emphasis is placed on
 ```
 - When commenting, be careful not to leave any misspelled words: Prosa's CI system comprises a spell-checker that will signal errors.
 - When comments have to contain variable names or mathematical notation, use square brackets (e.g. `[job_cost j]`). You can nest square brackets _only if they are balanced_: `[[t1,t2)]` will not work. In this case, use `<<[t1,t2)>>`.
-- The vocabulary of the spell-checker is extended with the words contained in `scripts/wordlist.pws`. Add new words only if strictly necessary.
+- The vocabulary of the spell-checker is extended with the words contained in [`scripts/wordlist.pws`](../scripts/wordlist.pws). Add new words only if strictly necessary.
 - Document the sources of lemmas and theorems in the comments. For example, say something like "Theorem XXX in (Foo & Bar, 2007)", and document at the beginning of the file what "(Foo & Bar, 2007)" refers to.
 
 

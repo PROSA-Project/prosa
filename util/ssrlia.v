@@ -24,6 +24,10 @@ Ltac arith_goal_ssrnat2coqnat :=
     | |- is_true (_ < _) => try apply/ltP
   end.
 
+(** Solve arithmetic goals.
+  This tactic first rewrites the context to replace operations from ssreflect
+  to the corresponding operations in the Coq library, then calls [lia]. *)
+
 Ltac ssrlia :=
   repeat arith_hypo_ssrnat2coqnat;
   arith_goal_ssrnat2coqnat; simpl;

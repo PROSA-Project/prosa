@@ -6,7 +6,7 @@ This repository contains the main Coq specification & proof development of the [
 
 ## Documentation
 
-Up-to-date documentation for all branches of the main Prosa repository is available on the Prosa homeage:
+Up-to-date documentation for all branches of the main Prosa repository is available on the Prosa homepage:
 
 - <https://prosa.mpi-sws.org/branches>
 

@@ -19,19 +19,19 @@ Tactics taken from the standard library of Viktor Vafeiadis.
 
 - `desf_asm`: same as `desf`, but only applied to the assumptions in the local context.
 
-- `exploit H`: When applied to a hypothesis/lemma H, converts pre-conditions into goals in order to infer the post-condition of H, which is then added to the local context.
+- `exploit H`: When applied to a hypothesis/lemma `H`, converts pre-conditions into goals in order to infer the post-condition of `H`, which is then added to the local context.
 
-- `feed H`: Same as exploit, but only generates a goal for the first pre-condition. That is, applying exploit to (H: P1 -> P2 -> P3) produces (H: P2 -> P3) and converts P1 into a goal. This is useful for cleaning up induction hypotheses.
+- `feed H`: Same as exploit, but only generates a goal for the first pre-condition. That is, applying exploit to `H: P1 -> P2 -> P3` produces `H: P2 -> P3` and converts `P1` into a goal. This is useful for cleaning up induction hypotheses.
 
-- `feed_n k H`: Same as feed, but generates goals up to the k-th pre-condition.
+- `feed_n k H`: Same as feed, but generates goals up to the `k`-th pre-condition.
 
-- `specialize (H x1 x2 x3)`: instantiates hypothesis H in place with values x1, x2, x3.
+- `specialize (H x1 x2 x3)`: instantiates hypothesis `H` in place with values `x1`, `x2`, and `x3`.
 
 *To be continued… please help out.*
 
 ## Tactics from `ssreflect`
 
-- `have y := f x1 x2 x3`: Creates an alias to (f x1 x2 x3) called y (in the local context). Note that f can be a function or a proposition/lemma.
+- `have y := f x1 x2 x3`: Creates an alias to `f x1 x2 x3` called `y` (in the local context). Note that `f` can be a function or a proposition/lemma. It's usually easier to read than `move: (f x1 x2 x3) => y`.
 
 *To be written… please feel free to start.*
 
@@ -39,4 +39,8 @@ Tactics taken from the standard library of Viktor Vafeiadis.
 ## Standard Coq Tactics
 
 *To be written… please feel free to start.*
+
+## Miscellaneous
+
+- `ssrlia`: Solves arithmetic goals, including ones with `ssreflect`'s definitions.
 
