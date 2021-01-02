@@ -3,306 +3,136 @@ Require Export prosa.util.nat.
 
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
-(* Lemmas about sum. *)
-Section ExtraLemmas.
+Section SumsOverSequences.
 
-  Lemma leq_sum_seq (I: eqType) (r: seq I) (P : pred I) (E1 E2 : I -> nat) :
-    (forall i, i \in r -> P i -> E1 i <= E2 i) ->
-    \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
-  Proof.
-    intros LE.
-    rewrite big_seq_cond [\sum_(_ <- _| P _)_]big_seq_cond.
-      by apply leq_sum; move => j /andP [IN H]; apply LE.
-  Qed.
+  (** Consider any type [I] with a decidable equality ... *)
+  Variable (I : eqType).
 
-  Lemma eq_sum_seq: forall (I: eqType) (r: seq I) (P: pred I) (E1 E2 : I -> nat), 
-      (forall i, i \in r -> P i -> E1 i == E2 i) ->
-      \sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i.
-  Proof.
-    intros; rewrite eqn_leq; apply/andP; split.
-    - apply leq_sum_seq; intros.
-        by move: (H i H0 H1) => /eqP EQ; rewrite EQ.
-    - apply leq_sum_seq; intros.
-        by move: (H i H0 H1) => /eqP EQ; rewrite EQ.
-  Qed.  
+  (** ... and assume we are given a sequence ... *)
+  Variable (r: seq I).
 
-  Lemma sum_nat_eq0_nat (T : eqType) (F : T -> nat) (r: seq T) :
-    all (fun x => F x == 0) r = (\sum_(i <- r) F i == 0).
-  Proof.
-    destruct (all (fun x => F x == 0) r) eqn:ZERO.
-    - move: ZERO => /allP ZERO; rewrite -leqn0.
-      rewrite big_seq_cond (eq_bigr (fun x => 0));
-        first by rewrite big_const_seq iter_addn mul0n addn0 leqnn.
-      intro i; rewrite andbT; intros IN.
-      specialize (ZERO i); rewrite IN in ZERO.
-        by move: ZERO => /implyP ZERO; apply/eqP; apply ZERO.
-    - apply negbT in ZERO; rewrite -has_predC in ZERO.
-      move: ZERO => /hasP ZERO; destruct ZERO as [x IN NEQ]; simpl in NEQ.
-      rewrite (big_rem x) /=; last by done.
-      symmetry; apply negbTE; rewrite neq_ltn; apply/orP; right.
-      apply leq_trans with (n := F x); last by apply leq_addr.
-        by rewrite lt0n.
-  Qed.
+  (** ... and a predicate [P]. *) 
+  Variable (P : pred I).
 
+  (** First, we will show some properties of the sum performed over a single function
+      yielding natural numbers. *)
+  Section SumOfOneFunction.
 
-  Lemma sum_seq_gt0P:
-    forall (T:eqType) (r: seq T) (F: T -> nat),
+    (** Consider any function that yields natural numbers... *)
+    Variable (F : I -> nat).
+
+    (** We start showing that having every member of [r] equal to zero is equivalent to 
+        having the sum of all the elements of [r] equal to zero, and vice-versa. *)
+    Lemma sum_nat_eq0_nat :
+      all (fun x => F x == 0) r = (\sum_(i <- r) F i == 0).
+    Proof.
+      destruct (all (fun x => F x == 0) r) eqn:ZERO.
+      { move: ZERO => /allP ZERO; rewrite -leqn0.
+        rewrite big_seq_cond (eq_bigr (fun x => 0)); first by rewrite big_const_seq iter_addn.
+        move=> i; rewrite andbT=>IN.
+        specialize (ZERO i); rewrite IN in ZERO.
+        by move: ZERO => /implyP ZERO; apply/eqP; apply ZERO. }
+      { apply negbT in ZERO; rewrite -has_predC in ZERO.
+        move: ZERO => /hasP [x IN NEQ].
+        rewrite (big_rem x) //=.
+        symmetry; apply negbTE; rewrite neq_ltn; apply/orP; right.
+        apply leq_trans with (n := F x); last by apply leq_addr.
+        by rewrite lt0n. }
+    Qed. 
+
+    (** In the same way, if at least one element of [r] is not zero, then the sum of all 
+        elements of [r] must be strictly positive, and vice-versa. *)
+    Lemma sum_seq_gt0P:
       reflect (exists i, i \in r /\ 0 < F i) (0 < \sum_(i <- r) F i).
-  Proof.
-    intros; apply: (iffP idP); intros.
-    {
-      induction r; first by rewrite big_nil in H.
-      destruct (F a > 0) eqn:POS.
-      exists a; split; [by rewrite in_cons; apply/orP; left | by done].
-      apply negbT in POS; rewrite -leqNgt leqn0 in POS; move: POS => /eqP POS.
-      rewrite big_cons POS add0n in H. clear POS.
-      feed IHr; first by done. move: IHr => [i [IN POS]].
-      exists i; split; [by rewrite in_cons; apply/orP;right | by done].
-    }
-    {
-      move: H => [i [IN POS]].
-      rewrite (big_rem i) //=.
-      apply leq_trans with (F i); [by done | by rewrite leq_addr].
-    }
-  Qed.
+    Proof.
+      apply: (iffP idP); move=> LT0.
+      { induction r; first by rewrite big_nil in LT0.
+        destruct (F a > 0) eqn:POS.
+        - exists a.
+          by split => //; rewrite in_cons; apply /orP; left.
+        - apply negbT in POS; rewrite -leqNgt leqn0 in POS; move: POS => /eqP POS.
+          rewrite big_cons POS add0n in LT0.
+          move: (IHl LT0) => [i [IN POSi]].
+          by exists i; split => //; rewrite in_cons; apply /orP; right. }
+      { move: LT0 => [i [IN POS]].
+        rewrite (big_rem i) //=.
+        by apply leq_trans with (F i); last by rewrite leq_addr. }
+    Qed.
 
-  Lemma sum_notin_rem_eqn:
-    forall (T:eqType) (a: T) xs P F,
-      a \notin xs ->
-      \sum_(x <- xs | P x && (x != a)) F x = \sum_(x <- xs | P x) F x.
-  Proof.
-    intros ? ? ? ? ? NOTIN.
-    induction xs; first by rewrite !big_nil.
-    rewrite !big_cons.
-    rewrite IHxs; clear IHxs; last first.
-    { apply/memPn; intros y IN.
-      move: NOTIN => /memPn NOTIN.
-        by apply NOTIN; rewrite in_cons; apply/orP; right.
-    }
-    move: NOTIN => /memPn NOTIN. 
-    move: (NOTIN a0) => NEQ.
-    feed NEQ; first by (rewrite in_cons; apply/orP; left).
-      by rewrite NEQ Bool.andb_true_r.
-  Qed.
-  
-  (* Trivial identity: any sum of zeros is zero. *)
-  Lemma sum0 m n:
-    \sum_(m <= i < n) 0 = 0.
-  Proof.
-    by rewrite big_const_nat iter_addn mul0n addn0 //.
-  Qed.
+    (** Next, we show that if a number [a] is not contained in [r], then filtering or not 
+        filtering [a] when summing leads to the same result. *)
+    Lemma sum_notin_rem_eqn:
+      forall a,
+        a \notin r ->
+        \sum_(x <- r | P x && (x != a)) F x = \sum_(x <- r | P x) F x.
+    Proof.
+      intros a NOTIN.
+      induction r; first by rewrite !big_nil.
+      rewrite !big_cons IHl.
+      { move: NOTIN => /memPn NOTIN. 
+        move: (NOTIN a0) => NEQ.
+        feed NEQ; first by (rewrite in_cons; apply/orP; left).
+        by rewrite NEQ Bool.andb_true_r. }
+      { apply /memPn; intros y IN.
+        move: NOTIN => /memPn NOTIN.
+        by apply NOTIN; rewrite in_cons; apply/orP; right. }
+    Qed.
 
-  (* A sum of natural numbers equals zero iff all terms are zero. *)
-  Lemma big_nat_eq0 m n F:
-    \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
-  Proof.
-    split.
-    - rewrite /index_iota => /eqP.
-      rewrite -sum_nat_eq0_nat => /allP ZERO i.
-      rewrite -mem_index_iota /index_iota => IN.
-      by apply/eqP; apply ZERO.
-    - move=> ZERO.
-      have ->: \sum_(m <= i < n) F i = \sum_(m <= i < n) 0
-        by apply eq_big_nat => //.
-      by apply sum0.
-  Qed.
+    (** We prove that if any element of [r] is bounded by constant [c], 
+        then the sum of the whole set is bounded by [c * size r]. *)
+    Lemma sum_majorant_constant:
+      forall c,
+        (forall a, a \in r -> P a -> F a <= c) -> 
+        \sum_(j <- r | P j) F j <= c * (size [seq j <- r | P j]).
+    Proof.
+      intros.
+      induction r; first by rewrite big_nil.
+      feed IHl.
+      { intros; apply H.
+        - by rewrite in_cons; apply/orP; right.
+        - by done. } 
+      rewrite big_cons.
+      destruct (P a) eqn:EQ.
+      { rewrite -cat1s filter_cat size_cat mulnDr.
+        apply leq_add; last by done.
+        rewrite size_filter //= EQ addn0 muln1.
+        apply H; last by done. 
+        by rewrite in_cons; apply/orP; left. }
+      { apply leq_trans with (c * size [seq j <- l | P j]); first by done.
+        rewrite leq_mul2l; apply /orP; right.
+        by rewrite -cat1s filter_cat size_cat leq_addl. }
+    Qed.
 
-  (* We prove that if any element of a set r is bounded by constant [const], 
-     then the sum of the whole set is bounded by [const * size r]. *)
-  Lemma sum_majorant_constant:
-    forall (T: eqType) (r: seq T) (P: pred T) F const,
-      (forall a,  a \in r -> P a -> F a <= const) -> 
-      \sum_(j <- r | P j) F j <= const * (size [seq j <- r | P j]).
-  Proof.
-    clear; intros.
-    induction r; first by rewrite big_nil.
-    feed IHr.
-    { intros; apply H.
-      - by rewrite in_cons; apply/orP; right.
-      - by done. } 
-    rewrite big_cons.
-    destruct (P a) eqn:EQ.
-    { rewrite -cat1s filter_cat size_cat.
-      rewrite mulnDr.
-      apply leq_add; last by done.
-      rewrite size_filter.
-      simpl; rewrite addn0.
-      rewrite EQ muln1.
-      apply H; last by done. 
-        by rewrite in_cons; apply/orP; left. 
-    }
-    { apply leq_trans with (const * size [seq j <- r | P j]); first by done.
-      rewrite leq_mul2l; apply/orP; right.
-      rewrite -cat1s filter_cat size_cat.
-        by rewrite leq_addl.
-    }
-  Qed.
-
-  (* We prove that if for any element x of a set [xs] the following two statements hold 
-     (1) [F1 x] is less than or equal to [F2 x] and (2) the sum [F1 x_1, ..., F1 x_n] 
-     is equal to the sum of [F2 x_1, ..., F2 x_n], then [F1 x] is equal to [F2 x] for 
-     any element x of [xs]. *)
-  Lemma sum_majorant_eqn:
-    forall (T: eqType) xs F1 F2 (P: pred T),
-      (forall x, x \in xs -> P x -> F1 x <= F2 x) -> 
-      \sum_(x <- xs | P x) F1 x = \sum_(x <- xs | P x) F2 x ->
-      (forall x, x \in xs -> P x -> F1 x = F2 x).
-  Proof.
-    intros T xs F1 F2 P H1 H2 x IN PX.
-    induction xs; first by done.
-    have Fact: \sum_(j <- xs | P j) F1 j <= \sum_(j <- xs | P j) F2 j.
-    { rewrite [in X in X <= _]big_seq_cond [in X in _ <= X]big_seq_cond leq_sum //.
-      move => y /andP [INy PY].
-      apply: H1; last by done. 
-        by rewrite in_cons; apply/orP; right. }
-    feed IHxs.
-    { intros x' IN' PX'.
-      apply H1; last by done.
-        by rewrite in_cons; apply/orP; right. }
-    rewrite big_cons [RHS]big_cons in H2.
-    have EqLeq: forall a b c d, a + b = c + d -> a <= c -> b >= d.
-    { clear; intros; ssrlia. } 
-    move: IN; rewrite in_cons; move => /orP [/eqP EQ | IN]. 
-    { subst a.
-      rewrite PX in H2.
-      specialize (H1 x).
-      feed_n 2 H1; [ by rewrite in_cons; apply/orP; left | by done | ].
-      move: (EqLeq
-               (F1 x) (\sum_(j <- xs | P j) F1 j)
-               (F2 x) (\sum_(j <- xs | P j) F2 j) H2 H1) => Q.
-      have EQ: \sum_(j <- xs | P j) F1 j = \sum_(j <- xs | P j) F2 j. 
-      { by apply/eqP; rewrite eqn_leq; apply/andP; split. }
-        by move: H2 => /eqP; rewrite EQ eqn_add2r; move => /eqP EQ'.
-    }
-    { destruct (P a) eqn:PA; last by apply IHxs.
-      apply: IHxs; last by done.
-      specialize (H1 a).
-      feed_n 2 (H1); [ by rewrite in_cons; apply/orP; left | by done | ].
-      move: (EqLeq
-               (F1 a) (\sum_(j <- xs | P j) F1 j)
-               (F2 a) (\sum_(j <- xs | P j) F2 j) H2 H1) => Q.
-        by apply/eqP; rewrite eqn_leq; apply/andP; split.
-    }
-  Qed.
-
-  (* We prove that the sum of Δ ones is equal to Δ. *)
-  Lemma sum_of_ones:
-    forall t Δ,
-      \sum_(t <= x < t + Δ) 1 = Δ. 
-  Proof.
-    intros.
-    rewrite big_const_nat iter_addn_0 mul1n.
-    rewrite addnC -addnBA; last by done.
-      by rewrite subnn addn0.  
-  Qed.
-
-  (* We show that the fact that the sum is smaller than the range 
-     of the summation implies the existence of a zero element. *)
-  Lemma sum_le_summation_range:
-    forall f t Δ,
-      \sum_(t <= x < t + Δ) f x < Δ ->
-      exists x, t <= x < t + Δ /\ f x = 0.
-  Proof.
-    induction Δ; intros; first by rewrite ltn0 in H.
-    destruct (f (t + Δ)) eqn: EQ.
-    { exists (t + Δ); split; last by done.
-        by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS].
-    }
-    { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS; move => H.
-      feed IHΔ.
-      { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
-      move: IHΔ => [z [/andP [LE GE] ZERO]].
-      exists z; split; last by done.
-      apply/andP; split; first by done.
-        by rewrite ltnS ltnW.
-    }
-  Qed.
-
-  (** If a function [F] gives same values at [t1 + g] and [t2 + g] for all [g] strictly
-      less than an integer [d] and for any [t1] and [t2], then summation of [F] over
-      the intervals <<[t1, t1 + d)>> and <<[t2, t2 + d)>> is equal. *)
-  Lemma big_sum_eq_in_eq_sized_intervals:
-    forall t1 t2 d (F1 F2 : nat -> nat),
-      (forall g, g < d -> F1 (t1 + g) = F2 (t2 + g)) -> 
-      \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
-  Proof.
-    intros * P.
-    induction d.
-    now rewrite !addn0 !big_geq => //.
-    feed_n 1 IHd.
-    { intros g G_LT.
-      now specialize (P g); feed_n 1 P; ssrlia.
-    }
-    rewrite !addnS !big_nat_recr => //; try by ssrlia.
-    rewrite IHd.
-    specialize (P d); feed_n 1 P. ssrlia.
-    now rewrite P.
-  Qed.
-  
-End ExtraLemmas.
-
-(* Lemmas about arithmetic with sums. *)
-Section SumArithmetic.
-
-  Lemma sum_seq_diff:
-    forall (T:eqType) (rs: seq T) (F G : T -> nat),
-      (forall i : T, i \in rs -> G i <= F i) ->
-      \sum_(i <- rs) (F i - G i) = \sum_(i <- rs) F i - \sum_(i <- rs) G i.
-  Proof.
-    intros.
-    induction rs; first by rewrite !big_nil subn0. 
-    rewrite !big_cons subh2.
-    - apply/eqP; rewrite eqn_add2l; apply/eqP; apply IHrs.
-        by intros; apply H; rewrite in_cons; apply/orP; right.
-    - by apply H; rewrite in_cons; apply/orP; left.
-    - rewrite big_seq_cond [in X in _ <= X]big_seq_cond.
-      rewrite leq_sum //; move => i /andP [IN _].
-        by apply H; rewrite in_cons; apply/orP; right.
-  Qed.
-  
-  Lemma sum_diff:
-    forall n F G,
-      (forall i (LT: i < n), F i >= G i) ->
-      \sum_(0 <= i < n) (F i - G i) =
-      (\sum_(0 <= i < n) (F i)) - (\sum_(0 <= i < n) (G i)).       
-  Proof.
-    intros n F G ALL.
-    rewrite sum_seq_diff; first by done.
-    move => i; rewrite mem_index_iota; move => /andP [_ LT].
-      by apply ALL.
-  Qed.
-
-  Lemma sum_pred_diff:
-    forall (T: eqType) (rs: seq T) (P: T -> bool) (F: T -> nat),
-      \sum_(r <- rs | P r) F r =
-      \sum_(r <- rs) F r - \sum_(r <- rs | ~~ P r) F r.
-  Proof.
-    clear; intros.
-    induction rs; first by rewrite !big_nil subn0.
-    rewrite !big_cons !IHrs; clear IHrs.
-    case (P a); simpl; last by rewrite subnDl.
-    rewrite addnBA; first by done.
-    rewrite big_mkcond leq_sum //.
-    intros t _.
+    (** Next, we show that the sum of the elements in [r] respecting [P] can
+        be obtained by removing from the total sum over [r] the sum of the elements
+        in [r] not respecting [P]. *)
+    Lemma sum_pred_diff:
+      \sum_(r <- r | P r) F r =
+      \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
+    Proof.
+      induction r; first by rewrite !big_nil subn0.
+      rewrite !big_cons !IHl; clear IHl.
+      case (P a); simpl; last by rewrite subnDl.
+      rewrite addnBA; first by done.
+      rewrite big_mkcond leq_sum //.
+      intros t _.
       by case (P t).
-  Qed.
+    Qed.
 
-  (** Summing natural numbers over a superset can only yields a greater sum.
-      Requiring the absence of duplicate in r1 is a simple way to
-      guarantee that the set inclusion r1 <= r2 implies the actually
-      required multiset inclusion. *)
-  Lemma leq_sum_sub_uniq :
-    forall (T: eqType) (r1 r2: seq T) F,
-      uniq r1 ->
-      {subset r1 <= r2} ->
-      \sum_(i <- r1) F i <= \sum_(i <- r2) F i.
-  Proof.
-    intros T r1 r2 F UNIQ SUB; generalize dependent r2.
-    induction r1 as [| x r1' IH]; first by ins; rewrite big_nil.
-    {
-      intros r2 SUB.
-      assert (IN: x \in r2).
-      by apply SUB; rewrite in_cons eq_refl orTb.
+    (** Summing natural numbers over a superset can only yields a greater sum.
+        Requiring the absence of duplicate in [r] is a simple way to
+        guarantee that the set inclusion [r <= rs] implies the actually
+        required multiset inclusion. *)
+    Lemma leq_sum_sub_uniq :
+      forall (rs: seq I),
+        uniq r ->
+        {subset r <= rs} ->
+        \sum_(i <- r) F i <= \sum_(i <- rs) F i.
+    Proof.
+      intros rs UNIQ SUB; generalize dependent rs.
+      induction r as [| x r1' IH]; first by ins; rewrite big_nil.
+      intros rs SUB.
+      have IN: x \in rs by apply SUB; rewrite in_cons eq_refl orTb.
       simpl in UNIQ; move: UNIQ => /andP [NOTIN UNIQ]; specialize (IH UNIQ).
       destruct (splitPr IN).
       rewrite big_cat 2!big_cons /= addnA [_ + F x]addnC -addnA leq_add2l.
@@ -312,10 +142,209 @@ Section SumArithmetic.
       rewrite mem_cat.
       feed (SUB x0); first by rewrite in_cons IN0 orbT.
       rewrite mem_cat in_cons in SUB.
-      move: SUB => /orP [SUB1 | /orP [/eqP EQx | SUB2]];
-        [by rewrite SUB1 | | by rewrite SUB2 orbT].
+      move:SUB => /orP [SUB1 | /orP [/eqP EQx | SUB2]]; [by rewrite SUB1 | | by rewrite SUB2 orbT].
       by rewrite -EQx IN0 in NOTIN.
-    }
+    Qed.
+
+  End SumOfOneFunction.
+  
+  (** In this section, we show some properties of the sum performed over two different functions. *)
+  Section SumOfTwoFunctions.
+
+    (** Consider two functions that yield natural numbers. *)
+    Variable (E1 E2 : I -> nat).
+
+    (** Assume that [E2] dominates [E1] in all the points contained in the set [r] and respecting
+        the predicate [P]. We prove that, if we sum both function over those points, then the sum 
+        of [E2] will dominate the sum of [E1]. *)
+    Lemma leq_sum_seq :
+      (forall i, i \in r -> P i -> E1 i <= E2 i) ->
+      \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
+    Proof.
+      intros LE.
+      rewrite big_seq_cond [\sum_(_ <- _| P _)_]big_seq_cond.
+      by apply leq_sum; move => j /andP [IN H]; apply LE.
+    Qed.
+
+    (** In the same way, if [E1] equals [E2] in all the points considered above, then also the two
+        sums will be identical. *)
+    Lemma eq_sum_seq:
+      (forall i, i \in r -> P i -> E1 i == E2 i) ->
+      \sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i.
+    Proof.
+      move=> EQ.
+      rewrite big_seq_cond [\sum_(_ <- _| P _)_]big_seq_cond.
+      rewrite eqn_leq; apply /andP; split.
+      all: apply leq_sum; move => j /andP [IN H].
+      all: by move:(EQ j IN H) => LEQ; ssrlia.
+    Qed.
+
+    (** Next, we prove that if for any element x of a set [xs] the following two statements 
+        hold (1) [F1 x] is less than or equal to [F2 x] and (2) the sum [F1 x_1, ..., F1 x_n] 
+        is equal to the sum of [F2 x_1, ..., F2 x_n], then [F1 x] is equal to [F2 x] for 
+        any element x of [xs]. *)
+    Lemma sum_majorant_eqn:
+      forall xs,
+        (forall x, x \in xs -> P x -> E1 x <= E2 x) -> 
+        \sum_(x <- xs | P x) E1 x = \sum_(x <- xs | P x) E2 x ->
+        (forall x, x \in xs -> P x -> E1 x = E2 x).
+    Proof.
+      intros xs H1 H2 x IN PX.
+      induction xs; first by done.
+      have Fact: \sum_(j <- xs | P j) E1 j <= \sum_(j <- xs | P j) E2 j.
+      { rewrite [in X in X <= _]big_seq_cond [in X in _ <= X]big_seq_cond leq_sum //.
+        move => y /andP [INy PY].
+        apply: H1; last by done. 
+        by rewrite in_cons; apply/orP; right. }
+      feed IHxs.
+      { intros x' IN' PX'.
+        apply H1; last by done.
+        by rewrite in_cons; apply/orP; right. }
+      rewrite big_cons [RHS]big_cons in H2.
+      have EqLeq: forall a b c d, a + b = c + d -> a <= c -> b >= d by intros; ssrlia.
+      move: IN; rewrite in_cons; move => /orP [/eqP EQ | IN]. 
+      { subst a.
+        rewrite PX in H2.
+        specialize (H1 x).
+        feed_n 2 H1=> //; first by rewrite in_cons; apply/orP; left.
+        move: (EqLeq
+                 (E1 x) (\sum_(j <- xs | P j) E1 j)
+                 (E2 x) (\sum_(j <- xs | P j) E2 j) H2 H1) => Q.
+        have EQ: \sum_(j <- xs | P j) E1 j = \sum_(j <- xs | P j) E2 j. 
+        { by apply /eqP; rewrite eqn_leq; apply/andP; split. }
+        by move: H2 => /eqP; rewrite EQ eqn_add2r; move => /eqP EQ'. }
+      { destruct (P a) eqn:PA; last by apply IHxs.
+        apply: IHxs; last by done.
+        specialize (H1 a).
+        feed_n 2 (H1); [ by rewrite in_cons; apply/orP; left | by done | ].
+        move: (EqLeq
+                 (E1 a) (\sum_(j <- xs | P j) E1 j)
+                 (E2 a) (\sum_(j <- xs | P j) E2 j) H2 H1) => Q.
+        by apply/eqP; rewrite eqn_leq; apply/andP; split. }
+    Qed.
+
+    (** Next, we prove that the summing over the difference of [E1] and [E2] is
+        the same as the difference of the two sums performed separately. Since we
+        are using natural numbers, we have to require that [E2] dominates [E1] over
+        the summing points given by [r]. *)
+    Lemma sum_seq_diff:
+        (forall i : I, i \in r -> E1 i <= E2 i) ->
+        \sum_(i <- r) (E2 i - E1 i) = \sum_(i <- r) E2 i - \sum_(i <- r) E1 i.
+    Proof.
+      move=> LEQ.
+      induction r; first by rewrite !big_nil subn0. 
+      rewrite !big_cons subh2.
+      - apply/eqP; rewrite eqn_add2l; apply/eqP; apply IHl.
+        by intros; apply LEQ; rewrite in_cons; apply/orP; right.
+      - by apply LEQ; rewrite in_cons; apply/orP; left.
+      - rewrite big_seq_cond [in X in _ <= X]big_seq_cond.
+        rewrite leq_sum //; move => i /andP [IN _].
+        by apply LEQ; rewrite in_cons; apply/orP; right.
+    Qed.
+
+  End SumOfTwoFunctions.
+  
+End SumsOverSequences.
+
+(** In this section, we prove a variety of properties of sums performed over ranges. *)
+Section SumsOverRanges.
+  
+  (** First, we show a trivial identity: any sum of zeros is zero. *)
+  Lemma sum0 m n:
+    \sum_(m <= i < n) 0 = 0.
+  Proof.
+    by rewrite big_const_nat iter_addn mul0n addn0 //.
+  Qed.
+  
+  (** In a similar way, we prove that the sum of Δ ones is equal to Δ. *)
+  Lemma sum_of_ones:
+    forall t Δ,
+      \sum_(t <= x < t + Δ) 1 = Δ. 
+  Proof.
+    move=> t Δ.
+    rewrite big_const_nat iter_addn_0.
+    by ssrlia.
   Qed.
 
-End SumArithmetic.
+  (** Next, we show that a sum of natural numbers equals zero if and only 
+      if all terms are zero. *)
+  Lemma big_nat_eq0 m n F:
+    \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
+  Proof.
+    split.
+    - rewrite /index_iota => /eqP.
+      rewrite -sum_nat_eq0_nat => /allP ZERO i.
+      rewrite -mem_index_iota /index_iota => IN.
+      by apply/eqP; apply ZERO.
+    - move=> ZERO.
+      have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
+      by apply sum0.
+  Qed.
+
+  (** Moreover, the fact that the sum is smaller than the range of the summation 
+      implies the existence of a zero element. *)
+  Lemma sum_le_summation_range:
+    forall f t Δ,
+      \sum_(t <= x < t + Δ) f x < Δ ->
+      exists x, t <= x < t + Δ /\ f x = 0.
+  Proof.
+    induction Δ; intros; first by rewrite ltn0 in H.
+    destruct (f (t + Δ)) eqn: EQ.
+    { exists (t + Δ); split; last by done.
+      by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS]. }
+    { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS; move => H.
+      feed IHΔ.
+      { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
+      move: IHΔ => [z [/andP [LE GE] ZERO]].
+      exists z; split; last by done.
+      apply/andP; split; first by done.
+      by rewrite ltnS ltnW. }
+  Qed.
+  
+  (** Next, we prove that the summing over the difference of two functions is
+      the same as summing over the two functions separately, and then taking the 
+      difference of the two sums. Since we are using natural numbers, we have to
+      require that one function dominates the other in the summing range. *)
+  Lemma sum_diff:
+    forall n F G,
+      (forall i, i < n -> F i >= G i) ->
+      \sum_(0 <= i < n) (F i - G i) =
+      (\sum_(0 <= i < n) (F i)) - (\sum_(0 <= i < n) (G i)).       
+  Proof.
+    intros n F G ALL.
+    rewrite sum_seq_diff; first by done.
+    move=> i; rewrite mem_index_iota; move => /andP [_ LT].
+    by apply ALL.
+  Qed.
+  
+End SumsOverRanges.
+
+(** In this section, we show how it is possible to equate the result of two sums performed
+    on two different functions and on different intervals, provided that the two functions
+    match point-wise. *)
+Section SumOfTwoIntervals.
+
+  (** Consider two equally-sized intervals <<[t1, t1+d)>> and <<[t2, t2+d)>>... *)
+  Variable (t1 t2 : nat).
+  Variable (d : nat).
+
+  (** ...and two functions [F1] and [F2]. *)
+  Variable (F1 F2 : nat -> nat).
+
+  (** Assume that the two functions match point-wise with each other, with the points taken 
+      in their respective interval. *)
+  Hypothesis equal_before_d: forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
+
+  (** The then summations of [F1] over <<[t1, t1 + d)>> and [F2] over 
+      <<[t2, t2 + d)>> are equal. *)
+  Lemma big_sum_eq_in_eq_sized_intervals:
+    \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
+  Proof.
+    induction d; first by rewrite !addn0 !big_geq.
+    rewrite !addnS !big_nat_recr => //; try by ssrlia.
+    rewrite IHn //=; last by move=> g G_LTl; apply (equal_before_d g); ssrlia.
+    by rewrite equal_before_d.
+  Qed.
+  
+End SumOfTwoIntervals.
+

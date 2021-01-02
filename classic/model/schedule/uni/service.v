@@ -504,7 +504,7 @@ Module Service.
           rewrite /service /service_during (@big_cat_nat _ _ _ t1) //=.
           rewrite (cumulative_service_before_job_arrival_zero
                      job_arrival sched _ j 0 t1) // add0n.
-          rewrite <- sum_majorant_eqn with (F1 := fun j => service_during sched j t1 t_compl)
+          rewrite <- sum_majorant_eqn with (E1 := fun j => service_during sched j t1 t_compl)
                                       (xs := arrivals_between t1 t2) (P := P); try done.
             by intros; apply cumulative_service_le_job_cost.
         } 
