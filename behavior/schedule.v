@@ -1,7 +1,7 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
 Require Export prosa.behavior.arrival_sequence.
 
-(** * Generic Processor State *)
+(** * Generic Processor State Interface *)
 
 (** Rather than choosing a specific schedule representation up front, we define
     the notion of a generic processor state, which allows us to state general
@@ -13,12 +13,13 @@ Require Export prosa.behavior.arrival_sequence.
     A concrete processor state type precisely determines how all relevant
     aspects of the execution environment are modeled (e.g., scheduled jobs,
     overheads, spinning). Here, we define just the common interface of all
-    possible concrete processor states by means of a "type class", i.e., we
-    define a few generic predicates and an invariant that must be defined by
+    possible concrete processor states by means of a type class, i.e., we
+    define a few generic functions and an invariant that must be defined for
     all concrete processor state types.
 
-    In the most simple case (i.e., an ideal uniprocessor state), at any time,
-    either a particular job is scheduled or the processor is idle. *)
+    In the most simple case (i.e., an ideal uniprocessor state—see
+    [model/processor/ideal.v]), at any given time, either a particular job is
+    scheduled or the processor is idle. *)
 Class ProcessorState (Job : JobType) (State : Type) :=
   {
     (** A [ProcessorState] instance provides a finite set of cores on which
@@ -32,18 +33,43 @@ Class ProcessorState (Job : JobType) (State : Type) :=
     (** For a given processor state and core, the [scheduled_on] predicate
         checks whether a given job is running on the given core. *)
     scheduled_on : Job -> State -> Core -> bool;
-    (** For a given processor state, the [scheduled_in] predicate checks
-        whether a given job is running on any core in that state. *)
-    scheduled_in (j : Job) (s : State) : bool :=
-      [exists c : Core, scheduled_on j s c];
-    (** For a given processor state, the [service_in] function determines how
-       much service a given job receives in that state (across all cores). *)
-    service_in : Job -> State -> work;
-    (** For a given processor state, a job does not receive service if it is
-        not scheduled in that state *)
-    service_implies_scheduled :
-      forall j s, ~~ scheduled_in j s -> service_in j s = 0
+    (** For a given processor state and core, the [service_on] function determines
+        how much service a given job receives on the given core). *)
+    service_on : Job -> State -> Core -> work;
+    (** We require [scheduled_on] and [service_on] to be consistent in
+        the sense that a job can receive service (on a given core)
+        only if it is also scheduled (on that core). *)
+    service_on_implies_scheduled_on :
+      forall j s r, ~~ scheduled_on j s r -> service_on j s r = 0
   }.
+
+(** The above definition of the [ProcessorState] interface provides
+    the predicate [scheduled_on] and the function [service_on], which
+    relate a given job to a given core in a given state. This level of
+    detail is required for generality, but in many situations it
+    suffices and is more convenient to elide the information about
+    individual cores, instead referring to all cores at once. To this
+    end, we next define the short-hand functions [scheduled_in] and
+    [service_in] to directly check whether a job is scheduled at all
+    (i.e., on any core), and how much service the job receives
+    anywhere (i.e., across all cores). *)
+Section ProcessorIn.
+  (** Consider any type of jobs... *)
+  Context {Job : JobType}.
+  (** ...and any type of processor state. *)
+  Context {State : Type} `{ProcessorState Job State}.
+
+  (** For a given processor state, the [scheduled_in] predicate checks
+      whether a given job is running on any core in that state. *)
+  Definition scheduled_in (j : Job) (s : State) : bool :=
+    [exists c : Core, scheduled_on j s c].
+
+  (** For a given processor state, the [service_in] function determines how
+      much service a given job receives in that state (across all cores). *)
+  Definition service_in (j : Job) (s : State) : work :=
+    \sum_(r : Core) service_on j s r.
+
+End ProcessorIn.
 
 (** * Schedule Representation *)
 
@@ -55,6 +81,6 @@ Class ProcessorState (Job : JobType) (State : Type) :=
 Definition schedule (PState : Type) := instant -> PState.
 
 (** The following line instructs Coq to not let proofs use knowledge of how
-    [scheduled_on], [scheduled_in], and [service_in] are defined. Instead,
+    [scheduled_on] and [service_on] are defined. Instead,
     proofs must rely on basic lemmas about processor state classes. *)
-Global Opaque scheduled_on scheduled_in service_in.
+Global Opaque scheduled_on service_on.

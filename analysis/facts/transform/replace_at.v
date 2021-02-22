@@ -104,7 +104,7 @@ Section ReplaceAtFacts.
     move=> NOT_IN_NEW NOT_IN_OLD t.
     rewrite /service_at.
     case: (boolP (t == t')) => /eqP TT.
-    - rewrite !TT !service_implies_scheduled //; by apply negbTE.
+    - by rewrite !TT !service_in_implies_scheduled_in //; apply negbTE.
     - rewrite rest_of_schedule_invariant//.
   Qed.
 

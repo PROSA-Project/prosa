@@ -273,14 +273,29 @@ Section RelationToScheduled.
   (** ...and a given job that is to be scheduled. *)
   Variable j: Job.
 
-  (** We observe that a job that isn't scheduled cannot possibly receive service. *)
-  Lemma not_scheduled_implies_no_service:
+  (** We observe that a job that isn't scheduled in a given processor
+      state cannot possibly receive service in that state. *)
+  Lemma service_in_implies_scheduled_in : forall s,
+    ~~ scheduled_in j s -> service_in j s = 0.
+  Proof.
+    move=> s /existsP Hsched.
+    apply/eqP.
+    rewrite sum_nat_eq0.
+    apply/forallP => c /=.
+    rewrite service_on_implies_scheduled_on => //.
+    apply/negP => Hsch.
+    apply: Hsched.
+    by exists c.
+  Qed.
+
+  (** In particular, it cannot receive service at any given time. *)
+  Corollary not_scheduled_implies_no_service:
     forall t,
       ~~ scheduled_at sched j t -> service_at sched j t = 0.
   Proof.
     rewrite /service_at /scheduled_at.
     move=> t NOT_SCHED.
-    by rewrite service_implies_scheduled //.
+    by rewrite service_in_implies_scheduled_in.
   Qed.
 
   (** Conversely, if a job receives service, then it must be scheduled. *)
@@ -290,7 +305,7 @@ Section RelationToScheduled.
   Proof.
     move=> t.
     destruct (scheduled_at sched j t) eqn:SCHEDULED; first trivial.
-    by rewrite not_scheduled_implies_no_service // negbT //.
+    by rewrite not_scheduled_implies_no_service // negbT.
   Qed.
 
   (** Thus, if the cumulative amount of service changes, then it must be
@@ -328,7 +343,7 @@ Section RelationToScheduled.
         rewrite andbT; move => /andP [GT LT].
         specialize (ALL (Ordinal LT)); simpl in ALL.
         rewrite GT andTb -eqn0Ngt in ALL.
-        by apply /eqP => //.
+        by apply /eqP.
     }
     {
       move=> [t [TT SERVICE]].
@@ -385,9 +400,9 @@ Section RelationToScheduled.
     Proof.
       move=> t. rewrite /scheduled_at /service_at.
       split => [NOT_SCHED | NO_SERVICE].
-      - by rewrite service_implies_scheduled //.
+      - by rewrite service_in_implies_scheduled_in.
       - apply (contra (H_scheduled_implies_serviced j (sched t))).
-        by rewrite -eqn0Ngt; apply /eqP => //.
+        by rewrite -eqn0Ngt; apply /eqP.
     Qed.
 
     (** Then, if a job does not receive any service during an interval, it
@@ -402,7 +417,7 @@ Section RelationToScheduled.
       rewrite no_service_not_scheduled.
       move: ZERO_SUM.
       rewrite /service_during big_nat_eq0 => IS_ZERO.
-      by apply (IS_ZERO t); apply /andP; split => //.
+      by apply (IS_ZERO t); apply/andP.
     Qed.
     
     (** Conversely, if a job is not scheduled during an interval, then
@@ -443,7 +458,7 @@ Section RelationToScheduled.
     Proof.
       move=> t [t' [TT SCHED]].
       rewrite /service. apply scheduled_implies_cumulative_service.
-      by exists t'; split => //.
+      by exists t'.
     Qed.
 
   End GuaranteedService.
@@ -479,7 +494,7 @@ Section RelationToScheduled.
     Proof.
       move=> t EARLY.
       apply: (contra (H_jobs_must_arrive j t)).
-      by rewrite /has_arrived -ltnNge //.
+      by rewrite /has_arrived -ltnNge.
    Qed.
 
     (** We show that job [j] does not receive service at any time [t] prior to its
@@ -490,7 +505,7 @@ Section RelationToScheduled.
         service_at sched j t = 0.
     Proof.
       move=> t NOT_ARR.
-      by rewrite not_scheduled_implies_no_service // not_scheduled_before_arrival //.
+      by rewrite not_scheduled_implies_no_service // not_scheduled_before_arrival.
     Qed.
 
     (** Note that the same property applies to the cumulative service. *)
@@ -506,7 +521,7 @@ Section RelationToScheduled.
       rewrite big_nat_cond [in RHS]big_nat_cond.
       apply: eq_bigr => i /andP [TIMES _]. move: TIMES => /andP [le_t1_i lt_i_t2].
       apply (service_before_job_arrival_zero i).
-      by apply leq_trans with (n := t2); auto.
+      by apply leq_trans with (n := t2).
     Qed.
 
     (** Hence, one can ignore the service received by a job before its arrival
@@ -520,7 +535,7 @@ Section RelationToScheduled.
       move=> t1 t2 le_t1 le_t2.
       rewrite -(service_during_cat sched j t1 (job_arrival j) t2).
       rewrite cumulative_service_before_job_arrival_zero //.
-      by apply/andP; split.
+      by apply/andP.
     Qed.
 
     (** ... which we can also state in terms of cumulative service. *)
@@ -529,7 +544,7 @@ Section RelationToScheduled.
         t <= job_arrival j -> service sched j t = 0.
     Proof.
       move=> t EARLY.
-      by rewrite /service cumulative_service_before_job_arrival_zero //.
+      by rewrite /service cumulative_service_before_job_arrival_zero.
     Qed.
 
   End AfterArrival.
@@ -554,7 +569,7 @@ Section RelationToScheduled.
     Proof.
       move: H_same_service.
       rewrite -(service_cat sched j t1 t2) // -[service sched j t1 in LHS]addn0 => /eqP.
-      by rewrite eqn_add2l => /eqP //.
+      by rewrite eqn_add2l => /eqP.
     Qed.
 
     (** ...which of course implies that it does not receive service at any
@@ -566,7 +581,8 @@ Section RelationToScheduled.
       move=> t /andP [GE_t1 LT_t2].
       move: constant_service_implies_no_service_during.
       rewrite /service_during big_nat_eq0 => IS_ZERO.
-      by apply IS_ZERO; apply/andP; split => //.
+      apply IS_ZERO.
+      by apply /andP.
     Qed.
 
     (** We show that job [j] receives service at some point [t < t1]

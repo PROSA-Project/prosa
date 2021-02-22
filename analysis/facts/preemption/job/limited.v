@@ -215,7 +215,7 @@ Section ModelWithLimitedPreemptions.
         rewrite big_nat_recr //=.
         rewrite eqn_add2l eq_sym.
         rewrite scheduled_at_def in NSCHED.
-          by rewrite eqb0. }
+          by rewrite service_at_def eqb0. }
       rewrite -[job_preemptable _ _]Bool.negb_involutive.
       apply/negP; intros CONTR.
       move: NSCHED => /negP NSCHED; apply: NSCHED.

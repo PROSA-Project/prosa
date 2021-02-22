@@ -35,7 +35,7 @@ Section State.
 
     (** If it is scheduled in state [s], job [j] receives service proportional
         to the speed recorded in the state. *)
-    Definition varspeed_service_in (s : processor_state) : nat :=
+    Definition varspeed_service_on (s : processor_state) (_ : unit) : work :=
       match s with
       | Idle => 0
       | Progress j' speed  => if j' == j then speed else 0
@@ -48,13 +48,12 @@ Section State.
   Global Program Instance pstate_instance : ProcessorState Job processor_state :=
     {
       scheduled_on := varspeed_scheduled_on;
-      service_in   := varspeed_service_in
+      service_on   := varspeed_service_on
     }.
   Next Obligation.
-    move: H.
-    case: s=>//= j' v /existsP.
-    case: ifP=>//=_[].
-    by exists.
+    move: r H.
+    case: s=>//= j' v _.
+    by case: ifP.
   Defined.
 
 End State.

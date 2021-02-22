@@ -351,7 +351,7 @@ Section JLFPInstantiation.
         { ideal_proc_model_sched_case_analysis_eq sched x jo; first by done.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (another_hep_job jo j) eqn:PRIO; last by done.
-          rewrite (big_rem jo) //=; first by rewrite PRIO eq_refl.
+          rewrite (big_rem jo) /=; first by rewrite PRIO service_at_def EQ eq_refl.
           apply arrived_between_implies_in_arrivals; try done.
           - by apply H_jobs_come_from_arrival_sequence with x.
           - rewrite /arrived_between; apply/andP; split.
@@ -365,14 +365,16 @@ Section JLFPInstantiation.
               eapply H_jobs_come_from_arrival_sequence; eauto.
             + by apply leq_ltn_trans with x; [apply H_jobs_must_arrive_to_execute | done].
         }
-        { ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
+        { erewrite eq_bigr; last by move=> i _; rewrite service_at_def /=.
+          ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (another_hep_job jo j) eqn:PRIO.
           - rewrite -EQ. have SCH := service_of_jobs_le_1 _ _ sched _ (arrivals_between t1 t) _ x.
             eapply leq_trans; last first. 
             + apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
                             ideal_proc_model_is_a_uniprocessor_model.
-            + by erewrite leq_sum.
+            + erewrite leq_sum => // i _.
+              by rewrite service_at_def.
           - rewrite leqn0 big1 //; intros joo PRIO2.
             apply/eqP; rewrite eqb0; apply/eqP; intros C.
             inversion C; subst joo; clear C.
@@ -394,7 +396,7 @@ Section JLFPInstantiation.
         { ideal_proc_model_sched_case_analysis_eq sched x jo; first by done.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (hep_job_from_another_task jo j) eqn:PRIO; last by done.
-          rewrite (big_rem jo) //=; first by rewrite PRIO eq_refl.
+          rewrite (big_rem jo) /=; first by rewrite PRIO service_at_def EQ eq_refl.
           apply arrived_between_implies_in_arrivals; try done.
           - by apply H_jobs_come_from_arrival_sequence with x.
           - rewrite /arrived_between; apply/andP; split.
@@ -405,17 +407,19 @@ Section JLFPInstantiation.
               apply completed_implies_not_scheduled; eauto. 
               apply completion_monotonic with t1; try done.
               apply H_quiet_time; try done.
-              eapply H_jobs_come_from_arrival_sequence; simpl; eauto.
+              by eapply H_jobs_come_from_arrival_sequence; eauto.
             + by apply leq_ltn_trans with x; [apply H_jobs_must_arrive_to_execute | done].
         }
-        { ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
+        { erewrite eq_bigr; last by move=> i _; rewrite service_at_def /=.
+          ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (hep_job_from_another_task jo j) eqn:PRIO.
           - rewrite -EQ. have SCH := service_of_jobs_le_1 _ _ sched _ (arrivals_between t1 t) _ x.
             eapply leq_trans; last first. 
             + by apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
                             ideal_proc_model_is_a_uniprocessor_model.
-            + by erewrite leq_sum.
+            + erewrite leq_sum => // i _.
+              by rewrite service_at_def.
           - rewrite leqn0 big1 //; intros joo PRIO2.
             apply/eqP; rewrite eqb0; apply/eqP; intros C.
             inversion C; subst joo; clear C.

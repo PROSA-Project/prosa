@@ -64,7 +64,7 @@ Section FullyNonPreemptiveModel.
         * by rewrite /service /service_during big_nat_recr //= leq_addr. 
         * rewrite -addn1; apply leq_trans with (service sched j t.+2). 
           have <-: (service_at sched j t.+1) = 1.
-          { by apply/eqP; rewrite eqb1 -scheduled_at_def. }
+          { by apply/eqP; rewrite service_at_def eqb1 -scheduled_at_def. }
             by rewrite -big_nat_recr //=.
             by apply completion.service_at_most_cost; eauto 2 with basic_facts.
   Qed.

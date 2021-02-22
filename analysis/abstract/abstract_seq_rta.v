@@ -328,10 +328,10 @@ Section Sequential_Abstract_RTA.
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at/= scheduled_at_def.
-              rewrite !H_idle/=.
-              rewrite big1_eq addn0 add0n.
+              erewrite eq_bigr; last by move => i j' /=; rewrite service_at_def H_idle /=.
+              rewrite /= big1_eq add0n H_idle addn0.
               case INT: (interference j t); last by done.
-              simpl; rewrite lt0b.
+              rewrite /= lt0b.
               apply/hasP; exists j; last by done.
               rewrite mem_filter; apply/andP; split; first by done.
               by apply arrived_between_implies_in_arrivals.
@@ -365,14 +365,15 @@ Section Sequential_Abstract_RTA.
               have ->: Some j' == Some j = false; last rewrite addn0.
               { apply/negP => /eqP CONTR; inversion CONTR; subst j'.
                 by move: (H_not_job_of_tsk); rewrite H_job_of_tsk. } 
+              erewrite eq_bigr; last by move=> i _; rewrite service_at_def H_sched.
               have ZERO: \sum_(i <- arrivals_between t1 (t1 + A + ε) | job_task i == tsk) (Some j' == Some i) = 0.
               { apply big1 => j2 TSK.
                 apply/eqP; rewrite eqb0; apply/negP => /eqP EQ; inversion EQ; subst j'.                
                 by move: (H_not_job_of_tsk); rewrite / job_of_task TSK.
               }
-              rewrite ZERO ?addn0 add0n; simpl; clear ZERO.
+              rewrite {}ZERO ?addn0 add0n /=.
               case INT: (interference j t); last by done.
-              simpl; rewrite lt0b.
+              rewrite /= lt0b.
               apply/hasP; exists j; last by done.
               rewrite  mem_filter; apply/andP; split; first by done.
               by eapply arrived_between_implies_in_arrivals.
@@ -415,7 +416,8 @@ Section Sequential_Abstract_RTA.
                 by move: CONTR; rewrite H_sched => /eqP EQ; inversion EQ; subst; move: H_j_neq_j' => /eqP.
               }
               rewrite big_mkcond; apply/sum_seq_gt0P; exists j'; split; last first.
-              { by move: H_not_job_of_tsk => /eqP TSK; rewrite /job_of_task TSK eq_refl eq_refl. }
+              { move: H_not_job_of_tsk => /eqP TSK.
+                by rewrite /job_of_task TSK eq_refl service_at_def H_sched eq_refl. }
               { intros. have ARR:= arrives_after_beginning_of_busy_interval j j' _ _ _ _ _ t1 t2 _ t.
                 feed_n 8 ARR; try (done || by move: H_t_in_interval => /andP [T1 T2]).
                 { move: H_sched => /eqP SCHEDt.
@@ -469,9 +471,8 @@ Section Sequential_Abstract_RTA.
               feed ZIJT; first by rewrite scheduled_at_def H_sched; simpl.
               move: ZIJT => /negP /eqP; rewrite eqb_negLR; simpl; move => /eqP ZIJT; rewrite ZIJT; simpl; rewrite add0n.
               rewrite big_mkcond //=; apply/sum_seq_gt0P.
-              exists j; split.
-              - by apply j_is_in_arrivals_between.
-              - by move: (H_job_of_tsk) => ->; rewrite H_sched !eq_refl.
+              exists j; split; first by apply j_is_in_arrivals_between.
+              by move: (H_job_of_tsk) => ->; rewrite service_at_def H_sched eq_refl.
             Qed.
 
           End Case4.
@@ -516,11 +517,11 @@ Section Sequential_Abstract_RTA.
           /service_of_jobs exchange_big //=.
           rewrite -(leq_add2r (\sum_(t1 <= t < (t1 + x)) service_at sched j t)).
           rewrite [X in _ <= X]addnC addnA subnKC; last first.
-          { rewrite exchange_big //= (big_rem j) //=; auto using j_is_in_arrivals_between.
+          { rewrite (exchange_big _ _ (arrivals_between _ _)) /= (big_rem j) //=.
             by rewrite H_job_of_tsk leq_addr. }
           rewrite -big_split -big_split //=.
           rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum //; move => t /andP [NEQ _].
-          rewrite -scheduled_at_def.
+          rewrite {1}service_at_def -scheduled_at_def.
           by apply interference_plus_sched_le_serv_of_task_plus_task_interference.
         Qed.
 

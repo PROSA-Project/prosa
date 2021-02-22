@@ -395,7 +395,10 @@ Section IdealModelLemmas.
       eapply arrived_between_implies_in_arrivals; eauto 2.
       by apply H_jobs_must_arrive_to_execute in SCHED; apply leq_ltn_trans with x.
     } 
-    by move: L; simpl;rewrite eqb0; move => /eqP EQ.
+    move: SCHED L => /=.
+    rewrite scheduled_at_def service_at_def => /eqP-> /eqP.
+    by rewrite eqxx.
   Qed.
+
   
 End IdealModelLemmas.

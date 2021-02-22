@@ -283,7 +283,8 @@ Section ExistsBusyIntervalJLFP.
       move => t' /andP [_ NEQ]; rewrite mem_iota in NEQ.
       rewrite big1_seq //.
       move => jhp /andP [HP ARR].
-      apply/eqP; rewrite eqb0. rewrite -scheduled_at_def.
+      apply/eqP.
+      rewrite service_at_def eqb0 -scheduled_at_def.
       apply (completed_implies_not_scheduled _ _ H_completed_jobs_dont_execute).
       apply completion_monotonic with t1; [ move: NEQ => /andP [T1 _] | ]; try done.
       apply H_quiet_time; try done.
@@ -301,8 +302,7 @@ Section ExistsBusyIntervalJLFP.
       apply/eqP; rewrite eqn_leq; apply/andP; split.
       { rewrite leq_sum // => t' _.
         have SCH := @service_of_jobs_le_1 _ _ _ _ _ sched predT (arrivals_between 0 (t1 + Δ)).        
-        eapply leq_trans; last apply SCH; eauto using arrivals_uniq with basic_facts.
-        by rewrite leq_sum // => i _; rewrite -scheduled_at_def service_at_is_scheduled_at. }
+        by eapply leq_trans; last apply SCH; eauto using arrivals_uniq with basic_facts. }
       { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=
                 leq_sum // => t' /andP [/andP [LT GT] _]; apply/sum_seq_gt0P.
         ideal_proc_model_sched_case_analysis_eq sched t' jo.
@@ -328,7 +328,9 @@ Section ExistsBusyIntervalJLFP.
             apply/andP; split; first by done.
             apply H_jobs_must_arrive_to_execute in Sched_jo.
             by apply leq_ltn_trans with t'. 
-          - by rewrite lt0b -scheduled_at_def. } }
+          - by rewrite service_at_def lt0b -scheduled_at_def.
+        }
+      }
     Qed.
     
   End QuietTimeAndServiceOfJobs.
@@ -478,18 +480,19 @@ Section ExistsBusyIntervalJLFP.
                 apply leq_sum_seq; move => t II _.
                 rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
                 case SCHED: (sched t) => [j1 | ]; simpl; first last.
-                { by rewrite leqn0 big1_seq //. }
-                { case PRIO1: (hep_job j1 j); simpl; first last.
-                  - rewrite <- SCHED.
-                    have SCH := @service_of_jobs_le_1 _ _ _ _ _ _ (fun i => ~~ hep_job i j) (arrivals_between 0 (t1 + delta)).
-                    eapply leq_trans; last eapply SCH; eauto using arrivals_uniq with basic_facts.
-                    by rewrite leq_sum // => i _; rewrite -scheduled_at_def service_at_is_scheduled_at.
+                { rewrite leqn0 big1_seq // /service_at => i Hi.
+                  by rewrite service_in_def SCHED. }
+                { case PRIO1: (hep_job j1 j) => /=; first last.
+                  - apply service_of_jobs_le_1; auto with basic_facts.
+                    by apply arrivals_uniq.
                   - rewrite leqn0 big1_seq; first by done.
                     move => j2 /andP [PRIO2 ARRj2].
                     case EQ: (j1 == j2).
                     + by move: EQ => /eqP EQ; subst j2; rewrite PRIO1 in PRIO2.
-                    + apply/eqP; rewrite eqb0; apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
-                      by inversion CONTR; clear CONTR; subst j2; rewrite PRIO1 in PRIO2. } } }
+                    + apply/eqP.
+                      rewrite service_at_def eqb0.
+                      apply/negP => /eqP CONTR. rewrite SCHED in CONTR.
+                      by inversion CONTR; subst j2; rewrite PRIO1 in PRIO2. } } }
             { rewrite leq_add2r.
               destruct (t1 + delta <= t_busy.+1) eqn:NEQ; [ | apply negbT in NEQ; rewrite -ltnNge in NEQ].
               - apply leq_trans with (cumulative_priority_inversion sched j t1 t_busy.+1); last eauto 2.

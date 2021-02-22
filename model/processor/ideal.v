@@ -38,13 +38,13 @@ Section State.
       (** As this is a uniprocessor model, cores are implicitly defined
           as the [unit] type containing a single element as a placeholder. *)
       scheduled_on j s (_ : unit) := ideal_scheduled_at j s;
-      service_in j s := ideal_service_in j s;
+      service_on j s (_ : unit) := ideal_service_in j s;
     }.
   Next Obligation.
     rewrite /ideal_service_in /nat_of_bool.
-    case: ifP H =>//= SOME /existsP[].
-    by exists tt.
+    by case: ifP H =>// SOME /negP [].
   Defined.
+
 End State.
 
 (** ** Idle Instants *)
@@ -60,7 +60,7 @@ Section IsIdle.
   (** ... and any ideal uniprocessor schedule of such jobs. *)
   Variable sched : schedule ((*ideal*)processor_state Job).
 
-  (** We say that the processor is idle at time t iff there is no job being scheduled. *)
+  (** We say that the processor is idle at time [t] iff there is no job being scheduled. *)
   Definition is_idle (t : instant) := sched t == None.
 
 End IsIdle.

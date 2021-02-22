@@ -616,7 +616,8 @@ Section PriorityInversionIsBounded.
                 + rewrite big_nat_cond [in X in _ <= X]big_nat_cond.
                   rewrite leq_sum //.
                   move => x /andP [HYP _].
-                    by rewrite lt0b -scheduled_at_def; apply continuously_scheduled_between_preemption_points.
+                  rewrite service_at_def lt0b -scheduled_at_def.
+                    by apply continuously_scheduled_between_preemption_points.
               } by done.
             - case: (posnP fpt) => [ZERO|POS].
               { subst fpt.

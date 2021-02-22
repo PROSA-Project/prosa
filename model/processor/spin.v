@@ -37,7 +37,7 @@ Section State.
 
     (** In contrast, job [j] receives service only if the given state [s] is
         [Progress j]. *)
-    Definition spin_service_in (s : processor_state) : nat :=
+    Definition spin_service_on (s : processor_state) (_ : unit) : work :=
       match s with
       | Idle        => 0
       | Spin j'     => 0
@@ -51,13 +51,12 @@ Section State.
   Global Program Instance pstate_instance : ProcessorState Job (processor_state) :=
     {
       scheduled_on := spin_scheduled_on;
-      service_in   := spin_service_in
+      service_on   := spin_service_on
     }.
   Next Obligation.
-    move: H.
-    case: s=>//= j' /existsP.
+    move: r H.
+    case: s=>//= j' _.
     rewrite /nat_of_bool.
-    case: ifP=>//=_[].
-    by exists.
+    by case: ifP.
   Defined.
 End State.
