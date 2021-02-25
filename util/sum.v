@@ -9,9 +9,9 @@ Section SumsOverSequences.
   Variable (I : eqType).
 
   (** ... and assume we are given a sequence ... *)
-  Variable (r: seq I).
+  Variable (r : seq I).
 
-  (** ... and a predicate [P]. *) 
+  (** ... and a predicate [P]. *)
   Variable (P : pred I).
 
   (** First, we will show some properties of the sum performed over a single function
@@ -151,8 +151,11 @@ Section SumsOverSequences.
   (** In this section, we show some properties of the sum performed over two different functions. *)
   Section SumOfTwoFunctions.
 
-    (** Consider two functions that yield natural numbers. *)
-    Variable (E1 E2 : I -> nat).
+    (** Consider three functions that yield natural numbers. *)
+    Variable (E E1 E2 : I -> nat).
+
+    (** Besides earlier introduced predicate [P], we add two additional predicates [P1] and [P2]. *)
+    Variable (P1 P2 : pred I).
 
     (** Assume that [E2] dominates [E1] in all the points contained in the set [r] and respecting
         the predicate [P]. We prove that, if we sum both function over those points, then the sum 
@@ -178,6 +181,29 @@ Section SumsOverSequences.
       all: apply leq_sum; move => j /andP [IN H].
       all: by move:(EQ j IN H) => LEQ; ssrlia.
     Qed.
+    
+    (** Assume that [P1] implies [P2] in all the points contained in
+        the set [r]. We prove that, if we sum both functions over those
+        points, then the sum of [E] conditioned by [P2] will dominate
+        the sum of [E] conditioned by [P1]. *)
+    Lemma leq_sum_seq_pred:
+      (forall i, i \in r -> P1 i -> P2 i) ->
+      \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
+    Proof.
+      intros LE.
+      induction r; first by rewrite !big_nil.
+      rewrite !big_cons.
+      destruct (P1 a) eqn:P1a; first (move: P1a => /eqP; rewrite eqb_id => P1a). 
+      - rewrite LE //; last by rewrite in_cons; apply/orP; left.
+        rewrite leq_add2l.
+        by apply IHl; intros; apply LE => //; rewrite in_cons; apply/orP; right.
+      - destruct (P2 a) eqn:P2a.
+        + by eapply leq_trans;
+            [apply IHl; intros; apply LE => //; rewrite in_cons; apply/orP; right
+            | apply leq_addl].
+        + by apply IHl; intros; apply LE => //; rewrite in_cons; apply/orP; right. 
+    Qed.
+    
 
     (** Next, we prove that if for any element x of a set [xs] the following two statements 
         hold (1) [F1 x] is less than or equal to [F2 x] and (2) the sum [F1 x_1, ..., F1 x_n] 
@@ -248,7 +274,7 @@ End SumsOverSequences.
 
 (** In this section, we prove a variety of properties of sums performed over ranges. *)
 Section SumsOverRanges.
-  
+
   (** First, we show a trivial identity: any sum of zeros is zero. *)
   Lemma sum0 m n:
     \sum_(m <= i < n) 0 = 0.
@@ -315,6 +341,33 @@ Section SumsOverRanges.
     rewrite sum_seq_diff; first by done.
     move=> i; rewrite mem_index_iota; move => /andP [_ LT].
     by apply ALL.
+  Qed.
+
+  (** Given a sequence [r], function [F], and a predicate [P], we
+      prove that the fact that the sum of [F] conditioned by [P] is
+      greater than [0] is equivalent to the fact that there exists an
+      element [i \in r] such that [F i > 0] and [P i] holds. *) 
+  Lemma sum_seq_cond_gt0P:
+    forall (T : eqType) (r : seq T) (P : T -> bool) (F : T -> nat),
+      reflect (exists i, i \in r /\ P i /\ 0 < F i) (0 < \sum_(i <- r | P i) F i).
+  Proof.
+    intros; apply: (iffP idP); intros.
+    { induction r; first by rewrite big_nil in H.
+      rewrite big_cons in H.
+      destruct (P a) eqn:PA, (F a > 0) eqn:POS.
+      - exists a; repeat split; [by rewrite in_cons; apply/orP; left | by done | by done].
+      - move: POS => /negP/negP; rewrite -leqNgt leqn0 => /eqP Z; rewrite Z add0n in H.
+        apply IHr in H; destruct H as [i [IN [Pi POS]]].
+        by (exists i; repeat split; [rewrite in_cons;apply/orP;right | | ]).
+      - clear POS; apply IHr in H; destruct H as [i [IN [Pi POS]]].
+        by (exists i; repeat split; [rewrite in_cons;apply/orP;right | | ]).
+      - clear POS; apply IHr in H; destruct H as [i [IN [Pi POS]]].
+        by (exists i; repeat split; [rewrite in_cons;apply/orP;right | | ]).
+    }
+    { move: H => [i [IN [Pi POS]]].
+      rewrite (big_rem i) //=; rewrite Pi.      
+      by apply leq_trans with (F i); last rewrite leq_addr.
+    }
   Qed.
   
 End SumsOverRanges.
