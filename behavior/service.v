@@ -17,6 +17,10 @@ Section Service.
 
   (** ... and the instantaneous service received by job j at time t. *)
   Definition service_at (j : Job) (t : instant) := service_in j (sched t).
+  
+  (** We say that a job [j] receives service at time [t] if
+      [service_at j t] is positive. *) 
+  Definition receives_service_at (j : Job) (t : instant) := 0 < service_at j t.
 
   (** Based on the notion of instantaneous service, we define the cumulative
       service received by job j during any interval from [t1] until (but not
