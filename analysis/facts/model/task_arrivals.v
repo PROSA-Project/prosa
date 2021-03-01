@@ -230,7 +230,7 @@ Section TaskArrivals.
   Proof.
     intros *.
     rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
-    now apply cat_filter_eq_filter_cat.
+    now apply bigcat_nat_filter_eq_filter_bigcat_nat.
   Qed.
 
   (** The number of jobs of a task [tsk] in the interval <<[t1, t2)>> is the same 
@@ -242,7 +242,7 @@ Section TaskArrivals.
   Proof.
     intros *.
     rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
-    now rewrite size_big_nat cat_filter_eq_filter_cat.
+    now rewrite size_big_nat bigcat_nat_filter_eq_filter_bigcat_nat.
   Qed.
     
 End TaskArrivals.

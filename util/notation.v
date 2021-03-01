@@ -29,4 +29,17 @@ Reserved Notation "\cat_ ( i < n | P ) F"
 
 Notation "\cat_ ( i < n | P ) F" :=
   (\big[cat/[::]]_(i < n | P) F%N) : nat_scope.
-  
+
+Reserved Notation "\cat_ ( x <- xs | P ) F"
+  (at level 41, F at level 41, x, xs at level 50,
+   format "'[' \cat_ ( x <- xs | P ) '/ ' F ']'").
+
+Notation "\cat_ ( x <- xs | P ) F" :=
+  (\big[cat/[::]]_(x <- xs | P) F) : big_scope.
+
+Reserved Notation "\cat_ ( x <- xs ) F"
+  (at level 41, F at level 41, x, xs at level 50,
+   format "'[' \cat_ ( x <- xs ) '/ ' F ']'").
+
+Notation "\cat_ ( x <- xs ) F" :=
+   (\big[cat/[::]]_(x <- xs) F) : big_scope.
