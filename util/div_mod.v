@@ -1,6 +1,5 @@
-Require Export prosa.util.nat.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
-
+Require Export prosa.util.nat prosa.util.subadditivity.
+From mathcomp Require Export ssreflect ssrbool eqtype ssrnat seq fintype bigop div ssrfun.
 
 Definition div_floor (x y: nat) : nat := x %/ y.
 Definition div_ceil (x y: nat) := if y %| x then x %/ y else (x %/ y).+1.
@@ -30,4 +29,27 @@ Proof.
   rewrite [in X in X < _]DIV.
   rewrite ltn_add2l.
   now apply ltn_pmod.
-Qed.    
+Qed.
+
+(** We show that the division with ceiling by a constant [T] is a subadditive function. *)
+Lemma div_ceil_subadditive:
+  forall T,
+    subadditive (div_ceil^~T).
+Proof.
+  move=> T ab a b SUM.
+  rewrite -SUM.
+  destruct (T %| a) eqn:DIVa, (T %| b) eqn:DIVb.
+  - have DIVab: T %| a + b by apply dvdn_add.
+    by rewrite /div_ceil DIVa DIVb DIVab divnDl.
+  - have DIVab: T %| a+b = false by rewrite -DIVb; apply dvdn_addr.
+    by rewrite /div_ceil DIVa DIVb DIVab divnDl //=; ssrlia.
+  - have DIVab: T %| a+b = false by rewrite -DIVa; apply dvdn_addl.
+    by rewrite /div_ceil DIVa DIVb DIVab divnDr //=; ssrlia.
+  - destruct (T %| a + b) eqn:DIVab.
+    + rewrite /div_ceil DIVa DIVb DIVab.
+      apply leq_trans with (a %/ T + b %/T + 1); last by ssrlia.
+      by apply leq_divDl.
+    + rewrite /div_ceil DIVa DIVb DIVab.
+      apply leq_ltn_trans with (a %/ T + b %/T + 1); last by ssrlia.
+      by apply leq_divDl.
+Qed.

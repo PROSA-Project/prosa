@@ -210,7 +210,7 @@ Section PeriodicLemmas.
       now apply leq_trunc_div.
     + specialize (div_floor_add_g (job_arrival j1 - O_max) HP) => AB.
       feed_n 1 AB; first by apply valid_periods_imply_pos_hp => //.
-      apply ltn_subLR in AB.
+      rewrite ltn_subLR // in AB.
       now rewrite -/(HP); ssrlia.
   Qed.
 
