@@ -1,12 +1,13 @@
 Require Export prosa.analysis.facts.behavior.service.
 Require Export prosa.analysis.facts.behavior.arrivals.
 Require Export prosa.analysis.definitions.schedule_prefix.
+Require Export prosa.analysis.definitions.job_properties.
 
 (** * Completion *)
 
 (** In this file, we establish basic facts about job completions. *)
 Section CompletionFacts.
-  
+
   (** Consider any job type,...*)
   Context {Job: JobType}.
   Context `{JobCost Job}.
@@ -18,10 +19,10 @@ Section CompletionFacts.
   (** ...and a given schedule. *)
   Variable sched: schedule PState.
 
-  (** Let j be any job that is to be scheduled. *)
+  (** Let [j] be any job that is to be scheduled. *)
   Variable j: Job.
 
-  (** We prove that after job j completes, it remains completed. *)
+  (** We prove that after job [j] completes, it remains completed. *)
   Lemma completion_monotonic:
     forall t t',
       t <= t' ->
@@ -31,6 +32,19 @@ Section CompletionFacts.
     move => t t' LE. rewrite /completed_by /service => COMP.
     apply leq_trans with (n := service_during sched j 0 t); auto.
       by apply service_monotonic.
+  Qed.
+
+  (** We prove that if [j] is not completed by [t'], then it's also not
+      completed by any earlier instant. *)
+  Lemma incompletion_monotonic:
+    forall t t',
+      t <= t' ->
+      ~~ completed_by sched j t' ->
+      ~~ completed_by sched j t.
+  Proof.
+    move => t t' LE.
+    apply contra.
+    by apply completion_monotonic.
   Qed.
 
   (** We observe that being incomplete is the same as not having received
@@ -50,6 +64,19 @@ Section CompletionFacts.
       <-> remaining_cost sched j t > 0.
   Proof.
     move=> t. by split; rewrite /remaining_cost -less_service_than_cost_is_incomplete subn_gt0 //.
+  Qed.
+
+  (** Trivially, it follows that an incomplete job has a positive cost. *)
+  Corollary incomplete_implies_positive_cost:
+    forall t,
+      ~~ completed_by sched j t ->
+      job_cost_positive j.
+  Proof.
+    move=> t INCOMP.
+    apply: (ltn_leq_trans _);
+      last by apply leq_subr.
+    apply incomplete_is_positive_remaining_cost.
+    exact INCOMP.
   Qed.
 
   (** Assume that completed jobs do not execute. *)

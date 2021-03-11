@@ -93,6 +93,19 @@ Section Arrived.
     now apply ready_implies_arrived.
   Qed.
 
+  (** Similarly, since backlogged jobs are by definition pending, any
+      backlogged job must be incomplete. *)
+  Lemma backlogged_implies_incomplete:
+    forall j t,
+      backlogged sched j t -> ~~ completed_by sched j t.
+  Proof.
+    move=> j t BACK.
+    have suff: pending sched j t.
+    - by move /andP => [_ INCOMP].
+    - apply; move: BACK => /andP [READY _].
+      by apply any_ready_job_is_pending.
+  Qed.
+
 End Arrived.
 
 (** In this section, we establish useful facts about arrival sequence prefixes. *)

@@ -1,5 +1,6 @@
 Require Export prosa.analysis.facts.transform.edf_opt.
 Require Export prosa.analysis.facts.transform.edf_wc.
+Require Export prosa.analysis.facts.edf_definitions.
 
 (** * Optimality of EDF on Ideal Uniprocessors *)
 
@@ -8,11 +9,15 @@ Require Export prosa.analysis.facts.transform.edf_wc.
     schedule), then there is also an (ideal) EDF schedule in which all
     deadlines are met. *)
 
-(** The following results assume ideal uniprocessor schedules... *)
+(** The following results assume ideal uniprocessor schedules,... *)
 Require prosa.model.processor.ideal.
-(** ... and the basic (i.e., Liu & Layland) readiness model under which any
-    pending job is always ready. *)
+(** ... the basic (i.e., Liu & Layland) readiness model under which any
+    pending job is always ready, ... *)
 Require prosa.model.readiness.basic.
+(** ... the EDF priority policy, ... *)
+Require prosa.model.priority.edf.
+(** ...and a fully preemptive job model. *)
+Require prosa.model.preemption.fully_preemptive.
 
 (** ** Optimality Theorem *)
 
@@ -26,7 +31,7 @@ Section Optimality.
   Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
 
   (** We observe that EDF is optimal in the sense that, if there exists
-     any schedule in which all jobs of arr_seq meet their deadline,
+     any schedule in which all jobs of [arr_seq] meet their deadline,
      then there also exists an EDF schedule in which all deadlines are
      met. *)
   Theorem EDF_optimality:
@@ -86,6 +91,33 @@ Section Optimality.
   (** Remark: [EDF_optimality] is of course an immediate corollary of
       [EDF_WC_optimality]. We nonetheless have two separate proofs for historic
       reasons as [EDF_optimality] predates [EDF_WC_optimality] (in Prosa). *)
+
+  (** Finally, we state the optimality theorem also in terms of a
+      policy-compliant schedule, which a more generic notion used in Prosa for
+      scheduling policies (rather than the simpler, but ad-hoc
+      [EDF_schedule] predicate used above).
+
+      Given that we're considering the EDF priority policy and a fully
+      preemptive job model, satisfying the [EDF_schedule] predicate is
+      equivalent to satisfying the [respects_policy_at_preemption_point]
+      w.r.t. to the EDF policy predicate. The optimality of priority-compliant
+      schedules that are work-conserving follows hence directly from the above
+      [EDF_WC_optimality] theorem. *)
+  Corollary EDF_priority_compliant_WC_optimality:
+    (exists any_sched : schedule (ideal.processor_state Job),
+        valid_schedule any_sched arr_seq /\
+        all_deadlines_of_arrivals_met arr_seq any_sched) ->
+    exists priority_compliant_sched : schedule (ideal.processor_state Job),
+        valid_schedule priority_compliant_sched arr_seq /\
+        all_deadlines_of_arrivals_met arr_seq priority_compliant_sched /\
+        work_conserving arr_seq priority_compliant_sched /\
+        respects_policy_at_preemption_point arr_seq priority_compliant_sched.
+  Proof.
+    move /EDF_WC_optimality => [edf_sched [[ARR READY] [DL_MET [WC EDF]]]].
+    exists edf_sched.
+    apply (EDF_schedule_equiv arr_seq _) in EDF => //.
+    now apply (completed_jobs_are_not_ready edf_sched READY).
+  Qed.
 
 End Optimality.
 
