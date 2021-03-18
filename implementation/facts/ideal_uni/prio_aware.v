@@ -27,8 +27,7 @@ Section PrioAwareUniprocessorScheduler.
 
   (** ... a preemption model that is consistent with the readiness model, ... *)
   Context `{JobPreemptable Job}.
-  Hypothesis H_valid_preemption_behavior:
-    valid_nonpreemptive_readiness RM.
+  Hypothesis H_valid_preemption_behavior: valid_nonpreemptive_readiness RM.
 
   (** ... and reflexive, total, and transitive JLDP priority policy. *)
   Context `{JLDP_policy Job}.
@@ -61,6 +60,27 @@ Section PrioAwareUniprocessorScheduler.
     now apply supremum_in.
   Qed.
 
+  (** Third, the schedule respects also the preemption model semantics. *)
+  Section PreemptionCompliance.
+
+    (** Suppose that every job in [arr_seq] adheres to the basic validity
+        requirement that jobs must start execution to become nonpreemptive. *)
+    Hypothesis H_valid_preemption_function :
+      forall j,
+        arrives_in arr_seq j ->
+        job_cannot_become_nonpreemptive_before_execution j.
+
+    (** Since [uni_schedule arr_seq] is an instance of [np_uni_schedule], the
+        compliance of [schedule] with the preemption model follows trivially
+        from the compliance of [np_uni_schedule]. *)
+    Corollary schedule_respects_preemption_model :
+      schedule_respects_preemption_model arr_seq schedule.
+    Proof.
+      by apply np_respects_preemption_model.
+    Qed.
+
+  End PreemptionCompliance.
+
   (** Now we proceed to the main property of the priority-aware scheduler: in
       the following section we establish that [uni_schedule arr_seq] is
       compliant with the given priority policy whenever jobs are
@@ -71,7 +91,9 @@ Section PrioAwareUniprocessorScheduler.
         policy and a prefix of the schedule based on which the next decision is
         made. *)
     Let policy := allocation_at arr_seq choose_highest_prio_job.
-    Let prefix t := if t is t'.+1 then schedule_up_to policy idle_state t' else empty_schedule idle_state.
+    Let prefix t := if t is t'.+1
+                    then schedule_up_to policy idle_state t'
+                    else empty_schedule idle_state.
 
     (** To start, we observe that, at preemption times, the scheduled job is a
         supremum w.r.t. to the priority order and the set of backlogged
@@ -92,7 +114,7 @@ Section PrioAwareUniprocessorScheduler.
       rewrite ifF //.
       now apply negbTE.
     Qed.
- 
+
     (** From the preceding facts, we conclude that [uni_schedule arr_seq]
         respects the priority policy at preemption times. *)
     Theorem schedule_respects_policy :
@@ -115,7 +137,7 @@ Section PrioAwareUniprocessorScheduler.
         move: (scheduled_job_is_supremum j2 t SCHED_j2 PREEMPT) => SUPREMUM.
         apply supremum_spec with (s := jobs_backlogged_at arr_seq (prefix t) t) => //.
         now apply mem_backlogged_jobs. }
-    Qed.    
+    Qed.
 
   End Priority.
 

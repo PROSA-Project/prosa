@@ -68,7 +68,7 @@ Section GenericScheduleProperties.
   Qed.
 
   (** A crucial fact is that a prefix up to horizon [h1] is identical to a
-       prefix up to a later horizon [h2] at times up to [h1]. *)
+      prefix up to a later horizon [h2] at times up to [h1]. *)
   Lemma schedule_up_to_prefix_inclusion:
     forall h1 h2,
       h1 <= h2 ->
@@ -82,6 +82,19 @@ Section GenericScheduleProperties.
     rewrite leq_eqVlt ltnS => /orP [/eqP <-|LEQ] // t_H1.
     rewrite IH // schedule_up_to_widen //.
     now apply (leq_trans t_H1).
+  Qed.
+
+  (** It follows that [generic_schedule] and [schedule_up_to] for a given
+      horizon [h] share an identical prefix. *)
+  Corollary schedule_up_to_identical_prefix:
+    forall h t,
+      t <= h.+1 ->
+      identical_prefix (schedule_up_to policy idle_state h) (generic_schedule policy idle_state) t.
+  Proof.
+    move=> h t LE.
+    rewrite /identical_prefix /generic_schedule => t' LT.
+    rewrite (schedule_up_to_prefix_inclusion t' h) //.
+    by move: (leq_trans LT LE); rewrite ltnS.
   Qed.
 
 End GenericScheduleProperties.
