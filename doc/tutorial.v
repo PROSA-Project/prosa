@@ -60,7 +60,7 @@ Getting Started
 ===============
 
 In a first reading, it is possible to skip this part and go directly
-to the next one (TODO link) However, for a deeper understanding of the
+to `the next one <#formulating-constructs>`_ However, for a deeper understanding of the
 Prosa library, it is advisable to install the Coq system and
 interactively replay the examples proposed in this document. The
 current section thus provides some minimal information to get a
@@ -71,18 +71,104 @@ concepts will be introduced on the fly.
 Installing Coq
 --------------
 
-TODO (OPAM or Coq platform ?)
+Under Windows, the easiest solution is to resort on the `binary installer
+provided on Coq's website <https://coq.inria.fr/download>`_ (although it wil
+install much more than we need). On Linux or MacOS, the more versatile solution
+is to use the Opam package manager and we detail below the main steps
+(`more detailled instructions <https://coq.inria.fr/opam-using.html>`_
+are available on Coq's website).
+
+1. Install Opam, following `the instructions on Opam's website
+   <https://opam.ocaml.org/doc/Install.html>`_
+
+2. Check that you have Opam version 2.0.0 or above
+
+   .. code-block:: sh
+
+      opam --version
+
+3. Initialize Opam
+
+   .. code-block:: sh
+
+      opam init
+      eval $(opam env)
+
+   `opam init` will prompt you to allow opam to set up initialization scripts,
+   which is generally fine to accept. Otherwise, every time a new shell is
+   opened you have to type in the `eval $(opam env)` command above
+   to update environment variables. Note that this can take several minutes.
+
+4. Install dependencies
+
+   .. code-block:: sh
+
+      opam install opam-depext
+      opam-depext coq
+
+   This should tell you how to install additional dependencies needed by Coq
+   (if any) on your system. If needed, use the provided commands (for instance
+   `sudo apt-get install m4`).
+
+5. Install Coq
+
+   .. code-block:: sh
+
+      opam install coq
+
+   This will compile Coq from source which tipically takes a few (dozen)
+   minutes. You can test that Coq is properly installed by typing
+
+   .. code-block:: sh
+
+      coqc -v
+
+   which should output Coq's version.
+
+5. Install the Ssreflect library used by Prosa
+
+   .. code-block:: sh
+
+      opam repo add coq-released https://coq.inria.fr/opam/released
+      opam install coq-mathcomp-ssreflect
 
 Installing a Coq interface
 --------------------------
 
-TODO (just point to proog general, VSCoq or Coqide)
+Coq programs/proofs are files, with the extension `.v`, that can be compiled
+by Coq compiler `coqc` but Coq proof script are usually developped in an
+interactive way. Thus, one needs an editor or IDE with some Coq support.
+The user of Visual Studio Code can
+`install its VSCoq extension <https://github.com/coq-community/vscoq>`_
+whereas Emacs' users will enjoy the
+`Proof General <https://proofgeneral.github.io/>`_ mode. A `more detailled list
+<https://coq.inria.fr/user-interfaces.html>`_ is available on Coq's website.
+
+Learning about Coq
+------------------
+
+A priori knowledge of Coq should not be needed to understand the
+current document. However, the reader interested in going further and
+developing its own proofs will need some experience with the ssreflect tactic
+language used in Prosa. A good first reading is Part1 of the
+`Mathematical Components book <https://math-comp.github.io/mcb/>`_.
 
 Getting Prosa
 -------------
 
-TODO (dependencies (ssreflect), git clone, ./create_makefile.sh --without_classic && make &&
-make install)
+You can download the code of Prosa using git
+
+.. code-block:: sh
+
+   git clone https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs.git
+
+Compilation then proceeds as follows
+
+.. code-block:: sh
+
+   ./create_makefile.sh --without-refinements
+   make
+   make install
 
 Reading this Tutorial
 ---------------------
@@ -90,6 +176,10 @@ Reading this Tutorial
 This tutorial is actually a Coq file that can be downloaded at (TODO
 URL) so one can step through it with Coq and thus replay the examples
 and experiment with them while reading the tutorial.
+When Coq is installed, it is then advisable to download this file and step
+through it in your editor/IDE (essential keyboard shortcuts are C-c C-n,
+C-c C-u and C-c RET to go down, up ot to the cursor under Emacs,
+Alt-down, Alt-up or Alt-right under VSCode).
 
 It is first needed to load a few libraries.
 |*)
@@ -97,6 +187,8 @@ From mathcomp Require Export all_ssreflect.
 Require Import prosa.util.notation.
 
 (*|
+.. _formulating-constructs:
+
 Formulating Real-time Constructs in Prosa
 =========================================
 
@@ -642,6 +734,8 @@ Task Response-Time Bound Computation
 ------------------------------------
 
 TODO: retrieve/update material from Borislav's document
+
+test maths :math:`\sum_{i=1}^n i^2`
 |*)
 
 (*|
