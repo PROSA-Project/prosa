@@ -10,6 +10,9 @@ A Tutorial on Prosa
 
 .. TODO: eventually add this to the CI so that this tutorial is deployed
    automatically on Prosa'website.
+
+.. contents::
+
 |*)
 
 (*|
@@ -307,7 +310,7 @@ Class JobArrival (Job : JobType) := job_arrival : Job -> instant.
 Class JobDeadline (Job : JobType) := job_deadline : Job -> instant.
 
 (*|
-TODO : short explanation about Class and typeclasses
+TODO : very short explanation about Class and typeclasses
 
 From the above listing we can see that job is an entity with several parameters:
 
@@ -752,6 +755,13 @@ Prosa Parts not Covered in this Document
 ----------------------------------------
 
 TODO: retrieve/update material from Borislav's document
+|*)
+
+(*|
+Contributing
+============
+
+TODO (link to the end of the README)
 |*)
 
 (*|
