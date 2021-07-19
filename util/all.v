@@ -16,3 +16,4 @@ Require Export prosa.util.minmax.
 Require Export prosa.util.supremum.
 Require Export prosa.util.nondecreasing.
 Require Export prosa.util.rewrite_facilities.
+Require Export prosa.util.setoid.
