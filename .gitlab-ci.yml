@@ -205,17 +205,17 @@ doc-classic:
 
 proof-state:
   extends:
-    - .not_in_wip_branches  
-    - .preferred-stable-version
-  stage: process
-  needs: ["compile"]
-  dependencies:
-    - compile
+   - .not_in_wip_branches  
+  stage: build
+  image: bbbrandenburg/alectryon-ci:latest
   script:
+    - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
+    - ./create_makefile.sh --without-classic
+    - make -j ${NJOBS}
     - make alectryon
-    - mv html ../with-proofs-and-proof-state
+    - mv html html-alectryon
   artifacts:
     name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
     paths:
-      - "with-proofs-and-proof-state/"
+      - "html-alectryon/"
     expire_in: 1 week
