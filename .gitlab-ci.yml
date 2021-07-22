@@ -1,6 +1,21 @@
+###################### Global Config ######################
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
 stages:
   - build
   - process
+
+###################### Rules and Scripts ##################
+
+.not_in_wip_branches:
+  rules:
+    - if: ($CI_COMMIT_BRANCH !~ /^wip-.*$/) || ($CI_PIPELINE_SOURCE == "merge_request_event")
 
 .build-common:
   stage: build
@@ -21,14 +36,14 @@ stages:
   image: mathcomp/mathcomp-dev:${CI_JOB_NAME}
   extends: .build-common
 
-.build-for-process:
+.compile:
   stage: build
   image: mathcomp/mathcomp:1.12.0-coq-8.13
   script:
     - ./create_makefile.sh --without-classic
     - make -j ${NJOBS}
 
-.build-for-process-classic:
+.compile-classic:
   stage: build
   image: mathcomp/mathcomp:1.12.0-coq-8.13
   script:
@@ -63,70 +78,6 @@ stages:
     - "*/*/*/*/*/*/*/*/*/*.glob"
     expire_in: 1 week
 
-1.10.0-coq-8.11:
-  extends: .build
-
-1.11.0-coq-8.11:
-  extends: .build
-
-1.11.0-coq-8.12:
-  extends: .build
-
-1.12.0-coq-8.13:
-  extends: .build
-
-build-for-process:
-  extends:
-    - .build-for-process
-    - .collect-vo-files
-
-build-for-process-classic:
-  extends:
-    - .build-for-process-classic
-    - .collect-vo-files
-
-proof-length:
-  stage: build
-  image: python:3-alpine
-  script:
-    - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
-
-spell-check:
-  stage: build
-  image: bbbrandenburg/aspell-ci
-  script:
-    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
-
-coq-8.13:
-  extends:
-    - .build-dev
-  # it's ok to fail with an unreleased version of ssreflect
-  allow_failure: true
-
-coq-dev:
-  extends:
-    - .build-dev
-  # it's ok to fail with an unreleased version of ssreflect and Coq
-  allow_failure: true
-
-validate:
-  extends:
-    - .preferred-stable-version
-  stage: process
-  needs: ["build-for-process"]
-  dependencies:
-    - build-for-process
-  script: make validate
-
-validate-classic:
-  extends:
-    - .preferred-stable-version
-  stage: process
-  needs: ["build-for-process-classic"]
-  dependencies:
-    - build-for-process-classic
-  script: make validate
-
 .doc: 
   extends:
     - .preferred-stable-version
@@ -139,12 +90,96 @@ validate-classic:
     - make htmlpretty -j ${NJOBS}
     - mv html pretty
 
+
+###################### The Jobs ######################
+
+1.10.0-coq-8.11:
+  extends:
+    - .build
+    - .not_in_wip_branches
+
+1.11.0-coq-8.11:
+  extends:
+    - .build
+    - .not_in_wip_branches
+
+1.11.0-coq-8.12:
+  extends:
+    - .build
+    - .not_in_wip_branches
+
+1.12.0-coq-8.13:
+  extends:
+    - .build
+    - .not_in_wip_branches
+
+compile:
+  extends:
+    - .compile
+    - .collect-vo-files
+
+compile-classic:
+  extends:
+    - .not_in_wip_branches
+    - .compile-classic
+    - .collect-vo-files
+
+proof-length:
+  stage: build
+  image: python:3-alpine
+  script:
+    - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
+
+spell-check:
+  extends:  
+    - .not_in_wip_branches  
+  stage: build
+  image: bbbrandenburg/aspell-ci
+  script:
+    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
+
+# mathcomp-dev with stable Coq 8.13
+coq-8.13:
+  extends:
+    - .build-dev
+    - .not_in_wip_branches    
+  # it's ok to fail with an unreleased version of ssreflect
+  allow_failure: true
+
+# mathcomp-dev with coq-dev
+coq-dev:
+  extends:
+    - .build-dev
+    - .not_in_wip_branches    
+  # it's ok to fail with an unreleased version of ssreflect and Coq
+  allow_failure: true
+
+validate:
+  extends:
+    - .not_in_wip_branches
+    - .preferred-stable-version
+  stage: process
+  needs: ["compile"]
+  dependencies:
+    - compile
+  script: make validate
+
+validate-classic:
+  extends:
+    - .not_in_wip_branches  
+    - .preferred-stable-version
+  stage: process
+  needs: ["compile-classic"]
+  dependencies:
+    - compile-classic
+  script: make validate
+
 doc:
   extends:
     - .doc
-  needs: ["build-for-process"]
+  needs: ["compile"]
   dependencies:
-    - build-for-process
+    - compile
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -155,10 +190,11 @@ doc:
 
 doc-classic:
   extends:
+    - .not_in_wip_branches  
     - .doc
-  needs: ["build-for-process-classic"]
+  needs: ["compile-classic"]
   dependencies:
-    - build-for-process-classic
+    - compile-classic
   artifacts:
     name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -169,11 +205,12 @@ doc-classic:
 
 proof-state:
   extends:
+    - .not_in_wip_branches  
     - .preferred-stable-version
   stage: process
-  needs: ["build-for-process"]
+  needs: ["compile"]
   dependencies:
-    - build-for-process
+    - compile
   script:
     - make alectryon
     - mv html ../with-proofs-and-proof-state
