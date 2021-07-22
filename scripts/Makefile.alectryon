@@ -1,0 +1,4 @@
+alectryon: $(GLOBFILES) $(VFILES)
+	$(SHOW)'Running alectryon on all .v files'
+	$(HIDE)scripts/alectryon.sh $(VFILES)
+
