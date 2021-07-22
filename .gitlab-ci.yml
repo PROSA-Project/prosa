@@ -175,14 +175,7 @@ proof-state:
   dependencies:
     - build-for-process
   script:
-    - find . -iname *.v ! -path './classic/*' | xargs -P ${NJOBS} -n 1 scripts/record-proof-state.py -c '-R . prosa -w -notation-overriden,-parsing' --timeout 20
-    - scripts/intersperse-proof-state.py `find . -iname *.v ! -path './classic/*'`
-    - cd with-proof-state/
-    - ln -s ../scripts/
-    - ln -s ../_CoqProject
-    - ../create_makefile.sh
-    - make -j ${NJOBS}
-    - make html -j ${NJOBS} COQDOCEXTRAFLAGS=--plain-comments
+    - make alectryon
     - mv html ../with-proofs-and-proof-state
   artifacts:
     name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
