@@ -4,3 +4,8 @@ html-alectryon/%.html: $(VOFILES)
 	$(HIDE)scripts/alectryon.sh $(patsubst %,%.v,$(subst html-alectryon/prosa/,,$(subst .,/,$(@:.html=))))
 
 alectryon: $(ALECTRYONFILES)
+
+tutorial: $(VOFILES) doc/tutorial.v
+	$(SHOW)'Compiling the tutorial with alectryon: doc/tutorial.v -> html/tutorial.html'
+	$(HIDE)mkdir -p html
+	$(HIDE)alectryon  -R . prosa --frontend coq+rst --backend webpage --output-directory "html" doc/tutorial.v 
