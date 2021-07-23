@@ -211,9 +211,7 @@ proof-state:
   script:
     - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
     - ./create_makefile.sh --without-classic
-    - make -j ${NJOBS}
-    - make alectryon
-    - mv html html-alectryon
+    - make -j ${NJOBS} alectryon
   artifacts:
     name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
     paths:

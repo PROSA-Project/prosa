@@ -2,7 +2,7 @@
 set -e
 
 ALE="alectryon"
-OUT="./html"
+OUT="./html-alectryon"
 
 mkdir -p "$OUT"
 

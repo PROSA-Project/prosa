@@ -1,4 +1,6 @@
-alectryon: $(GLOBFILES) $(VFILES)
-	$(SHOW)'Running alectryon on all .v files'
-	$(HIDE)scripts/alectryon.sh $(VFILES)
+ALECTRYONFILES = $(patsubst %,html-alectryon/prosa.%,$(subst /,.,$(subst ./,,$(VFILES:.v=.html))))
 
+html-alectryon/%.html: $(VOFILES)
+	$(HIDE)scripts/alectryon.sh $(patsubst %,%.v,$(subst html-alectryon/prosa/,,$(subst .,/,$(@:.html=))))
+
+alectryon: $(ALECTRYONFILES)
