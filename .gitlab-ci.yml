@@ -153,6 +153,24 @@ spell-check:
 #  # it's ok to fail with an unreleased version of ssreflect and Coq
 #  allow_failure: true
 
+tutorial:
+  extends:
+   - .not_in_wip_branches
+  stage: build
+  image: bbbrandenburg/alectryon-ci:latest
+  script:
+    - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
+    - opam update -y
+    - opam install -y -v -j ${NJOBS} --deps-only coq-prosa
+    - ./create_makefile.sh --without-refinements
+    - make -j ${NJOBS} tutorial
+    - mv html html-tutorial
+  artifacts:
+    name: "prosa-tutorial-$CI_COMMIT_REF_NAME"
+    paths:
+      - "html-tutorial/"
+    expire_in: 1 week
+
 proof-state:
   extends:
    - .not_in_wip_branches  
