@@ -583,20 +583,19 @@ Section NondecreasingSequence.
     Qed.
 
     (** We prove that [index_iota 0 n] produces a sequence of numbers
-        which are always one unit apart each other. *)
+        which are always one unit apart from each other. *)
     Lemma distances_of_iota_ε:
       forall n x, x \in distances (index_iota 0 n) -> x = ε.
     Proof.
       intros n x IN; induction n.
       - by unfold index_iota, distances in IN.
       - destruct n; first by unfold distances, index_iota in IN. 
-        rewrite -addn1 /index_iota subn0 iota_add in IN.
-        rewrite add0n in IN. 
-        rewrite distances_unfold_1app_last in IN; last by rewrite size_iota. 
-        move: IN; rewrite mem_cat; move => /orP [IN|IN].
+        move: IN; rewrite -addn1 /index_iota subn0 iotaD add0n.
+        rewrite distances_unfold_1app_last; last by rewrite size_iota. 
+        rewrite mem_cat => /orP [IN|IN].
         + by apply IHn; rewrite /index_iota subn0; simpl.
         + by move: IN;
-            rewrite -addn1 iota_add /last0 last_cat add0n addn1 // subSnn in_cons;
+            rewrite -addn1 iotaD /last0 last_cat add0n addn1 // subSnn in_cons;
             move => /orP [/eqP EQ|F]; subst.
     Qed.
     

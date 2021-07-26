@@ -71,7 +71,7 @@ Section RunToCompletionThreshold.
     Proof.
       intros POS.
       unfold job_preemption_points, range, index_iota; rewrite subn0 -addn1.
-      rewrite iota_add add0n filter_cat mem_cat.
+      rewrite iotaD add0n filter_cat mem_cat.
       apply/orP; right; simpl.
       destruct (H_valid_preemption_model j) as [A1 [A2 [A3 A4]]]; auto.
       unfold job_cannot_be_nonpreemptive_after_completion in *.
@@ -111,9 +111,9 @@ Section RunToCompletionThreshold.
       erewrite last0_filter.
       + by apply/eqP; apply eq_refl.
       + unfold range, index_iota; rewrite subn0 -addn1.
-          by rewrite iota_add; destruct (iota 0 (job_cost j)). 
+          by rewrite iotaD; destruct (iota 0 (job_cost j)). 
       + unfold range, index_iota; rewrite subn0 -addn1.
-          by rewrite iota_add last0_cat //. 
+          by rewrite iotaD last0_cat //. 
       + by apply A2.
     Qed.
     
