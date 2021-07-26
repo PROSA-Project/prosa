@@ -245,7 +245,7 @@ add variables
   (** Given any job type with decidable equality, ... *)
   Variable Job: JobType.
 (*|
-whcich can be used in further definitions in the section
+which can be used in further definitions in the section
 |*)
   (** ..., an arrival sequence is a mapping from any time to a (finite)
       sequence of jobs. *)
@@ -390,8 +390,8 @@ Section ArrivalSequencePrefix.
 End ArrivalSequencePrefix.
 
 (*|
-Workload and Ressource States
------------------------------
+Workload and Resource States
+----------------------------
 
 As already mentioned, jobs execute upon resources. In our uniprocessor
 case, that would relate to jobs executing on a processor. Since there
@@ -421,7 +421,7 @@ and what amount of service it is given
 Check service_in.  (* .unfold *)
 
 (*|
-Equiped with this definitions, the file `behavior/service.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/service.v>`_
+Equipped with this definitions, the file `behavior/service.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/service.v>`_
 gives basic definitions on the service received by a job.
 |*)
 Section Service.
@@ -501,7 +501,7 @@ and of pending jobs
 End Service.
 (*|
 Similarly, one can find in file `behavior/ready.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/ready.v>`_
-the definiitons of ready and backlogged jobs
+the definitions of ready and backlogged jobs
 as well as a characterization of valid schedules
 with respect to job arrivals costs and arrival sequences.
 |*)
