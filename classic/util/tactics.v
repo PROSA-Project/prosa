@@ -69,7 +69,7 @@ Proof. by intros; case eqP. Qed.
 Lemma beq_sym : forall (T : eqType) (x y : T), (x == y) = (y == x).
 Proof. intros; do 2 case eqP; congruence. Qed.
 
-Hint Resolve beq_refl : vlib.
+Global Hint Resolve beq_refl : vlib.
 Hint Rewrite beq_refl : vlib_trivial.
 
 Notation eqxx := beq_refl.
@@ -112,7 +112,7 @@ Proof. by intros; apply/andP; split. Qed.
 
 Create HintDb vlib_refl discriminated.
 
-Hint Resolve andP orP nandP norP negP vlib__internal_eqP neqP : vlib_refl.
+Global Hint Resolve andP orP nandP norP negP vlib__internal_eqP neqP : vlib_refl.
 
 (* Add x <= y <= z splitting to the core hint database. *)
 Hint Immediate vlib__leq_split vlib__ltn_split1 vlib__ltn_split2 : core.

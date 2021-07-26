@@ -37,7 +37,7 @@ End PropertiesOfEDF.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
-Hint Resolve
+Global Hint Resolve
      EDF_is_reflexive
      EDF_is_transitive
      EDF_is_total

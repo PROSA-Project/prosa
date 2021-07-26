@@ -38,4 +38,4 @@ Section TaskRTCThresholdFullyPreemptiveModel.
   Qed.
     
 End TaskRTCThresholdFullyPreemptiveModel.
-Hint Resolve fully_preemptive_valid_task_run_to_completion_threshold : basic_facts.
+Global Hint Resolve fully_preemptive_valid_task_run_to_completion_threshold : basic_facts.

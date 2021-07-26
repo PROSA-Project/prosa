@@ -261,4 +261,4 @@ End RunToCompletionThreshold.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq 
     will be able to apply them automatically. *)   
-Hint Resolve job_run_to_completion_threshold_le_job_cost : basic_facts.
+Global Hint Resolve job_run_to_completion_threshold_le_job_cost : basic_facts.

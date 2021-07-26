@@ -40,4 +40,4 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
   Qed.
   
 End TaskRTCThresholdFloatingNonPreemptiveRegions.
-Hint Resolve floating_preemptive_valid_task_run_to_completion_threshold : basic_facts.
+Global Hint Resolve floating_preemptive_valid_task_run_to_completion_threshold : basic_facts.

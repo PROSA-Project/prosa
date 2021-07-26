@@ -126,4 +126,4 @@ Section FullyNonPreemptiveModel.
   Qed.
   
 End FullyNonPreemptiveModel.
-Hint Resolve valid_fully_nonpreemptive_model : basic_facts.
+Global Hint Resolve valid_fully_nonpreemptive_model : basic_facts.

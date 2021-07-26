@@ -37,7 +37,7 @@ End Properties.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
-Hint Resolve
+Global Hint Resolve
      DM_is_reflexive
      DM_is_transitive
      DM_is_total

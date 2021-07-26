@@ -109,7 +109,7 @@ Section LimitedPreemptionsModel.
 End LimitedPreemptionsModel. 
 
 (** We add the above lemma into a "Hint Database" basic_facts, so Coq will be able to apply them automatically. *)
-Hint Resolve
+Global Hint Resolve
      valid_fixed_preemption_points_model_lemma
      fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions
      fixed_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions : basic_facts.

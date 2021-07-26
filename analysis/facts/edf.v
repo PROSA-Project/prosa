@@ -31,4 +31,4 @@ End PropertiesOfEDF.
 
 (** We add the above lemma into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
-Hint Resolve EDF_respects_sequential_tasks : basic_facts.
+Global Hint Resolve EDF_respects_sequential_tasks : basic_facts.

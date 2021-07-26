@@ -48,7 +48,7 @@ End Properties.
 
 (** We add the above lemmas into a "Hint Database" basic_facts, so Coq
     will be able to apply them automatically. *)
-Hint Resolve
+Global Hint Resolve
      NFP_is_reflexive
      NFP_is_transitive
      NFP_is_total

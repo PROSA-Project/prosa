@@ -140,4 +140,4 @@ Section TaskRTCThresholdLimitedPreemptions.
   Qed.
   
 End TaskRTCThresholdLimitedPreemptions.
-Hint Resolve limited_valid_task_run_to_completion_threshold : basic_facts.
+Global Hint Resolve limited_valid_task_run_to_completion_threshold : basic_facts.

@@ -86,7 +86,7 @@ Section FullyNonPreemptiveModel.
 End FullyNonPreemptiveModel.
 
 (** We add the above lemma into a "Hint Database" basic_facts, so Coq will be able to apply them automatically. *)
-Hint Resolve
+Global Hint Resolve 
      valid_fully_nonpreemptive_model
      fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions
      fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions : basic_facts.
