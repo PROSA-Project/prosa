@@ -135,7 +135,7 @@ spell-check:
   stage: build
   image: bbbrandenburg/aspell-ci
   script:
-    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v'`
+    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './doc/*'`
 
 # mathcomp-dev with stable Coq
 #coq-8.15:
