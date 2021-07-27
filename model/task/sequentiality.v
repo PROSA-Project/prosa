@@ -1,4 +1,5 @@
 Require Export prosa.model.task.concept.
+Require Export prosa.model.task.arrivals.
 
 (** In this module, we give a precise definition of the common notion of
     "sequential tasks", which is commonly understood to mean that the jobs of a
@@ -35,5 +36,14 @@ Section PropertyOfSequentiality.
       job_arrival j1 < job_arrival j2 ->
       scheduled_at sched j2 t ->
       completed_by sched j1 t.
+
+  (* Given a job [j] and a time instant [t], we say that all prior
+     jobs are completed if any job [j_tsk] of task [job_task j] that
+     arrives before time [job_arrival j] is completed by time [t]. *)
+  Definition prior_jobs_complete (j : Job) (t : instant) :=
+    all 
+      (fun j_tsk => completed_by sched j_tsk t) 
+      (task_arrivals_before arr_seq (job_task j) (job_arrival j)).
+      
 
 End PropertyOfSequentiality.

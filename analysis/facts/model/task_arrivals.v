@@ -1,7 +1,7 @@
 Require Export prosa.model.task.arrivals.
 Require Export prosa.util.all.
 Require Export prosa.analysis.facts.behavior.arrivals.
-        
+
 (** In this file we provide basic properties related to tasks on arrival sequences. *)
 Section TaskArrivals.
 
@@ -10,12 +10,12 @@ Section TaskArrivals.
   Context {Task : TaskType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
-  
+
   (** Consider any job arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
-  
-  (** We show that the number of arrivals of task can be split into disjoint intervals. *) 
+
+  (** We show that the number of arrivals of task can be split into disjoint intervals. *)
   Lemma num_arrivals_of_task_cat:
     forall tsk t t1 t2,
       t1 <= t <= t2 ->
@@ -23,7 +23,7 @@ Section TaskArrivals.
       number_of_task_arrivals arr_seq tsk t1 t + number_of_task_arrivals arr_seq tsk t t2.
   Proof.
     move => tsk t t1 t2 /andP [GE LE].
-    rewrite /number_of_task_arrivals /task_arrivals_between /arrivals_between. 
+    rewrite /number_of_task_arrivals /task_arrivals_between /arrivals_between.
     now rewrite (@big_cat_nat _ _ _ t) //= filter_cat size_cat.
   Qed.
 
@@ -137,14 +137,38 @@ Section TaskArrivals.
       in the arrival sequence [arr_seq]. *)
   Lemma arrives_in_task_arrivals_implies_arrived:
     forall t1 t2 j,
-      j \in (task_arrivals_between arr_seq tsk t1 t2) ->
+      j \in task_arrivals_between arr_seq tsk t1 t2 ->
       arrives_in arr_seq j.
   Proof.
     intros * JB_IN.
     move : JB_IN; rewrite mem_filter; move => /andP [/eqP TSK JB_IN].
     now apply in_arrivals_implies_arrived in JB_IN.
   Qed.
-    
+
+  (** Any job [j] in [task_arrivals_before arr_seq tsk t] has an arrival
+      time earlier than [t]. *)
+  Lemma arrives_in_task_arrivals_before_implies_arrives_before :
+    forall j t,
+      j \in task_arrivals_before arr_seq tsk t ->
+      job_arrival j < t.
+  Proof.
+    intros * IN.
+    unfold task_arrivals_before, task_arrivals_between in *.
+    move: IN; rewrite mem_filter => /andP [_ IN].
+    by apply in_arrivals_implies_arrived_between in IN => //.
+  Qed.
+
+  (** Any job [j] in [task_arrivals_before arr_seq tsk t] is a job of task [tsk]. *) 
+  Lemma arrives_in_task_arrivals_implies_job_task :
+    forall j t, 
+      j \in task_arrivals_before arr_seq tsk t ->
+      job_task j == tsk.
+  Proof.
+    intros * IN.
+    unfold task_arrivals_before, task_arrivals_between in *.
+    by move: IN; rewrite mem_filter => /andP [TSK _].
+  Qed.
+  
   (** An arrival sequence with non-duplicate arrivals implies that the 
       task arrivals also contain non-duplicate arrivals. *)
   Lemma uniq_task_arrivals:
@@ -244,5 +268,5 @@ Section TaskArrivals.
     rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
     now rewrite size_big_nat bigcat_nat_filter_eq_filter_bigcat_nat.
   Qed.
-    
+  
 End TaskArrivals.

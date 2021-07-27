@@ -1,12 +1,14 @@
 Require Export prosa.behavior.ready.
 Require Export prosa.analysis.definitions.schedule_prefix.
 Require Export prosa.model.preemption.parameter.
+Require Export prosa.model.priority.classes.
 
 (** * Properties of Readiness Models *)
 
 (** In this file, we define commonsense properties of readiness models. *)
 Section ReadinessModelProperties.
-  (** For any type of jobs with costs and arrival times... *)
+  
+  (** For any type of jobs with costs and arrival times ... *)
   Context {Job : JobType} `{JobCost Job} `{JobArrival Job}.
 
   (** ... and any kind of processor model, ... *)
@@ -30,7 +32,7 @@ Section ReadinessModelProperties.
       forall t,
         t <= h ->
         job_ready sched j t = job_ready sched' j t.
-
+  
   (** Next, we relate the readiness model to the preemption model. *)
   Context `{JobPreemptable Job}.
 
@@ -42,7 +44,7 @@ Section ReadinessModelProperties.
   Definition valid_nonpreemptive_readiness :=
      forall sched j t,
         ~~ job_preemptable j (service sched j t) -> job_ready sched j t.
-
+  
 End ReadinessModelProperties.
 
 
