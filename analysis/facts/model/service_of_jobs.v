@@ -38,10 +38,7 @@ Section GenericModelLemmas.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Let P be any predicate over jobs. *)
-  Variable P : Job -> bool.
-
-  (** Let's define some local names for clarity. *)
-  Let arrivals_between := arrivals_between arr_seq.
+  Variable P : pred Job.
 
   (** In this section, we prove that the service received by any set of jobs
      is upper-bounded by the corresponding workload. *)
@@ -71,20 +68,20 @@ Section GenericModelLemmas.
   Section ServiceCat.
 
     (** We show that the total service of jobs released in a time interval <<[t1,t2)>>
-       during [t1,t2) is equal to the sum of:
-       (1) the total service of jobs released in time interval [t1, t) during time [t1, t)
-       (2) the total service of jobs released in time interval [t1, t) during time [t, t2)
-       and (3) the total service of jobs released in time interval [t, t2) during time [t, t2). *)
+       during <<[t1,t2)>> is equal to the sum of:
+       (1) the total service of jobs released in time interval <<[t1, t)>> during time <<[t1, t)>>
+       (2) the total service of jobs released in time interval <<[t1, t)>> during time <<[t, t2)>>
+       and (3) the total service of jobs released in time interval <<[t, t2)>> during time <<[t, t2)>>. *)
     Lemma service_of_jobs_cat_scheduling_interval :
       forall t1 t2 t,
         t1 <= t <= t2 ->
-        service_of_jobs sched P (arrivals_between t1 t2) t1 t2
-        = service_of_jobs sched P (arrivals_between t1 t) t1 t
-          + service_of_jobs sched P (arrivals_between t1 t) t t2
-          + service_of_jobs sched P (arrivals_between t t2) t t2.
+        service_of_jobs sched P (arrivals_between arr_seq t1 t2) t1 t2
+        = service_of_jobs sched P (arrivals_between arr_seq t1 t) t1 t
+          + service_of_jobs sched P (arrivals_between arr_seq t1 t) t t2
+          + service_of_jobs sched P (arrivals_between arr_seq t t2) t t2.
     Proof.
       move => t1 t2 t /andP [GEt LEt].
-      rewrite /arrivals_between (arrivals_between_cat _ _ t) //.
+      rewrite (arrivals_between_cat _ _ t) //.
       rewrite {1}/service_of_jobs big_cat //=.
       rewrite exchange_big //= (@big_cat_nat _ _ _ t) //=;
               rewrite [in X in X + _ + _]exchange_big //= [in X in _ + X + _]exchange_big //=.
@@ -101,19 +98,19 @@ Section GenericModelLemmas.
     Qed.
 
     (** We show that the total service of jobs released in a time interval <<[t1,t2)>>
-       during [t,t2) is equal to the sum of:
-       (1) the total service of jobs released in a time interval [t1,t) during [t,t2)
-       and (2) the total service of jobs released in a time interval [t,t2) during [t,t2). *)
+       during <<[t,t2)>> is equal to the sum of:
+       (1) the total service of jobs released in a time interval <<[t1,t)>> during <<[t,t2)>>
+       and (2) the total service of jobs released in a time interval <<[t,t2)>> during <<[t,t2)>>. *)
     Lemma service_of_jobs_cat_arrival_interval :
       forall t1 t2 t,
         t1 <= t <= t2 ->
-        service_of_jobs sched P (arrivals_between t1 t2) t t2 =
-        service_of_jobs sched P (arrivals_between t1 t) t t2 +
-        service_of_jobs sched P (arrivals_between t t2) t t2.
+        service_of_jobs sched P (arrivals_between arr_seq t1 t2) t t2 =
+        service_of_jobs sched P (arrivals_between arr_seq t1 t) t t2 +
+        service_of_jobs sched P (arrivals_between arr_seq t t2) t t2.
     Proof.
       move => t1 t2 t /andP [GEt LEt].
       apply/eqP;rewrite eq_sym; apply/eqP.
-      rewrite /arrivals_between [in X in _ = X](arrivals_between_cat _ _ t) //.
+      rewrite [in X in _ = X](arrivals_between_cat _ _ t) //.
         by rewrite {3}/service_of_jobs -big_cat //=.
     Qed.
 
@@ -283,7 +280,8 @@ Section IdealModelLemmas.
 
     (** And state the proposition that all jobs are completed by time
        [t_compl]. Next we show that this proposition is equivalent to
-       the fact that [workload of jobs = service of jobs]. *)
+       the fact that the workload of the jobs is equal to the service
+       received by the jobs. *)
     Let all_jobs_completed_by t_compl :=
       forall j, j \in jobs -> P j -> completed_by j t_compl.
 

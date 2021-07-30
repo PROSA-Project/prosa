@@ -1,9 +1,6 @@
 Require Export prosa.model.priority.classes.
 Require Export prosa.analysis.facts.behavior.completion.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import prosa.model.processor.ideal.
-
 (** * Busy Interval for JLFP-models *)
 (** In this file we define the notion of busy intervals for uniprocessor for JLFP schedulers. *)
 Section BusyIntervalJLFP.
@@ -34,8 +31,8 @@ Section BusyIntervalJLFP.
     Variable j : Job.
     Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
     
-    (** We say that t is a quiet time for j iff every higher-priority job from
-         the arrival sequence that arrived before t has completed by that time. *)
+    (** We say that [t] is a quiet time for [j] iff every higher-priority job from
+         the arrival sequence that arrived before [t] has completed by that time. *)
     Definition quiet_time (t : instant) :=
       forall (j_hp : Job),
         arrives_in arr_seq j_hp ->
@@ -47,7 +44,7 @@ Section BusyIntervalJLFP.
          <<[t1, t_busy)>> is a (potentially unbounded) busy-interval prefix
          iff the interval starts with a quiet time where a higher or equal 
          priority job is released and remains non-quiet. We also require
-         job j to be released in the interval. *)    
+         job [j] to be released in the interval. *)    
     Definition busy_interval_prefix (t1 t_busy : instant) :=
       t1 < t_busy /\
       quiet_time t1 /\
@@ -55,7 +52,7 @@ Section BusyIntervalJLFP.
       t1 <= job_arrival j < t_busy.
 
     (** Next, we say that an interval <<[t1, t2)>> is a busy interval iff
-         [t1, t2) is a busy-interval prefix and t2 is a quiet time. *)
+        <<[t1, t2)>> is a busy-interval prefix and [t2] is a quiet time. *)
     Definition busy_interval (t1 t2 : instant) :=
       busy_interval_prefix t1 t2 /\
       quiet_time t2.
@@ -66,8 +63,8 @@ Section BusyIntervalJLFP.
       version of the notion of quiet time. *)
   Section DecidableQuietTime.
 
-    (** We say that t is a quiet time for j iff every higher-priority job from
-        the arrival sequence that arrived before t has completed by that time. *)
+    (** We say that t is a quiet time for [j] iff every higher-priority job from
+        the arrival sequence that arrived before [t] has completed by that time. *)
     Definition quiet_time_dec (j : Job) (t : instant) :=
       all
         (fun j_hp => hep_job j_hp j ==> (completed_by sched j_hp t))

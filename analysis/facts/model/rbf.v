@@ -27,8 +27,9 @@ Section ProofWorkloadBound.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (** ... and any ideal uni-processor schedule of this arrival sequence.*)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... and any schedule corresponding to this arrival sequence. *)
+  Context {PState : Type} `{ProcessorState Job PState}.
+  Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation. *)

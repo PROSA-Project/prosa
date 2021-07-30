@@ -1,11 +1,6 @@
 Require Export prosa.model.task.arrival.curves.
 Require Export prosa.model.priority.classes.
 
-(** The following definitions assume ideal uni-processor schedules.
-    This restriction exists for historic reasons; the defined concepts
-    could be generalized in future work. *)
-Require Import prosa.analysis.facts.model.ideal_schedule.
-
 (** * Request Bound Function (RBF) *)
 
 (** We define the notion of a task's request-bound function (RBF), as well as
@@ -22,9 +17,6 @@ Section TaskWorkloadBoundedByArrivalCurves.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobCost Job}.
-
-  (** Consider any ideal uni-processor schedule of these jobs... *)
-  Variable sched : schedule (ideal.processor_state Job).
 
   (** ... and an FP policy that indicates a higher-or-equal priority
       relation. *)
