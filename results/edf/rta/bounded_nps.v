@@ -58,10 +58,6 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-  
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)
   Context `{JobPreemptable Job}.
@@ -277,7 +273,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Theorem uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments:
       response_time_bounded_by tsk R.
     Proof.
-      eapply uniprocessor_response_time_bound_edf; eauto 2.
+      eapply uniprocessor_response_time_bound_edf; eauto 2 with basic_facts.
       - eapply EDF_implies_sequential_tasks; eauto 2.
         + by apply basic.basic_readiness_is_work_bearing_readiness, EDF_is_reflexive.
       - by apply priority_inversion_is_bounded. 

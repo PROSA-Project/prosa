@@ -64,10 +64,6 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid: valid_schedule sched arr_seq.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
-  
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.  
@@ -141,7 +137,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
         by rewrite /job_response_time_bound /completed_by ZEROj.
     }
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L).
-    all: eauto 2 with basic_facts.
+    all: eauto 3 with basic_facts.
   Qed.
   
 End RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.

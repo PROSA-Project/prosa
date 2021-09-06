@@ -68,10 +68,6 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
      and assume that the relation is reflexive and transitive. *)
   Context `{FP_policy Task}.
@@ -153,7 +149,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with
         (L0 := L).
-    all: eauto 2 with basic_facts.
+    all: eauto 3 with basic_facts.
     - by apply sequential_readiness_implies_work_bearing_readiness.
     - by apply sequential_readiness_implies_sequential_tasks.
   Qed.

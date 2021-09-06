@@ -76,10 +76,6 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Hypothesis H_schedule_respects_preemption_model:
     schedule_respects_preemption_model arr_seq sched.
 
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
      and assume that the relation is reflexive and transitive. *)
   Context `{FP_policy Task}.

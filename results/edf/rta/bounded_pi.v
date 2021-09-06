@@ -67,10 +67,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
   (** Note that we differentiate between abstract and 
      classical notions of work conserving schedule. *)
   Let work_conserving_ab := definitions.work_conserving arr_seq sched.
@@ -370,9 +366,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           erewrite instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks;
             eauto 2 with basic_facts.
           - by rewrite -H_job_of_tsk /jobs.
-          - rewrite /edf.EDF /EDF instantiated_quiet_time_equivalent_quiet_time //.
-            + by apply EDF_is_reflexive.
-            + by apply EDF_respects_sequential_tasks.
+          - rewrite instantiated_quiet_time_equivalent_quiet_time; eauto 2 with basic_facts.
         Qed.
 
         (** By lemma [service_of_jobs_le_workload], the total
@@ -689,7 +683,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
     { by rewrite /job_response_time_bound /completed_by ZERO. }    
     eapply uniprocessor_response_time_bound_seq with
         (interference0 := interference) (interfering_workload0 := interfering_workload)
-        (task_interference_bound_function := fun tsk A R => IBF A R) (L0 := L); eauto 3.
+        (task_interference_bound_function := fun tsk A R => IBF A R) (L0 := L); eauto 2 with basic_facts.
     - by apply instantiated_i_and_w_are_coherent_with_schedule.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - by apply instantiated_busy_intervals_are_bounded.

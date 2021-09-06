@@ -83,6 +83,16 @@ Section Arrived.
     by apply ready_implies_arrived.
   Qed.
 
+  (** Furthermore, in a valid schedule, jobs must arrive to execute. *)
+  Corollary valid_schedule_implies_jobs_must_arrive_to_execute:
+    forall arr_seq, 
+    valid_schedule sched arr_seq ->
+    jobs_must_arrive_to_execute sched.
+  Proof.
+    move=> arr_seq [??].
+    by apply jobs_must_arrive_to_be_ready.
+  Qed.
+  
   (** Since backlogged jobs are by definition ready, any backlogged job must have arrived. *)
   Corollary backlogged_implies_arrived:
     forall j t,
@@ -107,6 +117,10 @@ Section Arrived.
   Qed.
 
 End Arrived.
+
+(** We add the above lemma into a "Hint Database" basic_facts, so Coq
+    will be able to apply it automatically. *)
+Global Hint Resolve valid_schedule_implies_jobs_must_arrive_to_execute : basic_facts.
 
 (** In this section, we establish useful facts about arrival sequence prefixes. *)
 Section ArrivalSequencePrefix.

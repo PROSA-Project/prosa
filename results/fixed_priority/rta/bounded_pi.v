@@ -60,10 +60,6 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** ... and assume that the schedule is valid.  *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-  (** We also assume that jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-  
   (** Note that we differentiate between abstract and 
      classical notions of work conserving schedule. *)
   Let work_conserving_ab := definitions.work_conserving arr_seq sched.
@@ -205,7 +201,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         + exfalso; clear HYP1 HYP2.
           eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto with basic_facts.
             by move: BUSY => [PREF _]; eapply not_quiet_implies_not_idle;
-                              eauto 2 using eqprop_to_eqbool.
+                              eauto 2 using eqprop_to_eqbool with basic_facts.
       - move: (HYP); rewrite scheduled_at_def; move => /eqP HYP2; apply/negP.
         rewrite /interference /ideal_jlfp_rta.interference /is_priority_inversion
                   /is_interference_from_another_hep_job HYP2 negb_or.
@@ -246,7 +242,8 @@ Section AbstractRTAforFPwithArrivalCurves.
     Proof.
       intros j ARR TSK POS.
       move: H_sched_valid => [CARR MBR].
-      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]]; eauto 2.
+      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]];
+        eauto 2 with basic_facts.
       { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_rbf'. }
       exists t1, t2; split; first by done.
       split; first by done.
@@ -295,11 +292,11 @@ Section AbstractRTAforFPwithArrivalCurves.
             (workload_of_jobs
                (fun jhp : Job => (FP_to_JLFP _ _) jhp j && (job_task jhp != job_task j))
                (arrivals_between arr_seq t1 (t1 + R0))).
-        { by apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service. } 
+        { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
+          by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). } 
         { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
-          by rewrite -TSK; apply total_workload_le_total_rbf.
-        }
-      }
+          by rewrite -TSK; apply total_workload_le_total_rbf. } 
+        all: eauto 2 using arr_seq with basic_facts. }
     Qed.
 
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
@@ -370,7 +367,7 @@ Section AbstractRTAforFPwithArrivalCurves.
     move: H_sched_valid => [CARR MBR].
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
-    eapply uniprocessor_response_time_bound_seq; eauto 3.
+    eapply uniprocessor_response_time_bound_seq; eauto 2 with basic_facts.
     - by apply instantiated_i_and_w_are_consistent_with_schedule. 
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks. 
     - by apply instantiated_busy_intervals_are_bounded.

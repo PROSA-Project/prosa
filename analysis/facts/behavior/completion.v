@@ -345,6 +345,16 @@ Section CompletedJobs.
     by apply ready_implies_incomplete.
   Qed.
 
+  (** Furthermore, in a valid schedule, completed jobs don't execute. *)
+  Corollary valid_schedule_implies_completed_jobs_dont_execute:
+    forall arr_seq, 
+    valid_schedule sched arr_seq ->
+    completed_jobs_dont_execute sched.
+  Proof.
+    move=> arr_seq [??].
+    by apply completed_jobs_are_not_ready.
+  Qed.
+
   (** We further observe that completed jobs don't execute if scheduled jobs
      always receive non-zero service and cumulative service never exceeds job
      costs. *)
@@ -362,6 +372,10 @@ Section CompletedJobs.
   Qed.
 
 End CompletedJobs.
+
+(** We add the above lemma into a "Hint Database" basic_facts, so Coq
+    will be able to apply it automatically. *)
+Global Hint Resolve valid_schedule_implies_completed_jobs_dont_execute : basic_facts.
 
 (** Next, we relate the completion of jobs in schedules with identical prefixes. *)
 Section CompletionInTwoSchedules.

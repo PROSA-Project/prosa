@@ -75,10 +75,6 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Hypothesis H_sched_valid: valid_schedule sched arr_seq.
   Hypothesis H_schedule_with_limited_preemptions:
     schedule_respects_preemption_model arr_seq sched.
-  
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
