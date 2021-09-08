@@ -494,7 +494,7 @@ Module AbstractSeqRTA.
             } 
             have Fact1: num_arrivals_of_task job_task arr_seq tsk (t1 + A) (t1 + A + ε) >= 1.
             { rewrite /num_arrivals_of_task /arrivals_of_task_between.
-              rewrite -count_filter_fun -has_count; apply/hasP.
+              rewrite size_filter -has_count; apply/hasP.
                 by exists j; last rewrite /is_job_of_task TSK.
             }
             have Fact2: job_cost j <= task_workload_between (t1 + A) (t1 + A + ε).

@@ -1,7 +1,6 @@
 Require Export prosa.util.tactics.
 Require Export prosa.util.notation.
 Require Export prosa.util.bigcat.
-Require Export prosa.util.counting.
 Require Export prosa.util.div_mod.
 Require Export prosa.util.list.
 Require Export prosa.util.nat.

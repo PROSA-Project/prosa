@@ -1,5 +1,3 @@
-Require Export prosa.util.counting.
-
 Require Import prosa.classic.util.tactics prosa.classic.util.ord_quantifier.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 

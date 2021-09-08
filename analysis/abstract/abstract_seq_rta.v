@@ -585,7 +585,7 @@ Section Sequential_Abstract_RTA.
         { by move: ARR => [t ARR]; rewrite subnKC //; feed (H_arrival_times_are_consistent j t); try (subst t). }
         have Fact1: 1 <= number_of_task_arrivals arr_seq tsk (t1 + A) (t1 + A + ε).
         { rewrite /number_of_task_arrivals /task_arrivals_between /arrival_sequence.arrivals_between.
-          by rewrite -count_filter_fun -has_count; apply/hasP; exists j; last rewrite TSK.
+          by rewrite size_filter -has_count; apply/hasP; exists j; last rewrite TSK.
         }
         rewrite (@num_arrivals_of_task_cat _ _ _ _ _ (t1 + A)); last by apply/andP; split; rewrite leq_addr //.
         rewrite mulnDr.
