@@ -51,7 +51,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
+  
   (** Note that we differentiate between abstract and 
      classical notions of work conserving schedule. *)
   Let work_conserving_ab := definitions.work_conserving arr_seq sched.
@@ -241,9 +241,8 @@ Section AbstractRTAforFPwithArrivalCurves.
       edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]]; eauto 2.
       { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_rbf'. }
       exists t1, t2; split; first by done.
-      split.
-      - by done.
-      - by eapply instantiated_busy_interval_equivalent_edf_busy_interval; eauto 2 with basic_facts.
+      split; first by done.
+      by eapply instantiated_busy_interval_equivalent_edf_busy_interval; eauto 2 with basic_facts.
     Qed.
 
     (** Next, we prove that IBF is indeed an interference bound.

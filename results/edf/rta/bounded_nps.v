@@ -4,11 +4,14 @@ Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.results.edf.rta.bounded_pi.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules ... *)
 Require Import prosa.model.processor.ideal.
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+(** ... and the classic (i.e., Liu & Layland) model of readiness
+    without jitter or self-suspensions, wherein pending jobs are
+    always ready. *)
 Require Import prosa.model.readiness.basic.
+
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
@@ -37,7 +40,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** For clarity, let's denote the relative deadline of a task as D. *)
+  (** For clarity, let's denote the relative deadline of a task as [D]. *)
   Let D tsk := task_deadline tsk.
 
   (** Consider the EDF policy that indicates a higher-or-equal priority relation.
@@ -199,7 +202,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           rewrite /D; ssrlia.
         }
     Qed.
-    
+
     (** Using the lemma above, we prove that the priority inversion of the task is bounded by 
        the maximum length of a nonpreemptive section of lower-priority tasks. *)
     Lemma priority_inversion_is_bounded:
@@ -246,7 +249,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Qed.
       
   End PriorityInversionIsBounded.
-  
+        
   (** ** Response-Time Bound *)
   (** In this section, we prove that the maximum among the solutions of the response-time 
       bound recurrence is a response-time bound for [tsk]. *)

@@ -6,8 +6,9 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 (** In this module we prove the RTA theorem for EDF-schedulers with
     fixed preemption points. *)
 
-(** Throughout this file, we assume the EDF priority policy, ideal uni-processor 
-    schedules, and the basic (i.e., Liu & Layland) readiness model. *)
+(** Throughout this file, we assume the EDF priority policy, ideal
+    uni-processor schedules, and the classic (i.e., Liu & Layland)
+    readiness model. *)
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.basic.
@@ -151,7 +152,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     { intros j ARR TSK.
       move: (H_valid_job_cost _ ARR) => POSt.
       move: POSt; rewrite /valid_job_cost TSK ZERO leqn0; move => /eqP Z.
-        by rewrite /job_response_time_bound /completed_by Z.
+      by rewrite /job_response_time_bound /completed_by Z.
     }
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L).
     all: eauto 2 with basic_facts.

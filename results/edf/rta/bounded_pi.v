@@ -7,10 +7,12 @@ Require Import prosa.model.task.absolute_deadline.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
+(** Throughout this file, we assume ideal uni-processor schedules ... *)
 Require Import prosa.model.processor.ideal.
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
+(** ... and the classic (i.e., Liu & Layland) model of readiness
+    without jitter or self-suspensions, wherein pending jobs are
+    always ready. *)
 Require Import prosa.model.readiness.basic.
 
 
@@ -185,7 +187,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
                 + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                 + bound_on_total_hep_workload  A (A + F) /\
         F + (task_cost tsk - task_rtct tsk) <= R.
-
   
   (** To use the theorem uniprocessor_response_time_bound_seq from the Abstract RTA module, 
      we need to specify functions of interference, interfering workload and IBF.  *)
@@ -227,8 +228,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         { exfalso; clear HYP1 HYP2.
           eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto 2 with basic_facts.
           move: BUSY => [PREF _].
-            by eapply not_quiet_implies_not_idle; eauto 2 with basic_facts.
-        }
+          by eapply not_quiet_implies_not_idle; eauto 2 with basic_facts. }
         { clear EqSched_jo; move: Sched_jo; rewrite scheduled_at_def; move => /eqP EqSched_jo.
           rewrite EqSched_jo in HYP1, HYP2. 
           move: HYP1 HYP2.
@@ -585,7 +585,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             eapply leq_trans. eapply total_service_is_bounded_by_total_workload; eauto 2.
             eapply leq_trans. eapply reorder_summation; eauto 2.
             eapply leq_trans. eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
-              by done.          
+            by done. 
       Qed.
 
     End TaskInterferenceIsBoundedByIBF.

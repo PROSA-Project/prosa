@@ -145,7 +145,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       bound for the more concrete model of fixed preemption points. *)
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-    
+
   Theorem uniprocessor_response_time_bound_fp_with_fixed_preemption_points:
     response_time_bounded_by tsk R.  
   Proof.
@@ -155,7 +155,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     { intros j ARR TSK.
       move: (H_valid_job_cost _ ARR) => POSt.
       move: POSt; rewrite /valid_job_cost TSK ZERO leqn0; move => /eqP Z.
-        by rewrite /job_response_time_bound /completed_by Z.
+      by rewrite /job_response_time_bound /completed_by Z.
     }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments
       with (L0 := L).

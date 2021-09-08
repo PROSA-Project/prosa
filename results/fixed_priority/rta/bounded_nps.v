@@ -79,7 +79,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
-
+  
   (** ... assume that all jobs come from the task set, ... *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
   
@@ -159,7 +159,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           by inversion JINB as [ta' [JIN' _]]; exists ta'.
       }
     Qed.
-    
+
     (** Using the above lemma, we prove that the priority inversion of the task is bounded by blocking_bound. *) 
     Lemma priority_inversion_is_bounded:
       priority_inversion_is_bounded_by

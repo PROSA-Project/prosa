@@ -74,7 +74,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
-  Hypothesis H_work_conserving : work_conserving arr_seq sched.
+  Hypothesis H_work_conserving : work_conserving arr_seq sched.  
   
   (** ... and the schedule respects the policy defined by the
       job_preemptable function (i.e., jobs have bounded nonpreemptive

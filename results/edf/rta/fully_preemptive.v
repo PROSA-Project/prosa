@@ -139,7 +139,8 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       move: H_R_is_maximum => [F [FIX BOUND]].
       exists F; split.
       + by rewrite BLOCK add0n subnn subn0. 
-      + by rewrite subnn addn0. 
+      + by rewrite subnn addn0.
   Qed.
-
+    
 End RTAforFullyPreemptiveEDFModelwithArrivalCurves.
+

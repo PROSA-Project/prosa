@@ -7,7 +7,7 @@ Require Export prosa.model.task.concept.
 Require Export prosa.model.processor.ideal.
 
 (** * Schedule of task *)
-(** In this section we define properties of schedule of a task *)
+(** In this section we define properties of the schedule of a task. *)
 Section ScheduleOfTask.
  
   (** Consider any type of tasks ... *)
@@ -40,8 +40,8 @@ Section ScheduleOfTask.
   Definition task_service_during (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) task_service_at t.
 
-  (** ...and the cumulative service received by [tsk] up to time t2,
+  (** ...and the cumulative service received by [tsk] up to time [t2],
        i.e., in the interval <<[0, t2)>>. *)
-  Definition task_service (t2 : instant) := task_service_during 0 t2.
+  Definition task_service (t2 : instant) := task_service_during 0 t2.  
 
 End ScheduleOfTask. 

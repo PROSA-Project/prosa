@@ -28,7 +28,7 @@ Section ExistsBusyIntervalJLFP.
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  
+
   (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence:
@@ -62,7 +62,7 @@ Section ExistsBusyIntervalJLFP.
   Let busy_interval t1 t2 := busy_interval arr_seq sched j t1 t2.
   Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by arr_seq sched j K.
   
-  (** We begin by proving a basic lemma about completion of the job within its busy interval. *)
+  (** We begin by proving a basic lemma about busy intervals. *)
   Section BasicLemma.
 
     (** Assume that the priority relation is reflexive. *)
@@ -72,7 +72,7 @@ Section ExistsBusyIntervalJLFP.
     Variable t1 t2 : instant.
     Hypothesis H_busy_interval : busy_interval t1 t2.
     
-    (** We prove that job j completes by the end of the busy interval. *)
+    (** We prove that job [j] completes by the end of the busy interval. *)
     Lemma job_completes_within_busy_interval: 
       job_completed_by j t2.
     Proof.
@@ -85,17 +85,17 @@ Section ExistsBusyIntervalJLFP.
   End BasicLemma.
   
   (** In this section, we prove that during a busy interval there
-         always exists a pending job. *)
+      always exists a pending job. *)
   Section ExistsPendingJob.
     
-    (** Let [[t1, t2]] be any interval where time t1 is quiet and time t2 is not quiet. *)
+    (** Let <<[t1, t2]>> be any interval where time [t1] is quiet and time [t2] is not quiet. *)
     Variable t1 t2 : instant.
     Hypothesis H_interval : t1 <= t2.
     Hypothesis H_quiet : quiet_time t1.
     Hypothesis H_not_quiet : ~ quiet_time t2.
     
-    (** Then, we prove that there is a job pending at time t2
-         that has higher or equal priority (with respect of [tsk]). *)
+    (** Then, we prove that there is a job pending at time [t2]
+        that has higher or equal priority (with respect to [tsk]). *)
     Lemma not_quiet_implies_exists_pending_job:
       exists j_hp,
         arrives_in arr_seq j_hp /\
@@ -110,7 +110,7 @@ Section ExistsBusyIntervalJLFP.
         move: (ARR) => INarr.
         apply in_arrivals_implies_arrived_between in ARR; last by done.
         apply in_arrivals_implies_arrived in INarr.
-          by exists j_hp; repeat split; last by apply/negP.
+        by exists j_hp; repeat split; last by apply/negP.
       }
       {
         apply negbT in COMP; rewrite -all_predC in COMP.
@@ -119,15 +119,15 @@ Section ExistsBusyIntervalJLFP.
         destruct (ltnP (job_arrival j_hp) t1) as [BEFORE | AFTER];
           first by specialize (QUIET j_hp IN HP BEFORE); apply completion_monotonic with (t := t1).
         feed (COMP j_hp).
-          by eapply arrived_between_implies_in_arrivals; eauto 1; apply/andP; split.
-            by rewrite /= HP andbT negbK in COMP.
+        { by eapply arrived_between_implies_in_arrivals; eauto 1; apply/andP; split. } 
+        by rewrite /= HP andbT negbK in COMP.
       }
     Qed.
 
   End ExistsPendingJob.
   
   (** In this section, we prove that during a busy interval the
-         processor is never idle. *)
+      processor is never idle. *)
   Section ProcessorAlwaysBusy.
 
     (** Assume that the schedule is work-conserving ... *)
@@ -141,8 +141,8 @@ Section ExistsBusyIntervalJLFP.
     Variable t1 t2 : instant.
     Hypothesis H_busy_interval_prefix : busy_interval_prefix t1 t2.
 
-    (** We prove that if the processor is idle at a time instant t, then 
-           the next time instant [t+1] will be a quiet time. *)
+    (** We prove that if the processor is idle at a time instant [t],
+        then the next time instant [t+1] will be a quiet time. *)
     Lemma idle_time_implies_quiet_time_at_the_next_time_instant:
       forall (t : instant),
         is_idle sched t ->
@@ -161,12 +161,12 @@ Section ExistsBusyIntervalJLFP.
         - by move: IDLE => /eqP IDLE; rewrite /scheduled_at scheduled_in_def IDLE. 
       }
       move: IDLE WC => /eqP IDLE [jo SCHED].
-        by rewrite scheduled_at_def IDLE in SCHED.
+      by rewrite scheduled_at_def IDLE in SCHED.
     Qed.
-
-    (** Next, we prove that at any time instant t within the busy interval there exists a job 
-           [jhp] such that (1) job [jhp] is pending at time [t] and (2) job [jhp] has higher-or-equal
-           priority than task [tsk]. *)
+    
+    (** Next, we prove that at any time instant [t] within the busy interval there exists a job 
+        [jhp] such that (1) job [jhp] is pending at time [t] and (2) job [jhp] has higher-or-equal
+        priority than task [tsk]. *)
     Lemma pending_hp_job_exists:
       forall t,
         t1 <= t < t2 ->
@@ -194,7 +194,7 @@ Section ExistsBusyIntervalJLFP.
           - move: T => [ARR [PEN HP]].
             rewrite mem_filter; apply/andP; split; first (apply/andP; split); try done.
             eapply arrived_between_implies_in_arrivals; try done.
-              by apply/andP; split; last rewrite ltnS; move: PEN => /andP [T _].
+            by apply/andP; split; last rewrite ltnS; move: PEN => /andP [T _].
         } move: EX => [hp__seq SE]; case FL: (hp__seq) => [ | jhp jhps].
         + subst hp__seq; exfalso.
           move: GE; rewrite leq_eqVlt; move => /orP [/eqP EQ| GE].
@@ -206,14 +206,14 @@ Section ExistsBusyIntervalJLFP.
             repeat split; try done; first apply/andP; split; try done.
             apply/negP; intros COMLP.
             move: NCOMP => /negP NCOMP; apply: NCOMP.
-              by apply completion_monotonic with t1.
+            by apply completion_monotonic with t1.
           * apply NQT with t; first by apply/andP; split.
             intros jhp ARR HP ARRB; apply negbNE; apply/negP; intros NCOMP.
             move: (SE jhp) => [_ SE2].
             rewrite in_nil in SE2; feed SE2; [clear SE2 | by done].
               by repeat split; auto; apply/andP; split; first apply ltnW.
         + move: (SE jhp)=> [SE1 _]; subst; clear SE.
-            by exists jhp; apply SE1; rewrite in_cons; apply/orP; left.
+          by exists jhp; apply SE1; rewrite in_cons; apply/orP; left.
     Qed.
     
     (** We prove that at any time instant [t] within <<[t1, t2)>> the processor is not idle. *)
@@ -249,19 +249,20 @@ Section ExistsBusyIntervalJLFP.
     Variable t1 : instant.
     Hypothesis H_quiet_time : quiet_time t1.
     
-    (** Assume that there is no quiet time in the interval (t1, t1 + Δ]. *)
+    (** Assume that there is no quiet time in the interval <<(t1, t1 + Δ]>>. *)
     Variable Δ : duration.
     Hypothesis H_no_quiet_time : forall t, t1 < t <= t1 + Δ -> ~ quiet_time t.
 
-    (** For clarity, we introduce a notion of the total service of jobs released in 
-           time interval <<[t_beg, t_end)>> during the time interval [t1, t1 + Δ). *)
+    (** For clarity, we introduce a notion of the total service of
+        jobs released in time interval <<[t_beg, t_end)>> during the
+        time interval <<[t1, t1 + Δ)>>. *)
     Let service_received_by_hep_jobs_released_during t_beg t_end :=
       service_of_higher_or_equal_priority_jobs
         sched (arrivals_between t_beg t_end) j t1 (t1 + Δ).
 
     (** We prove that jobs with higher-than-or-equal priority that
-           released before time instant t1 receive no service after 
-           time instant t1. *)
+        released before time instant [t1] receive no service after time
+        instant [t1]. *)
     Lemma hep_jobs_receive_no_service_before_quiet_time:
       service_received_by_hep_jobs_released_during t1 (t1 + Δ) =
       service_received_by_hep_jobs_released_during 0 (t1 + Δ).
@@ -328,10 +329,8 @@ Section ExistsBusyIntervalJLFP.
             apply H_jobs_come_from_arrival_sequence with t'; try done.
             apply/andP; split; first by done.
             apply H_jobs_must_arrive_to_execute in Sched_jo.
-              by apply leq_ltn_trans with t'. 
-          - by rewrite lt0b -scheduled_at_def. 
-        }
-      }
+            by apply leq_ltn_trans with t'. 
+          - by rewrite lt0b -scheduled_at_def. } }
     Qed.
     
   End QuietTimeAndServiceOfJobs.
@@ -352,14 +351,15 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_priority_is_reflexive: reflexive_priorities.
     Hypothesis H_priority_is_transitive: transitive_priorities.
     
-    (** Next, we recall the notion of workload of all jobs released in a given interval
-           <<[t1, t2)>> that have higher-or-equal priority w.r.t the job j being analyzed. *)
+    (** Next, we recall the notion of workload of all jobs released in
+        a given interval <<[t1, t2)>> that have higher-or-equal
+        priority w.r.t. the job [j] being analyzed. *)
     Let hp_workload t1 t2 :=
       workload_of_higher_or_equal_priority_jobs j (arrivals_between t1 t2).
 
     (** With regard to the jobs with higher-or-equal priority that are released
            in a given interval <<[t1, t2)>>, we also recall the service received by these
-           jobs in the same interval [t1, t2). *)
+           jobs in the same interval <<[t1, t2)>>. *)
     Let hp_service t1 t2 :=
       service_of_higher_or_equal_priority_jobs
         sched (arrivals_between t1 t2) j t1 t2.
@@ -367,15 +367,15 @@ Section ExistsBusyIntervalJLFP.
     (** Now we begin the proof. First, we show that the busy interval is bounded. *)
     Section BoundingBusyInterval.
 
-      (** Suppose that job j is pending at time t_busy. *)
+      (** Suppose that job [j] is pending at time [t_busy]. *)
       Variable t_busy : instant.
       Hypothesis H_j_is_pending : job_pending_at j t_busy.
       
       (** First, we show that there must exist a busy interval prefix. *)
       Section LowerBound.
 
-        (** Since job j is pending, there is a (potentially unbounded)
-               busy interval that starts no later than with the arrival of j. *)
+        (** Since job [j] is pending, there is a (potentially unbounded)
+            busy interval that starts no later than with the arrival of [j]. *)
         Lemma exists_busy_interval_prefix:
           exists t1,
             busy_interval_prefix t1 t_busy.+1 /\
@@ -422,43 +422,46 @@ Section ExistsBusyIntervalJLFP.
         Qed.             
 
       End LowerBound.
-      
-      (** Next we prove that, if there is a point where the requested workload
-             is upper-bounded by the supply, then the busy interval eventually ends. *)
+
+      (** Next we prove that, if there is a point where the requested
+          workload is upper-bounded by the supply, then the busy
+          interval eventually ends. *)
       Section UpperBound.
 
-        (** Consider any busy interval prefix of job j. *)
+        (** Consider any busy interval prefix of job [j]. *)
         Variable t1 : instant.
         Hypothesis H_is_busy_prefix : busy_interval_prefix t1 t_busy.+1.
         
-        (** Let priority_inversion_bound be a constant which bounds
-             length of a priority inversion. *)
+        (** Let [priority_inversion_bound] be a constant that bounds
+            the length of any priority inversion. *)
         Variable priority_inversion_bound: instant.
         Hypothesis H_priority_inversion_is_bounded:
           is_priority_inversion_bounded_by priority_inversion_bound.
         
         (** Next, assume that for some positive delta, the sum of requested workload
-               at time [t1 + delta] and constant priority_inversion_bound is bounded by 
-               delta (i.e., the supply). *)
+            at time [t1 + delta] and constant priority_inversion_bound is bounded by 
+            delta (i.e., the supply). *)
         Variable delta : duration.
         Hypothesis H_delta_positive : delta > 0.
         Hypothesis H_workload_is_bounded :
           priority_inversion_bound + hp_workload t1 (t1 + delta) <= delta.
 
-        (** If there is a quiet time by time (t1 + delta), it trivially follows that
-               the busy interval is bounded.
-               Thus, let's consider first the harder case where there is no quiet time,
-               which turns out to be impossible. *)
+        (** If there is a quiet time by time [t1 + delta], it
+            trivially follows that the busy interval is bounded.
+            Thus, let's consider first the harder case where there is
+            no quiet time, which turns out to be impossible. *)
         Section CannotBeBusyForSoLong.
           
-          (** Assume that there is no quiet time in the interval (t1, t1 + delta]. *)
+          (** Assume that there is no quiet time in the interval <<(t1, t1 + delta]>>. *)
           Hypothesis H_no_quiet_time:
             forall t, t1 < t <= t1 + delta -> ~ quiet_time t.                
 
-          (** Since the interval is always non-quiet, the processor is always busy
-                 with tasks of higher-or-equal priority or some lower priority job which was scheduled,
-                 i.e., the sum of service done by jobs with actual arrival time in <<[t1, t1 + delta)>> 
-                 and priority inversion equals delta. *)
+          (** Since the interval is always non-quiet, the processor is
+              always busy with tasks of higher-or-equal priority or
+              some lower priority job which was scheduled, i.e., the
+              sum of service done by jobs with actual arrival time in
+              <<[t1, t1 + delta)>> and priority inversion equals
+              [delta]. *)
           Lemma busy_interval_has_uninterrupted_service: 
             delta <= priority_inversion_bound + hp_service t1 (t1 + delta).
           Proof. 
@@ -479,7 +482,7 @@ Section ExistsBusyIntervalJLFP.
                 apply leq_sum_seq; move => t II _.
                 rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
                 case SCHED: (sched t) => [j1 | ]; simpl; first last.
-                { rewrite leqn0 big1_seq //. }
+                { by rewrite leqn0 big1_seq //. }
                 { case PRIO1: (hep_job j1 j); simpl; first last.
                   - rewrite <- SCHED.
                     have SCH := service_of_jobs_le_1 sched _ _ _ t; eauto using arrivals_uniq. 
@@ -488,22 +491,23 @@ Section ExistsBusyIntervalJLFP.
                     case EQ: (j1 == j2).
                     + by move: EQ => /eqP EQ; subst j2; rewrite PRIO1 in PRIO2.
                     + apply/eqP; rewrite eqb0; apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
-                        by inversion CONTR; clear CONTR; subst j2; rewrite PRIO1 in PRIO2. } } }
+                      by inversion CONTR; clear CONTR; subst j2; rewrite PRIO1 in PRIO2. } } }
             { rewrite leq_add2r.
               destruct (t1 + delta <= t_busy.+1) eqn:NEQ; [ | apply negbT in NEQ; rewrite -ltnNge in NEQ].
               - apply leq_trans with (cumulative_priority_inversion sched j t1 t_busy.+1); last eauto 2.
-                  by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + delta)) //=; rewrite leq_addr.
+                by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + delta)) //=; rewrite leq_addr.
               -  apply H_priority_inversion_is_bounded; repeat split; try done.
                  + by rewrite -addn1 leq_add2l.
                  + move => t' /andP [LT GT]; apply H_no_quiet_time.
-                     by apply/andP; split; [ | rewrite ltnW ].
+                   by apply/andP; split; [ | rewrite ltnW ].
                  + move: EXj => /andP [T1 T2].
-                     by apply/andP; split; [done | apply ltn_trans with (t_busy.+1)].
+                   by apply/andP; split; [done | apply ltn_trans with (t_busy.+1)].
             }
           Qed.
           
-          (** Moreover, the fact that the interval is not quiet also implies
-                 that there's more workload requested than service received. *)
+          (** Moreover, the fact that the interval is not quiet also
+              implies that there's more workload requested than
+              service received. *)
           Lemma busy_interval_too_much_workload:
             hp_workload t1 (t1 + delta) > hp_service t1 (t1 + delta).
           Proof.
@@ -543,8 +547,9 @@ Section ExistsBusyIntervalJLFP.
               by rewrite ltnNge; apply/negP.
           Qed.               
           
-          (** Using the two lemmas above, we infer that the workload is larger than the
-                 interval length. However, this contradicts the assumption H_workload_is_bounded. *)
+          (** Using the two lemmas above, we infer that the workload
+              is larger than the interval length. However, this
+              contradicts the assumption [H_workload_is_bounded]. *)
           Corollary busy_interval_workload_larger_than_interval:
             priority_inversion_bound + hp_workload t1 (t1 + delta)  > delta.
           Proof.
@@ -556,13 +561,14 @@ Section ExistsBusyIntervalJLFP.
           
         End CannotBeBusyForSoLong.  
 
-        (** Since the interval cannot remain busy for so long, we prove that
-               the busy interval finishes at some point t2 <= t1 + delta. *)
+        (** Since the interval cannot remain busy for so long, we
+            prove that the busy interval finishes at some point [t2 <=
+            t1 + delta]. *)
         Lemma busy_interval_is_bounded:
           exists t2,
             t2 <= t1 + delta /\
             busy_interval t1 t2.
-        Proof. 
+        Proof.
           move: H_is_busy_prefix => [LT [QT [NQ NEQ]]].
           destruct ([exists t2:'I_(t1 + delta).+1, (t2 > t1) && quiet_time_dec t2]) eqn:EX.
           - have EX': exists (t2 : instant), ((t1 < t2 <= t1 + delta) && quiet_time_dec t2).
@@ -605,11 +611,11 @@ Section ExistsBusyIntervalJLFP.
         Qed.
         
       End UpperBound.
-
+      
     End BoundingBusyInterval.
 
-    (** In this section, we show that from a workload bound we can infer
-           the existence of a busy interval. *)
+    (** In this section, we show that from a workload bound we can
+        infer the existence of a busy interval. *) 
     Section BusyIntervalFromWorkloadBound.
 
       (** Let priority_inversion_bound be a constant that bounds the length of a priority inversion. *)
@@ -618,18 +624,18 @@ Section ExistsBusyIntervalJLFP.
         is_priority_inversion_bounded_by priority_inversion_bound.
 
       (** Assume that for some positive delta, the sum of requested workload at
-             time (t1 + delta) and priority inversion is bounded by delta (i.e., the supply). *)
+             time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
       Variable delta: duration.
       Hypothesis H_delta_positive: delta > 0.
       Hypothesis H_workload_is_bounded:
         forall t, priority_inversion_bound + hp_workload t (t + delta) <= delta.
 
-      (** Next, we assume that job j has positive cost, from which we can
-             infer that there is a time in which j is pending. *)
+      (** Next, we assume that job [j] has positive cost, from which we
+          can infer that there is a time in which [j] is pending. *)
       Hypothesis H_positive_cost: job_cost j > 0.
 
       (** Therefore there must exists a busy interval <<[t1, t2)>> that
-             contains the arrival time of j. *)
+          contains the arrival time of [j]. *)
       Corollary exists_busy_interval:
         exists t1 t2, 
           t1 <= job_arrival j < t2 /\
@@ -660,11 +666,12 @@ Section ExistsBusyIntervalJLFP.
         }
           by split. 
       Qed.
+
       
     End BusyIntervalFromWorkloadBound.
 
     (** If we know that the workload is bounded, we can also use the
-           busy interval to infer a response-time bound. *)
+        busy interval to infer a response-time bound. *)
     Section ResponseTimeBoundFromBusyInterval.
 
       (** Let priority_inversion_bound be a constant that bounds the length of a priority inversion. *)
@@ -673,13 +680,13 @@ Section ExistsBusyIntervalJLFP.
         is_priority_inversion_bounded_by priority_inversion_bound.
 
       (** Assume that for some positive delta, the sum of requested workload at
-             time (t1 + delta) and priority inversion is bounded by delta (i.e., the supply). *)
+             time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
       Variable delta: duration.
       Hypothesis H_delta_positive: delta > 0.
       Hypothesis H_workload_is_bounded:
         forall t, priority_inversion_bound + hp_workload t (t + delta) <= delta.
 
-      (** Then, job j must complete by (job_arrival j + delta). *)
+      (** Then, job [j] must complete by [job_arrival j + delta]. *)
       Lemma busy_interval_bounds_response_time:
         job_completed_by j (job_arrival j + delta).
       Proof.
@@ -696,5 +703,5 @@ Section ExistsBusyIntervalJLFP.
     End ResponseTimeBoundFromBusyInterval.
 
   End BoundingBusyInterval.
-
+  
 End ExistsBusyIntervalJLFP.

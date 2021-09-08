@@ -149,13 +149,12 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
     move: (LIMJ) => [BEG [END _]].
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L).
     all: eauto 2 with basic_facts.
-    { rewrite subnn.
-      intros A SP.
-      apply H_R_is_maximum in SP.
-      move: SP => [F [EQ LE]].
-      exists F.
-        by rewrite subn0 addn0; split.
-    }
+    rewrite subnn.
+    intros A SP.
+    apply H_R_is_maximum in SP.
+    move: SP => [F [EQ LE]].
+    exists F.
+    by rewrite subn0 addn0; split.
   Qed.
-
+  
 End RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.

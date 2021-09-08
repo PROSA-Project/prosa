@@ -84,9 +84,9 @@ Section ExistsNoCarryIn.
       { by apply/andP; split; [apply ltnW | done]. }
     }
     move: NIDLE => [j' SCHED].
-      by rewrite scheduled_at_def IDLE in SCHED.
+    by rewrite scheduled_at_def IDLE in SCHED.
   Qed.
-  
+
   (** Moreover, an idle time implies no carry in at the next time instant. *)
   Lemma idle_instant_implies_no_carry_in_at_t_pl_1 :
     forall t,
@@ -106,7 +106,7 @@ Section ExistsNoCarryIn.
       }  
     }
     move: NIDLE => [j' SCHED].
-      by rewrite scheduled_at_def IDLE in SCHED.
+    by rewrite scheduled_at_def IDLE in SCHED.
   Qed.
   
   (** Let the priority relation be reflexive. *)
@@ -129,33 +129,34 @@ Section ExistsNoCarryIn.
   Hypothesis H_delta_positive: Δ > 0.
   Hypothesis H_workload_is_bounded: forall t, total_workload t (t + Δ) <= Δ.
 
-  (** Next we prove that since for any time instant t there is a point where 
-         the total workload is upper-bounded by the supply the processor encounters 
-         no carry-in instants at least every Δ time units. *)
+  (** Next we prove that, since for any time instant [t] there is a
+      point where the total workload is upper-bounded by the supply,
+      the processor encounters no-carry-in instants at least every [Δ]
+      time units. *)
   Section ProcessorIsNotTooBusy.
 
-    (** We start by proving that the processor has no carry-in at 
-           the beginning (i.e., has no carry-in at time instant 0). *)
+    (** We start by proving that the processor has no carry-in at the
+        beginning (i.e., has no carry-in at time instant [0]). *)
     Lemma no_carry_in_at_the_beginning :
       no_carry_in 0.
     Proof.
       intros s ARR AB; exfalso.
-        by rewrite /arrived_before ltn0 in AB.
+      by rewrite /arrived_before ltn0 in AB.
     Qed.
 
-    (** In this section, we prove that for any time instant t there
-           exists another time instant t' ∈ (t, t + Δ] such that the 
-           processor has no carry-in at time t'. *)
+    (** In this section, we prove that for any time instant [t] there
+        exists another time instant <<t' ∈ (t, t + Δ]>> such that the
+        processor has no carry-in at time [t']. *)
     Section ProcessorIsNotTooBusyInduction. 
 
-      (** Consider an arbitrary time instant t... *)
-      Variable t: duration.
+      (** Consider an arbitrary time instant [t]... *)
+      Variable t : duration.
       
-      (** ...such that the processor has no carry-in at time t. *)
-      Hypothesis H_no_carry_in: no_carry_in t.
+      (** ...such that the processor has no carry-in at time [t]. *)
+      Hypothesis H_no_carry_in : no_carry_in t.
 
       (** First, recall that the total service is bounded by the total workload. Therefore
-             the total service of jobs in the interval <<[t, t + Δ)>> is bounded by Δ. *)
+             the total service of jobs in the interval <<[t, t + Δ)>> is bounded by [Δ]. *)
       Lemma total_service_is_bounded_by_Δ :
         total_service t (t + Δ) <= Δ.
       Proof.
@@ -166,12 +167,12 @@ Section ExistsNoCarryIn.
       Qed.
 
       (** Next we consider two cases: 
-             (1) The case when the total service is strictly less than Δ, 
-             (2) And when the total service is equal to Δ. *)
+          (1) The case when the total service is strictly less than [Δ], and
+          (2) the case when the total service is equal to [Δ]. *)
 
-      (** In the first case, we use the pigeonhole principle to conclude 
-             that there is an idle time instant; which in turn implies existence
-             of a time instant with no carry-in. *)
+      (** In the first case, we use the pigeonhole principle to
+          conclude that there is an idle time instant; which in turn
+          implies existence of a time instant with no carry-in. *)
       Lemma low_total_service_implies_existence_of_time_with_no_carry_in :
         total_service t (t + Δ) < Δ ->
         exists δ, δ < Δ /\ no_carry_in (t.+1 + δ).
@@ -185,7 +186,7 @@ Section ExistsNoCarryIn.
           rewrite addn0; subst t_idle.
           intros s ARR BEF.
           apply idle_instant_implies_no_carry_in_at_t_pl_1 in IDLE; try done.
-            by apply IDLE.
+          by apply IDLE.
         }
         have EX: exists γ, t_idle = t + γ.
         { by exists (t_idle - t); rewrite subnKC // ltnW. }
@@ -195,13 +196,16 @@ Section ExistsNoCarryIn.
         - apply leq_trans with γ. by rewrite prednK. by rewrite ltnW.
         - rewrite -subn1 -addn1 -addnA subnKC //.
           intros s ARR BEF.
-            by apply idle_instant_implies_no_carry_in_at_t.
+          by apply idle_instant_implies_no_carry_in_at_t.
       Qed.
-      
-      (** In the second case, the total service within the time interval <<[t, t + Δ)>> is equal to Δ. 
-             On the other hand, we know that the total workload is lower-bounded by the total service
-             and upper-bounded by Δ. Therefore, the total workload is equal to total service this
-             implies completion of all jobs by time [t + Δ] and hence no carry-in at time [t + Δ]. *)
+             
+      (** In the second case, the total service within the time
+          interval <<[t, t + Δ)>> is equal to [Δ]. On the other hand,
+          we know that the total workload is lower-bounded by the
+          total service and upper-bounded by [Δ]. Therefore, the total
+          workload is equal to the total service, which implies
+          completion of all jobs by time [t + Δ] and hence no carry-in
+          at time [t + Δ]. *)
       Lemma completion_of_all_jobs_implies_no_carry_in :
         total_service t (t + Δ) = Δ ->
         no_carry_in (t + Δ).
@@ -231,7 +235,7 @@ Section ExistsNoCarryIn.
           rewrite -service_of_jobs_cat_arrival_interval; last first.
           apply/andP; split; [by done| by rewrite leq_addr].
           rewrite EQserv.
-            by apply H_workload_is_bounded.
+          by apply H_workload_is_bounded.
         }  
         intros s ARR BEF.
         eapply workload_eq_service_impl_all_jobs_have_completed; eauto 2; try done.
@@ -240,7 +244,7 @@ Section ExistsNoCarryIn.
 
     End ProcessorIsNotTooBusyInduction.
 
-    (** Finally, we show that any interval of length Δ contains a time instant with no carry-in. *)
+    (** Finally, we show that any interval of length [Δ] contains a time instant with no carry-in. *)
     Lemma processor_is_not_too_busy :
       forall t, exists δ, δ < Δ /\ no_carry_in (t + δ).
     Proof.
@@ -259,16 +263,16 @@ Section ExistsNoCarryIn.
         - by apply low_total_service_implies_existence_of_time_with_no_carry_in. 
       }
     Qed.
-    
+         
   End ProcessorIsNotTooBusy.
   
-  (** Consider an arbitrary job j with positive cost. *)
+  (** Consider an arbitrary job [j] with positive cost. *)
   Variable j : Job.
   Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
   Hypothesis H_job_cost_positive : job_cost_positive j.    
 
   (** We show that there must exist a busy interval <<[t1, t2)>> that
-         contains the arrival time of j. *)
+      contains the arrival time of [j]. *)
   Corollary exists_busy_interval_from_total_workload_bound :
     exists t1 t2, 
       t1 <= job_arrival j < t2 /\
@@ -294,7 +298,7 @@ Section ExistsNoCarryIn.
       move: (PREFIX) => [_ [_ [NQT _]]].
       move: (NQT t2); clear NQT; move  => NQT.
       feed NQT; first by (apply/andP; split; [|rewrite ltnS]). 
-        by apply: NQT; apply/quiet_time_P.
+      by apply: NQT; apply/quiet_time_P.
     }
     exists t2; split; last split; first by done. 
     { apply leq_trans with (t1.+1 + δ); [by done | by rewrite addSn ltn_add2l]. }
@@ -305,7 +309,7 @@ Section ExistsNoCarryIn.
           + by apply/andP; split; last (apply leq_trans with t2; [apply ltnW | ]).
           + by apply/quiet_time_P.
         }
-          by move: LTt; rewrite ltnNge; move => /negP LTt; apply: LTt.
+        by move: LTt; rewrite ltnNge; move => /negP LTt; apply: LTt.
       - by apply/quiet_time_P. 
     }
   Qed.

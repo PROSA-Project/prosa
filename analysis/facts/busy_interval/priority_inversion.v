@@ -186,14 +186,14 @@ Section PriorityInversionIsBounded.
       Variable t : instant.
       Hypothesis H_t_in_busy_interval : t1 <= t < t2.
       Hypothesis H_t_preemption_time : preemption_time sched t.
-
+      
       (** First note since [t] lies inside the busy interval, 
           the processor cannot be idle at time [t]. *)
       Lemma instant_t_is_not_idle:
         ~ is_idle sched t.
       Proof.
-        intros Idle.
-          by exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2.
+        intros IDLE.
+        by exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2.
       Qed.
       
       (** Next we consider two cases: (1) when [t] is less than [t2 - 1] and (2) [t] is equal to [t2 - 1]. *)
@@ -207,8 +207,8 @@ Section PriorityInversionIsBounded.
         rewrite leq_eqVlt in TEMP; move: TEMP => /orP [/eqP EQUALt2m1 | LTt2m1].
         - right; auto.
         - left; auto.
-      Qed.      
-
+      Qed.
+      
       (** In case when [t < t2 - 1], we use the fact that time instant
           [t+1] is not a quiet time. The later implies that there is a
           pending higher-or-equal priority job at time [t]. Thus, the
@@ -327,8 +327,8 @@ Section PriorityInversionIsBounded.
         have COMP: job_completed_by jhp t by apply completion_monotonic with (t0 := t1).
         apply completed_implies_not_scheduled in COMP; last by done.
           by move: COMP => /negP COMP; apply COMP.
-      Qed.      
-
+      Qed.
+      
       (** From the above lemmas we prove that there is a job [jhp] that is (1) scheduled at time [t],
           (2) has higher-or-equal priority, and (3) arrived between [t1] and [t2].   *)
       Corollary not_quiet_implies_exists_scheduled_hp_job_at_preemption_point:
@@ -346,8 +346,8 @@ Section PriorityInversionIsBounded.
         - by apply scheduled_at_preemption_time_implies_arrived_between_within_busy_interval.
         - by apply scheduled_at_preemption_time_implies_higher_or_equal_priority.
         - by done.
-      Qed.        
-
+      Qed.
+      
     End ProcessorBusyWithHEPJobAtPreemptionPoints.
     
     (** Next we prove that every nonpreemptive segment 
@@ -445,7 +445,7 @@ Section PriorityInversionIsBounded.
       apply completed_implies_not_scheduled in COMP; last by done.
         by move: COMP => /negP COMP; apply COMP.
     Qed.
-
+    
     (** Now, suppose there exists some constant K that bounds the distance to 
        a preemption time from the beginning of the busy interval. *)
     Variable K : duration.
@@ -465,11 +465,11 @@ Section PriorityInversionIsBounded.
       move => t /andP [GE LT].
       move: H_preemption_time_exists => [prt [PR /andP [GEprt LEprt]]].
       apply not_quiet_implies_exists_scheduled_hp_job_after_preemption_point with (tp := prt); eauto 2. 
-      -  apply/andP; split; first by done.
-         apply leq_ltn_trans with (t1 + K); first by done.
-           by apply leq_ltn_trans with t.
+      - apply/andP; split; first by done.
+        apply leq_ltn_trans with (t1 + K); first by done.
+        by apply leq_ltn_trans with t.
       - apply/andP; split; last by done.
-          by apply leq_trans with (t1 + K).
+        by apply leq_trans with (t1 + K).
     Qed.
     
   End PreemptionTimeAndPriorityInversion.
@@ -521,7 +521,7 @@ Section PriorityInversionIsBounded.
       move: LP => /negP LP; apply: LP.
         by have ->: jlp = jhp by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
     Qed.
-
+     
     (** Moreover, we show that lower-priority jobs that are scheduled
         inside the busy-interval prefix <<[t1,t2)>> must be scheduled
         before that interval. *)
@@ -555,7 +555,7 @@ Section PriorityInversionIsBounded.
       - by rewrite -addn1 in LT2; apply subh3 in LT2; rewrite subn1 in LT2.
       - by apply leq_trans with t1; first apply leq_pred. 
     Qed.
-
+    
     (** Thus, there must be a preemption time in the interval [t1, t1
         + max_priority_inversion t1]. That is, if a job with
         higher-or-equal priority is scheduled at time instant t1, then

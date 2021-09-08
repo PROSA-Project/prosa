@@ -33,14 +33,14 @@ Section Composition.
       t1 >= t2 -> service_during sched j t1 t2 = 0.
   Proof.
     move=> t1 t2 t1t2.
-    rewrite /service_during big_geq //.
+    by rewrite /service_during big_geq //.
   Qed.
 
   (** Equally trivially, no job has received service prior to time zero. *)
   Corollary service0:
     service sched j 0 = 0.
   Proof.
-    rewrite /service service_during_geq //.
+    by rewrite /service service_during_geq //.
   Qed.
 
   (** Trivially, an interval consisting of one time unit is equivalent to
@@ -50,7 +50,7 @@ Section Composition.
       service_during sched j t t.+1 = service_at sched j t.
   Proof.
     move => t.
-     by rewrite /service_during big_nat_recr ?big_geq //.
+    by rewrite /service_during big_nat_recr ?big_geq //.
   Qed.
 
   (** Next, we observe that we can look at the service received during an
@@ -64,7 +64,7 @@ Section Composition.
       = service_during sched j t1 t3.
   Proof.
     move => t1 t2 t3 /andP [t1t2 t2t3].
-      by rewrite /service_during -big_cat_nat /=.
+    by rewrite /service_during -big_cat_nat /=.
   Qed.
 
   (** Since [service] is just a special case of [service_during], the same holds
@@ -76,7 +76,7 @@ Section Composition.
       = service sched j t2.
   Proof.
     move=> t1 t2 t1t2.
-    rewrite /service service_during_cat //.
+    by rewrite /service service_during_cat //.
   Qed.
 
   (** As a special case, we observe that the service during an interval can be
@@ -90,7 +90,7 @@ Section Composition.
     move => t1 t2 t1t2.
     have TIMES: t1 <= t1.+1 <= t2 by rewrite /(_ && _) ifT //.
     have SPLIT := service_during_cat t1 t1.+1 t2 TIMES.
-      by rewrite -service_during_instant //.
+    by rewrite -service_during_instant //.
   Qed.
 
   (** Symmetrically, we have the same for the end of the interval. *)
@@ -102,7 +102,7 @@ Section Composition.
   Proof.
     move=> t1 t2 t1t2.
     rewrite -(service_during_cat t1 t2 t2.+1); last by rewrite /(_ && _) ifT //.
-    rewrite service_during_instant //.
+    by rewrite service_during_instant //.
   Qed.
 
   (** And hence also for [service]. *)
@@ -112,7 +112,7 @@ Section Composition.
       = service sched j t.+1.
   Proof.
     move=> t.
-    rewrite /service. rewrite -service_during_last_plus_before //.
+    by rewrite /service -service_during_last_plus_before //.
   Qed.
 
   (** Finally, we deconstruct the service received during an interval <<[t1, t3)>>
@@ -126,7 +126,7 @@ Section Composition.
   Proof.
     move => t1 t2 t3 /andP [t1t2 t2t3].
     rewrite -addnA service_during_first_plus_later// service_during_cat// /(_ && _) ifT//.
-      by exact: ltnW.
+    by exact: ltnW.
   Qed.
 
 End Composition.
@@ -136,24 +136,24 @@ End Composition.
 Section UnitService.
 
   (** Consider any job type and any processor state. *)
-  Context {Job: JobType}.
-  Context {PState: Type}.
+  Context {Job : JobType}.
+  Context {PState : Type}.
   Context `{ProcessorState Job PState}.
 
   (** Let's consider a unit-service model... *)
   Hypothesis H_unit_service: unit_service_proc_model PState.
 
   (** ...and a given schedule. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Let [j] be any job that is to be scheduled. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (** First, we prove that the instantaneous service cannot be greater than 1, ... *)
   Lemma service_at_most_one:
     forall t, service_at sched j t <= 1.
   Proof.
-      by move=> t; rewrite /service_at.
+    by move=> t; rewrite /service_at.
   Qed.
 
   (** ...which implies that the cumulative service received by job [j] in any
@@ -176,31 +176,31 @@ Section UnitService.
     Proof.
       rewrite /is_step_function => t.
       rewrite addn1 -service_last_plus_before leq_add2l.
-      apply service_at_most_one.
+      by apply service_at_most_one.
     Qed.
 
     (** Next, consider any time [t]... *)
-    Variable t: instant.
+    Variable t : instant.
 
-    (** ...and let [s0] be any value less than the service received
+    (** ...and let [s] be any value less than the service received
        by job [j] by time [t]. *)
-    Variable s0: duration.
-    Hypothesis H_less_than_s: s0 < service sched j t.
+    Variable s : duration.
+    Hypothesis H_less_than_s: s < service sched j t.
 
-    (** Then, we show that there exists an earlier time [t0] where job [j] had [s0]
-       units of service. *)
+    (** Then, we show that there exists an earlier time [t'] where job
+       [j] had [s] units of service. *)
     Corollary exists_intermediate_service:
-      exists t0,
-        t0 < t /\
-        service sched j t0 = s0.
+      exists t',
+        t' < t /\
+        service sched j t' = s.
     Proof.
       feed (exists_intermediate_point (service sched j));
         [by apply service_is_a_step_function | intros EX].
       feed (EX 0 t); first by done.
-      feed (EX s0);
-        first by rewrite /service /service_during big_geq //.
-        by move: EX => /= [x_mid EX]; exists x_mid.
+      feed (EX s); first by rewrite /service /service_during big_geq //.
+      by move: EX => /= [x_mid EX]; exists x_mid.
     Qed.
+
   End ServiceIsAStepFunction.
 
 End UnitService.
@@ -226,7 +226,7 @@ Section Monotonicity.
       service sched j t1 <= service sched j t2.
   Proof.
     move=> t1 t2 let1t2.
-      by rewrite -(service_cat sched j t1 t2 let1t2); apply: leq_addr.
+    by rewrite -(service_cat sched j t1 t2 let1t2); apply: leq_addr.
   Qed.
 
 End Monotonicity.
@@ -251,7 +251,7 @@ Section RelationToScheduled.
   Proof.
     rewrite /service_at /scheduled_at.
     move=> t NOT_SCHED.
-    rewrite service_implies_scheduled //.
+    by rewrite service_implies_scheduled //.
   Qed.
 
   (** Conversely, if a job receives service, then it must be scheduled. *)
@@ -261,7 +261,7 @@ Section RelationToScheduled.
   Proof.
     move=> t.
     destruct (scheduled_at sched j t) eqn:SCHEDULED; first trivial.
-    rewrite not_scheduled_implies_no_service // negbT //.
+    by rewrite not_scheduled_implies_no_service // negbT //.
   Qed.
 
   (** Thus, if the cumulative amount of service changes, then it must be
@@ -272,7 +272,7 @@ Section RelationToScheduled.
   Proof.
     move => t.
     rewrite -service_last_plus_before -{1}(addn0 (service sched j t)) ltn_add2l.
-    apply: service_at_implies_scheduled_at.
+    by apply: service_at_implies_scheduled_at.
   Qed.
 
   (** We observe that a job receives cumulative service during some interval iff
@@ -299,7 +299,7 @@ Section RelationToScheduled.
         rewrite andbT; move => /andP [GT LT].
         specialize (ALL (Ordinal LT)); simpl in ALL.
         rewrite GT andTb -eqn0Ngt in ALL.
-        apply /eqP => //.
+        by apply /eqP => //.
     }
     {
       move=> [t [TT SERVICE]].
@@ -309,7 +309,7 @@ Section RelationToScheduled.
       rewrite big_nat_eq0 => IS_ZERO.
       have NO_SERVICE := IS_ZERO t TT.
       apply lt0n_neq0 in SERVICE.
-        by move/neqP in SERVICE; contradiction.
+      by move/neqP in SERVICE; contradiction.
     }
   Qed.
 
@@ -401,7 +401,7 @@ Section RelationToScheduled.
       rewrite service_during_service_at.
       exists t'; split => //.
       move: SCHED. rewrite /scheduled_at /service_at.
-        by apply (H_scheduled_implies_serviced j (sched t')).
+      by apply (H_scheduled_implies_serviced j (sched t')).
     Qed.
 
     (** ...which again applies to total service, too. *)
@@ -414,7 +414,7 @@ Section RelationToScheduled.
     Proof.
       move=> t [t' [TT SCHED]].
       rewrite /service. apply scheduled_implies_cumulative_service.
-      exists t'; split => //.
+      by exists t'; split => //.
     Qed.
 
   End GuaranteedService.
@@ -439,10 +439,10 @@ Section RelationToScheduled.
       move=> t SERVICE.
       have EX_SCHED := positive_service_implies_scheduled_before t SERVICE.
       inversion EX_SCHED as [t'' [TIMES SCHED_AT]].
-      exists t''; split; last by assumption.
+      exists t''; split; last by done.
       rewrite /(_ && _) ifT //.
       move: H_jobs_must_arrive. rewrite /jobs_must_arrive_to_execute /has_arrived => ARR.
-        by apply: ARR; exact.
+      by apply: ARR.
     Qed.
 
     Lemma not_scheduled_before_arrival:
@@ -450,7 +450,7 @@ Section RelationToScheduled.
     Proof.
       move=> t EARLY.
       apply: (contra (H_jobs_must_arrive j t)).
-      rewrite /has_arrived -ltnNge //.
+      by rewrite /has_arrived -ltnNge //.
    Qed.
 
     (** We show that job [j] does not receive service at any time [t] prior to its
@@ -461,7 +461,7 @@ Section RelationToScheduled.
         service_at sched j t = 0.
     Proof.
       move=> t NOT_ARR.
-      rewrite not_scheduled_implies_no_service // not_scheduled_before_arrival //.
+      by rewrite not_scheduled_implies_no_service // not_scheduled_before_arrival //.
     Qed.
 
     (** Note that the same property applies to the cumulative service. *)
@@ -477,7 +477,7 @@ Section RelationToScheduled.
       rewrite big_nat_cond [in RHS]big_nat_cond.
       apply: eq_bigr => i /andP [TIMES _]. move: TIMES => /andP [le_t1_i lt_i_t2].
       apply (service_before_job_arrival_zero i).
-        by apply leq_trans with (n := t2); auto.
+      by apply leq_trans with (n := t2); auto.
     Qed.
 
     (** Hence, one can ignore the service received by a job before its arrival
@@ -491,7 +491,7 @@ Section RelationToScheduled.
       move=> t1 t2 le_t1 le_t2.
       rewrite -(service_during_cat sched j t1 (job_arrival j) t2).
       rewrite cumulative_service_before_job_arrival_zero //.
-        by apply/andP; split; exact.
+      by apply/andP; split.
     Qed.
 
     (** ... which we can also state in terms of cumulative service. *)
@@ -500,7 +500,7 @@ Section RelationToScheduled.
         t <= job_arrival j -> service sched j t = 0.
     Proof.
       move=> t EARLY.
-      rewrite /service cumulative_service_before_job_arrival_zero //.
+      by rewrite /service cumulative_service_before_job_arrival_zero //.
     Qed.
 
   End AfterArrival.
@@ -537,7 +537,7 @@ Section RelationToScheduled.
       move=> t /andP [GE_t1 LT_t2].
       move: constant_service_implies_no_service_during.
       rewrite /service_during big_nat_eq0 => IS_ZERO.
-      apply IS_ZERO. apply /andP; split => //.
+      by apply IS_ZERO; apply/andP; split => //.
     Qed.
 
     (** We show that job [j] receives service at some point [t < t1]
@@ -548,8 +548,7 @@ Section RelationToScheduled.
     Proof.
       apply /idP/idP => /existsP [t SERVICED].
       {
-        have LE: t < t2
-          by apply: (leq_trans _ H_t1_le_t2) => //.
+        have LE: t < t2 by apply: (leq_trans _ H_t1_le_t2) => //.
         by apply /existsP; exists (Ordinal LE).
       }
       {
@@ -585,8 +584,9 @@ Section RelationToScheduled.
         - by apply service_at_implies_scheduled_at.
       }
       rewrite !CONV.
-      apply same_service_implies_serviced_at_earlier_times.
+      by apply same_service_implies_serviced_at_earlier_times.
     Qed.
+    
   End TimesWithSameService.
 
 End RelationToScheduled.
@@ -650,6 +650,7 @@ Section ServiceInTwoSchedules.
       identical_prefix sched1 sched2 h ->
       forall j, service sched1 j h = service sched2 j h.
   Proof.
-    move=> h IDENT j; by apply equal_prefix_implies_same_service_during. Qed.
+    by move=> h IDENT j; apply equal_prefix_implies_same_service_during.
+  Qed.
 
 End ServiceInTwoSchedules.

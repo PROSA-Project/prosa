@@ -30,7 +30,7 @@ Section GenericModelLemmas.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (** ... and any schedule of this arrival sequence ...*)
+  (** ... and any schedule of this arrival sequence ... *)
   Variable sched : schedule PState.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -94,7 +94,7 @@ Section GenericModelLemmas.
       move => j /andP [ARR Ps].
       apply service_before_job_arrival_zero with H0; auto.
       eapply in_arrivals_implies_arrived_between in ARR; eauto 2.
-        by move: ARR => /andP [N1 N2]; apply leq_trans with t.
+      by move: ARR => /andP [N1 N2]; apply leq_trans with t.
     Qed.
 
     (** We show that the total service of jobs released in a time interval <<[t1,t2)>>
@@ -266,7 +266,7 @@ Section IdealModelLemmas.
   End ServiceOfJobsIsBoundedByLength.
 
   (** In this section, we introduce a connection between the cumulative
-     service, cumulative workload, and completion of jobs. *)
+      service, cumulative workload, and completion of jobs. *)
   Section WorkloadServiceAndCompletion.
 
     (** Consider an arbitrary time interval <<[t1, t2)>>. *)
@@ -280,16 +280,15 @@ Section IdealModelLemmas.
 
     (** And state the proposition that all jobs are completed by time
        [t_compl]. Next we show that this proposition is equivalent to
-       the fact that the workload of the jobs is equal to the service
-       received by the jobs. *)
+       the fact that [workload of jobs = service of jobs]. *)
     Let all_jobs_completed_by t_compl :=
       forall j, j \in jobs -> P j -> completed_by j t_compl.
 
-    (** First, we prove that if the workload of [jobs] is equal to the service
-       of [jobs], then any job in [jobs] is completed by time [t_compl]. *)
-    Lemma workload_eq_service_impl_all_jobs_have_completed:
-      workload_of_jobs P jobs =
-      service_of_jobs sched P jobs t1 t_compl ->
+    (** First, we prove that if the workload of [jobs] is equal to the
+        service of [jobs], then any job in [jobs] is completed by time
+        [t_compl]. *)
+    Lemma workload_eq_service_impl_all_jobs_have_completed :
+      workload_of_jobs P jobs = service_of_jobs sched P jobs t1 t_compl ->
       all_jobs_completed_by t_compl.
     Proof.
       unfold jobs; intros EQ j ARR Pj; move: (ARR) => ARR2.
@@ -318,7 +317,7 @@ Section IdealModelLemmas.
 
     (** And vice versa, the fact that any job in [jobs] is completed by time [t_compl]
        implies that the workload of [jobs] is equal to the service of [jobs]. *)
-    Lemma all_jobs_have_completed_impl_workload_eq_service:
+    Lemma all_jobs_have_completed_impl_workload_eq_service :
       all_jobs_completed_by t_compl ->
       workload_of_jobs P jobs =
       service_of_jobs sched P jobs t1 t_compl.
@@ -328,7 +327,8 @@ Section IdealModelLemmas.
       { intros j t LE ARR.
         eapply in_arrivals_implies_arrived_between in ARR; eauto 2; move: ARR => /andP [GE LT].
         eapply cumulative_service_before_job_arrival_zero; eauto 2.
-          by apply leq_trans with t1. }
+        by apply leq_trans with t1.
+      }
       destruct (t_compl <= t1) eqn:EQ.
       { unfold service_of_jobs. unfold service_during.
         rewrite exchange_big //=.
@@ -356,11 +356,10 @@ Section IdealModelLemmas.
       }
     Qed.
 
-    (** Using the lemmas above, we prove equivalence. *)
-    Corollary all_jobs_have_completed_equiv_workload_eq_service:
+    (** Using the lemmas above, we prove the equivalence. *)
+    Corollary all_jobs_have_completed_equiv_workload_eq_service :
       all_jobs_completed_by t_compl <->
-      workload_of_jobs P jobs =
-      service_of_jobs sched P jobs t1 t_compl.
+      workload_of_jobs P jobs = service_of_jobs sched P jobs t1 t_compl.
     Proof.
       split.
       - by apply all_jobs_have_completed_impl_workload_eq_service.
