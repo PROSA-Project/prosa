@@ -221,7 +221,7 @@ Section RunToCompletionThreshold.
     apply/negP; intros C.
     have POS : 0 < job_cost j; first by ssrlia.
     rewrite /job_rtct subnBA in GE; last by apply job_last_nonpreemptive_segment_positive.
-    rewrite -subh1 in GE; [rewrite addn1 in GE | by apply job_last_nonpreemptive_segment_le_job_cost]. 
+    rewrite -addnBAC in GE; [rewrite addn1 in GE | by apply job_last_nonpreemptive_segment_le_job_cost]. 
     rewrite job_cost_is_last_element_of_preemption_points in LT, GE.
     rewrite last_seq_minus_last_distance_seq in GE; last by apply preemption_points_nondecreasing.
     have EQ := antidensity_of_nondecreasing_seq.

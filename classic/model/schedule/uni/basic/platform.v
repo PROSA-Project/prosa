@@ -178,7 +178,7 @@ Module Platform.
           first by apply leq_sum; ins; apply leq_b1.
         simpl_sum_const; rewrite -(ltn_add2r 1). 
         rewrite [job_cost j + 1]addn1 ltnS.
-        by rewrite subh1 // leq_subLR addn1.
+        by rewrite addnBAC // leq_subLR addn1.
       Qed. 
 
     End JobNeverBacklogged.

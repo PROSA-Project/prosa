@@ -489,7 +489,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
                   by rewrite !leq_add2r leq_subr. 
             - move: HEP; rewrite /EDF /edf.EDF leqNgt; move => /negP HEP; apply: HEP.                      
               apply leq_ltn_trans with (job_arrival jo + (A + D tsk)). 
-              + rewrite subh1 // addnBA.
+              + rewrite addnBAC // addnBA.
                 rewrite [in X in _ <= X]addnC -addnBA.
                 * by rewrite /job_deadline /job_deadline_from_task_deadline H_job_of_tsk leq_addr.
                 * by apply leq_trans with (t1 + (A + ε + D tsk - D tsk_o)); first rewrite leq_addr.

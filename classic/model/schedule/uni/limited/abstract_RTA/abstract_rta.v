@@ -309,13 +309,13 @@ Module AbstractRTA.
                 apply leq_trans with (F_sp - optimism + job_last ); first by rewrite leq_add2r leq_sub2r. 
                 apply leq_trans with (F_sp + (task_cost tsk - task_lock_in_service tsk)); last by done. 
                 rewrite /optimism subnBA; last by apply PRT2.
-                rewrite -subh1 //.
+                rewrite -addnBAC //.
                 rewrite /job_last.
                 rewrite addnBA; last by auto.
-                rewrite -subh1; last by rewrite leq_addl.
+                rewrite -addnBAC; last by rewrite leq_addl.
                 rewrite -addnBA // subnn addn0.
                 rewrite addnBA; last by auto.
-                rewrite subh1; last by done.
+                rewrite addnBAC; last by done.
                 rewrite leq_sub2r // leq_add2l.
                   by rewrite -H_job_of_tsk; apply H_job_cost_le_task_cost.
               } 
@@ -333,7 +333,7 @@ Module AbstractRTA.
             feed_n 7 ESERV; eauto 2. 
             { rewrite {2}FIX2.
               rewrite /AbstractRTADefinitions.cumul_interference.
-              rewrite -[in X in _ <= X]subh1; last by rewrite leq_subr.
+              rewrite -[in X in _ <= X]addnBAC; last by rewrite leq_subr.
               rewrite {2}/optimism. 
               rewrite subKn; last by auto.
               rewrite leq_add2l.              

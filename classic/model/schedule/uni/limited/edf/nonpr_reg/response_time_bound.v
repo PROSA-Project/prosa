@@ -219,13 +219,11 @@ Module RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
             have F: forall a b c d, a + b < c + d -> a > c -> b < d.
             { clear.
               intros.
-              rewrite -addn1 -addnA -leq_subLR -subh1 in H; last by apply ltnW.
+              rewrite -addn1 -addnA -leq_subLR -addnBAC in H; last by apply ltnW.
               rewrite addn1 addnS in H.
               rewrite -subn_gt0 in H0.
               apply ltn_trans with (a - c + b); last by done.
-              apply util.nat.ltn_subLR.
-              have EQ: b - b = 0. apply/eqP. rewrite subn_eq0. by done.
-                by rewrite EQ.
+              ssrlia.
             }
             eapply F; eauto 2.
           }

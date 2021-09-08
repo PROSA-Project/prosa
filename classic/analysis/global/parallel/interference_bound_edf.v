@@ -638,7 +638,7 @@ Module InterferenceBoundEDF.
                 by rewrite sort_uniq -/interfering_jobs filter_uniq // undup_uniq.
                 by rewrite CURtsk.
             }
-            by rewrite subh3 // addnC /p_k -CURtsk.
+            by rewrite leq_subRL_impl // addnC /p_k -CURtsk.
           Qed.
 
           Lemma interference_bound_edf_slack_le_delta:
@@ -688,13 +688,13 @@ Module InterferenceBoundEDF.
                 - by rewrite -addn1; apply ltnW, ltn_ceil.      
             }
             rewrite leq_subLR in SLACK.
-            rewrite -(leq_add2r a_fst) subh1 in BUG;
+            rewrite -(leq_add2r a_fst) addnBAC in BUG;
               last by apply interference_bound_edf_j_fst_before_j_lst.
             rewrite -[a_lst + _ - _]subnBA // subnn subn0 in BUG.
             rewrite addnC addnS in BUG.
             rewrite addnBA // in BUG; last by rewrite addnC.
             rewrite -(ltn_add2r D_k) in BUG.
-            rewrite subh1 in BUG; last first.
+            rewrite addnBAC in BUG; last first.
             {
               rewrite [D_i + R_k]addnC.
               by apply leq_trans with (n := R_k + D_i);

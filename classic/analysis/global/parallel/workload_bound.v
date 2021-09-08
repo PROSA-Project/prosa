@@ -416,7 +416,7 @@ Module WorkloadBound.
               by rewrite sort_uniq -/scheduled_jobs filter_uniq // undup_uniq.
               by rewrite CURtsk.   
           }
-          by rewrite subh3 // addnC -CURtsk.
+          by rewrite leq_subRL_impl // addnC -CURtsk.
         Qed.
 
         (* Next, we prove that n_k covers every scheduled job, ... *)
@@ -441,7 +441,7 @@ Module WorkloadBound.
             by apply ltnW, ltn_ceil, PARAMS0.
           }
           rewrite <- leq_add2r with (p := job_arrival j_fst) in DISTmax.
-          rewrite addnC subh1 in DISTmax; last first.
+          rewrite addnC addnBAC in DISTmax; last first.
           {
             unfold j_fst, j_lst; rewrite -[_.+1]add0n.
             apply prev_le_next; last by rewrite H_at_least_two_jobs add0n leqnn.

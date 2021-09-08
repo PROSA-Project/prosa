@@ -251,10 +251,10 @@ Section Max0.
 
 End Max0.
 
-(* Additional lemmas about rem for lists. *)
+(** Additional lemmas about rem for lists. *)
 Section RemList.
   
-  (* We prove that if [x] lies in [xs] excluding [y], then [x] also lies in [xs]. *)
+  (** We prove that if [x] lies in [xs] excluding [y], then [x] also lies in [xs]. *)
   Lemma rem_in:
     forall (T: eqType) (x y: T) (xs: seq T),
       x \in rem y xs -> x \in xs.
@@ -272,7 +272,7 @@ Section RemList.
     }
   Qed.
 
-  (* We prove that if we remove an element [x] for which [P x] from 
+  (** We prove that if we remove an element [x] for which [P x] from 
      a filter, then the size of the filter decreases by [1]. *)
   Lemma filter_size_rem: 
     forall (T: eqType) (x:T) (xs: seq T) (P: T -> bool), 
@@ -297,17 +297,17 @@ Section RemList.
 
 End RemList.
 
-(* Additional lemmas about sequences. *)
+(** Additional lemmas about sequences. *)
 Section AdditionalLemmas.
 
-  (* First, we show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
+  (** First, we show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
   Lemma nth0_cons:
     forall x xs n,
       n > 0 ->
       nth 0 (x :: xs) n = nth 0 xs n.-1.
   Proof. by intros; destruct n. Qed.
 
-  (* We prove that a sequence [xs] of size [n.+1] can be destructed
+  (** We prove that a sequence [xs] of size [n.+1] can be destructed
      into a sequence [xs_l] of size [n] and an element [x] such that
      [x = xs ++ [::x]]. *)
   Lemma seq_elim_last:
@@ -331,7 +331,7 @@ Section AdditionalLemmas.
         by apply eq_S.
   Qed.
   
-  (* Next, we prove that [x ∈ xs] implies that [xs] can be split 
+  (** Next, we prove that [x ∈ xs] implies that [xs] can be split 
      into two parts such that [xs = xsl ++ [::x] ++ [xsr]]. *)
   Lemma in_cat:
     forall {X : eqType} (x : X) (xs : list X),
@@ -346,7 +346,7 @@ Section AdditionalLemmas.
         by subst; exists (a::xsl), xsr.
   Qed.  
   
-  (* We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence 
+  (** We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence 
      of [ys] implies that the size of [xs] is at most the size of [ys]. *)
   Lemma subseq_leq_size:
     forall {X : eqType} (xs ys: seq X),
@@ -390,7 +390,7 @@ Section AdditionalLemmas.
     }
   Qed.
 
-  (* We prove that if no element of a sequence [xs] satisfies
+  (** We prove that if no element of a sequence [xs] satisfies
      a predicate [P], then [filter P xs] is equal to an empty
      sequence. *)
   Lemma filter_in_pred0:

@@ -508,7 +508,7 @@ Module InterferenceBoundEDFJitter.
               apply leq_trans with (n := job_interference job_arrival job_cost job_jitter sched j_i j_fst a_i t2);
                 first by apply extend_sum; [by apply leq_addr | by apply leqnn].
               
-              rewrite -(leq_add2r (D_k - R_k - J_k)) subh1 // -addnBA // subnn addn0.
+              rewrite -(leq_add2r (D_k - R_k - J_k)) addnBAC // -addnBA // subnn addn0.
 
               assert (SUBST: D_k - R_k - J_k = \sum_(a_fst + J_k + R_k <= i < a_fst + D_k) 1).
               {
@@ -660,7 +660,7 @@ Module InterferenceBoundEDFJitter.
               have FST := interference_bound_edf_j_fst_is_job_of_tsk_k.
               destruct FST as [FSTtask [_ [LEdl _]]].            
               have LTr := interference_bound_edf_response_time_bound_of_j_fst_after_interval.
-              apply subh3.
+              apply leq_subRL_impl.
               apply leq_trans with (n := job_interference job_arrival job_cost job_jitter sched j_i
                                        j_fst t1 (job_arrival j_fst + J_k + R_k) + (D_k - R_k - J_k)).
               {
@@ -920,7 +920,7 @@ Module InterferenceBoundEDFJitter.
                 by rewrite sort_uniq -/interfering_jobs filter_uniq // undup_uniq.
                 by rewrite CURtsk.
             }
-            by rewrite subh3 // addnC /p_k -INnth.
+            by rewrite leq_subRL_impl // addnC /p_k -INnth.
           Qed.
 
           (* Using the lemma above, we prove that the ratio n_k is at least the number of
@@ -1021,7 +1021,7 @@ Module InterferenceBoundEDFJitter.
               rewrite addnBA; last by apply leq_trunc_div.
               apply leq_trans with (n := J_k + R_k + D_i - (a_lst - a_fst)); last by apply leq_sub2l.
               rewrite subnBA; last by apply interference_bound_edf_j_fst_before_j_lst.
-              rewrite -(leq_add2r a_lst) subh1; last first.
+              rewrite -(leq_add2r a_lst) addnBAC; last first.
               {
                 apply leq_trans with (n := t2);
                   [by apply ltnW, interference_bound_edf_last_job_arrives_before_end_of_interval|].
@@ -1051,8 +1051,8 @@ Module InterferenceBoundEDFJitter.
               interference_caused_by j_fst t1 t2 <= D_i %% p_k - (D_k - R_k - J_k).
             Proof.
               intro LE.
-              apply subh3.
-              by rewrite -subndiv_eq_mod; apply subh3.
+              apply leq_subRL_impl.
+              by rewrite -subndiv_eq_mod; apply leq_subRL_impl.
             Qed.
               
             (* Next, we prove that interference caused by j_fst is bounded by the length

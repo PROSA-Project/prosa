@@ -488,7 +488,7 @@ Module WorkloadBoundJitter.
           have lemma1 := workload_bound_last_job_arrives_before_end_of_interval.
           have lemma2 := workload_bound_response_time_of_first_job_inside_interval.
           rewrite addnBA; last by apply ltnW.
-          rewrite subh1; last by done.
+          rewrite addnBAC; last by done.
           rewrite -addnBA; last by apply leq_addr.
           
           rewrite addnC; unfold t2.
@@ -571,7 +571,7 @@ Module WorkloadBoundJitter.
               by rewrite sort_uniq -/scheduled_jobs filter_uniq // undup_uniq.
               by rewrite CURtsk NEXTtsk.
           }
-          by rewrite subh3 // addnC -CURtsk.
+          by rewrite leq_subRL_impl // addnC -CURtsk.
         Qed.
 
         (* Prove that n_k is at least the number of the middle jobs *)
@@ -595,7 +595,7 @@ Module WorkloadBoundJitter.
             by apply workload_bound_many_periods_in_between.
           }
           rewrite <- leq_add2r with (p := job_arrival j_fst) in DISTmax.
-          rewrite addnC subh1 in DISTmax; last first.
+          rewrite addnC addnBAC in DISTmax; last first.
           {
             unfold j_fst, j_lst; rewrite -[_.+1]add0n.
             apply prev_le_next; last by rewrite H_at_least_two_jobs add0n leqnn.

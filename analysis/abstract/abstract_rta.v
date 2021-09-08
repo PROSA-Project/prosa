@@ -278,7 +278,7 @@ Section Abstract_RTA.
             { eapply job_run_to_completion_threshold_le_job_cost; eauto. }
             { rewrite {2}H_A_F_fixpoint.
               rewrite /definitions.cumul_interference.
-              rewrite -[in X in _ <= X]subh1; last by rewrite leq_subr.
+              rewrite -[in X in _ <= X]addnBAC; last by rewrite leq_subr.
               rewrite {2}/optimism.
               rewrite subKn; last by apply H_valid_run_to_completion_threshold.
               rewrite leq_add2l.              
@@ -404,13 +404,13 @@ Section Abstract_RTA.
               apply leq_trans with (F_sp - optimism + job_last ); first by rewrite leq_add2r leq_sub2r. 
               apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)); last by done. 
               rewrite /optimism subnBA; last by apply PRT2.
-              rewrite -subh1 //.
+              rewrite -addnBAC //.
               rewrite /job_last.
               rewrite addnBA; last by eapply job_run_to_completion_threshold_le_job_cost; eauto.
-              rewrite -subh1; last by rewrite leq_addl.
+              rewrite -addnBAC; last by rewrite leq_addl.
               rewrite -addnBA // subnn addn0.
               rewrite addnBA; last by apply PRT1.
-              rewrite subh1; last by done.
+              rewrite addnBAC; last by done.
               rewrite leq_sub2r // leq_add2l.
                 by rewrite -H_job_of_tsk; apply H_valid_job_cost.
             }

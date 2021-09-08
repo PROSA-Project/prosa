@@ -116,30 +116,33 @@ Section TDMAFacts.
 
     (** Then, we proved that no two tasks share the same time slot at any time. *)
     Lemma task_in_time_slot_uniq:
-      forall tsk1 tsk2 t, tsk1 \in ts -> task_time_slot tsk1 > 0 ->
-                                   tsk2 \in ts -> task_time_slot tsk2 > 0 ->
-                                            task_in_time_slot ts tsk1 t ->
-                                            task_in_time_slot ts tsk2 t ->
-                                            tsk1 = tsk2.
+      forall tsk1 tsk2 t,
+        tsk1 \in ts -> task_time_slot tsk1 > 0 ->
+        tsk2 \in ts -> task_time_slot tsk2 > 0 ->
+        task_in_time_slot ts tsk1 t ->
+        task_in_time_slot ts tsk2 t ->
+        tsk1 = tsk2.
     Proof.
-      intros* IN1 SLOT1 IN2 SLOT2.
+      intros * IN1 SLOT1 IN2 SLOT2.
       rewrite /task_in_time_slot.
-      set cycle:=TDMA_cycle ts.
-      set O1:= task_slot_offset ts tsk1.
-      set O2:= task_slot_offset ts tsk2.
-      have CO1: O1 < cycle by apply Offset_lt_cycle.
-      have CO2: O2 < cycle by apply Offset_lt_cycle.
-      have C: cycle > 0 by apply (TDMA_cycle_positive tsk1).
-      have GO1:O1 %% cycle = O1 by apply modn_small,Offset_lt_cycle. rewrite GO1.
-      have GO2:O2 %% cycle = O2 by apply modn_small,Offset_lt_cycle. rewrite GO2.
-      have SO1:O1 + task_time_slot tsk1 <= cycle by apply (Offset_add_slot_leq_cycle tsk1).
-      have SO2:O2 + task_time_slot tsk2 <= cycle by apply (Offset_add_slot_leq_cycle tsk2).
-      repeat rewrite mod_elim;auto.
-      case (O1 <= t%%cycle)eqn:O1T;case (O2 <= t %%cycle)eqn:O2T;intros G1 G2;try ssrlia.
-      apply ltn_subLR in G1;apply ltn_subLR in G2. case (tsk1==tsk2) eqn:NEQ;move/eqP in NEQ;auto.
-      destruct (slot_order_total tsk1 tsk2) as [order |order];auto;apply relation_offset in order;
-      fold O1 O2 in order;try ssrlia;auto. by move/eqP in NEQ. apply /eqP;auto.
+      set cycle := TDMA_cycle ts.
+      set O1 := task_slot_offset ts tsk1.
+      set O2 := task_slot_offset ts tsk2.
+      have CO1 : O1 < cycle by apply Offset_lt_cycle.
+      have CO2 : O2 < cycle by apply Offset_lt_cycle.
+      have C : cycle > 0 by apply (TDMA_cycle_positive tsk1).
+      have -> : O1 %% cycle = O1 by apply modn_small, Offset_lt_cycle.
+      have -> : O2 %% cycle = O2 by apply modn_small, Offset_lt_cycle.
+      have SO1 : O1 + task_time_slot tsk1 <= cycle by apply (Offset_add_slot_leq_cycle tsk1).
+      have SO2 : O2 + task_time_slot tsk2 <= cycle by apply (Offset_add_slot_leq_cycle tsk2).
+      repeat rewrite mod_elim; auto.
+      case (O1 <= t %% cycle) eqn:O1T; case (O2 <= t %% cycle) eqn:O2T; intros G1 G2; try ssrlia.
+      rewrite ltn_subLR // in G1; rewrite ltn_subLR // in G2.
+      case (tsk1 == tsk2) eqn:NEQ; move/eqP in NEQ; auto.
+      destruct (slot_order_total tsk1 tsk2) as [order | order]; auto.
+      all: by apply relation_offset in order; fold O1 O2 in order; try ssrlia; auto; apply/eqP; auto.
     Qed.
 
   End TimeSlotOrderFacts.
+  
 End TDMAFacts.

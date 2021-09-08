@@ -455,7 +455,7 @@ Module AbstractRTAforEDFwithArrivalCurves.
                   { apply negbT in NEQ2; rewrite -ltnNge in NEQ2.
                     move: HEP; rewrite leqNgt; move => /negP HEP; apply: HEP.                      
                     apply leq_ltn_trans with (job_arrival jo + (job_arrival j - t1 + task_deadline tsk)).
-                    { rewrite subh1; last by done.
+                    { rewrite addnBAC; last by done.
                       rewrite addnBA; last apply leq_trans with (job_arrival j); [ | by done | by rewrite leq_addr].
                       rewrite [in X in _ <= X]addnC.
                       rewrite -addnBA; first by rewrite leq_addr.

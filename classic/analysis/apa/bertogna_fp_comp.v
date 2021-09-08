@@ -415,7 +415,7 @@ Module ResponseTimeIterationFP.
             [by rewrite mem_rcons in_cons eq_refl orTb | intro PARAMS; des].
           induction k.
           {
-            intros _; rewrite add0n -addn1 subh1;
+            intros _; rewrite add0n -addn1 addnBAC;
               first by rewrite -addnBA // subnn addn0 /= leqnn.
             by apply PARAMS.
           }
@@ -425,7 +425,7 @@ Module ResponseTimeIterationFP.
             apply leq_ltn_trans with (n := f k);last by apply INC, ltnW.
             rewrite -addn1 -addnA [1 + _]addnC addnA -addnBA // subnn addn0.
             rewrite -(ltn_add2r 1) in IHk.
-            rewrite subh1 in IHk;
+            rewrite addnBAC in IHk;
               last by apply leq_trans with (n := task_cost tsk);
                 [by apply PARAMS | by apply leq_addl].
             by rewrite -addnBA // subnn addn0 addn1 ltnS in IHk.
@@ -466,7 +466,7 @@ Module ResponseTimeIterationFP.
         exploit TOOMUCH; [by apply DIFF | by apply leq_addr |].
         exploit (TASK_PARAMS tsk);
           [by rewrite mem_rcons in_cons eq_refl orTb | intro PARAMS; des].
-        rewrite subh1; last by apply PARAMS2.
+        rewrite addnBAC; last by apply PARAMS2.
         rewrite -addnBA // subnn addn0 subn1 prednK //.
         intros LT; apply (leq_ltn_trans LT).
         by rewrite /max_steps [_ - _ + 1]addn1; apply INC, leq_addr.

@@ -202,7 +202,7 @@ Section PriorityInversionIsBounded.
       Proof.
         have TEMP: t <= t2.-1.
         { move: (H_t_in_busy_interval) => /andP [GEt LEt]. 
-            by rewrite -subn1 subh3 // addn1.
+            by rewrite -subn1 leq_subRL_impl // addn1.
         }
         rewrite leq_eqVlt in TEMP; move: TEMP => /orP [/eqP EQUALt2m1 | LTt2m1].
         - right; auto.
@@ -552,7 +552,7 @@ Section PriorityInversionIsBounded.
           by have ->: jlp = jhp by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
       }
       apply SCHEDc; apply/andP; split.
-      - by rewrite -addn1 in LT2; apply subh3 in LT2; rewrite subn1 in LT2.
+      - by rewrite -addn1 in LT2; apply leq_subRL_impl in LT2; rewrite subn1 in LT2.
       - by apply leq_trans with t1; first apply leq_pred. 
     Qed.
     
@@ -789,7 +789,7 @@ Section PriorityInversionIsBounded.
             all: unfold service.service; try done.
             intros; apply MIN; apply/andP; split; by done.
           - apply preemption_time_le_max_len_of_priority_inversion.
-            unfold service.service; try done.
+            by unfold service.service.
         Qed.
         
       End Case3.
@@ -798,7 +798,7 @@ Section PriorityInversionIsBounded.
 
     (** By doing the case analysis, we show that indeed there is a
         preemption time in time interval [[t1, t1 +
-        max_length_of_priority_inversion j t1]. *)
+        max_length_of_priority_inversion j t1]]. *)
     Lemma preemption_time_exists: 
       exists pr_t,
         preemption_time sched pr_t /\
@@ -812,7 +812,7 @@ Section PriorityInversionIsBounded.
       - destruct (hep_job s j) eqn:PRIO.
         + by eapply preemption_time_exists_case2; eauto.
         + eapply preemption_time_exists_case3 with s; eauto.
-            by rewrite -eqbF_neg; apply /eqP.
+          by rewrite -eqbF_neg; apply /eqP.
     Qed.
     
   End PreemptionTimeExists.

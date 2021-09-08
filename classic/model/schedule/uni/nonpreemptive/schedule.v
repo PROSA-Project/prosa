@@ -114,7 +114,7 @@ Module NonpreemptiveSchedule.
           apply contraT; rewrite negbK; intros COMP.
           exfalso; move: NOTCOMP => /negP NOTCOMP; apply: NOTCOMP.
           apply completion_monotonic with (t0 := i); try ( by done).
-            by apply subh3; first rewrite addn1.
+            by apply leq_subRL_impl; first rewrite addn1.
         Qed.
         
       End CompletionUnderNonpreemptive.
@@ -181,11 +181,11 @@ Module NonpreemptiveSchedule.
                  rewrite leq_sum //; intros; by destruct (scheduled_at sched j i).
                  simpl_sum_const. by done.
                  unfold job_remaining_cost, remaining_cost.
-                 rewrite -addn1 -addn1  subh1; first by
+                 rewrite -addn1 -addn1  addnBAC; first by
                      by rewrite leq_subLR addnBA;
-                 first by  rewrite -addnA [1+job_cost j]addnC addnA -subh1.
+                 first by  rewrite -addnA [1+job_cost j]addnC addnA -addnBAC.
                  { 
-                  rewrite subh1; last by done.
+                  rewrite addnBAC; last by done.
                   rewrite leq_subLR addnA.
                   rewrite addnBA; last by done.
                   rewrite [_+t]addnC [_+job_cost j]addnC addnA.
@@ -196,7 +196,7 @@ Module NonpreemptiveSchedule.
               {
                 unfold remaining_cost.
                 rewrite addnBA; last by done.
-                rewrite -addn1 subh1; last by done.
+                rewrite -addn1 addnBAC; last by done.
                 rewrite leq_subLR -addnBA; last by done.
                 rewrite addnA [_+t]addnC -addnA leq_add2l addnBA; last by done.
                   by rewrite addnC -addnBA; first by rewrite subnn addn0.
@@ -247,7 +247,7 @@ Module NonpreemptiveSchedule.
                   have LLF: t' < t - service sched j t.
                   {
                       by apply ltn_trans with (t - service sched j t - 1);
-                    last by rewrite -addn1 subh1 // -addnBA // subnn addn0.
+                    last by rewrite -addn1 addnBAC // -addnBA // subnn addn0.
                   } clear LT.
                   rewrite !addnBA;
                     try(rewrite H_completed_jobs_dont_execute //).
@@ -257,7 +257,7 @@ Module NonpreemptiveSchedule.
                   rewrite -addnBA ?leq_add2l; last by done.
                   by apply leq_trans with (t' + 1 - 1);
                     rewrite addn1 subn1 -pred_Sn;
-                  [rewrite leq_subr | rewrite subh3 // addn1].
+                  [rewrite leq_subr | rewrite leq_subRL_impl // addn1].
                 }
                 have L3 := job_doesnt_complete_before_remaining_cost job_cost sched
                              j H_completed_jobs_dont_execute t;
@@ -266,8 +266,8 @@ Module NonpreemptiveSchedule.
                   by move: L3 => /negP L3; apply L3.
               }
               rewrite /job_remaining_cost /remaining_cost T1 subn0 addnBA; last by done.
-              rewrite -subh1.
-                by rewrite -[(t-service sched j t) + _ - _]subh1.
+              rewrite -addnBAC.
+                by rewrite -[(t-service sched j t) + _ - _]addnBAC.
                   by rewrite cumulative_service_le_delta.
             }
             move: L1 => /neqP L1; apply: L1.
@@ -309,7 +309,7 @@ Module NonpreemptiveSchedule.
             move: COMP; apply contraR; intros CONTR.
             apply in_nonpreemption_schedule_preemption_implies_completeness
             with (t:=t); [|by done| by done].
-            rewrite subh3 // ?leq_add2l.
+            rewrite leq_subRL_impl // ?leq_add2l.
               by rewrite scheduled_implies_positive_remaining_cost //.
           Qed.
 
@@ -337,7 +337,7 @@ Module NonpreemptiveSchedule.
         Proof.
           move => t' /andP [GE LE].
           move: (H_j_is_scheduled_at_t) => SCHED1; move: (H_j_is_scheduled_at_t) => SCHED2.
-          rewrite -addn1 in LE; apply subh3 with (m := t') (p := 1) in LE;
+          rewrite -addn1 in LE; apply leq_subRL_impl with (m := t') (n := 1) in LE;
             apply continuity_of_nonpreemptive_scheduling with
                 (t1 := t - service sched j t)
                 (t2 := t + job_remaining_cost j t - 1); first by done.

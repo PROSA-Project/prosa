@@ -393,7 +393,7 @@ Module RTAforConcreteModels.
             have EQ: exists Δ, t' = t + Δ.
             { exists (t' - t); rewrite subnKC; by done. }
             move: EQ => [Δ EQ]; subst t'; clear LE.
-            rewrite -subh1 in LS.
+            rewrite -addnBAC in LS.
             rewrite addn1 in LS.
             apply H_schedule_with_limited_preemptions; first by done.
             rewrite /can_be_preempted_for_model_with_limited_preemptions; apply/negP.
@@ -442,7 +442,7 @@ Module RTAforConcreteModels.
               rewrite -(ltn_add2r 1) !addn1 prednK //.
               move: (Fact2) => Fact3.
               rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2. 
-              rewrite -subh1 -?[in X in _ <= X]subh1; first last. 
+              rewrite -addnBAC -?[in X in _ <= X]addnBAC; first last. 
               { apply leq_trans with (job_max_nps j).
                 - by apply last_of_seq_le_max_of_seq. 
                 - by rewrite -ENDj //; apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
@@ -574,7 +574,7 @@ Module RTAforConcreteModels.
             have EQ: exists Δ, t' = t + Δ.
             { exists (t' - t); rewrite subnKC; by done. }
             move: EQ => [Δ EQ]; subst t'; clear LE.
-            rewrite -subh1 in LS.
+            rewrite -addnBAC in LS.
             rewrite addn1 in LS.
             apply H_schedule_with_limited_preemptions; first by done.
             rewrite /can_be_preempted_for_model_with_limited_preemptions; apply/negP.

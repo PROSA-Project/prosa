@@ -880,7 +880,7 @@ Section NondecreasingSequence.
           specialize (LE 0); simpl in LE, FLE.
           rewrite leqNgt; apply/negP; intros NEQ.
           move: LE; rewrite leqNgt; move => /negP LE; apply: LE.
-          rewrite -(ltn_add2r x1) subnK // subh1 // -(ltn_add2r y1) subnK.
+          rewrite -(ltn_add2r x1) subnK // addnBAC // -(ltn_add2r y1) subnK.
           - by eapply leq_ltn_trans; [erewrite leq_add2l | erewrite ltn_add2r].
           - by apply leq_trans with y2; auto using leq_addr.
         }

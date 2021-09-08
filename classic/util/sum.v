@@ -122,7 +122,7 @@ Section SumArithmetic.
     specialize (RECL nat 0 addn (size r).-1 0 (fun i => F (nth x0 r i))).
     rewrite sum_diff; last by ins.
     rewrite addmovr; last by rewrite -[_.-1]add0n; apply prev_le_next; try rewrite add0n leqnn.
-    rewrite subh1; last by apply leq_sum_nat; move => i /andP [_ LT] _; apply ALL.
+    rewrite addnBAC; last by apply leq_sum_nat; move => i /andP [_ LT] _; apply ALL.
     rewrite addnC -RECL //.
     rewrite addmovl; last by rewrite big_nat_recr // -{1}[\sum_(_ <= _ < _) _]addn0; apply leq_add.
       by rewrite addnC -big_nat_recr.

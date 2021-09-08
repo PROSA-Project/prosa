@@ -1,81 +1,45 @@
 Require Export prosa.util.tactics prosa.util.ssrlia.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
-(* Additional lemmas about natural numbers. *)
+(** Additional lemmas about natural numbers. *)
 Section NatLemmas.
 
-  Lemma subh1:
-    forall m n p,
-      m >= n ->
-      m - n + p = m + p - n.
-  Proof. by ins; ssrlia. Qed.
-
-  Lemma subh2:
+  (** First, we show that, given [m1 >= m2] and [n1 >= n2], an
+      expression [(m1 + n1) - (m2 + n2)] can be transformed into
+      expression [(m1 - m2) + (n1 - n2)]. *)
+  Lemma subnD:
     forall m1 m2 n1 n2,
       m1 >= m2 ->
       n1 >= n2 ->
-      (m1 + n1) - (m2 + n2) = m1 - m2 + (n1 - n2).
+      (m1 + n1) - (m2 + n2) = (m1 - m2) + (n1 - n2).
   Proof. by ins; ssrlia. Qed.
   
-  Lemma subh3:
+  (** Next, we show that [m + p <= n] implies that [m <= n - p]. Note
+      that this lemma is similar to ssreflect's lemma [leq_subRL];
+      however, the current lemma has no precondition [n <= p], since it
+      has only one direction. *)
+  Lemma leq_subRL_impl:
     forall m n p,
-      m + p <= n ->
-      m <= n - p.
-  Proof.
-    clear.
-    intros.
-    rewrite <- leq_add2r with (p := p).
-    rewrite subh1 //.
-    - by rewrite -addnBA // subnn addn0.
-    - by apply leq_trans with (m+p); first rewrite leq_addl.
-  Qed.
-
-  (* Simplify [n + a - b + b - a = n] if [n >= b]. *)
+      m + n <= p ->
+      m <= p - n.
+  Proof. by intros; ssrlia. Qed.
+    
+  (** Simplify [n + a - b + b - a = n] if [n >= b]. *)
   Lemma subn_abba:
     forall n a b,
       n >= b ->
       n + a - b + b - a = n.
-  Proof.
-    move=> n a b le_bn.
-    rewrite subnK;
-      first by rewrite -addnBA // subnn addn0 //.
-    rewrite -[b]addn0.
-    apply leq_trans with (n := n + 0); rewrite !addn0 //.
-    apply leq_addr.
-  Qed.
-
-  Lemma add_subC:
-    forall a b c,
-      a >= c ->
-      b >=c ->
-      a + (b - c) = a - c + b.
-  Proof.
-    intros* AgeC BgeC.
-    induction b;induction c;intros;try ssrlia.
-  Qed.
-
-  (* TODO: remove when mathcomp minimum required version becomes 1.10.0 *)
-  Lemma ltn_subLR:
-    forall a b c,
-      a - c < b ->
-      a < b + c.
-  Proof.
-    intros* AC. ssrlia.
-  Qed.
-
-  (* We can drop additive terms on the lesser side of an inequality. *)
+  Proof. by intros; ssrlia. Qed.
+  
+  (** We can drop additive terms on the lesser side of an inequality. *)
   Lemma leq_addk:
     forall m n k,
       n + k <= m ->
       n <= m.
-  Proof.
-    move=> m n p.
-    apply leq_trans.
-    by apply leq_addr.
-  Qed.
-
-  (** For any numbers [a], [b], and [m], either there exists a number [n] 
-   such that [m = a + n * b] or [m <> a + n * b] for any [n]. *)
+  Proof. by intros; ssrlia. Qed.
+    
+  (** For any numbers [a], [b], and [m], either there exists a number
+      [n] such that [m = a + n * b] or [m <> a + n * b] for any [n]. *)
   Lemma exists_or_not_add_mul_cases:
     forall a b m,
       (exists n, m = a + n * b) \/
@@ -83,19 +47,21 @@ Section NatLemmas.
   Proof.
     move=> a b m.
     case: (leqP a  m) => LE.
-    { case: (boolP(b %| (m - a))) => DIV.
-      { left; exists ((m - a) %/ b).
-        now rewrite divnK //   subnKC //. }
-      { right. move=> n EQ.
+    { case: (boolP(b %| (m - a))) => DIV; [left | right].
+      { exists ((m - a) %/ b).
+        by rewrite divnK // subnKC //. }
+      { move => n EQ.
         move: DIV => /negP DIV; apply DIV.
         rewrite EQ.
         rewrite -addnBAC // subnn add0n.
         apply dvdn_mull.
-        now apply dvdnn. }}
+        by apply dvdnn. }
+    }
     { right; move=> n EQ.
       move: LE; rewrite EQ.
-      now rewrite -ltn_subRL subnn //. }
-  Qed.
+      by rewrite -ltn_subRL subnn //.
+    }
+  Qed.  
 
   (** The expression [n2 * a + b] can be written as [n1 * a + b + (n2 - n1) * a]
       for any integer [n1] such that [n1 <= n2]. *)
@@ -108,12 +74,12 @@ Section NatLemmas.
     rewrite mulnBl.
     rewrite addnBA; first by ssrlia.
     destruct a; first by ssrlia.
-    now rewrite leq_pmul2r.
+    by rewrite leq_pmul2r.
   Qed.
 
-  (** Given constants [a, b, c, z] such that [b <= a] and there is no constant [m] 
-      such that [a = b + m * c], it holds that there is no constant [n] such that 
-      [a + z * c = b + n * c]. *)
+  (** Given constants [a, b, c, z] such that [b <= a], if there is no
+      constant [m] such that [a = b + m * c], then it holds that there
+      is no constant [n] such that [a + z * c = b + n * c]. *)
   Lemma mul_add_neq: 
     forall a b c z,
       b <= a ->
@@ -123,31 +89,34 @@ Section NatLemmas.
     intros * LTE NEQ n EQ.
     specialize (NEQ (n - z)).
     rewrite mulnBl in NEQ.
-    now ssrlia.
+    by ssrlia.
   Qed.
   
 End NatLemmas.
 
+(** In this section, we prove a lemma about intervals of natural
+    numbers. *)
 Section Interval.
   
-  (* Trivially, points before the start of an interval, or past the end of an
-     interval, are not included in the interval. *)
+  (** Trivially, points before the start of an interval, or past the
+      end of an interval, are not included in the interval. *)
   Lemma point_not_in_interval:
     forall t1 t2 t',
       t2 <= t' \/ t' < t1 ->
       forall t,
-        t1 <= t < t2
-        -> t <> t'.
+        t1 <= t < t2 ->
+        t <> t'.
   Proof.
-    move=> t1 t2 t' EXCLUDED t /andP [GEQ_t1 LT_t2] EQ.
-    subst.
-    case EXCLUDED => [INEQ | INEQ];
+    move=> t1 t2 t' EXCLUDED t /andP [GEQ_t1 LT_t2] EQ; subst.
+    by case EXCLUDED => [INEQ | INEQ];
       eapply leq_ltn_trans in INEQ; eauto;
-      by rewrite ltnn in INEQ.
+        rewrite ltnn in INEQ.
   Qed.
 
 End Interval.
 
+(** In the section, we introduce an additional lemma about relation
+    [<] over natural numbers.  *)
 Section NatOrderLemmas.
 
   (* Mimic the way implicit arguments are used in [ssreflect]. *)

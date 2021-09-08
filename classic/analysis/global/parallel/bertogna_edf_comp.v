@@ -646,7 +646,7 @@ Module ResponseTimeIterationEDF.
             rewrite (eq_bigr (fun i => snd i)); last first.
             {
               intro i; rewrite andbT; intro IN;
-              rewrite subh1; first by rewrite -addnBA // subnn addn0.
+              rewrite addnBAC; first by rewrite -addnBA // subnn addn0.
               have GE_COST := edf_claimed_bounds_ge_cost ts step.
               by destruct i; apply GE_COST.
             }
@@ -654,7 +654,7 @@ Module ResponseTimeIterationEDF.
             {
               intro i; rewrite andbT; intro IN.
               unfold update_bound; destruct i; simpl.
-              rewrite subh1; first by rewrite -addnBA // subnn addn0.
+              rewrite addnBAC; first by rewrite -addnBA // subnn addn0.
               apply (edf_claimed_bounds_ge_cost ts step.+1).
               by rewrite iterS; apply/mapP; exists (s, t).
             }
@@ -765,7 +765,7 @@ Module ResponseTimeIterationEDF.
           rewrite (eq_bigr (fun x => snd x)); last first.
           {
             intro i; rewrite andbT; intro IN.
-            rewrite subh1; first by rewrite -addnBA // subnn addn0.
+            rewrite addnBAC; first by rewrite -addnBA // subnn addn0.
             have GE_COST := edf_claimed_bounds_ge_cost ts (max_steps ts).
             fold (f (max_steps ts)) in GE_COST.
             by destruct i; apply GE_COST.
@@ -773,7 +773,7 @@ Module ResponseTimeIterationEDF.
           rewrite (eq_bigr (fun x => task_deadline x)); last first.
           {
             intro i; rewrite andbT; intro IN.
-            rewrite subh1; first by rewrite -addnBA // subnn addn0.
+            rewrite addnBAC; first by rewrite -addnBA // subnn addn0.
             by specialize (VALID i IN); des.
           }
           rewrite -2!big_seq_cond.

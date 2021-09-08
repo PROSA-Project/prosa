@@ -243,7 +243,7 @@ Module ResponseTimeAnalysisEDF.
         unfold completed, valid_sporadic_job in *.
         unfold X, total_interference; rewrite addn1.
         rewrite -(ltn_add2r (task_cost tsk)).
-        rewrite subh1; last by rewrite [R](REC tsk) // leq_addr.
+        rewrite addnBAC; last by rewrite [R](REC tsk) // leq_addr.
         rewrite -addnBA // subnn addn0.
         move: (NOTCOMP) => /negP NOTCOMP'.
         rewrite -ltnNge in NOTCOMP.
@@ -881,7 +881,7 @@ Module ResponseTimeAnalysisEDF.
           first by apply H_at_least_one_cpu; rewrite -JOBtsk FROMTS.
         rewrite -(ltn_add2l (task_cost tsk)) -REC; last first. by done.
         rewrite -addn1 -leq_subLR.
-        rewrite -[R + 1 - _]subh1; last by apply GE_COST.
+        rewrite -[R + 1 - _]addnBAC; last by apply GE_COST.
         rewrite leq_divRL;
           last by apply H_at_least_one_cpu; rewrite -JOBtsk FROMTS.
         apply EXCEEDS, SUB.

@@ -39,7 +39,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
     {
       exploit (@ltn_pmod n d); [by apply GT0 | intro LTd; fold y in LTd].
       rewrite -(ltn_add2r 1) [y+1]addn1 ltnS in BUG.
-      rewrite subh1 in BUG; last by apply GT0.
+      rewrite addnBAC in BUG; last by apply GT0.
       rewrite -addnBA // subnn addn0 in BUG.
       by apply (leq_ltn_trans BUG) in LTd; rewrite ltnn in LTd.
     }
@@ -47,7 +47,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
     {
       (* Case 1: y = d - 1*)
       move: GE => /eqP GE; rewrite -(eqn_add2r 1) in GE.
-      rewrite subh1 in GE; last by apply GT0.
+      rewrite addnBAC in GE; last by apply GT0.
       rewrite -addnBA // subnn addn0 in GE.
       move: GE => /eqP GE.
       apply f_equal with (f := fun x => x %/ d) in GE.
@@ -80,10 +80,10 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop d
       {
         unfold x, y in *.
         rewrite -2!subndiv_eq_mod.
-        rewrite subh1 ?addn1; last by apply leq_trunc_div.
+        rewrite addnBAC ?addn1; last by apply leq_trunc_div.
         rewrite EQDIV; apply/eqP.
         rewrite -(eqn_add2r (n%/d*d)).
-        by rewrite subh1; last by apply leq_trunc_div.
+        by rewrite addnBAC; last by apply leq_trunc_div.
       }
     }
   Qed.

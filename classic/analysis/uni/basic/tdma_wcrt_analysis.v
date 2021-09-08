@@ -812,7 +812,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
           + have F:in_time_slot_at (job_arrival j) = false by auto. rewrite F.
             rewrite /to_next_slot EXISTS /duration_to_finish_from_start_of_slot_with.
             rewrite mulnBl mul1n addnA  {1}gtn_eqF // -COST_WCET.
-            apply /eqP. rewrite eqn_add2r addnC subh1.
+            apply /eqP. rewrite eqn_add2r addnC addnBAC.
             * by rewrite addnK. 
             * by apply leq_pmull, ceil_neq0.
       Qed.
