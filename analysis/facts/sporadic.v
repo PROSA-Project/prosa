@@ -45,10 +45,10 @@ Section SporadicModelIndexLemmas.
   Proof.
     intro IND.
     move: (H_sporadic_model j1 j2) => SPORADIC; feed_n 6 SPORADIC => //. 
-    - rewrite -> diff_jobs_iff_diff_indices => //; auto.
+    - rewrite -> diff_jobs_iff_diff_indices => //; eauto.
        + now ssrlia.
        + now rewrite H_j1_task. 
-    - apply (index_lte_implies_arrival_lte arr_seq); try auto.
+    - apply (index_lte_implies_arrival_lte arr_seq); try eauto.
       now rewrite H_j1_task.
     - have POS_IA : task_min_inter_arrival_time tsk > 0 by auto.
       now ssrlia.
@@ -95,7 +95,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
       job_arrival j1 <> job_arrival j2.
   Proof.
     intros UNEQ EQ_ARR.
-    rewrite -> diff_jobs_iff_diff_indices in UNEQ => //; auto; last by rewrite H_j1_task.
+    rewrite -> diff_jobs_iff_diff_indices in UNEQ => //; eauto; last by rewrite H_j1_task.
     move /neqP: UNEQ; rewrite neq_ltn => /orP [LT|LT].
     all: now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia.
   Qed.
@@ -110,7 +110,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     split; first by apply congr1.
     intro EQ_ARR.
     case: (boolP (j1 == j2)) => [/eqP EQ | /eqP NEQ]; first by auto.
-    rewrite -> diff_jobs_iff_diff_indices in NEQ => //; auto; last by rewrite H_j1_task.
+    rewrite -> diff_jobs_iff_diff_indices in NEQ => //; eauto; last by rewrite H_j1_task.
     move /neqP: NEQ; rewrite neq_ltn => /orP [LT|LT].
     all: now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia.
   Qed.

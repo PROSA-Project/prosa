@@ -102,8 +102,8 @@ Section JobArrivalSeparation.
         - feed BEFORE; first by ssrlia.
           move : BEFORE => [nj [NEQNJ [TSKNJ [ARRNJ INDNJ]]]]; rewrite TSKj2 in TSKNJ.
           specialize (IHs nj j2); feed_n 6 IHs => //; first by ssrlia.          
-          { now apply (lower_index_implies_earlier_arrival _ H_consistent_arrivals H_uniq_arrseq tsk);
-              auto with basic_facts; ssrlia.
+          { by apply (lower_index_implies_earlier_arrival _ H_consistent_arrivals tsk);
+              eauto with basic_facts; ssrlia.
           }
           move : IHs => [n [NZN ARRJ'NJ]].          
           move: (H_periodic_model nj) => PERIODIC; feed_n 3 PERIODIC => //; first by ssrlia. 

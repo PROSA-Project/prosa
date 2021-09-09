@@ -46,7 +46,7 @@ Section PeriodicTasksAsSporadicTasks.
     intros tsk VALID_PERIOD H_PERIODIC j1 j2 NEQ ARR ARR' TSK TSK' ARR_LT.
     rewrite /task_min_inter_arrival_time /periodic_as_sporadic.
     have IND_LT : job_index arr_seq j1 < job_index arr_seq j2.
-    { rewrite -> diff_jobs_iff_diff_indices in NEQ => //; auto; last by rewrite TSK.
+    { rewrite -> diff_jobs_iff_diff_indices in NEQ => //; eauto; last by rewrite TSK.
       move_neq_up IND_LTE; move_neq_down ARR_LT.
       specialize (H_PERIODIC j1); feed_n 3 H_PERIODIC => //; try by ssrlia.
       move : H_PERIODIC => [pj [ARR_PJ [IND_PJ [TSK_PJ PJ_ARR]]]].

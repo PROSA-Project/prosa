@@ -51,7 +51,6 @@ Section JobIndexLemmas.
       apply eq_ind_in_seq with (xs := task_arrivals_up_to_job_arrival arr_seq j2) => //.
       - now rewrite -/(job_index _ _) -IND -ARR_CAT index_cat ifT;
           try apply arrives_in_task_arrivals_up_to.
-      - now apply uniq_task_arrivals.
       - rewrite -ARR_CAT mem_cat; apply /orP.
         now left; apply arrives_in_task_arrivals_up_to.
       - now apply arrives_in_task_arrivals_up_to.
@@ -69,7 +68,6 @@ Section JobIndexLemmas.
       apply (eq_ind_in_seq _ _ _ (task_arrivals_up_to_job_arrival arr_seq j1)) => //.
       - now rewrite -/(job_index _ _) IND -ARR_CAT index_cat ifT;
           try apply arrives_in_task_arrivals_up_to.
-      - now apply uniq_task_arrivals.
       - now apply arrives_in_task_arrivals_up_to.
       - rewrite -ARR_CAT mem_cat; apply /orP.
         now left; apply arrives_in_task_arrivals_up_to => //.
@@ -368,7 +366,7 @@ Section PreviousJob.
     { apply index_uniq => //.
       now apply uniq_task_arrivals => //. }
     repeat split => //.    
-    { rewrite -> diff_jobs_iff_diff_indices => //; last by auto.
+    { rewrite -> diff_jobs_iff_diff_indices => //; eauto.
       rewrite /job_index; rewrite [in X in _ <> X] (job_index_same_in_task_arrivals _ _ jk j) => //.
       - rewrite index_uniq -/(job_index arr_seq j)=> //; last by apply uniq_task_arrivals.
         now ssrlia.
