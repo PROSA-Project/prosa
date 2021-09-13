@@ -175,7 +175,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           by apply H_valid_model_with_bounded_nonpreemptive_segments. 
       - apply /bigmax_leq_seqP. 
         intros j' JINB NOTHEP.
-        apply leq_bigmax_cond_seq with (i0 := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1). 
+        apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1). 
         { apply H_all_jobs_from_taskset.
           apply mem_bigcat_nat_exists in JINB.
             by inversion JINB as [ta' [JIN' _]]; exists ta'. }
