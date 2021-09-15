@@ -52,7 +52,7 @@ Section RequestBoundFunctions.
         that equals 0 for the empty interval [delta = 0]. *)
     Definition valid_request_bound_function (request_bound : duration -> work) :=
       request_bound 0 = 0 /\
-      monotone request_bound leq.
+      monotone leq request_bound.
 
     (** We say that [request_bound] is an upper request bound for task
         [tsk] iff, for any interval <<[t1, t2)>>, [request_bound (t2 -

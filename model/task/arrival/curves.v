@@ -62,7 +62,7 @@ Section ArrivalCurves.
         the empty interval [delta = 0]. *)
     Definition valid_arrival_curve (num_arrivals : duration -> nat) :=
       num_arrivals 0 = 0 /\
-      monotone num_arrivals leq.
+      monotone leq num_arrivals.
 
     (** We say that [max_arrivals] is an upper arrival bound for task [tsk]
         iff, for any interval <<[t1, t2)>>, [max_arrivals (t2 - t1)] bounds the

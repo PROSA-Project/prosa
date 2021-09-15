@@ -270,7 +270,7 @@ Section RequestBoundFunctions.
 
   (** We prove that [task_rbf] is monotone. *)
   Lemma task_rbf_monotone:
-    monotone task_rbf leq.
+    monotone leq task_rbf.
   Proof.
     rewrite /monotone; intros ? ? LE.
     rewrite /task_rbf /task_request_bound_function leq_mul2l.

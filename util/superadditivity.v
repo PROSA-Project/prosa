@@ -80,7 +80,7 @@ Section Superadditivity.
 
       (** First, we show that [f] must also be monotone. *)
       Lemma superadditive_monotone:
-        monotone f leq.
+        monotone leq f.
       Proof.
         move=> x y LEQ.
         apply leq_trans with (f x + f (y - x)).
