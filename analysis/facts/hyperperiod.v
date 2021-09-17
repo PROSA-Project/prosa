@@ -20,11 +20,7 @@ Section Hyperperiod.
   Lemma hyperperiod_int_mult_of_any_task: 
     exists (k : nat),
       hyperperiod ts = k * task_period tsk.
-  Proof.
-    apply lcm_seq_is_mult_of_all_ints.
-    apply map_f.
-    now apply H_tsk_in_ts.
-  Qed.
+  Proof. by apply/dvdnP; apply lcm_seq_is_mult_of_all_ints, map_f, H_tsk_in_ts. Qed. 
 
 End Hyperperiod.
 

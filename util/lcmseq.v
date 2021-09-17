@@ -2,47 +2,41 @@ From mathcomp Require Export ssreflect seq div ssrbool ssrnat eqtype ssrfun.
 Require Export prosa.util.tactics.
 
 (** A function to calculate the least common multiple 
-    of all integers in a sequence [xs], denoted by [lcml xs]  **)
+    of all integers in a sequence [xs], denoted by [lcml xs]. *)
 Definition lcml (xs : seq nat) : nat := foldr lcmn 1 xs.
 
-(** Any integer [a] that is contained in the sequence [xs] divides [lcml xs]. **)
+(** First we show that [x] divides [lcml (x :: xs)] for any [x] and [xs]. *)
 Lemma int_divides_lcm_in_seq: 
-  forall (a : nat) (xs : seq nat), a %| lcml (a :: xs).
+  forall (x : nat) (xs : seq nat), x %| lcml (x :: xs).
 Proof.
-  intros.
-  rewrite /lcml.
-  induction xs.
-  - rewrite /foldr.
-    now apply dvdn_lcml.
-  - rewrite -cat1s.
-    rewrite foldr_cat /foldr.
+  induction xs. 
+  - by apply dvdn_lcml.
+  - rewrite /lcml -cat1s foldr_cat /foldr.
     by apply dvdn_lcml.
 Qed.
 
-(** Also, [lcml xs1] divides [lcml xs2] if [xs2] contains one extra element as compared to [xs1]. *)
+(** Similarly, [lcml xs] divides [lcml (x :: xs)] for any [x] and [xs]. *) 
 Lemma lcm_seq_divides_lcm_super: 
   forall (x : nat) (xs : seq nat), 
   lcml xs %| lcml (x :: xs).
 Proof.
-  intros.
-  rewrite /lcml.
   induction xs; first by auto.
-  rewrite -cat1s foldr_cat /foldr.
+  rewrite /lcml -cat1s foldr_cat /foldr.
   by apply dvdn_lcmr.
 Qed.
 
-(** All integers in a sequence [xs] divide [lcml xs]. *)
+(** Given a sequence [xs], any integer [x \in xs] divides [lcml xs]. *)
 Lemma lcm_seq_is_mult_of_all_ints: 
-  forall (sq : seq nat) (a : nat), a \in sq -> exists k, lcml sq = k * a. 
+  forall (x : nat) (xs: seq nat), x \in xs -> x %| lcml xs. 
 Proof.
-  intros xs x IN.
-  induction xs as [ | z sq IH_DIVIDES]; first by easy.
+  intros x xs IN; apply/dvdnP.
+  induction xs as [ | z sq IH_DIV]; first by done.
   rewrite in_cons in IN.
   move : IN => /orP [/eqP EQ | IN].
-  + apply /dvdnP.
+  - apply /dvdnP.
     rewrite EQ /lcml.
     by apply int_divides_lcm_in_seq.
-  + move : (IH_DIVIDES IN) => [k EQ].
+  + move : (IH_DIV IN) => [k EQ].
     exists ((foldr lcmn 1 (z :: sq)) %/ (foldr lcmn 1 sq) * k).
     rewrite -mulnA -EQ divnK /lcml //.
     by apply lcm_seq_divides_lcm_super.
@@ -51,18 +45,14 @@ Qed.
 (** The LCM of all elements in a sequence with only positive elements is positive. *)
 Lemma all_pos_implies_lcml_pos:
   forall (xs : seq nat),
-    (forall b, b \in xs -> b > 0) ->
+    (forall x, x \in xs -> x > 0) ->
     lcml xs > 0.
 Proof.
   intros * POS.
   induction xs; first by easy.
-  rewrite /lcml -cat1s => //.
-  simpl; rewrite lcmn_gt0.
-  apply /andP; split => //.
-  + apply POS; rewrite in_cons; apply /orP; left.
-    now apply /eqP.
-  + feed_n 1 IHxs.
-    - intros b B_IN.
-      now apply POS; rewrite in_cons; apply /orP; right => //.
-    - now rewrite /lcml in IHxs.
+  rewrite /lcml -cat1s //= lcmn_gt0.
+  apply/andP; split => //.
+  - by apply POS; rewrite in_cons eq_refl.
+  - apply: IHxs; intros b B_IN.
+    by apply POS; rewrite in_cons; apply /orP; right => //.
 Qed.
