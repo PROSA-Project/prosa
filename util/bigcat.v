@@ -2,16 +2,16 @@ Require Export prosa.util.tactics prosa.util.notation.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 Require Export prosa.util.tactics prosa.util.ssrlia prosa.util.list.
 
-(** In this section, we introduce useful lemmas about the concatenation operation 
-    performed over arbitrary sequences. *)
+(** In this section, we introduce lemmas about the concatenation
+    operation performed over arbitrary sequences. *)
 Section BigCatNatLemmas.
 
-  (** Consider any type supporting equality comparisons... *)
-  Variable T: eqType.
+  (** Consider any type [T] supporting equality comparisons... *)
+  Variable T : eqType.
 
-  (** ...and a function that, given an index, yields a sequence. *)
-  Variable f: nat -> list T.
-
+  (** ...and a function [f] that, given an index, yields a sequence. *)
+  Variable f : nat -> seq T.
+  
   (** In this section, we prove that the concatenation over sequences works as expected: 
       no element is lost during the concatenation, and no new element is introduced. *)
   Section BigCatNatElements.
@@ -19,7 +19,7 @@ Section BigCatNatLemmas.
     (** First, we show that the concatenation comprises all the elements of each sequence; 
         i.e. any element contained in one of the sequences will also be an element of the 
         result of the concatenation. *)
-    Lemma mem_bigcat_nat:
+    Lemma mem_bigcat_nat :
       forall x m n j,
         m <= j < n ->
         x \in f j ->
@@ -35,7 +35,7 @@ Section BigCatNatLemmas.
       
     (** Conversely, we prove that any element belonging to a concatenation of sequences 
         must come from one of the sequences. *)
-    Lemma mem_bigcat_nat_exists:
+    Lemma mem_bigcat_nat_exists :
       forall x m n,
         x \in \cat_(m <= i < n) (f i) ->
         exists i,
@@ -53,9 +53,10 @@ Section BigCatNatLemmas.
       - exists n; split; first by done.
         by apply/andP; split; last apply ltnSn.
     Qed.
-    
-    Lemma mem_bigcat_ord:
-      forall x n (j: 'I_n) (f: 'I_n -> list T),
+
+    (** We also restate lemma [mem_bigcat_nat] in terms of ordinals. *)
+    Lemma mem_bigcat_ord :
+      forall (x : T) (n : nat) (j : 'I_n) (f : 'I_n -> seq T),
         j < n ->
         x \in (f j) ->
         x \in \cat_(i < n) (f i).
@@ -68,7 +69,7 @@ Section BigCatNatLemmas.
         apply (IHn (Ordinal Hj)); [by []|].
         by set j' := widen_ord _ _; have -> : j' = j; [apply ord_inj|].
     Qed.
-
+      
   End BigCatNatElements.
 
   (** In this section, we show how we can preserve uniqueness of the elements 
@@ -84,7 +85,7 @@ Section BigCatNatLemmas.
       forall x i1 i2, x \in f i1 -> x \in f i2 -> i1 = i2.
     
     (** We prove that the concatenation will yield a sequence with unique elements. *)
-    Lemma bigcat_nat_uniq:
+    Lemma bigcat_nat_uniq :
       forall n1 n2,
         uniq (\cat_(n1 <= i < n2) (f i)).
     Proof.
@@ -107,7 +108,7 @@ Section BigCatNatLemmas.
     (** Conversely, if the concatenation of the sequences has no duplicates, any
         element can only belong to a single sequence. *)
     Lemma bigcat_ord_uniq_reverse :
-      forall n (f: 'I_n -> list T),
+      forall (n : nat) (f : 'I_n -> seq T),
         uniq (\cat_(i < n) (f i)) ->
         (forall x i1 i2,
             x \in (f i1) -> x \in (f i2) -> i1 = i2).
@@ -146,11 +147,12 @@ Section BigCatNatLemmas.
 
   End BigCatNatDistinctElements.
 
-  (**  We show that filtering a concatenated sequence by any predicate [P] 
-   is the same as concatenating the elements of the sequence that satisfy [P]. *) 
-  Lemma bigcat_nat_filter_eq_filter_bigcat_nat:
+  (** We show that filtering a concatenated sequence by any predicate
+      [P] is the same as concatenating the elements of the sequence
+      that satisfy [P]. *) 
+  Lemma bigcat_nat_filter_eq_filter_bigcat_nat :
     forall {X : Type} (F : nat -> seq X) (P : X -> bool) (t1 t2 : nat),
-      [seq x <- \cat_(t1<=t<t2) F t | P x] = \cat_(t1<=t<t2)[seq x <- F t | P x].
+      [seq x <- \cat_(t1 <= t < t2) F t | P x] = \cat_(t1 <= t < t2)[seq x <- F t | P x].
   Proof.
     intros.
     specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
@@ -164,9 +166,9 @@ Section BigCatNatLemmas.
     + by rewrite !big_geq => //.
   Qed.
 
-  (** We show that the size of a concatenated sequence is the same as 
-   summation of sizes of each element of the sequence. *)
-  Lemma size_big_nat: 
+  (** We show that the size of a concatenated sequence is the same as
+      summation of sizes of each element of the sequence. *)
+  Lemma size_big_nat : 
     forall {X : Type} (F : nat -> seq X) (t1 t2 : nat),
       \sum_(t1 <= t < t2) size (F t) =
       size (\cat_(t1 <= t < t2) F t).
@@ -178,22 +180,21 @@ Section BigCatNatLemmas.
       induction Δ.
       { by rewrite addn0 !big_geq => //. }
       { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
-        rewrite size_cat IHΔ => //.
-        by ssrlia. }         
+        by rewrite size_cat IHΔ => //; ssrlia. }         
     - by rewrite !big_geq => //.
   Qed.      
   
 End BigCatNatLemmas.
 
 
-(** In this section, we introduce useful lemmas about the concatenation operation 
-    performed over arbitrary sequences. *)
+(** In this section, we introduce a few lemmas about the concatenation
+    operation performed over arbitrary sequences. *)
 Section BigCatLemmas.
 
-  (** Consider any two types supporting equality comparisons... *)
+  (** Consider any two types [X] and [Y] supporting equality comparisons... *)
   Variable X Y : eqType.
 
-  (** ...and a function that, given an index, yields a sequence. *)
+  (** ...and a function [f] that, given an index [X], yields a sequence of [Y]. *)
   Variable f : X -> seq Y.
 
   (** First, we show that the concatenation comprises all the elements of each sequence; 
@@ -232,7 +233,7 @@ Section BigCatLemmas.
 
   (** Next, we show that a map and filter operation can be done either 
       before or after a concatenation, leading to the same result. *)
-  Lemma bigcat_filter_eq_filter_bigcat:
+  Lemma bigcat_filter_eq_filter_bigcat :
     forall xss P, 
       [seq x <- \cat_(xs <- xss) f xs | P x]  =        
       \cat_(xs <- xss) [seq x <- f xs | P x] .
