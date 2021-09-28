@@ -4,17 +4,17 @@ Require Export prosa.model.task.arrival.curves.
 
 (** * Converting an Arrival Curve + Worst-Case/Best-Case to a Request-Bound Function (RBF) *)
 
-(** Consider any type of tasks with a given cost ... *)
-Context {Task : TaskType} `{TaskCost Task} `{TaskMinCost Task}.
-
-(**  ... and any type of jobs associated with these tasks. *)
-Context {Job : JobType} `{JobTask Job Task} `{JobCost Job}.
-
 (** In the following, we show a way to convert a given arrival curve, 
     paired with a worst-case/best-case execution time, to a request-bound function. 
     Definitions and proofs will handle both lower-bounding and upper-bounding arrival 
     curves. *)
 Section ArrivalCurveToRBF.
+
+  (** Consider any type of tasks with a given cost ... *)
+  Context {Task : TaskType} `{TaskCost Task} `{TaskMinCost Task}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType} `{JobTask Job Task} `{JobCost Job}.
 
   (** Let [MaxArr] and [MinArr] represent two arrivals curves. [MaxArr] upper-bounds 
       the possible number or arrivals for a given task, whereas [MinArr] lower-bounds it. *)
