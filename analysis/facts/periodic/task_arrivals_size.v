@@ -61,7 +61,7 @@ Section TaskArrivalsSize.
     intro t.
     case: (ltngtP (size (task_arrivals_at arr_seq tsk t)) 1) => [LT|GT|EQ]; try by auto.
     destruct (size (task_arrivals_at arr_seq tsk t)); now left.
-    specialize (exists_two Job (task_arrivals_at arr_seq tsk t)) => EXISTS_TWO.
+    specialize (exists_two (task_arrivals_at arr_seq tsk t)) => EXISTS_TWO.
     destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by done | by apply filter_uniq | ].
     rewrite mem_filter in A_IN; rewrite mem_filter in B_IN.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].

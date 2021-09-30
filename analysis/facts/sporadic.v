@@ -164,7 +164,7 @@ Section SporadicArrivals.
       False.
   Proof.
     move => [j [SIZE_G [PERIODIC VALID_TMIA]]].
-    specialize (exists_two Job (task_arrivals_at_job_arrival arr_seq j)) => EXISTS_TWO.
+    specialize (exists_two (task_arrivals_at_job_arrival arr_seq j)) => EXISTS_TWO.
     destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by done | by apply filter_uniq | ].
     rewrite mem_filter in A_IN; rewrite mem_filter in B_IN.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].

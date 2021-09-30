@@ -604,7 +604,7 @@ Section Sequential_Abstract_RTA.
         rewrite {1}addn1 big_nat1 addn1 big_nat1.
         rewrite (big_rem j) //= TSK !eq_refl; simpl.
         rewrite addnC -addnBA // subnn addn0.
-        rewrite (filter_size_rem _ j); [ | by done | by rewrite TSK].
+        rewrite (filter_size_rem j); [ | by done | by rewrite TSK].
         rewrite mulnDr mulnC muln1 -addnBA // subnn addn0 mulnC.
         apply sum_majorant_constant.
         move => j' ARR' /eqP TSK2.

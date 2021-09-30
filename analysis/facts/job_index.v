@@ -48,7 +48,7 @@ Section JobIndexLemmas.
       move: H_equal_index => IND. 
       apply task_arrivals_up_to_prefix_cat with (arr_seq0 := arr_seq) in ARR_LT => //.
       move : ARR_LT => [xs ARR_CAT]. 
-      apply eq_ind_in_seq with (xs := task_arrivals_up_to_job_arrival arr_seq j2) => //.
+      apply eq_ind_in_seq with (xs0 := task_arrivals_up_to_job_arrival arr_seq j2) => //.
       - now rewrite -/(job_index _ _) -IND -ARR_CAT index_cat ifT;
           try apply arrives_in_task_arrivals_up_to.
       - rewrite -ARR_CAT mem_cat; apply /orP.
@@ -65,7 +65,7 @@ Section JobIndexLemmas.
       move: H_equal_index => IND.
       apply ltnW, (task_arrivals_up_to_prefix_cat arr_seq) in LT => //.
       move: LT => [xs ARR_CAT].
-      apply (eq_ind_in_seq _ _ _ (task_arrivals_up_to_job_arrival arr_seq j1)) => //.
+      apply (eq_ind_in_seq _ _ (task_arrivals_up_to_job_arrival arr_seq j1)) => //.
       - now rewrite -/(job_index _ _) IND -ARR_CAT index_cat ifT;
           try apply arrives_in_task_arrivals_up_to.
       - now apply arrives_in_task_arrivals_up_to.
@@ -257,7 +257,7 @@ Section PreviousJob.
   Lemma prev_job_arr:
     arrives_in arr_seq (prev_job arr_seq j).
   Proof.
-    destruct (default_or_in _ (job_index arr_seq j - 1) j (task_arrivals_up_to_job_arrival arr_seq j)) as [EQ|IN].
+    destruct (default_or_in (job_index arr_seq j - 1) j (task_arrivals_up_to_job_arrival arr_seq j)) as [EQ|IN].
     + now rewrite /prev_job EQ.
     + apply in_arrivals_implies_arrived with (t1 := 0) (t2 := (job_arrival j).+1).
        now move: IN; rewrite mem_filter => /andP [_ IN].

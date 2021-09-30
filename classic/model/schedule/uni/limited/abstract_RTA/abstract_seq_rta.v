@@ -532,7 +532,7 @@ Module AbstractSeqRTA.
               rewrite (big_rem j) //=  TSK !eq_refl; simpl.
               rewrite addnC -addnBA; last by done.
               rewrite subnn addn0.
-              rewrite (filter_size_rem _ j); [ | by done | by rewrite /is_job_of_task TSK].
+              rewrite (filter_size_rem j); [ | by done | by rewrite /is_job_of_task TSK].
               rewrite mulnDr mulnC muln1 -addnBA; last by done.
               rewrite subnn addn0.
               rewrite mulnC.
