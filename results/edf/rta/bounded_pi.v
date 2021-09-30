@@ -171,18 +171,19 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Definition is_in_search_space (A : duration) :=
     (A < L) && (task_rbf_changes_at A || bound_on_total_hep_workload_changes_at A).
   
-  (** Let R be a value that upper-bounds the solution of each response-time recurrence, 
-     i.e., for any relative arrival time A in the search space, there exists a corresponding 
-     solution F such that [F + (task cost - task lock-in service) <= R]. *)
+  (** Let [R] be a value that upper-bounds the solution of each
+      response-time recurrence, i.e., for any relative arrival time [A]
+      in the search space, there exists a corresponding solution [F]
+      such that [R >= F + (task cost - task lock-in service)]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum: 
     forall (A : duration),
       is_in_search_space A -> 
       exists (F : duration),
-        A + F = priority_inversion_bound
+        A + F >= priority_inversion_bound
                 + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                 + bound_on_total_hep_workload  A (A + F) /\
-        F + (task_cost tsk - task_rtct tsk) <= R.
+        R >= F + (task_cost tsk - task_rtct tsk).
   
   (** To use the theorem uniprocessor_response_time_bound_seq from the Abstract RTA module, 
      we need to specify functions of interference, interfering workload and IBF.  *)
@@ -657,14 +658,14 @@ Section AbstractRTAforEDFwithArrivalCurves.
       (** Then, there exists solution for response-time recurrence (in the abstract sense). *)
       Corollary correct_search_space:
         exists F,
-          A + F = task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF A (A + F) /\
-          F + (task_cost tsk - task_rtct tsk) <= R.
+          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF A (A + F) /\
+          R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         edestruct H_R_is_maximum as [F [FIX NEQ]].
         - by apply A_is_in_concrete_search_space.
         - exists F; split; last by done.
-          apply/eqP; rewrite {1}FIX.
-            by rewrite addnA [_ + priority_inversion_bound]addnC -!addnA.
+          rewrite -{2}(leqRW FIX).
+          by rewrite addnA [_ + priority_inversion_bound]addnC -!addnA.
       Qed.
          
       End SolutionOfResponseTimeReccurenceExists.       
@@ -688,7 +689,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - by apply instantiated_busy_intervals_are_bounded.
     - by apply instantiated_task_interference_is_bounded.
-    - eapply correct_search_space; eauto 2. by apply/eqP.
+    - by eapply correct_search_space; eauto 2; apply/eqP.
   Qed.
   
 End AbstractRTAforEDFwithArrivalCurves. 

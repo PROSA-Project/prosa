@@ -132,7 +132,7 @@ Section AbstractRTAReduction.
     (** Suppose [A_sp + F_sp] is a "small" solution (i.e. less than [B]) of the response-time recurrence. *)
     Variables A_sp F_sp : duration.
     Hypothesis H_less_than : A_sp + F_sp < B.
-    Hypothesis H_fixpoint : A_sp + F_sp = interference_bound_function tsk A_sp (A_sp + F_sp).
+    Hypothesis H_fixpoint : A_sp + F_sp >= interference_bound_function tsk A_sp (A_sp + F_sp).
 
     (** Next, let [A] be any point such that: (a) [A_sp <= A <= A_sp + F_sp] and 
        (b) [interference_bound_function(A, x)] is equal to 
@@ -150,7 +150,7 @@ Section AbstractRTAReduction.
       exists F,
         A_sp + F_sp = A + F /\
         F <= F_sp /\
-        A + F = interference_bound_function tsk A (A + F).
+        A + F >= interference_bound_function tsk A (A + F).
     Proof.  
       move: H_bounds_for_A => /andP [NEQ1 NEQ2].
       set (X := A_sp + F_sp) in *.

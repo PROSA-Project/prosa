@@ -204,9 +204,9 @@ Section Sequential_Abstract_RTA.
       forall (A : duration),
         is_in_search_space_seq A ->
         exists (F : duration),
-          A + F = (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
+          A + F >= (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                   + task_interference_bound_function tsk A (A + F) /\
-          F + (task_cost tsk - task_rtct tsk) <= R.
+          R >= F + (task_cost tsk - task_rtct tsk).
 
     (** In this section we prove a few simple lemmas about the completion of jobs from the task
        considering the busy interval of the job under consideration. *)
@@ -648,18 +648,17 @@ Section Sequential_Abstract_RTA.
         forall (A : duration),
           is_in_search_space A ->
           exists (F : duration),
-            A + F = task_rtct tsk +
+            A + F >= task_rtct tsk +
                     (task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A (A + F)) /\
-            F + (task_cost tsk - task_rtct tsk) <= R.
+            R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         move: H_valid_run_to_completion_threshold => [PRT1 PRT2].
         intros A INSP.
         clear H_sequential_tasks H_interference_and_workload_consistent_with_sequential_tasks.
         move: (H_R_is_maximum_seq _ INSP) => [F [FIX LE]].
         exists F; split; last by done.
-        rewrite {1}FIX.
-        apply/eqP.
-        rewrite addnA eqn_add2r.
+        rewrite -{2}(leqRW FIX).
+        rewrite addnA leq_add2r.
         rewrite addnBA; last first.
         { apply leq_trans with (task_rbf 1).
           eapply task_rbf_1_ge_task_cost; eauto 2.

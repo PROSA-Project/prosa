@@ -118,15 +118,16 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := is_in_search_space ts tsk L.
   
-  (** Consider any value R, and assume that for any given arrival offset A in the search space,
-      there is a solution of the response-time bound recurrence which is bounded by R. *)
+  (** Consider any value [R], and assume that for any given arrival
+      offset [A] in the search space, there is a solution of the
+      response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum:
     forall (A : duration),
       is_in_search_space A -> 
       exists (F : duration),
-        A + F = blocking_bound + task_rbf (A + ε) + bound_on_total_hep_workload A (A + F) /\
-        F <= R.
+        A + F >= blocking_bound + task_rbf (A + ε) + bound_on_total_hep_workload A (A + F) /\
+        R >= F.
 
   (** Now, we can leverage the results for the abstract model with
       bounded nonpreemptive segments to establish a response-time

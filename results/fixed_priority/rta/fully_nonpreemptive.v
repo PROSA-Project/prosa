@@ -116,17 +116,18 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := is_in_search_space tsk L.
 
-  (** Next, consider any value R, and assume that for any given arrival A from search space
-      there is a solution of the response-time bound recurrence which is bounded by R. *)
+  (** Next, consider any value [R], and assume that for any given
+      arrival [A] from search space there is a solution of the
+      response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum:
     forall (A : duration),
       is_in_search_space A -> 
       exists (F : duration),
-        A + F = blocking_bound
+        A + F >= blocking_bound
                 + (task_rbf (A + ε) - (task_cost tsk - ε))
                 + total_ohep_rbf (A + F) /\
-        F + (task_cost tsk - ε) <= R.
+        R >= F + (task_cost tsk - ε).
   
   (** Now, we can leverage the results for the abstract model with
       bounded nonpreemptive segments to establish a response-time

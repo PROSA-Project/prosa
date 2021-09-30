@@ -97,17 +97,18 @@ Section Abstract_RTA.
   (** For simplicity, let's define a local name for the search space. *)
   Let is_in_search_space A := is_in_search_space tsk L interference_bound_function A.
 
-  (** Consider any value [R] that upper-bounds the solution of each response-time recurrence, 
-     i.e., for any relative arrival time A in the search space, there exists a corresponding 
-     solution [F] such that [F + (task_cost tsk - task_rtct tsk) <= R]. *)
+  (** Consider any value [R] that upper-bounds the solution of each
+      response-time recurrence, i.e., for any relative arrival time [A]
+      in the search space, there exists a corresponding solution [F]
+      such that [R >= F + (task_cost tsk - task_rtct tsk)]. *)
   Variable R: nat.
   Hypothesis H_R_is_maximum:
     forall A,
       is_in_search_space A -> 
       exists F,
-        A + F = task_rtct tsk
+        A + F >= task_rtct tsk
                 + interference_bound_function tsk A (A + F) /\
-        F + (task_cost tsk - task_rtct tsk) <= R.
+        R >= F + (task_cost tsk - task_rtct tsk).
 
   (** In this section we show a detailed proof of the main theorem 
      that establishes that R is a response-time bound of task [tsk]. *) 
@@ -152,10 +153,10 @@ Section Abstract_RTA.
    
     (** (d) [A_sp + F_sp] is a solution of the response time recurrence... *)
     Hypothesis H_Asp_Fsp_fixpoint :
-      A_sp + F_sp = task_rtct tsk + interference_bound_function tsk A_sp (A_sp + F_sp).
+      A_sp + F_sp >= task_rtct tsk + interference_bound_function tsk A_sp (A_sp + F_sp).
 
     (** (e) and finally, [F_sp + (task_last - ε)] is no greater than R. *)
-    Hypothesis H_R_gt_Fsp : F_sp + (task_cost tsk - task_rtct tsk) <= R.
+    Hypothesis H_R_gt_Fsp : R >= F_sp + (task_cost tsk - task_rtct tsk).
 
     (** In this section, we consider the case where the solution is so large 
        that the value of [t1 + A_sp + F_sp] goes beyond the busy interval. 
@@ -225,7 +226,7 @@ Section Abstract_RTA.
           Hypothesis H_F_le_Fsp : F <= F_sp.
           (** (c) and [A + F] is a solution for the response-time recurrence for [A]. *)
           Hypothesis H_A_F_fixpoint:
-            A + F = task_rtct tsk + interference_bound_function tsk A (A + F).
+            A + F >= task_rtct tsk + interference_bound_function tsk A (A + F).
  
           (** Next, we assume that job [j] is not completed by time [job_arrival j + R]. *)
           Hypothesis H_j_not_completed : ~~ completed_by sched j (job_arrival j + R).
@@ -276,7 +277,7 @@ Section Abstract_RTA.
             specialize (ESERV H3 H4).
             feed_n 2 ESERV.
             { eapply job_run_to_completion_threshold_le_job_cost; eauto. }
-            { rewrite {2}H_A_F_fixpoint.
+            { rewrite -{2}(leqRW H_A_F_fixpoint).
               rewrite /definitions.cumul_interference.
               rewrite -[in X in _ <= X]addnBAC; last by rewrite leq_subr.
               rewrite {2}/optimism.
@@ -504,7 +505,7 @@ Section Abstract_RTA.
           feed_n 7 ESERV; eauto 2.
           specialize (ESERV H3 H4).
           feed_n 2 ESERV; eauto using job_run_to_completion_threshold_le_job_cost.
-            by rewrite {2}H_Asp_Fsp_fixpoint leq_add //; apply H_valid_run_to_completion_threshold.
+          by rewrite -{2}(leqRW H_Asp_Fsp_fixpoint) leq_add //; apply H_valid_run_to_completion_threshold.
         Qed.
 
         (** However, this is a contradiction. Since job [j] has not yet arrived, its service 

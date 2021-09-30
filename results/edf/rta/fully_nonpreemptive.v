@@ -108,16 +108,17 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := is_in_search_space ts tsk L.
   
-  (** Consider any value R, and assume that for any given arrival offset A in the search space,
-      there is a solution of the response-time bound recurrence which is bounded by R. *)
+  (** Consider any value [R], and assume that for any given arrival
+      offset [A] in the search space, there is a solution of the
+      response-time bound recurrence which is bounded by [R]. *)
   Variable R: nat.
   Hypothesis H_R_is_maximum:
     forall A,
       is_in_search_space A -> 
       exists F,
-        A + F = blocking_bound + (task_rbf (A + ε) - (task_cost tsk - ε))
+        A + F >= blocking_bound + (task_rbf (A + ε) - (task_cost tsk - ε))
                 + bound_on_total_hep_workload A (A + F) /\
-        F + (task_cost tsk - ε) <= R.
+        R >= F + (task_cost tsk - ε).
 
   (** Now, we can leverage the results for the abstract model with bounded nonpreemptive segments
      to establish a response-time bound for the more concrete model of fully nonpreemptive scheduling. *)

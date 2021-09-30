@@ -145,18 +145,18 @@ Section AbstractRTAforFPwithArrivalCurves.
      analysis might have with regard to the beginning of its busy-window. *)
   Definition is_in_search_space A := (A < L) && (task_rbf A != task_rbf (A + ε)).
 
-  (** Let R be a value that upper-bounds the solution of each response-time recurrence, 
+  (** Let [R] be a value that upper-bounds the solution of each response-time recurrence, 
      i.e., for any relative arrival time A in the search space, there exists a corresponding 
-     solution F such that [F + (task cost - task lock-in service) <= R]. *)
+     solution [F] such that [R >= F + (task cost - task lock-in service)]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum : 
     forall (A : duration),
       is_in_search_space A -> 
       exists (F : duration),
-        A + F = priority_inversion_bound
+        A + F >= priority_inversion_bound
                 + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                 + total_ohep_rbf (A + F) /\
-        F + (task_cost tsk - task_rtct tsk) <= R.
+        R >= F + (task_cost tsk - task_rtct tsk).
 
   (** Instantiation of Interference *)
   (** We say that job j incurs interference at time t iff it cannot execute due to 
@@ -342,14 +342,14 @@ Section AbstractRTAforFPwithArrivalCurves.
       (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
       Corollary correct_search_space:
         exists (F : duration),
-          A + F = task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF (A + F) /\
-          F + (task_cost tsk - task_rtct tsk) <= R.
+          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF (A + F) /\
+          R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         move: (H_R_is_maximum A) => FIX.
         feed FIX; first by apply A_is_in_concrete_search_space. 
         move: FIX => [F [FIX NEQ]].
         exists F; split; last by done.
-        apply/eqP; rewrite {1}FIX.
+        rewrite -{2}(leqRW FIX).
           by rewrite addnA [_ + priority_inversion_bound]addnC -!addnA.
       Qed.
 

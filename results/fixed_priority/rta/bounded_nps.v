@@ -227,7 +227,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       forall (A : duration), 
         is_in_search_space A -> 
         exists (F : duration),
-          A + F = blocking_bound
+          A + F >= blocking_bound
                   + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                   + total_ohep_rbf (A + F) /\
           F + (task_cost tsk - task_rtct tsk) <= R.
