@@ -296,7 +296,7 @@ Section JLFPInstantiation.
             by rewrite /workload_of_jobs big_nil.
         }
         { unfold interfering_workload_of_hep_jobs, workload_of_jobs.
-          convert_two_instants_into_instant_and_duration t1 t2 k.
+          interval_to_duration t1 t2 k.
           induction k.
           - rewrite !addn0.
             rewrite big_geq; last by done.

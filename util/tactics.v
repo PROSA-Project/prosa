@@ -91,9 +91,9 @@ Ltac move_neq_up H :=
   || (rewrite leqNgt; apply/negP; intros H).
 
 (** The following tactic converts inequality [t1 <= t2] into a constant
- [k] such that [t2 = t1 + k] and substitutes all the occurrences of
- [t2]. *)
-Ltac convert_two_instants_into_instant_and_duration t1 t2 k :=
+    [k] such that [t2 = t1 + k] and substitutes all the occurrences of
+    [t2]. *)
+Ltac interval_to_duration t1 t2 k :=
   match goal with
   | [ H: (t1 <= t2) = true |- _ ] =>
     ltac:(
@@ -102,6 +102,18 @@ Ltac convert_two_instants_into_instant_and_duration t1 t2 k :=
       destruct EX as [k EQ]; subst t2; clear H
     )
   | [ H: (t1 < t2) = true |- _ ] =>
+    ltac:(
+      assert (EX : exists (k: nat), t2 = t1 + k);
+      [exists (t2 - t1); rewrite subnKC; auto using ltnW | ];
+      destruct EX as [k EQ]; subst t2; clear H
+    )
+  | [ H: is_true (t1 <= t2) |- _ ] =>
+    ltac:(
+      assert (EX : exists (k: nat), t2 = t1 + k);
+      [exists (t2 - t1); rewrite subnKC; auto | ];
+      destruct EX as [k EQ]; subst t2; clear H
+    )
+  | [ H: is_true (t1 < t2) |- _ ] =>
     ltac:(
       assert (EX : exists (k: nat), t2 = t1 + k);
       [exists (t2 - t1); rewrite subnKC; auto using ltnW | ];
