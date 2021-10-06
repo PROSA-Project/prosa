@@ -732,7 +732,7 @@ Module JLFPInstantiation.
 
         (* Based on that, we prove that the concept of busy interval obtained by instantiating the abstract 
            definition of busy interval coincides with the conventional definition of busy interval. *)
-        Lemma instantiated_busy_interval_equivalent_edf_busy_interval:
+        Lemma instantiated_busy_interval_equivalent_busy_interval:
           forall t1 t2,
             busy_interval job_arrival job_cost arr_seq sched higher_eq_priority j t1 t2 <-> 
             AbstractRTADefinitions.busy_interval job_arrival job_cost sched interference interfering_workload j t1 t2.

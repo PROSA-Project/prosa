@@ -525,7 +525,7 @@ Section JLFPInstantiation.
      
         (** Based on that, we prove that the concept of busy interval obtained by instantiating the abstract 
            definition of busy interval coincides with the conventional definition of busy interval. *)
-        Lemma instantiated_busy_interval_equivalent_edf_busy_interval:
+        Lemma instantiated_busy_interval_equivalent_busy_interval:
           forall t1 t2,
             busy_interval_cl j t1 t2 <-> busy_interval_ab j t1 t2.
         Proof.

@@ -199,7 +199,7 @@ Section AbstractRTAforFPwithArrivalCurves.
           * by exfalso.
           * by subst s; rewrite scheduled_at_def //; apply eqprop_to_eqbool.
         + exfalso; clear HYP1 HYP2.
-          eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto with basic_facts.
+          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto with basic_facts.
             by move: BUSY => [PREF _]; eapply not_quiet_implies_not_idle;
                               eauto 2 using eqprop_to_eqbool with basic_facts.
       - move: (HYP); rewrite scheduled_at_def; move => /eqP HYP2; apply/negP.
@@ -219,7 +219,7 @@ Section AbstractRTAforFPwithArrivalCurves.
     Proof.
       intros j t1 t2 ARR TSK POS BUSY.
       move: H_sched_valid => [CARR MBR].
-      eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto with basic_facts.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto with basic_facts.
       eapply all_jobs_have_completed_equiv_workload_eq_service; eauto with basic_facts.
       intros s ARRs TSKs.
       move: (BUSY) => [[_ [QT _]] _].
@@ -247,7 +247,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_rbf'. }
       exists t1, t2; split; first by done.
       split; first by done.
-      by eapply instantiated_busy_interval_equivalent_edf_busy_interval; eauto 2 with basic_facts.
+      by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
     Qed.
 
     (** Next, we prove that IBF is indeed an interference bound.
@@ -271,7 +271,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       move: H_sched_valid => [CARR MBR].
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
-      eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto 2 with basic_facts.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto 2 with basic_facts.
       rewrite /interference; erewrite cumulative_task_interference_split; eauto 2 with basic_facts; last first.
       { move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _].
           by eapply arrived_between_implies_in_arrivals; eauto 2. }

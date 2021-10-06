@@ -224,7 +224,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         move => /andP [HYP1 HYP2].
         ideal_proc_model_sched_case_analysis_eq sched t jo.
         { exfalso; clear HYP1 HYP2.
-          eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto 2 with basic_facts.
+          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto 2 with basic_facts.
           move: BUSY => [PREF _].
           by eapply not_quiet_implies_not_idle; eauto 2 with basic_facts. }
         { clear EqSched_jo; move: Sched_jo; rewrite scheduled_at_def; move => /eqP EqSched_jo.
@@ -256,7 +256,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       unfold EDF in *.
       intros j t1 t2 ARR TSK POS BUSY.
       move: H_sched_valid => [CARR MBR].
-      eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; eauto 2 with basic_facts.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto 2 with basic_facts.
       eapply all_jobs_have_completed_equiv_workload_eq_service; eauto 2 with basic_facts.
       intros s INs TSKs.
       rewrite /arrivals_between in INs. 
@@ -288,7 +288,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf''. }
       exists t1, t2; split; first by done.
       split; first by done.
-        by eapply instantiated_busy_interval_equivalent_edf_busy_interval; eauto 2 with basic_facts.
+        by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
     Qed.
     
     (** Next, we prove that IBF is indeed an interference bound. *)
@@ -344,7 +344,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             + by rewrite /is_priority_inversion leq_addr.
             + by rewrite ltnW.
           - apply H_priority_inversion_is_bounded; try done.
-            eapply instantiated_busy_interval_equivalent_edf_busy_interval in H_busy_interval; eauto 2 with basic_facts.
+            eapply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval; eauto 2 with basic_facts.
               by move: H_busy_interval => [PREF _].
         Qed.
 

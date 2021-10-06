@@ -239,7 +239,7 @@ Module AbstractRTAforEDFwithArrivalCurves.
                 by subst s; rewrite /scheduled_at SCHED.
           }
           { exfalso; clear HYP1 HYP2.
-            eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; try done; first last.
+            eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try done; first last.
             { by rewrite /JLFP_is_reflexive /reflexive /EDF /Priority.EDF. }
             { by apply job_task. } 
             have EQ:= not_quiet_implies_not_idle
@@ -268,7 +268,7 @@ Module AbstractRTAforEDFwithArrivalCurves.
           job_arrival job_cost job_task arr_seq sched tsk interference interfering_workload.          
       Proof. 
         intros j t1 t2 ARR TSK POS BUSY. 
-        eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; try done; first last.
+        eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try done; first last.
         { by rewrite /JLFP_is_reflexive /reflexive /EDF /Priority.EDF. }
         { by apply job_task. }
         eapply all_jobs_have_completed_equiv_workload_eq_service; eauto 2.
@@ -310,7 +310,7 @@ Module AbstractRTAforEDFwithArrivalCurves.
         move: EX => [t1 [t2 [H1 [H2 GGG]]]].
         exists t1, t2; split; first by done.
         split; first by done.
-        eapply instantiated_busy_interval_equivalent_edf_busy_interval; eauto 2.
+        eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2.
           by unfold JLFP_is_reflexive, reflexive, EDF, Priority.EDF. 
       Qed.
 
@@ -354,7 +354,7 @@ Module AbstractRTAforEDFwithArrivalCurves.
             - by rewrite ltnW.
           }
           { apply H_priority_inversion_is_bounded; try done.
-            eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; try done.
+            eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try done.
             { by move: BUSY => [PREF _]. }
             { by apply job_task. }
             { by rewrite /JLFP_is_reflexive /reflexive /EDF /Priority.EDF. }

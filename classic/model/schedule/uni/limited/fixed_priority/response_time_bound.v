@@ -214,7 +214,7 @@ Module AbstractRTAforFPwithArrivalCurves.
             - by subst s; rewrite /scheduled_at SCHED.
           }
           { exfalso; clear HYP1 HYP2. 
-            eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; try done; first last.
+            eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try done; first last.
             { by intros x; apply H_priority_is_reflexive. }
             { by apply job_task. } 
             have EQ:= not_quiet_implies_not_idle
@@ -244,7 +244,7 @@ Module AbstractRTAforFPwithArrivalCurves.
           job_arrival job_cost job_task arr_seq sched tsk interference interfering_workload.
       Proof.
         intros j t1 t2 ARR TSK POS BUSY. 
-        eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; first last; try by done.
+        eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; first last; try by done.
         { by intros x; apply H_priority_is_reflexive. }
         { by apply job_task. }
         eapply all_jobs_have_completed_equiv_workload_eq_service; eauto 2; intros s ARRs TSKs.
@@ -280,7 +280,7 @@ Module AbstractRTAforFPwithArrivalCurves.
         move: EX => [t1 [t2 [H1 [H2 GGG]]]].
         exists t1, t2; split; first by done.
         split; first by done.
-        eapply instantiated_busy_interval_equivalent_edf_busy_interval; eauto 2.
+        eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2.
           by intros x; apply H_priority_is_reflexive.
       Qed.
 
@@ -308,7 +308,7 @@ Module AbstractRTAforFPwithArrivalCurves.
           move: NCOMPL => /negP COMPL; apply: COMPL.
             by rewrite /is_response_time_bound_of_job /completed_by ZERO.
         }    
-        eapply instantiated_busy_interval_equivalent_edf_busy_interval in BUSY; first last; try done.
+        eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; first last; try done.
         { by intros x; apply H_priority_is_reflexive. }
         { by apply job_task. } 
         have T123 := cumulative_task_interference_split.
