@@ -200,8 +200,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Let interfering_workload (j : Job) (t : instant) :=
     ideal_jlfp_rta.interfering_workload arr_seq sched j t.
 
-  (** Finally, we define the interference bound function (IBF_other). IBF_other bounds the interference if tasks are sequential.
-      Since tasks are sequential, we exclude interference from other jobs of the same task. For EDF, we define IBF_other as the sum of the priority 
+  (** Finally, we define the interference bound function ([IBF_other]). [IBF_other] bounds the interference if tasks are sequential.
+      Since tasks are sequential, we exclude interference from other jobs of the same task. For EDF, we define [IBF_other] as the sum of the priority 
       interference bound and the higher-or-equal-priority workload. *)
   Let IBF_other (A R : duration) := priority_inversion_bound + bound_on_total_hep_workload A R.
 
@@ -382,11 +382,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
             by apply service_of_jobs_le_workload; eauto 2 with basic_facts.
         Qed.
 
-        (** Next, we reorder summation. So the total workload of jobs
-            with higher-or-equal priority from other tasks is equal to
-            the sum over all tasks [tsk_o] that are to equal to task
-            [tsk] of workload of jobs with higher-or-equal priority
-            task [tsk_o]. *)
+        (** Next, we prove that the total workload of jobs
+            with higher-or-equal priority from other tasks is bounded by
+            the sum over all tasks [tsk_o] that are not equal to task
+            [tsk] of workload of jobs with higher-or-equal priority from
+            task [tsk_o].*)
         Lemma reorder_summation:
           workload_of_jobs (EDF_not_from tsk) jobs
           <= \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (EDF_from tsk_o) jobs.

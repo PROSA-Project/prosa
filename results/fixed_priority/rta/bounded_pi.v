@@ -171,8 +171,8 @@ Section AbstractRTAforFPwithArrivalCurves.
   Let interfering_workload (j : Job) (t : instant) :=
     ideal_jlfp_rta.interfering_workload arr_seq sched j t.
   
-  (** Finally, we define the interference bound function (IBF_other). IBF_other bounds the interference if tasks are sequential.
-      Since tasks are sequential, we exclude interference from other jobs of the same task. For FP, we define IBF_other as the sum of the priority 
+  (** Finally, we define the interference bound function ([IBF_other]). [IBF_other] bounds the interference if tasks are sequential.
+      Since tasks are sequential, we exclude interference from other jobs of the same task. For FP, we define [IBF_other] as the sum of the priority 
       interference bound and the higher-or-equal-priority workload. *)
   Let IBF_other (R : duration) := priority_inversion_bound + total_ohep_rbf R.
 
