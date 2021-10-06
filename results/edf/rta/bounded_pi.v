@@ -1,4 +1,4 @@
-Require Export prosa.analysis.facts.edf.
+Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.

@@ -36,6 +36,7 @@ Global Hint Resolve EDF_respects_sequential_tasks : basic_facts.
 
 Require Export prosa.model.task.sequentiality.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
+Require Export prosa.analysis.facts.priority.sequential.
 
 (** In this section, we prove that EDF priority policy 
     implies that tasks are sequential. *)
@@ -81,64 +82,23 @@ Section SequentialEDF.
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Next, we assume that the schedule respects the policy defined by
-     the [job_preemptable] function (i.e., jobs have bounded
-     non-preemptive segments). *)
+      the [job_preemptable] function (i.e., jobs have bounded
+      non-preemptive segments). *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
-  
-  (** We say that a job [j1] always has higher priority than job [j2]
-      if, at any time [t], the priority of job [j1] is strictly higher than
-      priority of job [j2]. 
-      
-      NB: this definition and the following lemma are general facts about 
-      priority policies on uniprocessors that depend on neither EDF nor the ideal uniprocessor assumption. Generalizing to any priority policy and processor
-      model left to future work.
-      (https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/issues/78). *)
-  Definition always_higher_priority j1 j2 :=
-    forall t, hep_job_at t j1 j2 && ~~ hep_job_at t j2 j1.
-  
-  (** First, we show that, given two jobs [j1] and [j2], if job [j1]
-      arrives earlier than job [j2] and [j1] always has higher
-      priority than [j2], then [j2] is scheduled only after [j1] is
-      completed. *) 
-  Lemma early_hep_job_is_scheduled: 
-    forall j1 j2,
-      arrives_in arr_seq j1 -> 
-      job_arrival j1 < job_arrival j2 -> 
-      always_higher_priority j1 j2 ->
-      forall t,
-        scheduled_at sched j2 t ->
-        completed_by sched j1 t.
-  Proof.
-    move=> j1 j2 ARR LE AHP t SCHED; apply/negPn/negP; intros NCOMPL.
-    move: H_sched_valid => [COARR MBR].
-    have ARR_EXEC := jobs_must_arrive_to_be_ready sched MBR. 
-    edestruct scheduling_of_any_segment_starts_with_preemption_time
-      as [pt [LET [PT ALL_SCHED]]]; try eauto 2.
-    move: LET => /andP [LE1 LE2].
-    specialize (ALL_SCHED pt); feed ALL_SCHED; first by apply/andP; split.
-    have PEND1: pending sched j1 pt.
-    { apply/andP; split.
-      - by rewrite /has_arrived; ssrlia.
-      - by move: NCOMPL; apply contra, completion_monotonic.
-    }
-    apply H_job_ready in PEND1 => //; destruct PEND1 as [j3 [ARR3 [READY3 HEP3]]].
-    move: (AHP pt) => /andP[HEP /negP NHEP]; eapply NHEP.
-    eapply EDF_is_transitive; last by apply HEP3.
-    eapply H_respects_policy; eauto 2.
-    apply/andP; split; first by done.
-    apply/negP; intros SCHED2.
-    have EQ := ideal_proc_model_is_a_uniprocessor_model _ _ _ pt SCHED2 ALL_SCHED.
-    subst j2; rename j3 into j.
-    by specialize (AHP 0); destruct AHP; auto.
-  Qed.
 
-  (** Clearly, under the EDF priority policy, jobs satisfy the conditions
-     described by the lemma above; hence EDF implies sequential tasks. *)
+  (** To prove sequentiality, we use lemma
+      [early_hep_job_is_scheduled]. Clearly, under the EDF priority
+      policy, jobs satisfy the conditions described by the lemma
+      (i.e., given two jobs [j1] and [j2] from the same task, if [j1]
+      arrives earlier than [j2], then [j1] always has a higher
+      priority than job [j2], and hence completes before [j2]);
+      therefore EDF implies sequential tasks. *)
   Lemma EDF_implies_sequential_tasks:
     sequential_tasks arr_seq sched.
   Proof.
     intros ? ? ? ARR1 ARR2 SAME LT.
-    apply early_hep_job_is_scheduled => //.
+    eapply early_hep_job_is_scheduled => //; eauto 2.
+    - by auto with basic_facts.
     - clear t; intros ?.
       move: SAME => /eqP SAME.
       apply /andP.
