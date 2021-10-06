@@ -202,7 +202,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
   (** Finally, we define the interference bound function as the sum of the priority 
      interference bound and the higher-or-equal-priority workload. *)
-  Let IBF (A R : duration) := priority_inversion_bound + bound_on_total_hep_workload A R.
+  Let IBF_other (A R : duration) := priority_inversion_bound + bound_on_total_hep_workload A R.
 
   (** ** Filling Out Hypothesis Of Abstract RTA Theorem *)
   (** In this section we prove that all hypotheses necessary 
@@ -568,7 +568,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         ignores the task. *)
       Corollary instantiated_task_interference_is_bounded:
         task_interference_is_bounded_by
-          arr_seq sched tsk interference interfering_workload (fun tsk A R => IBF A R).
+          arr_seq sched tsk interference interfering_workload (fun tsk A R => IBF_other A R).
       Proof.
         unfold EDF in *.
         intros j R2 t1 t2 ARR TSK N NCOMPL BUSY.
@@ -604,7 +604,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
          the busy interval, the bound of the total interference incurred by j within an 
          interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF(A, Δ)]. *)
       Let total_interference_bound tsk (A Δ : duration) :=
-        task_rbf (A + ε) - task_cost tsk + IBF A Δ.
+        task_rbf (A + ε) - task_cost tsk + IBF_other A Δ.
       
       (** Next, consider any A from the search space (in abstract sense). *)
       Variable A : duration.
@@ -658,7 +658,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       (** Then, there exists solution for response-time recurrence (in the abstract sense). *)
       Corollary correct_search_space:
         exists F,
-          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF A (A + F) /\
+          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF_other A (A + F) /\
           R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         edestruct H_R_is_maximum as [F [FIX NEQ]].
@@ -684,7 +684,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
     { by rewrite /job_response_time_bound /completed_by ZERO. }    
     eapply uniprocessor_response_time_bound_seq with
         (interference0 := interference) (interfering_workload0 := interfering_workload)
-        (task_interference_bound_function := fun tsk A R => IBF A R) (L0 := L); eauto 2 with basic_facts.
+        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L); eauto 2 with basic_facts.
     - by apply instantiated_i_and_w_are_coherent_with_schedule.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - by apply instantiated_busy_intervals_are_bounded.

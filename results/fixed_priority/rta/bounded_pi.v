@@ -173,7 +173,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   
   (** Finally, we define the interference bound function as the sum of the priority 
       interference bound and the higher-or-equal-priority workload. *)
-  Let IBF (R : duration) := priority_inversion_bound + total_ohep_rbf R.
+  Let IBF_other (R : duration) := priority_inversion_bound + total_ohep_rbf R.
 
   (** ** Filling Out Hypotheses Of Abstract RTA Theorem *)
   (** In this section we prove that all preconditions necessary to use the abstract theorem are satisfied. *)
@@ -265,7 +265,7 @@ Section AbstractRTAforFPwithArrivalCurves.
        function that accepts, but simply ignores, the task and the relative arrival time. *)
     Lemma instantiated_task_interference_is_bounded:
       task_interference_is_bounded_by
-        arr_seq sched tsk interference interfering_workload (fun t A R => IBF R).
+        arr_seq sched tsk interference interfering_workload (fun t A R => IBF_other R).
     Proof.
       intros ? ? ? ? ARR TSK ? NCOMPL BUSY; simpl.
       move: H_sched_valid => [CARR MBR].
@@ -275,7 +275,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       rewrite /interference; erewrite cumulative_task_interference_split; eauto 2 with basic_facts; last first.
       { move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _].
           by eapply arrived_between_implies_in_arrivals; eauto 2. }
-      unfold IBF, interference.
+      unfold IBF_other, interference.
       rewrite leq_add; try done. 
       { move: (H_priority_inversion_is_bounded j ARR TSK) => BOUND.
         apply leq_trans with (cumulative_priority_inversion sched j t1 (t1 + R0)); first by done.
@@ -312,7 +312,7 @@ Section AbstractRTAforFPwithArrivalCurves.
          the busy interval, the bound of the total interference incurred by j within an 
          interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF Δ]. *)
       Let total_interference_bound tsk A Δ :=
-        task_rbf (A + ε) - task_cost tsk + IBF Δ.
+        task_rbf (A + ε) - task_cost tsk + IBF_other Δ.
 
       (** Next, consider any A from the search space (in the abstract sense). *)
       Variable A : duration.
@@ -342,7 +342,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
       Corollary correct_search_space:
         exists (F : duration),
-          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF (A + F) /\
+          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF_other (A + F) /\
           R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         move: (H_R_is_maximum A) => FIX.
