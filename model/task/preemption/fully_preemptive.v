@@ -8,7 +8,7 @@ Require Export prosa.model.task.preemption.parameters.
 Section FullyPreemptiveModel.
 
   (** Consider any type of jobs. *)
-  Context {Task : JobType}.
+  Context {Task : TaskType}.
 
   (** In the fully preemptive model, any job can be preempted at any
       time. Thus, the maximal non-preemptive segment has length at most ε
