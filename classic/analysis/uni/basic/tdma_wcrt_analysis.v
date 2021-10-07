@@ -1,4 +1,4 @@
-Require Import Arith Omega Nat.
+Require Import Arith Nat.
 Require Import prosa.classic.util.all.
 Require Import prosa.classic.model.arrival.basic.job
                prosa.classic.model.arrival.basic.task_arrival
