@@ -19,3 +19,5 @@ Makefile*
 /proof-state
 /with-proof-state
 /html-alectryon
+_esy
+esy.lock/

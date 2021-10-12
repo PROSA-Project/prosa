@@ -1,0 +1,55 @@
+{
+	"name": "coq-prosa",
+	"version": "1.0",
+	"description": "A Foundation for Formally Proven Schedulability Analysis",
+	"license": "BSD",
+	"esy": {
+		"buildsInSource": true,
+		"buildEnv": {
+			"COQBIN": "#{@opam/coq.bin}/",
+			"COQLIB": "#{@opam/coq.lib}/coq/",
+			"COQPATH": "#{coq-mathcomp-ssreflect.install}/user-contrib",
+			"DESTDIR": "#{self.install}"
+		},
+		"build": [
+			["./create_makefile.sh"],
+			["make", "-j"]
+		],
+		"install": "make install"
+	},
+	"scripts": {
+		"clean": "make clean",
+		"doc": "make html -j"
+	},
+	"dependencies": {
+		"@opam/coq": "8.13.2",
+		"@opam/ocamlfind": "1.8.1",
+		"coq-mathcomp-ssreflect": "1.12.0"
+	},
+	"devDependencies": {},
+	"resolutions": {
+		"coq-mathcomp-ssreflect": {
+			"source": "github:math-comp/math-comp#6bff567e84b01c1b3502985ec936b9e74ea252b4",
+			"version": "1.12.0",
+			"override": {
+				"dependencies": {
+					"@opam/coq": "8.13.2"
+				},
+				"buildsInSource": true,
+				"buildEnv": {
+					"HOME": "#{self.target_dir}",
+					"COQBIN": "#{@opam/coq.bin}/",
+					"COQLIB": "#{@opam/coq.lib}/coq/",
+					"COQPATH": "#{@opam/coq.lib}/coq/user-contrib",
+					"COQMAKEFILEOPTIONS": "DESTDIR = '#{self.install}' COQMF_WINDRIVE = '#{@opam/coq.lib}/coq'"
+				},
+				"build": [
+					[ "make", "-C", "mathcomp/ssreflect", "-j" ]
+				],
+				"install": [
+					[ "make", "-C", "mathcomp/ssreflect", "install" ]
+				]
+			}
+		}
+	}
+}

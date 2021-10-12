@@ -46,7 +46,31 @@ opam update
 opam install coq-prosa
 ```
 
-### From sources
+### From Sources With `esy`
+
+Prosa can be installed using [esy](https://esy.sh/).
+
+#### Installing `esy`
+
+`esy` itself can typically be installed through `npm`.
+It should look something like this on most `apt`-based systems:
+```
+sudo apt install npm
+sudo npm install --global esy@latest
+```
+
+#### Installing Prosa
+
+With `esy` in place, it is easy to compile Prosa in one go. To download and compile all of Prosa's dependencies (including Coq), and then to compile Prosa itself, simply issue the command:
+```
+esy
+```
+
+Note that `esy` uses an internal compilation environment, which is not exported to the current shell.
+To work within this environment, prefix any command with `esy`: for instance `esy coqide` to run your system’s coqIDE within the right environment.
+Alternatively, `esy shell` opens a shell within its environment.
+
+### Manually From Sources
 
 #### Dependencies
 
