@@ -26,7 +26,7 @@ stages:
     - opam install -y -v -j ${NJOBS} coq-prosa
 
 .preferred-stable-version:
-    image: mathcomp/mathcomp:1.12.0-coq-8.13
+    image: mathcomp/mathcomp:1.12.0-coq-8.14
 
 .build:
   image: mathcomp/mathcomp:${CI_JOB_NAME}
@@ -38,14 +38,14 @@ stages:
 
 .compile:
   stage: build
-  image: mathcomp/mathcomp:1.12.0-coq-8.13
+  image: mathcomp/mathcomp:1.12.0-coq-8.14
   script:
     - ./create_makefile.sh --without-classic
     - make -j ${NJOBS}
 
 .compile-classic:
   stage: build
-  image: mathcomp/mathcomp:1.12.0-coq-8.13
+  image: mathcomp/mathcomp:1.12.0-coq-8.14
   script:
     - ./create_makefile.sh --only-classic
     - make -j ${NJOBS}
@@ -94,6 +94,11 @@ stages:
 ###################### The Jobs ######################
 
 1.12.0-coq-8.13:
+  extends:
+    - .build
+    - .not_in_wip_branches
+
+1.12.0-coq-8.14:
   extends:
     - .build
     - .not_in_wip_branches
