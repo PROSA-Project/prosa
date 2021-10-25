@@ -87,7 +87,7 @@ End MaxAndLastNonpreemptiveSegment.
     model must satisfy. *)
 Section PreemptionModel.
 
-  (**  Consider any type of jobs with arrival times and execution costs... *)
+  (** Consider any type of jobs with arrival times and execution costs... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
@@ -105,6 +105,13 @@ Section PreemptionModel.
   (** ... and any given schedule. *)
   Variable sched : schedule PState.
 
+  (** We say that a job is [preempted_at t] if the job is scheduled at [t-1] and not scheduled at [t],
+      but not completed by [t].  *)
+  Definition preempted_at (j : Job) (t : instant) :=
+    scheduled_at sched j t.-1
+    && ~~ completed_by sched j t
+    && ~~ scheduled_at sched j t.
+  
   (** In the following, we define the notion of a valid preemption model.  To
       begin with, we require that a job has to be executed at least one time
       instant in order to reach a nonpreemptive segment. In other words, a job

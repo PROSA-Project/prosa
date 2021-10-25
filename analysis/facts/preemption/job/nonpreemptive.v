@@ -7,16 +7,17 @@ Require Export prosa.model.schedule.nonpreemptive.
 Require Import prosa.model.preemption.fully_nonpreemptive.
 
 (** * Platform for Fully Non-Preemptive model *)
+
 (** In this section, we prove that instantiation of predicate
     [job_preemptable] to the fully non-preemptive model indeed
     defines a valid preemption model. *)
 Section FullyNonPreemptiveModel.
-  
+
   (**  Consider any type of jobs. *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
-
+  
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
@@ -28,7 +29,7 @@ Section FullyNonPreemptiveModel.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.  
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched. 
   
   (** For simplicity, let's define some local names. *)
   Let job_pending := pending sched.
@@ -127,3 +128,45 @@ Section FullyNonPreemptiveModel.
   
 End FullyNonPreemptiveModel.
 Global Hint Resolve valid_fully_nonpreemptive_model : basic_facts.
+
+(** In this section, we prove the equivalence between no preemptions and a non-preemptive schedule. *)
+Section NoPreemptionsEquivalence.
+
+  (** Consider any type of jobs with preemption points. *)
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+  
+  (** Consider an ideal uniprocessor schedule. *)
+  Variable sched : schedule (ideal.processor_state Job).
+  
+  (** We prove that no preemptions in a schedule is equivalent to a non-preemptive schedule. *)
+  Lemma no_preemptions_equiv_nonpreemptive :
+    (forall j t, ~~preempted_at sched j t) <-> nonpreemptive_schedule sched.
+  Proof.
+    split.
+    { move=> NOT_PREEMPTED j t t'.
+      elim: t'; first by rewrite leqn0 => /eqP ->.
+      move=> t' IH LE_tt' SCHEDULED INCOMP.
+      apply contraT => NOT_SCHEDULED'.
+      move: LE_tt'. rewrite leq_eqVlt => /orP [/eqP EQ |];
+        first by move: NOT_SCHEDULED' SCHEDULED; rewrite -EQ => /negP //.
+      rewrite ltnS => LEQ.
+      have SCHEDULED': scheduled_at sched j t'
+        by apply IH, (incompletion_monotonic _ _ _ t'.+1) => //.
+      move: (NOT_PREEMPTED j t'.+1).
+      rewrite /preempted_at -pred_Sn -andbA negb_and => /orP [/negP //|].
+      rewrite negb_and => /orP [/negPn|/negPn].
+      - by move: INCOMP => /negP.
+      - by move: NOT_SCHEDULED' => /negP. }
+    { move => NONPRE j t.
+      apply contraT => /negPn /andP [/andP [SCHED_PREV INCOMP] NOT_SCHED].
+      have SCHED: scheduled_at sched j t
+        by apply: (NONPRE j t.-1 t) => //; apply leq_pred.
+      contradict NOT_SCHED.
+      apply /negP.
+      by rewrite Bool.negb_involutive.
+    }
+    Qed.
+
+End NoPreemptionsEquivalence. 
