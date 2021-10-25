@@ -5,22 +5,10 @@ Require Export prosa.analysis.facts.busy_interval.priority_inversion.
     job [j1] arrives earlier than job [j2] and [j1] always has higher
     priority than [j2], then [j2] is scheduled only after [j1] is
     completed. *) 
-Section SequentialJLFP.  
+Section SequentialJLFP.
 
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-  Context `{TaskCost Task}.
-  Context `{TaskDeadline Task}.
-
-  (** ... with a bound on the maximum non-preemptive segment length.
-      The bound is needed to ensure that, at any instant, it always 
-      exists a subsequent preemption time in which the scheduler can, 
-      if needed, switch to another higher-priority job. *)
-  Context `{TaskMaxNonpreemptiveSegment Task}.
-  
-  (** Further, consider any type of jobs associated with these tasks. *)
+  (** Consider any type of jobs. *)
   Context {Job : JobType}.
-  Context `{JobTask Job Task}.
   Context `{Arrival : JobArrival Job}.
   Context `{Cost : JobCost Job}.
 
@@ -46,15 +34,16 @@ Section SequentialJLFP.
       to their preemption points ... *)
   Context `{JobPreemptable Job}.
 
-  (** ... and assume that it defines a valid preemption model with
-      bounded non-preemptive segments. *)
-  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
-    valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
+  (** ... and assume that it defines a valid preemption model. *)
+  Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** Next, we assume that the schedule respects the policy defined by
      the [job_preemptable] function (i.e., jobs have bounded
-     non-preemptive segments). *)
+     non-preemptive segments)... *)
   Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
+
+  (** ... and that jobs must arrive to execute. *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   
   (** We show that, given two jobs [j1] and [j2], if job [j1] arrives
       earlier than job [j2] and [j1] always has higher priority than
@@ -68,9 +57,9 @@ Section SequentialJLFP.
         scheduled_at sched j2 t ->
         completed_by sched j1 t.
   Proof.
-    move=> j1 j2 ARR LE AHP t SCHED; apply/negPn/negP; intros NCOMPL.
+    move=> j1 j2 ARR LE AHP t SCHED.
+    apply/negPn/negP; intros NCOMPL.
     move: H_sched_valid => [COARR MBR].
-    have ARR_EXEC := jobs_must_arrive_to_be_ready sched MBR. 
     edestruct scheduling_of_any_segment_starts_with_preemption_time
       as [pt [LET [PT ALL_SCHED]]]; try eauto 2.
     move: LET => /andP [LE1 LE2].

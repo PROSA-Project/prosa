@@ -95,15 +95,9 @@ Section PriorityInversionIsBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (** ... and any ideal uniprocessor schedule of this arrival sequence ... *)
+  (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
-
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-      
+ 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context `{JLFP_policy Job}.
@@ -127,6 +121,10 @@ Section PriorityInversionIsBounded.
   (** Further, allow for any work-bearing notion of job readiness. *)
   Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+
+  (** We assume that the schedule is valid and that all jobs come from the arrival sequence. *)
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_jobs_come_from_arrival_sequence: jobs_come_from_arrival_sequence sched arr_seq.
   
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
@@ -192,7 +190,7 @@ Section PriorityInversionIsBounded.
         ~ is_idle sched t.
       Proof.
         intros IDLE.
-        by exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2.
+        by exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2 with basic_facts.
       Qed.
       
       (** Next we consider two cases: (1) when [t] is less than [t2 - 1] and (2) [t] is equal to [t2 - 1]. *)
@@ -268,8 +266,8 @@ Section PriorityInversionIsBounded.
             rewrite ltnS -pred_Sn in INBI.
             now rewrite -pred_Sn.
           }
-          have PEND := job_pending_at_arrival sched _ H_job_cost_positive H_jobs_must_arrive_to_execute.
-          rewrite ARR in PEND.
+          have PEND: pending sched j t2.-1
+            by rewrite -ARR; apply job_pending_at_arrival => //; eauto with basic_facts.
           apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [PENDhp HEPhp]]].
           eapply NOTHP, (H_priority_is_transitive 0); last by apply HEPhp.
           apply (H_respects_policy _ _ t2.-1); auto.
@@ -332,8 +330,8 @@ Section PriorityInversionIsBounded.
         feed (QUIET jhp); first by eapply CONS, Sched_jhp.
         specialize (QUIET HP LT).
         have COMP: job_completed_by jhp t by apply completion_monotonic with (t0 := t1).
-        apply completed_implies_not_scheduled in COMP; last by done.
-          by move: COMP => /negP COMP; apply COMP.
+        apply completed_implies_not_scheduled in COMP; eauto with basic_facts.
+        by move: COMP => /negP COMP; apply COMP.
       Qed.
       
       (** From the above lemmas we prove that there is a job [jhp] that is (1) scheduled at time [t],
@@ -354,52 +352,9 @@ Section PriorityInversionIsBounded.
         - by apply scheduled_at_preemption_time_implies_higher_or_equal_priority.
         - by done.
       Qed.
+
       
     End ProcessorBusyWithHEPJobAtPreemptionPoints.
-    
-    (** Next we prove that every nonpreemptive segment 
-        always begins with a preemption time ... *)
-    Lemma scheduling_of_any_segment_starts_with_preemption_time: 
-      forall j t,
-        job_scheduled_at j t ->
-        exists pt,
-          job_arrival j <= pt <= t /\
-          preemption_time sched pt /\
-          (forall t', pt <= t' <= t -> job_scheduled_at j t').
-    Proof.
-      intros s t SCHEDst.
-      have EX: exists t', (t' <= t) && (job_scheduled_at s t')
-                              && (all (fun t'' => job_scheduled_at s t'') (index_iota t' t.+1 )).
-      { exists t. apply/andP; split; [ by apply/andP; split | ].
-        apply/allP; intros t'.
-          by rewrite mem_index_iota ltnS -eqn_leq; move => /eqP <-.  
-      } 
-      have MIN := ex_minnP EX. 
-      move: MIN => [mpt /andP [/andP [LT1 SCHEDsmpt] /allP ALL] MIN]; clear EX.
-      destruct mpt.
-      - exists 0; repeat split.
-        + by apply/andP; split; first apply H_jobs_must_arrive_to_execute in SCHEDsmpt.
-        + by eapply zero_is_pt; eauto 2.
-        + by intros; apply ALL; rewrite mem_iota subn0 add0n ltnS.
-      - have NSCHED: ~~ job_scheduled_at s mpt.
-        { apply/negP; intros SCHED.
-          enough (F : mpt < mpt); first by rewrite ltnn in F.
-          apply MIN.
-          apply/andP; split; [by apply/andP; split; [ apply ltnW | ] | ].
-          apply/allP; intros t'.
-          rewrite mem_index_iota; move => /andP [GE LE].
-          move: GE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LT].
-          - by subst t'. 
-          - by apply ALL; rewrite mem_index_iota; apply/andP; split. 
-        }         
-        have PP: preemption_time sched mpt.+1.
-        { by eapply first_moment_is_pt with (j0 := s); eauto 2. }
-        exists mpt.+1; repeat split; try done.
-        + apply/andP; split; last by done.
-            by apply H_jobs_must_arrive_to_execute in SCHEDsmpt.
-        + move => t' /andP [GE LE].
-            by apply ALL; rewrite mem_index_iota; apply/andP; split.
-    Qed.
 
     (** ... and the fact that at any time instant after a preemption point the
        processor is always busy with a job with higher or equal priority. *) 
@@ -413,8 +368,6 @@ Section PriorityInversionIsBounded.
           hep_job j_hp j /\
           job_scheduled_at j_hp t.
     Proof.
-      move: (H_jobs_come_from_arrival_sequence) (H_work_conserving) => CONS WORK.
-      move: (H_respects_policy) => PRIO.              
       move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
       ideal_proc_model_sched_case_analysis_eq sched t jhp.
       { apply instant_t_is_not_idle in Idle; first by done.
@@ -422,7 +375,8 @@ Section PriorityInversionIsBounded.
       exists jhp.
       have HP: hep_job jhp j.
       { intros.
-        have SOAS := scheduling_of_any_segment_starts_with_preemption_time _ _ Sched_jhp.
+         move:(H_valid_model_with_bounded_nonpreemptive_segments) => [PREE ?].
+        specialize (scheduling_of_any_segment_starts_with_preemption_time arr_seq sched H_sched_valid PREE jhp t Sched_jhp) => SOAS.
         move: SOAS => [prt [/andP [_ LE] [PR SCH]]].
         case E:(t1 <= prt).
         - move: E => /eqP /eqP E; rewrite subn_eq0 in E.
@@ -445,13 +399,13 @@ Section PriorityInversionIsBounded.
       eapply scheduled_implies_pending in PENDING; eauto with basic_facts.
       apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
       apply contraT; rewrite -ltnNge; intro LT; exfalso.
-      feed (QUIET jhp); first by eapply CONS, Sched_jhp.
+      feed (QUIET jhp); first by eapply H_jobs_come_from_arrival_sequence, Sched_jhp.
       specialize (QUIET HP LT).
       have COMP: job_completed_by jhp t.
       { by apply completion_monotonic with (t0 := t1); [ apply leq_trans with tp | ]. }
-      apply completed_implies_not_scheduled in COMP; last by done.
-        by move: COMP => /negP COMP; apply COMP.
-    Qed.
+      apply completed_implies_not_scheduled in COMP; eauto with basic_facts.
+      by move : COMP => /negP COMP; apply : COMP.
+    Qed. 
     
     (** Now, suppose there exists some constant K that bounds the distance to 
        a preemption time from the beginning of the busy interval. *)
@@ -499,8 +453,11 @@ Section PriorityInversionIsBounded.
       apply/negP; intros SCHED2.
       specialize (QT jhp).
       feed_n 3 QT; eauto.
-      apply completed_implies_not_scheduled in QT; last by done.
-        by move: QT => /negP NSCHED; apply: NSCHED.
+      - have MATE: jobs_must_arrive_to_execute sched by eauto with basic_facts.
+        have HA: has_arrived jhp t by apply MATE.
+        by done.
+      apply completed_implies_not_scheduled in QT; eauto with basic_facts.
+      by move: QT => /negP NSCHED; apply: NSCHED.
     Qed.
 
     (** Also, we show that lower-priority jobs that are scheduled inside the
@@ -515,7 +472,9 @@ Section PriorityInversionIsBounded.
       move => jlp t /andP [GE LT] SCHED LP.
       move: (H_busy_interval_prefix) => [NEM [QT [NQT HPJ]]].
       apply negbNE; apply/negP; intros ARR; rewrite -leqNgt in ARR.
-      have SCH:= scheduling_of_any_segment_starts_with_preemption_time _ _ SCHED.
+      rewrite /job_scheduled_at in SCHED.
+      move:(H_valid_model_with_bounded_nonpreemptive_segments) => [PREE ?].
+      specialize (scheduling_of_any_segment_starts_with_preemption_time arr_seq sched H_sched_valid PREE jlp t SCHED) => SCH.
       move: SCH => [pt [/andP [NEQ1 NEQ2] [PT FA]]].
       have NEQ: t1 <= pt < t2.
       { apply/andP; split.
@@ -526,7 +485,7 @@ Section PriorityInversionIsBounded.
       move: LL => [jhp [ARRjhp [HP SCHEDhp]]].
       feed (FA pt); first (by apply/andP; split). 
       move: LP => /negP LP; apply: LP.
-        by have ->: jlp = jhp by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
+      by have ->: jlp = jhp by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
     Qed.
      
     (** Moreover, we show that lower-priority jobs that are scheduled
@@ -544,7 +503,8 @@ Section PriorityInversionIsBounded.
       exists t1.-1; split.
       { by rewrite prednK; last apply leq_ltn_trans with (job_arrival jlp). } 
       move: (H_busy_interval_prefix) => [NEM [QT [NQT HPJ]]].
-      have SCHEDST := scheduling_of_any_segment_starts_with_preemption_time _ _ SCHED.
+      move:(H_valid_model_with_bounded_nonpreemptive_segments) => [PREE ?].
+      specialize (scheduling_of_any_segment_starts_with_preemption_time arr_seq sched H_sched_valid PREE jlp t SCHED) => SCHEDST.
       move: SCHEDST => [pt [NEQpt [PT SCHEDc]]].
       have LT2: pt < t1.
       { rewrite ltnNge; apply/negP; intros CONTR.
@@ -612,14 +572,15 @@ Section PriorityInversionIsBounded.
             t1 <= pr_t <= t1 + max_length_of_priority_inversion j t1.
         Proof.
           set (service := service sched).
+          move :  (H_valid_model_with_bounded_nonpreemptive_segments) =>  [VALID BOUNDED].
           move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
           move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]].
           exists t1; split; last first.
           apply/andP; split; [by done | by rewrite leq_addr].
           destruct t1.
-          - eapply zero_is_pt; eauto 2. 
-          - eapply hp_job_not_scheduled_before_quiet_time in QT1; eauto 2.
-              by eapply first_moment_is_pt with (j0 := jhp); eauto 2.
+          - by eapply zero_is_pt; eauto 2.
+          - eapply first_moment_is_pt with (j0 := jhp); eauto 2.
+            by eapply hp_job_not_scheduled_before_quiet_time; try by done.
         Qed.
           
       End Case2.
@@ -776,11 +737,11 @@ Section PriorityInversionIsBounded.
               ((service jlp t1) <= pt <= (service jlp t1) + (job_max_nonpreemptive_segment jlp - 1)) && job_preemptable jlp pt.
           { move: (H_jlp_is_scheduled) => ARRs; apply H_jobs_come_from_arrival_sequence in ARRs.
             move: (proj2 (H_valid_model_with_bounded_nonpreemptive_segments) jlp ARRs) =>[_ EXPP].
+            destruct H_sched_valid as [A B].
             specialize (EXPP (service jlp t1)).
             feed EXPP.
             { apply/andP; split; first by done.
-              apply service_at_most_cost; first by done.
-                by apply ideal_proc_model_provides_unit_service.
+              apply service_at_most_cost; eauto with basic_facts.
             }
             move: EXPP => [pt [NEQ PP]].
             exists pt; apply/andP; split; by done.

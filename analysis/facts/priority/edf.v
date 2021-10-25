@@ -99,11 +99,12 @@ Section SequentialEDF.
     intros ? ? ? ARR1 ARR2 SAME LT.
     eapply early_hep_job_is_scheduled => //; eauto 2.
     - by auto with basic_facts.
+    - move : H_valid_model_with_bounded_nonpreemptive_segments => [VALID _]; apply VALID.
     - clear t; intros ?.
       move: SAME => /eqP SAME.
       apply /andP.
       rewrite /hep_job_at /JLFP_to_JLDP /hep_job /edf.EDF /job_deadline
-              /absolute_deadline.job_deadline_from_task_deadline SAME.
+               /absolute_deadline.job_deadline_from_task_deadline SAME. 
       split.
       + by rewrite leq_add2r ltnW.
       + by rewrite -ltnNge ltn_add2r. 
