@@ -5,75 +5,10 @@ Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.busy_interval.
 Require Export prosa.analysis.facts.model.ideal_schedule.
 Require Export prosa.analysis.facts.busy_interval.busy_interval.
+Require Export prosa.analysis.facts.model.preemption.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
-
-(** In preparation of the derivation of the priority inversion bound, we
-    establish two basic facts on preemption times. *)
-Section PreemptionTimes.
-
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-  Context `{TaskCost Task}.
-  Context `{TaskMaxNonpreemptiveSegment Task}.
-
-  (**  ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
-
-  (** In addition, we assume the existence of a function mapping a
-      task to its maximal non-preemptive segment ... *)
-  Context `{TaskMaxNonpreemptiveSegment Task}.
-
-  (** ... and the existence of a function mapping a job and
-      its progress to a boolean value saying whether this job is
-      preemptable at its current point of execution. *)
-  Context `{JobPreemptable Job}.
-
-  (** Consider any arrival sequence with consistent arrivals. *)
-  Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
-
-  (** Consider a valid model with bounded nonpreemptive segments. *)
-  Hypothesis H_model_with_bounded_nonpreemptive_segments:
-    valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
-
-  (** Then, we show that time 0 is a preemption time. *)
-  Lemma zero_is_pt: preemption_time sched 0.
-  Proof.
-    unfold preemption_time.
-    case SCHED: (sched 0) => [j | ]; last by done.
-    move: (SCHED) => /eqP; rewrite -scheduled_at_def; move => ARR.
-    apply H_jobs_come_from_arrival_sequence in ARR.
-    rewrite /service /service_during big_geq; last by done.
-    destruct H_model_with_bounded_nonpreemptive_segments as [T1 T2].
-    by move: (T1 j ARR) => [PP _].
-  Qed.
-
-  (** Also, we show that the first instant of execution is a preemption time. *)
-  Lemma first_moment_is_pt:
-    forall j prt,
-      arrives_in arr_seq j ->
-      ~~ scheduled_at sched j prt ->
-      scheduled_at sched j prt.+1 ->
-      preemption_time sched prt.+1.
-  Proof.
-    intros s pt ARR NSCHED SCHED.
-    unfold preemption_time.
-    move: (SCHED); rewrite scheduled_at_def; move => /eqP SCHED2; rewrite SCHED2; clear SCHED2.
-    destruct H_model_with_bounded_nonpreemptive_segments as [T1 T2].
-    by move: (T1 s ARR) => [_ [_ [_ P]]]; apply P.
-  Qed.
-
-End PreemptionTimes.
 
 (** * Priority inversion is bounded *)
 (** In this module we prove that any priority inversion that occurs in the model with bounded 
