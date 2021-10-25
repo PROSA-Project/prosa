@@ -118,9 +118,12 @@ Section Arrived.
 
 End Arrived.
 
-(** We add the above lemma into a "Hint Database" basic_facts, so Coq
-    will be able to apply it automatically. *)
-Global Hint Resolve valid_schedule_implies_jobs_must_arrive_to_execute : basic_facts.
+(** We add some of the above lemmas to the "Hint Database"
+    [basic_facts], so the [auto] tactic will be able to use them. *)
+Global Hint Resolve
+       valid_schedule_implies_jobs_must_arrive_to_execute
+       jobs_must_arrive_to_be_ready
+  : basic_facts.
 
 (** In this section, we establish useful facts about arrival sequence prefixes. *)
 Section ArrivalSequencePrefix.
