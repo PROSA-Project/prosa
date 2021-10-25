@@ -1,5 +1,6 @@
 Require Export prosa.util.all.
 Require Export prosa.behavior.all.
+Require Export prosa.model.priority.classes.
 
 (** * Job-Level Preemption Model *)
 (** There are many equivalent ways to represent at which points in time a job
@@ -95,6 +96,9 @@ Section PreemptionModel.
   (** ... and any preemption model. *)
   Context `{JobPreemptable Job}.
 
+  (** Consider any JLDP policy. *)
+  Context `{JLDP_policy Job}.
+
   (** Consider any kind of processor model, ... *)
   Context {PState : Type}.
   Context `{ProcessorState Job PState}.
@@ -146,5 +150,13 @@ Section PreemptionModel.
       /\ job_cannot_be_nonpreemptive_after_completion j
       /\ not_preemptive_implies_scheduled j
       /\ execution_starts_with_preemption_point j.
+  
+  (** We say that there are no superfluous preemptions if a job can 
+      only be preempted by another job having strictly higher priority. *)
+  Definition no_superfluous_preemptions :=
+    forall t j j_hp,
+      preempted_at j t ->
+      scheduled_at sched j_hp t ->
+      ~~ hep_job_at t j j_hp.
 
 End PreemptionModel.
