@@ -339,7 +339,7 @@ Section Sequential_Abstract_RTA.
             Qed.
 
           End Case1.
-
+            
           Section Case2.
 
             (** Assume a job [j'] from another task is scheduled at time [t]. *)
@@ -363,13 +363,14 @@ Section Sequential_Abstract_RTA.
                       /service_of_jobs.service_of_jobs_at scheduled_at_def/=.
               have ARRs: arrives_in arr_seq j'; first by apply H_jobs_come_from_arrival_sequence with t; rewrite scheduled_at_def; apply/eqP.
               rewrite H_sched H_not_job_of_tsk; simpl.
-              rewrite (negbTE (option_inj_neq (neqprop_to_neqbool
-                                                 (diseq (fun j => job_task j = tsk) _ _
-                                                        (neqbool_to_neqprop H_not_job_of_tsk) H_job_of_tsk)))) addn0.
+              have ->: Some j' == Some j = false; last rewrite addn0.
+              { apply/negP => /eqP CONTR; inversion CONTR; subst j'.
+                by move: (H_job_of_tsk) (H_not_job_of_tsk) => -> => /eqP NEQ; apply: NEQ. }
               have ZERO: \sum_(i <- arrivals_between t1 (t1 + A + ε) | job_task i == tsk) (Some j' == Some i) = 0.
               { apply big1; move => j2 /eqP TSK2; apply/eqP; rewrite eqb0.
-                apply option_inj_neq, neqprop_to_neqbool, (diseq (fun j => job_task j = tsk) _ _
-                                                                 (neqbool_to_neqprop H_not_job_of_tsk) TSK2). }
+                apply/negP => /eqP EQ; inversion EQ; subst j'.
+                by move: TSK2 H_not_job_of_tsk => -> /negP.
+              }
               rewrite ZERO ?addn0 add0n; simpl; clear ZERO.
               case INT: (interference j t); last by done.
               simpl; rewrite lt0b.
@@ -404,15 +405,17 @@ Section Sequential_Abstract_RTA.
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def/=.
               have ARRs: arrives_in arr_seq j'; first by apply H_jobs_come_from_arrival_sequence with t; rewrite scheduled_at_def; apply/eqP.
-              rewrite H_sched H_not_job_of_tsk addn0; simpl;
-                rewrite [Some j' == Some j](negbTE (option_inj_neq (neq_sym H_j_neq_j'))) addn0.
+              rewrite H_sched H_not_job_of_tsk addn0; simpl.
+              have ->: Some j' == Some j = false by
+                  apply/negP => /eqP EQ; inversion EQ; subst j'; move:H_j_neq_j' => /negP NEQ; apply: NEQ.
               replace (interference j t) with true; last first.
               { have NEQT: t1 <= t < t2.
                 { by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x). }
                 move: (H_work_conserving j t1 t2 t H_j_arrives H_job_of_tsk H_job_cost_positive H_busy_interval NEQT) => [Hn _].
                 apply/eqP;rewrite eq_sym eqb_id; apply/negPn/negP; intros CONTR; move: CONTR => /negP CONTR.
                 apply Hn in CONTR; rewrite scheduled_at_def in CONTR; simpl in CONTR.
-                by rewrite H_sched [Some j' == Some j](negbTE (option_inj_neq (neq_sym H_j_neq_j'))) in CONTR. }
+                by move: CONTR; rewrite H_sched => /eqP EQ; inversion EQ; subst; move: H_j_neq_j' => /eqP.
+              }
               rewrite big_mkcond; apply/sum_seq_gt0P; exists j'; split; last first.
               { by move: H_not_job_of_tsk => /eqP TSK; rewrite /job_of_task TSK eq_refl eq_refl. }
               { intros. have ARR:= arrives_after_beginning_of_busy_interval j j' _ _ _ _ _ t1 t2 _ t.
@@ -460,7 +463,7 @@ Section Sequential_Abstract_RTA.
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def.
-              rewrite H_sched H_job_of_tsk neq_antirefl addn0; simpl.
+              rewrite H_sched H_job_of_tsk !eq_refl addn0 //=.
               move: (H_work_conserving j _ _ t H_j_arrives H_job_of_tsk H_job_cost_positive H_busy_interval) => WORK.
               feed WORK.
               { move: H_t_in_interval => /andP [NEQ1 NEQ2].
@@ -468,7 +471,7 @@ Section Sequential_Abstract_RTA.
               move: WORK => [_ ZIJT].
               feed ZIJT; first by rewrite scheduled_at_def H_sched; simpl.
               move: ZIJT => /negP /eqP; rewrite eqb_negLR; simpl; move => /eqP ZIJT; rewrite ZIJT; simpl; rewrite add0n.
-              rewrite !eq_refl; simpl; rewrite big_mkcond //=; apply/sum_seq_gt0P.
+              rewrite big_mkcond //=; apply/sum_seq_gt0P.
               by exists j; split; [apply j_is_in_arrivals_between | rewrite /job_of_task H_job_of_tsk H_sched !eq_refl].
             Qed.
 

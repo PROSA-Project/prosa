@@ -375,7 +375,7 @@ Section IdealModelLemmas.
     destruct (t1 <= t2) eqn:LE; last first.
     { move: LE => /negP/negP; rewrite -ltnNge.
       move => LT; apply ltnW in LT; rewrite -subn_eq0 in LT.
-      by rewrite (eqbool_to_eqprop LT) ltn0 in SERV.
+      by move: LT => /eqP -> in SERV; rewrite ltn0 in SERV.
     }
     have EX: exists δ, t2 = t1 + δ.
     { by exists (t2 - t1); rewrite subnKC // ltnW. }

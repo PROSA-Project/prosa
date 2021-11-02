@@ -622,9 +622,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
           rewrite /task_rbf_changes_at neq_ltn; apply/orP; left.
           rewrite /task_rbf /rbf; erewrite task_rbf_0_zero; eauto 2.
           rewrite add0n /task_rbf; apply leq_trans with (task_cost tsk).
-          - by eapply leq_trans; eauto 2;
-              rewrite -(eqbool_to_eqprop H_job_of_tsk); apply H_valid_job_cost. 
-          - by eapply task_rbf_1_ge_task_cost; eauto using eqbool_to_eqprop.
+          - by eapply leq_trans; eauto 2; move: H_job_of_tsk => /eqP <-; apply H_valid_job_cost. 
+          - by eapply task_rbf_1_ge_task_cost; eauto 2; apply/eqP.
         }
         { apply/andP; split; first by done.
           rewrite -[_ || _ ]Bool.negb_involutive negb_or; apply/negP; move => /andP [/negPn/eqP EQ1 /hasPn EQ2].

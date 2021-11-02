@@ -591,7 +591,7 @@ Section PriorityInversionIsBounded.
           move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
           move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]].
           exists t1; split.
-          - by rewrite /preemption_time (eqbool_to_eqprop H_is_idle).
+          - by rewrite /preemption_time; move: H_is_idle => /eqP ->.
           - by apply/andP; split; last rewrite leq_addr. 
         Qed.
         

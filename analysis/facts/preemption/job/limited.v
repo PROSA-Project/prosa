@@ -72,7 +72,7 @@ Section ModelWithLimitedPreemptions.
       move: H_valid_limited_preemptions_job_model => [BEG [END _]].
       apply/negPn/negP; rewrite -eqn0Ngt; intros CONTR; rewrite size_eq0 in CONTR.
       specialize (BEG j H_j_arrives).
-        by rewrite /beginning_of_execution_in_preemption_points (eqbool_to_eqprop CONTR) in BEG.
+      by move: CONTR BEG => /eqP; rewrite /beginning_of_execution_in_preemption_points => ->.
     Qed.
 
     (** Next, we prove that the cost of a job is a preemption point. *)

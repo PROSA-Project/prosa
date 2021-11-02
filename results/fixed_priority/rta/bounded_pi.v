@@ -198,11 +198,10 @@ Section AbstractRTAforFPwithArrivalCurves.
           rewrite !Bool.negb_involutive negb_and Bool.negb_involutive.
           move => HYP1 /orP [/negP HYP2| /eqP HYP2].
           * by exfalso.
-          * by subst s; rewrite scheduled_at_def //; apply eqprop_to_eqbool.
+          * by subst s; rewrite scheduled_at_def //; apply/eqP. 
         + exfalso; clear HYP1 HYP2.
           eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto with basic_facts.
-            by move: BUSY => [PREF _]; eapply not_quiet_implies_not_idle;
-                              eauto 2 using eqprop_to_eqbool with basic_facts.
+          by move: BUSY => [PREF _]; eapply not_quiet_implies_not_idle; eauto 2 with basic_facts; apply/eqP.
       - move: (HYP); rewrite scheduled_at_def; move => /eqP HYP2; apply/negP.
         rewrite /interference /ideal_jlfp_rta.interference /is_priority_inversion
                   /is_interference_from_another_hep_job HYP2 negb_or.
