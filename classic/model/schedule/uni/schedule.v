@@ -492,15 +492,15 @@ Module UniprocessorSchedule.
           
       End OnlyOneJobScheduled.
 
-      Section ServiceIsAStepFunction.
+      Section ServiceIsUnitGrowthFunction.
 
         (* First, we show that the service received by any job j
-           is a step function. *)
-        Lemma service_is_a_step_function:
+           is a unit growth funciton. *)
+        Lemma service_is_unit_growth_function:
           forall j,
-            is_step_function (service sched j).
+            unit_growth_function (service sched j).
         Proof.
-          unfold is_step_function, service, service_during; intros j t.
+          unfold unit_growth_function, service, service_during; intros j t.
           rewrite addn1 big_nat_recr //=.
           by apply leq_add; last by apply leq_b1.
         Qed.
@@ -522,14 +522,14 @@ Module UniprocessorSchedule.
             service sched j t0 = s0.
         Proof.
           feed (exists_intermediate_point (service sched j));
-            [by apply service_is_a_step_function | intros EX].
+            [by apply service_is_unit_growth_function | intros EX].
           feed (EX 0 t); first by done.
           feed (EX s0);
             first by rewrite /service /service_during big_geq //. 
           by move: EX => /= [x_mid EX]; exists x_mid.
         Qed.
 
-      End ServiceIsAStepFunction.
+      End ServiceIsUnitGrowthFunction.
 
       Section ScheduledAtEarlierTime.
 

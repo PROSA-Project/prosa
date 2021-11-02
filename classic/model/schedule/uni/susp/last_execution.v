@@ -335,7 +335,7 @@ Module LastExecution.
           rename H_jobs_must_arrive_to_execute into ARR.
           move: H_j_has_completed => COMP.
           feed (exists_intermediate_point (service sched j));
-            first by apply service_is_a_step_function.
+            first by apply service_is_unit_growth_function.
           move => EX; feed (EX (job_arrival j) t).
           { feed (cumulative_service_implies_scheduled sched j 0 t).
             apply leq_ltn_trans with (n := s); first by done.

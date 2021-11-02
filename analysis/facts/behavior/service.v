@@ -197,13 +197,13 @@ Section UnitService.
   Qed.
   
 
-  Section ServiceIsAStepFunction.
+  Section ServiceIsUnitGrowthFunction.
 
-    (** We show that the service received by any job [j] is a step function. *)
-    Lemma service_is_a_step_function:
-      is_step_function (service sched j).
+    (** We show that the service received by any job [j] is a unit growth function. *)
+    Lemma service_is_unit_growth_function:
+      unit_growth_function (service sched j).
     Proof.
-      rewrite /is_step_function => t.
+      rewrite /unit_growth_function => t.
       rewrite addn1 -service_last_plus_before leq_add2l.
       by apply service_at_most_one.
     Qed.
@@ -224,14 +224,14 @@ Section UnitService.
         service sched j t' = s.
     Proof.
       feed (exists_intermediate_point (service sched j));
-        [by apply service_is_a_step_function | intros EX].
+        [by apply service_is_unit_growth_function | intros EX].
       feed (EX 0 t); first by done.
       feed (EX s); first by rewrite /service /service_during big_geq //.
       by move: EX => /= [x_mid EX]; exists x_mid.
     Qed.
 
-  End ServiceIsAStepFunction.
-
+  End ServiceIsUnitGrowthFunction.
+  
 End UnitService.
 
 (** We establish a basic fact about the monotonicity of service. *)

@@ -7,7 +7,7 @@ Require Export prosa.util.nat.
 Require Export prosa.util.ssrlia.
 Require Export prosa.util.sum.
 Require Export prosa.util.seqset.
-Require Export prosa.util.step_function.
+Require Export prosa.util.unit_growth.
 Require Export prosa.util.epsilon.
 Require Export prosa.util.search_arg.
 Require Export prosa.util.rel.
