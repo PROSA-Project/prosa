@@ -1,5 +1,7 @@
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq fintype.
 
+(** In this section, we define a notion of a set (based on a sequence
+    without duplicates). *)
 Section SeqSet.
 
   (** Let [T] be any type with decidable equality. *)
