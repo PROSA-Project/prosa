@@ -11,6 +11,7 @@ Section CompletionFacts.
   (** Consider any job type,...*)
   Context {Job: JobType}.
   Context `{JobCost Job}.
+  Context `{JobArrival Job}.
 
   (** ...any kind of processor model,... *)
   Context {PState: Type}.
@@ -79,12 +80,24 @@ Section CompletionFacts.
     exact INCOMP.
   Qed.
 
-  (** Assume that completed jobs do not execute. *)
-  Hypothesis H_completed_jobs:
-    completed_jobs_dont_execute sched.
+
+  (** In the remainder of this section, we assume that schedules are
+      "well-formed": jobs are scheduled neither before their arrival
+      nor after their completion. *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs : completed_jobs_dont_execute sched.
+
+  (** We observe that a job that is completed at the instant of its
+      arrival has a cost of zero. *)
+  Lemma completed_on_arrival_implies_zero_cost :
+    completed_by sched j (job_arrival j) ->
+    job_cost j = 0.
+  Proof.
+    by rewrite /completed_by no_service_before_arrival // leqn0 => /eqP.
+  Qed.
 
   (** Further, we note that if a job receives service at some time t, then its
-     remaining cost at this time is positive. *)
+      remaining cost at this time is positive. *)
   Lemma serviced_implies_positive_remaining_cost:
     forall t,
       service_at sched j t > 0 ->

@@ -26,8 +26,8 @@ Section BasicLemmas.
   (** Suppose jobs have preemption points ... *)
   Context `{JobPreemptable Job}.
 
-  (** ...and that the length of non-preemptive segments is bounded. *)
-  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
+  (** ...and that the preemption model is valid. *)
+  Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
 
   (** Assume that the schedule respects the FIFO scheduling policy whenever jobs
@@ -58,6 +58,25 @@ Section BasicLemmas.
     have -> : scheduled_at sched s t -> completed_by sched j t => //.
     eapply (early_hep_job_is_scheduled); try eauto 2 with basic_facts.
     - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=].
+  Qed.
+
+  (** We prove that in a FIFO-compliant schedule, if a job [j] is
+      scheduled, then all jobs with higher priority than [j] have been
+      completed. *)
+  Lemma scheduled_implies_higher_priority_completed :
+    forall j t,
+      scheduled_at sched j t ->
+      forall j_hp,
+        arrives_in arr_seq j_hp ->
+        ~~hep_job j j_hp ->
+        completed_by sched j_hp t.
+  Proof.
+    move => j' t SCHED j_hp ARRjhp HEP.
+    have EARLIER: job_arrival j_hp < job_arrival j' by rewrite -ltnNge in HEP.
+    eapply (early_hep_job_is_scheduled arr_seq _ sched _ _ _ _ j_hp j' _ _ _ t).
+    Unshelve. all : eauto with basic_facts.
+    move=> t'; apply /andP; split => //.
+    by apply ltnW.
   Qed.
 
   (** The next lemma considers FIFO schedules in the context of tasks. *)
