@@ -244,7 +244,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       move: H_sched_valid => [CARR MBR].
       edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]];
         eauto 2 with basic_facts.
-      { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_rbf'. }
+      { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_hep_rbf. }
       exists t1, t2; split; first by done.
       split; first by done.
       by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
@@ -295,7 +295,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
           by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). } 
         { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
-          by rewrite -TSK; apply total_workload_le_total_rbf. } 
+          by rewrite -TSK; apply total_workload_le_total_ohep_rbf. } 
         all: eauto 2 using arr_seq with basic_facts. }
     Qed.
 

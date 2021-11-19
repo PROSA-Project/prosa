@@ -287,10 +287,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
       move: H_sched_valid => [CARR MBR].
       edestruct exists_busy_interval_from_total_workload_bound
         with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; eauto 2 with basic_facts.
-      { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf''. }
+      { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
       exists t1, t2; split; first by done.
       split; first by done.
-        by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
+      by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
     Qed.
     
     (** Next, we prove that [IBF_other] is indeed an interference bound. *)
