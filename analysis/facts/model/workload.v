@@ -34,4 +34,33 @@ Section WorkloadFacts.
       by rewrite (arrivals_between_cat _ _ t) // big_cat.
   Qed.
 
+  (** Consider a job [j] ... *)
+  Variable j : Job.
+
+  (** ... and a duplicate-free sequence of jobs [jobs]. *)
+  Variable jobs : seq Job.
+  Hypothesis H_jobs_uniq : uniq jobs.
+
+  (** Further, assume that [j] is contained in [jobs]. *)
+  Hypothesis H_j_in_jobs : j \in jobs.
+
+  (** To help with rewriting, we prove that the workload of [jobs]
+      minus the job cost of [j] is equal to the workload of all jobs
+      except [j]. To define the workload of all jobs, since
+      [workload_of_jobs] expects a predicate, we use [predT], which
+      is the always-true predicate. *)
+  Lemma workload_minus_job_cost :
+    workload_of_jobs (fun jhp : Job => jhp != j) jobs =
+    workload_of_jobs predT jobs - job_cost j.
+  Proof.
+    rewrite /workload_of_jobs (big_rem j) //=  eq_refl //= add0n.
+    rewrite [in RHS](big_rem j) //= addnC -subnBA //= subnn subn0.
+    rewrite [in LHS]big_seq_cond [in RHS]big_seq_cond.
+    apply eq_bigl => j'.
+    rewrite Bool.andb_true_r.
+    destruct (j' \in rem (T:=Job) j jobs) eqn:INjobs; last by done.
+    apply /negP => /eqP EQUAL.
+    by rewrite EQUAL mem_rem_uniqF in INjobs.
+  Qed.
+
 End WorkloadFacts.
