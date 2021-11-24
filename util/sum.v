@@ -401,3 +401,92 @@ Section SumOfTwoIntervals.
   
 End SumOfTwoIntervals.
 
+
+(** In this section, we relate the sum of items with the sum over partitions of those items. *)
+Section SumOverPartitions.
+
+  (** Consider an item type [X] and a partition type [Y]. *)
+  Variable X Y : eqType.
+
+  (** [x_to_y] is the mapping from an item to the partition it is contained in. *)
+  Variable x_to_y : X -> Y.
+
+  (** Consider [f], a function from [X] to [nat]. *) 
+  Variable f : X -> nat.
+
+  (** Consider an arbitrary predicate [P] on [X]. *) 
+  Variable P : pred X.
+
+  (** Consider a sequence of items [xs] and a sequence of partitions [ys]. *)
+  Variable xs : seq X.
+  Variable ys : seq Y.
+
+  (** We assume that any item in [xs] has its corresponding partition in the sequence of partitions [ys]. *)
+  Hypothesis H_no_partition_missing : forall x, x \in xs -> x_to_y x \in ys.
+
+  (** Consider the sum of [f x] over all [x] in a given partition [y]. *) 
+  Let sum_of_partition y := \sum_(x <- xs | P x && (x_to_y x == y)) f x.
+
+  (** We prove that summation of [f x] over all [x] is less than or equal to the summation of 
+      [sum_of_partition] over all partitions. *) 
+  Lemma sum_over_partitions_le :
+    \sum_(x <- xs | P x) f x
+    <= \sum_(y <- ys) sum_of_partition y.
+  Proof.
+    rewrite /sum_of_partition.
+    induction xs as [| x' xs' LE_TAIL]; first by rewrite big_nil.
+    have P_HOLDS: forall i j, true -> P j && (x_to_y j== i) -> P j by move=> ??? /andP [P_HOLDS _].
+    have IN_ys: forall x : X, x \in xs' -> x_to_y x \in ys.
+    { by move=> ??; apply H_no_partition_missing => //; rewrite in_cons; apply /orP; right. }
+    move: LE_TAIL; rewrite (exchange_big_dep P) => //= LE_TAIL.
+    rewrite (exchange_big_dep P) //= !big_cons.
+    case: (P x') => //=; last by apply LE_TAIL.
+    apply leq_add => //; last by apply LE_TAIL.
+    rewrite big_const_seq iter_addn_0.
+    apply leq_pmulr; rewrite -has_count.
+    apply /hasP; eapply ex_intro2 => //.
+    by apply H_no_partition_missing, mem_head.
+  Qed.
+
+  (** In this section, we prove a stronger result about the equality between
+      the sum over all items and the sum over all partitions of those items. *)
+  Section Equality.
+
+    (** In order to prove the stronger result of equality, we additionally 
+        assume that the sequences [xs] and [ys] are sets, i.e., that each
+        element is contained at most once. *)
+    Hypothesis H_xs_unique : uniq xs.
+    Hypothesis H_ys_unique : uniq ys.
+
+    (** We prove that summation of [f x] over all [x] is equal to the summation of 
+      [sum_of_partition] over all partitions. *)
+    Lemma sum_over_partitions_eq :
+      \sum_(x <- xs | P x) f x
+      = \sum_(y <- ys) sum_of_partition y.
+    Proof.
+      rewrite /sum_of_partition.
+      induction xs as [|x' xs' LE_TAIL]; first by rewrite big_nil big1_seq //= => ??; rewrite big_nil.
+      rewrite //= in LE_TAIL; feed_n 2 LE_TAIL.
+      { by move => ??; apply H_no_partition_missing; rewrite in_cons; apply /orP; right. }
+      { by move: H_xs_unique; rewrite cons_uniq => /andP [??]. }
+      rewrite (exchange_big_dep P) //=; last by move=> ??? /andP[??].
+      rewrite !big_cons.
+      destruct (P x'); last by rewrite LE_TAIL (exchange_big_dep P) //=;  move=> ??? /andP[??].
+      have -> : \sum_(i <- ys | true && ( x_to_y x' == i)) f x' = f x'.
+      { rewrite //= -big_filter.
+        have -> : [seq i <- ys | x_to_y x' == i] = [:: x_to_y x']; last by rewrite unlock //= addn0.
+        have -> : [seq i <- ys | x_to_y x' == i] = [seq i <- ys | i == x_to_y x'].
+        { clear H_no_partition_missing LE_TAIL. 
+          induction ys as [| y' ys' LE_TAILy]; first by done.
+          feed LE_TAILy; first by move: H_ys_unique; rewrite cons_uniq => /andP [??].
+          by rewrite //=  LE_TAILy //= eq_sym. }
+        apply filter_pred1_uniq => //.
+        by apply H_no_partition_missing; rewrite in_cons; apply /orP; left. }
+      apply /eqP; rewrite eqn_add2l; apply /eqP.
+      by rewrite LE_TAIL (exchange_big_dep P) //=;  move=> ??? /andP[??].
+    Qed.
+
+  End Equality.
+
+End SumOverPartitions.
+
