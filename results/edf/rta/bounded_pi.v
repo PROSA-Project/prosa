@@ -186,7 +186,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         R >= F + (task_cost tsk - task_rtct tsk).
   
   (** To use the theorem uniprocessor_response_time_bound_seq from the Abstract RTA module, 
-     we need to specify functions of interference, interfering workload and IBF.  *)
+     we need to specify functions of interference, interfering workload and [IBF_other].  *)
 
   (** Instantiation of Interference *)
   (** We say that job j incurs interference at time t iff it cannot execute due to 
@@ -200,9 +200,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Let interfering_workload (j : Job) (t : instant) :=
     ideal_jlfp_rta.interfering_workload arr_seq sched j t.
 
-  (** Finally, we define the interference bound function ([IBF_other]). [IBF_other] bounds the interference if tasks are sequential.
-      Since tasks are sequential, we exclude interference from other jobs of the same task. For EDF, we define [IBF_other] as the sum of the priority 
-      interference bound and the higher-or-equal-priority workload. *)
+  (** Finally, we define the interference bound function ([IBF_other]). [IBF_other] bounds 
+      the interference if tasks are sequential. Since tasks are sequential, we exclude 
+      interference from other jobs of the same task. For EDF, we define [IBF_other] as 
+      the sum of the priority interference bound and the higher-or-equal-priority workload. *)
   Let IBF_other (A R : duration) := priority_inversion_bound + bound_on_total_hep_workload A R.
 
   (** ** Filling Out Hypothesis Of Abstract RTA Theorem *)
@@ -292,14 +293,14 @@ Section AbstractRTAforEDFwithArrivalCurves.
         by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
     Qed.
     
-    (** Next, we prove that IBF is indeed an interference bound. *)
-    Section TaskInterferenceIsBoundedByIBF.
+    (** Next, we prove that [IBF_other] is indeed an interference bound. *)
+    Section TaskInterferenceIsBoundedByIBF_other.
 
-      (** We show that task_interference_is_bounded_by is bounded by IBF by 
+      (** We show that task_interference_is_bounded_by is bounded by [IBF_other] by 
           constructing a sequence of inequalities. *) 
       Section Inequalities.
 
-        (* Consider an arbitrary job j of [tsk]. *)
+        (** Consider an arbitrary job j of [tsk]. *)
         Variable j : Job.
         Hypothesis H_j_arrives : arrives_in arr_seq j.
         Hypothesis H_job_of_tsk : job_task j = tsk.
@@ -330,7 +331,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             such that [job_deadline jo <= job_deadline j] and [job_task jo ≠ tsk]. *)
         Let EDF_not_from (tsk : Task) := fun (jo : Job) => EDF jo j && (job_task jo != tsk).
         
-        (** Recall that [IBF(A, R) := priority_inversion_bound +
+        (** Recall that [IBF_other(A, R) := priority_inversion_bound +
             bound_on_total_hep_workload(A, R)]. The fact that
             [priority_inversion_bound] bounds cumulative priority inversion 
             follows from assumption [H_priority_inversion_is_bounded]. *)
@@ -563,9 +564,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
         However, in this module we analyze only one task -- [tsk],
         therefore it is “hard-coded” inside the interference bound
-        function IBF. Therefore, in order for the IBF signature to
+        function [IBF_other]. Therefore, in order for the [IBF_other] signature to
         match the required signature in module abstract_seq_RTA, we
-        wrap the IBF function in a function that accepts, but simply
+        wrap the [IBF_other] function in a function that accepts, but simply
         ignores the task. *)
       Corollary instantiated_task_interference_is_bounded:
         task_interference_is_bounded_by
@@ -590,7 +591,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             by done. 
       Qed.
 
-    End TaskInterferenceIsBoundedByIBF.
+    End TaskInterferenceIsBoundedByIBF_other.
     
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
     Section SolutionOfResponseTimeReccurenceExists.
@@ -603,7 +604,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
       (** Given any job j of task [tsk] that arrives exactly A units after the beginning of 
          the busy interval, the bound of the total interference incurred by j within an 
-         interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF(A, Δ)]. *)
+         interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF_other(A, Δ)]. *)
       Let total_interference_bound tsk (A Δ : duration) :=
         task_rbf (A + ε) - task_cost tsk + IBF_other A Δ.
       

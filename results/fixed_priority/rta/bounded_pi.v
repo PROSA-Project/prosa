@@ -250,7 +250,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
     Qed.
 
-    (** Next, we prove that IBF is indeed an interference bound.
+    (** Next, we prove that [IBF_other] is indeed an interference bound.
 
        Recall that in module abstract_seq_RTA hypothesis task_interference_is_bounded_by expects 
        to receive a function that maps some task t, the relative arrival time of a job j of task t, 
@@ -258,10 +258,10 @@ Section AbstractRTAforFPwithArrivalCurves.
        files limited.abstract_RTA.definitions and limited.abstract_RTA.abstract_seq_rta).
 
        However, in this module we analyze only one task -- [tsk], therefore it is “hard-coded” 
-       inside the interference bound function IBF. Moreover, in case of a model with fixed 
+       inside the interference bound function [IBF_other]. Moreover, in case of a model with fixed 
        priorities, interference that some job j incurs from higher-or-equal priority jobs does not
-       depend on the relative arrival time of job j. Therefore, in order for the IBF signature to
-       match the required signature in module abstract_seq_RTA, we wrap the IBF function in a 
+       depend on the relative arrival time of job j. Therefore, in order for the [IBF_other] signature to
+       match the required signature in module abstract_seq_RTA, we wrap the [IBF_other] function in a 
        function that accepts, but simply ignores, the task and the relative arrival time. *)
     Lemma instantiated_task_interference_is_bounded:
       task_interference_is_bounded_by
@@ -310,7 +310,7 @@ Section AbstractRTAforFPwithArrivalCurves.
 
       (** Given any job j of task [tsk] that arrives exactly A units after the beginning of 
          the busy interval, the bound of the total interference incurred by j within an 
-         interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF Δ]. *)
+         interval of length Δ is equal to [task_rbf (A + ε) - task_cost tsk + IBF_other Δ]. *)
       Let total_interference_bound tsk A Δ :=
         task_rbf (A + ε) - task_cost tsk + IBF_other Δ.
 
