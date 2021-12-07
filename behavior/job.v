@@ -6,9 +6,9 @@ From mathcomp Require Export eqtype ssrnat.
 (** Throughout the library we assume that jobs have decidable equality. *)
 Definition JobType := eqType.
 
-(** * Unit of Work *)
+(** * Notion of Work *)
 
-(** We define 'work' to denote the unit of service received or needed. In a
+(** We define 'work' to denote the amount of service received or needed. In a
    real system, this corresponds to the number of processor cycles. *)
 Definition work  := nat.
 
