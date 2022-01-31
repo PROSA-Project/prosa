@@ -270,19 +270,19 @@ Section RequestBoundFunctions.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_task j = tsk.
 
-  (** Then we prove that [task_rbf 1] is greater than or equal to task cost. *)
+  (** Then we prove that [task_rbf] at [ε] is greater than or equal to task cost. *)
   Lemma task_rbf_1_ge_task_cost:
-    task_rbf 1 >= task_cost tsk.
+    task_rbf ε >= task_cost tsk.
   Proof.
     have ALT: forall n, n = 0 \/ n > 0 by clear; intros n; destruct n; [left | right].
     specialize (ALT (task_cost tsk)); destruct ALT as [Z | POS]; first by rewrite Z.
     rewrite leqNgt; apply/negP; intros CONTR.
     move: H_is_arrival_curve => ARRB.
-    specialize (ARRB (job_arrival j) (job_arrival j + 1)).
+    specialize (ARRB (job_arrival j) (job_arrival j + ε)).
     feed ARRB; first by rewrite leq_addr.
     move: CONTR; rewrite /task_rbf /task_request_bound_function.
     rewrite -{2}[task_cost tsk]muln1 ltn_mul2l => /andP [_ CONTR].
-    move: CONTR; rewrite -addn1 -{3}[1]add0n leq_add2r leqn0 => /eqP CONTR.
+    move: CONTR; rewrite -addn1 -[1]add0n leq_add2r leqn0 => /eqP CONTR.
     move: ARRB; rewrite addKn CONTR leqn0 eqn0Ngt => /negP T; apply: T.
     rewrite /number_of_task_arrivals -has_predT /task_arrivals_between.
     apply/hasP; exists j; last by done.
@@ -294,6 +294,16 @@ Section RequestBoundFunctions.
     by rewrite CONS.
   Qed.
 
+  (** Assume that [tsk] has a positive cost. *)
+  Hypothesis H_positive_cost : 0 < task_cost tsk.
+  
+  (** Then, we prove that [task_rbf] at [ε] is greater than [0]. *)
+  Lemma task_rbf_epsilon_gt_0 : 0 < task_rbf ε.
+  Proof.
+    apply leq_trans with (task_cost tsk); first by done.
+    by eapply task_rbf_1_ge_task_cost; eauto. 
+  Qed.
+            
   (** Consider a set of tasks [ts] containing the task [tsk]. *)
   Variable ts : seq Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
