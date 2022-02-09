@@ -155,7 +155,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       by rewrite /job_response_time_bound /completed_by Z.
     }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments
-      with (L0 := L).
+      with (L := L).
     all: eauto 2 with basic_facts.
     - by apply sequential_readiness_implies_work_bearing_readiness.
     - by apply sequential_readiness_implies_sequential_tasks.

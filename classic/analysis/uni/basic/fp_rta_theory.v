@@ -102,8 +102,8 @@ Module ResponseTimeAnalysisFP.
       { by rewrite /is_response_time_bound_of_job /completed_by Z. }
       set prio := FP_to_JLFP job_task higher_eq_priority.
       apply busy_interval_bounds_response_time with
-          (arr_seq0 := arr_seq)
-          (higher_eq_priority0 := prio)
+          (arr_seq := arr_seq)
+          (higher_eq_priority := prio)
           (priority_inversion_bound := 0); try by done.
       - by intros x; apply H_priority_is_reflexive.
       { intros t1 t2 BUSY.
@@ -130,9 +130,9 @@ Module ResponseTimeAnalysisFP.
         { by rewrite /scheduled_at SCHED. }
       }
       apply fp_workload_bound_holds with
-          (job_arrival0 := job_arrival) (task_cost0 := task_cost)
-          (task_period0 := task_period) (task_deadline0 := task_deadline)
-          (job_deadline0 := job_deadline) (ts0 := ts); try (by done).
+          (job_arrival := job_arrival) (task_cost := task_cost)
+          (task_period := task_period) (task_deadline := task_deadline)
+          (job_deadline := job_deadline) (ts := ts); try (by done).
         by rewrite JOBtsk.
     Qed.
 

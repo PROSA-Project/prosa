@@ -73,7 +73,7 @@ Module ArrivalBounds.
           destruct arriving_jobs as [| j l] eqn:EQ; first by done.
           have IN: j \in arriving_jobs by rewrite EQ in_cons eq_refl orTb.
           rewrite mem_filter in IN; move: IN => /andP [_ ARR].
-          apply in_arrivals_implies_arrived_between with (job_arrival0 := job_arrival) in ARR;
+          apply in_arrivals_implies_arrived_between with (job_arrival := job_arrival) in ARR;
             last by done.
           move: ARR => /andP [GE LT].
           by apply: (leq_ltn_trans GE).

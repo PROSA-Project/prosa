@@ -399,8 +399,8 @@ Module WorkloadBoundJitter.
           }
           instantiate (1 := elem); move => [FSTARR [FSTtsk [/eqP FSTserv FSTin]]].
           apply FSTserv.
-          apply cumulative_service_after_job_rt_zero with (job_arrival0 := job_arrival)
-                  (job_cost0 := job_cost) (R := task_jitter tsk + R_tsk);
+          apply cumulative_service_after_job_rt_zero with (job_arrival := job_arrival)
+                  (job_cost := job_cost) (R := task_jitter tsk + R_tsk);
             [by done | | by rewrite addnA ltnW].
           rewrite addnA; apply H_response_time_bound; try (by done).
           by apply leq_trans with (n := t1); last by apply leq_addr.
@@ -419,7 +419,7 @@ Module WorkloadBoundJitter.
           instantiate (1 := elem); move => [LSTarr [LSTtsk [/eqP LSTserv LSTin]]].
           apply LSTserv.
           apply (cumulative_service_before_job_arrival_zero job_arrival); last by done.
-          by apply arrival_before_jitter with (job_jitter0 := job_jitter).
+          by apply arrival_before_jitter with (job_jitter := job_jitter).
         Qed.
 
         (* Next, we upper-bound the service of the first and last jobs using their arrival times. *)
@@ -475,7 +475,7 @@ Module WorkloadBoundJitter.
                 last by apply leq_sum; ins; apply service_at_most_one.
               rewrite (cumulative_service_before_job_arrival_zero job_arrival);
                 [by apply leqnn | | by apply leqnn].
-              by apply arrival_before_jitter with (job_jitter0 := job_jitter).
+              by apply arrival_before_jitter with (job_jitter := job_jitter).
             }
           }
         Qed.
@@ -685,8 +685,8 @@ Module WorkloadBoundJitter.
             have PARAMSfst := JOBPARAMS j_fst INfst; des.
             have PARAMSlst := JOBPARAMS j_lst INlst; des.
             by apply leq_add; apply cumulative_service_le_task_cost with
-                      (task_deadline0 := task_deadline) (job_cost0 := job_cost)
-                      (job_deadline0 := job_deadline) (job_task0 := job_task).  
+                      (task_deadline := task_deadline) (job_cost := job_cost)
+                      (job_deadline := job_deadline) (job_task := job_task).  
           }
           {
             rewrite subnAC subnK; last first.

@@ -416,7 +416,7 @@ Module WorkloadBound.
           }  
           instantiate (1 := elem); move => [LSTarr [LSTtsk [/eqP LSTserv LSTin]]].
           unfold service_during; apply LSTserv.
-          by apply cumulative_service_before_job_arrival_zero with (job_arrival0 := job_arrival).
+          by apply cumulative_service_before_job_arrival_zero with (job_arrival := job_arrival).
         Qed.
 
         (* Next, we upper-bound the service of the first and last jobs using their arrival times. *)
@@ -657,8 +657,8 @@ Module WorkloadBound.
             have PARAMSfst := JOBPARAMS j_fst INfst; des.
             have PARAMSlst := JOBPARAMS j_lst INlst; des.
             by apply leq_add; apply cumulative_service_le_task_cost with
-                    (task_deadline0 := task_deadline)
-                    (job_cost0 := job_cost) (job_deadline0 := job_deadline) (job_task0 := job_task).
+                    (task_deadline := task_deadline)
+                    (job_cost := job_cost) (job_deadline := job_deadline) (job_task := job_task).
           }
           {
             rewrite subnAC subnK; last first.

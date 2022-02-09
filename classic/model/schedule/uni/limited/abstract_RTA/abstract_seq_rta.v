@@ -614,7 +614,7 @@ Module AbstractSeqRTA.
         intros j ARR TSK.
         eapply uniprocessor_response_time_bound with
             (interference_bound_function := fun tsk A R => task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A R)
-            (interfering_workload0 := interfering_workload); eauto 2.
+            (interfering_workload := interfering_workload); eauto 2.
         { clear ARR TSK H_R_is_maximum_seq R j.
           intros t1 t2 R j BUSY NEQ ARR TSK COMPL.
           move: (posnP (job_cost j)) => [ZERO|POS].

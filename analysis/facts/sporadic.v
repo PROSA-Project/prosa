@@ -97,7 +97,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     intros UNEQ EQ_ARR.
     rewrite -> diff_jobs_iff_diff_indices in UNEQ => //; eauto; last by rewrite H_j1_task.
     move /neqP: UNEQ; rewrite neq_ltn => /orP [LT|LT].
-    all: now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia.
+    all: now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; ssrlia.
   Qed.
 
   (** We prove a stronger version of the above lemma by showing 
@@ -112,7 +112,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     case: (boolP (j1 == j2)) => [/eqP EQ | /eqP NEQ]; first by auto.
     rewrite -> diff_jobs_iff_diff_indices in NEQ => //; eauto; last by rewrite H_j1_task.
     move /neqP: NEQ; rewrite neq_ltn => /orP [LT|LT].
-    all: now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia.
+    all: now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; ssrlia.
   Qed.
     
 End DifferentJobsImplyDifferentArrivalTimes.
@@ -172,7 +172,7 @@ Section SporadicArrivals.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
     have EQ_ARR_A : (job_arrival a = job_arrival j) by apply H_consistent_arrivals.
     have EQ_ARR_B : (job_arrival b = job_arrival j) by apply H_consistent_arrivals.
-    apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j) in NEQ => //.
+    apply uneq_job_uneq_arr with (arr_seq := arr_seq) (tsk := job_task j) in NEQ => //.
     now rewrite EQ_ARR_A EQ_ARR_B in NEQ.
   Qed.
 
@@ -231,7 +231,7 @@ Section SporadicArrivals.
     have PREV_ARR_LTE : job_arrival (prev_job arr_seq j1) <= job_arrival j1 by apply prev_job_arr_lte => //. 
     rewrite ltn_neqAle; apply /andP.
     split => //; apply /eqP.
-    apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j1) => //; try by rewrite H_j1_task.
+    apply uneq_job_uneq_arr with (arr_seq := arr_seq) (tsk := job_task j1) => //; try by rewrite H_j1_task.
     - now apply prev_job_arr.
     - now apply prev_job_task.
     - intro EQ.

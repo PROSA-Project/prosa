@@ -36,9 +36,10 @@ Section Lemmas.
           f x1 <= y < f (x1 + delta) ->
           exists x_mid, x1 <= x_mid < x1 + delta /\ f x_mid = y.
       { move => x2 LE /andP [GEy LTy].
-        exploit (DELTA (x2 - x1));
-          first by apply/andP; split; last by rewrite addnBA // addKn.
-          by rewrite addnBA // addKn.
+        (* apply DELTA. *) 
+        specialize (DELTA (x2 - x1)); feed DELTA.
+        { by apply/andP; split; last by rewrite addnBA // addKn. }
+        by rewrite subnKC in DELTA.
       }
       induction delta.
       { rewrite addn0; move => /andP [GE0 LT0].

@@ -84,7 +84,7 @@ Module ArrivalSequenceWithJitter.
             case (ltnP (actual_job_arrival j) t) => [BEFORE | AFTER]; last by right; rewrite LT2.
             left; rewrite GE1 /=.
             have INarr: arrives_in arr_seq j by apply in_arrivals_implies_arrived in IN.
-            apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival);
+            apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival);
               try (by done).
             by apply: (leq_ltn_trans _ BEFORE); apply leq_addr.
           }
@@ -95,7 +95,7 @@ Module ArrivalSequenceWithJitter.
               rewrite mem_filter GE0 /=.
               apply/andP; split; first by apply: (leq_trans _ LE).
               have INarr: arrives_in arr_seq j by apply in_arrivals_implies_arrived in IN0.
-              apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival);
+              apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival);
                 try (by done).
               rewrite /arrived_between /=.
               by apply: (leq_trans _ LE); apply: (leq_ltn_trans _ LT0); apply leq_addr.
@@ -105,7 +105,7 @@ Module ArrivalSequenceWithJitter.
               rewrite mem_filter LT0 /= andbT.
               apply/andP; split; first by apply: (leq_trans GE).
               have INarr: arrives_in arr_seq j by apply in_arrivals_implies_arrived in IN0.
-              apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival);
+              apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival);
                 try (by done).
               by apply: (leq_ltn_trans _ LT0); apply leq_addr.
             }

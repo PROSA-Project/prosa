@@ -194,8 +194,8 @@ Module ResponseTimeAnalysisEDF.
           apply leq_trans with (n := workload job_task sched tsk_other
                                          (job_arrival j) (job_arrival j + R));
             first by apply task_interference_le_workload.
-          by apply workload_bounded_by_W with (task_deadline0 := task_deadline) (arr_seq0 := arr_seq)
-            (job_arrival0 := job_arrival) (job_cost0 := job_cost) (job_deadline0 := job_deadline);
+          by apply workload_bounded_by_W with (task_deadline := task_deadline) (arr_seq := arr_seq)
+            (job_arrival := job_arrival) (job_cost := job_cost) (job_deadline := job_deadline);
             try (by ins); last 2 first;
             [ by apply bertogna_edf_R_other_ge_cost
             | by ins; apply NOMISS
@@ -208,8 +208,8 @@ Module ResponseTimeAnalysisEDF.
         Lemma bertogna_edf_specific_bound_holds :
           x tsk_other <= edf_specific_bound tsk_other R_other.
         Proof.
-          apply interference_bound_edf_bounds_interference with (job_deadline0 := job_deadline)
-                                              (arr_seq0 := arr_seq) (ts0 := ts); try (by done);
+          apply interference_bound_edf_bounds_interference with (job_deadline := job_deadline)
+                                              (arr_seq := arr_seq) (ts := ts); try (by done);
             [ by apply bertogna_edf_tsk_other_in_ts
             | by apply H_tasks_miss_no_deadlines
             | ].
@@ -288,14 +288,14 @@ Module ResponseTimeAnalysisEDF.
           by apply/existsP; exists cpu.
         clear SCHED; rename SCHED' into SCHED.
         move: (SCHED) => PENDING.
-        apply scheduled_implies_pending with (job_cost0 := job_cost) (job_arrival0 := job_arrival)
+        apply scheduled_implies_pending with (job_cost := job_cost) (job_arrival := job_arrival)
           in PENDING; try (by done).
         destruct (ltnP (job_arrival j_other) (job_arrival j)) as [BEFOREother | BEFOREj].
          {
           move: (BEFOREother) => LT; rewrite -(ltn_add2r R) in LT.
           specialize (BEFOREok j_other tsk R ARRother SAMEtsk INbounds LT).
           move: PENDING => /andP [_ /negP NOTCOMP]; apply NOTCOMP.
-          apply completion_monotonic with (t0 := job_arrival j_other + R); try (by done).
+          apply completion_monotonic with (t := job_arrival j_other + R); try (by done).
           apply leq_trans with (n := job_arrival j); last by done.
           apply leq_trans with (n := job_arrival j_other + task_deadline tsk);
             first by rewrite leq_add2l; apply NOMISS.
@@ -340,7 +340,7 @@ Module ResponseTimeAnalysisEDF.
         intros t j0 ARR0 LEt LE.
         cut ((job_task j0) \in unzip1 rt_bounds = true); last by rewrite UNZIP FROMTS.
         move => /mapP [p IN EQ]; destruct p as [tsk' R0]; simpl in *; subst tsk'.
-        apply completion_monotonic with (t0 := job_arrival j0 + R0).
+        apply completion_monotonic with (t := job_arrival j0 + R0).
         {
           rewrite leq_add2l; apply leq_trans with (n := task_deadline (job_task j0));
             [by apply NOMISS | by apply CONSTR; rewrite FROMTS].
@@ -385,7 +385,7 @@ Module ResponseTimeAnalysisEDF.
         intros j0 tsk0 ARR0 TSK0 LE.
         cut (tsk0 \in unzip1 rt_bounds = true); last by rewrite UNZIP -TSK0 FROMTS.
         move => /mapP [p IN EQ]; destruct p as [tsk' R0]; simpl in *; subst tsk'.
-        apply completion_monotonic with (t0 := job_arrival j0 + R0); try (by done).
+        apply completion_monotonic with (t := job_arrival j0 + R0); try (by done).
         {
           rewrite leq_add2l TSK0.
           apply leq_trans with (n := task_deadline tsk0); first by apply NOMISS.
@@ -536,10 +536,10 @@ Module ResponseTimeAnalysisEDF.
           }
           assert (BUG: j1 = j2).
           {
-            apply platform_at_most_one_pending_job_of_each_task with (task_cost0 := task_cost)
-            (task_period0 := task_period) (task_deadline0 := task_deadline) (tsk0 := tsk)
-            (job_cost0 := job_cost) (job_task0 := job_task) (sched0 := sched) (j0 := j) (t0 := t)
-            (job_arrival0 := job_arrival) (arr_seq0 := arr_seq);
+            apply platform_at_most_one_pending_job_of_each_task with (task_cost := task_cost)
+            (task_period := task_period) (task_deadline := task_deadline) (tsk := tsk)
+            (job_cost := job_cost) (job_task := job_task) (sched := sched) (j := j) (t := t)
+            (job_arrival := job_arrival) (arr_seq := arr_seq);
                rewrite ?JOBtsk ?SAMEtsk //; first by apply PARAMS; rewrite -JOBtsk FROMTS.
             intros j0 tsk0 ARR0 TSK0 LE.
             by apply (COMP t); rewrite ?TSK0.

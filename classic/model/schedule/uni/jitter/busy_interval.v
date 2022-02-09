@@ -127,7 +127,7 @@ Module BusyInterval.
             move: PEND => /andP [_ /negP NOTCOMP].
             move: INT => /andP [LE _].
             exfalso; apply NOTCOMP.
-            apply completion_monotonic with (t0 := t1); try (by done).
+            apply completion_monotonic with (t := t1); try (by done).
             by apply QUIET; [by done | by apply REFL |].
           Qed.
 
@@ -284,7 +284,7 @@ Module BusyInterval.
                 }
                 apply/andP; split; first by done.
                 apply/negP; intro COMP; apply NOTCOMP'.
-                by apply completion_monotonic with (t0 := t).
+                by apply completion_monotonic with (t := t).
               }
               feed (PRIO j_hp' j_hp t IN BACK);  first by done.
               by apply NOTHP, TRANS with (y := j_hp').
@@ -292,14 +292,14 @@ Module BusyInterval.
             repeat split; [| by done | by done].
             {
               move: (SCHED) => PENDING.
-              apply scheduled_implies_pending with (job_arrival0 := job_arrival)
-                      (job_cost0 := job_cost) (job_jitter0 := job_jitter) in PENDING; try (by done).
+              apply scheduled_implies_pending with (job_arrival := job_arrival)
+                      (job_cost := job_cost) (job_jitter := job_jitter) in PENDING; try (by done).
               apply/andP; split;
                 last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
               apply contraT; rewrite -ltnNge; intro LT; exfalso.
               feed (QUIET j_hp); first by eapply FROM, SCHED. 
               specialize (QUIET HP LT).
-              have COMP: job_completed_by j_hp t by apply completion_monotonic with (t0 := t1).
+              have COMP: job_completed_by j_hp t by apply completion_monotonic with (t := t1).
               apply completed_implies_not_scheduled in COMP; last by done.
               by move: COMP => /negP COMP; apply COMP.
             }
@@ -491,7 +491,7 @@ Module BusyInterval.
                   intros j' NEQ; destruct (higher_eq_priority j' j); last by done.
                   apply/eqP; rewrite eqb0; apply/negP; move => SCHED'.
                   move: NEQ => /eqP NEQ; apply NEQ.
-                  by apply only_one_job_scheduled with (sched0 := sched) (t0 := t).
+                  by apply only_one_job_scheduled with (sched := sched) (t := t).
                 }
                 {
                   apply H_jobs_come_from_arrival_sequence in SCHED.
@@ -539,7 +539,7 @@ Module BusyInterval.
                 unfold service_during.
                 rewrite (ignore_service_before_jitter job_arrival job_jitter) //;
                   last by apply/andP; split; last by apply ltnW.
-                rewrite <- ignore_service_before_jitter with (t2:=0); rewrite //; [|by apply ltnW].
+                rewrite <- ignore_service_before_jitter with (t1:=0); rewrite //; [|by apply ltnW].
                   by rewrite ltnNge; apply/negP.
               Qed.
 

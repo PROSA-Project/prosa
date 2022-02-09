@@ -161,8 +161,8 @@ Section WeakOptimality.
     - by apply edf_transform_completed_jobs_dont_execute.
     - by apply edf_transform_deadlines_met.
     - by apply edf_transform_ensures_edf.
-    - by move=> [t SCHED_j]; apply edf_transform_job_scheduled' with (t0 := t).
-    - by move=> [t SCHED_j]; apply edf_transform_job_scheduled with (t0 := t).
+    - by move=> [t SCHED_j]; apply edf_transform_job_scheduled' with (t := t).
+    - by move=> [t SCHED_j]; apply edf_transform_job_scheduled with (t := t).
   Qed.
 
 End WeakOptimality.

@@ -153,7 +153,7 @@ Module ResponseTimeAnalysisEDF.
       unfold valid_sporadic_job, valid_realtime_job in *; des.
       apply taskset_schedulable_by_edf_rta with (task_cost := task_cost) (task_period := task_period)
         (task_deadline := task_deadline) (alpha := task_affinity) (alpha' := task_affinity)
-        (ts0 := ts); try (by done).
+        (ts := ts); try (by done).
       - by apply ts_has_constrained_deadlines.
       - by apply ts_non_empty_affinities.
       - by ins.

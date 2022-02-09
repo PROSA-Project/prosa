@@ -314,9 +314,9 @@ Module TaskSetMembership.
           apply leq_trans with (n := R (job_task any_j) - higher_cost_wcet any_j);
             last by apply leq_sub2l; rewrite /higher_cost_wcet eq_refl.
           apply sust_prop.sched_susp_highercost_incurs_more_interference with
-            (job_arrival0 := job_arrival) (arr_seq0 := arr_seq) (sched_susp0 := sched_susp)
-            (higher_eq_priority0:=job_higher_eq_priority)
-            (job_suspension_duration0 := job_suspension_duration); try (by done).
+            (job_arrival := job_arrival) (arr_seq := arr_seq) (sched_susp := sched_susp)
+            (higher_eq_priority:=job_higher_eq_priority)
+            (job_suspension_duration := job_suspension_duration); try (by done).
           - by intros t j1; apply H_priority_is_reflexive.
           - by rewrite /higher_cost_wcet eq_refl; apply H_job_cost_le_task_cost.
           - by move => j' NEQ; apply negbTE in NEQ; rewrite /higher_cost_wcet NEQ.

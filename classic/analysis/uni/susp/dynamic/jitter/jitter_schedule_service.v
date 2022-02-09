@@ -254,7 +254,7 @@ Module JitterScheduleService.
             rewrite big_mkcond [X in _ <= X]big_mkcond.
             apply leq_sum_sub_uniq; first by apply actual_arrivals_uniq.
             intros j0 IN0.
-            by apply actual_arrivals_between_sub with (t3 := 0) (t4 := t).
+            by apply actual_arrivals_between_sub with (t1 := 0) (t2 := t).
           }
           apply leq_sum_seq; rewrite /act /actual_arrivals; intros j0 IN0 HP0.
           apply WORK; try done.
@@ -313,7 +313,7 @@ Module JitterScheduleService.
           rewrite HP0 SCHED0 /=.
           have ARRin0: arrives_in arr_seq j0 by apply FROMarr in SCHED0.
           have ARR0: job_arrival j0 <= t' by apply MUSTARRs.
-          apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival);
+          apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival);
             try (by done).
           by apply: (leq_ltn_trans _ LT').
         Qed.
@@ -997,7 +997,7 @@ Module JitterScheduleService.
               {
                 rewrite /sched_j in SCHED2.
                 by apply reduction_prop.sched_jitter_jobs_come_from_arrival_sequence with
-                                                    (sched_susp0 := sched_susp) in SCHED2.
+                                                    (sched_susp := sched_susp) in SCHED2.
               }
               have HP2: hep j2.
               {
@@ -1193,7 +1193,7 @@ Module JitterScheduleService.
           rewrite (big_rem j_hp) /other_higher_eq_priority_job /=; last first.
           {
             have IN: arrives_in arr_seq j_hp by apply FROM in SCHEDhp. 
-            apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival);
+            apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival);
               try (by done).
             by apply: (leq_trans _ LTi); apply ARRIVE.
           }
@@ -1238,7 +1238,7 @@ Module JitterScheduleService.
         apply leq_ltn_trans with (n := service_during sched_jitter j arr_j (arr_j + R_j)).
         { rewrite /service /service_during.
           rewrite (ignore_service_before_arrival job_arrival) ?leq_addr //.
-          apply jobs_with_jitter_must_arrive_to_execute with (job_jitter0 := job_jitter).
+          apply jobs_with_jitter_must_arrive_to_execute with (job_jitter := job_jitter).
             by apply reduction_prop.sched_jitter_jobs_execute_after_jitter.
         }
         apply: (leq_ltn_trans LESS).

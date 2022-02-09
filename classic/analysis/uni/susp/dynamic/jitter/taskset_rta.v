@@ -206,10 +206,10 @@ Module TaskSetRTA.
       set job_jitter := reduction.job_jitter job_arrival job_task
                         higher_eq_priority job_cost j actual_response_time.
       apply valid_response_time_bound_in_sched_susp with
-        (task_period0 := task_period) (task_deadline0 := task_deadline)
-        (job_deadline0 := job_deadline) (job_task0 := job_task) (ts0 := ts)
-        (arr_seq0 := arr_seq) (higher_eq_priority0 := higher_eq_priority)
-        (job_suspension_duration0:=job_suspension_duration); try (by done).
+        (task_period := task_period) (task_deadline := task_deadline)
+        (job_deadline := job_deadline) (job_task := job_task) (ts := ts)
+        (arr_seq := arr_seq) (higher_eq_priority := higher_eq_priority)
+        (job_suspension_duration:=job_suspension_duration); try (by done).
       - by intros tsk_hp IN OHEP j'; apply RESPhp.
       {   
         intros j0 ARR0 LT0 JOB0.

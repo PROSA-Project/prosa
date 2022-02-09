@@ -159,7 +159,7 @@ Module PriorityInversionIsBounded.
             { apply/andP; split.
               - apply/andP; split. unfold arrived_before, has_arrived in *. by rewrite ltnW. 
                 apply/negP; intro COMP; apply NOTCOMP'.
-                  by apply completion_monotonic with (t0 := t).
+                  by apply completion_monotonic with (t := t).
               - apply/negP; intro SCHED'.
                 apply only_one_job_scheduled with (j1 := j_hp) in SCHED'; last by done.
                   by apply NOTHP; subst. 
@@ -185,7 +185,7 @@ Module PriorityInversionIsBounded.
                   }
                   apply/andP; split. unfold arrived_before, has_arrived in *. by done. 
                   apply/negP; intro COMP; apply NOTCOMP'.
-                    by apply completion_monotonic with (t0 := t).
+                    by apply completion_monotonic with (t := t).
                 }
                 feed (PRIO j_hp' j_hp t PREEMPTP IN BACK); first by done.
                   by apply NOTHP; apply H_priority_is_transitive with j_hp'. 
@@ -193,12 +193,12 @@ Module PriorityInversionIsBounded.
         }
         repeat split; [| by done | by done].
         move: (SCHED) => PENDING.
-        eapply scheduled_implies_pending with (job_cost0 := job_cost) in PENDING; [| by eauto | by done].
+        eapply scheduled_implies_pending with (job_cost := job_cost) in PENDING; [| by eauto | by done].
         apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _]. 
         apply contraT; rewrite -ltnNge; intro LT; exfalso.
         feed (QUIET j_hp); first by eapply CONS, SCHED.
         specialize (QUIET HP LT).
-        have COMP: job_completed_by j_hp t by apply completion_monotonic with (t0 := t1).
+        have COMP: job_completed_by j_hp t by apply completion_monotonic with (t := t1).
         apply completed_implies_not_scheduled in COMP; last by done.
           by move: COMP => /negP COMP; apply COMP.
       Qed.
@@ -248,7 +248,7 @@ Module PriorityInversionIsBounded.
             rewrite !subnKC; last rewrite ltnW; by done.
               by rewrite ltnn in MIN. }
           have PP: preemption_time mpt.+1.
-          { apply first_moment_is_pt with (arr_seq0 := arr_seq) (j0 := s); eauto 2. }
+          { apply first_moment_is_pt with (arr_seq := arr_seq) (j := s); eauto 2. }
           exists mpt.+1; repeat split; try done.
           - apply/andP; split; last by done.
               by apply H_jobs_must_arrive_to_execute in SCHEDsmpt.
@@ -315,7 +315,7 @@ Module PriorityInversionIsBounded.
         repeat split; [| by done | by done].
         move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET EXj]]]. 
         move: (SCHED) => PENDING.
-        eapply scheduled_implies_pending with (job_cost0 := job_cost) in PENDING;
+        eapply scheduled_implies_pending with (job_cost := job_cost) in PENDING;
           [| by eauto | by done].
         apply/andP; split; 
           last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
@@ -323,7 +323,7 @@ Module PriorityInversionIsBounded.
         feed (QUIET j_hp); first by eapply CONS, SCHED.
         specialize (QUIET HP LT).
         have COMP: job_completed_by j_hp t.
-        { by apply completion_monotonic with (t0 := t1); [ apply leq_trans with tp | ]. }
+        { by apply completion_monotonic with (t := t1); [ apply leq_trans with tp | ]. }
         apply completed_implies_not_scheduled in COMP; last by done.
           by move: COMP => /negP COMP; apply COMP.
       Qed.
@@ -476,7 +476,7 @@ Module PriorityInversionIsBounded.
             destruct t1.
             { eapply zero_is_pt; [eauto 2 | apply H_jobs_come_from_arrival_sequence]. }
             eapply hp_job_not_scheduled_before_quiet_time in QT1; eauto 2.
-            eapply first_moment_is_pt with (j0 := s); eauto 2.
+            eapply first_moment_is_pt with (j := s); eauto 2.
           } 
           { move: (SCHED) => ARRs; apply H_jobs_come_from_arrival_sequence in ARRs.
             move: (H_model_with_bounded_nonpreemptive_segments s ARRs) => [_ [_ [_ EXPP]]].

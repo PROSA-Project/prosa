@@ -139,7 +139,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       }
         by rewrite /job_response_time_bound /completed_by ZEROj.
     }
-    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L).
+    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L).
     all: eauto 3 with basic_facts.
   Qed.
   

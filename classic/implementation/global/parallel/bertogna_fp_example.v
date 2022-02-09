@@ -168,7 +168,7 @@ Module ResponseTimeAnalysisFP.
       unfold valid_sporadic_job, valid_realtime_job in *; des.
       apply taskset_schedulable_by_fp_rta with (task_cost := task_cost)
        (task_period := task_period) (task_deadline := task_deadline)
-       (ts0 := ts) (higher_priority0 := RM task_period); try (by done).
+       (ts := ts) (higher_priority := RM task_period); try (by done).
       - by apply ts_has_constrained_deadlines.
       - by apply ts_has_unique_priorities.
       - by apply priority_is_total.

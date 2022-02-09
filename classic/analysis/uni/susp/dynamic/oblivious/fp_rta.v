@@ -133,16 +133,16 @@ Module SuspensionObliviousFP.
                H_jobs_from_taskset into FROMTS, H_inflated_cost_le_deadline_and_period into LEdl.
         intros tsk INts j ARRj JOBtsk.
         apply suspension_oblivious_preserves_schedulability with
-              (higher_eq_priority0 := (FP_to_JLDP job_task higher_eq_priority))
-              (arr_seq0 := arr_seq) (next_suspension0 := next_suspension); try (by done).
+              (higher_eq_priority := (FP_to_JLDP job_task higher_eq_priority))
+              (arr_seq := arr_seq) (next_suspension := next_suspension); try (by done).
         - by intros t y x z; apply H_priority_is_transitive.
         - by intros j1 j2 t ARR1 ARR2; apply/orP; apply H_priority_is_total; apply FROMTS.
-        apply jobs_schedulable_by_fp_rta with (task_cost0 := inflated_cost) (ts0 := ts)
-            (task_period0 := task_period) (task_deadline0 := task_deadline) (job_task0 := job_task)
-            (higher_eq_priority0 := higher_eq_priority); try (by done).
+        apply jobs_schedulable_by_fp_rta with (task_cost := inflated_cost) (ts := ts)
+            (task_period := task_period) (task_deadline := task_deadline) (job_task := job_task)
+            (higher_eq_priority := higher_eq_priority); try (by done).
         - by apply suspension_oblivious_task_parameters_remain_valid.
-        - by apply suspension_oblivious_job_parameters_remain_valid with (ts0 := ts)
-                                                       (task_period0 := task_period).
+        - by apply suspension_oblivious_job_parameters_remain_valid with (ts := ts)
+                                                       (task_period := task_period).
         - by apply sched_newjobs_come_from_arrival_sequence.
         - by apply sched_new_jobs_must_arrive_to_execute. 
         - by apply sched_new_completed_jobs_dont_execute.

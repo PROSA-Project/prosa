@@ -151,7 +151,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       by rewrite /job_response_time_bound /completed_by ZEROj.
     }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with
-        (L0 := L).
+        (L := L).
     all: eauto 3 with basic_facts.
     - by apply sequential_readiness_implies_work_bearing_readiness.
     - by apply sequential_readiness_implies_sequential_tasks.

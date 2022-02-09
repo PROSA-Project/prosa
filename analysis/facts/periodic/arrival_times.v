@@ -39,7 +39,7 @@ Section PeriodicArrivalTimes.
     induction n.
     { intros j ARR TSK_IN ZINDEX.
       rewrite mul0n addn0.
-      apply first_job_arrival with (arr_seq0 := arr_seq) (tsk0 := job_task j) => //.
+      apply first_job_arrival with (arr_seq := arr_seq) (tsk := job_task j) => //.
     }
     { intros j ARR TSK_IN JB_INDEX.
       move : (H_task_respects_periodic_model j ARR) => PREV_JOB.
@@ -81,14 +81,14 @@ Section PeriodicArrivalTimes.
     + intros * ARR_J TSK ARR.
       specialize (H_task_respects_periodic_model j); feed_n 3 H_task_respects_periodic_model => //.
       { rewrite lt0n; apply /eqP; intro EQ.
-        apply first_job_arrival with (tsk0 := tsk) in EQ => //.
+        apply first_job_arrival with (tsk := tsk) in EQ => //.
         now rewrite EQ in ARR; ssrlia.
       }
       move : H_task_respects_periodic_model => [j' [ARR' [IND' [TSK' ARRIVAL']]]].
       specialize (IHn j'); feed_n 3 IHn => //; first by rewrite ARR in ARRIVAL'; ssrlia.
       rewrite IHn in IND'.
       destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]]; last by ssrlia.
-      apply first_job_arrival with (tsk0 := tsk) in Z => //.
+      apply first_job_arrival with (tsk := tsk) in Z => //.
       now rewrite Z in ARR; ssrlia.
   Qed.
   

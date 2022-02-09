@@ -608,10 +608,10 @@ Module ResponseTimeIterationFP.
         intros [_ [_ [REC DL]]].
 
         apply bertogna_cirinei_response_time_bound_fp with
-              (task_cost0 := task_cost) (task_period0 := task_period)
-              (task_deadline0 := task_deadline) (job_deadline0 := job_deadline) (tsk0 := (TASK idx))
-              (job_task0 := job_task) (ts0 := ts) (hp_bounds0 := take idx hp_bounds)
-              (job_jitter0 := job_jitter) (higher_eq_priority := higher_priority); try (by done).
+              (task_cost := task_cost) (task_period := task_period)
+              (task_deadline := task_deadline) (job_deadline := job_deadline) (tsk := (TASK idx))
+              (job_task := job_task) (ts := ts) (hp_bounds := take idx hp_bounds)
+              (job_jitter := job_jitter) (higher_eq_priority := higher_priority); try (by done).
         {
           cut (NTH idx \in hp_bounds = true);
             [intros IN | by apply mem_nth].

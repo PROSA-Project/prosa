@@ -154,8 +154,8 @@ Module ResponseTimeAnalysisFP.
       intros tsk IN.
       unfold valid_sporadic_job, valid_realtime_job in *; des.
       apply taskset_schedulable_by_fp_rta with (task_cost := task_cost)
-                (task_period := task_period) (task_deadline := task_deadline) (ts0 := ts)
-                (higher_eq_priority0 := RM task_period) (job_jitter0 := job_jitter)
+                (task_period := task_period) (task_deadline := task_deadline) (ts := ts)
+                (higher_eq_priority := RM task_period) (job_jitter := job_jitter)
                 (task_jitter := task_jitter); try (by done).
       - by apply ts_has_positive_costs.
       - by apply ts_has_positive_periods.

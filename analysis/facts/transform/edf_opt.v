@@ -256,7 +256,7 @@ Section MakeEDFAtFacts.
         now apply scheduled_job_in_sched_has_later_deadline.
       - have EX: (exists t', scheduled_at sched j t').
         {
-          apply swap_job_scheduled with (t1 := t_edf) (t2 := find_swap_candidate sched t_edf j_orig) (t0 := t).
+          apply swap_job_scheduled with (t1 := t_edf) (t2 := find_swap_candidate sched t_edf j_orig) (t := t).
           now move: SCHED; rewrite /sched' /make_edf_at SCHED_orig.
         }
         move: EX => [t' SCHED_t'].
@@ -419,7 +419,7 @@ Section MakeEDFAtFacts.
       + by rewrite -EQ; apply fsc_range1.
     - case (boolP(t_edf == t)) => [/eqP EQ'| /eqP NEQ'].
       + move=> SCHED_j.
-        have ARR_j: job_arrival j <= t_edf by apply fsc_found_job_arrival with (sched0 := sched) (j1 := j_orig) => //; rewrite scheduled_at_def.
+        have ARR_j: job_arrival j <= t_edf by apply fsc_found_job_arrival with (sched := sched) (j1 := j_orig) => //; rewrite scheduled_at_def.
         now rewrite -EQ'.
       + move=> SCHED_j.
         apply H_jobs_must_arrive_to_execute.
@@ -703,7 +703,7 @@ Section EDFPrefixInclusion.
       by rewrite scheduled_at_def /edf_transform_prefix; apply /eqP.
     apply fsc_range1 => //.
     - by apply edf_prefix_jobs_must_arrive.
-    - apply edf_prefix_scheduled_job_has_later_deadline with (sched0 := sched) (horizon := h2) => //.
+    - apply edf_prefix_scheduled_job_has_later_deadline with (sched := sched) (horizon := h2) => //.
   Qed.
 
 End EDFPrefixInclusion.
@@ -798,7 +798,7 @@ Section EDFTransformFacts.
                                         H_completed_jobs_dont_execute H_no_deadline_misses t_dl.+1) => [_ [_ DL]].
       now apply (DL j t).
     - by apply (identical_prefix_inclusion _ _ t_dl.+1) => //; apply edf_finite_prefix.
-    - by apply edf_prefix_scheduled_job_has_later_deadline with (sched0 := sched) (horizon := t.+1).
+    - by apply edf_prefix_scheduled_job_has_later_deadline with (sched := sched) (horizon := t.+1).
   Qed.
 
   (** We observe that no new jobs are introduced: any job scheduled in the EDF
@@ -818,12 +818,12 @@ Section EDFTransformFacts.
   Proof.
     move=> j t SCHED_j.
     have EX: exists t', scheduled_at (edf_transform_prefix sched (job_deadline j)) j t'
-      by apply edf_prefix_job_scheduled' with (t0 := t).
+      by apply edf_prefix_job_scheduled' with (t := t).
     move: EX => [t' SCHED'].
     exists t'.
     rewrite /sched_edf /edf_transform scheduled_at_def.
     rewrite (edf_prefix_inclusion _ _ _ _ t'.+1 (job_deadline j)) -?scheduled_at_def=> //.
-    now apply edf_prefix_scheduled_job_has_later_deadline with (sched0 := sched) (horizon := job_deadline j).
+    now apply edf_prefix_scheduled_job_has_later_deadline with (sched := sched) (horizon := job_deadline j).
   Qed.
 
   (** Next, we note that [edf_transform] maintains the property that all jobs

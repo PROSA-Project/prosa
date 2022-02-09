@@ -206,8 +206,8 @@ Module ResponseTimeAnalysisEDF.
           x tsk_other <= edf_specific_bound tsk_other R_other.
         Proof.
           rename H_job_of_tsk into JOBtsk, H_all_jobs_from_taskset into FROMTS.
-          apply interference_bound_edf_bounds_interference with (job_deadline0 := job_deadline)
-                                               (arr_seq0 := arr_seq) (ts0 := ts); try (by done);
+          apply interference_bound_edf_bounds_interference with (job_deadline := job_deadline)
+                                               (arr_seq := arr_seq) (ts := ts); try (by done);
           [ by rewrite -JOBtsk FROMTS
           | by apply bertogna_edf_tsk_other_in_ts
           | by apply H_tasks_miss_no_deadlines
@@ -315,14 +315,14 @@ Module ResponseTimeAnalysisEDF.
         }
         clear SCHED; rename SCHED' into SCHED.
         move: (SCHED) => PENDING.
-        apply scheduled_implies_pending with (job_cost0 := job_cost) (job_arrival0 := job_arrival)
+        apply scheduled_implies_pending with (job_cost := job_cost) (job_arrival := job_arrival)
           in PENDING; try (by done).
         destruct (ltnP (job_arrival j_other) (job_arrival j)) as [BEFOREother | BEFOREj].
          {
           move: (BEFOREother) => LT; rewrite -(ltn_add2r R) in LT.
           specialize (BEFOREok j_other tsk R ARRother SAMEtsk INbounds LT).
           move: PENDING => /andP [_ /negP NOTCOMP]; apply NOTCOMP.
-          apply completion_monotonic with (t0 := job_arrival j_other + R); try (by done).
+          apply completion_monotonic with (t := job_arrival j_other + R); try (by done).
           apply leq_trans with (n := job_arrival j); last by done.
           apply leq_trans with (n := job_arrival j_other + task_deadline tsk);
             first by rewrite leq_add2l; apply NOMISS.

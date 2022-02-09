@@ -186,7 +186,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         - rewrite /has_arrived. auto.
         - rewrite /completed_by /service /service_during.
           rewrite ->cumulative_service_before_job_arrival_zero
-          with (job_arrival0:=job_arrival). rewrite -ltnNge. 
+          with (job_arrival:=job_arrival). rewrite -ltnNge. 
           apply H_valid_job. apply H_jobs_must_arrive_to_execute. auto.
       Qed.
 
@@ -710,7 +710,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
     apply completes_at_end_time_pre.
     by apply pendingArrival.
     rewrite /service /service_during.
-    by rewrite ->cumulative_service_before_job_arrival_zero with (job_arrival0:=job_arrival).
+    by rewrite ->cumulative_service_before_job_arrival_zero with (job_arrival:=job_arrival).
     Qed.
 
     (** Finally, we prove that job can be finished within the formula WCRT. *)
@@ -826,7 +826,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         apply completion_monotonic with (t:= job_arrival j + job_response_time_tdma_in_at_most_one_job_is_pending);auto.
         rewrite leq_add2l.
         apply response_time_le_WCRT.
-        apply completed_by_end_time with (job_arrival0:=job_arrival);auto.
+        apply completed_by_end_time with (job_arrival:=job_arrival);auto.
         apply completes_at_end_time.
       Qed.
 

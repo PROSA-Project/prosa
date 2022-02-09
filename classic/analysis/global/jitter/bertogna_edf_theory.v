@@ -225,8 +225,8 @@ Module ResponseTimeAnalysisEDFJitter.
         Lemma bertogna_edf_specific_bound_holds :
           x tsk_other <= edf_specific_bound tsk_other R_other.
         Proof.
-          by apply interference_bound_edf_bounds_interference with (job_deadline0 := job_deadline)
-                   (arr_seq0 := arr_seq) (ts0 := ts); try (by done);
+          by apply interference_bound_edf_bounds_interference with (job_deadline := job_deadline)
+                   (arr_seq := arr_seq) (ts := ts); try (by done);
           [  by apply bertogna_edf_tsk_other_in_ts
           |  by apply H_tasks_miss_no_deadlines         
           |  by ins; apply H_all_previous_jobs_completed_on_time with (tsk_other := tsk_other)].
@@ -307,8 +307,8 @@ Module ResponseTimeAnalysisEDFJitter.
           have ARRother: arrives_in arr_seq j_other.
             by apply (H_jobs_come_from_arrival_sequence j_other t).
           move: (SCHED) => PENDING.
-          apply scheduled_implies_pending with (job_cost0 := job_cost) (job_jitter0 := job_jitter)
-            (job_arrival0 := job_arrival) in PENDING; try (by done).
+          apply scheduled_implies_pending with (job_cost := job_cost) (job_jitter := job_jitter)
+            (job_arrival := job_arrival) in PENDING; try (by done).
           destruct (ltnP (job_arrival j_other) (job_arrival j)) as [BEFOREother | BEFOREj].
           {
             move: (BEFOREother) => LT; rewrite -(ltn_add2r R) in LT.
@@ -319,7 +319,7 @@ Module ResponseTimeAnalysisEDFJitter.
             }
             intros COMP.
             move: PENDING => /andP [_ /negP NOTCOMP]; apply NOTCOMP.
-            apply completion_monotonic with (t0 := job_arrival j_other + task_jitter tsk + R);
+            apply completion_monotonic with (t := job_arrival j_other + task_jitter tsk + R);
               try by done.
             apply leq_trans with (n := job_arrival j);
               last by apply leq_trans with (n := t1); [by apply leq_addr | by done].
@@ -379,7 +379,7 @@ Module ResponseTimeAnalysisEDFJitter.
           intros t j0 LEt ARR0 LE.
           cut ((job_task j0) \in unzip1 rt_bounds = true); last by rewrite UNZIP FROMTS.
           move => /mapP [p IN EQ]; destruct p as [tsk' R0]; simpl in *; subst tsk'.
-          apply completion_monotonic with (t0 := job_arrival j0 + task_jitter (job_task j0) + R0).
+          apply completion_monotonic with (t := job_arrival j0 + task_jitter (job_task j0) + R0).
           {
             rewrite -addnA leq_add2l.
             apply leq_trans with (n := task_deadline (job_task j0));
@@ -433,7 +433,7 @@ Module ResponseTimeAnalysisEDFJitter.
           intros j0 tsk0 ARR0 TSK0 LE.
           cut (tsk0 \in unzip1 rt_bounds = true); last by rewrite UNZIP -TSK0 FROMTS //.
           move => /mapP [p IN EQ]; destruct p as [tsk' R0]; simpl in *; subst tsk'.
-          apply completion_monotonic with (t0 := job_arrival j0 + task_jitter tsk0 + R0); try (by done).
+          apply completion_monotonic with (t := job_arrival j0 + task_jitter tsk0 + R0); try (by done).
           {
             rewrite -addnA leq_add2l TSK0.
             apply leq_trans with (n := task_deadline tsk0); first by apply NOMISS.
@@ -577,11 +577,11 @@ Module ResponseTimeAnalysisEDFJitter.
             }
             assert (BUG: j1 = j2).
             {
-              apply platform_at_most_one_pending_job_of_each_task with (task_cost0 := task_cost)
-               (job_jitter0 := job_jitter) (task_period0 := task_period) (job_cost0 := job_cost)
-               (task_deadline0 := task_deadline) (tsk0 := tsk) (job_task0 := job_task)
-               (sched0 := sched) (job_arrival0 := job_arrival) (arr_seq0 := arr_seq)
-               (j0 := j) (t0 := t);
+              apply platform_at_most_one_pending_job_of_each_task with (task_cost := task_cost)
+               (job_jitter := job_jitter) (task_period := task_period) (job_cost := job_cost)
+               (task_deadline := task_deadline) (tsk := tsk) (job_task := job_task)
+               (sched := sched) (job_arrival := job_arrival) (arr_seq := arr_seq)
+               (j := j) (t := t);
               rewrite ?JOBtsk ?SAMEtsk //; first by apply PARAMS; rewrite -JOBtsk FROMTS.
               by intros j0 tsk0 ARR0 TSK0 LE; apply (COMP t); rewrite ?TSK0.
             }

@@ -180,10 +180,10 @@ Module RTAByReduction.
              H_valid_response_time_bound_of_hp_tasks into RESPhp,
              H_valid_response_time_bound_in_sched_jitter into RESPj.
       rewrite -H_job_of_tsk /job_response_time_in_sched_susp_bounded_by.
-      apply reduction_serv.jitter_reduction_job_j_completes_no_later with (job_task0 := job_task)
-        (ts0 := ts) (arr_seq0 := arr_seq) (higher_eq_priority0 := higher_eq_priority)
-        (task_period0 := task_period) (task_deadline0 := task_deadline) (job_deadline0 := job_deadline)
-        (job_suspension_duration0 := job_suspension_duration) (R_hp := actual_response_time);
+      apply reduction_serv.jitter_reduction_job_j_completes_no_later with (job_task := job_task)
+        (ts := ts) (arr_seq := arr_seq) (higher_eq_priority := higher_eq_priority)
+        (task_period := task_period) (task_deadline := task_deadline) (job_deadline := job_deadline)
+        (job_suspension_duration := job_suspension_duration) (R_hp := actual_response_time);
         try (by done).
       {
         intros j_hp ARRhp OTHERhp.

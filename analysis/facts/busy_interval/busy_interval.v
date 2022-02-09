@@ -544,8 +544,8 @@ Section ExistsBusyIntervalJLFP.
                 by apply cumulative_service_le_job_cost, ideal_proc_model_provides_unit_service.
             }
             rewrite ignore_service_before_arrival; rewrite //; [| by apply ltnW].
-            rewrite <- ignore_service_before_arrival with (t2:=0); rewrite //; [|by apply ltnW].
-              by rewrite ltnNge; apply/negP.
+            rewrite <- ignore_service_before_arrival with (t1:=0); rewrite //; [|by apply ltnW].
+            by rewrite ltnNge; apply/negP.
           Qed.               
           
           (** Using the two lemmas above, we infer that the workload

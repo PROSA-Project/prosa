@@ -262,10 +262,10 @@ Section JLFPInstantiation.
           rewrite Bool.andb_true_r Fact; simpl; rewrite lt0b; clear Fact.
           apply/hasP; exists j.
           * rewrite mem_filter; apply/andP; split; first by rewrite TSK; apply/eqP.
-              by eapply arrivals_between_sub with (t2 := 0) (t3 := upp); eauto 2.
+            by eapply arrivals_between_sub with (t1 := 0) (t2 := upp); eauto 2.
           * destruct (hep_job s j) eqn:HP; apply/orP; [right|left]; last by done.
-              by rewrite /is_interference_from_another_hep_job EQ
-                         /another_hep_job NEQ Bool.andb_true_r. 
+            by rewrite /is_interference_from_another_hep_job EQ
+                       /another_hep_job NEQ Bool.andb_true_r. 
     Qed.
     
     (** In this section we prove that the (abstract) cumulative interfering workload is equivalent to 

@@ -157,8 +157,8 @@ Module ResponseTimeAnalysisFP.
       have TSVALID := ts_has_valid_parameters.
       unfold valid_sporadic_job, valid_realtime_job in *; des.
       apply suspension_oblivious_fp_rta_implies_schedulability with (task_cost := task_cost)
-                (task_period := task_period) (task_deadline := task_deadline) (ts0 := ts)
-                (higher_eq_priority0 := RM task_period) (next_suspension0 := next_suspension)
+                (task_period := task_period) (task_deadline := task_deadline) (ts := ts)
+                (higher_eq_priority := RM task_period) (next_suspension := next_suspension)
                 (task_suspension_bound := task_suspension_bound); try (by done).
       - by apply periodic_arrivals_are_consistent.
       - by apply periodic_arrivals_is_a_set.

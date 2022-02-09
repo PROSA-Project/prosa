@@ -125,7 +125,7 @@ Section PriorityInversionIsBounded.
         ~ is_idle sched t.
       Proof.
         intros IDLE.
-        by exfalso; eapply not_quiet_implies_not_idle with (t0 := t); eauto 2 with basic_facts.
+        by exfalso; eapply not_quiet_implies_not_idle with (t := t); eauto 2 with basic_facts.
       Qed.
       
       (** Next we consider two cases: (1) when [t] is less than [t2 - 1] and (2) [t] is equal to [t2 - 1]. *)
@@ -264,7 +264,7 @@ Section PriorityInversionIsBounded.
         apply contraT; rewrite -ltnNge; intro LT; exfalso.
         feed (QUIET jhp); first by eapply CONS, Sched_jhp.
         specialize (QUIET HP LT).
-        have COMP: job_completed_by jhp t by apply completion_monotonic with (t0 := t1).
+        have COMP: job_completed_by jhp t by apply completion_monotonic with (t := t1).
         apply completed_implies_not_scheduled in COMP; eauto with basic_facts.
         by move: COMP => /negP COMP; apply COMP.
       Qed.
@@ -318,7 +318,7 @@ Section PriorityInversionIsBounded.
           edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point as [jlp [_ [HEP SCHEDjhp]]]; eauto 2.
           { by apply /andP; split; last by apply leq_ltn_trans with t. }
           enough (EQ : jhp = jlp); first by subst.
-          eapply ideal_proc_model_is_a_uniprocessor_model with (t0 := prt); eauto;
+          eapply ideal_proc_model_is_a_uniprocessor_model with (t := prt); eauto;
             by apply SCH; apply/andP; split.
         - move: E => /eqP /neqP E; rewrite -lt0n subn_gt0 in E.
           apply negbNE; apply/negP; intros LP; rename jhp into jlp.
@@ -326,7 +326,7 @@ Section PriorityInversionIsBounded.
             as [jhp [_ [HEP SCHEDjhp]]]; [ | apply PRPOINT| ]; first by apply/andP; split.
           move: LP => /negP LP; apply: LP.
           enough (EQ : jhp = jlp); first by subst. 
-          eapply ideal_proc_model_is_a_uniprocessor_model with (j1 := jhp) (t0 := tp); eauto. 
+          eapply ideal_proc_model_is_a_uniprocessor_model with (j1 := jhp) (t := tp); eauto. 
             by apply SCH; apply/andP; split; first apply leq_trans with t1; auto.
       } 
       repeat split; try done. 
@@ -337,7 +337,7 @@ Section PriorityInversionIsBounded.
       feed (QUIET jhp); first by eapply H_jobs_come_from_arrival_sequence, Sched_jhp.
       specialize (QUIET HP LT).
       have COMP: job_completed_by jhp t.
-      { by apply completion_monotonic with (t0 := t1); [ apply leq_trans with tp | ]. }
+      { by apply completion_monotonic with (t := t1); [ apply leq_trans with tp | ]. }
       apply completed_implies_not_scheduled in COMP; eauto with basic_facts.
       by move : COMP => /negP COMP; apply : COMP.
     Qed. 
@@ -514,7 +514,7 @@ Section PriorityInversionIsBounded.
           apply/andP; split; [by done | by rewrite leq_addr].
           destruct t1.
           - by eapply zero_is_pt; eauto 2.
-          - eapply first_moment_is_pt with (j0 := jhp); eauto 2.
+          - eapply first_moment_is_pt with (j := jhp); eauto 2.
             by eapply hp_job_not_scheduled_before_quiet_time; try by done.
         Qed.
           

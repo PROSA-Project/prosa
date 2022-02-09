@@ -413,7 +413,7 @@ Module SustainabilitySingleCostProperties.
             case (boolP (any_j == j)) => [/eqP EQ | NEQ]; subst.
             { unfold completed_jobs_dont_execute in *. 
               have BUG: service sched_susp j t >= job_cost j.
-              { apply completion_monotonic with (t0 := k); try (by done); apply ltnW. }
+              { apply completion_monotonic with (t := k); try (by done); apply ltnW. }
                 by exfalso; move: BUG; rewrite leqNgt; move => /negP BUG; apply: BUG.
             }
             rewrite COSTother //.
@@ -589,7 +589,7 @@ Module SustainabilitySingleCostProperties.
         intros k any_j LT; apply IHtmp; first by done.
         apply/negP; intro COMPk.
         suff COMPt: completed_in_sched_susp j t by rewrite COMPt in NOTCOMP.
-          by apply completion_monotonic with (t0 := k);[apply ltnW|].
+          by apply completion_monotonic with (t := k);[apply ltnW|].
       Qed.
       
     End SchedulingInvariant.

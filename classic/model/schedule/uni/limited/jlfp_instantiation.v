@@ -283,7 +283,7 @@ Module JLFPInstantiation.
           apply/hasP; exists j.
           { rewrite /arrivals_of_task_before /arrivals_of_task_between.
             rewrite /arrivals_of_task_between mem_filter; apply/andP; split; first by rewrite /is_job_of_task. 
-              by unfold jobs_arrived_before in ARR; apply jobs_arrived_between_sub with (t2 := 0) (t3 := upp). 
+              by unfold jobs_arrived_before in ARR; apply jobs_arrived_between_sub with (t1 := 0) (t2 := upp). 
           }
           { case HP: (higher_eq_priority s j).
             { apply/orP; right.
@@ -430,7 +430,7 @@ Module JLFPInstantiation.
                 rewrite eqn_leq; apply/andP; split; last by apply service_of_jobs_le_1 with job_arrival.
                 rewrite (big_rem jo) //=.
                 rewrite PRIO  /service_at /scheduled_at SCHED eq_refl add1n; by done.
-                apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival); try done.
+                apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival); try done.
                 unfold jobs_come_from_arrival_sequence in *.
                 apply H_jobs_come_from_arrival_sequence with (t1 + k). by rewrite /scheduled_at SCHED.
                 { move: PRIO => /andP [PRIO1 PRIO2].
@@ -556,7 +556,7 @@ Module JLFPInstantiation.
                                                        rewrite PRIO /job_from_another_task_with_higher_eq_priority
                                                                /is_interference_from_another_task_with_higher_eq_priority /service_at
                                                                /scheduled_at SCHED eq_refl add1n PRIO; by done.
-                                                       apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival); try done.
+                                                       apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival); try done.
                                                        unfold jobs_come_from_arrival_sequence in *.
                                                        apply H_jobs_come_from_arrival_sequence with (t1 + k). by rewrite /scheduled_at SCHED.
                                                        { move: PRIO => /andP [PRIO1 PRIO2].
@@ -657,7 +657,7 @@ Module JLFPInstantiation.
               apply in_arrivals_implies_arrived in H0; by done.
               move: H1 => /andP [H3 H4].
               unfold FP_to_JLFP.  by done.
-              apply in_arrivals_implies_arrived_between with (job_arrival0 := job_arrival) in H0; try done.
+              apply in_arrivals_implies_arrived_between with (job_arrival := job_arrival) in H0; try done.
             }
             {
               unfold pending_earlier_and_at. 
@@ -694,7 +694,7 @@ Module JLFPInstantiation.
                   intros jo IN; apply/negP; intros EQ; move: EQ => /eqP EQ.
                   subst jo.
                   unfold arrivals_between in *.
-                  apply in_arrivals_implies_arrived_between with (job_arrival0:= job_arrival) in IN; try done.
+                  apply in_arrivals_implies_arrived_between with (job_arrival:= job_arrival) in IN; try done.
                     by move: IN => /andP [_ IN]; move: H1; rewrite leqNgt; move => /negP LT; apply: LT.
                 }
                 have UL1 := sum_notin_rem_eqn.
@@ -705,7 +705,7 @@ Module JLFPInstantiation.
               {
                 have JIN: j \in arrivals_between 0 t.
                 { eapply completed_implies_scheduled_before in H1; eauto 2.
-                  apply arrived_between_implies_in_arrivals with (job_arrival0:= job_arrival); try done.
+                  apply arrived_between_implies_in_arrivals with (job_arrival:= job_arrival); try done.
                   move: H1 => [t' [H3 _]].
                   apply/andP; split; first by done.
                   move: H3 => /andP [H3e H3t].

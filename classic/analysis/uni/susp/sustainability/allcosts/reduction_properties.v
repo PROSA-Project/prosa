@@ -568,12 +568,12 @@ Module SustainabilityAllCostsProperties.
           by apply NOSERV; rewrite ?SUSPn ?LTr ?SUSPt ?GE ?LT.
         }
         apply/andP; split; first by apply: (ltn_trans _ LTr).
-        apply suspended_in_suspension_interval with (t0 := t); try done.
+        apply suspended_in_suspension_interval with (t := t); try done.
         {
           apply/negP; intro COMPmid.
           apply suspended_implies_not_completed in SUSPt.
           suff BUG: completed_by job_cost sched_susp j0 t by rewrite BUG in SUSPt.
-            by apply completion_monotonic with (t0 := k); [ apply ltnW |].
+            by apply completion_monotonic with (t := k); [ apply ltnW |].
         }
         apply/andP; split;
           last by apply: (ltn_trans LT); move: SUSPt => /andP [_ /andP [_ GTt]].

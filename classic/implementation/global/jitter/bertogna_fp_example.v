@@ -150,7 +150,7 @@ Module ResponseTimeAnalysisFP.
       apply taskset_schedulable_by_fp_rta with (task_cost := task_cost)
         (task_period := task_period) (task_deadline := task_deadline)
         (task_jitter := task_jitter) (job_jitter := job_jitter)
-        (ts0 := ts) (higher_priority0 := RM task_period); try (by done).
+        (ts := ts) (higher_priority := RM task_period); try (by done).
       - by apply ts_has_constrained_deadlines.
       - by apply ts_has_unique_priorities.
       - by apply priority_is_total.

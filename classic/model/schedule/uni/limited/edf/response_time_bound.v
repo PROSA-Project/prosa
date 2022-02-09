@@ -637,8 +637,8 @@ Module AbstractRTAforEDFwithArrivalCurves.
       move: (posnP (job_cost js)) => [ZERO|POS].
       { by rewrite /is_response_time_bound_of_job /completed_by ZERO. }    
       eapply AbstractSeqRTA.uniprocessor_response_time_bound_seq with
-          (interference0 := interference) (interfering_workload0 := interfering_workload)
-          (task_interference_bound_function := fun tsk A R => IBF A R) (L0 := L); eauto 3.
+          (interference := interference) (interfering_workload := interfering_workload)
+          (task_interference_bound_function := fun tsk A R => IBF A R) (L := L); eauto 3.
       - by apply instantiated_i_and_w_are_coherent_with_schedule.
       - by apply instantiated_interference_and_workload_consistent_with_sequential_jobs.
       - by apply instantiated_busy_intervals_are_bounded.
