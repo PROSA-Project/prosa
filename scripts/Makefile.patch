@@ -17,7 +17,7 @@
  COQFLAGS?=-q $(OTHERFLAGS) $(COQEXTRAFLAGS)
  COQCHKFLAGS?=-silent -o $(COQCHKEXTRAFLAGS)
 -COQDOCFLAGS?=-interpolate -utf8 $(COQDOCEXTRAFLAGS)
-+COQDOCFLAGS?=-interpolate -utf8 --parse-comments --coqlib https://coq.inria.fr/distrib/current/stdlib/ --external https://math-comp.github.io/htmldoc/ mathcomp $(COQDOCEXTRAFLAGS)
++COQDOCFLAGS?=-interpolate -utf8 --parse-comments --external https://math-comp.github.io/htmldoc/ mathcomp $(COQDOCEXTRAFLAGS)
  
  COQDOCLIBS?=$(COQLIBS_NOML)
  
