@@ -297,7 +297,7 @@ Section Abstract_RTA.
                     by apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)).
               }
             }
-            eapply job_completes_after_reaching_run_to_completion_threshold with (arr_seq := arr_seq); eauto 2.
+            apply: job_completes_after_reaching_run_to_completion_threshold; eauto 2.
           Qed.
 
           (** However, [t1 + (A + F) - optimism + last ≤ job_arrival j + R]! 

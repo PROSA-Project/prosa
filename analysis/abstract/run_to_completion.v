@@ -190,7 +190,7 @@ Section AbstractRTARunToCompletionThreshold.
         rewrite subnKC //.
         apply/negP; intros COMPL.
         move: CONTR => /negP Temp; apply: Temp.
-        apply completion_monotonic with (t := t'); try done.
+        exact: completion_monotonic COMPL.
       }
       have SERV: job_last + 1 <= \sum_(t <= t' < t + (job_last + 1)) service_at sched j t'.
       { rewrite -{1}[job_last + 1]addn0  -{2}(subnn t) addnBA // addnC.
@@ -201,8 +201,10 @@ Section AbstractRTARunToCompletionThreshold.
         apply H_ideal_progress_proc_model; apply SCHED.
           by rewrite addn1 addnS ltnS in NEQ.
       }
-      eapply service_at_most_cost with (j := j) (t := t + job_last.+1) in H_completed_jobs_dont_execute; auto.
-      move: H_completed_jobs_dont_execute; rewrite leqNgt; move => /negP T; apply: T.
+      move: (service_at_most_cost
+               _ H_completed_jobs_dont_execute j H_unit_service_proc_model
+               (t + job_last.+1)).
+      rewrite leqNgt; move => /negP T; apply: T.
       rewrite /service -(service_during_cat _ _ _ t); last by (apply/andP; split; last rewrite leq_addr).
       apply leq_trans with (job_rtct j + service_during sched j t (t + job_last.+1));
         last by rewrite leq_add2r.

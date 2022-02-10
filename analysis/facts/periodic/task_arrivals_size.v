@@ -45,8 +45,8 @@ Section TaskArrivalsSize.
     move : (A_ARR) => A_IN; apply H_consistent_arrivals in A_IN.
     rewrite -A_IN in T; rewrite /arrivals_at in A_ARR.
     apply in_arrseq_implies_arrives in A_ARR.
-    have EXISTS_N : exists n, job_arrival a = task_offset tsk + n * task_period tsk by
-          apply job_arrival_times with (arr_seq := arr_seq) => //.
+    have EXISTS_N : exists n, job_arrival a = task_offset tsk + n * task_period tsk.
+      exact: (job_arrival_times arr_seq).
     move : EXISTS_N => [n A_ARRIVAL].
     now move : (T n) => T1.
   Qed.
@@ -116,7 +116,7 @@ Section TaskArrivalsSize.
       intros *.
       destruct (H_infinite_jobs tsk n) as [j [ARR [TSK IND]]].
       exists j; repeat split => //.
-      now apply periodic_arrival_times with (arr_seq := arr_seq) => //.
+      exact: (periodic_arrival_times arr_seq).
     Qed.
     
     (** We show that the size of task arrivals at any arrival time is equal to one. *)
@@ -127,8 +127,9 @@ Section TaskArrivalsSize.
     Proof.
       intros n l; rewrite /l.
       move : (jobs_exists_later n) => [j' [ARR [TSK [ARRIVAL IND]]]].
-      apply only_j_in_task_arrivals_at_j with (tsk := tsk) in ARR => //; last by
-          auto with basic_facts.
+      apply (only_j_in_task_arrivals_at_j
+               arr_seq H_consistent_arrivals H_uniq_arr_seq tsk) in ARR => //;
+        last by auto with basic_facts.
       rewrite /task_arrivals_at_job_arrival TSK in ARR.
       now rewrite -ARRIVAL ARR.
     Qed.
