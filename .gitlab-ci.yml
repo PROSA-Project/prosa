@@ -217,7 +217,7 @@ proof-state:
   extends:
    - .not_in_wip_branches  
   stage: build
-  image: bbbrandenburg/alectryon-ci:latest
+  image: bbbrandenburg/alectryon-ci:1.14.0-coq-8.15.0
   script:
     - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
     - ./create_makefile.sh --without-classic
