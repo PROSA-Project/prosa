@@ -119,7 +119,7 @@ Section BasicLemmas.
       - do 2 (apply /andP; split; last by done).
         eapply scheduled_implies_pending in SCHED1; try eauto with basic_facts.
         move : SCHED1 => /andP [HAS COMPL].
-        by apply leq_trans with t.-1; [exact HAS| ssrlia].
+        by apply leq_trans with t.-1; [exact HAS| lia].
       - move: SCHEDj_other IDLE.
         rewrite scheduled_at_def => /eqP SCHED /eqP IDLE.
         by rewrite IDLE in SCHED. }
@@ -132,7 +132,7 @@ Section BasicLemmas.
       rewrite /hep_job /fifo.FIFO -ltnNge in HEP. 
       eapply (early_hep_job_is_scheduled arr_seq ) in SCHED1; try eauto 2 with basic_facts.
       - apply scheduled_implies_not_completed in INTER; eauto with basic_facts.
-        by eapply (incompletion_monotonic sched s t.-1 t) in INTER; [move: INTER => /negP|ssrlia].
+        by eapply (incompletion_monotonic sched s t.-1 t) in INTER; [move: INTER => /negP|lia].
       - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=]. }
   Qed.
 

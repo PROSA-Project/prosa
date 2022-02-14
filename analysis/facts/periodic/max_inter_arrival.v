@@ -44,11 +44,11 @@ Section PeriodicTasksRespectMaxInterArrivalModel.
       exists j'; repeat split => //.
       { case: (boolP (j == j')) => [/eqP EQ|NEQ].
         - have EQ_IND : (job_index arr_seq j' = job_index arr_seq j) by apply f_equal => //.
-          now exfalso; ssrlia.
+          now exfalso; lia.
         - now apply /eqP. }
       { have NZ_PERIOD : (task_period tsk > 0) by apply VALID_PERIOD.
         rewrite /max_inter_eq_period /task_max_inter_arrival_time ARRJ'. 
-        now ssrlia. }
+        now lia. }
     Qed.
     
 End PeriodicTasksRespectMaxInterArrivalModel.

@@ -111,9 +111,9 @@ Section TaskRTCThresholdLimitedPreemptions.
       rewrite last0_nth; apply T6; eauto 2.
       have F: 1 <= size (distances (task_preemption_points tsk)).
       { apply leq_trans with (size (task_preemption_points tsk) - 1). 
-        - have F := number_of_preemption_points_in_task_at_least_two; ssrlia.
-        - rewrite [in X in X - 1]size_of_seq_of_distances; [ssrlia | apply number_of_preemption_points_in_task_at_least_two].
-      } ssrlia.
+        - have F := number_of_preemption_points_in_task_at_least_two; lia.
+        - rewrite [in X in X - 1]size_of_seq_of_distances; [lia | apply number_of_preemption_points_in_task_at_least_two].
+      } lia.
     }    
     have J_RTCT__le : job_last_nonpreemptive_segment j <= job_cost j
       by eapply job_last_nonpreemptive_segment_le_job_cost; eauto using valid_fixed_preemption_points_model_lemma.

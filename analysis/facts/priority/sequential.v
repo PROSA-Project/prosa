@@ -66,7 +66,7 @@ Section SequentialJLFP.
     specialize (ALL_SCHED pt); feed ALL_SCHED; first by apply/andP; split.
     have PEND1: pending sched j1 pt.
     { apply/andP; split.
-      - by rewrite /has_arrived; ssrlia.
+      - by rewrite /has_arrived; lia.
       - by move: NCOMPL; apply contra, completion_monotonic.
     }
     apply H_job_ready in PEND1 => //; destruct PEND1 as [j3 [ARR3 [READY3 HEP3]]].

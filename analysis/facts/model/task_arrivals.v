@@ -72,7 +72,7 @@ Section TaskArrivals.
     move : ARR => [t ARR]; move : (ARR) => EQ.
     apply H_consistent_arrivals in EQ.
     rewrite (mem_bigcat_nat _ (fun t => arrivals_at arr_seq t) j 0 _ (job_arrival j)) // EQ //.
-    now ssrlia.
+    now lia.
   Qed.
 
   (** Also, any job [j] from the arrival sequence is contained in 
@@ -192,7 +192,7 @@ Section TaskArrivals.
     apply /negP; rewrite mem_filter => /andP [_ IN].
     apply mem_bigcat_nat_exists in IN; move : IN => [t' [IN NEQt']].
     rewrite -(H_consistent_arrivals j t') in NEQt' => //.
-    now ssrlia.
+    now lia.
   Qed.
 
   (** We show that for any two jobs [j1] and [j2], task arrivals up to arrival of job [j1] form a 
@@ -211,9 +211,9 @@ Section TaskArrivals.
     split.
     - move: (in_nil j2) => /negP => JIN NIL.
       rewrite -NIL in JIN; contradict JIN.
-      now apply job_in_task_arrivals_between => //; ssrlia.
+      now apply job_in_task_arrivals_between => //; lia.
     - rewrite /task_arrivals_up_to_job_arrival TSK1 TSK2.
-      now rewrite -task_arrivals_cat; try by ssrlia.
+      now rewrite -task_arrivals_cat; try by lia.
   Qed.
 
   (** For any job [j2] with [job_index] equal to [n], the nth job 

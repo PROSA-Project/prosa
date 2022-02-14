@@ -140,7 +140,7 @@ Module ResponseTimeAnalysisTDMA.
         with (task_deadline:=task_deadline)
                  (arr_seq:=arr_seq)(job_deadline:=job_deadline)
                  (job_task:=job_task)(slot_order:=slot_order) );eauto 2.
-        intros. apply H_arrival_times_are_consistent in ARR. ssrlia.
+        intros. apply H_arrival_times_are_consistent in ARR. lia.
       - have INJ: arrives_in arr_seq j by exists n.+1.
         try ( apply completion_monotonic 
           with (t0:=job_arrival j + WCRT task_cost task_time_slot ts tsk);auto ) ||
@@ -157,13 +157,13 @@ Module ResponseTimeAnalysisTDMA.
         intros.
         have PERIOD: job_arrival j_other + task_period (job_task j_other)<= job_arrival j.
         apply H_sporadic_tasks;auto. case (j==j_other)eqn: JJ;move/eqP in JJ;last auto.
-        have JO:job_arrival j_other = job_arrival j by f_equal. ssrlia.
+        have JO:job_arrival j_other = job_arrival j by f_equal. lia.
         try ( apply completion_monotonic with (t0:= job_arrival j_other +
            task_period (job_task j_other)); auto ) ||
         apply completion_monotonic with (t:= job_arrival j_other +
            task_period (job_task j_other)); auto.
         have ARRJ: job_arrival j = n.+1 by auto.
-        apply (IHt (job_arrival j_other));auto. ssrlia.
+        apply (IHt (job_arrival j_other));auto. lia.
         destruct H0 as [tj AAJO]. have CONSIST: job_arrival j_other =tj by auto.
         by subst. by subst.
     Qed.
@@ -182,7 +182,7 @@ Module ResponseTimeAnalysisTDMA.
       intros.
       have PERIOD: job_arrival j_other + task_period (job_task j_other)<= job_arrival j.
       apply H_sporadic_tasks;auto. case (j==j_other)eqn: JJ;move/eqP in JJ;last auto. 
-      have JO:job_arrival j_other = job_arrival j by f_equal. ssrlia.
+      have JO:job_arrival j_other = job_arrival j by f_equal. lia.
       apply completion_monotonic with (t:=job_arrival j_other + task_period (job_task j_other));auto.
       apply any_job_completed_before_period;auto. by subst.
     Qed.

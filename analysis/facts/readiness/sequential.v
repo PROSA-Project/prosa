@@ -98,7 +98,7 @@ Section SequentialTasksReadiness.
         have PEND' : pending sched j' t.
         { apply/andP; split; last by done.
           move: PEND => /andP [LE _].
-          by unfold has_arrived in *; ssrlia.
+          by unfold has_arrived in *; lia.
         }
         specialize (IHk j' LE' t ARR' PEND').
         destruct IHk as [j'' [ARR'' [READY'' HEP'']]].

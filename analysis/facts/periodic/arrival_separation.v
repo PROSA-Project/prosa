@@ -48,11 +48,11 @@ Section JobArrivalSeparation.
       job_arrival j2 = job_arrival j1 + task_period tsk.
     Proof.
       move : (H_periodic_model j2) => PERIODIC.
-      feed_n 3 PERIODIC => //; first by rewrite H_consecutive_jobs; ssrlia.
+      feed_n 3 PERIODIC => //; first by rewrite H_consecutive_jobs; lia.
       move : PERIODIC => [pj' [ARR_IN_PJ' [INDPJ'J' [TSKPJ' ARRPJ']]]].
       rewrite H_consecutive_jobs addnK in INDPJ'J'. 
       apply equal_index_implies_equal_jobs in INDPJ'J' => //; last by rewrite TSKPJ'.
-      now rewrite INDPJ'J' in ARRPJ'; ssrlia.
+      now rewrite INDPJ'J' in ARRPJ'; lia.
     Qed.    
 
   End ConsecutiveJobSeparation.
@@ -91,29 +91,29 @@ Section JobArrivalSeparation.
       { intros j1 j2 TSKj1 TSKj2 STEP LT ARRj1 ARRj2; exfalso.
         specialize (earlier_arrival_implies_lower_index arr_seq H_consistent_arrivals j1 j2) => LT_IND.
         feed_n 4 LT_IND => //; first by rewrite TSKj2.        
-        now ssrlia.
+        now lia.
       }
       { intros j1 j2 TSKj1 TSKj2 STEP LT ARRj2 ARRj1.
         specialize (exists_jobs_before_j
                       arr_seq H_consistent_arrivals H_uniq_arrseq j2 ARRj2 (job_index arr_seq j2 - s)) => BEFORE.
         destruct s.
         - exists 1; repeat split.
-          now rewrite (consecutive_job_separation j1) //; ssrlia.
-        - feed BEFORE; first by ssrlia.
+          now rewrite (consecutive_job_separation j1) //; lia.
+        - feed BEFORE; first by lia.
           move : BEFORE => [nj [NEQNJ [TSKNJ [ARRNJ INDNJ]]]]; rewrite TSKj2 in TSKNJ.
-          specialize (IHs nj j2); feed_n 6 IHs => //; first by ssrlia.          
+          specialize (IHs nj j2); feed_n 6 IHs => //; first by lia.          
           { by apply (lower_index_implies_earlier_arrival _ H_consistent_arrivals tsk);
-              eauto with basic_facts; ssrlia.
+              eauto with basic_facts; lia.
           }
           move : IHs => [n [NZN ARRJ'NJ]].          
-          move: (H_periodic_model nj) => PERIODIC; feed_n 3 PERIODIC => //; first by ssrlia. 
+          move: (H_periodic_model nj) => PERIODIC; feed_n 3 PERIODIC => //; first by lia. 
           move : PERIODIC => [sj [ARR_IN_SJ [INDSJ [TSKSJ ARRSJ]]]]; rewrite ARRSJ in ARRJ'NJ.
-          have INDJ : (job_index arr_seq j1 = job_index arr_seq j2 - s.+2) by ssrlia.
+          have INDJ : (job_index arr_seq j1 = job_index arr_seq j2 - s.+2) by lia.
           rewrite INDNJ -subnDA addn1 -INDJ in INDSJ.
           apply equal_index_implies_equal_jobs in INDSJ => //; last by rewrite TSKj1 => //. 
-          exists (n.+1); split; try by ssrlia.
+          exists (n.+1); split; try by lia.
           rewrite INDSJ in ARRJ'NJ; rewrite mulSnr.
-          now ssrlia.
+          now lia.
       }
     Qed.
 

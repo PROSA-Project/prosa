@@ -548,7 +548,7 @@ Module WorkloadBound.
           {
             apply H_sporadic_tasks; try (by done).
             unfold cur, next, not; intro EQ; move: EQ => /eqP EQ.
-            rewrite nth_uniq in EQ; first move: EQ => /eqP EQ; try ssrlia.
+            rewrite nth_uniq in EQ; first move: EQ => /eqP EQ; try lia.
               by rewrite sort_uniq -/scheduled_jobs filter_uniq // undup_uniq.
               by rewrite CURtsk.
           }

@@ -48,18 +48,18 @@ Section PeriodicTasksAsSporadicTasks.
     have IND_LT : job_index arr_seq j1 < job_index arr_seq j2.
     { rewrite -> diff_jobs_iff_diff_indices in NEQ => //; eauto; last by rewrite TSK.
       move_neq_up IND_LTE; move_neq_down ARR_LT.
-      specialize (H_PERIODIC j1); feed_n 3 H_PERIODIC => //; try by ssrlia.
+      specialize (H_PERIODIC j1); feed_n 3 H_PERIODIC => //; try by lia.
       move : H_PERIODIC => [pj [ARR_PJ [IND_PJ [TSK_PJ PJ_ARR]]]].
-      have JB_IND_LTE : job_index arr_seq j2 <= job_index arr_seq pj by ssrlia.
+      have JB_IND_LTE : job_index arr_seq j2 <= job_index arr_seq pj by lia.
       apply index_lte_implies_arrival_lte in JB_IND_LTE => //; try by rewrite TSK_PJ.
       rewrite PJ_ARR.
       have POS_PERIOD : task_period tsk > 0 by auto.
-      now ssrlia. }
-    specialize (H_PERIODIC j2); feed_n 3 H_PERIODIC => //; try by ssrlia.
+      now lia. }
+    specialize (H_PERIODIC j2); feed_n 3 H_PERIODIC => //; try by lia.
     move: H_PERIODIC => [pj [ARR_PJ [IND_PJ [TSK_PJ PJ_ARR]]]].
-    have JB_IND_LTE : job_index arr_seq j1 <= job_index arr_seq pj by ssrlia.
+    have JB_IND_LTE : job_index arr_seq j1 <= job_index arr_seq pj by lia.
     apply index_lte_implies_arrival_lte in JB_IND_LTE => //; try by rewrite TSK_PJ.
-    now rewrite PJ_ARR; ssrlia.
+    now rewrite PJ_ARR; lia.
   Qed.
     
   (** For convenience, we state these obvious correspondences also at the level

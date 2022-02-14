@@ -1,10 +1,10 @@
+Require Export mathcomp.zify.zify.
 Require Export prosa.util.tactics.
 Require Export prosa.util.notation.
 Require Export prosa.util.bigcat.
 Require Export prosa.util.div_mod.
 Require Export prosa.util.list.
 Require Export prosa.util.nat.
-Require Export prosa.util.ssrlia.
 Require Export prosa.util.sum.
 Require Export prosa.util.seqset.
 Require Export prosa.util.unit_growth.

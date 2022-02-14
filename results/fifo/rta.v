@@ -252,7 +252,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
               eauto 2 with basic_facts;last by done.
             move : H_busy_interval => [ [_ [_ [QUIET /andP [ARR _ ]]]] _].
             destruct (leqP t t1) as [LE | LT].
-            { have EQ : t = job_arrival j by apply eq_trans with t1; ssrlia.
+            { have EQ : t = job_arrival j by apply eq_trans with t1; lia.
               rewrite EQ in COMPL; apply completed_on_arrival_implies_zero_cost in COMPL; eauto with basic_facts.
               by move: (H_job_cost_positive); rewrite /job_cost_positive COMPL. }
             { specialize (QUIET t); feed QUIET.
@@ -280,7 +280,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL.
       move: H_valid_schedule => [READY MUST ].
       rewrite /cumul_interference cumulative_interference_split.
-      have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; ssrlia.
+      have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
       move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
       erewrite (cumulative_priority_inversion_is_bounded j ARRj JPOS t1 t2); rewrite //= add0n.
       rewrite (instantiated_cumulative_interference_of_hep_jobs_equal_total_interference_of_hep_jobs arr_seq) //=; 
@@ -293,7 +293,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         { apply leq_trans with (task_rbf ε).
           ( try ( apply (task_rbf_1_ge_task_cost arr_seq) with (j0 := j) => //= ) ||
           apply (task_rbf_1_ge_task_cost arr_seq) with (j := j) => //=); first by auto.
-          by apply task_rbf_monotone; [apply H_valid_arrival_curve | ssrlia]. }
+          by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia]. }
         { eapply leq_trans; last first.
           by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
           rewrite addnBA.
@@ -383,14 +383,14 @@ Section AbstractRTAforFIFOwithArrivalCurves.
           - destruct H_valid_run_to_completion_threshold as [TASKvalid JOBvalid].
             by apply TASKvalid. 
           - rewrite addnBA; first by rewrite leq_sub2r // leq_add2l.
-            have GE: task_cost tsk <= R; last by ssrlia.
+            have GE: task_cost tsk <= R; last by lia.
             rewrite !add0n in LE1.
             rewrite -(leqRW LE2) -(leqRW LE1).
             by eapply (task_cost_le_sum_rbf arr_seq); eauto with basic_facts. }
         { rewrite subnK; first by done.
           rewrite !add0n in LE1. apply leq_trans with F; last by done.
           apply leq_trans with (\sum_(tsko <- ts) rbf tsko ε); last by done.
-          apply leq_trans with (task_cost tsk); first by ssrlia.
+          apply leq_trans with (task_cost tsk); first by lia.
           eapply task_cost_le_sum_rbf; eauto with basic_facts. }
       Qed.
       

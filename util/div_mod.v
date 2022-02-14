@@ -16,9 +16,9 @@ Section DivMod.
     destruct (posnP h) as [Z | POSh].
     { by subst; rewrite !modn0. }
     { have EX: exists k, t1 + k = t2.
-      { exists (t2 - t1); ssrlia. }
+      { exists (t2 - t1); lia. }
       destruct EX as [k EX]; subst t2; clear LT.
-      rewrite modnD //; replace (h <= t1 %% h + k %% h) with false; first by ssrlia.
+      rewrite modnD //; replace (h <= t1 %% h + k %% h) with false; first by lia.
       symmetry; apply/negP/negP; rewrite -ltnNge.
       symmetry in EQ; rewrite divnD // in EQ; move: EQ => /eqP.
       rewrite -{2}[t1 %/ h]addn0 -addnA eqn_add2l addn_eq0 => /andP [_ /eqP Z2].
@@ -45,7 +45,7 @@ Section DivMod.
         - by apply dvdn_mull, dvdnn.
         - by apply dvdnn.
       }
-      { by move: LT; rewrite -addn1 leq_add2r leqNgt ltn_pmod //; ssrlia. }
+      { by move: LT; rewrite -addn1 leq_add2r leqNgt ltn_pmod //; lia. }
     }
   Qed.
 
@@ -60,7 +60,7 @@ Section DivMod.
     intros x h POS EQ.
     rewrite !addnS !addn0.
     rewrite addnS divnS // addn0 in EQ.
-    destruct (h %| x.+1) eqn:DIV ; rewrite /= in EQ; first by ssrlia.
+    destruct (h %| x.+1) eqn:DIV ; rewrite /= in EQ; first by lia.
     by rewrite modnS DIV. 
   Qed.
   
@@ -119,7 +119,7 @@ Section DivFloorCeil.
     move => d m n LEQ.
     rewrite /div_ceil.
     have LEQd: m %/ d <= n %/ d by apply leq_div2r.
-    destruct (d %| m) eqn:Mm; destruct (d %| n) eqn:Mn => //; first by ssrlia.
+    destruct (d %| m) eqn:Mm; destruct (d %| n) eqn:Mn => //; first by lia.
     rewrite ltn_divRL //.
     apply ltn_leq_trans with m => //.
     move: (leq_trunc_div m d) => LEQm.
@@ -139,8 +139,7 @@ Section DivFloorCeil.
     have lkc: (Δ - T) %/ T < Δ %/ T.
     { rewrite divnBr; last by auto.
       rewrite divnn POS.
-      rewrite ltn_psubCl //; try ssrlia.
-      by rewrite divn_gt0.
+      rewrite ltn_psubCl //; lia.
     }
     destruct (T %| Δ) eqn:EQ1.
     { have divck:  (T %| Δ) ->  (T %| (Δ - T)) by auto.
@@ -160,15 +159,15 @@ Section DivFloorCeil.
     - have DIVab: T %| a + b by apply dvdn_add.
       by rewrite /div_ceil DIVa DIVb DIVab divnDl.
     - have DIVab: T %| a+b = false by rewrite -DIVb; apply dvdn_addr.
-      by rewrite /div_ceil DIVa DIVb DIVab divnDl //=; ssrlia.
+      by rewrite /div_ceil DIVa DIVb DIVab divnDl //=; lia.
     - have DIVab: T %| a+b = false by rewrite -DIVa; apply dvdn_addl.
-      by rewrite /div_ceil DIVa DIVb DIVab divnDr //=; ssrlia.
+      by rewrite /div_ceil DIVa DIVb DIVab divnDr //=; lia.
     - destruct (T %| a + b) eqn:DIVab.
       + rewrite /div_ceil DIVa DIVb DIVab.
-        apply leq_trans with (a %/ T + b %/T + 1); last by ssrlia.
+        apply leq_trans with (a %/ T + b %/T + 1); last by lia.
         by apply leq_divDl.
       + rewrite /div_ceil DIVa DIVb DIVab.
-        apply leq_ltn_trans with (a %/ T + b %/T + 1); last by ssrlia.
+        apply leq_ltn_trans with (a %/ T + b %/T + 1); last by lia.
         by apply leq_divDl.
   Qed.
   
@@ -195,12 +194,12 @@ Section DivFloorCeil.
       (a + c - b) %% c = if a %% c >= b then (a %% c - b) else (a %% c + c - b).
   Proof.
     intros * BC.
-    have POS : c > 0 by ssrlia.
+    have POS : c > 0 by lia.
     have G : a %% c < c by apply ltn_pmod.
     case (b <= a %% c) eqn:CASE; rewrite -addnBA; auto; rewrite -modnDml.
     - rewrite addnABC; auto.
-      by rewrite -modnDmr modnn addn0 modn_small; auto; ssrlia.
-    - by rewrite modn_small; ssrlia.
+      by rewrite -modnDmr modnn addn0 modn_small; auto; lia.
+    - by rewrite modn_small; lia.
   Qed.
   
 End DivFloorCeil.

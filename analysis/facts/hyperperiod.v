@@ -95,13 +95,14 @@ Section PeriodicLemmas.
       job_task (corresponding_job_in_hyperperiod ts arr_seq j1
                (starting_instant_of_corresponding_hyperperiod ts j2) (job_task j1)) = job_task j1.
   Proof.
+    clear H_task_in_ts H_valid_period.
     intros *.
     set ARRIVALS := (task_arrivals_between arr_seq (job_task j1) (starting_instant_of_hyperperiod ts (job_arrival j2))
           (starting_instant_of_hyperperiod ts (job_arrival j2) + HP)).
     set IND := (job_index_in_hyperperiod ts arr_seq j1 (starting_instant_of_hyperperiod ts (job_arrival j1)) (job_task j1)).
     have SIZE_G : size ARRIVALS <= IND -> job_task (nth j1 ARRIVALS IND) = job_task j1 by intro SG; rewrite nth_default.
-    case: (boolP (size ARRIVALS == IND)) => [/eqP EQ|NEQ]; first by apply SIZE_G; ssrlia.
-    move : NEQ; rewrite neq_ltn; move => /orP [LT | G]; first by apply SIZE_G; ssrlia.
+    case: (boolP (size ARRIVALS == IND)) => [/eqP EQ|NEQ]; first by apply SIZE_G; lia.
+    move : NEQ; rewrite neq_ltn; move => /orP [LT | G]; first by apply SIZE_G; lia.
     set jb := nth j1 ARRIVALS IND.
     have JOB_IN : jb \in ARRIVALS by apply mem_nth.
     rewrite /ARRIVALS /task_arrivals_between mem_filter in JOB_IN.
@@ -139,8 +140,8 @@ Section PeriodicLemmas.
     rewrite mulnA /HP /jobs_in_hyperperiod !size_of_task_arrivals_between.
     erewrite big_sum_eq_in_eq_sized_intervals => //; intros g G_LT.
     have OFF_G : task_offset tsk <= O_max by apply max_offset_g.
-    have FG : forall v b n, v + b + n = v + n + b by intros *; ssrlia.
-    erewrite eq_size_of_task_arrivals_seperated_by_period => //; last by ssrlia.
+    have FG : forall v b n, v + b + n = v + n + b by intros *; lia.
+    erewrite eq_size_of_task_arrivals_seperated_by_period => //; last by lia.
     now rewrite FG.
   Qed.
 
@@ -154,9 +155,9 @@ Section PeriodicLemmas.
     intros *.
     case : (boolP (n1 == n2)) => [/eqP EQ | NEQ]; first by rewrite EQ.
     move : NEQ; rewrite neq_ltn; move => /orP [LT | LT].
-    + now apply eq_size_hyp_lt => //; ssrlia.
+    + now apply eq_size_hyp_lt => //; lia.
     + move : (eq_size_hyp_lt n2 n1) => EQ_S.
-      now feed_n 1 EQ_S => //; ssrlia.
+      now feed_n 1 EQ_S => //; lia.
   Qed.
 
   (** Consider any two jobs [j1] and [j2] that stem from the arrival sequence
@@ -189,11 +190,11 @@ Section PeriodicLemmas.
     move : NTH_IN => [i [NJ_IN INEQ]]; apply H_consistent_arrivals in NJ_IN; rewrite -NJ_IN in INEQ.
     apply /andP; split => //.
     rewrite ltnS.
-    apply leq_trans with (n := (job_arrival j2 - O_max) %/ HP * HP + O_max + HP); first by ssrlia.
+    apply leq_trans with (n := (job_arrival j2 - O_max) %/ HP * HP + O_max + HP); first by lia.
     rewrite leq_add2r.
     have O_M : (job_arrival j2 - O_max) %/ HP * HP <= job_arrival j2 - O_max by apply leq_trunc_div.
     have ARR_G : job_arrival j2 >= O_max by auto.
-    now ssrlia.
+    now lia.
   Qed.
 
   (** We show that job [j1] arrives in its own hyperperiod. *)
@@ -207,7 +208,7 @@ Section PeriodicLemmas.
     + specialize (div_floor_add_g (job_arrival j1 - O_max) HP) => AB.
       feed_n 1 AB; first by apply valid_periods_imply_pos_hp => //.
       rewrite ltn_subLR // in AB.
-      now rewrite -/(HP); ssrlia.
+      now rewrite -/(HP); lia.
   Qed.
 
   (** We show that the [corresponding_job_in_hyperperiod] of [j1] in [j2]'s hyperperiod

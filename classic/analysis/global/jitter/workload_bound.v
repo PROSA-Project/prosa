@@ -569,7 +569,7 @@ Module WorkloadBoundJitter.
           {
             apply H_sporadic_tasks; try (by done).
             unfold cur, next, not; intro EQ; move: EQ => /eqP EQ.
-            rewrite nth_uniq in EQ; first by move: EQ => /eqP EQ; ssrlia.
+            rewrite nth_uniq in EQ; first by move: EQ => /eqP EQ; lia.
               by apply ltn_trans with (n := (size sorted_jobs).-1); destruct sorted_jobs; ins.
               by destruct sorted_jobs; ins.
               by rewrite sort_uniq -/scheduled_jobs filter_uniq // undup_uniq.

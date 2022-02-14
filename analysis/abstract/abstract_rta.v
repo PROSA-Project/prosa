@@ -359,7 +359,7 @@ Section Abstract_RTA.
               have HH : task_rtct tsk <= F.
               { move: H_A_F_fixpoint => EQ.
                 have L1 := relative_arrival_le_interference_bound.
-                ssrlia.
+                lia.
               }
               apply leq_trans with F; auto.
             Qed.
@@ -371,7 +371,7 @@ Section Abstract_RTA.
               have HH : task_rtct tsk <= F.
               { move: H_A_F_fixpoint => EQ.
                 have L1 := relative_arrival_le_interference_bound.
-                ssrlia.
+                lia.
               }
                 by apply leq_trans with (task_rtct tsk); first rewrite /optimism leq_subr.
             Qed.

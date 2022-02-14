@@ -14,7 +14,7 @@ Section BasicFacts.
     transitive ltn_steps.
   Proof.
     move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    by apply /andP; split; ssrlia. 
+    by apply /andP; split; lia. 
   Qed.
 
   (** Next, we show that the relation [leq_steps] is reflexive... *) 
@@ -31,7 +31,7 @@ Section BasicFacts.
     transitive leq_steps.
   Proof.
     move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    by apply /andP; split; ssrlia. 
+    by apply /andP; split; lia. 
   Qed.
 
 End BasicFacts.
@@ -69,7 +69,7 @@ Section ArrivalCurvePrefixSortedLeq.
       move => /andP [ALL SORT].          
       destruct (leqP (fst (t__c, v__c)) t1) as [R1 | R1], (leqP (fst (t__c, v__c)) t2) as [R2 | R2]; simpl in *. 
       { rewrite R1 R2 //=; apply IHsteps; try done. } 
-      { by ssrlia. }
+      { by lia. }
       { rewrite ltnNge -eqbF_neg in R1; move: R1 => /eqP ->; rewrite R2 //=; apply IHsteps; try done.
         - by move: LTN1; rewrite /leq_steps => /andP //= [_ LEc]. 
         - by apply/allP.
@@ -105,7 +105,7 @@ Section ArrivalCurvePrefixSortedLeq.
           rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT; last first.
           { clear; intros [a b]; simpl.
             destruct (leqP a t).
-            - by rewrite Bool.andb_true_r; apply/eqP; ssrlia.
+            - by rewrite Bool.andb_true_r; apply/eqP; lia.
             - by rewrite Bool.andb_false_r.
           } 
           { by rewrite cats0 ltnn in LT. }
@@ -121,7 +121,7 @@ Section ArrivalCurvePrefixSortedLeq.
       induction steps; [by done | simpl in *].
       move: SORT; rewrite path_sortedE; auto using leq_steps_is_transitive; move => /andP [LE SORT].
       apply IHsteps in SORT.
-      rewrite path_sortedE; last by intros ? ? ? LE1 LE2; ssrlia.
+      rewrite path_sortedE; last by intros ? ? ? LE1 LE2; lia.
       apply/andP; split; last by done.
       apply/allP; intros [x y] IN.
       by move: LE => /allP LE; specialize (LE _ IN); move: LE => /andP [LT _].
@@ -151,7 +151,7 @@ Section ArrivalCurvePrefixSortedLtn.
     destruct l; simpl in *; first by done.
     eapply sub_path; last by apply H_sorted_ltn.
     intros [a1 b1] [a2 b2] LT.
-    by unfold ltn_steps, leq_steps in *; simpl in *; ssrlia.
+    by unfold ltn_steps, leq_steps in *; simpl in *; lia.
   Qed.
 
   (** Next, we show that [step_at 0] is equal to [(0, 0)]. *)
@@ -164,7 +164,7 @@ Section ArrivalCurvePrefixSortedLtn.
     have EM : [seq step <- steps | fst step <= 0] = [::].
     { apply filter_in_pred0; intros [t' v'] IN.
       move: ALL => /allP ALL; specialize (ALL _ IN); simpl in ALL.
-      by rewrite -ltnNge //=; move: ALL; rewrite /ltn_steps //= => /andP [T _ ]; ssrlia.
+      by rewrite -ltnNge //=; move: ALL; rewrite /ltn_steps //= => /andP [T _ ]; lia.
     }
     rewrite EM; destruct (posnP t) as [Z | POS].
     { subst t; simpl.
@@ -222,10 +222,10 @@ Section ExtrapolatedArrivalCurve.
       { by apply/orP; rewrite -leq_eqVlt; apply leq_div2r, ltnW. }
       move: ALT => [/eqP EQ | LT].
       { rewrite EQ leq_add2l; apply value_at_monotone => //.
-        by apply eqdivn_leqmodn; ssrlia.
+        by apply eqdivn_leqmodn; lia.
       } 
       { have EQ: exists k, t1 + k = t2 /\ k > 0.
-        { exists (t2 - t1); split; ssrlia. } 
+        { exists (t2 - t1); split; lia. } 
         destruct EQ as [k [EQ POS]]; subst t2; clear LTs.
         rewrite divnD; last by done.
         rewrite !mulnDl -!addnA leq_add2l.          
@@ -269,7 +269,7 @@ Section ExtrapolatedArrivalCurve.
         s1 < s2 \/ s1 = s2 /\ x < y.
     {  clear; intros * LEs LT.
        move: LEs; rewrite leq_eqVlt => /orP [/eqP EQ | LTs].
-       { by subst s2; rename s1 into s; right; split; [ done | ssrlia]. } 
+       { by subst s2; rename s1 into s; right; split; [ done | lia]. } 
        { by left. }
     }         
     apply AF with (m := prefix h).

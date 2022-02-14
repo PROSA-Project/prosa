@@ -65,10 +65,10 @@ Section NondecreasingSequence.
           + destruct n1, n2; try done; simpl.
             * apply iota_filter_gt; first by done.
               by rewrite index_iota_lt_step // //= PA //= in LT.
-            * apply IHk; try ssrlia.
+            * apply IHk; try lia.
               apply/andP; split; first by done.
               by rewrite index_iota_lt_step // //= PA //= in LT.
-          + apply IHk; try ssrlia.
+          + apply IHk; try lia.
             apply/andP; split; first by done.
             by rewrite index_iota_lt_step // //= PA //= in LT.
       }
@@ -353,7 +353,7 @@ Section NondecreasingSequence.
       apply/eqP; rewrite eqbF_neg.
       apply nondecreasing_sequence_cons in H0.
       apply/negP; intros ?; eauto 2.
-      by eapply nondecreasing_sequence_cons_min in H0; eauto 2; ssrlia.
+      by eapply nondecreasing_sequence_cons_min in H0; eauto 2; lia.
     Qed.
 
     (** Next we show that function [undup] doesn't change 
@@ -626,10 +626,10 @@ Section NondecreasingSequence.
         { rewrite ltnNge; apply/negP; intros CONTR.
           subst x y; move: LT; rewrite ltnNge; move => /negP T; apply: T.
           by apply SIZE; apply/andP. } 
-        have EQ: exists Δ, indy = indx + Δ; [by exists (indy - indx); ssrlia | move: EQ => [Δ EQ]; subst indy].
+        have EQ: exists Δ, indy = indx + Δ; [by exists (indy - indx); lia | move: EQ => [Δ EQ]; subst indy].
         have F: exists ind, indx <= ind < indx + Δ /\ xs[|ind|] < xs[|ind.+1|].
         { subst x y; clear SIZEx SIZEy; revert xs indx LTind SIZE LT.
-          induction Δ; intros; first by ssrlia.
+          induction Δ; intros; first by lia.
           destruct (posnP Δ) as [ZERO|POS].
           { by subst Δ; exists indx; split; [rewrite addn1; apply/andP | rewrite addn1 in LT]; auto. }
           have ALT: xs[|indx + Δ|] == xs[|indx + Δ.+1|] \/ xs[|indx + Δ|] < xs[|indx + Δ.+1|].

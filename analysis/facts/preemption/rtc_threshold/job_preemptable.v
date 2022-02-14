@@ -199,7 +199,7 @@ Section RunToCompletionThreshold.
     intros COST; unfold job_rtct, ε.
     have N1 := job_last_nonpreemptive_segment_positive COST.
     have N2 := job_last_nonpreemptive_segment_le_job_cost.
-    ssrlia.
+    lia.
   Qed.
   
   (** Next we show that the run-to-completion threshold is at most
@@ -218,7 +218,7 @@ Section RunToCompletionThreshold.
   Proof.
     move => ρ /andP [GE LT].
     apply/negP; intros C.
-    have POS : 0 < job_cost j; first by ssrlia.
+    have POS : 0 < job_cost j; first by lia.
     rewrite /job_rtct subnBA in GE; last by apply job_last_nonpreemptive_segment_positive.
     rewrite -addnBAC in GE; [rewrite addn1 in GE | by apply job_last_nonpreemptive_segment_le_job_cost]. 
     rewrite job_cost_is_last_element_of_preemption_points in LT, GE.

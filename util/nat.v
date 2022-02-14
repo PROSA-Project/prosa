@@ -1,5 +1,7 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
-Require Export prosa.util.tactics prosa.util.ssrlia.
+Require Export mathcomp.zify.zify.
+
+Require Export prosa.util.tactics.
 
 (** Additional lemmas about natural numbers. *)
 Section NatLemmas.
@@ -12,7 +14,7 @@ Section NatLemmas.
       m1 >= m2 ->
       n1 >= n2 ->
       (m1 + n1) - (m2 + n2) = (m1 - m2) + (n1 - n2).
-  Proof. by ins; ssrlia. Qed.
+  Proof. by ins; lia. Qed.
   
   (** Next, we show that [m + p <= n] implies that [m <= n - p]. Note
       that this lemma is similar to ssreflect's lemma [leq_subRL];
@@ -22,21 +24,21 @@ Section NatLemmas.
     forall m n p,
       m + n <= p ->
       m <= p - n.
-  Proof. by intros; ssrlia. Qed.
+  Proof. by intros; lia. Qed.
     
   (** Simplify [n + a - b + b - a = n] if [n >= b]. *)
   Lemma subn_abba:
     forall n a b,
       n >= b ->
       n + a - b + b - a = n.
-  Proof. by intros; ssrlia. Qed.
+  Proof. by intros; lia. Qed.
   
   (** We can drop additive terms on the lesser side of an inequality. *)
   Lemma leq_addk:
     forall m n k,
       n + k <= m ->
       n <= m.
-  Proof. by intros; ssrlia. Qed.
+  Proof. by intros; lia. Qed.
     
   (** For any numbers [a], [b], and [m], either there exists a number
       [n] such that [m = a + n * b] or [m <> a + n * b] for any [n]. *)
@@ -72,8 +74,8 @@ Section NatLemmas.
   Proof.
     intros * LT.
     rewrite mulnBl.
-    rewrite addnBA; first by ssrlia.
-    destruct a; first by ssrlia.
+    rewrite addnBA; first by lia.
+    destruct a; first by lia.
     by rewrite leq_pmul2r.
   Qed.
 
@@ -89,7 +91,7 @@ Section NatLemmas.
     intros * LTE NEQ n EQ.
     specialize (NEQ (n - z)).
     rewrite mulnBl in NEQ.
-    by ssrlia.
+    by lia.
   Qed.
   
 End NatLemmas.

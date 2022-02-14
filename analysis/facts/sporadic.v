@@ -46,12 +46,12 @@ Section SporadicModelIndexLemmas.
     intro IND.
     move: (H_sporadic_model j1 j2) => SPORADIC; feed_n 6 SPORADIC => //. 
     - rewrite -> diff_jobs_iff_diff_indices => //; eauto.
-       + now ssrlia.
+       + now lia.
        + now rewrite H_j1_task. 
     - apply (index_lte_implies_arrival_lte arr_seq); try eauto.
       now rewrite H_j1_task.
     - have POS_IA : task_min_inter_arrival_time tsk > 0 by auto.
-      now ssrlia.
+      now lia.
   Qed.
 
 End SporadicModelIndexLemmas.
@@ -97,8 +97,8 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     intros UNEQ EQ_ARR.
     rewrite -> diff_jobs_iff_diff_indices in UNEQ => //; eauto; last by rewrite H_j1_task.
     move /neqP: UNEQ; rewrite neq_ltn => /orP [LT|LT].
-    all: try ( now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia ) ||
-      now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; ssrlia.
+    all: try ( now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; lia ) ||
+      now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; lia.
   Qed.
 
   (** We prove a stronger version of the above lemma by showing 
@@ -113,7 +113,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     case: (boolP (j1 == j2)) => [/eqP EQ | /eqP NEQ]; first by auto.
     rewrite -> diff_jobs_iff_diff_indices in NEQ => //; eauto; last by rewrite H_j1_task.
     move /neqP: NEQ; rewrite neq_ltn => /orP [LT|LT].
-    all: try ( now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; ssrlia ) || now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; ssrlia.
+    all: try ( now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; lia ) || now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; lia.
   Qed.
     
 End DifferentJobsImplyDifferentArrivalTimes.
@@ -239,7 +239,7 @@ Section SporadicArrivals.
     - now apply prev_job_task.
     - intro EQ.
       have SM_IND: job_index arr_seq j1 - 1 = job_index arr_seq j1 by rewrite -prev_job_index // EQ.
-      now ssrlia.
+      now lia.
   Qed.
 
   (** We show that task arrivals at [job_arrival j1] is the 

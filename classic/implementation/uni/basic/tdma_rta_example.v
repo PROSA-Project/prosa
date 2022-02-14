@@ -92,14 +92,14 @@ Module ResponseTimeAnalysisExemple.
       slot_order_is_transitive slot_order.
     Proof.
     rewrite /slot_order.
-    intros t1 t2 t3 IN1 IN2. ssrlia.
+    intros t1 t2 t3 IN1 IN2. lia.
     Qed.
 
     Fact slot_order_antisymmetric:
       slot_order_is_antisymmetric_over_task_set ts slot_order.
     Proof.
     intros x y IN1 IN2. rewrite /slot_order. intros O1 O2.
-    have EQ: task_id x = task_id y by ssrlia.
+    have EQ: task_id x = task_id y by lia.
     case (x==y)eqn:XY;move/eqP in XY;auto.
     repeat (move:IN2=> /orP [/eqP TSK2 |IN2]); repeat (move:IN1=>/orP [/eqP TSK1|IN1];subst);compute ;try done.
     Qed.
@@ -145,7 +145,7 @@ Module ResponseTimeAnalysisExemple.
           apply (respects_FIFO ) in FIND;auto.
           apply periodic_arrivals_are_sporadic with (ts:=ts) in FIND;auto.
           have PERIODY:task_period (job_task y)>0 by
-          apply ts_has_valid_parameters,periodic_arrivals_all_jobs_from_taskset. ssrlia.  
+          apply ts_has_valid_parameters,periodic_arrivals_all_jobs_from_taskset. lia.  
           apply  job_arrival_times_are_consistent.
           apply periodic_arrivals_is_a_set,ts_has_valid_parameters.
           split;auto.

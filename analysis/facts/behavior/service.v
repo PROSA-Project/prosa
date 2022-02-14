@@ -184,8 +184,8 @@ Section UnitService.
       ρ <= delta.
   Proof.
     induction delta; intros ? LE.
-    - by rewrite service_during_geq in LE; ssrlia.
-    - rewrite addnS -service_during_last_plus_before in LE; last by ssrlia.
+    - by rewrite service_during_geq in LE; lia.
+    - rewrite addnS -service_during_last_plus_before in LE; last by lia.
       destruct (service_is_zero_or_one (t + delta)) as [EQ|EQ]; rewrite EQ in LE.
       + rewrite addn0 in LE.
         by apply IHdelta in LE; rewrite (leqRW LE).

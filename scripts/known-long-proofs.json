@@ -32,7 +32,7 @@
         },
         "./classic/analysis/apa/interference_bound_edf.v": {
             "interference_bound_edf_holds_for_single_job_that_completes_on_time": 90,
-            "interference_bound_edf_many_periods_in_between": 40
+            "interference_bound_edf_many_periods_in_between": 41
         },
         "./classic/analysis/apa/workload_bound.v": {
             "W_monotonic": 51,
@@ -62,7 +62,7 @@
         },
         "./classic/analysis/global/basic/interference_bound_edf.v": {
             "interference_bound_edf_holds_for_single_job_that_completes_on_time": 100,
-            "interference_bound_edf_many_periods_in_between": 40
+            "interference_bound_edf_many_periods_in_between": 41
         },
         "./classic/analysis/global/basic/workload_bound.v": {
             "W_monotonic": 51,
@@ -94,7 +94,7 @@
             "interference_bound_edf_holds_for_single_job_that_completes_on_time": 132,
             "interference_bound_edf_holds_for_single_job_with_small_slack": 57,
             "interference_bound_edf_j_fst_completed_on_time": 48,
-            "interference_bound_edf_many_periods_in_between": 49
+            "interference_bound_edf_many_periods_in_between": 51
         },
         "./classic/analysis/global/jitter/workload_bound.v": {
             "W_monotonic": 51,
@@ -122,7 +122,7 @@
             "bertogna_fp_all_cpus_are_busy": 81
         },
         "./classic/analysis/global/parallel/interference_bound_edf.v": {
-            "interference_bound_edf_many_periods_in_between": 40,
+            "interference_bound_edf_many_periods_in_between": 42,
             "interference_bound_edf_n_k_covers_all_jobs": 47
         },
         "./classic/analysis/uni/arrival_curves/workload_bound.v": {
@@ -137,7 +137,7 @@
             "uniprocessor_response_time_bound_fp": 46
         },
         "./classic/analysis/uni/basic/tdma_wcrt_analysis.v": {
-            "formula_not_sched_St": 45,
+            "formula_not_sched_St": 44,
             "formula_sched_St": 100,
             "response_time_le_WCRT": 52
         },

@@ -179,7 +179,7 @@ Section SumsOverSequences.
       rewrite big_seq_cond [\sum_(_ <- _| P _)_]big_seq_cond.
       rewrite eqn_leq; apply /andP; split.
       all: apply leq_sum; move => j /andP [IN H].
-      all: by move:(EQ j IN H) => LEQ; ssrlia.
+      all: by move:(EQ j IN H) => LEQ; lia.
     Qed.
     
     (** Assume that [P1] implies [P2] in all the points contained in
@@ -227,7 +227,7 @@ Section SumsOverSequences.
         apply H1; last by done.
         by rewrite in_cons; apply/orP; right. }
       rewrite big_cons [RHS]big_cons in H2.
-      have EqLeq: forall a b c d, a + b = c + d -> a <= c -> b >= d by intros; ssrlia.
+      have EqLeq: forall a b c d, a + b = c + d -> a <= c -> b >= d by intros; lia.
       move: IN; rewrite in_cons; move => /orP [/eqP EQ | IN]. 
       { subst a.
         rewrite PX in H2.
@@ -289,7 +289,7 @@ Section SumsOverRanges.
   Proof.
     move=> t Δ.
     rewrite big_const_nat iter_addn_0.
-    by ssrlia.
+    by lia.
   Qed.
 
   (** Next, we show that a sum of natural numbers equals zero if and only 
@@ -394,8 +394,8 @@ Section SumOfTwoIntervals.
     \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
   Proof.
     induction d; first by rewrite !addn0 !big_geq.
-    rewrite !addnS !big_nat_recr => //; try by ssrlia.
-    rewrite IHn //=; last by move=> g G_LTl; apply (equal_before_d g); ssrlia.
+    rewrite !addnS !big_nat_recr => //; try by lia.
+    rewrite IHn //=; last by move=> g G_LTl; apply (equal_before_d g); lia.
     by rewrite equal_before_d.
   Qed.
   

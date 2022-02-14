@@ -83,7 +83,7 @@ Section ValidJobCostsShifted.
     + now apply H_valid_offsets_in_taskset.
     + now apply H_valid_periods_in_taskset.  
     + now apply H_periodic_taskset.
-    + now ssrlia.
+    + now lia.
   Qed.
 
 End ValidJobCostsShifted.

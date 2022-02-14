@@ -39,5 +39,5 @@ Tactics taken from the standard library of Viktor Vafeiadis.
 
 ## Miscellaneous
 
-- `ssrlia`: Solves arithmetic goals, including ones with `ssreflect`'s definitions.
+- `lia`: Solves arithmetic goals, including ones with `ssreflect`'s definitions.
 

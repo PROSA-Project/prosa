@@ -86,6 +86,7 @@ Section WorkloadFacts.
       workload_of_jobs (fun j => (job_arrival j <= t) && P j) (arrivals_between t1 t2)
       <= workload_of_jobs (fun j => P j) (arrivals_between t1 (t + ε)).
     Proof.
+      clear H_jobs_uniq H_j_in_jobs H_t1_le_t2.
       rewrite /workload_of_jobs big_seq_cond.
       rewrite -[in X in X <= _]big_filter -[in X in _ <= X]big_filter.
       apply leq_sum_sub_uniq; first by apply filter_uniq, arrivals_uniq.
@@ -94,7 +95,7 @@ Section WorkloadFacts.
       apply job_in_arrivals_between; eauto.
       - by eapply in_arrivals_implies_arrived; eauto 2.
       - apply in_arrivals_implies_arrived_between in A; auto; move: A => /andP [A E].
-        by unfold ε; apply/andP; split; ssrlia.
+        by unfold ε; apply/andP; split; lia.
     Qed.
 
   End Subset.

@@ -42,7 +42,7 @@ Section OffsetLemmas.
     - have IND_LTE : (job_index arr_seq j <= job_index arr_seq j') by rewrite INDX N.
       apply index_lte_implies_arrival_lte in IND_LTE => //; last by rewrite TSK.
       now apply/eqP; rewrite eqn_leq; apply/andP; split;
-        [ssrlia | apply H_valid_offset].
+        [lia | apply H_valid_offset].
   Qed.
 
   (** Consider any task set [ts]. *)

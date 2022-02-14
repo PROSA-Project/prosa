@@ -1,6 +1,6 @@
 Require Export prosa.util.nat.
 
-Require Import prosa.classic.util.tactics prosa.util.ssrlia.
+Require Import prosa.classic.util.tactics mathcomp.zify.zify.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
 
 (* Additional lemmas about natural numbers. *)
@@ -30,7 +30,7 @@ Section NatLemmas.
       m >= n ->
       (m - n = p <-> m = p + n).
   Proof.
-    by split; ins; ssrlia.
+    by split; ins; lia.
   Qed.
 
   Lemma addmovl:
@@ -38,7 +38,7 @@ Section NatLemmas.
       m >= n ->
       (p = m - n <-> p + n = m).
   Proof.
-    by split; ins; ssrlia.
+    by split; ins; lia.
   Qed.
 
   Lemma ltSnm : forall n m, n.+1 < m -> n < m.

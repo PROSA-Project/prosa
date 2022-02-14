@@ -43,10 +43,10 @@ Section PeriodicArrivalTimes.
     }
     { intros j ARR TSK_IN JB_INDEX.
       move : (H_task_respects_periodic_model j ARR) => PREV_JOB.
-      feed_n 2 PREV_JOB => //; first by ssrlia.
+      feed_n 2 PREV_JOB => //; first by lia.
       move : PREV_JOB => [pj [ARR' [IND [TSK ARRIVAL]]]].
-      specialize (IHn pj); feed_n 3 IHn => //; first by rewrite IND JB_INDEX; ssrlia.
-      rewrite ARRIVAL IHn; ssrlia.
+      specialize (IHn pj); feed_n 3 IHn => //; first by rewrite IND JB_INDEX; lia.
+      rewrite ARRIVAL IHn; lia.
     }
   Qed.
 
@@ -77,19 +77,19 @@ Section PeriodicArrivalTimes.
     induction n.
     + intros * ARR_J TSK ARR.
       destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]] => //. 
-      now apply periodic_arrival_times in SUCC => //; ssrlia.
+      now apply periodic_arrival_times in SUCC => //; lia.
     + intros * ARR_J TSK ARR.
       specialize (H_task_respects_periodic_model j); feed_n 3 H_task_respects_periodic_model => //.
       { rewrite lt0n; apply /eqP; intro EQ.
         apply (first_job_arrival _ H_consistent_arrivals tsk) in EQ => //.
-        now rewrite EQ in ARR; ssrlia.
+        now rewrite EQ in ARR; lia.
       }
       move : H_task_respects_periodic_model => [j' [ARR' [IND' [TSK' ARRIVAL']]]].
-      specialize (IHn j'); feed_n 3 IHn => //; first by rewrite ARR in ARRIVAL'; ssrlia.
+      specialize (IHn j'); feed_n 3 IHn => //; first by rewrite ARR in ARRIVAL'; lia.
       rewrite IHn in IND'.
-      destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]]; last by ssrlia.
+      destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]]; last by lia.
       rewrite (first_job_arrival arr_seq _ tsk)// in ARR.
-      ssrlia.
+      by lia.
   Qed.
   
 End PeriodicArrivalTimes.

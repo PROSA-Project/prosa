@@ -1,6 +1,7 @@
+Require Export mathcomp.zify.zify.
 Require Export prosa.util.tactics prosa.util.notation.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-Require Export prosa.util.tactics prosa.util.ssrlia prosa.util.list.
+Require Export prosa.util.tactics prosa.util.list.
 
 (** In this section, we introduce lemmas about the concatenation
     operation performed over arbitrary sequences. *)
@@ -156,13 +157,13 @@ Section BigCatNatLemmas.
   Proof.
     intros.
     specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
-    + have EX: exists Δ, t2 = t1 + Δ by simpl; exists (t2 - t1); ssrlia.
+    + have EX: exists Δ, t2 = t1 + Δ by simpl; exists (t2 - t1); lia.
       move: EX => [Δ EQ]; subst t2.
       induction Δ.
       { by rewrite addn0 !big_geq => //. }
       { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
         rewrite filter_cat IHΔ => //.
-        by ssrlia. }
+        by lia. }
     + by rewrite !big_geq => //.
   Qed.
 
@@ -175,12 +176,12 @@ Section BigCatNatLemmas.
   Proof.
     intros.
     specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
-    - have EX: exists Δ, t2 = t1 + Δ by simpl; exists (t2 - t1); ssrlia.
+    - have EX: exists Δ, t2 = t1 + Δ by simpl; exists (t2 - t1); lia.
       move: EX => [Δ EQ]; subst t2.
       induction Δ.
       { by rewrite addn0 !big_geq => //. }
       { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
-        by rewrite size_cat IHΔ => //; ssrlia. }         
+        by rewrite size_cat IHΔ => //; lia. }         
     - by rewrite !big_geq => //.
   Qed.      
   

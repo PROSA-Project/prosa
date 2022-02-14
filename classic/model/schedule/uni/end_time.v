@@ -199,7 +199,7 @@ Module end_time.
          forall t c e, job_end_time_p t c e -> t <= e.
       Proof.
         intros* G.
-        induction G as [t|t c e Hcase1 Hpre |t c e Hcase2 Hpre]; ssrlia.
+        induction G as [t|t c e Hcase1 Hpre |t c e Hcase2 Hpre]; lia.
       Qed.
 
       (* the sum of job arrival and job cost is less than or equal to 
@@ -210,7 +210,7 @@ Module end_time.
           t+c<=e.
       Proof.
         intros* h1.
-        induction h1 as [t|t c e Hcase1 Hpre |t c e Hcase2 Hpre]; ssrlia.
+        induction h1 as [t|t c e Hcase1 Hpre |t c e Hcase2 Hpre]; lia.
       Qed.
 
       (* The servive received between the job arrival
@@ -254,7 +254,7 @@ Module end_time.
         unfold job_completed_by, completed_by, service, service_during in h1.
         destruct job_end; trivial. 
         rewrite big_geq // in h1. 
-        ssrlia.
+        lia.
       Qed.
 
       (* The service received between job arrival and the previous instant
@@ -273,7 +273,7 @@ Module end_time.
           rewrite big_ltn // IHHpre /service_at /service_during.
           case C:(scheduled_at sched job t);done.  
         - destruct c. 
-          + inversion Hpre. apply big_geq. ssrlia.
+          + inversion Hpre. apply big_geq. lia.
           + apply arrival_add_cost_le_end, leq_sub2r with (p:=1) in Hpre.
             rewrite subn1 addnS //= addSn subn1 in Hpre.
             apply leq_ltn_trans with (m:=t) in Hpre; try (apply leq_addr).
@@ -289,17 +289,17 @@ Module end_time.
       Proof.
         intros job_cmplted t' [ht1 ht2].
         assert (H_slot: job_cost job > 0) by (apply H_valid_job).
-        apply leq_ltn_trans with (n:= (job_cost job).-1); last ssrlia.
+        apply leq_ltn_trans with (n:= (job_cost job).-1); last lia.
         rewrite -job_uncompletes_at_end_time_sub_1 // /job_service_during /service_during.
         assert (H_lt: exists delta, t' + delta = job_end.-1).
         - move/leP:ht2 => ht2.
           apply Nat.le_exists_sub in ht2.
-          destruct ht2 as [p [ht21 ht22]]. exists p. ssrlia.
+          destruct ht2 as [p [ht21 ht22]]. exists p. lia.
         - destruct H_lt as [delta ht']. rewrite -ht'.
           replace (\sum_(job_arrival job <= t < t' + delta) service_at sched job t)
           with    (addn_monoid(\big[addn_monoid/0]_(job_arrival job <= i < t') service_at sched job i)
-                  (\big[addn_monoid/0]_(t'  <= i < t'+delta) service_at sched job i)); simpl; try ssrlia.
-          symmetry. apply big_cat_nat; ssrlia.
+                  (\big[addn_monoid/0]_(t'  <= i < t'+delta) service_at sched job i)); simpl; try lia.
+          symmetry. apply big_cat_nat; lia.
       Qed.
 
     End Lemmas.

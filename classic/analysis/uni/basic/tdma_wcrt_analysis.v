@@ -1,5 +1,5 @@
 Require Import Arith Nat.
-Require Import prosa.classic.util.all.
+Require Import prosa.classic.util.all prosa.classic.util.ssrlia.
 Require Import prosa.classic.model.arrival.basic.job
                prosa.classic.model.arrival.basic.task_arrival
                prosa.classic.model.schedule.uni.schedulability
@@ -389,15 +389,14 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
             repeat rewrite subn0.
             case Hc_slot:(c < time_slot); rewrite /duration_to_finish_from_start_of_slot_with.
             * by rewrite ceil_eq1 //; ssrlia.
-            * rewrite ceil_suba //; try ssrlia.
+            * rewrite ceil_suba //; [|ssrlia].
               rewrite subn1 mulnBl mul1n addnA -addSn addn1.
-               apply/eqP. rewrite eqn_add2l subnBA // addnA. repeat rewrite addnBA; try ssrlia.
+               apply/eqP. rewrite eqn_add2l subnBA // addnA. repeat rewrite addnBA; [| |ssrlia].
               -- by rewrite addKn addnAC addnK.
               -- apply leq_trans with (n:=tdma_cycle - time_slot + time_slot).
-                 ++ ssrlia. 
-                 ++ apply leq_add.
-                    ** apply leq_pmull, ceil_neq0; try ssrlia. rewrite ltn_subRL addn0. ssrlia. 
-                    ** apply leqnn.
+                 ++ ssrlia.
+                 ++ apply leq_add; [|ssrlia].
+                    apply leq_pmull, ceil_neq0; lia.
       - rewrite Hcases. repeat rewrite addnA. apply/eqP. repeat rewrite eqn_add2r.
         rewrite -addn1 -addnA eqn_add2l /to_next_slot /from_start_of_slot.
         move:Hcases. repeat rewrite -addnBA //. intro Hcases.
@@ -443,9 +442,10 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
                   rewrite ltn_subRL addSn in Hc1. rewrite ltn_subRL addnS -addnBA // in Hc.
                   ssrlia.
                 * repeat rewrite -addnBA //.
-                  case (c < time_slot - ((t.+1 + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)) eqn:Hc1; try ssrlia.
+                  case (c < time_slot - ((t.+1 + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)) eqn:Hc1; [ssrlia|].
                   rewrite prednK // in mod_case. destruct mod_case.
-                  rewrite addSn in Hc1. ssrlia. 
+                  rewrite addSn in Hc1.
+                  ssrlia.
             - destruct c; repeat rewrite -addnBA // in Hc;rewrite -addnBA // in NSLOT;simpl.
               + ssrlia.
               + repeat rewrite -addnBA // addSn.
@@ -489,7 +489,6 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
                      rewrite addSn case1 case2 add0n subn0 add0n.
                      replace (tdma_cycle - tdma_cycle.-1)  with 1 by ssrlia.
                      rewrite add1n subn1 //= addnBA; try ssrlia. 
-                     by rewrite addKn.
           - move/negP /negP in Hcases. rewrite -ltnNge in Hcases. rewrite -addnBA in NSLOT.
             rewrite /from_start_of_slot.
             case (c < time_slot - (t + tdma_cycle - slot_offset %% tdma_cycle) %% tdma_cycle)eqn:Hc.

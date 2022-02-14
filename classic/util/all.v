@@ -1,3 +1,4 @@
+Require Export mathcomp.zify.zify.
 Require Export prosa.classic.util.tactics.
 Require Export prosa.classic.util.notation.
 Require Export prosa.classic.util.bigcat.
@@ -17,4 +18,3 @@ Require Export prosa.classic.util.minmax.
 Require Export prosa.classic.util.seqset.
 Require Export prosa.classic.util.step_function.
 Require Export prosa.util.epsilon.
-Require Export prosa.util.ssrlia.

@@ -70,11 +70,11 @@ Section TaskArrivalsSize.
     have SPO : respects_sporadic_task_model arr_seq tsk; try by auto with basic_facts.
     have EQ_ARR_A : (job_arrival a = t) by apply H_consistent_arrivals.
     have EQ_ARR_B : (job_arrival b = t) by apply H_consistent_arrivals.
-    specialize (SPO a b); feed_n 6 SPO => //; try by ssrlia.
+    specialize (SPO a b); feed_n 6 SPO => //; try by lia.
     rewrite EQ_ARR_A EQ_ARR_B in SPO.
     rewrite /task_min_inter_arrival_time /periodic_as_sporadic in SPO.
     have POS : task_period tsk > 0 by auto.
-    now ssrlia.
+    now lia.
   Qed.
 
   (** We show that the size of task arrivals (strictly) between two consecutive arrival
@@ -92,7 +92,7 @@ Section TaskArrivalsSize.
     move : INEQ => /andP [INEQ1 INEQ2].
     rewrite ltn_add2l ltn_mul2r in INEQ1; rewrite ltn_add2l ltn_mul2r in INEQ2.
     move : INEQ1 INEQ2 => /andP [A B] /andP [C D].
-    now ssrlia.
+    now lia.
   Qed.
   
   (** In this section we show some properties of task arrivals in case
@@ -144,7 +144,7 @@ Section TaskArrivalsSize.
       have Z : size (task_arrivals_between arr_seq tsk 0 (task_offset tsk)) = 0.
       { rewrite size_of_task_arrivals_between big_nat_eq0 => //; intros t T_EQ.
         rewrite task_arrivals_size_at_non_arrival => //; intros n EQ.
-        now ssrlia.
+        now lia.
       }               
       rewrite Z add0n /task_arrivals_between /arrivals_between big_nat1.
       specialize (task_arrivals_at_size 0) => AT_SIZE.
@@ -165,17 +165,17 @@ Section TaskArrivalsSize.
       intros l r.
       specialize (task_arrivals_cat arr_seq tsk (task_offset tsk + n * task_period tsk)
                                     (task_offset tsk + n.+1 * task_period tsk)) => CAT.
-      feed_n 1 CAT; first by ssrlia.
+      feed_n 1 CAT; first by lia.
       rewrite CAT size_cat IHn.
       specialize (task_arrivals_between_cat arr_seq tsk (task_offset tsk + n * task_period tsk).+1
                  (task_offset tsk + n.+1 * task_period tsk) (task_offset tsk + n.+1 * task_period tsk).+1) => S_CAT.
-      feed_n 2 S_CAT; try by ssrlia.
+      feed_n 2 S_CAT; try by lia.
       { rewrite ltn_add2l ltn_mul2r.
         now apply /andP; split => //.
       }
       rewrite S_CAT size_cat /task_arrivals_between /arrivals_between big_nat1.
       rewrite size_task_arrivals_between_eq0 task_arrivals_at_size => //.
-      now ssrlia.
+      now lia.
     Qed.
     
     (** We show that the number of jobs released by task [tsk] at any instant [t] 
@@ -190,7 +190,7 @@ Section TaskArrivalsSize.
       destruct (exists_or_not_add_mul_cases (task_offset tsk) (task_period tsk) t) as [[n1 JB_ARR] | JB_NOT_ARR].
       + have EXISTS_N : exists nn, t + n * task_period tsk = task_offset tsk + nn * task_period tsk.
         { exists (n1 + n).
-          now rewrite JB_ARR; ssrlia.
+          now rewrite JB_ARR; lia.
         }
         move : EXISTS_N => [nn JB_ARR'].
         now rewrite JB_ARR' JB_ARR !task_arrivals_at_size => //.

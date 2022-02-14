@@ -1,5 +1,5 @@
 Require Export prosa.util.sum.
-Require Export prosa.util.ssrlia.
+Require Export mathcomp.zify.zify.
 
 Require Import prosa.classic.util.tactics.
 Require Import prosa.classic.util.notation.

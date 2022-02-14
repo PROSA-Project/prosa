@@ -69,7 +69,7 @@ Section Superadditivity.
       specialize (SUPER 0 0 (addn0 0)).
       contradict SUPER.
       apply /negP; rewrite -ltnNge.
-      by ssrlia.
+      by lia.
     Qed.
     
     (** In this section, we show some of the properties of superadditive functions. *)
@@ -84,9 +84,9 @@ Section Superadditivity.
       Proof.
         move=> x y LEQ.
         apply leq_trans with (f x + f (y - x)).
-        - by ssrlia.
+        - by lia.
         - apply h_superadditive.
-          by ssrlia.
+          by lia.
       Qed.
       
       (** Next, we prove that moving any factor [m] outside of the arguments
@@ -96,7 +96,7 @@ Section Superadditivity.
           m * f n <= f (m * n).
       Proof.
         move=> n m.
-        elim: m=> [| m IHm]; first by ssrlia.
+        elim: m=> [| m IHm]; first by lia.
         rewrite !mulSnr.
         apply leq_trans with (f (m * n) + f n).
         - by rewrite leq_add2r.
@@ -189,17 +189,17 @@ Section Superadditivity.
         rewrite -SUM.
         destruct a as [|a'] eqn:EQa; destruct b as [|b'] eqn:EQb => //=.
         { rewrite add0n eq_refl superadditive_first_zero; first by rewrite add0n.
-          by apply h_superadditive_until; ssrlia. }
+          by apply h_superadditive_until; lia. }
         { rewrite addn0 eq_refl superadditive_first_zero; first by rewrite addn0.
-          by apply h_superadditive_until; ssrlia. }
+          by apply h_superadditive_until; lia. }
         { rewrite -!EQa -!EQb eq_refl //=.
           rewrite -{1}(addn0 a) eqn_add2l {1}EQb //=.
           rewrite -{1}(add0n b) eqn_add2r {2}EQa //=.
           rewrite /minimal_superadditive_extension.
           apply in_max0_le.
           apply /mapP; exists a.
-          - by rewrite mem_iota; ssrlia.
-          - by have -> : a + b - a = b by ssrlia. }
+          - by rewrite mem_iota; lia.
+          - by have -> : a + b - a = b by lia. }
       Qed. 
 
       (** And finally, we prove that [f'] is superadditive until [h.+1]. *)
@@ -209,9 +209,9 @@ Section Superadditivity.
         move=> t LEQh a b SUM.
         destruct (ltngtP t h) as [LT | GT | EQ].
         - rewrite !h_f'_min_extension.
-          rewrite !ltn_eqF; try ssrlia.
+          rewrite !ltn_eqF; try lia.
           by apply h_superadditive_until.
-        - by ssrlia.
+        - by lia.
         - rewrite EQ in SUM; rewrite EQ.
           by apply minimal_extension_superadditive_at_horizon.
       Qed.

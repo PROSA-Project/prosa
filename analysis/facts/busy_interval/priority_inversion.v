@@ -627,7 +627,7 @@ Section PriorityInversionIsBounded.
                   by inversion SCHED2.
               }
               { have EX: exists sm, sm.+1 = fpt.
-                { exists fpt.-1. ssrlia. }
+                { exists fpt.-1. lia. }
                 destruct EX as [sm EQ2]. rewrite -EQ2.
                 rewrite addnS.
                 move: ((proj1 CORR) s' (H_jobs_come_from_arrival_sequence _ _ Sched_s')) => T.

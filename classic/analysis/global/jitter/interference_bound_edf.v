@@ -893,6 +893,8 @@ Module InterferenceBoundEDFJitter.
           Lemma interference_bound_edf_many_periods_in_between :
             a_lst - a_fst >= num_mid_jobs.+1 * p_k.
           Proof.
+            clear H_tsk_k_in_task_set.
+            clear H_at_least_one_cpu H_tsk_i_in_task_set H_delta_le_deadline.
             unfold a_fst, a_lst, j_fst, j_lst. 
             assert (EQnk: num_mid_jobs.+1=(size sorted_jobs).-1).
               by rewrite H_at_least_two_jobs.
@@ -935,7 +937,7 @@ Module InterferenceBoundEDFJitter.
             {
               apply H_sporadic_tasks; try (by done).
               unfold cur, next, not; intro EQ; move: EQ => /eqP EQ.
-              rewrite nth_uniq in EQ; first by move: EQ => /eqP EQ; ssrlia.
+              rewrite nth_uniq in EQ; first by move: EQ => /eqP EQ; lia.
                 by apply ltn_trans with (n := (size sorted_jobs).-1); destruct sorted_jobs; ins.
                 by destruct sorted_jobs; ins.
                 by rewrite sort_uniq -/interfering_jobs filter_uniq // undup_uniq.

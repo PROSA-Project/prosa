@@ -162,7 +162,7 @@ Section ArrivalSequencePrefix.
     Proof.
       intros P t t1 t2 INEQ.
       rewrite -filter_cat.
-      now rewrite -arrivals_between_cat => //; ssrlia.
+      now rewrite -arrivals_between_cat => //; lia.
     Qed.
     
     (** The same observation applies to membership in the set of
@@ -339,7 +339,7 @@ Section ArrivalSequencePrefix.
       apply mem_bigcat_nat_exists in J2ARR; move : J2ARR => [i [J2_IN INEQ]].
       apply mem_bigcat_nat with (j := i) => //.
       apply H_consistent_arrival_times in J2_IN; rewrite J2_IN in ARR_LT.
-      now ssrlia.
+      now lia.
     Qed.
 
   End ArrivalTimes.
