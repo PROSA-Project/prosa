@@ -1,9 +1,9 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.nonpreemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.nonpreemptive.
 Require Export prosa.analysis.facts.readiness.basic.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 
 (** * RTA for Fully Non-Preemptive EDF *)

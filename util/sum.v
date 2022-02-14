@@ -1,7 +1,7 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
+
 Require Export prosa.util.notation.
 Require Export prosa.util.nat.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 Section SumsOverSequences.
 

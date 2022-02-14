@@ -1,8 +1,8 @@
+From mathcomp Require Export seq.
+
 Require Export prosa.model.task.concept.
 Require Export prosa.util.rel.
 Require Export prosa.util.list.
-
-From mathcomp Require Export seq.
 
 (** * The FP, JLFP, and JLDP Priority Classes *)
 

@@ -1,9 +1,9 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
 Require Import prosa.analysis.facts.priority.fifo. 
 Require Import prosa.model.priority.fifo.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 Require Export prosa.analysis.facts.busy_interval.carry_in.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules ... *)
 Require Import prosa.model.processor.ideal.

@@ -1,9 +1,9 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.facts.readiness.sequential.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 
 (** * RTA for Fully Preemptive FP Model *)

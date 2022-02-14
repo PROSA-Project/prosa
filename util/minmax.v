@@ -1,5 +1,5 @@
-Require Export prosa.util.notation prosa.util.nat prosa.util.list.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export prosa.util.notation prosa.util.nat prosa.util.list.
 
 (** Additional lemmas about [BigMax]. *)
 Section ExtraLemmas.

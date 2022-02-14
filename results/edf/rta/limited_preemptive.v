@@ -1,8 +1,8 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.facts.readiness.basic.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * RTA for EDF with Fixed Preemption Points *)
 (** In this module we prove the RTA theorem for EDF-schedulers with

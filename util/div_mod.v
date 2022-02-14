@@ -1,5 +1,5 @@
-Require Export prosa.util.nat prosa.util.subadditivity.
 From mathcomp Require Export ssreflect ssrbool eqtype ssrnat seq fintype bigop div ssrfun.
+Require Export prosa.util.nat prosa.util.subadditivity.
 
 (** Additional lemmas about [divn] and [modn]. *)
 Section DivMod.

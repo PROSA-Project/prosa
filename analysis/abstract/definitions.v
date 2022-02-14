@@ -1,5 +1,5 @@
-Require Export prosa.model.task.concept.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+Require Export prosa.model.task.concept.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.  

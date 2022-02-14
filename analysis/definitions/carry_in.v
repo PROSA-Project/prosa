@@ -1,5 +1,5 @@
-Require Export prosa.model.priority.classes.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export prosa.model.priority.classes.
 
 (** * No Carry-In *)
 (** In this module, we define the notion of a time without any carry-in work. *)

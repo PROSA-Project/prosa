@@ -1,6 +1,6 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 Require Import prosa.util.ssrlia prosa.util.tactics.
 Require Export prosa.util.supremum.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** We define a few simple operations on lists that return zero for
     empty lists: [max0], [first0], and [last0]. *)

@@ -1,10 +1,10 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.facts.model.ideal_schedule.
 Require Import prosa.model.processor.ideal.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** * Lemmas about Service Received by Sets of Jobs *)
 (** In this file, we establish basic facts about the service received by _sets_ of jobs. *)

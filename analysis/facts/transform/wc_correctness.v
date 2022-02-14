@@ -1,11 +1,11 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.facts.model.ideal_schedule.
 Require Export prosa.analysis.transform.wc_trans.
 Require Export prosa.analysis.facts.transform.swaps.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.list.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 (** * Correctness of the work-conservation transformation *)
 (** This file contains the main argument of the work-conservation proof,

@@ -1,8 +1,8 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.abstract.search_space.
 Require Export prosa.analysis.abstract.run_to_completion.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Abstract Response-Time Analysis *)
 (** In this module, we propose the general framework for response-time analysis (RTA) 

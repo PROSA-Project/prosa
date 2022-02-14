@@ -1,6 +1,6 @@
+From mathcomp Require Import div.
 Require Export prosa.model.task.arrival.periodic.
 Require Export prosa.util.lcmseq.
-From mathcomp Require Import div.
 
 (** In this file we define the notion of a hyperperiod for periodic tasks. *)
 Section Hyperperiod.

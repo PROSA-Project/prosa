@@ -1,3 +1,5 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+
 Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.priority.edf.
@@ -5,8 +7,6 @@ Require Import prosa.model.task.absolute_deadline.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
-
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules ... *)
 Require Import prosa.model.processor.ideal.

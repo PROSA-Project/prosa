@@ -1,5 +1,5 @@
-Require Import prosa.util.tactics prosa.util.notation.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat.
+Require Import prosa.util.tactics prosa.util.notation.
 
 (** We say that a function [f] is a unit growth function iff for any
     time instant [t] it holds that [f (t + 1) <= f t + 1]. *)

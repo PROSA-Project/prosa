@@ -1,7 +1,7 @@
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 Require Export prosa.util.epsilon.
 Require Export prosa.util.nat.
 Require Export prosa.util.list.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq fintype bigop.
 
 (** * Non-Decreasing Sequence and Distances *)
 (** In this file we introduce the notion of a non-decreasing sequence. *)

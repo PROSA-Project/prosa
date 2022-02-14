@@ -1,7 +1,7 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 Require Import prosa.util.epsilon.
 Require Import prosa.util.tactics.
 Require Import prosa.model.task.concept.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** * Reduction of the search space for Abstract RTA *)
 (** In this file, we prove that in order to calculate the worst-case response time 

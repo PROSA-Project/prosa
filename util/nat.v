@@ -1,5 +1,5 @@
-Require Export prosa.util.tactics prosa.util.ssrlia.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop div.
+Require Export prosa.util.tactics prosa.util.ssrlia.
 
 (** Additional lemmas about natural numbers. *)
 Section NatLemmas.

@@ -1,6 +1,6 @@
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.abstract.abstract_seq_rta.
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
