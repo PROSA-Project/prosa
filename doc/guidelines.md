@@ -60,12 +60,20 @@ Examples: `task_cost`, `task_deadline`.
 
 ## Structuring Specifications
 
-1. Split specifications into succinct, logically self-contained files/modules. As a rule of thumb, use one file/module per concept.
-2. As stated above, use `Section`s liberally within each file. However, avoid needless sections, i.e., a section without a single variable, context declaration, or hypothesis serves no purpose and can/should be removed. 
-3. Prefer `Require Export full.path.to.module.that.you.want` over `From full.path.to.module.that.you Require Export want` because (as of Coq 8.10) the latter is brittle w.r.t. Coq's auto-magic module finding heuristics (see also: Coq issues [9080](https://github.com/coq/coq/issues/9080), [9839](https://github.com/coq/coq/issues/9839), and [11124](https://github.com/coq/coq/issues/11124)).  
+- Split specifications into succinct, logically self-contained files/modules.
+- As a rule of thumb, use one file/module per concept.
+- As stated above, use `Section`s liberally within each file.
+- However, avoid needless sections, i.e., a section without a single variable, context declaration, or hypothesis serves no purpose and can and should be removed. 
+
+## Stating Dependencies with `Require Import` and `Require Export`
+
+1. Prefer `Require Export full.path.to.module.that.you.want` over `From full.path.to.module.that.you Require Export want` because (as of Coq 8.10) the latter is brittle w.r.t. Coq's auto-magic module finding heuristics (see also: Coq issues [9080](https://github.com/coq/coq/issues/9080), [9839](https://github.com/coq/coq/issues/9839), and [11124](https://github.com/coq/coq/issues/11124)).  
 Exception to this rule: ssreflect and other standard library imports. 
-4. Avoid repetitive, lengthy blocks of `Require Import` statements at the beginning of files through the judicious use of `Require Export`.
-5. As an import exception to the prior rule, *never* re-export modules that contain type class instance definitions. Prosa uses type class instances to express key modeling choices; such assumptions need to be made explicit and should not be implicitly "inherited" via re-exported modules. 
+2. Avoid repetitive, lengthy blocks of `Require Import` statements at the beginning of files through the judicious use of `Require Export`.
+3. As an important exception to the prior rule, do not re-export modules that contain type class instance definitions. Prosa uses type class instances to express key modeling choices; such assumptions should be made explicitly.
+4. Always require external libraries first, i.e., *before* stating any Prosa-internal dependencies. This way, an addition in external libraries
+cannot shadow a definition in Prosa. For example, require `mathcomp` modules before any modules in the `prosa` namespace. 
+
 
 ## Writing Proofs
 
