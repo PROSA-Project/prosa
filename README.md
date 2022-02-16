@@ -12,7 +12,7 @@ Up-to-date documentation for all branches of the main Prosa repository is availa
 
 ## Publications
 
-Please see the [list of publications](http://prosa.mpi-sws.org/documentation.html#publications) on the Prosa project's homepage. 
+Please see the [list of publications](https://prosa.mpi-sws.org/publications.html) on the Prosa project's homepage. 
 
 ## Directory and Module Structure
 
@@ -37,12 +37,23 @@ All results published prior to 2020 build on this "classic" version of Prosa.
 
 ### With OPAM
 
-Prosa can be installed using the [OPAM package manager](https://opam.ocaml.org/) (>= 2.0)
+Prosa can be installed using the [OPAM package manager](https://opam.ocaml.org/) (>= 2.0).
 
 ```
 opam repo add coq-released https://coq.inria.fr/opam/released
 # or for the dev version (git master): https://coq.inria.fr/opam/extra-dev
 opam update
+opam install coq-prosa
+```
+
+### From Sources with `opam`
+
+OPAM can also be used to install a local checkout. For example, this is done in the CI setup (see `.gitlab-ci.yaml`).
+
+```
+opam repo add coq-released https://coq.inria.fr/opam/released
+opam update
+opam pin add -n -y -k path coq-prosa .
 opam install coq-prosa
 ```
 
@@ -74,13 +85,22 @@ Alternatively, `esy shell` opens a shell within its environment.
 
 #### Dependencies
 
-Besides Coq itself, Prosa's only external dependency is the ssreflect library of the [Mathematical Components project](https://math-comp.github.io).
+Besides on Coq itself, Prosa depends on 
+
+1. the `ssreflect` library of the [Mathematical Components project](https://math-comp.github.io) and
+2. the [Micromega support for the Mathematical Components library](https://github.com/math-comp/mczify) provided by `mczify`.
+
+These dependencies can be easily installed with OPAM.
+
+```
+opam install -y coq-mathcomp-ssreflect coq-mathcomp-zify
+```
 
 Prosa always tracks the latest stable versions of Coq and ssreflect. We do not maintain compatibility with older versions of either Coq or ssreflect.
 
 #### Compiling Prosa
 
-Assuming ssreflect is available (either via OPAM or compiled from source, see the [Prosa setup instructions](http://prosa.mpi-sws.org/setup-instructions.html)), compiling Prosa consists of only two steps.
+Assuming all dependencies are available (either via OPAM or compiled from source, see the [Prosa setup instructions](http://prosa.mpi-sws.org/setup-instructions.html)), compiling Prosa consists of only two steps.
 
 First, create an appropriate `Makefile`.
 

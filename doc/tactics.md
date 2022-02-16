@@ -24,11 +24,15 @@ Tactics taken from the standard library of Viktor Vafeiadis.
 
 - `have y := f x1 x2 x3`: creates an alias to `f x1 x2 x3` called `y` (in the local context). Note that `f` can be a function or a proposition/lemma. It's usually easier to read than `move: (f x1 x2 x3) => y`.
 
-*To be written… please feel free to start.*
+*To be continued… please help out.*
 
 ## Standard Coq Tactics
 
-*To be written… please feel free to start.*
+Generally speaking, in new code, prefer `ssreflect` tactics over standard Coq tactics whenever possible. While the current code base is a mix of classic Coq tactics and `ssreflect` tactics, that's only a historical accident not worth emulating. 
+
+- `lia`: Solves arithmetic goals, including ones with `ssreflect`'s definitions (thanks to the `coq-mathcomp-zify` dependency).
+
+*To be continued… please help out.*
 
 ## PROSA Tactics
 
@@ -37,7 +41,4 @@ Tactics taken from the standard library of Viktor Vafeiadis.
 - `interval_to_duration t1 t2 k`: any interval `[t1, t2]` can be represented as `[t1, t1 + k]` for some natural number `k`. This tactic searches for inequality `t1 <= t2` (or `t1 < t2`) in the context and replaces `t2` with `t1 + k`. Note: `k` is the name of a newly created natural number. 
 
 
-## Miscellaneous
-
-- `lia`: Solves arithmetic goals, including ones with `ssreflect`'s definitions.
 
