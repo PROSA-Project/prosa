@@ -38,14 +38,14 @@ Section Task.
   Definition task_response_time_bound :=
     forall j,
       arrives_in arr_seq j ->
-      job_task j = tsk ->
+      job_of_task tsk j ->
       job_response_time_bound sched j R.
 
   (** We say that a task is schedulable if all its jobs meet their deadline *)
   Definition schedulable_task :=
     forall j,
       arrives_in arr_seq j ->
-      job_task j = tsk ->
+      job_of_task tsk j ->
       job_meets_deadline sched j.
   
 End Task.
@@ -94,8 +94,9 @@ Section Schedulability.
     rewrite /job_meets_deadline.
     apply completion_monotonic with (t := job_arrival j + R);
       [ | by apply H_response_time_bounded].
-    rewrite /job_deadline leq_add2l JOBtsk.
-      by erewrite leq_trans; eauto.
+    rewrite /job_deadline leq_add2l.
+    move: JOBtsk => /eqP ->.
+    by erewrite leq_trans; eauto.
   Qed.
 
 End Schedulability.

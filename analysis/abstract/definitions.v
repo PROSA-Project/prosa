@@ -169,7 +169,7 @@ Section AbstractRTADefinitions.
       Definition work_conserving :=
         forall j t1 t2 t,
           arrives_in arr_seq j ->
-          job_task j = tsk ->
+          job_of_task tsk j ->
           job_cost j > 0 ->
           busy_interval j t1 t2 ->
           t1 <= t < t2 ->
@@ -183,7 +183,7 @@ Section AbstractRTADefinitions.
       Definition busy_intervals_are_bounded_by L :=
         forall j,
           arrives_in arr_seq j ->
-          job_task j = tsk ->
+          job_of_task tsk j ->
           job_cost j > 0 -> 
           exists t1 t2,
             t1 <= job_arrival j < t2 /\
@@ -204,7 +204,7 @@ Section AbstractRTADefinitions.
         forall t1 t2 delta j,
           (** First, we require [j] to be a job of task [tsk]. *)
           arrives_in arr_seq j ->
-          job_task j = tsk ->
+          job_of_task tsk j ->
           (** Next, we require the IBF to bound the interference only within the interval <<[t1, t1 + delta)>>. *)
           busy_interval j t1 t2 ->
           t1 + delta < t2 ->

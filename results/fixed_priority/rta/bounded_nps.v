@@ -131,10 +131,10 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Lemma priority_inversion_is_bounded_by_blocking:
       forall j t, 
         arrives_in arr_seq j ->
-        job_task j = tsk -> 
+        job_of_task tsk j -> 
         max_length_of_priority_inversion j t <= blocking_bound.
     Proof.
-      intros j t ARR TSK.
+      intros j t ARR TSK; move: TSK => /eqP TSK.
       rewrite /max_length_of_priority_inversion /blocking_bound /FP_to_JLFP
               /priority_inversion.max_length_of_priority_inversion.
       apply leq_trans with
@@ -170,7 +170,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         rewrite /cumulative_priority_inversion /is_priority_inversion.
         rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat leq_sum //. 
         intros t _; case: (sched t); last by done.
-          by intros s; case: (hep_job s j). 
+        by intros s; case: (hep_job s j). 
       } 
       move: NEQ => /negP /negP; rewrite -ltnNge; move => BOUND.
       edestruct (@preemption_time_exists) as [ppt [PPT NEQ]]; eauto 2 with basic_facts.
@@ -179,11 +179,11 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         last apply leq_trans with (ppt - t1); first last.
       - rewrite leq_subLR.
         apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
-          by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
+        by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
       - rewrite /cumulative_priority_inversion /is_priority_inversion.
         rewrite -[X in _ <= X]addn0 -[ppt - t1]mul1n -iter_addn -big_const_nat. 
         rewrite leq_sum //; intros t _; case: (sched t); last by done.
-          by intros s; case: (hep_job s j).
+        by intros s; case: (hep_job s j).
       - rewrite /cumulative_priority_inversion /is_priority_inversion. 
         rewrite (@big_cat_nat _ _ _ ppt) //=; last first.
         { rewrite ltn_subRL in BOUND.
@@ -202,7 +202,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         apply/eqP; rewrite eqb0 Bool.negb_involutive.
         enough (EQef : s = j_hp); first by subst;auto.
         eapply ideal_proc_model_is_a_uniprocessor_model; eauto 2.
-          by rewrite scheduled_at_def SCHED.
+        by rewrite scheduled_at_def SCHED.
     Qed.
     
   End PriorityInversionIsBounded. 

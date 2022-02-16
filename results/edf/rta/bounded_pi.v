@@ -268,7 +268,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       move: (BUSY) => [[ _ [QT [_ /andP [JAj _]]] _]].
       apply QT; try done.
       - eapply in_arrivals_implies_arrived; eauto 2.
-      - unfold edf.EDF, EDF; move: TSKs => /eqP TSKs.
+      - unfold edf.EDF, EDF; move: TSK TSKs => /eqP TSK /eqP TSKs.
         rewrite /job_deadline /job_deadline_from_task_deadline /hep_job TSK TSKs leq_add2r.
           by apply leq_trans with t1; [apply ltnW | ].
     Qed.
@@ -303,7 +303,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         (** Consider an arbitrary job j of [tsk]. *)
         Variable j : Job.
         Hypothesis H_j_arrives : arrives_in arr_seq j.
-        Hypothesis H_job_of_tsk : job_task j = tsk.
+        Hypothesis H_job_of_tsk : job_of_task tsk j.
         Hypothesis H_job_cost_positive: job_cost_positive j.
 
         (** Consider any busy interval <<[t1, t2)>> of job [j]. *)
@@ -347,7 +347,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             + by rewrite ltnW.
           - apply H_priority_inversion_is_bounded; try done.
             eapply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval; eauto 2 with basic_facts.
-              by move: H_busy_interval => [PREF _].
+            by move: H_busy_interval => [PREF _].
         Qed.
 
         (** Next, we show that [bound_on_total_hep_workload(A, R)] bounds 
@@ -368,8 +368,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
           move: H_sched_valid => [CARR MBR].
           erewrite instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks;
             eauto 2 with basic_facts.
-          - by rewrite -H_job_of_tsk /jobs.
-          - rewrite instantiated_quiet_time_equivalent_quiet_time; eauto 2 with basic_facts.
+          - by move: (H_job_of_tsk) => /eqP ->; rewrite /jobs.
+          - by rewrite instantiated_quiet_time_equivalent_quiet_time; eauto 2 with basic_facts.
         Qed.
 
         (** By lemma [service_of_jobs_le_workload], the total
@@ -484,7 +484,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             edestruct (leqP (D tsk_o) (A + ε + D tsk)) as [NEQ2|NEQ2]. 
             - move: ARRIN; rewrite leqNgt; move => /negP ARRIN; apply: ARRIN.
               rewrite -(ltn_add2r (D tsk_o)).
-              apply leq_ltn_trans with (job_arrival j + D tsk); first by rewrite -H_job_of_tsk -TSKo.
+              apply leq_ltn_trans with (job_arrival j + D tsk); first by move: (H_job_of_tsk) => /eqP <-; rewrite -TSKo.
               rewrite addnBA // addnA addnA subnKC // subnK.
               + by rewrite ltn_add2r addn1.
               + apply leq_trans with (A + ε + D tsk); first by done.
@@ -493,7 +493,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
               apply leq_ltn_trans with (job_arrival jo + (A + D tsk)). 
               + rewrite addnBAC // addnBA.
                 rewrite [in X in _ <= X]addnC -addnBA.
-                * by rewrite /job_deadline /job_deadline_from_task_deadline H_job_of_tsk leq_addr.
+                * rewrite /job_deadline /job_deadline_from_task_deadline;
+                    by move: (H_job_of_tsk) => /eqP ->; rewrite leq_addr.
                 * by apply leq_trans with (t1 + (A + ε + D tsk - D tsk_o)); first rewrite leq_addr.
                     by apply leq_trans with (job_arrival j); [ | by rewrite leq_addr].
               + rewrite ltn_add2l.

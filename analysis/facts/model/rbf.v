@@ -136,7 +136,7 @@ Section ProofWorkloadBound.
     (** Next, we consider any job [j] of [tsk]. *)
     Variable j : Job.
     Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_task j = tsk.
+    Hypothesis H_job_of_tsk : job_of_task tsk j.
     
     (** We say that two jobs [j1] and [j2] are in relation
       [other_higher_eq_priority], iff [j1] has higher or equal priority than [j2] and
@@ -162,8 +162,9 @@ Section ProofWorkloadBound.
       set l := arrivals_between arr_seq t (t + Δ).
       apply (@leq_trans (\sum_(tsk' <- ts | hep_task tsk' tsk && (tsk' != tsk))
                           (\sum_(j0 <- l | job_task j0 == tsk') job_cost j0))).
-      { rewrite /total_ohep_workload /workload_of_jobs /other_higher_eq_priority.
-        rewrite /jlfp_higher_eq_priority /FP_to_JLFP /same_task H_job_of_tsk.
+      { move: (H_job_of_tsk) => /eqP TSK.
+        rewrite /total_ohep_workload /workload_of_jobs /other_higher_eq_priority.
+        rewrite /jlfp_higher_eq_priority /FP_to_JLFP /same_task TSK.
         set P := fun x => hep_task (job_task x) tsk && (job_task x != tsk).
         rewrite (exchange_big_dep P) //=; last by rewrite /P; move => ???/eqP->.
         rewrite /P /workload_of_jobs -/l big_seq_cond [X in _ <= X]big_seq_cond.
@@ -190,7 +191,8 @@ Section ProofWorkloadBound.
       set l := arrivals_between arr_seq t (t + Δ).
       apply(@leq_trans (\sum_(tsk' <- ts | hep_task tsk' tsk)
                          (\sum_(j0 <- l | job_task j0 == tsk') job_cost j0))).
-      { rewrite /total_hep_workload /jlfp_higher_eq_priority /FP_to_JLFP H_job_of_tsk.
+      { move: (H_job_of_tsk) => /eqP TSK.
+        rewrite /total_hep_workload /jlfp_higher_eq_priority /FP_to_JLFP TSK.
         have EXCHANGE := exchange_big_dep (fun x => hep_task (job_task x) tsk).
         rewrite EXCHANGE /=; clear EXCHANGE; last by move => tsk0 j0 HEP /eqP JOB0; rewrite JOB0.
         rewrite /workload_of_jobs -/l big_seq_cond [X in _ <= X]big_seq_cond.
@@ -268,7 +270,7 @@ Section RequestBoundFunctions.
       job of task [tsk]. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
-  Hypothesis H_job_of_tsk : job_task j = tsk.
+  Hypothesis H_job_of_tsk : job_of_task tsk j.
 
   (** Then we prove that [task_rbf] at [ε] is greater than or equal to task cost. *)
   Lemma task_rbf_1_ge_task_cost:
@@ -288,7 +290,7 @@ Section RequestBoundFunctions.
     apply/hasP; exists j; last by done.
     rewrite /arrivals_between addn1 big_nat_recl; last by done.
     rewrite big_geq ?cats0 //= mem_filter.
-    apply/andP; split; first by apply/eqP.
+    apply/andP; split; first by done.
     move: H_j_arrives => [t ARR]; move: (ARR) => CONS.
     apply H_arrival_times_are_consistent in CONS.
     by rewrite CONS.

@@ -132,8 +132,10 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     { intros j ARR TSK.
       have ZEROj: job_cost j = 0.
       { move: (H_valid_job_cost j ARR) => NEQ.
-        rewrite /valid_job_cost TSK ZERO in NEQ.
-          by apply/eqP; rewrite -leqn0.
+        rewrite /valid_job_cost in NEQ.
+        move: TSK => /eqP -> in NEQ.
+        rewrite ZERO in NEQ.
+        by apply/eqP; rewrite -leqn0.
       }
         by rewrite /job_response_time_bound /completed_by ZEROj.
     }

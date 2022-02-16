@@ -62,7 +62,7 @@ Section AbstractRTARunToCompletionThreshold.
   (** Let [j] be any job of task [tsk] with positive cost. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
-  Hypothesis H_job_of_tsk : job_task j = tsk.
+  Hypothesis H_job_of_tsk : job_of_task tsk j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
 
   (** Next, consider any busy interval <<[t1, t2)>> of job [j]. *)

@@ -220,7 +220,7 @@ Section JLFPInstantiation.
     Lemma cumulative_task_interference_split: 
       forall j t1 t2 upp_t,
         arrives_in arr_seq j -> 
-        job_task j = tsk ->
+        job_of_task tsk j ->
         j \in arrivals_before arr_seq upp_t ->
         ~~ job_completed_by j t2 ->
         cumulative_task_interference interference tsk upp_t t1 t2 = 
@@ -228,7 +228,7 @@ Section JLFPInstantiation.
         cumulative_interference_from_hep_jobs_from_other_tasks j t1 t2.
     Proof.
       rewrite /cumulative_task_interference /cumul_task_interference.
-      intros j t1 R upp ARRin TSK ARR NCOMPL.
+      intros j t1 R upp ARRin TSK ARR NCOMPL; move: TSK => /eqP TSK.
       rewrite -big_split //= big_nat_cond [X in _ = X]big_nat_cond. 
       apply/eqP; rewrite eqn_leq; apply/andP; split.
       all: rewrite /interference /is_priority_inversion /priority_inversion.is_priority_inversion.
@@ -261,7 +261,7 @@ Section JLFPInstantiation.
           have Fact: forall b, ~~ b + b = true; first by intros b; destruct b.
           rewrite Bool.andb_true_r Fact; simpl; rewrite lt0b; clear Fact.
           apply/hasP; exists j.
-          * rewrite mem_filter; apply/andP; split; first by done.
+          * rewrite mem_filter; apply/andP; split; first by rewrite TSK; apply/eqP.
               by eapply arrivals_between_sub with (t2 := 0) (t3 := upp); eauto 2.
           * destruct (hep_job s j) eqn:HP; apply/orP; [right|left]; last by done.
               by rewrite /is_interference_from_another_hep_job EQ
@@ -432,7 +432,7 @@ Section JLFPInstantiation.
         (** Consider any job j of [tsk]. *)
         Variable j : Job.
         Hypothesis H_j_arrives : arrives_in arr_seq j.
-        Hypothesis H_job_of_tsk : job_task j = tsk.
+        Hypothesis H_job_of_tsk : job_of_task tsk j.
         Hypothesis H_job_cost_positive : job_cost_positive j.
 
         (** To show the equivalence of the notions of busy intervals

@@ -117,7 +117,7 @@ Section Abstract_RTA.
     (** Consider any job j of [tsk] with positive cost. *)
     Variable j: Job. 
     Hypothesis H_j_arrives: arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk: job_task j = tsk.
+    Hypothesis H_job_of_tsk: job_of_task tsk j. 
     Hypothesis H_job_cost_positive: job_cost_positive j.
     
     (** Assume we have a busy interval <<[t1, t2)>> of job j that is bounded by L. *)
@@ -413,7 +413,7 @@ Section Abstract_RTA.
               rewrite addnBA; last by apply PRT1.
               rewrite addnBAC; last by done.
               rewrite leq_sub2r // leq_add2l.
-                by rewrite -H_job_of_tsk; apply H_valid_job_cost.
+              by move: H_job_of_tsk => /eqP <-; apply H_valid_job_cost.
             }
           Qed.
           

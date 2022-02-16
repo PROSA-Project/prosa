@@ -70,7 +70,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
     intros; split.
     - by unfold task_rtc_bounded_by_cost.
     - intros j ARR TSK.
-      rewrite -TSK /fully_nonpreemptive.
+      move: TSK => /eqP <-; rewrite /fully_nonpreemptive.
       edestruct (posnP (job_cost j)) as [ZERO|POS].
       + by rewrite job_rtc_threshold_is_0.
       + by erewrite job_rtc_threshold_is_ε; eauto 2. 

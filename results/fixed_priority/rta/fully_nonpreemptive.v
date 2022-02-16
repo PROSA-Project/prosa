@@ -143,10 +143,12 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     { intros j ARR TSK.
       have ZEROj: job_cost j = 0.
       { move: (H_valid_job_cost j ARR) => NEQ.
-        rewrite /valid_job_cost TSK ZERO in NEQ.
-          by apply/eqP; rewrite -leqn0.
+        rewrite /valid_job_cost in NEQ.
+        move: TSK => /eqP -> in NEQ.
+        rewrite ZERO in NEQ.
+        by apply/eqP; rewrite -leqn0.
       }
-        by rewrite /job_response_time_bound /completed_by ZEROj.
+      by rewrite /job_response_time_bound /completed_by ZEROj.
     }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with
         (L0 := L).

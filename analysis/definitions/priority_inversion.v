@@ -73,7 +73,7 @@ Section CumulativePriorityInversion.
     Definition priority_inversion_is_bounded_by (B : duration) :=
       forall (j : Job),
         arrives_in arr_seq j ->
-        job_task j = tsk ->
+        job_of_task tsk j ->
         job_cost j > 0 -> 
         priority_inversion_of_job_is_bounded_by j B.
 

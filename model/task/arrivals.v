@@ -21,7 +21,7 @@ Section TaskArrivals.
   (** First, we construct the list of jobs of task [tsk] that arrive
       in a given half-open interval <<[t1, t2)>>. *)
   Definition task_arrivals_between (t1 t2 : instant) :=
-    [seq j <- arrivals_between arr_seq t1 t2 | job_task j == tsk].
+    [seq j <- arrivals_between arr_seq t1 t2 | job_of_task tsk j].
   
   (** Based on that, we define the list of jobs of task [tsk] that
       arrive up to and including time [t], ... *)
@@ -35,7 +35,7 @@ Section TaskArrivals.
 
   (** ... the list of jobs of task [tsk] that arrive exactly at an instant [t], ... *)
   Definition task_arrivals_at (tsk : Task) (t : instant) :=
-    [seq j <- arrivals_at arr_seq t | job_task j == tsk].
+    [seq j <- arrivals_at arr_seq t | job_of_task tsk j].
   
   (** ... and finally count the number of job arrivals. *)
   Definition number_of_task_arrivals (t1 t2 : instant) :=

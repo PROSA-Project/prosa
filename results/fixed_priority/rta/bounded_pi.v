@@ -225,9 +225,9 @@ Section AbstractRTAforFPwithArrivalCurves.
       move: (BUSY) => [[_ [QT _]] _].
       apply QT.
       - by apply in_arrivals_implies_arrived in ARRs.
-      - move: TSKs => /eqP TSKs.
+      - move: TSK TSKs => /eqP TSK /eqP TSKs.
         rewrite /hep_job /FP_to_JLFP TSK -TSKs; eauto 2.
-          by eapply (H_priority_is_reflexive 0); eauto.
+        by eapply (H_priority_is_reflexive 0); eauto.
       - by eapply in_arrivals_implies_arrived_before; eauto 2.
     Qed.
 
@@ -295,7 +295,8 @@ Section AbstractRTAforFPwithArrivalCurves.
         { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
           by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). } 
         { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
-          by rewrite -TSK; apply total_workload_le_total_ohep_rbf. } 
+          move: (TSK) => /eqP <-; apply total_workload_le_total_ohep_rbf; try done.
+          by move: (TSK) => /eqP ->. } 
         all: eauto 2 using arr_seq with basic_facts. }
     Qed.
 
@@ -305,7 +306,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       (** Consider any job [j] of [tsk]. *)
       Variable j : Job.
       Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_of_tsk : job_task j = tsk.
+      Hypothesis H_job_of_tsk : job_of_task tsk j.
       Hypothesis H_job_cost_positive: job_cost_positive j.
 
       (** Given any job j of task [tsk] that arrives exactly A units after the beginning of 
@@ -329,8 +330,8 @@ Section AbstractRTAforFPwithArrivalCurves.
           rewrite neq_ltn; apply/orP; left.
           rewrite {1}/task_rbf; erewrite task_rbf_0_zero; eauto 2; try done.
           rewrite add0n /task_rbf; apply leq_trans with (task_cost tsk).
-          + by apply leq_trans with (job_cost j); rewrite -?H_job_of_tsk; eauto 2.
-          + eapply task_rbf_1_ge_task_cost; eauto 2.
+          + by apply leq_trans with (job_cost j); eauto 2; move: (H_job_of_tsk) => /eqP <-; eauto 2.
+          + by eapply task_rbf_1_ge_task_cost; eauto 2.
         - apply/andP; split; first by done.
           apply/negP; intros EQ; move: EQ => /eqP EQ.
           apply INSP2.

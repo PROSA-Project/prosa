@@ -171,7 +171,7 @@ Section ValidTaskRunToCompletionThreshold.
   Definition job_respects_task_rtc tsk :=
     forall j,
       arrives_in arr_seq j ->
-      job_task j = tsk ->
+      job_of_task tsk j ->
       job_rtct j <= task_rtct tsk.
 
   (** Finally, we require that a valid run-to-completion threshold parameter

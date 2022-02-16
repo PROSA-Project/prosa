@@ -130,7 +130,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     apply leq_trans with( nth 0 (job_preemption_points j) ((size (job_preemption_points j)).-2)); first by apply undup_nth_le; eauto 2.
     have -> : task_cost tsk = last0 (task_preemption_points tsk) by rewrite COST__task. 
     rewrite last_seq_minus_last_distance_seq; last by apply SORT__task.
-    rewrite -TSK__j.
+    move: TSK__j => /eqP TSK__j; rewrite -TSK__j.
     rewrite T4; last by done.
     apply domination_of_distances_implies_domination_of_seq; try eauto 2.
     - erewrite zero_is_first_element; eauto.

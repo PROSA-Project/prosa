@@ -145,7 +145,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     case: (posnP (task_cost tsk)) => [ZERO|POSt].
     { intros j ARR TSK.
       move: (H_valid_job_cost _ ARR) => POSt.
-      move: POSt; rewrite /valid_job_cost TSK ZERO leqn0; move => /eqP Z.
+      move: TSK => /eqP TSK; move: POSt; rewrite /valid_job_cost TSK ZERO leqn0; move => /eqP Z.
       by rewrite /job_response_time_bound /completed_by Z.
     }
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L).

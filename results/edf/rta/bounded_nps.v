@@ -150,7 +150,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Lemma priority_inversion_is_bounded_by_blocking:
       forall j t,
         arrives_in arr_seq j ->
-        job_task j = tsk ->
+        job_of_task tsk j ->
         t <= job_arrival j ->
         max_length_of_priority_inversion j t <= blocking_bound.
     Proof.
@@ -173,7 +173,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           { apply/eqP; intros TSKj'.
             rewrite /EDF -ltnNge in NOTHEP.
             rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline in NOTHEP.
-            rewrite TSKj' TSK ltn_add2r in NOTHEP.
+            move: TSK => /eqP -> in NOTHEP; rewrite TSKj' ltn_add2r in NOTHEP.
             move: NOTHEP; rewrite ltnNge; move => /negP T; apply: T.
             apply leq_trans with t; last by done.
             eapply in_arrivals_implies_arrived_between in JINB; last by eauto 2.
@@ -182,7 +182,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           }
           apply/andP; split; first by done.
           rewrite /EDF -ltnNge in NOTHEP.
-          rewrite -TSK.
+          move: TSK => /eqP <-.
           have ARRLE: job_arrival j' < job_arrival j.
           { apply leq_trans with t; last by done.
             eapply in_arrivals_implies_arrived_between in JINB; last by eauto 2.

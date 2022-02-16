@@ -36,7 +36,7 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
     - by rewrite /task_rtc_bounded_by_cost.
     - intros j ARR TSK.
       apply leq_trans with (job_cost j); eauto 2 with basic_facts.
-        by rewrite-TSK; apply H_valid_job_cost.
+      by move: TSK => /eqP <-; apply H_valid_job_cost.
   Qed.
   
 End TaskRTCThresholdFloatingNonPreemptiveRegions.

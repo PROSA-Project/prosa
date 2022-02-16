@@ -291,9 +291,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       { rewrite /workload_of_jobs /IBF (big_rem tsk) //= (addnC (rbf tsk (job_arrival j - t1 + ε))).
         rewrite -addnBA; last first.
         { apply leq_trans with (task_rbf ε).
-          apply (task_rbf_1_ge_task_cost arr_seq) with (j0 := j) => //=.
-          - by rewrite -TSKj; apply H_is_arrival_curve, H_all_jobs_from_taskset.
-          - by apply task_rbf_monotone; [apply H_valid_arrival_curve | ssrlia]. }
+          apply (task_rbf_1_ge_task_cost arr_seq) with (j0 := j) => //=; first by auto.
+          by apply task_rbf_monotone; [apply H_valid_arrival_curve | ssrlia]. }
         { eapply leq_trans; last first.
           by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
           rewrite addnBA.
@@ -309,11 +308,11 @@ Section AbstractRTAforFIFOwithArrivalCurves.
               + by apply (task_workload_le_task_rbf _ _ _ IN H_valid_job_cost H_is_arrival_curve t1).
               + by rewrite addnBAC //= subnKC //= addn1; apply leqW. } 
           { rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=.
-            - by rewrite /job_of_task TSKj //= eq_refl; apply leq_addr. 
+            - by rewrite TSKj; apply leq_addr.
             - apply job_in_arrivals_between => //.
               by apply /andP; split; [| rewrite subnKC; [rewrite addn1 |]].  } } }
-      apply arrivals_uniq; try by done.
-      apply job_in_arrivals_between; try by done.
+      apply: arrivals_uniq => //.
+      apply: job_in_arrivals_between => //.
       by apply /andP; split; [ | rewrite addn1]. 
     Qed.
 
@@ -345,9 +344,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
           rewrite /task_rbf /rbf; erewrite task_rbf_0_zero; eauto 2.
           rewrite add0n /task_rbf; apply leq_trans with (task_cost tsk).
           - by eapply leq_trans; eauto 2.
-          - eapply task_rbf_1_ge_task_cost; eauto.
-            unfold job_of_task in H_job_of_tsk.
-            by move : H_job_of_tsk => /eqP AAA. }
+          - by eapply task_rbf_1_ge_task_cost; eauto. }
         { apply /andP; split; first by done.
           apply /hasPn.
           move => EQ2. unfold IBF in INSP2.
@@ -415,9 +412,9 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     - by apply instantiated_i_and_w_are_coherent_with_schedule.
     - by apply instantiated_busy_intervals_are_bounded.
     - by apply instantiated_interference_is_bounded.
-    - eapply (exists_solution_for_abstract_response_time_recurrence js) => //=; first by apply /eqP.
-      apply leq_trans with (job_cost js); first by done.
-      rewrite -TSKs.
+    - eapply (exists_solution_for_abstract_response_time_recurrence js) => //=.
+      apply leq_trans with (job_cost js) => //.
+      move: TSKs; rewrite /job_of_task => /eqP <-.
       by eapply H_valid_job_cost.
   Qed.
   
