@@ -236,7 +236,8 @@ Module BusyIntervalJLFP.
           {
             move: COMP => /hasP [j_hp ARR /andP [NOTCOMP HP]].
             move: (ARR) => INarr.
-            apply in_arrivals_implies_arrived_between with (job_arrival := job_arrival) in ARR;
+            ( try ( apply in_arrivals_implies_arrived_between with (job_arrival0 := job_arrival) in ARR ) ||
+            apply in_arrivals_implies_arrived_between with (job_arrival := job_arrival) in ARR);
               last by done.
             apply in_arrivals_implies_arrived in INarr.
             by exists j_hp; repeat split; last by apply/negP.
@@ -327,6 +328,7 @@ Module BusyIntervalJLFP.
               { move: H => [ARR [PEN HP]].
                 rewrite mem_filter.
                 apply/andP; split; first (apply/andP; split); try done.
+                try ( apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival); try done ) ||
                 apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival); try done.
                 apply/andP; split; first by done.
                 rewrite ltnS.
@@ -740,7 +742,7 @@ Module BusyIntervalJLFP.
                 }
                 unfold service_during.
                 rewrite (ignore_service_before_arrival job_arrival); rewrite //; [| by apply ltnW].
-                rewrite <- ignore_service_before_arrival with (t1:=0); rewrite //; [|by apply ltnW].
+                ( try ( rewrite <- ignore_service_before_arrival with (t2:=0)) || rewrite <- ignore_service_before_arrival with (t1:=0)); rewrite //; [|by apply ltnW].
                   by rewrite ltnNge; apply/negP.
               Qed.               
               
@@ -1215,4 +1217,3 @@ Module BusyIntervalJLFP.
   End Definitions. 
     
 End BusyIntervalJLFP.
-     

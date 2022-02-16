@@ -119,11 +119,15 @@ Module ResponseTimeAnalysisFP.
         by rewrite -JOBtsk; apply H_job_jitter_le_task_jitter.
       }
       set prio := FP_to_JLFP job_task higher_eq_priority.
+      try ( apply busy_interval_bounds_response_time with (arr_seq0 := arr_seq)
+                                                    (higher_eq_priority0 := prio); try (by done) ) ||
       apply busy_interval_bounds_response_time with (arr_seq := arr_seq)
                                                     (higher_eq_priority := prio); try (by done).
         - by intros x; apply H_priority_is_reflexive.
         - by intros x z y; apply H_priority_is_transitive.
       intros t.
+      try ( apply fp_workload_bound_holds with (task_cost0 := task_cost)
+            (task_period0 := task_period) (task_jitter0 := task_jitter) (ts0 := ts); try (by done) ) ||
       apply fp_workload_bound_holds with (task_cost := task_cost)
             (task_period := task_period) (task_jitter := task_jitter) (ts := ts); try (by done).
       by rewrite JOBtsk.

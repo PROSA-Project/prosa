@@ -110,6 +110,9 @@ Module ResponseTimeAnalysisEDF.
       have VALIDTS := ts_has_valid_parameters.
       unfold valid_sporadic_job_with_jitter,
              valid_sporadic_job, valid_realtime_job in *; des.
+      try ( apply taskset_schedulable_by_edf_rta with (task_cost := task_cost) (task_period := task_period)
+               (task_deadline := task_deadline) (ts0 := ts) (task_jitter := task_jitter)
+               (job_jitter := job_jitter); try (by done) ) ||
       apply taskset_schedulable_by_edf_rta with (task_cost := task_cost) (task_period := task_period)
                (task_deadline := task_deadline) (ts := ts) (task_jitter := task_jitter)
                (job_jitter := job_jitter); try (by done).

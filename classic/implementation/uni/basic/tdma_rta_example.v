@@ -126,6 +126,7 @@ Module ResponseTimeAnalysisExemple.
         have SAMETSK: job_task j = job_task y.
         have EQ:Task_in_time_slot ts slot_order (job_task y) time_slot t =
                   Task_in_time_slot ts slot_order (job_task j) time_slot t by rewrite INSLOT. 
+        try ( apply task_in_time_slot_uniq with (ts0:= ts) (t0:=t) (slot_order:=slot_order) (task_time_slot:=time_slot);auto ) ||
         apply task_in_time_slot_uniq with (ts:= ts) (t:=t) (slot_order:=slot_order) (task_time_slot:=time_slot);auto.
         intros;by apply slot_order_total.
         by apply slot_order_antisymmetric.
@@ -136,9 +137,11 @@ Module ResponseTimeAnalysisExemple.
         by apply valid_time_slots ,periodic_arrivals_all_jobs_from_taskset.
         split;auto.
         * split;case (y==j)eqn:YJ;move/eqP in YJ;try by rewrite FIND YJ in NSJ;move/eqP in NSJ;auto.
-          apply pending_job_in_penging_list with (arr_seq:=arr_seq) in PEN;auto
+          ( try ( apply pending_job_in_penging_list with (arr_seq0:=arr_seq) in PEN ) ||
+          apply pending_job_in_penging_list with (arr_seq:=arr_seq) in PEN);auto
           ;last apply job_arrival_times_are_consistent.
-          apply findP_FIFO with (y:=j) in FIND;auto. fold sched in FIND.
+          ( try ( apply findP_FIFO with (y0:=j) in FIND ) ||
+          apply findP_FIFO with (y:=j) in FIND);auto. fold sched in FIND.
           apply (respects_FIFO ) in FIND;auto.
           apply periodic_arrivals_are_sporadic with (ts:=ts) in FIND;auto.
           have PERIODY:task_period (job_task y)>0 by
@@ -196,6 +199,10 @@ Module ResponseTimeAnalysisExemple.
     Proof.
     intros tsk tskIN.
     have VALID_JOB := periodic_arrivals_valid_job_parameters ts ts_has_valid_parameters.
+    try ( apply taskset_schedulable_by_tdma with (task_deadline:=task_deadline)(task_period:=task_period) 
+    (tsk0:=tsk)(ts0:=ts)(task_cost:=task_cost)
+    (task_time_slot:=time_slot) (slot_order:= slot_order)
+    (arr_seq0:=arr_seq) ) ||
     apply taskset_schedulable_by_tdma with (task_deadline:=task_deadline)(task_period:=task_period) 
     (tsk:=tsk)(ts:=ts)(task_cost:=task_cost)
     (task_time_slot:=time_slot) (slot_order:= slot_order)
@@ -218,7 +225,3 @@ Module ResponseTimeAnalysisExemple.
   End ExampleTDMA.
 
 End ResponseTimeAnalysisExemple.
-
-
-
-

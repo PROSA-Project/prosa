@@ -613,12 +613,18 @@ Module ResponseTimeIterationFP.
         }
         intros [_ [_ [REC DL]]].
 
+        (try ( apply bertogna_cirinei_response_time_bound_fp with
+              (alpha0 := alpha) (alpha'0 := alpha')
+              (task_cost0 := task_cost) (task_period0 := task_period)
+              (task_deadline0 := task_deadline) (job_deadline0 := job_deadline) (tsk0 := (TASK idx))
+              (job_task0 := job_task) (ts0 := ts) (hp_bounds0 := take idx hp_bounds)
+              (higher_eq_priority := higher_priority) ) ||
         apply bertogna_cirinei_response_time_bound_fp with
               (alpha := alpha) (alpha' := alpha')
               (task_cost := task_cost) (task_period := task_period)
               (task_deadline := task_deadline) (job_deadline := job_deadline) (tsk := (TASK idx))
               (job_task := job_task) (ts := ts) (hp_bounds := take idx hp_bounds)
-              (higher_eq_priority := higher_priority); try (by ins).
+              (higher_eq_priority := higher_priority)); try (by ins).
         {
           cut (NTH idx \in hp_bounds = true); [intros IN | by apply mem_nth].
           by rewrite set_mem -UNZIP; apply/mapP; exists (TASK idx, RESP idx); rewrite PAIR.

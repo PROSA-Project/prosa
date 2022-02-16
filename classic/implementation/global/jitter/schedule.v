@@ -141,6 +141,7 @@ Module ConcreteScheduler.
         {
           rewrite mem_sort mem_filter PENDING andTb.
           move: PENDING => /andP [ARRIVED _].
+          try ( by apply arrived_between_implies_in_actual_arrivals with (job_arrival0 := job_arrival) ) ||
           by apply arrived_between_implies_in_actual_arrivals with (job_arrival := job_arrival).
         }
         apply nth_or_none_mem_exists in IN; des.
@@ -185,6 +186,7 @@ Module ConcreteScheduler.
       intros j t cpu1 cpu2 SCHED1 SCHED2.
       rewrite 2!scheduler_nth_or_none_mapping in SCHED1 SCHED2.
       set l := sorted_pending_jobs _ _ _ _ _ _ _ _ in SCHED1 SCHED2.
+      try ( apply ord_inj, nth_or_none_uniq with (l0 := l) (x := j); try (by done) ) ||
       apply ord_inj, nth_or_none_uniq with (l := l) (x := j); try (by done).
       by rewrite sort_uniq filter_uniq // /actual_arrivals_up_to; apply actual_arrivals_uniq.
     Qed.
@@ -216,6 +218,7 @@ Module ConcreteScheduler.
         move: SCHED SCHED' => /eqP SCHED /eqP SCHED'.
         rewrite 2!scheduler_nth_or_none_mapping in SCHED SCHED'.
         set l := sorted_pending_jobs _ _ _ _ _ _ _ _ in SCHED SCHED'.
+        try ( apply nth_or_none_uniq with (l0 := l) (x := j); try (by done) ) ||
         apply nth_or_none_uniq with (l := l) (x := j); try (by done).
         by rewrite sort_uniq filter_uniq //; apply actual_arrivals_uniq.
       }

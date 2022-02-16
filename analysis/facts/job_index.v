@@ -46,8 +46,10 @@ Section JobIndexLemmas.
     Proof.
       move => ARR_LT.
       move: H_equal_index => IND. 
+      try ( apply task_arrivals_up_to_prefix_cat with (arr_seq0 := arr_seq) in ARR_LT => // ) ||
       apply task_arrivals_up_to_prefix_cat with (arr_seq := arr_seq) in ARR_LT => //.
       move : ARR_LT => [xs ARR_CAT]. 
+      try ( apply eq_ind_in_seq with (xs0 := task_arrivals_up_to_job_arrival arr_seq j2) => // ) ||
       apply eq_ind_in_seq with (xs := task_arrivals_up_to_job_arrival arr_seq j2) => //.
       - now rewrite -/(job_index _ _) -IND -ARR_CAT index_cat ifT;
           try apply arrives_in_task_arrivals_up_to.

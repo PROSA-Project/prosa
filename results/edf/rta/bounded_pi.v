@@ -678,9 +678,12 @@ Section AbstractRTAforEDFwithArrivalCurves.
     move: H_sched_valid => [CARR MBR].
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }    
+    ( try ( eapply uniprocessor_response_time_bound_seq with
+        (interference0 := interference) (interfering_workload0 := interfering_workload)
+        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L) ) ||
     eapply uniprocessor_response_time_bound_seq with
         (interference := interference) (interfering_workload := interfering_workload)
-        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L); eauto 2 with basic_facts.
+        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); eauto 2 with basic_facts.
     - by apply instantiated_i_and_w_are_coherent_with_schedule.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - by apply instantiated_busy_intervals_are_bounded.

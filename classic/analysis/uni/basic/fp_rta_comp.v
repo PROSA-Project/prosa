@@ -221,6 +221,8 @@ Module ResponseTimeIterationFP.
                 apply total_workload_bound_fp_non_decreasing.
             }
             apply leq_trans with (n := task_cost tsk); first by done.
+            try ( apply iter_fixpoint_ge_bottom with (f0 := f) (max_steps := s);
+              try (by done) ) ||
             apply iter_fixpoint_ge_bottom with (f := f) (max_steps := s);
               try (by done).
             by apply fp_claimed_bounds_computes_iteration.
@@ -323,18 +325,31 @@ Module ResponseTimeIterationFP.
              valid_sporadic_taskset, is_valid_sporadic_task in *.
       unfold RTA_claimed_bounds; intros tsk R.
       case SOME: fp_claimed_bounds => [rt_bounds|] IN; last by done.
+      try ( apply uniprocessor_response_time_bound_fp with
+            (task_cost0 := task_cost) (task_period0 := task_period)
+            (ts0 := ts) (task_deadline0 := task_deadline)
+            (job_deadline0 := job_deadline)
+            (higher_eq_priority0 := higher_eq_priority); try (by done) ) ||
       apply uniprocessor_response_time_bound_fp with
             (task_cost := task_cost) (task_period := task_period)
             (ts := ts) (task_deadline := task_deadline)
             (job_deadline := job_deadline)
             (higher_eq_priority := higher_eq_priority); try (by done).
       {
+        ( try ( apply fp_claimed_bounds_gt_zero with (task_cost0 := task_cost)
+          (task_period0 := task_period) (task_deadline0 := task_deadline)
+          (higher_eq_priority0 := higher_eq_priority) (ts0 := ts)
+          (rt_bounds0 := rt_bounds) (tsk0 := tsk) ) ||
         apply fp_claimed_bounds_gt_zero with (task_cost := task_cost)
           (task_period := task_period) (task_deadline := task_deadline)
           (higher_eq_priority := higher_eq_priority) (ts := ts)
-          (rt_bounds := rt_bounds) (tsk := tsk); try (by done).
+          (rt_bounds := rt_bounds) (tsk := tsk)); try (by done).
         {
-          feed (PARAMS tsk); last by move: PARAMS => [P1 _].
+          feed (PARAMS tsk) ; last by move: PARAMS => [P1 _].
+          try ( by apply fp_claimed_bounds_from_taskset with
+            (task_cost0 := task_cost) (task_period0 := task_period)
+            (task_deadline0 := task_deadline) (rt_bounds0 := rt_bounds)
+            (higher_eq_priority0 := higher_eq_priority) (R0 := R) ) ||
           by apply fp_claimed_bounds_from_taskset with
             (task_cost := task_cost) (task_period := task_period)
             (task_deadline := task_deadline) (rt_bounds := rt_bounds)
@@ -342,6 +357,8 @@ Module ResponseTimeIterationFP.
         }
         by intros tsk0 IN0; specialize (PARAMS tsk0 IN0); des.
       }
+      try ( by apply fp_claimed_bounds_yields_fixed_point with
+        (task_deadline0 := task_deadline) (rt_bounds0 := rt_bounds) ) ||
       by apply fp_claimed_bounds_yields_fixed_point with
         (task_deadline := task_deadline) (rt_bounds := rt_bounds). 
     Qed.
@@ -367,8 +384,10 @@ Module ResponseTimeIterationFP.
         intros tsk IN.
         move: (RESP rt_bounds TEST tsk IN) => [R INbounds].
         specialize (DL rt_bounds TEST tsk R INbounds).
+        ( try ( apply task_completes_before_deadline with
+                (task_deadline0 := task_deadline) (R0 := R) ) ||
         apply task_completes_before_deadline with
-                (task_deadline := task_deadline) (R := R); try (by done);
+                (task_deadline := task_deadline) (R := R)); try (by done);
           first by intros j ARRj; specialize (JOBPARAMS j ARRj); move: JOBPARAMS => [_ [_ EQ]].
         by apply RTA; rewrite /RTA_claimed_bounds TEST.
       Qed.

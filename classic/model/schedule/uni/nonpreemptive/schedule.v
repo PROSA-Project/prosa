@@ -113,7 +113,8 @@ Module NonpreemptiveSchedule.
           apply job_doesnt_complete_before_remaining_cost in NOTCOMP; last by done.
           apply contraT; rewrite negbK; intros COMP.
           exfalso; move: NOTCOMP => /negP NOTCOMP; apply: NOTCOMP.
-          apply completion_monotonic with (t := i); try ( by done).
+          ( try ( apply completion_monotonic with (t0 := i) ) ||
+          apply completion_monotonic with (t := i)); try ( by done).
             by apply leq_subRL_impl; first rewrite addn1.
         Qed.
         
@@ -241,7 +242,8 @@ Module NonpreemptiveSchedule.
 
                 have COMPL: completed_by job_cost sched j (t + job_remaining_cost j t - 1).
                 {
-                  apply completion_monotonic with (t := t' + job_remaining_cost j t');
+                  ( try ( apply completion_monotonic with (t0 := t' + job_remaining_cost j t') ) ||
+                  apply completion_monotonic with (t := t' + job_remaining_cost j t'));
                   [| by apply job_completes_after_remaining_cost].
                   unfold remaining_cost.
                   have LLF: t' < t - service sched j t.

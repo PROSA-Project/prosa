@@ -291,7 +291,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       { rewrite /workload_of_jobs /IBF (big_rem tsk) //= (addnC (rbf tsk (job_arrival j - t1 + ε))).
         rewrite -addnBA; last first.
         { apply leq_trans with (task_rbf ε).
-          apply (task_rbf_1_ge_task_cost arr_seq) with (j := j) => //=; first by auto.
+          ( try ( apply (task_rbf_1_ge_task_cost arr_seq) with (j0 := j) => //= ) ||
+          apply (task_rbf_1_ge_task_cost arr_seq) with (j := j) => //=); first by auto.
           by apply task_rbf_monotone; [apply H_valid_arrival_curve | ssrlia]. }
         { eapply leq_trans; last first.
           by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
@@ -406,9 +407,12 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     intros js ARRs TSKs.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }    
+    ( try ( eapply uniprocessor_response_time_bound with
+      (interference0 := interference) (interfering_workload0 := interfering_workload)
+      (interference_bound_function := fun tsk A R => IBF tsk A R) (L0 := L) ) ||
     eapply uniprocessor_response_time_bound with
       (interference := interference) (interfering_workload := interfering_workload)
-      (interference_bound_function := fun tsk A R => IBF tsk A R) (L := L); eauto 2 with basic_facts.
+      (interference_bound_function := fun tsk A R => IBF tsk A R) (L := L)); eauto 2 with basic_facts.
     - by apply instantiated_i_and_w_are_coherent_with_schedule.
     - by apply instantiated_busy_intervals_are_bounded.
     - by apply instantiated_interference_is_bounded.
@@ -419,6 +423,3 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   Qed.
   
 End AbstractRTAforFIFOwithArrivalCurves. 
-
-
-

@@ -12,26 +12,26 @@
             "bertogna_cirinei_response_time_bound_edf": 49,
             "bertogna_edf_all_cpus_in_affinity_busy": 52,
             "bertogna_edf_all_cpus_in_subaffinity_busy": 51,
-            "bertogna_edf_alpha'_is_full": 106,
-            "bertogna_edf_interference_by_different_tasks": 43,
-            "bertogna_edf_interference_in_non_full_processors": 133,
+            "bertogna_edf_alpha'_is_full": 116,
+            "bertogna_edf_interference_by_different_tasks": 46,
+            "bertogna_edf_interference_in_non_full_processors": 138,
             "bertogna_edf_sum_exceeds_total_interference": 43
         },
         "./classic/analysis/apa/bertogna_fp_comp.v": {
-            "fp_analysis_yields_response_time_bounds": 107
+            "fp_analysis_yields_response_time_bounds": 113
         },
         "./classic/analysis/apa/bertogna_fp_theory.v": {
             "bertogna_cirinei_response_time_bound_fp": 47,
             "bertogna_fp_all_cpus_in_affinity_busy": 54,
             "bertogna_fp_all_cpus_in_subaffinity_busy": 53,
-            "bertogna_fp_alpha'_is_full": 143,
-            "bertogna_fp_interference_by_different_tasks": 42,
-            "bertogna_fp_interference_in_non_full_processors": 149,
+            "bertogna_fp_alpha'_is_full": 154,
+            "bertogna_fp_interference_by_different_tasks": 45,
+            "bertogna_fp_interference_in_non_full_processors": 153,
             "bertogna_fp_sum_exceeds_total_interference": 42,
-            "bertogna_fp_workload_bounds_interference": 44
+            "bertogna_fp_workload_bounds_interference": 46
         },
         "./classic/analysis/apa/interference_bound_edf.v": {
-            "interference_bound_edf_holds_for_single_job_that_completes_on_time": 86,
+            "interference_bound_edf_holds_for_single_job_that_completes_on_time": 90,
             "interference_bound_edf_many_periods_in_between": 40
         },
         "./classic/analysis/apa/workload_bound.v": {
@@ -47,20 +47,21 @@
         },
         "./classic/analysis/global/basic/bertogna_edf_theory.v": {
             "bertogna_cirinei_response_time_bound_edf": 50,
-            "bertogna_edf_interference_by_different_tasks": 43,
-            "bertogna_edf_interference_in_non_full_processors": 129
+            "bertogna_edf_interference_by_different_tasks": 46,
+            "bertogna_edf_interference_in_non_full_processors": 133
         },
         "./classic/analysis/global/basic/bertogna_fp_comp.v": {
-            "fp_analysis_yields_response_time_bounds": 105
+            "fp_analysis_yields_response_time_bounds": 110
         },
         "./classic/analysis/global/basic/bertogna_fp_theory.v": {
             "bertogna_cirinei_response_time_bound_fp": 48,
-            "bertogna_fp_interference_by_different_tasks": 42,
-            "bertogna_fp_interference_in_non_full_processors": 164,
-            "bertogna_fp_workload_bounds_interference": 45
+            "bertogna_fp_all_cpus_are_busy": 44,
+            "bertogna_fp_interference_by_different_tasks": 45,
+            "bertogna_fp_interference_in_non_full_processors": 173,
+            "bertogna_fp_workload_bounds_interference": 47
         },
         "./classic/analysis/global/basic/interference_bound_edf.v": {
-            "interference_bound_edf_holds_for_single_job_that_completes_on_time": 92,
+            "interference_bound_edf_holds_for_single_job_that_completes_on_time": 100,
             "interference_bound_edf_many_periods_in_between": 40
         },
         "./classic/analysis/global/basic/workload_bound.v": {
@@ -76,30 +77,31 @@
         },
         "./classic/analysis/global/jitter/bertogna_edf_theory.v": {
             "bertogna_cirinei_response_time_bound_edf": 60,
-            "bertogna_edf_interference_by_different_tasks": 63,
-            "bertogna_edf_interference_in_non_full_processors": 125
+            "bertogna_edf_interference_by_different_tasks": 66,
+            "bertogna_edf_interference_in_non_full_processors": 130
         },
         "./classic/analysis/global/jitter/bertogna_fp_comp.v": {
-            "fp_analysis_yields_response_time_bounds": 120
+            "fp_analysis_yields_response_time_bounds": 125
         },
         "./classic/analysis/global/jitter/bertogna_fp_theory.v": {
             "bertogna_cirinei_response_time_bound_fp": 49,
-            "bertogna_fp_all_cpus_are_busy": 40,
-            "bertogna_fp_interference_by_different_tasks": 54,
-            "bertogna_fp_interference_in_non_full_processors": 173,
-            "bertogna_fp_workload_bounds_interference": 46
+            "bertogna_fp_all_cpus_are_busy": 46,
+            "bertogna_fp_interference_by_different_tasks": 57,
+            "bertogna_fp_interference_in_non_full_processors": 183,
+            "bertogna_fp_workload_bounds_interference": 49
         },
         "./classic/analysis/global/jitter/interference_bound_edf.v": {
-            "interference_bound_edf_holds_for_single_job_that_completes_on_time": 123,
-            "interference_bound_edf_holds_for_single_job_with_small_slack": 55,
-            "interference_bound_edf_j_fst_completed_on_time": 46,
+            "interference_bound_edf_holds_for_single_job_that_completes_on_time": 132,
+            "interference_bound_edf_holds_for_single_job_with_small_slack": 57,
+            "interference_bound_edf_j_fst_completed_on_time": 48,
             "interference_bound_edf_many_periods_in_between": 49
         },
         "./classic/analysis/global/jitter/workload_bound.v": {
             "W_monotonic": 51,
             "workload_bound_many_periods_in_between": 41,
             "workload_bound_n_k_covers_middle_jobs": 40,
-            "workload_bound_service_of_first_and_last_jobs": 50,
+            "workload_bound_n_k_equals_num_mid_jobs_plus_1": 42,
+            "workload_bound_service_of_first_and_last_jobs": 51,
             "workload_bounded_by_W": 48
         },
         "./classic/analysis/global/parallel/bertogna_edf_comp.v": {
@@ -110,23 +112,29 @@
         },
         "./classic/analysis/global/parallel/bertogna_edf_theory.v": {
             "bertogna_cirinei_response_time_bound_edf": 49,
-            "bertogna_edf_interference_on_all_cpus": 75
+            "bertogna_edf_interference_on_all_cpus": 78
         },
         "./classic/analysis/global/parallel/bertogna_fp_comp.v": {
-            "fp_analysis_yields_response_time_bounds": 98
+            "fp_analysis_yields_response_time_bounds": 103
         },
         "./classic/analysis/global/parallel/bertogna_fp_theory.v": {
             "bertogna_cirinei_response_time_bound_fp": 41,
-            "bertogna_fp_all_cpus_are_busy": 78
+            "bertogna_fp_all_cpus_are_busy": 81
         },
         "./classic/analysis/global/parallel/interference_bound_edf.v": {
             "interference_bound_edf_many_periods_in_between": 40,
-            "interference_bound_edf_n_k_covers_all_jobs": 45
+            "interference_bound_edf_n_k_covers_all_jobs": 47
         },
         "./classic/analysis/uni/arrival_curves/workload_bound.v": {
             "total_workload_le_total_rbf": 45,
             "total_workload_le_total_rbf'": 41,
             "total_workload_le_total_rbf''": 41
+        },
+        "./classic/analysis/uni/basic/fp_rta_comp.v": {
+            "fp_analysis_yields_response_time_bounds": 42
+        },
+        "./classic/analysis/uni/basic/fp_rta_theory.v": {
+            "uniprocessor_response_time_bound_fp": 46
         },
         "./classic/analysis/uni/basic/tdma_wcrt_analysis.v": {
             "formula_not_sched_St": 45,
@@ -138,18 +146,18 @@
             "sched_jitter_respects_policy": 77
         },
         "./classic/analysis/uni/susp/dynamic/jitter/jitter_schedule_service.v": {
-            "jitter_reduction_inductive_step_case2": 96,
+            "jitter_reduction_inductive_step_case2": 98,
             "jitter_reduction_less_job_service_before_interval_case5": 44,
             "jitter_reduction_service_jitter": 51
         },
         "./classic/analysis/uni/susp/dynamic/jitter/taskset_rta.v": {
-            "valid_response_time_bound_of_tsk_i": 52
+            "valid_response_time_bound_of_tsk_i": 57
         },
         "./classic/analysis/uni/susp/dynamic/oblivious/reduction.v": {
             "sched_new_completed_jobs_dont_execute": 42
         },
         "./classic/analysis/uni/susp/sustainability/allcosts/main_claim.v": {
-            "policy_is_weakly_sustainable": 63
+            "policy_is_weakly_sustainable": 66
         },
         "./classic/analysis/uni/susp/sustainability/allcosts/reduction_properties.v": {
             "executes_before_suspension_in_sched_new": 42,
@@ -169,7 +177,7 @@
         "./classic/implementation/apa/schedule.v": {
             "scheduler_has_no_duplicate_jobs": 55,
             "scheduler_mapping_is_work_conserving": 46,
-            "scheduler_priority": 113
+            "scheduler_priority": 114
         },
         "./classic/implementation/global/basic/bertogna_fp_example.v": {
             "schedulability_test_succeeds": 40
@@ -187,7 +195,7 @@
             "respects_FIFO": 45
         },
         "./classic/implementation/uni/basic/tdma_rta_example.v": {
-            "respects_TDMA_policy": 43
+            "respects_TDMA_policy": 46
         },
         "./classic/implementation/uni/jitter/fp_rta_example.v": {
             "RTA_yields_these_bounds": 52
@@ -196,18 +204,21 @@
             "RTA_yields_these_bounds": 51
         },
         "./classic/implementation/uni/susp/schedule.v": {
-            "scheduler_depends_only_on_prefix": 52
+            "scheduler_depends_only_on_prefix": 53
+        },
+        "./classic/model/arrival/jitter/arrival_sequence.v": {
+            "actual_arrivals_between_mem_cat": 42
         },
         "./classic/model/schedule/global/basic/constrained_deadlines.v": {
             "platform_cpus_busy_with_interfering_tasks": 65,
-            "platform_fp_cpus_busy_with_interfering_tasks": 82
+            "platform_fp_cpus_busy_with_interfering_tasks": 84
         },
         "./classic/model/schedule/global/basic/platform.v": {
             "work_conserving_eq_work_conserving_count": 67
         },
         "./classic/model/schedule/global/jitter/constrained_deadlines.v": {
             "platform_cpus_busy_with_interfering_tasks": 65,
-            "platform_fp_cpus_busy_with_interfering_tasks": 85
+            "platform_fp_cpus_busy_with_interfering_tasks": 87
         },
         "./classic/model/schedule/global/jitter/platform.v": {
             "work_conserving_eq_work_conserving_count": 68
@@ -215,7 +226,7 @@
         "./classic/model/schedule/uni/jitter/busy_interval.v": {
             "busy_interval_is_bounded": 59,
             "exists_busy_interval_prefix": 68,
-            "not_quiet_implies_exists_scheduled_hp_job": 46
+            "not_quiet_implies_exists_scheduled_hp_job": 50
         },
         "./classic/model/schedule/uni/limited/abstract_RTA/abstract_rta.v": {
             "in": 115
@@ -225,59 +236,49 @@
             "task_rbf_excl_tsk_bounds_task_workload_excl_j": 69
         },
         "./classic/model/schedule/uni/limited/busy_interval.v": {
-            "busy_interval_has_uninterrupted_service": 84,
-            "busy_interval_is_bounded": 81,
-            "exists_busy_interval_prefix": 75,
-            "no_idle_time_within_non_quiet_time_interval": 76,
-            "pending_hp_job_exists": 73
+            "busy_interval_is_bounded": 75,
+            "exists_busy_interval_prefix": 62,
+            "pending_hp_job_exists": 74
         },
         "./classic/model/schedule/uni/limited/edf/nonpr_reg/concrete_models/response_time_bound.v": {
-            "uniprocessor_response_time_bound_edf_with_fixed_preemption_points": 168,
-            "uniprocessor_response_time_bound_edf_with_floating_nonpreemptive_regions": 81
+            "uniprocessor_response_time_bound_edf_with_fixed_preemption_points": 174,
+            "uniprocessor_response_time_bound_edf_with_floating_nonpreemptive_regions": 88
         },
         "./classic/model/schedule/uni/limited/edf/nonpr_reg/response_time_bound.v": {
-            "priority_inversion_is_bounded": 56,
-            "priority_inversion_is_bounded_by_blocking": 58
+            "priority_inversion_is_bounded": 57,
+            "priority_inversion_is_bounded_by_blocking": 56
         },
         "./classic/model/schedule/uni/limited/edf/response_time_bound.v": {
             "A_is_in_concrete_search_space": 85,
             "instantiated_task_interference_is_bounded": 163
         },
         "./classic/model/schedule/uni/limited/fixed_priority/nonpr_reg/concrete_models/response_time_bound.v": {
-            "uniprocessor_response_time_bound_fp_with_fixed_preemption_points": 168,
-            "uniprocessor_response_time_bound_fp_with_floating_nonpreemptive_regions": 81
+            "uniprocessor_response_time_bound_fp_with_fixed_preemption_points": 176,
+            "uniprocessor_response_time_bound_fp_with_floating_nonpreemptive_regions": 88
         },
         "./classic/model/schedule/uni/limited/fixed_priority/nonpr_reg/response_time_bound.v": {
-            "priority_inversion_is_bounded": 52
+            "priority_inversion_is_bounded": 53
         },
         "./classic/model/schedule/uni/limited/fixed_priority/response_time_bound.v": {
             "instantiated_task_interference_is_bounded": 47
         },
         "./classic/model/schedule/uni/limited/jlfp_instantiation.v": {
-            "cumulative_task_interference_split": 62,
-            "instantiated_cumulative_interference_of_hep_jobs_equal_total_interference_of_hep_jobs": 114,
-            "instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks": 127,
-            "instantiated_quiet_time_equivalent_edf_quiet_time": 102
+            "cumulative_task_interference_split": 63,
+            "instantiated_cumulative_interference_of_hep_jobs_equal_total_interference_of_hep_jobs": 115,
+            "instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks": 128,
+            "instantiated_quiet_time_equivalent_edf_quiet_time": 105
         },
         "./classic/model/schedule/uni/limited/platform/limited.v": {
             "model_with_fixed_preemption_points_is_model_with_bounded_nonpreemptive_regions": 83
         },
         "./classic/model/schedule/uni/limited/platform/priority_inversion_is_bounded.v": {
-            "=>": 119,
-            "not_quiet_implies_exists_scheduled_hp_job_after_preemption_point": 55,
-            "not_quiet_implies_exists_scheduled_hp_job_at_preemption_point": 90,
-            "scheduling_of_any_segment_starts_with_preemption_time": 44
-        },
-        "./classic/model/schedule/uni/limited/platform/util.v": {
-            "belonging_to_segment_of_seq_is_total": 46,
-            "distance_between_neighboring_elements_le_max_distance_in_seq": 43,
-            "domination_of_distances_implies_domination_of_seq": 58,
-            "max_distance_in_nontrivial_seq_is_positive": 127,
-            "max_distance_in_seq_le_last_element_of_seq": 47,
-            "max_of_dominating_seq": 47
+            "=>": 120,
+            "not_quiet_implies_exists_scheduled_hp_job_after_preemption_point": 57,
+            "not_quiet_implies_exists_scheduled_hp_job_at_preemption_point": 94,
+            "scheduling_of_any_segment_starts_with_preemption_time": 45
         },
         "./classic/model/schedule/uni/nonpreemptive/schedule.v": {
-            "j_is_not_scheduled_at_t_minus_service_minus_one": 54,
+            "j_is_not_scheduled_at_t_minus_service_minus_one": 55,
             "j_is_scheduled_at_t_minus_service": 74
         },
         "./classic/model/schedule/uni/service.v": {
@@ -292,7 +293,7 @@
             "same_service_implies_same_last_execution": 49
         },
         "./classic/model/schedule/uni/susp/suspension_intervals.v": {
-            "cumulative_suspension_eq_total_suspension": 86,
+            "cumulative_suspension_eq_total_suspension": 87,
             "cumulative_suspension_le_total_suspension": 57
         },
         "./classic/model/schedule/uni/sustainability.v": {

@@ -113,6 +113,8 @@ Module ResponseTimeAnalysisEDF.
       have VALID := periodic_arrivals_valid_job_parameters ts ts_has_valid_parameters.
       have TSVALID := ts_has_valid_parameters.
       unfold valid_sporadic_job, valid_realtime_job in *; des.
+      try ( apply taskset_schedulable_by_edf_rta with (task_cost := task_cost)
+        (task_period := task_period) (task_deadline := task_deadline) (ts0 := ts); try (by done) ) ||
       apply taskset_schedulable_by_edf_rta with (task_cost := task_cost)
         (task_period := task_period) (task_deadline := task_deadline) (ts := ts); try (by done).
       - by apply ts_has_constrained_deadlines.

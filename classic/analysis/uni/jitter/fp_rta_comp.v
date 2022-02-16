@@ -344,11 +344,19 @@ Module ResponseTimeIterationFP.
              valid_sporadic_taskset, is_valid_sporadic_task in *.
       unfold RTA_claimed_bounds; intros tsk R.
       case SOME: fp_claimed_bounds => [rt_bounds|] IN; last by done.
+      try ( apply uniprocessor_response_time_bound_fp with
+            (task_cost0 := task_cost) (task_period0 := task_period)
+            (ts0 := ts) (job_jitter0 := job_jitter)
+            (higher_eq_priority0 := higher_eq_priority); try (by done) ) ||
       apply uniprocessor_response_time_bound_fp with
             (task_cost := task_cost) (task_period := task_period)
             (ts := ts) (job_jitter := job_jitter)
             (higher_eq_priority := higher_eq_priority); try (by done).
       {
+        try ( apply fp_claimed_bounds_gt_zero with (task_cost0 := task_cost)
+          (task_period0 := task_period) (task_deadline0 := task_deadline)
+          (higher_eq_priority0 := higher_eq_priority) (ts0 := ts) (task_jitter0 := task_jitter)
+          (rt_bounds0 := rt_bounds) (tsk0 := tsk); try (by done) ) ||
         apply fp_claimed_bounds_gt_zero with (task_cost := task_cost)
           (task_period := task_period) (task_deadline := task_deadline)
           (higher_eq_priority := higher_eq_priority) (ts := ts) (task_jitter := task_jitter)
@@ -356,6 +364,8 @@ Module ResponseTimeIterationFP.
         apply H_positive_costs.
         by eapply fp_claimed_bounds_from_taskset; eauto 1.
       }
+      try ( by apply fp_claimed_bounds_yields_fixed_point with
+        (task_deadline0 := task_deadline) (rt_bounds0 := rt_bounds) ) ||
       by apply fp_claimed_bounds_yields_fixed_point with
         (task_deadline := task_deadline) (rt_bounds := rt_bounds). 
     Qed.
@@ -381,6 +391,8 @@ Module ResponseTimeIterationFP.
         intros tsk IN.
         move: (RESP rt_bounds TEST tsk IN) => [R INbounds].
         specialize (DL rt_bounds TEST tsk R INbounds).
+        try ( apply task_completes_before_deadline with
+                (task_deadline0 := task_deadline) (R0 := task_jitter tsk + R); try (by done) ) ||
         apply task_completes_before_deadline with
                 (task_deadline := task_deadline) (R := task_jitter tsk + R); try (by done).
         by apply BOUND; rewrite /RTA_claimed_bounds TEST.

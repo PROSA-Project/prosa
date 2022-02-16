@@ -612,6 +612,9 @@ Module AbstractSeqRTA.
         response_time_bounded_by tsk R. 
       Proof.
         intros j ARR TSK.
+        try ( eapply uniprocessor_response_time_bound with
+            (interference_bound_function := fun tsk A R => task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A R)
+            (interfering_workload0 := interfering_workload); eauto 2 ) ||
         eapply uniprocessor_response_time_bound with
             (interference_bound_function := fun tsk A R => task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A R)
             (interfering_workload := interfering_workload); eauto 2.
@@ -636,4 +639,3 @@ Module AbstractSeqRTA.
   End Sequential_Abstract_RTA. 
   
 End AbstractSeqRTA.
- 

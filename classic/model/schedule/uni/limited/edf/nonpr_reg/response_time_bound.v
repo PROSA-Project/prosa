@@ -275,7 +275,8 @@ Module RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           move: SCHEDHP => [j_hp [ARRB [HP SCHEDHP]]].
           apply/eqP; rewrite eqb0 Bool.negb_involutive.
           have EQ: s = j_hp.
-          { by apply only_one_job_scheduled with (sched := sched) (t := t); [apply/eqP | ]. }
+          { by ( try ( apply only_one_job_scheduled with (sched0 := sched) (t0 := t) ) ||
+                apply only_one_job_scheduled with (sched := sched) (t := t) ); [apply/eqP | ]. }
             by rewrite EQ.
           rewrite ltn_subRL in NEQ.
           apply leq_trans with (t1 + blocking_bound); last by apply ltnW. 

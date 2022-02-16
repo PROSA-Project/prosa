@@ -62,7 +62,8 @@ Module ConcreteScheduler.
       suff SAME: pending_jobs sched1 t = pending_jobs sched2 t by rewrite SAME.
       apply eq_in_filter.
       intros j ARR.
-      apply in_arrivals_implies_arrived_before with (job_arrival := job_arrival) in ARR;
+      ( try ( apply in_arrivals_implies_arrived_before with (job_arrival0 := job_arrival) in ARR ) ||
+      apply in_arrivals_implies_arrived_before with (job_arrival := job_arrival) in ARR);
         last by done.
       rewrite /arrived_before ltnS in ARR.
       rewrite /pending /has_arrived ARR 2!andTb; f_equal.

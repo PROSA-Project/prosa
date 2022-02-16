@@ -201,8 +201,10 @@ Module ResponseTimeAnalysisFP.
           apply leq_trans with (n := workload job_task sched tsk_other
                                               (job_arrival j) (job_arrival j + R));
             first by apply task_interference_le_workload.
-          by apply workload_bounded_by_W with (task_deadline := task_deadline) (arr_seq := arr_seq)
-              (job_arrival := job_arrival)  (job_cost := job_cost) (job_deadline := job_deadline);
+          by ( try ( apply workload_bounded_by_W with (task_deadline0 := task_deadline) (arr_seq0 := arr_seq)
+              (job_arrival0 := job_arrival)  (job_cost0 := job_cost) (job_deadline0 := job_deadline) ) ||
+          apply workload_bounded_by_W with (task_deadline := task_deadline) (arr_seq := arr_seq)
+              (job_arrival := job_arrival)  (job_cost := job_cost) (job_deadline := job_deadline));
             try (by ins);
               [ by ins; apply TASK_PARAMS
               | by ins; apply RESP with (hp_tsk := tsk_other)].
@@ -315,12 +317,15 @@ Module ResponseTimeAnalysisFP.
               by apply/existsP; exists cpu; rewrite SCHED.
             } clear SCHED; rename SCHED' into SCHED.
             move: (SCHED) => PENDING.
+            try ( apply scheduled_implies_pending with (job_arrival0 := job_arrival)
+                                                 (job_cost0 := job_cost) in PENDING; try (by done) ) ||
             apply scheduled_implies_pending with (job_arrival := job_arrival)
                                                  (job_cost := job_cost) in PENDING; try (by done).
             destruct (ltnP (job_arrival j_other) (job_arrival j)) as [BEFOREother | BEFOREj].
             {
               specialize (BEFOREok j_other ARRother SAMEtsk BEFOREother).
               move: PENDING => /andP [_ /negP NOTCOMP]; apply NOTCOMP.
+              try ( apply completion_monotonic with (t0 := job_arrival j_other + R); try (by done) ) ||
               apply completion_monotonic with (t := job_arrival j_other + R); try (by done).
               apply leq_trans with (n := job_arrival j); last by done.
               apply leq_trans with (n := job_arrival j_other + task_deadline tsk);

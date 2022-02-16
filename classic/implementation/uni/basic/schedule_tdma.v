@@ -66,6 +66,8 @@ Module ConcreteSchedulerTDMA.
         Lemma pending_jobs_uniq:
           uniq pending_jobs.
         Proof.
+        try ( apply filter_uniq
+        , arrivals_uniq with (job_arrival0:=job_arrival);auto ) ||
         apply filter_uniq
         , arrivals_uniq with (job_arrival:=job_arrival);auto.
         Qed.
@@ -132,6 +134,7 @@ Module ConcreteSchedulerTDMA.
         intros* ARRJ PEN.
         rewrite mem_filter. apply /andP. split.
         apply PEN. rewrite /jobs_arrived_up_to.
+        try ( apply arrived_between_implies_in_arrivals with (job_arrival0:=job_arrival) ) ||
         apply arrived_between_implies_in_arrivals with (job_arrival:=job_arrival).
         apply H_arrival_times_are_consistent. auto.
         rewrite /arrived_between. simpl. 
@@ -169,6 +172,8 @@ Module ConcreteSchedulerTDMA.
         rewrite /job_to_schedule. f_equal.
         apply eq_in_filter.
         intros j ARR.
+        try ( apply in_arrivals_implies_arrived_before 
+        with (job_arrival0 := job_arrival) in ARR ) ||
         apply in_arrivals_implies_arrived_before 
         with (job_arrival := job_arrival) in ARR.
         rewrite /arrived_before ltnS in ARR.

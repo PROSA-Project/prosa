@@ -122,6 +122,9 @@ Module SustainabilityAllCostsProperty.
         good_arr_seq higher_eq_priority good_sched good_suspension bad_cost good_j R.
       set bad_params := [:: param JOB_ARRIVAL job_arrival; param JOB_COST bad_cost;
                             param JOB_SUSPENSION reduced_suspension_duration].  
+      try ( apply reduction_prop.sched_new_response_time_of_job_j with (arr_seq := good_arr_seq)
+        (higher_eq_priority0 := higher_eq_priority) (inflated_job_cost := bad_cost);
+        try done ) ||
       apply reduction_prop.sched_new_response_time_of_job_j with (arr_seq := good_arr_seq)
         (higher_eq_priority := higher_eq_priority) (inflated_job_cost := bad_cost);
         try done.

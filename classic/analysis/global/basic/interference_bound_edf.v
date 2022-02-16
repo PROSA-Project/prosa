@@ -316,8 +316,10 @@ Module InterferenceBoundEDF.
           move => [ARRj [TSKj _]].
           apply leq_trans with (n := service_during sched j t1 t2);
             first by apply job_interference_le_service.
+          ( try ( apply cumulative_service_le_task_cost with (job_task0 := job_task)
+            (task_deadline0 := task_deadline) (job_cost0 := job_cost) (job_deadline0 := job_deadline) ) ||
           apply cumulative_service_le_task_cost with (job_task := job_task)
-            (task_deadline := task_deadline) (job_cost := job_cost) (job_deadline := job_deadline);
+            (task_deadline := task_deadline) (job_cost := job_cost) (job_deadline := job_deadline));
             try (by done).
           by apply PARAMS.
         Qed.
@@ -413,6 +415,8 @@ Module InterferenceBoundEDF.
             rewrite -leqn0; apply leq_trans with (n := service_during sched j_fst t1 t2);
               first by apply job_interference_le_service.
             rewrite leqn0; apply/eqP.
+            try ( by apply cumulative_service_after_job_rt_zero with (job_cost0 := job_cost) (R := R_k)
+              (job_arrival0 := job_arrival); try (by done); apply ltnW ) ||
             by apply cumulative_service_after_job_rt_zero with (job_cost := job_cost) (R := R_k)
               (job_arrival := job_arrival); try (by done); apply ltnW.
           Qed. 
@@ -460,6 +464,8 @@ Module InterferenceBoundEDF.
                 interference_bound_edf_j_fst_completion_implies_rt_bound_inside_interval RBOUND.
               have FST := interference_bound_edf_j_fst_is_job_of_tsk_k.
               destruct FST as [FSTarr [_ [ LEdl _]]].            
+              try ( apply interference_under_edf_implies_shorter_deadlines with
+                    (arr_seq0 := arr_seq) (job_deadline0 := job_deadline) in LEdl; try (by done) ) ||
               apply interference_under_edf_implies_shorter_deadlines with
                     (arr_seq := arr_seq) (job_deadline := job_deadline) in LEdl; try (by done).
               destruct (D_k - R_k <= D_i) eqn:LEdk; last first.
@@ -480,6 +486,8 @@ Module InterferenceBoundEDF.
                 apply leq_trans with (n := service_during sched j_fst (a_fst + R_k) t2);
                   first by apply job_interference_le_service.
                 unfold service_during; rewrite leqn0; apply/eqP.
+                try ( by apply cumulative_service_after_job_rt_zero with (job_cost0 := job_cost) (R := R_k)
+                   (job_arrival0 := job_arrival); try (by done); apply leqnn ) ||
                 by apply cumulative_service_after_job_rt_zero with (job_cost := job_cost) (R := R_k)
                    (job_arrival := job_arrival); try (by done); apply leqnn.
               }
@@ -513,6 +521,8 @@ Module InterferenceBoundEDF.
                       by apply job_interference_le_service.
                     }
                     unfold service_during.
+                    try ( rewrite -> cumulative_service_after_job_rt_zero with
+                      (job_arrival0 := job_arrival) (job_cost0 := job_cost) (R := R_k); try (by done) ) ||
                     rewrite -> cumulative_service_after_job_rt_zero with
                       (job_arrival := job_arrival) (job_cost := job_cost) (R := R_k); try (by done). 
                     rewrite addn0; apply extend_sum; first by apply leqnn.
@@ -530,6 +540,8 @@ Module InterferenceBoundEDF.
                   by apply job_interference_le_service.
                 }
                 unfold service_during.
+                try ( rewrite -> cumulative_service_after_job_rt_zero with
+                  (job_arrival0 := job_arrival) (job_cost0 := job_cost) (R:=R_k); try (by done) ) ||
                 rewrite -> cumulative_service_after_job_rt_zero with
                   (job_arrival := job_arrival) (job_cost := job_cost) (R:=R_k); try (by done).
                 rewrite addn0.
@@ -587,6 +599,8 @@ Module InterferenceBoundEDF.
               apply/eqP; rewrite -[_ _ _ _ == 0]negbK; apply/negP; red; intro BUG.
               have FST := interference_bound_edf_j_fst_is_job_of_tsk_k.
               destruct FST as [FSTarr [_ [LEdl _]]].  
+              try ( apply interference_under_edf_implies_shorter_deadlines with
+                     (arr_seq0 := arr_seq) (job_deadline0 := job_deadline) in BUG; try (by done) ) ||
               apply interference_under_edf_implies_shorter_deadlines with
                      (arr_seq := arr_seq) (job_deadline := job_deadline) in BUG; try (by done).
               rewrite interference_bound_edf_j_fst_deadline
@@ -631,6 +645,8 @@ Module InterferenceBoundEDF.
               rewrite big_const_nat iter_addn mul1n addn0 leq_subLR.
               unfold D_i, D_k, t1, a_fst; rewrite -interference_bound_edf_j_fst_deadline
                                                   -interference_bound_edf_j_i_deadline.
+              try ( by apply interference_under_edf_implies_shorter_deadlines with
+                (arr_seq0 := arr_seq) (job_deadline0 := job_deadline) in LEdl ) ||
               by apply interference_under_edf_implies_shorter_deadlines with
                 (arr_seq := arr_seq) (job_deadline := job_deadline) in LEdl.
             Qed.
@@ -734,6 +750,7 @@ Module InterferenceBoundEDF.
               apply leq_trans with (n := service_during sched j_lst t1 t2);
                 first by apply job_interference_le_service.
               rewrite leqn0; apply/eqP; unfold service_during.
+              try ( by apply cumulative_service_before_job_arrival_zero with (job_arrival0 := job_arrival) ) ||
               by apply cumulative_service_before_job_arrival_zero with (job_arrival := job_arrival).
             Qed.
 
@@ -758,6 +775,7 @@ Module InterferenceBoundEDF.
                                                                           sched j_snd t1 t2);
                   first by apply job_interference_le_service.
                 rewrite leqn0; apply/eqP.
+                try ( by apply cumulative_service_before_job_arrival_zero with (job_arrival0 := job_arrival) ) ||
                 by apply cumulative_service_before_job_arrival_zero with (job_arrival := job_arrival).
               }
               apply leq_trans with (n := a_fst + p_k).
@@ -854,6 +872,8 @@ Module InterferenceBoundEDF.
             }
             have LST := interference_bound_edf_j_lst_is_job_of_tsk_k.
             destruct LST as [LSTarr [_ [ LEdl _]]].  
+            try ( apply interference_under_edf_implies_shorter_deadlines with
+                  (arr_seq0 := arr_seq) (job_deadline0 := job_deadline) in LEdl; try (by done) ) ||
             apply interference_under_edf_implies_shorter_deadlines with
                   (arr_seq := arr_seq) (job_deadline := job_deadline) in LEdl; try (by done).
             unfold D_i, D_k in DIST; rewrite interference_bound_edf_j_lst_deadline
@@ -939,6 +959,8 @@ Module InterferenceBoundEDF.
               destruct LST as [LSTarr [_ [ LSTserv _]]].
               unfold D_i, D_k, a_lst, t1; rewrite -interference_bound_edf_j_lst_deadline
                                                   -interference_bound_edf_j_i_deadline.
+              try ( by apply interference_under_edf_implies_shorter_deadlines with
+                            (arr_seq0 := arr_seq) (job_deadline0 := job_deadline) in LSTserv ) ||
               by apply interference_under_edf_implies_shorter_deadlines with
                             (arr_seq := arr_seq) (job_deadline := job_deadline) in LSTserv.
             Qed.
@@ -984,8 +1006,10 @@ Module InterferenceBoundEDF.
                 apply leq_trans with (n := service_during sched j_fst (a_fst + R_k) t2);
                   first by apply job_interference_le_service.
                 rewrite leqn0; apply/eqP.
+                (try ( apply cumulative_service_after_job_rt_zero with (job_cost0 := job_cost) (R := R_k)
+                  (job_arrival0 := job_arrival) ) ||
                 apply cumulative_service_after_job_rt_zero with (job_cost := job_cost) (R := R_k)
-                  (job_arrival := job_arrival); [ by done | | by apply leqnn].
+                  (job_arrival := job_arrival)); [ by done | | by apply leqnn].
                 by apply interference_bound_edf_j_fst_completed_on_time.
               }
             Qed.
@@ -1061,6 +1085,8 @@ Module InterferenceBoundEDF.
               destruct LST as [LSTarr [_ [ LSTserv _]]].
               unfold D_i, D_k, a_lst, t1; rewrite -interference_bound_edf_j_lst_deadline
                                                   -interference_bound_edf_j_i_deadline.
+              try ( by apply interference_under_edf_implies_shorter_deadlines
+                with (arr_seq0 := arr_seq) (job_deadline0 := job_deadline) in LSTserv ) ||
               by apply interference_under_edf_implies_shorter_deadlines
                 with (arr_seq := arr_seq) (job_deadline := job_deadline) in LSTserv.
             Qed.

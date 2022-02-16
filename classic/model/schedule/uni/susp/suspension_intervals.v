@@ -445,6 +445,7 @@ Module SuspensionIntervals.
                   apply contraT; rewrite -leqNgt; intro LE.
                   apply suspended_implies_not_completed in SUSPi.
                   exfalso; move: SUSPi => /negP COMPi; apply COMPi.
+                  try ( apply completion_monotonic with (t0 := t); try (by done) ) ||
                   apply completion_monotonic with (t := t); try (by done).
                   by apply/eqP.
                 }
@@ -502,6 +503,7 @@ Module SuspensionIntervals.
           {
             apply contraT; rewrite negbK; intro COMP.
             suff COMP': completed_by job_cost sched j t.+1 by rewrite COMP' in NOTCOMP'.
+            try ( by apply completion_monotonic with (t0 := t) ) ||
             by apply completion_monotonic with (t := t).
           }
           apply/andP; split; last by apply: (leq_ltn_trans _ LT).

@@ -225,6 +225,9 @@ Module ResponseTimeAnalysisFP.
           }
           apply leq_trans with (n := workload job_task sched tsk_other t1 (t1 + R));
             first by apply task_interference_le_workload.
+          try ( apply workload_bounded_by_W with (task_deadline0 := task_deadline)
+              (job_arrival0 := job_arrival) (arr_seq0 := arr_seq)
+              (job_jitter0 := job_jitter) (job_cost0 := job_cost) (job_deadline0 := job_deadline) ) ||
           apply workload_bounded_by_W with (task_deadline := task_deadline)
               (job_arrival := job_arrival) (arr_seq := arr_seq)
               (job_jitter := job_jitter) (job_cost := job_cost) (job_deadline := job_deadline);
@@ -310,6 +313,8 @@ Module ResponseTimeAnalysisFP.
           have SCHED': scheduled sched j_other t by apply/existsP; exists cpu.
           clear SCHED; rename SCHED' into SCHED.
           move: (SCHED) => PENDING.
+          try ( apply scheduled_implies_pending with (job_arrival0 := job_arrival)
+                (job_cost0 := job_cost) (job_jitter0 := job_jitter) in PENDING; try (by done) ) ||
           apply scheduled_implies_pending with (job_arrival := job_arrival)
                 (job_cost := job_cost) (job_jitter := job_jitter) in PENDING; try (by done).
           destruct (ltnP (job_arrival j_other) (job_arrival j)) as [BEFOREother | BEFOREj].
@@ -317,6 +322,7 @@ Module ResponseTimeAnalysisFP.
             move: (BEFOREother) => LT; rewrite -(ltn_add2r R) in LT.
             specialize (PREV j_other ARRother SAMEtsk BEFOREother).
             move: PENDING => /andP [_ /negP NOTCOMP]; apply NOTCOMP.
+            try ( apply completion_monotonic with (t0 := job_arrival j_other + task_jitter tsk + R) ) ||
             apply completion_monotonic with (t := job_arrival j_other + task_jitter tsk + R);
               try by done.
             apply leq_trans with (n := job_arrival j);
@@ -380,10 +386,14 @@ Module ResponseTimeAnalysisFP.
                  valid_sporadic_job_with_jitter in *.
           move => t /andP [LEt LTt] BACK.
 
+          ( try ( apply platform_fp_cpus_busy_with_interfering_tasks with (task_cost0 := task_cost)
+          (task_period0 := task_period) (task_deadline0 := task_deadline) (job_task0 := job_task)
+          (ts0 := ts) (tsk0 := tsk) (higher_eq_priority0 := higher_eq_priority) (arr_seq0 := arr_seq)
+            in BACK ) ||
           apply platform_fp_cpus_busy_with_interfering_tasks with (task_cost := task_cost)
           (task_period := task_period) (task_deadline := task_deadline) (job_task := job_task)
           (ts := ts) (tsk := tsk) (higher_eq_priority := higher_eq_priority) (arr_seq := arr_seq)
-            in BACK; try (by done); first by apply PARAMS; rewrite -JOBtsk FROMTS.
+            in BACK); try (by done); first by apply PARAMS; rewrite -JOBtsk FROMTS.
           {
             apply leq_trans with (n := job_arrival j + job_jitter j + R); first by done.
             rewrite -addnA leq_add2l.
@@ -395,13 +405,15 @@ Module ResponseTimeAnalysisFP.
             intros j_other tsk_other ARRother JOBother INTERF.
             feed (HAS tsk_other); first by rewrite -JOBother FROMTS.
             move: (HAS INTERF) => [R' IN].
+            try ( apply completion_monotonic with (t0 := job_arrival j_other + task_jitter tsk_other + R') ) ||
             apply completion_monotonic with (t := job_arrival j_other + task_jitter tsk_other + R');
               try (by done); last by rewrite -addnA; apply PREV.
             rewrite -addnA leq_add2l; apply leq_trans with (n := task_deadline tsk_other);
               [by apply NOMISS | by apply RESTR; rewrite -JOBother; apply FROMTS].
           }
           {
-            ins; apply completion_monotonic with (t := job_arrival j0 + task_jitter tsk + R);
+            ins; ( try ( apply completion_monotonic with (t0 := job_arrival j0 + task_jitter tsk + R) ) ||
+            apply completion_monotonic with (t := job_arrival j0 + task_jitter tsk + R));
               try (by done); last by apply PREVtsk.
             rewrite -addnA leq_add2l.
             by apply leq_trans with (n := task_deadline tsk); [by done | by apply RESTR].
@@ -542,9 +554,12 @@ Module ResponseTimeAnalysisFP.
               {
                 move: SAMEtsk => /eqP SAMEtsk.
                 move: (PENDING1) => SAMEjob. 
+                ( try ( apply platform_fp_no_multiple_jobs_of_tsk with (task_cost0 := task_cost)
+                  (task_period0 := task_period) (task_deadline0 := task_deadline) (arr_seq0 := arr_seq)
+                  (job_task0 := job_task) (tsk0 := tsk) (j0 := j) in SAMEjob) ||
                 apply platform_fp_no_multiple_jobs_of_tsk with (task_cost := task_cost)
                   (task_period := task_period) (task_deadline := task_deadline) (arr_seq := arr_seq)
-                  (job_task := job_task) (tsk := tsk) (j := j) in SAMEjob; try (by done);
+                  (job_task := job_task) (tsk := tsk) (j := j) in SAMEjob); try (by done);
                   [ | by apply PARAMS | |]; last 2 first.
                 {
                   apply (leq_trans LTt); rewrite -addnA leq_add2l.
@@ -554,7 +569,8 @@ Module ResponseTimeAnalysisFP.
                 }
                 {
                   intros j0 ARR0 JOB0 LT0.
-                  apply completion_monotonic with (t := job_arrival j0 + task_jitter tsk + R);
+                  ( try ( apply completion_monotonic with (t0 := job_arrival j0 + task_jitter tsk + R) ) ||
+                  apply completion_monotonic with (t := job_arrival j0 + task_jitter tsk + R));
                     try (by done); last by apply BEFOREok.
                   rewrite -addnA leq_add2l.
                   by apply leq_trans with (n := task_deadline tsk); last by apply CONSTR.
@@ -569,17 +585,23 @@ Module ResponseTimeAnalysisFP.
                   rewrite -JOBtsk; apply FP with (t := t); try (by done).
                   by apply/existsP; exists cpu; apply/eqP.
                 }
+                ( try ( apply platform_fp_no_multiple_jobs_of_interfering_tasks with
+                 (task_period0 := task_period) (tsk0 := tsk) (job_arrival0 := job_arrival)
+                 (higher_eq_priority0 := higher_eq_priority) (job_jitter0 := job_jitter)
+                 (arr_seq0 := arr_seq)
+                 (job_cost0 := job_cost) (job_task0 := job_task) (sched0 := sched) (t0 := t) ) ||
                 apply platform_fp_no_multiple_jobs_of_interfering_tasks with
                  (task_period := task_period) (tsk := tsk) (job_arrival := job_arrival)
                  (higher_eq_priority := higher_eq_priority) (job_jitter := job_jitter)
                  (arr_seq := arr_seq)
-                 (job_cost := job_cost) (job_task := job_task) (sched := sched) (t := t);
+                 (job_cost := job_cost) (job_task := job_task) (sched := sched) (t := t));
                   rewrite ?JOBtsk ?SAMEtsk //.
                 {
                   intros j0 tsk0 ARR0 JOB0 INTERF0.
                   feed (HASHP tsk0); first by rewrite -JOB0 FROMTS.
                   move: (HASHP INTERF0) => [R0 IN0].
-                  apply completion_monotonic with (t := job_arrival j0 + task_jitter tsk0 + R0);
+                  ( try ( apply completion_monotonic with (t0 := job_arrival j0 + task_jitter tsk0 + R0) ) ||
+                  apply completion_monotonic with (t := job_arrival j0 + task_jitter tsk0 + R0));
                     try (by done).
                   {
                     rewrite -addnA leq_add2l.

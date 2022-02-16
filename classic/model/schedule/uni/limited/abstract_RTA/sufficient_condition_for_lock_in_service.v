@@ -211,6 +211,7 @@ Module AbstractRTALockInService.
           rewrite subnKC //.
           apply/negP; intros COMPL.
           move: CONTR => /negP Temp; apply: Temp.
+          try ( apply completion_monotonic with (t0 := t'); try done ) ||
           apply completion_monotonic with (t := t'); try done.
         }
         have SERV: job_last + 1 <= \sum_(t <= t' < t + (job_last + 1)) service_at sched j t'.
@@ -239,4 +240,3 @@ Module AbstractRTALockInService.
   End LockInService.
 
 End AbstractRTALockInService.
-

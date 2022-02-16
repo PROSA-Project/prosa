@@ -494,7 +494,8 @@ Module ReductionToBasicSchedule.
                   first apply cumulative_service_le_job_cost,
                   sched_new_completed_jobs_dont_execute.
               }
-              rewrite leq_add //; first by apply completion_monotonic with (t := t).
+              rewrite leq_add //; first by ( try ( apply completion_monotonic with (t0 := t) ) ||
+              apply completion_monotonic with (t := t)).
               apply completion_monotonic with (t' := t.+1) in COMP; try done.
               rewrite /job_cumulative_suspension.
                 by rewrite -> cumulative_suspension_eq_total_suspension with
@@ -593,8 +594,10 @@ Module ReductionToBasicSchedule.
                 Proof.
                   rename H_j_not_scheduled_in_susp into NOTSCHEDs, H_j_scheduled_in_new into SCHEDn.
                   move: H_j_hp_is_scheduled (H_j_hp_is_scheduled) => SCHEDhp PENDhp.
+                  ( try ( apply scheduled_implies_pending with (job_arrival0 := job_arrival)
+                                   (job_cost := original_job_cost) in PENDhp) ||
                   apply scheduled_implies_pending with (job_arrival := job_arrival)
-                                   (job_cost := original_job_cost) in PENDhp; try (by done).
+                                   (job_cost := original_job_cost) in PENDhp); try (by done).
                   move: PENDhp => /andP [ARRhp _].
                   apply contraT; intro NOTCOMPhp.
                   have PENDhp: pending job_arrival inflated_job_cost sched_new j_hp t

@@ -112,7 +112,8 @@ Module ConstrainedDeadlines.
           exploit (PREV j1 (job_task j1) ARR1);
             [by done | by apply leq_trans with (n := job_arrival j2) | intros COMP1].
           apply NOTCOMP1.
-          apply completion_monotonic with (t := job_arrival j1 + task_period (job_task j1));
+          ( try ( apply completion_monotonic with (t0 := job_arrival j1 + task_period (job_task j1)) ) ||
+          apply completion_monotonic with (t := job_arrival j1 + task_period (job_task j1)));
             try (by done).
           by apply leq_trans with (n := job_arrival j2). 
         }
@@ -122,7 +123,8 @@ Module ConstrainedDeadlines.
           exploit (PREV j2 (job_task j2) ARR2);
             [by done | by apply leq_trans with (n := job_arrival j1) | intros COMP2].
           apply NOTCOMP2.
-          apply completion_monotonic with (t := job_arrival j2 + task_period (job_task j2));
+          ( try ( apply completion_monotonic with (t0 := job_arrival j2 + task_period (job_task j2)) ) ||
+          apply completion_monotonic with (t := job_arrival j2 + task_period (job_task j2)));
             try (by done).
           by apply leq_trans with (n := job_arrival j1).
         }
@@ -292,7 +294,8 @@ Module ConstrainedDeadlines.
           specialize (SPO j1 j2 DIFF ARR1 ARR2 SAMEtsk BEFORE1).
           exploit (PREV j1 (job_task j1) ARR1); [by done | by apply INTERF | intros COMP1].
           apply NOTCOMP1.
-          apply completion_monotonic with (t := job_arrival j1 + task_period (job_task j1));
+          ( try ( apply completion_monotonic with (t0 := job_arrival j1 + task_period (job_task j1)) ) ||
+          apply completion_monotonic with (t := job_arrival j1 + task_period (job_task j1)));
             try (by done).
           by apply leq_trans with (n := job_arrival j2). 
         }
@@ -302,7 +305,8 @@ Module ConstrainedDeadlines.
           exploit (PREV j2 (job_task j2) ARR2);
             [by done | by rewrite -SAMEtsk | intro COMP2 ].
           apply NOTCOMP2.
-          apply completion_monotonic with (t := job_arrival j2 + task_period (job_task j2));
+          ( try ( apply completion_monotonic with (t0 := job_arrival j2 + task_period (job_task j2)) ) ||
+          apply completion_monotonic with (t := job_arrival j2 + task_period (job_task j2)));
             try (by done).
           by apply leq_trans with (n := job_arrival j1).
         }
@@ -330,7 +334,8 @@ Module ConstrainedDeadlines.
         {
           exploit (SPO j' j DIFF ARR' H_j_arrives); [by rewrite JOBtsk | by done | intro SPO'].
           apply NOTCOMP'.
-          apply completion_monotonic with (t := job_arrival j' + task_period tsk); try (by done);
+          ( try ( apply completion_monotonic with (t0 := job_arrival j' + task_period tsk) ) ||
+          apply completion_monotonic with (t := job_arrival j' + task_period tsk)); try (by done);
             first by apply leq_trans with (n := job_arrival j); [by rewrite -SAMEtsk | by done].
           {
             apply PREVtsk; try (by done).
@@ -427,8 +432,10 @@ Module ConstrainedDeadlines.
               apply/eqP; red; intro SAMEtsk.
               generalize SCHED'; intro PENDING'.
               have ARRin': arrives_in arr_seq j' by apply (FROMarr j' t).
+              ( try ( apply scheduled_implies_pending with (job_arrival0 := job_arrival)
+                (job_cost0 := job_cost) in PENDING' ) ||
               apply scheduled_implies_pending with (job_arrival := job_arrival)
-                (job_cost := job_cost) in PENDING'; try (by done).
+                (job_cost := job_cost) in PENDING'); try (by done).
               specialize (UNIQ' j' ARRin' PENDING' SAMEtsk); subst j'.
               by move: BACK => /andP [_ NOTSCHED]; rewrite SCHED' in NOTSCHED.
             }

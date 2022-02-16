@@ -636,6 +636,9 @@ Module AbstractRTAforEDFwithArrivalCurves.
       intros js ARRs TSKs.
       move: (posnP (job_cost js)) => [ZERO|POS].
       { by rewrite /is_response_time_bound_of_job /completed_by ZERO. }    
+      try ( eapply AbstractSeqRTA.uniprocessor_response_time_bound_seq with
+          (interference0 := interference) (interfering_workload0 := interfering_workload)
+          (task_interference_bound_function := fun tsk A R => IBF A R) (L0 := L); eauto 3 ) ||
       eapply AbstractSeqRTA.uniprocessor_response_time_bound_seq with
           (interference := interference) (interfering_workload := interfering_workload)
           (task_interference_bound_function := fun tsk A R => IBF A R) (L := L); eauto 3.
@@ -648,4 +651,4 @@ Module AbstractRTAforEDFwithArrivalCurves.
      
   End AbstractResponseTimeAnalysisForEDF. 
    
-End AbstractRTAforEDFwithArrivalCurves. 
+End AbstractRTAforEDFwithArrivalCurves.

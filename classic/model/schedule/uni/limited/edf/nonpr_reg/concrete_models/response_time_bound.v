@@ -236,6 +236,12 @@ Module RTAforConcreteModels.
           }
             by rewrite /is_response_time_bound_of_job /completed_by ZEROj.
         }
+        try ( eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with
+            (job_max_nps := fun j => job_cost j)
+            (task_max_nps := fun tsk => task_cost tsk)
+            (job_lock_in_service := fun j => ε)
+            (task_lock_in_service := fun tsk => ε)
+            (L0 := L); eauto 2 ) ||
         eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with
             (job_max_nps := fun j => job_cost j)
             (task_max_nps := fun tsk => task_cost tsk)
@@ -358,6 +364,11 @@ Module RTAforConcreteModels.
               by rewrite -(leq_add2r 1) !addn1 prednK //.
           }
         }
+        try ( eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments
+          with (task_lock_in_service := fun tsk => (task_cost tsk - (task_last_nps tsk - ε))) 
+               (job_lock_in_service := fun job => (job_cost job - (job_last_nps job - ε)))
+               (L0 := L)(job_cost0 := job_cost) (task_max_nps0 := task_max_nps)
+        ; eauto 2 ) ||
         eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments
           with (task_lock_in_service := fun tsk => (task_cost tsk - (task_last_nps tsk - ε))) 
                (job_lock_in_service := fun job => (job_cost job - (job_last_nps job - ε)))
@@ -417,7 +428,9 @@ Module RTAforConcreteModels.
               apply/andP; split; first by done.
               rewrite prednK; first by done.
               rewrite -(leq_add2r 1) !addn1 prednK.
+              try ( eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2 ) ||
               eapply number_of_preemption_points_at_least_two with (job_cost := job_cost); eauto 2.
+              try ( eapply list_of_preemption_point_is_not_empty with (job_cost0 := job_cost); eauto 2 ) ||
               eapply list_of_preemption_point_is_not_empty with (job_cost := job_cost); eauto 2. 
             }
               by done.            
@@ -462,6 +475,7 @@ Module RTAforConcreteModels.
               rewrite leq_add2r.
               apply domination_of_distances_implies_domination_of_seq; try done; eauto 2. 
               rewrite BEG // BEGj //.
+              try ( eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2 ) ||
               eapply number_of_preemption_points_at_least_two with (job_cost := job_cost); eauto 2.
               rewrite -TSK; apply HYP1; try done.
               intros.              rewrite -TSK; eauto 2.
@@ -545,11 +559,16 @@ Module RTAforConcreteModels.
       Proof.
         move: (H_task_model_with_floating_nonpreemptive_regions) => [LIMJ JMLETM].
         move: (LIMJ) => [ZERO [LSMj [BEG [END HH]]]].
+        ( try ( eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments
+          with (task_lock_in_service := fun tsk => task_cost tsk) 
+               (job_lock_in_service := fun job => (job_cost job - (job_last_nps job - ε)))
+               (L0 := L) (job_max_nps0 := job_max_nps)
+               (job_cost0 := job_cost ) ) ||
         eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments
           with (task_lock_in_service := fun tsk => task_cost tsk) 
                (job_lock_in_service := fun job => (job_cost job - (job_last_nps job - ε)))
                (L := L) (job_max_nps := job_max_nps)
-               (job_cost := job_cost )
+               (job_cost := job_cost ) )
         ; eauto 2.
         { by apply model_with_fixed_preemption_points_is_correct. }
         { by eapply model_with_fixed_preemption_points_is_model_with_bounded_nonpreemptive_regions; eauto 2. }
@@ -598,7 +617,9 @@ Module RTAforConcreteModels.
               apply/andP; split; first by done.
               rewrite prednK; first by done.
               rewrite -(leq_add2r 1) !addn1 prednK.
+              try ( eapply number_of_preemption_points_at_least_two with (job_cost0 := job_cost); eauto 2 ) ||
               eapply number_of_preemption_points_at_least_two with (job_cost := job_cost); eauto 2. 
+              try ( eapply list_of_preemption_point_is_not_empty with (job_cost0 := job_cost); eauto 2 ) ||
               eapply list_of_preemption_point_is_not_empty with (job_cost := job_cost); eauto 2. 
             }
               by done.

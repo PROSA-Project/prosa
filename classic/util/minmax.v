@@ -321,6 +321,7 @@ Section MinMaxSeq.
             F x <= F y.
         Proof.
           intros l x y SOME IN.
+          try ( apply seq_argmin_computes_min with (l0 := l); try (by done) ) ||
           apply seq_argmin_computes_min with (l := l); try (by done).
           - by intros x1 x2 x3; apply leq_trans.
           - by intros x1 x2 IN1 IN2; apply leq_total.
@@ -333,6 +334,7 @@ Section MinMaxSeq.
             F x >= F y.
         Proof.
           intros l x y SOME IN.
+          try ( apply seq_argmax_computes_max with (l0 := l); try (by done) ) ||
           apply seq_argmax_computes_max with (l := l); try (by done).
           - by intros x1 x2 x3; apply leq_trans.
           - by intros x1 x2 IN1 IN2; apply leq_total.
@@ -392,6 +394,7 @@ Section MinMaxSeq.
             x <= y.
         Proof.
           intros l x y SOME IN.
+          try ( apply seq_min_computes_min with (l0 := l); try (by done) ) ||
           apply seq_min_computes_min with (l := l); try (by done).
           - by intros x1 x2 x3; apply leq_trans.
           - by intros x1 x2 IN1 IN2; apply leq_total.
@@ -404,6 +407,7 @@ Section MinMaxSeq.
             x >= y.
         Proof.
           intros l x y SOME IN.
+          try ( apply seq_max_computes_max with (l0 := l); try (by done) ) ||
           apply seq_max_computes_max with (l := l); try (by done).
           - by intros x1 x2 x3; apply leq_trans.
           - by intros x1 x2 IN1 IN2; apply leq_total.
@@ -452,6 +456,7 @@ Section MinMaxSeq.
         min_nat_cond P a b != None.
     Proof.
       intros P a b x LE HOLDS.
+      try ( apply seq_argmin_exists with (x0 := x) ) ||
       apply seq_argmin_exists with (x := x).
       by rewrite mem_filter mem_values_between HOLDS LE.
     Qed.
@@ -484,6 +489,7 @@ Section MinMaxSeq.
         max_nat_cond P a b != None.
     Proof.
       intros P a b x LE HOLDS.
+      try ( apply seq_argmax_exists with (x0 := x) ) ||
       apply seq_argmax_exists with (x := x).
       by rewrite mem_filter mem_values_between HOLDS LE.
     Qed.
@@ -538,6 +544,7 @@ Section Kmin.
         move => l x _ IN /=.
         destruct (seq_argmin rel F l) as [|] eqn:MIN; first by done.
         suff NOTNONE: seq_argmin rel F l != None by rewrite MIN in NOTNONE.
+        try ( by apply seq_argmin_exists with (x0 := x) ) ||
         by apply seq_argmin_exists with (x := x).
       Qed.
     

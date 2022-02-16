@@ -399,8 +399,10 @@ Module WorkloadBoundJitter.
           }
           instantiate (1 := elem); move => [FSTARR [FSTtsk [/eqP FSTserv FSTin]]].
           apply FSTserv.
+          ( try ( apply cumulative_service_after_job_rt_zero with (job_arrival0 := job_arrival)
+                  (job_cost0 := job_cost) (R := task_jitter tsk + R_tsk) ) ||
           apply cumulative_service_after_job_rt_zero with (job_arrival := job_arrival)
-                  (job_cost := job_cost) (R := task_jitter tsk + R_tsk);
+                  (job_cost := job_cost) (R := task_jitter tsk + R_tsk));
             [by done | | by rewrite addnA ltnW].
           rewrite addnA; apply H_response_time_bound; try (by done).
           by apply leq_trans with (n := t1); last by apply leq_addr.
@@ -419,6 +421,7 @@ Module WorkloadBoundJitter.
           instantiate (1 := elem); move => [LSTarr [LSTtsk [/eqP LSTserv LSTin]]].
           apply LSTserv.
           apply (cumulative_service_before_job_arrival_zero job_arrival); last by done.
+          try ( by apply arrival_before_jitter with (job_jitter0 := job_jitter) ) ||
           by apply arrival_before_jitter with (job_jitter := job_jitter).
         Qed.
 
@@ -475,6 +478,7 @@ Module WorkloadBoundJitter.
                 last by apply leq_sum; ins; apply service_at_most_one.
               rewrite (cumulative_service_before_job_arrival_zero job_arrival);
                 [by apply leqnn | | by apply leqnn].
+              try ( by apply arrival_before_jitter with (job_jitter0 := job_jitter) ) ||
               by apply arrival_before_jitter with (job_jitter := job_jitter).
             }
           }
@@ -684,6 +688,9 @@ Module WorkloadBoundJitter.
             have INlst := workload_bound_j_lst_is_job_of_tsk; des.
             have PARAMSfst := JOBPARAMS j_fst INfst; des.
             have PARAMSlst := JOBPARAMS j_lst INlst; des.
+            try ( by apply leq_add; apply cumulative_service_le_task_cost with
+                      (task_deadline0 := task_deadline) (job_cost0 := job_cost)
+                      (job_deadline0 := job_deadline) (job_task0 := job_task) ) ||
             by apply leq_add; apply cumulative_service_le_task_cost with
                       (task_deadline := task_deadline) (job_cost := job_cost)
                       (job_deadline := job_deadline) (job_task := job_task).  

@@ -444,6 +444,7 @@ Module ConcreteScheduler.
         {
           rewrite mem_sort mem_filter PENDING andTb.
           move: PENDING => /andP [ARR IN]; rewrite /has_arrived in ARR.
+          try ( by apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival) ) ||
           by apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival).
         }
         have INhp: j_hp \in l by apply scheduler_job_in_mapping in SCHED.
@@ -628,6 +629,7 @@ Module ConcreteScheduler.
       {
         rewrite mem_sort mem_filter PENDING andTb.
         move: PENDING => /andP [ARR _].
+        try ( by apply arrived_between_implies_in_arrivals with (job_arrival0 := job_arrival) ) ||
         by apply arrived_between_implies_in_arrivals with (job_arrival := job_arrival).
       }
       have WORK := scheduler_mapping_is_work_conserving j cpu t l IN SORT UNIQ.

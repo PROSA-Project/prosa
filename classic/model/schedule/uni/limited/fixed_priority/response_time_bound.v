@@ -421,6 +421,9 @@ Module AbstractRTAforFPwithArrivalCurves.
       { by rewrite /is_response_time_bound_of_job /completed_by ZERO. }
       move: H_proper_job_lock_in_service => [T1 [T2 T3]].
       move: H_proper_task_lock_in_service => [T4 T5]. 
+      try ( eapply AbstractSeqRTA.uniprocessor_response_time_bound_seq with
+          (interference0 := interference) (interfering_workload0 := interfering_workload)
+          (task_interference_bound_function := fun _ A R => IBF R) (L0 := L) (ts0 := ts); eauto 3 ) ||
       eapply AbstractSeqRTA.uniprocessor_response_time_bound_seq with
           (interference := interference) (interfering_workload := interfering_workload)
           (task_interference_bound_function := fun _ A R => IBF R) (L := L) (ts := ts); eauto 3.

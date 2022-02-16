@@ -132,16 +132,25 @@ Module ResponseTimeAnalysisTDMA.
       induction t as [ t IHt ] using (well_founded_induction lt_wf).
       case t eqn:GT;intros. 
       - have INJ: arrives_in arr_seq j by exists 0.
-        (apply completion_monotonic with (t:=job_arrival j + WCRT task_cost task_time_slot ts tsk )
-        ;trivial;try by rewrite leq_add2l H); apply job_completed_by_WCRT
+        (( try ( apply completion_monotonic with (t0:=job_arrival j + WCRT task_cost task_time_slot ts tsk ) ) ||  apply completion_monotonic with (t:=job_arrival j + WCRT task_cost task_time_slot ts tsk ) )
+        ;trivial;try by rewrite leq_add2l H); ( try ( apply job_completed_by_WCRT
+        with (task_deadline0:=task_deadline)
+                 (arr_seq0:=arr_seq)(job_deadline0:=job_deadline)
+                 (job_task0:=job_task)(slot_order0:=slot_order) ) || apply job_completed_by_WCRT
         with (task_deadline:=task_deadline)
                  (arr_seq:=arr_seq)(job_deadline:=job_deadline)
-                 (job_task:=job_task)(slot_order:=slot_order);eauto 2.
+                 (job_task:=job_task)(slot_order:=slot_order) );eauto 2.
         intros. apply H_arrival_times_are_consistent in ARR. ssrlia.
       - have INJ: arrives_in arr_seq j by exists n.+1.
+        try ( apply completion_monotonic 
+          with (t0:=job_arrival j + WCRT task_cost task_time_slot ts tsk);auto ) ||
         apply completion_monotonic 
           with (t:=job_arrival j + WCRT task_cost task_time_slot ts tsk);auto.
-        by rewrite leq_add2l H. apply job_completed_by_WCRT
+        by rewrite leq_add2l H. try ( apply job_completed_by_WCRT
+        with (task_deadline0:=task_deadline)
+                 (arr_seq0:=arr_seq)(job_deadline0:=job_deadline)
+                 (job_task0:=job_task)(slot_order0:=slot_order);auto ) ||
+                                    apply job_completed_by_WCRT
         with (task_deadline:=task_deadline)
                  (arr_seq:=arr_seq)(job_deadline:=job_deadline)
                  (job_task:=job_task)(slot_order:=slot_order);auto. 
@@ -149,6 +158,8 @@ Module ResponseTimeAnalysisTDMA.
         have PERIOD: job_arrival j_other + task_period (job_task j_other)<= job_arrival j.
         apply H_sporadic_tasks;auto. case (j==j_other)eqn: JJ;move/eqP in JJ;last auto.
         have JO:job_arrival j_other = job_arrival j by f_equal. ssrlia.
+        try ( apply completion_monotonic with (t0:= job_arrival j_other +
+           task_period (job_task j_other)); auto ) ||
         apply completion_monotonic with (t:= job_arrival j_other +
            task_period (job_task j_other)); auto.
         have ARRJ: job_arrival j = n.+1 by auto.
@@ -189,21 +200,35 @@ Module ResponseTimeAnalysisTDMA.
       intros j arr_seq_j JobTsk.
       apply completion_monotonic with (t:=job_arrival j + RT j); try done. 
       - rewrite leq_add2l /BOUND. 
+        (try ( apply (response_time_le_WCRT) 
+        with (task_cost0:=task_cost) (task_deadline0:=task_deadline)(sched0:=sched)
+             (job_arrival0:=job_arrival)(job_cost0:=job_cost)(job_deadline0:=job_deadline)
+             (job_task0:=job_task)(ts0:=ts)(arr_seq0:=arr_seq)
+             (slot_order0:=slot_order)(Job0:=Job)(tsk0:=tsk) ) ||
         apply (response_time_le_WCRT) 
         with (task_cost:=task_cost) (task_deadline:=task_deadline)(sched:=sched)
              (job_arrival:=job_arrival)(job_cost:=job_cost)(job_deadline:=job_deadline)
              (job_task:=job_task)(ts:=ts)(arr_seq:=arr_seq)
-             (slot_order:=slot_order)(Job:=Job)(tsk:=tsk); try done;auto;try (intros; 
+             (slot_order:=slot_order)(Job:=Job)(tsk:=tsk)); try done;auto;try (intros; 
         by apply all_previous_jobs_of_same_task_completed).
-      - apply completed_by_end_time 
+      - ( try ( apply completed_by_end_time 
+        with (sched0:=sched)(job_arrival0:=job_arrival)
+             (job_cost0:=job_cost) ) ||
+        apply completed_by_end_time 
         with (sched:=sched)(job_arrival:=job_arrival)
-             (job_cost:=job_cost); first exact.
+             (job_cost:=job_cost)); first exact.
+        ( try ( apply completes_at_end_time
+        with 
+             (job_arrival0:=job_arrival)(task_cost0:=task_cost)(arr_seq0:=arr_seq)
+             (job_task0:=job_task)(job_deadline0:=job_deadline)(task_deadline0:=task_deadline)
+             (sched0:=sched)(ts0:=ts)(slot_order0:=slot_order)
+             (tsk0:=tsk) (j0:=j) ) ||
         apply completes_at_end_time
         with 
              (job_arrival:=job_arrival)(task_cost:=task_cost)(arr_seq:=arr_seq)
              (job_task:=job_task)(job_deadline:=job_deadline)(task_deadline:=task_deadline)
              (sched:=sched)(ts:=ts)(slot_order:=slot_order)
-             (tsk:=tsk) (j:=j); try auto;try (intros; 
+             (tsk:=tsk) (j:=j)); try auto;try (intros; 
         by apply all_previous_jobs_of_same_task_completed).
     Qed. 
 
@@ -218,7 +243,8 @@ Module ResponseTimeAnalysisTDMA.
       (* We can prove the theorem: there is no deadline miss of task tsk *)
       Theorem taskset_schedulable_by_tdma : no_deadline_missed_by_task tsk.
       Proof.
-        apply task_completes_before_deadline with (task_deadline:=task_deadline) (R:=BOUND)
+        ( try ( apply task_completes_before_deadline with (task_deadline0:=task_deadline) (R:=BOUND) ) ||
+        apply task_completes_before_deadline with (task_deadline:=task_deadline) (R:=BOUND) )
         ;try done.
         move => j arr_seqJ.
         - by apply H_valid_job_parameters.
@@ -241,6 +267,3 @@ Module ResponseTimeAnalysisTDMA.
   End ResponseTimeBound.
 
 End ResponseTimeAnalysisTDMA.
-
-
-
