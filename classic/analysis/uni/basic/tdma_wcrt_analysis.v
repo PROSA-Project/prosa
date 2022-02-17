@@ -1,5 +1,5 @@
 Require Import Arith Nat.
-Require Import prosa.classic.util.all prosa.classic.util.ssrlia.
+Require Import prosa.classic.util.all.
 Require Import prosa.classic.model.arrival.basic.job
                prosa.classic.model.arrival.basic.task_arrival
                prosa.classic.model.schedule.uni.schedulability
@@ -224,7 +224,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         - rewrite /has_arrived; auto.
         - rewrite /completed_by /service /service_during big_nat_recr /service_at /=; 
           rewrite /is_scheduled_at in SCHED. rewrite SCHED /= -COST; apply/eqP;
-          rewrite /service /service_during /service_at;ssrlia. trivial.
+          rewrite /service /service_during /service_at; lia. trivial.
       Qed.
 
     End BasicLemmas.
@@ -256,8 +256,8 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         fold cycle_sub. repeat rewrite ltn_subRL.
         rewrite addSn addnS.
         case (modulo_cases (t + cycle_sub) tdma_cycle.-1); intros h1 h2.
-        - rewrite prednK // in h1. ssrlia. 
-        - destruct h1 as [h1 _]. rewrite prednK // in h1. ssrlia. 
+        - rewrite prednK // in h1. lia. 
+        - destruct h1 as [h1 _]. rewrite prednK // in h1. lia. 
       Qed.
 
       (* Lemma: if the duration to next start of slot is a+b at instant t
@@ -300,8 +300,8 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         rewrite /to_next_slot /from_start_of_slot -addnBA in h2.
         - fold cycle_sub in h2. rewrite ltn_subRL in h2.
           case (modulo_cases (t + cycle_sub) tdma_cycle.-1).
-          + intros h3 h4. rewrite prednK // in h3. rewrite h3. ssrlia.
-          + intros [h31 h32] h4. rewrite prednK // in h32. ssrlia. 
+          + intros h3 h4. rewrite prednK // in h3. rewrite h3. lia.
+          + intros [h31 h32] h4. rewrite prednK // in h32. lia. 
         - by apply ltnW, ltn_pmod.
       Qed.
 
@@ -319,7 +319,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         induction d as [| d' IHd'];intros t PEN.
         - by rewrite addn0.
         - rewrite addnS -addSn. intros NSCHED SD. apply IHd'. by apply pendingSt.
-          apply S_t_not_sched;auto. ssrlia. by apply lt_to_next_slot_1LR.
+          apply S_t_not_sched;auto. lia. by apply lt_to_next_slot_1LR.
       Qed.
 
       (* Lemma: if the job is pending but cannot be scheduled at instant t
@@ -335,7 +335,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         apply duration_not_sched with (d:= (to_next_slot t).-1)in PEN.
         replace (to_next_slot t) with ((to_next_slot t).-1 .+1).
         rewrite addnS. apply pendingSt. apply PEN. apply PEN.
-        ssrlia. auto. ssrlia.
+        lia. auto. lia.
       Qed.
 
       (* Lemma: It must be schedulable at next start of its time slot *)
@@ -382,20 +382,20 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
       - rewrite -addnBA // in NSLOT. rewrite -addnBA // in Hcases.
         case (modulo_cases (t + (tdma_cycle - slot_offset %% tdma_cycle)) tdma_cycle.-1); intro mod_case;
         repeat (rewrite prednK // in mod_case).
-          + rewrite addSn mod_case in Hcases. ssrlia.
+          + rewrite addSn mod_case in Hcases. lia.
           + destruct mod_case as [case1 case2].
             rewrite /to_next_slot  /from_start_of_slot. repeat (rewrite -addnBA //).
             rewrite case2 Hcases. repeat rewrite addSn case1 -subn1 subKn //.
             repeat rewrite subn0.
             case Hc_slot:(c < time_slot); rewrite /duration_to_finish_from_start_of_slot_with.
-            * by rewrite ceil_eq1 //; ssrlia.
-            * rewrite ceil_suba //; [|ssrlia].
+            * by rewrite ceil_eq1 //; lia.
+            * rewrite ceil_suba //; [|lia].
               rewrite subn1 mulnBl mul1n addnA -addSn addn1.
-               apply/eqP. rewrite eqn_add2l subnBA // addnA. repeat rewrite addnBA; [| |ssrlia].
+               apply/eqP. rewrite eqn_add2l subnBA // addnA. repeat rewrite addnBA; [| |lia].
               -- by rewrite addKn addnAC addnK.
               -- apply leq_trans with (n:=tdma_cycle - time_slot + time_slot).
-                 ++ ssrlia.
-                 ++ apply leq_add; [|ssrlia].
+                 ++ lia.
+                 ++ apply leq_add; [|lia].
                     apply leq_pmull, ceil_neq0; lia.
       - rewrite Hcases. repeat rewrite addnA. apply/eqP. repeat rewrite eqn_add2r.
         rewrite -addn1 -addnA eqn_add2l /to_next_slot /from_start_of_slot.
@@ -408,7 +408,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
           by rewrite subnDA subn1 addn1 prednK // ltn_subRL addn0 ltn_mod.
         + destruct mod_case as [case1 case2].
           rewrite addSn case1 in Hcases.
-          assert (H_slot_pos: time_slot > 0) by assumption. ssrlia.
+          assert (H_slot_pos: time_slot > 0) by assumption. lia.
       Qed.
 
       (* Lemma: if the job can be scheduled at instant t and its residue cost is not
@@ -435,23 +435,23 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
           rewrite /from_start_of_slot.
           case (c < time_slot - (t + tdma_cycle - slot_offset %% tdma_cycle) %% tdma_cycle) eqn: Hc.
             - destruct c; simpl. 
-              + ssrlia.
+              + lia.
               + case (modulo_cases (t + (tdma_cycle - slot_offset %% tdma_cycle)) tdma_cycle.-1); intro mod_case.
                 * repeat rewrite -addnBA //. rewrite prednK // in mod_case. repeat rewrite addSn mod_case.
-                  case (c < time_slot - ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1) eqn:Hc1; try ssrlia.
+                  case (c < time_slot - ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1) eqn:Hc1; try lia.
                   rewrite ltn_subRL addSn in Hc1. rewrite ltn_subRL addnS -addnBA // in Hc.
-                  ssrlia.
+                  lia.
                 * repeat rewrite -addnBA //.
-                  case (c < time_slot - ((t.+1 + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)) eqn:Hc1; [ssrlia|].
+                  case (c < time_slot - ((t.+1 + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)) eqn:Hc1; [lia|].
                   rewrite prednK // in mod_case. destruct mod_case.
                   rewrite addSn in Hc1.
-                  ssrlia.
+                  lia.
             - destruct c; repeat rewrite -addnBA // in Hc;rewrite -addnBA // in NSLOT;simpl.
-              + ssrlia.
+              + lia.
               + repeat rewrite -addnBA // addSn.
                 case (modulo_cases (t + (tdma_cycle - slot_offset %% tdma_cycle)) tdma_cycle.-1); 
                 intro mod_case; rewrite prednK // in mod_case.
-                * case (c < time_slot - ((t + (tdma_cycle - slot_offset %% tdma_cycle)).+1 %% tdma_cycle)) eqn:Hc1; try ssrlia.
+                * case (c < time_slot - ((t + (tdma_cycle - slot_offset %% tdma_cycle)).+1 %% tdma_cycle)) eqn:Hc1; try lia.
                   rewrite /to_next_slot /from_start_of_slot. repeat rewrite -addnBA //. rewrite addSn.
                   rewrite mod_case -addSn addnA addnA. 
                   replace (t.+1 +(tdma_cycle - ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1)) with
@@ -461,65 +461,64 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
                      (c.+1 - (time_slot - ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1)); trivial.
                      symmetry.
                      replace ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1 with
-                              (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)+1) by ssrlia.
-                     rewrite subnDA. repeat (rewrite subnBA;try ssrlia).  
-                     by rewrite addn1.
+                              (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)+1) by lia.
+                     rewrite subnDA. by repeat (rewrite subnBA;try lia).  
                   -- rewrite -addn1. apply/eqP. rewrite -addnA eqn_add2l. 
                      replace ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1 with
-                             (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)+1) by ssrlia.
+                             (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle)+1) by lia.
                      rewrite subnDA addnC addnBA.
                      ++ rewrite add1n subn1 //.
                      ++ rewrite ltn_subRL addn0. by apply ltn_pmod.
                 * case (c < time_slot - ((t + (tdma_cycle - slot_offset %% tdma_cycle)).+1 %% tdma_cycle)) eqn:Hc1;
                   destruct mod_case as [case1 case2].
                   -- rewrite leq_eqVlt in H_tdma_cycle_ge_slot. revert H_tdma_cycle_ge_slot.
-                     move/orP. intros [Hts | Hts]; try ssrlia.
+                     move/orP. intros [Hts | Hts]; try lia.
                      move/eqP in Hts. rewrite case2.
                      rewrite /duration_to_finish_from_start_of_slot_with Hts.
-                     replace (tdma_cycle - tdma_cycle) with 0 by ssrlia.
+                     replace (tdma_cycle - tdma_cycle) with 0 by lia.
                      rewrite muln0 /to_next_slot /from_start_of_slot -addnBA // case2. 
-                     replace (tdma_cycle - tdma_cycle.-1)  with 1 by ssrlia. ssrlia.
+                     replace (tdma_cycle - tdma_cycle.-1)  with 1 by lia. lia.
                   -- rewrite case1 case2. rewrite leq_eqVlt in H_tdma_cycle_ge_slot.
                      revert H_tdma_cycle_ge_slot. move/orP. 
-                     intros [Hts | Hts]; try ssrlia. move/eqP in Hts. apply /eqP. 
+                     intros [Hts | Hts]; try lia. move/eqP in Hts. apply /eqP. 
                      rewrite -addnS eqn_add2l /duration_to_finish_from_start_of_slot_with /to_next_slot /from_start_of_slot.
                      repeat rewrite Hts. 
-                     replace (tdma_cycle - tdma_cycle) with 0 by ssrlia. 
+                     replace (tdma_cycle - tdma_cycle) with 0 by lia. 
                      repeat rewrite muln0 -addnBA //.
                      rewrite addSn case1 case2 add0n subn0 add0n.
-                     replace (tdma_cycle - tdma_cycle.-1)  with 1 by ssrlia.
-                     rewrite add1n subn1 //= addnBA; try ssrlia. 
+                     replace (tdma_cycle - tdma_cycle.-1)  with 1 by lia.
+                     rewrite add1n subn1 //= addnBA; try lia. 
           - move/negP /negP in Hcases. rewrite -ltnNge in Hcases. rewrite -addnBA in NSLOT.
             rewrite /from_start_of_slot.
             case (c < time_slot - (t + tdma_cycle - slot_offset %% tdma_cycle) %% tdma_cycle)eqn:Hc.
-            + destruct c; simpl; try ssrlia.
+            + destruct c; simpl; try lia.
               rewrite /to_next_slot /from_start_of_slot.
              case (modulo_cases (t + (tdma_cycle - slot_offset %% tdma_cycle)) tdma_cycle.-1); intro mod_case;
              rewrite prednK // in mod_case. rewrite addSn mod_case leq_eqVlt in Hcases.
-             move: Hcases => /orP [Hcase | Hcase]; try ssrlia.
+             move: Hcases => /orP [Hcase | Hcase]; try lia.
              * rewrite -addn1 in Hcase.
                replace ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+2 with
-                       (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1 +1) in Hcase; try ssrlia.
+                       (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1 +1) in Hcase; try lia.
                rewrite eqn_add2r in Hcase. move/eqP in Hcase. 
-               rewrite Hcase -addnBA // subSnn in Hc. ssrlia.
+               rewrite Hcase -addnBA // subSnn in Hc. lia.
              * destruct mod_case as [case1 case2]. 
-               rewrite addSn case1 in Hcases. ssrlia.
+               rewrite addSn case1 in Hcases. lia.
            + destruct c; simpl. 
-             * rewrite ltn_subRL addn0 -addnBA // in Hc. ssrlia.
+             * rewrite ltn_subRL addn0 -addnBA // in Hc. lia.
              * rewrite /to_next_slot /from_start_of_slot.
                case (modulo_cases (t + (tdma_cycle - slot_offset %% tdma_cycle)) tdma_cycle.-1) ;intro mod_case;
                rewrite prednK // in mod_case.
                -- rewrite addSn mod_case leq_eqVlt in Hcases.
-                  move:Hcases =>/orP [Hcase|Hcase]; try ssrlia.
+                  move:Hcases =>/orP [Hcase|Hcase]; try lia.
                   rewrite -addn1 in Hcase. 
                   replace ((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+2 with
-                          (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1 +1) in Hcase; try ssrlia.
+                          (((t + (tdma_cycle - slot_offset %% tdma_cycle)) %% tdma_cycle).+1 +1) in Hcase; try lia.
                   rewrite eqn_add2r in Hcase.
                   move/eqP in Hcase. 
                   repeat rewrite -addnBA //. 
                   rewrite addSn addSn mod_case Hcase subSnn subn1 /= subnS -addnS -addSn prednK // ltn_subRL addn0.
                   by apply ltn_pmod.
-               -- destruct mod_case as [case1 _]. rewrite addSn case1 in Hcases. ssrlia.
+               -- destruct mod_case as [case1 _]. rewrite addSn case1 in Hcases. lia.
             + trivial.
       Qed.
 
@@ -555,10 +554,10 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         - rewrite formula_not_sched_St. 
           + replace (t + (to_next_slot t).-1).+1 with (t + to_next_slot t).
             * reflexivity.
-            * rewrite -addnS. ssrlia.
-          + apply duration_not_sched;auto. ssrlia.
-          + apply duration_not_sched;auto. ssrlia.
-         - ssrlia. 
+            * rewrite -addnS. lia.
+          + apply duration_not_sched;auto. lia.
+          + apply duration_not_sched;auto. lia.
+         - lia. 
       Qed.
 
       (* Lemma: if the job cannot be scheduled at instant t and its residue cost is not
@@ -685,7 +684,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
                 -- by apply pendingSt_Sched with (c:=c).
                 -- rewrite /is_scheduled_at in l;
                    rewrite -SC /service /service_during /service_at big_nat_recr //.
-                   rewrite l /=;ssrlia.
+                   rewrite l /=;lia.
           + apply end_time_predicate_eq;try exact l. 
             * exact PEN. 
             * destruct c as [|c];rewrite job_not_sched_to_cunsume_1unit //.
@@ -697,7 +696,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
                    by rewrite service_is_zero_in_Nsched_duration.
                 ++ rewrite <-service_is_zero_in_Nsched_duration with (d:=to_next_slot ARR) in SC;auto.
                    rewrite -SC /service /service_during /service_at big_nat_recr;auto. rewrite SCHED /=.
-                   ssrlia.
+                   lia.
       Qed.
 
     End formula_predicate_eq.
@@ -810,7 +809,7 @@ Import Job  TaskArrival ScheduleOfTask  ResponseTime Platform_TDMA end_time Sche
         - apply decPcases in gt_ref.
           destruct (TDMA_policy_case_RT_le_Period (job_arrival j)) as [hj |hj]. apply pendingArrival.
           unfold in_time_slot_at in hj.
-          + rewrite /from_start_of_slot in gt_ref. rewrite /from_start_of_slot in EXISTS. case (_ < _) in gt_ref;try ssrlia.
+          + rewrite /from_start_of_slot in gt_ref. rewrite /from_start_of_slot in EXISTS. case (_ < _) in gt_ref;try lia.
           + have F:in_time_slot_at (job_arrival j) = false by auto. rewrite F.
             rewrite /to_next_slot EXISTS /duration_to_finish_from_start_of_slot_with.
             rewrite mulnBl mul1n addnA  {1}gtn_eqF // -COST_WCET.
