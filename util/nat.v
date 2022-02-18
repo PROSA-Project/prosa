@@ -26,13 +26,6 @@ Section NatLemmas.
       m <= p - n.
   Proof. by intros; lia. Qed.
     
-  (** We can drop additive terms on the lesser side of an inequality. *)
-  Lemma leq_addk:
-    forall m n k,
-      n + k <= m ->
-      n <= m.
-  Proof. by intros; lia. Qed.
-    
   (** For any numbers [a], [b], and [m], either there exists a number
       [n] such that [m = a + n * b] or [m <> a + n * b] for any [n]. *)
   Lemma exists_or_not_add_mul_cases:

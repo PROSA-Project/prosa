@@ -52,7 +52,7 @@ Section ReadinessOfSelfSuspendingJobs.
     move: H2 => /andP [PASSED UNFINISHED].
     rewrite /pending. apply /andP. split => //.
     move: PASSED. rewrite /suspension_has_passed /has_arrived => /andP [ARR _].
-    by move: ARR; apply leq_addk.
+    by apply: leq_trans ARR; rewrite leq_addr.
   Qed.
 
 End ReadinessOfSelfSuspendingJobs.

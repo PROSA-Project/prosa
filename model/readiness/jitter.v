@@ -43,7 +43,7 @@ Section ReadinessOfJitteryJobs.
     move: H2 => /andP [REL UNFINISHED].
     rewrite /pending. apply /andP. split => //.
     move: REL. rewrite /is_released /has_arrived.
-    by apply leq_addk.
+    by apply: leq_trans; rewrite leq_addr.
   Qed.
 
 End ReadinessOfJitteryJobs.
