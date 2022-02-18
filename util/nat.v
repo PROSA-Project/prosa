@@ -26,13 +26,6 @@ Section NatLemmas.
       m <= p - n.
   Proof. by intros; lia. Qed.
     
-  (** Simplify [n + a - b + b - a = n] if [n >= b]. *)
-  Lemma subn_abba:
-    forall n a b,
-      n >= b ->
-      n + a - b + b - a = n.
-  Proof. by intros; lia. Qed.
-  
   (** We can drop additive terms on the lesser side of an inequality. *)
   Lemma leq_addk:
     forall m n k,

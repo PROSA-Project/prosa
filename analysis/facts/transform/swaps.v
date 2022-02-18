@@ -248,10 +248,9 @@ Section SwappedFacts.
     rewrite /service !service_in_replaced// /service_at// /replace_at //.
     rewrite ifT// ifT// ifF;
       last by apply ltn_eqF; exact.
-    rewrite subn_abba //.
-    rewrite -(service_split_at_point _ _ _ t1 _) /service_at //.
-    apply leq_trans with (n := service_during sched j 0 t1 + service_in j (sched t1));
-      [rewrite addnC|]; by apply leq_addr.
+    have service_in_t1 : service_in j (sched t1) <= service_during sched j 0 t.
+    { by rewrite -(service_split_at_point _ _ _ t1 _)// addnAC leq_addl. }
+    by rewrite subnK ?(leq_trans service_in_t1) ?leq_addr// addnK.
   Qed.
 
   (** Finally, we note that, trivially, jobs that are not involved in
