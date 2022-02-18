@@ -201,7 +201,7 @@ Section SwappedFacts.
       sched t = sched' t.
   Proof.
     move=> t t_lt_t1.
-    move: (ltn_leq_trans t_lt_t1 H_well_ordered) => t_lt_t2.
+    move: (leq_trans t_lt_t1 H_well_ordered) => t_lt_t2.
     by apply swap_other_times_invariant => /eqP /eqP EQ; subst;
        [move: t_lt_t1|move: t_lt_t2]; rewrite ltnn.
   Qed.
@@ -450,7 +450,7 @@ Section EDFSwap.
       move: (H_not_EDF j j2 AT_t1 AT_t2) => DL2_le_DL1.
       rewrite -service_invariant_implies_deadline_met; first by exact H_deadline_met.
       apply service_after_swap_invariant => //.
-      apply ltn_leq_trans with (n := job_deadline j2) => //.
+      apply leq_trans with (n := job_deadline j2) => //.
     Qed.
 
   End NoNewDeadlineMissesCases.

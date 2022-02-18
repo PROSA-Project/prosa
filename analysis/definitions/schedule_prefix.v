@@ -42,7 +42,7 @@ Section PrefixDefinition.
   Proof.
     move=> sched sched' h IDENT h' INCL t LT_h'.
     apply IDENT.
-    now apply (ltn_leq_trans LT_h').
+    now apply (leq_trans LT_h').
   Qed.
 
 End PrefixDefinition.

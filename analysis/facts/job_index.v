@@ -151,7 +151,7 @@ Section JobIndexLemmas.
     rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between in IN1 => //.
     rewrite !index_cat ifT; last by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     rewrite ifF.
-    - eapply ltn_leq_trans; [ | now erewrite leq_addr].
+    - eapply leq_trans; [ | now erewrite leq_addr].
       rewrite index_mem.
       now eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     - apply Bool.not_true_is_false; intro T.
@@ -192,7 +192,7 @@ Section JobIndexLemmas.
     rewrite -> task_arrivals_cat with (t_m := job_arrival j1); try by ssrlia.
     rewrite -H_same_task !index_cat ifT; try by apply arrives_in_task_arrivals_up_to.
     rewrite ifF.
-    - now eapply ltn_leq_trans;
+    - now eapply leq_trans;
         [apply index_job_lt_size_task_arrivals_up_to_job | rewrite leq_addr].
     - apply Bool.not_true_is_false; intro T.
       now apply job_arrival_between in T; try ssrlia.
@@ -359,7 +359,7 @@ Section PreviousJob.
     exists (nth j (task_arrivals_up_to_job_arrival arr_seq j) k).
     set (jk := nth j (task_arrivals_up_to_job_arrival arr_seq j) k).
     have K_LT_SIZE : (k < size (task_arrivals_up_to_job_arrival arr_seq j)) by
-        apply ltn_leq_trans with (n := job_index arr_seq j) => //; first by apply index_size.
+        apply leq_trans with (n := job_index arr_seq j) => //; first by apply index_size.
     have JK_IN : (jk \in task_arrivals_up_to_job_arrival arr_seq j) by rewrite /jk; apply mem_nth => //. 
     rewrite mem_filter in JK_IN; move : JK_IN => /andP [/eqP TSK JK_IN].
     apply mem_bigcat_nat_exists in JK_IN; move : JK_IN => [i [JK_IN I_INEQ]]. 

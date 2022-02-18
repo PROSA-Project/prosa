@@ -49,7 +49,7 @@ Section DeadlineFacts.
       rewrite -(ltn_add2l (service sched j t)) addn0.
       rewrite service_cat;
         last by (apply ltnW; apply incomplete_implies_later_deadline).
-      apply ltn_leq_trans with (n := job_cost j);
+      apply leq_trans with (n := job_cost j);
         first by rewrite less_service_than_cost_is_incomplete.
       by apply MET.
     Qed.

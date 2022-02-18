@@ -503,7 +503,7 @@ Section MakeEDFAtFacts.
       by rewrite scheduled_at_def; apply /eqP.
     have LT_t_fsc:  t < find_swap_candidate sched t_edf j_orig.
     {
-      apply ltn_leq_trans with (n := t_edf) => //.
+      apply leq_trans with (n := t_edf) => //.
       apply fsc_range1 => //.
       now apply scheduled_job_in_sched_has_later_deadline.
     }
@@ -693,14 +693,14 @@ Section EDFPrefixInclusion.
       identical_prefix (edf_transform_prefix sched h1) (edf_transform_prefix sched h2) h1.
   Proof.
     move=> h1 h2 LE_h1_h2. rewrite /identical_prefix => t LT_t_h1.
-    induction h2; first by move: (ltn_leq_trans LT_t_h1 LE_h1_h2).
+    induction h2; first by move: (leq_trans LT_t_h1 LE_h1_h2).
     move: LE_h1_h2. rewrite leq_eqVlt => /orP [/eqP ->|LT]; first by done.
     move: LT. rewrite ltnS => LE_h1_h2.
     rewrite [RHS]/edf_transform_prefix /prefix_map -/prefix_map IHh2 //.
     rewrite {1}/make_edf_at.
     destruct (prefix_map sched make_edf_at h2 h2) as [j|] eqn:SCHED; last by done.
     rewrite -(swap_before_invariant _  h2 (find_swap_candidate (edf_transform_prefix sched h2) h2 j)) // ;
-      last by apply ltn_leq_trans with (n := h1).
+      last by apply leq_trans with (n := h1).
     have SCHED_j: scheduled_at (edf_transform_prefix sched h2) j h2
       by rewrite scheduled_at_def /edf_transform_prefix; apply /eqP.
     apply fsc_range1 => //.

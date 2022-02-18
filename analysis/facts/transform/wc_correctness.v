@@ -466,14 +466,14 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       Proof.
         move=> t before_horizon.
         rewrite /sched1 /sched2.
-        induction h2; first by move: (ltn_leq_trans before_horizon H_horizon_order).
+        induction h2; first by move: (leq_trans before_horizon H_horizon_order).
         move: H_horizon_order. rewrite leq_eqVlt => /orP [/eqP ->|LT]; first by done.
         move: LT. rewrite ltnS => H_horizon_order_lt.
         rewrite [RHS]/wc_transform_prefix /prefix_map -/prefix_map IHi //.
         rewrite {1}/make_wc_at.
         destruct (prefix_map sched (make_wc_at arr_seq) i i) as [j|] eqn:SCHED; first by done.   
         rewrite -(swap_before_invariant _ i (find_swap_candidate arr_seq (wc_transform_prefix arr_seq sched i) i));
-          last by apply ltn_leq_trans with (n := h1).
+          last by apply leq_trans with (n := h1).
         rewrite //.
         apply swap_candidate_is_in_future.
       Qed.

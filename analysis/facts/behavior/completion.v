@@ -74,7 +74,7 @@ Section CompletionFacts.
       job_cost_positive j.
   Proof.
     move=> t INCOMP.
-    apply: (ltn_leq_trans _);
+    apply: (leq_trans _);
       last by apply leq_subr.
     apply incomplete_is_positive_remaining_cost.
     exact INCOMP.
@@ -379,7 +379,7 @@ Section CompletedJobs.
     move=> IDEAL SERVICE_BOUND j t SCHED.
     have UB := SERVICE_BOUND j t.+1.
     have POS := IDEAL _ _ SCHED.
-    apply ltn_leq_trans with (n := service sched j t.+1) => //.
+    apply leq_trans with (n := service sched j t.+1) => //.
     rewrite -service_last_plus_before /service_at.
     by rewrite -{1}(addn0 (service sched j t)) ltn_add2l.
   Qed.
