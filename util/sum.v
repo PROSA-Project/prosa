@@ -121,6 +121,7 @@ Section SumsOverSequences.
     (** Assume that [E2] dominates [E1] in all the points contained in the set [r] and respecting
         the predicate [P]. We prove that, if we sum both function over those points, then the sum
         of [E2] will dominate the sum of [E1]. *)
+    (* TODO: PR MathComp *)
     Lemma leq_sum_seq :
       (forall i, i \in r -> P i -> E1 i <= E2 i) ->
       \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
@@ -131,6 +132,9 @@ Section SumsOverSequences.
 
     (** In the same way, if [E1] equals [E2] in all the points considered above, then also the two
         sums will be identical. *)
+    (* TODO: PR MathComp
+       - generalize as eq_big_seq_cond (nothing specific to addn here)
+       - replace == with = ? *)
     Lemma eq_sum_seq:
       (forall i, i \in r -> P i -> E1 i == E2 i) ->
       \sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i.
