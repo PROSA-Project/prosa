@@ -262,33 +262,6 @@ Section SumsOverRanges.
     rewrite sumnB// => i; rewrite andbT; exact: le.
   Qed.
 
-  (** Given a sequence [r], function [F], and a predicate [P], we
-      prove that the fact that the sum of [F] conditioned by [P] is
-      greater than [0] is equivalent to the fact that there exists an
-      element [i \in r] such that [F i > 0] and [P i] holds. *) 
-  Lemma sum_seq_cond_gt0P:
-    forall (T : eqType) (r : seq T) (P : T -> bool) (F : T -> nat),
-      reflect (exists i, i \in r /\ P i /\ 0 < F i) (0 < \sum_(i <- r | P i) F i).
-  Proof.
-    intros; apply: (iffP idP); intros.
-    { induction r; first by rewrite big_nil in H.
-      rewrite big_cons in H.
-      destruct (P a) eqn:PA, (F a > 0) eqn:POS.
-      - exists a; repeat split; [by rewrite in_cons; apply/orP; left | by done | by done].
-      - move: POS => /negP/negP; rewrite -leqNgt leqn0 => /eqP Z; rewrite Z add0n in H.
-        apply IHr in H; destruct H as [i [IN [Pi POS]]].
-        by (exists i; repeat split; [rewrite in_cons;apply/orP;right | | ]).
-      - clear POS; apply IHr in H; destruct H as [i [IN [Pi POS]]].
-        by (exists i; repeat split; [rewrite in_cons;apply/orP;right | | ]).
-      - clear POS; apply IHr in H; destruct H as [i [IN [Pi POS]]].
-        by (exists i; repeat split; [rewrite in_cons;apply/orP;right | | ]).
-    }
-    { move: H => [i [IN [Pi POS]]].
-      rewrite (big_rem i) //=; rewrite Pi.      
-      by apply leq_trans with (F i); last rewrite leq_addr.
-    }
-  Qed.
-  
 End SumsOverRanges.
 
 (** In this section, we show how it is possible to equate the result of two sums performed
