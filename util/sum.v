@@ -41,21 +41,14 @@ Section SumsOverSequences.
 
     (** Next, we show that if a number [a] is not contained in [r], then filtering or not 
         filtering [a] when summing leads to the same result. *)
-    Lemma sum_notin_rem_eqn:
-      forall a,
-        a \notin r ->
-        \sum_(x <- r | P x && (x != a)) F x = \sum_(x <- r | P x) F x.
+    Lemma sum_notin_rem_eqn a :
+      a \notin r ->
+      \sum_(x <- r | P x && (x != a)) F x = \sum_(x <- r | P x) F x.
     Proof.
-      intros a NOTIN.
-      induction r; first by rewrite !big_nil.
-      rewrite !big_cons IHl.
-      { move: NOTIN => /memPn NOTIN. 
-        move: (NOTIN a0) => NEQ.
-        feed NEQ; first by (rewrite in_cons; apply/orP; left).
-        by rewrite NEQ Bool.andb_true_r. }
-      { apply /memPn; intros y IN.
-        move: NOTIN => /memPn NOTIN.
-        by apply NOTIN; rewrite in_cons; apply/orP; right. }
+      move=> a_notin_r; rewrite [LHS]big_seq_cond [RHS]big_seq_cond.
+      apply: eq_bigl => x; case xinr: (x \in r) => //=.
+      have [xa|] := eqP; last by rewrite andbT.
+      by move: xinr a_notin_r; rewrite xa => ->.
     Qed.
 
     (** We prove that if any element of [r] is bounded by constant [c], 
