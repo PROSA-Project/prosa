@@ -18,6 +18,7 @@ Section NatLemmas.
       that this lemma is similar to ssreflect's lemma [leq_subRL];
       however, the current lemma has no precondition [n <= p], since it
       has only one direction. *)
+  (* TODO: PR MathComp *)
   Lemma leq_subRL_impl m n p : m + n <= p -> n <= p - m.
   Proof.
     have [mlep|pltm] := leqP m p; first by rewrite leq_subRL.
