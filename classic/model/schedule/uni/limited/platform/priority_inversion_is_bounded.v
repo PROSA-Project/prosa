@@ -450,7 +450,7 @@ Module PriorityInversionIsBounded.
               by move: LP => /negP LP; apply: LP.
           }
           apply SCHEDc; apply/andP; split.
-          - rewrite -addn1 in NEQ.
+          - rewrite -add1n in NEQ.
             apply leq_subRL_impl in NEQ.
               by rewrite subn1 in NEQ.
           - apply leq_trans with t1. by apply leq_pred. by done.

@@ -552,7 +552,7 @@ Module WorkloadBound.
               by rewrite sort_uniq -/scheduled_jobs filter_uniq // undup_uniq.
               by rewrite CURtsk.
           }
-          by rewrite leq_subRL_impl // addnC -CURtsk.
+          by rewrite leq_subRL_impl // -CURtsk.
         Qed.
 
         (* Prove that n_k is at least the number of the middle jobs *)

@@ -647,7 +647,7 @@ Module InterferenceBoundEDF.
                 by rewrite sort_uniq -/interfering_jobs filter_uniq // undup_uniq.
                 by rewrite CURtsk.
             }
-            by rewrite leq_subRL_impl // addnC /p_k -CURtsk.
+            by rewrite leq_subRL_impl // /p_k -CURtsk.
           Qed.
 
           Lemma interference_bound_edf_slack_le_delta:

@@ -115,7 +115,7 @@ Module NonpreemptiveSchedule.
           exfalso; move: NOTCOMP => /negP NOTCOMP; apply: NOTCOMP.
           ( try ( apply completion_monotonic with (t0 := i) ) ||
           apply completion_monotonic with (t := i)); try ( by done).
-            by apply leq_subRL_impl; first rewrite addn1.
+            by apply leq_subRL_impl; first rewrite add1n.
         Qed.
         
       End CompletionUnderNonpreemptive.
@@ -311,7 +311,7 @@ Module NonpreemptiveSchedule.
             move: COMP; apply contraR; intros CONTR.
             apply in_nonpreemption_schedule_preemption_implies_completeness
             with (t:=t); [|by done| by done].
-            rewrite leq_subRL_impl // ?leq_add2l.
+            rewrite leq_subRL_impl // addnC ?leq_add2l.
               by rewrite scheduled_implies_positive_remaining_cost //.
           Qed.
 
@@ -339,7 +339,7 @@ Module NonpreemptiveSchedule.
         Proof.
           move => t' /andP [GE LE].
           move: (H_j_is_scheduled_at_t) => SCHED1; move: (H_j_is_scheduled_at_t) => SCHED2.
-          rewrite -addn1 in LE; apply leq_subRL_impl with (m := t') (n := 1) in LE;
+          rewrite -add1n in LE; apply leq_subRL_impl with (n := t') (m := 1) in LE;
             apply continuity_of_nonpreemptive_scheduling with
                 (t1 := t - service sched j t)
                 (t2 := t + job_remaining_cost j t - 1); first by done.

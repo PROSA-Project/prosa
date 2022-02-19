@@ -17,12 +17,12 @@ Section NatLemmas.
       that this lemma is similar to ssreflect's lemma [leq_subRL];
       however, the current lemma has no precondition [n <= p], since it
       has only one direction. *)
-  Lemma leq_subRL_impl:
-    forall m n p,
-      m + n <= p ->
-      m <= p - n.
-  Proof. by intros; lia. Qed.
-    
+  Lemma leq_subRL_impl m n p : m + n <= p -> n <= p - m.
+  Proof.
+    have [mlep|pltm] := leqP m p; first by rewrite leq_subRL.
+    by move=> /(leq_trans (ltn_addr _ pltm)); rewrite ltnn.
+  Qed.
+
   (** For any numbers [a], [b], and [m], either there exists a number
       [n] such that [m = a + n * b] or [m <> a + n * b] for any [n]. *)
   Lemma exists_or_not_add_mul_cases:

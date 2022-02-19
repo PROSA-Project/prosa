@@ -755,7 +755,7 @@ Module JitterScheduleService.
                                          \sum_(j_hp <- act 0 t2 | hep j_hp) SCHj j_hp t0.
               rewrite -/(TSs t1 (t1 + d).+1) -/(TSs 0 t1).
               rewrite leq_subRL_impl //.
-              rewrite addnC -big_cat_nat //=;
+              rewrite -big_cat_nat //=;
                 last by apply leq_trans with (n := t1 + d); first by apply leq_addr.
               by rewrite exchange_big; apply LEWORKs; rewrite ltn_add2l.
             Qed.
@@ -1107,7 +1107,7 @@ Module JitterScheduleService.
         feed AFTERj; try done.
         set Sj := service_during sched_jitter j arr_j.
         set Shp := service_of_other_hep_jobs_in_sched_jitter arr_j.
-        rewrite leq_subRL_impl //.
+        rewrite leq_subRL_impl // addnC.
         apply leq_trans with (n := \sum_(arr_j <= t < arr_j + R_j) 1);
           last by simpl_sum_const; rewrite addKn.
         rewrite /Sj /Shp /service_of_other_hep_jobs_in_sched_jitter /service_of_jobs

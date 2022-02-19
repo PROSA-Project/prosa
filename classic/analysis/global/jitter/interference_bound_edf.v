@@ -676,7 +676,7 @@ Module InterferenceBoundEDFJitter.
               have FST := interference_bound_edf_j_fst_is_job_of_tsk_k.
               destruct FST as [FSTtask [_ [LEdl _]]].            
               have LTr := interference_bound_edf_response_time_bound_of_j_fst_after_interval.
-              apply leq_subRL_impl.
+              apply leq_subRL_impl; rewrite addnC.
               apply leq_trans with (n := job_interference job_arrival job_cost job_jitter sched j_i
                                        j_fst t1 (job_arrival j_fst + J_k + R_k) + (D_k - R_k - J_k)).
               {
@@ -943,7 +943,7 @@ Module InterferenceBoundEDFJitter.
                 by rewrite sort_uniq -/interfering_jobs filter_uniq // undup_uniq.
                 by rewrite CURtsk.
             }
-            by rewrite leq_subRL_impl // addnC /p_k -INnth.
+            by rewrite leq_subRL_impl // /p_k -INnth.
           Qed.
 
           (* Using the lemma above, we prove that the ratio n_k is at least the number of
@@ -1079,7 +1079,7 @@ Module InterferenceBoundEDFJitter.
             Proof.
               intro LE.
               apply leq_subRL_impl.
-              by rewrite -subndiv_eq_mod; apply leq_subRL_impl.
+              by rewrite addnC -subndiv_eq_mod; apply leq_subRL_impl; rewrite addnC.
             Qed.
               
             (* Next, we prove that interference caused by j_fst is bounded by the length

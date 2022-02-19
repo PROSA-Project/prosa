@@ -454,7 +454,7 @@ Section PriorityInversionIsBounded.
           by have ->: jlp = jhp by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
       }
       apply SCHEDc; apply/andP; split.
-      - by rewrite -addn1 in LT2; apply leq_subRL_impl in LT2; rewrite subn1 in LT2.
+      - by rewrite -add1n in LT2; apply leq_subRL_impl in LT2; rewrite subn1 in LT2.
       - by apply leq_trans with t1; first apply leq_pred. 
     Qed.
     

@@ -416,7 +416,7 @@ Module WorkloadBound.
               by rewrite sort_uniq -/scheduled_jobs filter_uniq // undup_uniq.
               by rewrite CURtsk.   
           }
-          by rewrite leq_subRL_impl // addnC -CURtsk.
+          by rewrite leq_subRL_impl // -CURtsk.
         Qed.
 
         (* Next, we prove that n_k covers every scheduled job, ... *)
