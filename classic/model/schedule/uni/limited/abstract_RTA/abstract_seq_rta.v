@@ -433,8 +433,8 @@ Module AbstractSeqRTA.
               }
               rewrite IJT; clear IJT.
               simpl. rewrite addn0.
-              rewrite big_mkcond; apply/sum_seq_gt0P.
-              exists s; split.
+              rewrite big_mkcond sum_nat_gt0 filter_predT; apply/hasP.
+              exists s.
               { intros. have ARR:= arrives_after_beginning_of_busy_interval j s _ _ _ _ _ t1 t2 _ t.
                 feed_n 8 ARR; try done.
                 { by move: TSK => /eqP TSK; rewrite TSK. } 

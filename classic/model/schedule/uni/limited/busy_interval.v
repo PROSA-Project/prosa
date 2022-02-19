@@ -472,7 +472,7 @@ Module BusyIntervalJLFP.
           { rewrite leq_sum //; move => t' _; eapply service_of_jobs_le_1; eauto. } 
           { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=; rewrite leq_sum //.
             move => t' /andP [/andP [LT GT] _].
-            apply/sum_seq_gt0P.
+            rewrite sum_nat_gt0 filter_predT; apply/hasP.
             case SCHED: (sched t') => [j1 | ]; last first.
             { exfalso.
               move: LT; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
@@ -495,7 +495,7 @@ Module BusyIntervalJLFP.
                   by rewrite SCHED in SCHEDother.
               }              
             }
-            { exists j1; split.
+            { exists j1.
               - apply arrived_between_implies_in_arrivals with job_arrival; try done.
                 apply H_jobs_come_from_arrival_sequence with t'.
                 rewrite /scheduled_at SCHED; by done.

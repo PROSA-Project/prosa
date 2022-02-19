@@ -303,7 +303,8 @@ Section ExistsBusyIntervalJLFP.
         have SCH := @service_of_jobs_le_1 _ _ _ _ sched predT (arrivals_between arr_seq 0 (t1 + Δ)).
         by eapply leq_trans; [apply leqnn | apply SCH; eauto using arrivals_uniq with basic_rt_facts]. }
       { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=
-                leq_sum // => t' /andP [/andP [LT GT] _]; apply/sum_seq_gt0P.
+                leq_sum // => t' /andP [/andP [LT GT] _].
+        rewrite sum_nat_gt0 filter_predT; apply/hasP.
         ideal_proc_model_sched_case_analysis_eq sched t' jo.
         { exfalso; move: LT; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
           { subst t'.
@@ -321,7 +322,7 @@ Section ExistsBusyIntervalJLFP.
             { by apply/andP; split; last rewrite scheduled_at_def EqIdle. }
             move: H_work_conserving => [j_other SCHEDother].
             by rewrite scheduled_at_def EqIdle in SCHEDother. } }
-        { exists jo; split.
+        { exists jo.
           - apply arrived_between_implies_in_arrivals; try done.
             apply H_jobs_come_from_arrival_sequence with t'; try done.
             apply/andP; split; first by done.

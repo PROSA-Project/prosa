@@ -272,9 +272,11 @@ Section RelationToScheduled.
         service_at sched j t > 0.
   Proof.
     move=> t1 t2.
-    split=> [|[t titv_nz_serv]].
-    - by move=> /sum_seq_gt0P[t]; rewrite mem_index_iota => ?; exists t.
-    - by apply/sum_seq_gt0P; exists t; rewrite mem_index_iota.
+    split=> [|[t [titv nz_serv]]].
+    - rewrite sum_nat_gt0 filter_predT => /hasP [t IN GT0].
+      by exists t; split; [rewrite -mem_index_iota|].
+    - rewrite sum_nat_gt0; apply/hasP.
+      by exists t; [rewrite filter_predT mem_index_iota|].
   Qed.
 
   (** Thus, any job that receives some service during an interval must be

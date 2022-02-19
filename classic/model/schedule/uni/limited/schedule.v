@@ -154,7 +154,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
           move: (H_completed_jobs_dont_execute j t') => NN.
             by rewrite ZERO leqNgt in NN; move: NN => /negP NN; apply: NN.
         }
-        move: NEQ => /sum_seq_gt0P [ts [IN SCHED]].
+        move: NEQ; rewrite sum_nat_gt0 filter_predT => /hasP[ts IN SCHED].
         rewrite lt0b in SCHED.
         apply H_is_nonpreemptive_schedule with ts; try done.
         apply ltnW, leq_trans with t; last by done.
@@ -164,4 +164,3 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
     End FullyNonPreemptiveModel.
     
   End Examples.
- 

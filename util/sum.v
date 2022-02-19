@@ -32,21 +32,11 @@ Section SumsOverSequences.
 
     (** In the same way, if at least one element of [r] is not zero, then the sum of all 
         elements of [r] must be strictly positive, and vice-versa. *)
-    Lemma sum_seq_gt0P:
-      reflect (exists i, i \in r /\ 0 < F i) (0 < \sum_(i <- r) F i).
+    Lemma sum_nat_gt0 :
+      (0 < \sum_(i <- r | P i) F i) = has (fun x => 0 < F x) [seq x <- r | P x].
     Proof.
-      apply: (iffP idP); move=> LT0.
-      { induction r; first by rewrite big_nil in LT0.
-        destruct (F a > 0) eqn:POS.
-        - exists a.
-          by split => //; rewrite in_cons; apply /orP; left.
-        - apply negbT in POS; rewrite -leqNgt leqn0 in POS; move: POS => /eqP POS.
-          rewrite big_cons POS add0n in LT0.
-          move: (IHl LT0) => [i [IN POSi]].
-          by exists i; split => //; rewrite in_cons; apply /orP; right. }
-      { move: LT0 => [i [IN POS]].
-        rewrite (big_rem i) //=.
-        by apply leq_trans with (F i); last by rewrite leq_addr. }
+      apply/negb_inj; rewrite lt0n negbK sum_nat_eq0_nat -all_predC.
+      by apply/eq_all => ?; rewrite /= lt0n negbK.
     Qed.
 
     (** Next, we show that if a number [a] is not contained in [r], then filtering or not 

@@ -254,7 +254,7 @@ Module Service.
           - by rewrite /service_during big_geq.                
         }  
         { apply negbT in SCHED.
-          move: SERV; rewrite /service /service_during; move => /sum_seq_gt0P [t [IN SCHEDt]].
+          move: SERV; rewrite /service /service_during sum_nat_gt0 filter_predT; move => /hasP[t IN SCHEDt].
           rewrite lt0b in SCHEDt.
           rewrite mem_iota subnKC in IN; last by done.
           move: IN => /andP [IN1 IN2].
@@ -289,7 +289,7 @@ Module Service.
               by move: SERV; rewrite /service_during big_geq. 
         } 
         { apply negbT in SCHED.
-          move: SERV; rewrite /service /service_during; move => /sum_seq_gt0P [x [INx SCHEDx]].
+          move: SERV; rewrite /service /service_during sum_nat_gt0 filter_predT; move => /hasP[x INx SCHEDx].
           rewrite lt0b in SCHEDx.
           rewrite mem_iota subnKC in INx; last by done.
           move: INx => /andP [INx1 INx2].

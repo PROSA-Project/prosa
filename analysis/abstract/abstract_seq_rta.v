@@ -415,7 +415,7 @@ Section Sequential_Abstract_RTA.
                 apply Hn in CONTR; rewrite scheduled_at_def in CONTR; simpl in CONTR.
                 by move: CONTR; rewrite H_sched => /eqP EQ; inversion EQ; subst; move: H_j_neq_j' => /eqP.
               }
-              rewrite big_mkcond; apply/sum_seq_gt0P; exists j'; split; last first.
+              rewrite big_mkcond sum_nat_gt0 filter_predT; apply/hasP; exists j'; last first.
               { move: H_not_job_of_tsk => /eqP TSK.
                 by rewrite /job_of_task TSK eq_refl service_at_def H_sched eq_refl. }
               { intros. have ARR:= arrives_after_beginning_of_busy_interval j j' _ _ _ _ _ t1 t2 _ t.
@@ -470,8 +470,8 @@ Section Sequential_Abstract_RTA.
               move: WORK => [_ ZIJT].
               feed ZIJT; first by rewrite scheduled_at_def H_sched; simpl.
               move: ZIJT => /negP /eqP; rewrite eqb_negLR; simpl; move => /eqP ZIJT; rewrite ZIJT; simpl; rewrite add0n.
-              rewrite big_mkcond //=; apply/sum_seq_gt0P.
-              exists j; split; first by apply j_is_in_arrivals_between.
+              rewrite big_mkcond //= sum_nat_gt0 filter_predT; apply/hasP.
+              exists j; first by apply j_is_in_arrivals_between.
               by move: (H_job_of_tsk) => ->; rewrite service_at_def H_sched eq_refl.
             Qed.
 
