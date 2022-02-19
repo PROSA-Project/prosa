@@ -260,6 +260,8 @@ Section SumsOverRanges.
       the same as summing over the two functions separately, and then taking the
       difference of the two sums. Since we are using natural numbers, we have to
       require that one function dominates the other in the summing range. *)
+  (* TODO: PR MathComp
+     - add a condition P i *)
   Lemma sumnB_nat m n F G :
     (forall i, m <= i < n -> F i >= G i) ->
     \sum_(m <= i < n) (F i - G i) =
