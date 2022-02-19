@@ -26,37 +26,30 @@ Section NatLemmas.
   (** Given constants [a, b, c, z] such that [b <= a], if there is no
       constant [m] such that [a = b + m * c], then it holds that there
       is no constant [n] such that [a + z * c = b + n * c]. *)
-  Lemma mul_add_neq: 
-    forall a b c z,
-      b <= a ->
-      (forall m, a <> b + m * c) -> 
-      forall n, a + z * c <> b + n * c.
-  Proof.
-    intros * LTE NEQ n EQ.
-    specialize (NEQ (n - z)).
-    rewrite mulnBl in NEQ.
-    by lia.
-  Qed.
-  
+  Lemma mul_add_neq a b c z :
+    b <= a ->
+    (forall m, a <> b + m * c) ->
+    forall n, a + z * c <> b + n * c.
+  Proof. move=> b_le_a + n => /(_ (n - z)); rewrite mulnBl; lia. Qed.
+
 End NatLemmas.
 
 (** In this section, we prove a lemma about intervals of natural
     numbers. *)
 Section Interval.
-  
+
   (** Trivially, points before the start of an interval, or past the
       end of an interval, are not included in the interval. *)
-  Lemma point_not_in_interval:
-    forall t1 t2 t',
-      t2 <= t' \/ t' < t1 ->
-      forall t,
-        t1 <= t < t2 ->
-        t <> t'.
+  Lemma point_not_in_interval t1 t2 t' :
+    t2 <= t' \/ t' < t1 ->
+    forall t,
+      t1 <= t < t2 ->
+      t <> t'.
   Proof.
-    move=> t1 t2 t' EXCLUDED t /andP [GEQ_t1 LT_t2] EQ; subst.
-    by case EXCLUDED => [INEQ | INEQ];
-      eapply leq_ltn_trans in INEQ; eauto;
-        rewrite ltnn in INEQ.
+    move=> excl t /[swap]-> /andP[t1_le_t' t'_lt_t2].
+    have [t2_le_t'|t'_lt_t1] := excl.
+    - by move: (leq_trans t'_lt_t2 t2_le_t'); rewrite ltnn.
+    - by move: (leq_ltn_trans t1_le_t' t'_lt_t1); rewrite ltnn.
   Qed.
 
 End Interval.
