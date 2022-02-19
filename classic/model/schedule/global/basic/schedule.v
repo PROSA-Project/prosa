@@ -161,7 +161,7 @@ Module Schedule.
           by specialize (NOTSCHED cpu); rewrite SCHED eq_refl in NOTSCHED.
         }
         {
-          intros NOSERV; rewrite big_mkcond -sum_nat_eq0_nat in NOSERV.
+          intros NOSERV; rewrite big_mkcond sum_nat_eq0_nat filter_predT in NOSERV.
           move: NOSERV => /allP ALL.
           rewrite negb_exists; apply/forallP; intros cpu.
           exploit (ALL cpu); [by apply mem_index_enum | by desf].

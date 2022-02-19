@@ -70,7 +70,7 @@ Section IdealModelLemmas.
     unfold is_idle in NIDLE.
     destruct(sched x) eqn:SCHED; last by done.
     move: SCHED => /eqP SCHED; clear NIDLE; rewrite -scheduled_at_def/= in SCHED.
-    move: L => /eqP; rewrite -sum_nat_eq0_nat; move => /allP L.
+    move: L => /eqP; rewrite sum_nat_eq0_nat filter_predT; move => /allP L.
     specialize (L s); feed L. 
     { unfold arrivals_between.
       eapply arrived_between_implies_in_arrivals; eauto 2.

@@ -24,21 +24,11 @@ Section SumsOverSequences.
     (** We start showing that having every member of [r] equal to zero is equivalent to 
         having the sum of all the elements of [r] equal to zero, and vice-versa. *)
     Lemma sum_nat_eq0_nat :
-      all (fun x => F x == 0) r = (\sum_(i <- r) F i == 0).
+      (\sum_(i <- r | P i) F i == 0) = all (fun x => F x == 0) [seq x <- r | P x].
     Proof.
-      destruct (all (fun x => F x == 0) r) eqn:ZERO.
-      { move: ZERO => /allP ZERO; rewrite -leqn0.
-        rewrite big_seq_cond (eq_bigr (fun x => 0)); first by rewrite big_const_seq iter_addn.
-        move=> i; rewrite andbT=>IN.
-        specialize (ZERO i); rewrite IN in ZERO.
-        by move: ZERO => /implyP ZERO; apply/eqP; apply ZERO. }
-      { apply negbT in ZERO; rewrite -has_predC in ZERO.
-        move: ZERO => /hasP [x IN NEQ].
-        rewrite (big_rem x) //=.
-        symmetry; apply negbTE; rewrite neq_ltn; apply/orP; right.
-        apply leq_trans with (n := F x); last by apply leq_addr.
-        by rewrite lt0n. }
-    Qed. 
+      elim: r => [|x r' IH]; rewrite ?big_nil//= big_cons.
+      by case: ifP; rewrite ?addn_eq0 IH.
+    Qed.
 
     (** In the same way, if at least one element of [r] is not zero, then the sum of all 
         elements of [r] must be strictly positive, and vice-versa. *)
@@ -299,7 +289,7 @@ Section SumsOverRanges.
   Proof.
     split.
     - rewrite /index_iota => /eqP.
-      rewrite -sum_nat_eq0_nat => /allP ZERO i.
+      rewrite sum_nat_eq0_nat filter_predT => /allP ZERO i.
       rewrite -mem_index_iota /index_iota => IN.
       by apply/eqP; apply ZERO.
     - move=> ZERO.
@@ -489,4 +479,3 @@ Section SumOverPartitions.
   End Equality.
 
 End SumOverPartitions.
-
