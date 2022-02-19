@@ -187,18 +187,18 @@ Section TaskArrivalsSize.
         size (task_arrivals_at arr_seq tsk t) =
         size (task_arrivals_at arr_seq tsk (t + n * task_period tsk)).
     Proof.
-      intros * T_G.
-      destruct (exists_or_not_add_mul_cases (task_offset tsk) (task_period tsk) t) as [[n1 JB_ARR] | JB_NOT_ARR].
-      + have EXISTS_N : exists nn, t + n * task_period tsk = task_offset tsk + nn * task_period tsk.
-        { exists (n1 + n).
-          now rewrite JB_ARR; lia.
-        }
-        move : EXISTS_N => [nn JB_ARR'].
-        now rewrite JB_ARR' JB_ARR !task_arrivals_at_size => //.
-      + have FORALL_N : forall nn, t + n * task_period tsk <> task_offset tsk + nn * task_period tsk by apply mul_add_neq.
-        now rewrite !task_arrivals_size_at_non_arrival.
+      move=> n t o_le_t.
+      have [tmo_eq0|tmo_neq0] :=
+        @eqP _ ((t - task_offset tsk) %% task_period tsk) 0.
+      - rewrite -(subnKC o_le_t) (divn_eq (t - _) (task_period tsk)).
+        by rewrite tmo_eq0 addn0 -addnA -mulnDl !task_arrivals_at_size.
+      - rewrite !task_arrivals_size_at_non_arrival// => n';
+        move=> /(f_equal (subn^~(task_offset tsk))); rewrite addKn;
+        move=> /(f_equal (modn^~(task_period tsk))).
+        + by rewrite -addnBAC// addnC -[n' * _]addn0 !modnMDl mod0n.
+        + by rewrite -[n' * _]addn0 modnMDl mod0n.
     Qed.
-    
+
   End TaskArrivalsInCaseOfInfiniteJobs.
   
 End TaskArrivalsSize.

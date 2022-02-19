@@ -23,31 +23,6 @@ Section NatLemmas.
     by move=> /(leq_trans (ltn_addr _ pltm)); rewrite ltnn.
   Qed.
 
-  (** For any numbers [a], [b], and [m], either there exists a number
-      [n] such that [m = a + n * b] or [m <> a + n * b] for any [n]. *)
-  Lemma exists_or_not_add_mul_cases:
-    forall a b m,
-      (exists n, m = a + n * b) \/
-      (forall n, m <> a + n * b).
-  Proof.
-    move=> a b m.
-    case: (leqP a  m) => LE.
-    { case: (boolP(b %| (m - a))) => DIV; [left | right].
-      { exists ((m - a) %/ b).
-        by rewrite divnK // subnKC //. }
-      { move => n EQ.
-        move: DIV => /negP DIV; apply DIV.
-        rewrite EQ.
-        rewrite -addnBAC // subnn add0n.
-        apply dvdn_mull.
-        by apply dvdnn. }
-    }
-    { right; move=> n EQ.
-      move: LE; rewrite EQ.
-      by rewrite -ltn_subRL subnn //.
-    }
-  Qed.  
-
   (** The expression [n2 * a + b] can be written as [n1 * a + b + (n2 - n1) * a]
       for any integer [n1] such that [n1 <= n2]. *)
   Lemma add_mul_diff:
