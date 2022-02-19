@@ -147,6 +147,8 @@ Section SumsOverSequences.
         the set [r]. We prove that, if we sum both functions over those
         points, then the sum of [E] conditioned by [P2] will dominate
         the sum of [E] conditioned by [P1]. *)
+    (* TODO: PR MathComp
+       - maybe leq_sum_seq above should be leq_sum_seqr and this one leq_sum_seql *)
     Lemma leq_sum_seq_pred:
       (forall i, i \in r -> P1 i -> P2 i) ->
       \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
