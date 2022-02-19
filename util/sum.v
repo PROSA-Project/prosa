@@ -4,6 +4,7 @@ Require Export prosa.util.notation.
 Require Export prosa.util.rel.
 Require Export prosa.util.nat.
 
+(* TODO: PR MathComp *)
 Lemma leq_sum_subseq (I : eqType) (r r' : seq I) (P : pred I) (F : I -> nat) :
   subseq r r' -> \sum_(i <- r | P i) F i <= \sum_(i <- r' | P i) F i.
 Proof.
@@ -89,6 +90,8 @@ Section SumsOverSequences.
         Requiring the absence of duplicate in [r] is a simple way to
         guarantee that the set inclusion [r <= rs] implies the actually
         required multiset inclusion. *)
+    (* TODO: PR MathComp
+       - add a condition P i *)
     Lemma leq_sum_sub_uniq (rs : seq I) :
       uniq r -> {subset r <= rs} ->
       \sum_(i <- r) F i <= \sum_(i <- rs) F i.
