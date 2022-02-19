@@ -34,6 +34,9 @@ Section SumsOverSequences.
 
     (** We start showing that having every member of [r] equal to zero is equivalent to
         having the sum of all the elements of [r] equal to zero, and vice-versa. *)
+    (* TODO: PR MathComp
+       this should probably be named sum_nat_eq0,
+       but there is already a sum_nat_eq0 that is less generic? *)
     Lemma sum_nat_eq0_nat :
       (\sum_(i <- r | P i) F i == 0) = all (fun x => F x == 0) [seq x <- r | P x].
     Proof.
