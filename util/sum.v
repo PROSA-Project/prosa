@@ -51,29 +51,16 @@ Section SumsOverSequences.
       by move: xinr a_notin_r; rewrite xa => ->.
     Qed.
 
-    (** We prove that if any element of [r] is bounded by constant [c], 
+    (** We prove that if any element of [r] is bounded by constant [c],
         then the sum of the whole set is bounded by [c * size r]. *)
-    Lemma sum_majorant_constant:
-      forall c,
-        (forall a, a \in r -> P a -> F a <= c) -> 
-        \sum_(j <- r | P j) F j <= c * (size [seq j <- r | P j]).
+    Lemma sum_majorant_constant c :
+      (forall a, a \in r -> P a -> F a <= c) ->
+      \sum_(j <- r | P j) F j <= c * (size [seq j <- r | P j]).
     Proof.
-      intros.
-      induction r; first by rewrite big_nil.
-      feed IHl.
-      { intros; apply H.
-        - by rewrite in_cons; apply/orP; right.
-        - by done. } 
-      rewrite big_cons.
-      destruct (P a) eqn:EQ.
-      { rewrite -cat1s filter_cat size_cat mulnDr.
-        apply leq_add; last by done.
-        rewrite size_filter //= EQ addn0 muln1.
-        apply H; last by done. 
-        by rewrite in_cons; apply/orP; left. }
-      { apply leq_trans with (c * size [seq j <- l | P j]); first by done.
-        rewrite leq_mul2l; apply /orP; right.
-        by rewrite -cat1s filter_cat size_cat leq_addl. }
+      move=> Fa_le_c.
+      rewrite -sum1_size big_filter big_distrr/= muln1.
+      rewrite big_seq_cond [X in _ <= X]big_seq_cond.
+      apply: leq_sum => i /andP[ir Pi]; exact: Fa_le_c.
     Qed.
 
     (** Next, we show that the sum of the elements in [r] respecting [P] can
