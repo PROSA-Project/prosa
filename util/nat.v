@@ -23,20 +23,6 @@ Section NatLemmas.
     by move=> /(leq_trans (ltn_addr _ pltm)); rewrite ltnn.
   Qed.
 
-  (** The expression [n2 * a + b] can be written as [n1 * a + b + (n2 - n1) * a]
-      for any integer [n1] such that [n1 <= n2]. *)
-  Lemma add_mul_diff:
-    forall n1 n2 a b,
-      n1 <= n2 ->
-      n2 * a + b = n1 * a + b + (n2 - n1) * a.
-  Proof.
-    intros * LT.
-    rewrite mulnBl.
-    rewrite addnBA; first by lia.
-    destruct a; first by lia.
-    by rewrite leq_pmul2r.
-  Qed.
-
   (** Given constants [a, b, c, z] such that [b <= a], if there is no
       constant [m] such that [a = b + m * c], then it holds that there
       is no constant [n] such that [a + z * c = b + n * c]. *)

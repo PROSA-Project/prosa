@@ -133,8 +133,8 @@ Section PeriodicLemmas.
       size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
   Proof.
     intros * N1_LT.
-    specialize (add_mul_diff n1 n2 HP O_max) => AD; feed_n 1 AD => //.
-    rewrite AD.
+    have -> : n2 * HP + O_max = n1 * HP + O_max + (n2 - n1) * HP.
+    { by rewrite -[in LHS](subnKC N1_LT) mulnDl addnAC. }
     destruct (hyperperiod_int_mult_of_any_task ts tsk H_task_in_ts) as [k HYP]; rewrite !/HP.
     rewrite [in X in _ = size (_ (n1 * HP + O_max + _ * X) tsk)]HYP.
     rewrite mulnA /HP /jobs_in_hyperperiod !size_of_task_arrivals_between.
