@@ -9,6 +9,7 @@ Section NatLemmas.
   (** First, we show that, given [m >= p] and [n >= q], an
       expression [(m + n) - (p + q)] can be transformed into
       expression [(m - p) + (n - q)]. *)
+  (* TODO: PR MathComp *)
   Lemma subnACA m n p q : p <= m -> q <= n ->
     (m + n) - (p + q) = (m - p) + (n - q).
   Proof. by move=> plem qlen; rewrite subnDA addnBAC// addnBA// subnAC. Qed.
