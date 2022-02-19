@@ -67,17 +67,8 @@ Section SumsOverSequences.
         be obtained by removing from the total sum over [r] the sum of the elements
         in [r] not respecting [P]. *)
     Lemma sum_pred_diff:
-      \sum_(r <- r | P r) F r =
-      \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
-    Proof.
-      induction r; first by rewrite !big_nil subn0.
-      rewrite !big_cons !IHl; clear IHl.
-      case (P a); simpl; last by rewrite subnDl.
-      rewrite addnBA; first by done.
-      rewrite big_mkcond leq_sum //.
-      intros t _.
-      by case (P t).
-    Qed.
+      \sum_(r <- r | P r) F r = \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
+    Proof. by rewrite [X in X - _](bigID P)/= addnK. Qed.
 
     (** Summing natural numbers over a superset can only yields a greater sum.
         Requiring the absence of duplicate in [r] is a simple way to
