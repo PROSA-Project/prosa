@@ -189,27 +189,8 @@ Section SumsOverSequences.
         by apply/eqP; rewrite eqn_leq; apply/andP; split. }
     Qed.
 
-    (** Next, we prove that the summing over the difference of [E1] and [E2] is
-        the same as the difference of the two sums performed separately. Since we
-        are using natural numbers, we have to require that [E2] dominates [E1] over
-        the summing points given by [r]. *)
-    Lemma sum_seq_diff:
-        (forall i : I, i \in r -> E1 i <= E2 i) ->
-        \sum_(i <- r) (E2 i - E1 i) = \sum_(i <- r) E2 i - \sum_(i <- r) E1 i.
-    Proof.
-      move=> LEQ.
-      induction r; first by rewrite !big_nil subn0. 
-      rewrite !big_cons subnACA.
-      - apply/eqP; rewrite eqn_add2l; apply/eqP; apply IHl.
-        by intros; apply LEQ; rewrite in_cons; apply/orP; right.
-      - by apply LEQ; rewrite in_cons; apply/orP; left.
-      - rewrite big_seq_cond [in X in _ <= X]big_seq_cond.
-        rewrite leq_sum //; move => i /andP [IN _].
-        by apply LEQ; rewrite in_cons; apply/orP; right.
-    Qed.
-
   End SumOfTwoFunctions.
-  
+
 End SumsOverSequences.
 
 (** In this section, we prove a variety of properties of sums performed over ranges. *)
@@ -271,16 +252,14 @@ Section SumsOverRanges.
       the same as summing over the two functions separately, and then taking the 
       difference of the two sums. Since we are using natural numbers, we have to
       require that one function dominates the other in the summing range. *)
-  Lemma sum_diff:
-    forall n F G,
-      (forall i, i < n -> F i >= G i) ->
-      \sum_(0 <= i < n) (F i - G i) =
-      (\sum_(0 <= i < n) (F i)) - (\sum_(0 <= i < n) (G i)).       
+  Lemma sumnB_nat m n F G :
+    (forall i, m <= i < n -> F i >= G i) ->
+    \sum_(m <= i < n) (F i - G i) =
+      (\sum_(m <= i < n) (F i)) - (\sum_(m <= i < n) (G i)).
   Proof.
-    intros n F G ALL.
-    rewrite sum_seq_diff; first by done.
-    move=> i; rewrite mem_index_iota; move => /andP [_ LT].
-    by apply ALL.
+    move=> le.
+    rewrite big_nat_cond [X in X - _]big_nat_cond [X in _ - X]big_nat_cond.
+    rewrite sumnB// => i; rewrite andbT; exact: le.
   Qed.
 
   (** Given a sequence [r], function [F], and a predicate [P], we

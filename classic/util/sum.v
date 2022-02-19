@@ -120,7 +120,7 @@ Section SumArithmetic.
     have RECL := big_nat_recl.
     specialize (ADD1 nat 0 addn 0 (size r) (fun x => true) (fun i => F (nth x0 r i))).
     specialize (RECL nat 0 addn (size r).-1 0 (fun i => F (nth x0 r i))).
-    rewrite sum_diff; last by ins.
+    rewrite sumnB_nat; last by ins.
     rewrite addmovr; last by rewrite -[_.-1]add0n; apply prev_le_next; try rewrite add0n leqnn.
     rewrite addnBAC; last by apply leq_sum_nat; move => i /andP [_ LT] _; apply ALL.
     rewrite addnC -RECL //.

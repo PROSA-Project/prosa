@@ -122,11 +122,9 @@ Section GenericModelLemmas.
     Proof.
       rewrite /total_service_of_jobs_in /service_of_jobs.
       rewrite big_mkcond [in X in _ = X - _]big_mkcond [in X in _ = _ - X]big_mkcond //=.
-      rewrite -sum_seq_diff.
-      - apply eq_big_seq; intros j IN.
-        by destruct (P _); simpl; lia.
-      - intros j IN.
-        by destruct (P _).
+      rewrite -sumnB; last by move=> j _; case: (P j).
+      apply: eq_big_seq => j IN.
+      by case: (P j) => //=; lia.
     Qed.
 
     (** We show that [service_of_jobs] is monotone with respect to the
