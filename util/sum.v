@@ -259,7 +259,7 @@ Section SumsOverSequences.
     Proof.
       move=> LEQ.
       induction r; first by rewrite !big_nil subn0. 
-      rewrite !big_cons subnD.
+      rewrite !big_cons subnACA.
       - apply/eqP; rewrite eqn_add2l; apply/eqP; apply IHl.
         by intros; apply LEQ; rewrite in_cons; apply/orP; right.
       - by apply LEQ; rewrite in_cons; apply/orP; left.

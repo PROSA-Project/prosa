@@ -6,16 +6,13 @@ Require Export prosa.util.tactics.
 (** Additional lemmas about natural numbers. *)
 Section NatLemmas.
 
-  (** First, we show that, given [m1 >= m2] and [n1 >= n2], an
-      expression [(m1 + n1) - (m2 + n2)] can be transformed into
-      expression [(m1 - m2) + (n1 - n2)]. *)
-  Lemma subnD:
-    forall m1 m2 n1 n2,
-      m1 >= m2 ->
-      n1 >= n2 ->
-      (m1 + n1) - (m2 + n2) = (m1 - m2) + (n1 - n2).
-  Proof. by ins; lia. Qed.
-  
+  (** First, we show that, given [m >= p] and [n >= q], an
+      expression [(m + n) - (p + q)] can be transformed into
+      expression [(m - p) + (n - q)]. *)
+  Lemma subnACA m n p q : p <= m -> q <= n ->
+    (m + n) - (p + q) = (m - p) + (n - q).
+  Proof. by move=> plem qlen; rewrite subnDA addnBAC// addnBA// subnAC. Qed.
+
   (** Next, we show that [m + p <= n] implies that [m <= n - p]. Note
       that this lemma is similar to ssreflect's lemma [leq_subRL];
       however, the current lemma has no precondition [n <= p], since it
