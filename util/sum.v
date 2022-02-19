@@ -43,6 +43,7 @@ Section SumsOverSequences.
 
     (** In the same way, if at least one element of [r] is not zero, then the sum of all
         elements of [r] must be strictly positive, and vice-versa. *)
+    (* TODO: PR MathComp *)
     Lemma sum_nat_gt0 :
       (0 < \sum_(i <- r | P i) F i) = has (fun x => 0 < F x) [seq x <- r | P x].
     Proof.
