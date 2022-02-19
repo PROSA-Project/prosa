@@ -3,6 +3,16 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop p
 Require Export prosa.util.notation.
 Require Export prosa.util.nat.
 
+Lemma leq_sum_subseq (I : eqType) (r r' : seq I) (P : pred I) (F : I -> nat) :
+  subseq r r' -> \sum_(i <- r | P i) F i <= \sum_(i <- r' | P i) F i.
+Proof.
+elim: r r' => [|x r IH] r'; first by rewrite big_nil.
+elim: r' => [//|x' r' IH'] /=; have [<- /IH {}IH|_ /IH' {}IH'] := eqP.
+  by rewrite !big_cons; case: (P x); rewrite // leq_add2l.
+rewrite [X in _ <= X]big_cons; case: (P x') => //.
+exact: leq_trans (leq_addl _ _).
+Qed.
+
 Section SumsOverSequences.
 
   (** Consider any type [I] with a decidable equality ... *)
@@ -74,27 +84,19 @@ Section SumsOverSequences.
         Requiring the absence of duplicate in [r] is a simple way to
         guarantee that the set inclusion [r <= rs] implies the actually
         required multiset inclusion. *)
-    Lemma leq_sum_sub_uniq :
-      forall (rs: seq I),
-        uniq r ->
-        {subset r <= rs} ->
-        \sum_(i <- r) F i <= \sum_(i <- rs) F i.
+    Lemma leq_sum_sub_uniq (rs : seq I) :
+      uniq r -> {subset r <= rs} ->
+      \sum_(i <- r) F i <= \sum_(i <- rs) F i.
     Proof.
-      intros rs UNIQ SUB; generalize dependent rs.
-      induction r as [| x r1' IH]; first by ins; rewrite big_nil.
-      intros rs SUB.
-      have IN: x \in rs by apply SUB; rewrite in_cons eq_refl orTb.
-      simpl in UNIQ; move: UNIQ => /andP [NOTIN UNIQ]; specialize (IH UNIQ).
-      destruct (splitPr IN).
-      rewrite big_cat 2!big_cons /= addnA [_ + F x]addnC -addnA leq_add2l.
-      rewrite mem_cat in_cons eq_refl in IN.
-      rewrite -big_cat /=.
-      apply IH; red; intros x0 IN0.
-      rewrite mem_cat.
-      feed (SUB x0); first by rewrite in_cons IN0 orbT.
-      rewrite mem_cat in_cons in SUB.
-      move:SUB => /orP [SUB1 | /orP [/eqP EQx | SUB2]]; [by rewrite SUB1 | | by rewrite SUB2 orbT].
-      by rewrite -EQx IN0 in NOTIN.
+      move=> uniq_r sub_r_rs.
+      rewrite [X in _ <= X](bigID (fun x => x \in r))/=.
+      apply: leq_trans (leq_addr _ _).
+      rewrite (perm_big (undup [seq x <- rs | x \in r])).
+      - rewrite -filter_undup big_filter_cond/=.
+        under eq_bigl => ? do rewrite andbT; exact/leq_sum_subseq/undup_subseq.
+      - apply: uniq_perm; rewrite ?undup_uniq// => x.
+        rewrite mem_undup mem_filter.
+        by case xinr: (x \in r); rewrite // (sub_r_rs _ xinr).
     Qed.
 
   End SumOfOneFunction.
