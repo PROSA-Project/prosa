@@ -117,9 +117,8 @@ Section SumsOverSequences.
       (forall i, i \in r -> P i -> E1 i <= E2 i) ->
       \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
     Proof.
-      intros LE.
-      rewrite big_seq_cond [\sum_(_ <- _| P _)_]big_seq_cond.
-      by apply leq_sum; move => j /andP [IN H]; apply LE.
+      move=> le; rewrite big_seq_cond [X in _ <= X]big_seq_cond.
+      apply: leq_sum => i /andP[]; exact: le.
     Qed.
 
     (** In the same way, if [E1] equals [E2] in all the points considered above, then also the two
@@ -128,13 +127,10 @@ Section SumsOverSequences.
       (forall i, i \in r -> P i -> E1 i == E2 i) ->
       \sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i.
     Proof.
-      move=> EQ.
-      rewrite big_seq_cond [\sum_(_ <- _| P _)_]big_seq_cond.
-      rewrite eqn_leq; apply /andP; split.
-      all: apply leq_sum; move => j /andP [IN H].
-      all: by move:(EQ j IN H) => LEQ; lia.
+      move=> eqE; apply/eqP; rewrite -big_filter -[RHS]big_filter.
+      apply: eq_big_seq => x; rewrite mem_filter => /andP[Px xr]; exact/eqP/eqE.
     Qed.
-    
+
     (** Assume that [P1] implies [P2] in all the points contained in
         the set [r]. We prove that, if we sum both functions over those
         points, then the sum of [E] conditioned by [P2] will dominate
