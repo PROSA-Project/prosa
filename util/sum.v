@@ -139,20 +139,11 @@ Section SumsOverSequences.
       (forall i, i \in r -> P1 i -> P2 i) ->
       \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
     Proof.
-      intros LE.
-      induction r; first by rewrite !big_nil.
-      rewrite !big_cons.
-      destruct (P1 a) eqn:P1a; first (move: P1a => /eqP; rewrite eqb_id => P1a). 
-      - rewrite LE //; last by rewrite in_cons; apply/orP; left.
-        rewrite leq_add2l.
-        by apply IHl; intros; apply LE => //; rewrite in_cons; apply/orP; right.
-      - destruct (P2 a) eqn:P2a.
-        + by eapply leq_trans;
-            [apply IHl; intros; apply LE => //; rewrite in_cons; apply/orP; right
-            | apply leq_addl].
-        + by apply IHl; intros; apply LE => //; rewrite in_cons; apply/orP; right. 
+      move=> imp; rewrite [X in _ <= X](bigID P1)/=.
+      rewrite big_seq_cond [X in _ <= X + _]big_seq_cond.
+      rewrite (eq_bigl (fun i => [&& i \in r, P2 i & P1 i])) ?leq_addr// => i.
+      by case ir: (i \in r); case P1i: (P1 i); rewrite ?andbF //= (imp i).
     Qed.
-    
 
     (** Next, we prove that if for any element x of a set [xs] the following two statements 
         hold (1) [F1 x] is less than or equal to [F2 x] and (2) the sum [F1 x_1, ..., F1 x_n] 
