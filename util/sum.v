@@ -208,11 +208,7 @@ Section SumsOverRanges.
   Lemma sum_of_ones:
     forall t Δ,
       \sum_(t <= x < t + Δ) 1 = Δ. 
-  Proof.
-    move=> t Δ.
-    rewrite big_const_nat iter_addn_0.
-    by lia.
-  Qed.
+  Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
 
   (** Next, we show that a sum of natural numbers equals zero if and only 
       if all terms are zero. *)
