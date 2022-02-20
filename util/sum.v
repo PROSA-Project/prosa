@@ -199,6 +199,7 @@ Section SumsOverSequences.
       statements hold (1) [E1 i] is less than or equal to [E2 i] and (2) the sum
       [E1 x_1, ..., E1 x_n] is equal to the sum of [E2 x_1, ..., E2 x_n], then
       [E1 x] is equal to [E2 x] for any element x of [xs]. *)
+  (* TODO: PR MathComp *)
   Lemma eq_sum_leq_seq :
     (forall i, i \in r -> P i -> E1 i <= E2 i) ->
     \sum_(x <- r | P x) E1 x == \sum_(x <- r | P x) E2 x
