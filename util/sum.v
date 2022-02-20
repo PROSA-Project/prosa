@@ -204,14 +204,7 @@ End SumsOverSequences.
 (** In this section, we prove a variety of properties of sums performed over ranges. *)
 Section SumsOverRanges.
 
-  (** First, we show a trivial identity: any sum of zeros is zero. *)
-  Lemma sum0 m n:
-    \sum_(m <= i < n) 0 = 0.
-  Proof.
-    by rewrite big_const_nat iter_addn mul0n addn0 //.
-  Qed.
-  
-  (** In a similar way, we prove that the sum of Δ ones is equal to Δ. *)
+  (** First, we prove that the sum of Δ ones is equal to Δ. *)
   Lemma sum_of_ones:
     forall t Δ,
       \sum_(t <= x < t + Δ) 1 = Δ. 
@@ -233,7 +226,7 @@ Section SumsOverRanges.
       by apply/eqP; apply ZERO.
     - move=> ZERO.
       have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
-      by apply sum0.
+      exact: big1_eq.
   Qed.
 
   (** Moreover, the fact that the sum is smaller than the range of the summation 
