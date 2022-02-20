@@ -145,51 +145,59 @@ Section SumsOverSequences.
       by case ir: (i \in r); case P1i: (P1 i); rewrite ?andbF //= (imp i).
     Qed.
 
-    (** Next, we prove that if for any element x of a set [xs] the following two statements 
-        hold (1) [F1 x] is less than or equal to [F2 x] and (2) the sum [F1 x_1, ..., F1 x_n] 
-        is equal to the sum of [F2 x_1, ..., F2 x_n], then [F1 x] is equal to [F2 x] for 
-        any element x of [xs]. *)
-    Lemma sum_majorant_eqn:
-      forall xs,
-        (forall x, x \in xs -> P x -> E1 x <= E2 x) -> 
-        \sum_(x <- xs | P x) E1 x = \sum_(x <- xs | P x) E2 x ->
-        (forall x, x \in xs -> P x -> E1 x = E2 x).
-    Proof.
-      intros xs H1 H2 x IN PX.
-      induction xs; first by done.
-      have Fact: \sum_(j <- xs | P j) E1 j <= \sum_(j <- xs | P j) E2 j.
-      { rewrite [in X in X <= _]big_seq_cond [in X in _ <= X]big_seq_cond leq_sum //.
-        move => y /andP [INy PY].
-        apply: H1; last by done. 
-        by rewrite in_cons; apply/orP; right. }
-      feed IHxs.
-      { intros x' IN' PX'.
-        apply H1; last by done.
-        by rewrite in_cons; apply/orP; right. }
-      rewrite big_cons [RHS]big_cons in H2.
-      have EqLeq: forall a b c d, a + b = c + d -> a <= c -> b >= d by intros; lia.
-      move: IN; rewrite in_cons; move => /orP [/eqP EQ | IN]. 
-      { subst a.
-        rewrite PX in H2.
-        specialize (H1 x).
-        feed_n 2 H1=> //; first by rewrite in_cons; apply/orP; left.
-        move: (EqLeq
-                 (E1 x) (\sum_(j <- xs | P j) E1 j)
-                 (E2 x) (\sum_(j <- xs | P j) E2 j) H2 H1) => Q.
-        have EQ: \sum_(j <- xs | P j) E1 j = \sum_(j <- xs | P j) E2 j. 
-        { by apply /eqP; rewrite eqn_leq; apply/andP; split. }
-        by move: H2 => /eqP; rewrite EQ eqn_add2r; move => /eqP EQ'. }
-      { destruct (P a) eqn:PA; last by apply IHxs.
-        apply: IHxs; last by done.
-        specialize (H1 a).
-        feed_n 2 (H1); [ by rewrite in_cons; apply/orP; left | by done | ].
-        move: (EqLeq
-                 (E1 a) (\sum_(j <- xs | P j) E1 j)
-                 (E2 a) (\sum_(j <- xs | P j) E2 j) H2 H1) => Q.
-        by apply/eqP; rewrite eqn_leq; apply/andP; split. }
-    Qed.
-
   End SumOfTwoFunctions.
+
+End SumsOverSequences.
+
+(** We continue establishing properties of sums over sequences, but start a new
+    section here because some of the below proofs depend lemmas in the preceding
+    section in their full generality. *)
+Section SumsOverSequences.
+
+  (** Consider any type [I] with a decidable equality ... *)
+  Variable (I : eqType).
+
+  (** ... and assume we are given a sequence ... *)
+  Variable (r : seq I).
+
+  (** ... and a predicate [P]. *)
+  Variable (P : pred I).
+
+  (** Consider two functions that yield natural numbers. *)
+  Variable (E1 E2 : I -> nat).
+
+  (** First, as an auxiliary lemma, we observe that, if [E1 j] is less than [E2
+      j] for some element [j] involved in a summation (filtered by [P]), then
+      the corresponding totals are not equal. *)
+  Lemma ltn_sum_leq_seq j :
+    j \in r ->
+    P j ->
+    E1 j < E2 j ->
+    (forall i, i \in r -> P i -> E1 i <= E2 i) ->
+    \sum_(x <- r | P x) E1 x < \sum_(x <- r | P x) E2 x.
+  Proof.
+    move=> jr Pj ltj le.
+    rewrite (big_rem j)// [X in _ < X](big_rem j)//= Pj -addSn leq_add//.
+    apply: leq_sum_seq => i /mem_rem; exact: le.
+  Qed.
+
+  (** Next, we prove that if for any element i of a set [r] the following two
+      statements hold (1) [E1 i] is less than or equal to [E2 i] and (2) the sum
+      [E1 x_1, ..., E1 x_n] is equal to the sum of [E2 x_1, ..., E2 x_n], then
+      [E1 x] is equal to [E2 x] for any element x of [xs]. *)
+  Lemma eq_sum_leq_seq :
+    (forall i, i \in r -> P i -> E1 i <= E2 i) ->
+    \sum_(x <- r | P x) E1 x == \sum_(x <- r | P x) E2 x
+      = all (fun x => E1 x == E2 x) [seq x <- r | P x].
+  Proof.
+    move=> le; rewrite all_filter; case aE: all.
+    apply: eq_sum_seq => i ir Pi; move: aE => /allP/(_ i ir)/implyP; exact.
+    have [j /andP[jr Pj] ltj] : exists2 j, (j \in r) && P j & E1 j < E2 j.
+    have /negbT := aE; rewrite -has_predC => /hasP[j jr /=].
+    rewrite negb_imply => /andP[Pj neq].
+    - by exists j; first exact/andP; rewrite ltn_neqAle neq le.
+    - by apply/negbTE; rewrite neq_ltn (ltn_sum_leq_seq j).
+  Qed.
 
 End SumsOverSequences.
 

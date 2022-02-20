@@ -257,8 +257,9 @@ Section UnitServiceModelLemmas.
       - unfold workload_of_jobs, service_of_jobs in EQ; unfold completed_by, service.completed_by.
         rewrite /service -(service_during_cat _ _ _ t1); last by apply/andP; split.
         rewrite cumulative_service_before_job_arrival_zero // add0n.
-        rewrite <- sum_majorant_eqn with (E1 := fun j => service_during sched j t1 t_compl)
-                                        (xs := arrivals_between arr_seq t1 t2) (P := P); try done.
+        apply: eq_leq; have /esym/eqP := EQ; rewrite eq_sum_leq_seq.
+        { move=> /allP/(_ j) + /ltac:(apply/esym/eqP); apply.
+          by rewrite mem_filter Pj. }
         by intros; apply cumulative_service_le_job_cost; eauto.
     Qed.
 

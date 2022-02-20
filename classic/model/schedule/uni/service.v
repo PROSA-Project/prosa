@@ -504,9 +504,10 @@ Module Service.
           rewrite /service /service_during (@big_cat_nat _ _ _ t1) //=.
           rewrite (cumulative_service_before_job_arrival_zero
                      job_arrival sched _ j 0 t1) // add0n.
-          rewrite <- sum_majorant_eqn with (E1 := fun j => service_during sched j t1 t_compl)
-                                      (xs := arrivals_between t1 t2) (P := P); try done.
-            by intros; apply cumulative_service_le_job_cost.
+          apply: eq_leq; have /esym/eqP := H; rewrite eq_sum_leq_seq.
+          { move=> /allP/(_ j) + /ltac:(apply/esym/eqP); apply.
+            by rewrite mem_filter H1. }
+          by intros; apply cumulative_service_le_job_cost.
         } 
       Qed.
 
