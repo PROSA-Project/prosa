@@ -192,39 +192,6 @@ available on its `git repository
 Behavior
 ========
 
-TODO describe behavior
-|*)
-
-(*|
-.. _model:
-
-Model
-=====
-
-TODO describe model
-|*)
-
-(*|
-.. _analysis:
-
-Analysis
-========
-
-TODO describe some analysis
-
-was `scheduling theory for fixed-priority tasks deployed upon
-fully preemptive uniprocessors` in Borislav document
-|*)
-
-(*|
-.. _formulating-constructs:
-
-Formulating Real-time Constructs in Prosa
-=========================================
-
-|*)
-
-(*|
 Notion of Time
 --------------
 
@@ -235,7 +202,7 @@ there exist two approaches:
 2. continuous time domain.
 
 In the former approach, it is assumed
-that there exists the smallest atomic unit of time (typically assigned
+a smallest atomic unit of time (typically assigned
 an integer value of 1), and all other timing constructs are specified
 as multiples of that atomic unit. In the latter approach, the premise
 of the atomic unit does not exist, and each process can have an
@@ -243,13 +210,13 @@ arbitrary duration.
 
 In Prosa, a concept of time is introduced in the file `behavior/time.v
 <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/time.v>`_
-rt.model.time} in which one can read
+in which one can read
 |*)
 Definition duration := nat.
 Definition instant  := nat.
 (*|
-This means the notions of duration and time instant are bot defined
-as the type `nat` of natural integers from Coq standard library.
+This means the notions of duration and time instant are both defined
+as the type `nat` of natural integers from the Coq standard library.
 
 If one tries
 |*)
@@ -268,7 +235,7 @@ Unset Printing All.
    The `Set Printing All` command allows to see the underlying representation,
    otherwise the much more convenient notation `2` is used.
 
-Thus, in Prosa time is discrete (1.). At each observable moment (instant),
+Thus, in Prosa, time is discrete (1.). At each observable moment (instant),
 the time has an exact integer value. Moreover, the duration of any process
 can be described as a multiple of atomic time instants, where the value
 is equal to the difference between the time instant when the process
@@ -276,8 +243,8 @@ finished and the time instant when the process started.
 |*)
 
 (*|
-Concrete Workload, Jobs
------------------------
+Jobs
+----
 
 In real-time theory, and in Prosa, jobs represent an instantaneous
 arrival of an amount of workload that has to be executed upon a
@@ -289,7 +256,7 @@ performed on a processor. In Prosa, the definition is stated in
 
 .. note::
 
-   In Coq syntax, everything between `(*` and `*)` is a comment,
+   In Coq syntax, everything between ``(*`` and ``*)`` is a comment,
    ignored by Coq.
 
 This file is reproduced below.
@@ -297,24 +264,29 @@ This file is reproduced below.
 
 (** * Notion of a Job Type *)
 
-(** Throughout the library we assume that jobs have decidable equality. *)
+(** Throughout the library we assume that jobs
+    have decidable equality. *)
 Definition JobType := eqType.
 
-(** * Unit of Work *)
+(** * Notion of Work *)
 
 (** We define 'work' to denote the unit of service received or needed.
-   In a real system, this corresponds to the number of processor cycles. *)
+    In a real system, this corresponds to the number
+    of processor cycles. *)
 Definition work  := nat.
 
-(** * Basic Job Parameters — Cost, Arrival Time, and Absolute Deadline *)
+(** * Basic Job Parameters — Cost, Arrival Time,
+    and Absolute Deadline *)
 
-(** Definition of a generic type of parameter relating jobs to a discrete cost. *)
+(** Definition of a generic type of parameter relating jobs
+    to a discrete cost. *)
 Class JobCost (Job : JobType) := job_cost : Job -> work.
 
 (** Definition of a generic type of parameter for job_arrival. *)
 Class JobArrival (Job : JobType) := job_arrival : Job -> instant.
 
-(** Definition of a generic type of parameter relating jobs to an absolute deadline. *)
+(** Definition of a generic type of parameter relating jobs
+    to an absolute deadline. *)
 Class JobDeadline (Job : JobType) := job_deadline : Job -> instant.
 
 (*|
@@ -342,7 +314,8 @@ Let's first introduce here the `Section` mechanism of Coq, when typing
 |*)
 Section ArrivalSequence.
 (*|
-Coq starts a `Section` (called `ArrivalSequence` here) in which one can
+Coq starts a `Section` (called `ArrivalSequence` here, but that name
+only serves a documentation purpose) in which one can
 add variables
 |*)
   (** Given any job type with decidable equality, ... *)
@@ -391,12 +364,12 @@ Section JobProperties.
   (** First, we define the sequence of jobs arriving at time t. *)
   Definition arrivals_at (t : instant) := arr_seq t.
 
-  (** Next, we say that job j arrives at a given time t iff it belongs to the
-       corresponding sequence. *)
+  (** Next, we say that job j arrives at a given time t
+      iff it belongs to the corresponding sequence. *)
   Definition arrives_at (j : Job) (t : instant) := j \in arrivals_at t.
 
-  (** Similarly, we define whether job j arrives at some (unknown) time t, i.e.,
-       whether it belongs to the arrival sequence. *)
+  (** Similarly, we define whether job j arrives at some (unknown)
+      time t, i.e., whether it belongs to the arrival sequence. *)
   Definition arrives_in (j : Job) := exists t, j \in arrivals_at t.
 
 End JobProperties.
@@ -418,19 +391,19 @@ Section ValidArrivalSequence.
   (** Consider any job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
 
-  (** We say that arrival times are consistent if any job that arrives in the
-     sequence has the corresponding arrival time. *)
+  (** We say that arrival times are consistent if any job that arrives
+      in the sequence has the corresponding arrival time. *)
   Definition consistent_arrival_times :=
     forall j t,
       arrives_at arr_seq j t -> job_arrival j = t.
 
-  (** We say that the arrival sequence is a set iff it doesn't contain duplicate
-     jobs at any given time. *)
+  (** We say that the arrival sequence is a set iff it doesn't contain
+      duplicate jobs at any given time. *)
   Definition arrival_sequence_uniq :=
     forall t, uniq (arrivals_at arr_seq t).
 
-  (** We say that the arrival sequence is valid iff it is a set and arrival times
-     are consistent *)
+  (** We say that the arrival sequence is valid iff it is a set
+      and arrival times are consistent *)
   Definition valid_arrival_sequence :=
     consistent_arrival_times /\ arrival_sequence_uniq.
 
@@ -448,17 +421,18 @@ Section ArrivalTimeProperties.
   (** Let j be any job. *)
   Variable j: Job.
 
-  (** We say that job j has arrived at time t iff it arrives at some time t_0
-     with t_0 <= t. *)
+  (** We say that job j has arrived at time t iff it arrives
+      at some time t_0 with t_0 <= t. *)
   Definition has_arrived (t : instant) := job_arrival j <= t.
 
-  (** Next, we say that job j arrived before t iff it arrives at some time t_0
-     with t_0 < t. *)
+  (** Next, we say that job j arrived before t iff it arrives
+      at some time t_0 with t_0 < t. *)
   Definition arrived_before (t : instant) := job_arrival j < t.
 
-  (** Finally, we say that job j arrives between t1 and t2 iff it arrives at
-     some time t with t1 <= t < t2. *)
-  Definition arrived_between (t1 t2 : instant) := t1 <= job_arrival j < t2.
+  (** Finally, we say that job j arrives between t1 and t2
+      iff it arrives at some time t with t1 <= t < t2. *)
+  Definition arrived_between (t1 t2 : instant) :=
+    t1 <= job_arrival j < t2.
 
 End ArrivalTimeProperties.
 (*|
@@ -474,27 +448,28 @@ Section ArrivalSequencePrefix.
   (** Consider any job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
 
-  (** By concatenation, we construct the list of jobs that arrived in the
-     interval <<[t1, t2)>>. *)
+  (** By concatenation, we construct the list of jobs that arrived
+      in the interval <<[t1, t2)>>. *)
   Definition arrivals_between (t1 t2 : instant) :=
     \cat_(t1 <= t < t2) arrivals_at arr_seq t.
 
-  (** Based on that, we define the list of jobs that arrived up to time t, ...*)
+  (** Based on that, we define the list of jobs that arrived
+      up to time t, ...*)
   Definition arrivals_up_to (t : instant) := arrivals_between 0 t.+1.
 
   (** ... the list of jobs that arrived strictly before time t, ... *)
   Definition arrivals_before (t : instant) := arrivals_between 0 t.
 
-  (** ... and the list of jobs that arrive in the interval <<[t1, t2)>> and
-   satisfy a certain predicate [P]. *)
+  (** ... and the list of jobs that arrive in the interval
+      <<[t1, t2)>> and satisfy a certain predicate [P]. *)
   Definition arrivals_between_P (P : Job -> bool) (t1 t2 : instant) :=
     [seq j <- arrivals_between t1 t2 | P j].
 
 End ArrivalSequencePrefix.
 
 (*|
-Workload and Resource States
-----------------------------
+Schedule
+--------
 
 As already mentioned, jobs execute upon resources. In our uniprocessor
 case, that would relate to jobs executing on a processor. Since there
@@ -524,7 +499,11 @@ and what amount of service it is given
 Check service_in.  (* .unfold *)
 
 (*|
-Equipped with this definitions, the file `behavior/service.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/service.v>`_
+Service
+-------
+
+Equipped with this definitions, the file
+`behavior/service.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/service.v>`_
 gives basic definitions on the service received by a job.
 |*)
 Section Service.
@@ -537,10 +516,13 @@ Section Service.
   (** Consider any schedule. *)
   Variable sched : schedule PState.
 
-  (** First, we define whether a job [j] is scheduled at time [t], ... *)
-  Definition scheduled_at (j : Job) (t : instant) := scheduled_in j (sched t).
+  (** First, we define whether a job [j] is scheduled
+      at time [t], ... *)
+  Definition scheduled_at (j : Job) (t : instant) :=
+    scheduled_in j (sched t).
 
-  (** ... and the instantaneous service received by job j at time t. *)
+  (** ... and the instantaneous service received by job j
+      at time t. *)
   Definition service_at (j : Job) (t : instant) :=
     service_in j (sched t).
 
@@ -565,7 +547,8 @@ as well as the notion of completion of a job
   (** We say that job [j] has completed by time [t] if it received all
       required service in the interval from [0] until
       (but not including) [t]. *)
-  Definition completed_by (j : Job) (t : instant) := service j t >= job_cost j.
+  Definition completed_by (j : Job) (t : instant) :=
+    service j t >= job_cost j.
 
   (** We say that job [j] completes at time [t] if it has completed
       by time [t] but not by time [t - 1]. *)
@@ -607,6 +590,32 @@ Similarly, one can find in file `behavior/ready.v <https://gitlab.mpi-sws.org/RT
 the definitions of ready and backlogged jobs
 as well as a characterization of valid schedules
 with respect to job arrivals costs and arrival sequences.
+
+Finally, the
+`behavior/all.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/all.v>`_
+file provides a simple way to load all the above definitions by just typing
+|*)
+Require Import prosa.behavior.all.
+
+(*|
+.. _model:
+
+Model
+=====
+
+TODO describe model
+|*)
+
+(*|
+.. _analysis:
+
+Analysis
+========
+
+TODO describe some analysis
+
+was `scheduling theory for fixed-priority tasks deployed upon
+fully preemptive uniprocessors` in Borislav document
 |*)
 
 (*|
@@ -634,7 +643,8 @@ Section Monotonicity.
   (** ...and a given job that is to be scheduled. *)
   Variable j: Job.
 
-  (** We observe that the amount of service received is monotonic by definition. *)
+  (** We observe that the amount of service received
+      is monotonic by definition. *)
   Lemma service_monotonic:
     forall t1 t2,
       t1 <= t2 ->
