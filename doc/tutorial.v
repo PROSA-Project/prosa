@@ -56,6 +56,18 @@ Prosa extensions. Second, it should help the Prosa developers to
 better understand the challenges that the new users might face, and
 take that into consideration when refactoring existing and developing
 new functionalities.
+
+The description of Prosa constructs will be performed in such a way
+that each item will be covered *after* its constituting components
+were introduced. Therefore, in this tutorial description of Prosa, we
+first start with basic items, and then cover more complex ones. The
+content covered should be sufficient for readers to become familiar
+with Prosa, and after completing this document, readers should be able
+to understand and follow other Prosa artifacts that are not covered
+here. Readers interested in more advanced aspects of the scheduling
+theory and their implementation in Prosa should consult the Prosa
+source code itself which is highly documented in a literate
+programming style.
 |*)
 
 (*|
@@ -63,7 +75,7 @@ Getting Started
 ===============
 
 In a first reading, it is possible to skip this part and go directly
-to `the next one <#formulating-constructs>`_ However, for a deeper understanding of the
+to `the next one <#architecture>`_ However, for a deeper understanding of the
 Prosa library, it is advisable to install the Coq system and
 interactively replay the examples proposed in this document. The
 current section thus provides some minimal information to get a
@@ -136,30 +148,80 @@ From mathcomp Require Export all_ssreflect.
 Require Import prosa.util.notation.
 
 (*|
+.. _architecture:
+
+Architecture of Prosa
+=====================
+
+Th code of the Prosa library is split in a few main directories:
+
+* `behavior/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/behavior>`_
+  defines the behavior of real-time systems, as used in the remaining
+  of the library. This set of basic definitions is meant to remain as
+  small as possible and will be exhaustively covered in the
+  behavior_ Section below.
+* `model/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/model>`_
+  provides common specifications used by the real-time analyses proved
+  in the remaining of the library. This is already larger and will
+  be partially covered in the model_ Section below.
+  Enough will be presented for this document to remain self contained.
+* `analysis/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis>`_
+  contains the proofs of real-time analyses themselves.
+  An example of such a proof will be presented in the
+  analysis_ Section below.
+* `implementation/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/implementation>`_ TODO I don't know what's there
+* `results/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/results>`_ TODO I don't know what's there
+* `util/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/util>`_
+  contains generic mathematical results useful in the remaining
+  of the library.
+* `classic/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/classic>`_
+  contains an old version of the library. Some results are
+  not yet ported to the new version an remains available there.
+  This part is outside the scope fo the current document.
+
+Note that the following description
+and code listings correspond to the current version of Prosa publicly
+available on its `git repository
+<https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/>`_.
+
+|*)
+
+(*|
+.. _behavior:
+
+Behavior
+========
+
+TODO describe behavior
+|*)
+
+(*|
+.. _model:
+
+Model
+=====
+
+TODO describe model
+|*)
+
+(*|
+.. _analysis:
+
+Analysis
+========
+
+TODO describe some analysis
+
+was `scheduling theory for fixed-priority tasks deployed upon
+fully preemptive uniprocessors` in Borislav document
+|*)
+
+(*|
 .. _formulating-constructs:
 
 Formulating Real-time Constructs in Prosa
 =========================================
 
-In this section, an overview of the Prosa framework and some of its
-core functionalities will be given. Specifically, the main focus will
-be on the scheduling theory for fixed-priority tasks deployed upon
-fully preemptive uniprocessors. Note that the following description
-and code listings correspond to the current version of Prosa publicly
-available on its `git repository
-<https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/>`_.
-
-The description of Prosa constructs will be performed in such a way
-that each item will be covered *after* its constituting components
-were introduced. Therefore, in this tutorial description of Prosa, we
-first start with basic items, and then cover more complex ones. The
-content covered should be sufficient for readers to become familiar
-with Prosa, and after completing this document, readers should be able
-to understand and follow other Prosa artifacts that are not covered
-here. Readers interested in more advanced aspects of the scheduling
-theory and their implementation in Prosa should consult the Prosa
-source code itself which is highly documented in a literate
-programming style.
 |*)
 
 (*|
