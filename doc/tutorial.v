@@ -74,77 +74,23 @@ concepts will be introduced on the fly.
 Installing Coq
 --------------
 
-Under Windows, the easiest solution is to resort on the `binary installer
-provided on Coq's website <https://coq.inria.fr/download>`_ (although it wil
-install much more than we need). On Linux or MacOS, the more versatile solution
-is to use the Opam package manager and we detail below the main steps
-(`more detailled instructions <https://coq.inria.fr/opam-using.html>`_
-are available on Coq's website).
-
-1. Install Opam, following `the instructions on Opam's website
-   <https://opam.ocaml.org/doc/Install.html>`_
-
-2. Check that you have Opam version 2.0.0 or above
-
-   .. code-block:: sh
-
-      opam --version
-
-3. Initialize Opam
-
-   .. code-block:: sh
-
-      opam init
-      eval $(opam env)
-
-   `opam init` will prompt you to allow opam to set up initialization scripts,
-   which is generally fine to accept. Otherwise, every time a new shell is
-   opened you have to type in the `eval $(opam env)` command above
-   to update environment variables. Note that this can take several minutes.
-
-4. Install dependencies
-
-   .. code-block:: sh
-
-      opam install opam-depext
-      opam-depext coq
-
-   This should tell you how to install additional dependencies needed by Coq
-   (if any) on your system. If needed, use the provided commands (for instance
-   `sudo apt-get install m4`).
-
-5. Install Coq
-
-   .. code-block:: sh
-
-      opam install coq
-
-   This will compile Coq from source which tipically takes a few (dozen)
-   minutes. You can test that Coq is properly installed by typing
-
-   .. code-block:: sh
-
-      coqc -v
-
-   which should output Coq's version.
-
-5. Install the Ssreflect library used by Prosa
-
-   .. code-block:: sh
-
-      opam repo add coq-released https://coq.inria.fr/opam/released
-      opam install coq-mathcomp-ssreflect
+The easiest solution is to resort on the binary installers/packages
+provided by the `Coq platform <https://coq.inria.fr/download>`_
+for Linux, MacOS and Windows. This will install both Coq
+and some common libraries, including all Prosa dependencies.
 
 Installing a Coq interface
 --------------------------
 
 Coq programs/proofs are files, with the extension `.v`, that can be compiled
-by Coq compiler `coqc` but Coq proof script are usually developped in an
+by the Coq compiler `coqc` but Coq proof scripts are usually developped in an
 interactive way. Thus, one needs an editor or IDE with some Coq support.
-The user of Visual Studio Code can
-`install its VSCoq extension <https://github.com/coq-community/vscoq>`_
+The user of Visual Studio Code can install its
+`VSCoq extension <https://github.com/coq-community/vscoq#readme>`_
 whereas Emacs' users will enjoy the
-`Proof General <https://proofgeneral.github.io/>`_ mode. A `more detailled list
+`Proof General <https://proofgeneral.github.io/>`_ mode.
+Users not familiar with any of these editors can simply rely on the `coqide`
+tool installed by the Coq platform. A `more detailled list of interfaces
 <https://coq.inria.fr/user-interfaces.html>`_ is available on Coq's website.
 
 Learning about Coq
