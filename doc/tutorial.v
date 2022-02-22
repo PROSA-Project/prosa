@@ -604,6 +604,8 @@ Model
 =====
 
 TODO describe model
+
+test maths :math:`\sum_{i=1}^n i^2`
 |*)
 
 (*|
@@ -666,120 +668,12 @@ is now available for use in future proofs.
 |*)
 
 (*|
-Job Properties
---------------
-
-TODO: retrieve/update material from Borislav's document on fixed priority policy and EDF
-|*)
-
-(*|
-Platform
---------
-
-TODO: retrieve/update material from Borislav's document about schedulers
-|*)
-
-(*|
-Groups of Jobs
---------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Job Schedulability
-------------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Busy Interval
--------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Workload Abstraction and Workload Bounds
-----------------------------------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Tasks with respect to schedules, priorities, workload, service and schedulers
------------------------------------------------------------------------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Response Time Bounds
---------------------
-
-TODO: retrieve/update material from Borislav's document
-(and maybe move here the definition that was already given much earlier)
-|*)
-
-(*|
-Tasks Schedulability
---------------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Task Arrival Bounds
--------------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Workload bounds
----------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Task Response-Time Bound
-------------------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
-Task Response-Time Bound Computation
-------------------------------------
-
-TODO: retrieve/update material from Borislav's document
-
-test maths :math:`\sum_{i=1}^n i^2`
-|*)
-
-(*|
-Task Response-Time Bound Computation
-------------------------------------
-
-TODO: retrieve/update material from Borislav's document
-
-should we say a few words about CERTA ?
-|*)
-
-(*|
-Prosa Parts not Covered in this Document
-----------------------------------------
-
-TODO: retrieve/update material from Borislav's document
-|*)
-
-(*|
 Contributing
 ============
 
-TODO (link to the end of the README)
+TODO short conclusion, you should now be able to read doc by yourself
+
+TODO Prosa open source, contributions welcome (link to the end of the README)
 |*)
 
 (*|
