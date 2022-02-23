@@ -166,17 +166,22 @@ Th code of the Prosa library is split in a few main directories:
   be partially covered in the model_ Section below.
   Enough will be presented for this document to remain self contained.
 * `analysis/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis>`_
-  contains the proofs of real-time analyses themselves.
-  An example of such a proof will be presented in the
-  analysis_ Section below.
-* `implementation/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/implementation>`_ TODO I don't know what's there
-* `results/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/results>`_ TODO I don't know what's there
+  contains the proofs of real-time analyses themselves. This contains
+  a lot of often very generic results.
+* `results/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/results>`_
+  instantiates some of the above results in well known settings.
+  That's the place to look to understand what kind of results are in Prosa
+  or find your favorite analysis. The current document will focus on
+  a specific analysis, namely fixed priority tasks on a fully preemptive
+  uniprocessor.
+* `implementation/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/implementation>`_
+  instantiates the above results for concrete inputs.
 * `util/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/util>`_
   contains generic mathematical results useful in the remaining
   of the library.
 * `classic/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/classic>`_
   contains an old version of the library. Some results are
-  not yet ported to the new version an remains available there.
+  not yet ported to the new version and remains available there.
   This part is outside the scope fo the current document.
 
 Note that the following description
@@ -614,15 +619,20 @@ test maths :math:`\sum_{i=1}^n i^2`
 Analysis
 ========
 
-TODO describe some analysis
+TODO describe needed analysis for results/fixed_priority/rta/fully_preemptive.v
 
-was `scheduling theory for fixed-priority tasks deployed upon
-fully preemptive uniprocessors` in Borislav document
+Results
+=======
+
+describe results/fixed_priority/rta/fully_preemptive.v
+(probably very short)
 |*)
 
 (*|
 First Lemmas
 ------------
+
+TODO: old material, will probably disappear
 
 Based on the previous definitions, some lemmas can be proved.
 Prosa indeed proves a lot of more or less basic lemmas.
