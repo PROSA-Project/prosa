@@ -649,32 +649,205 @@ Check is_idle.  (* .unfold *)
 is then defined as the function which, given a schedule and an instant,
 tells whether the processor is idle in the given schedule at the given instant.
 
-.. processor.platform_properties
+.. omitted prosa.model.processor.platform_properties
 
 Concept of Task
 ---------------
 
-The file `model/task/concept.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/concept.v>`_ defines the concept of *task*.
+The file `model/task/concept.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/concept.v>`_
+defines the concept of *task*.
+A task is simply defined as a type with decidable equality.
 
+|*)
+Require Import model.task.concept.
 
+Print TaskType.  (* .unfold *)
+(*|
+Then, a few typeclasses are defined to be able to express the main
+characteristics of tasks. First, each job can be assigned to a task
+|*)
+Print JobTask.  (* .unfold *)
+(*|
+Three other classes are defined for task deadlines, cost and minimum cost.
+|*)
+Print TaskDeadline.
+Print TaskCost.
+Print TaskMinCost.
+(*|
+Then a bunch of validity hypothesis that usually apply to the above
+definitions are defined. For instance,
+|*)
+Print task_cost_positive.
+(*|
+One can look at the ``ModelValidity`` Section
+in `model/task/concept.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/concept.v>`_
+for the complete list. Those hypothesis usually need to be assumed
+whenever assuming any instance of the above typeclasses, otherwise
+they usually don't mean anything.
 
-* priority.classes <- one proof
-* task.arrivals
-* task.sequentiality
-* readiness.sequential <- one proof
-* preemption.parameter <- one proof
-* task.preemption.parameters
-* preemption.fully_preemptive
-* task.preemption.fully_preemptive
-* task.absolute_deadline
-* task.arrival.curves
-* schedule.preemption_time
-* schedule.priority_driven
-* schedule.work_conserving
-* aggregate.workload
-* aggregate.service_of_jobs
+Finally, task sets are defined as sequences of tasks.
+This is used to express the fact that all jobs in an arrival sequence
+come from a given finite set of tasks.
+|*)
+Print all_jobs_from_taskset.
+(*|
 
-test maths :math:`\sum_{i=1}^n i^2`
+Task Arrivals
+-------------
+
+The file `model/task/arrivals.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/arrivals.v>`_
+provides a few basic definitions about arrivals of jobs of a given task.
+For instance, given an arrival sequence ``arr_seq``, a task ``tsk``
+and two instants ``t1`` and ``t2``, then
+``task_arrivals_between arr_seq tsk t1 t2`` is the set of all jobs
+of task ``tsk`` arriving between ``t1`` and ``t2`` in ``arr_seq``.
+|*)
+Require Import prosa.model.task.arrivals.
+
+Print task_arrivals_between.  (* .unfold *)
+(*|
+
+Task Sequentiality
+------------------
+
+The file `model/task/sequentiality.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/sequentiality.v>`_
+defines the notion of sequential tasks.
+A task is called *sequential* when all its jobs execute
+in a non overlapping manner. This is formally defined in
+|*)
+Require Import prosa.model.task.sequentiality.
+
+Print sequential_tasks.
+(*|
+
+.. omitted prosa.model.readiness.sequential
+
+Priority Classes
+----------------
+
+The file `model/priority/classes.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/priority/classes.v>`_
+defines main classes of priority policies.
+In this document, we are interested in Fixed Priority (FP) policies,
+defined by the typeclass
+|*)
+Require Import prosa.model.priority.classes.
+
+Print FP_policy.  (* .unfold *)
+(*|
+A fixed priority policy is indeed defined as a relation on tasks.
+The relation is called
+|*)
+Check hep_task.
+(*|
+for Higher or Equal Priority. If ``tsk1`` and ``tsk2`` are tasks,
+then ``hep_task tsk1 tsk2`` means that ``tsk1`` has higher (or equal)
+priority than ``tsk2``.
+
+The two other classes provided are Job Level Fixed Priority (JLFP) and
+Job Level Dynamic Priority (JLDP).
+|*)
+Print JLFP_policy.
+Print JLDP_policy.
+(*|
+The first one is a relation between jobs, whereas the second one
+associates to each instant a (potentially) different relation.
+
+Two type class instances are then defined to automatically build a JLFP
+from a FP (associating the same priority for all jobs in a same task)
+and to build a JLDP from a JLFP (associating the same relation to each
+instant).
+
+The remaining of the file provides the definitions of some common
+hypotheses on priority policies, in particular reflexivity and transitivity
+or the fact that a priority is total.
+
+Preemption
+----------
+
+The file `model/preemption/parameter.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/preemption/parameter.v>`_
+defines the notion of preemption.
+
+In Prosa, the various preemption models are represented with a single
+predicate
+|*)
+Require Import prosa.model.preemption.parameter.
+
+Print JobPreemptable.
+(*|
+that indicates, given a job and a degree of progress, whether the job
+is preemptable at its current point of execution.
+
+The validity conditions of a preemption model are then defined
+|*)
+Print valid_preemption_model.
+(*|
+
+A fully preemptive job is then defined as a job that is always preemptable
+in file `model/preemption/fully_preemptive.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/preemption/fully_preemptive.v>`_.
+
+The preemption model for tasks is slightly more elaborate.
+The details can be found in file
+`model/task/preemption/parameters.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/preemption/parameters.v>`_.
+and the fully preemptive implementation lies in
+`model/task/preemption/fully_preemptive.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/preemption/fully_preemptive.v>`_.
+
+.. omitted prosa.model.task.absolute_deadline
+
+Arrival Curves
+--------------
+
+The file `model/task/arrival/curves.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/arrival/curves.v>`_
+defines (min and max) arrival curves.
+The typeclass ``MaxArrivals`` gives the type of arrival curves.
+|*)
+Require Import prosa.model.task.arrival.curves.
+
+Print MaxArrivals.  (* .unfold *)
+(*|
+Arrival curves associate to each task and duration a natural number.
+This number will be the maximum number of jobs of the given task that
+can arrive in any interval of time of the given duration.
+
+Valid arrival curves are the functions that start at 0 and are monotone
+|*)
+Print valid_arrival_curve.  (* .unfold *)
+(*|
+
+Finally, the semantics of arrival curves, is given by
+|*)
+Print respects_max_arrivals.  (* .unfold *)
+(*|
+
+In the same file, one can find similar definitions for minimal arrival curves,
+as well as min and max separations.
+
+Schedule Model
+--------------
+
+In file `model/schedule/preemption_time.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/schedule/preemption_time.v>`_,
+the notion of preemption time in a schedule is defined according
+to the scheduled job at each instant, if any.
+|*)
+Require Import prosa.model.schedule.preemption_time.
+
+Print preemption_time.  (* .unfold *)
+(*|
+This allows to, finally, define what it means for a schedule to
+respect a given priority policy in file
+`model/schedule/priority_driven.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/schedule/priority_driven.v>`_
+|*)
+Require Import prosa.model.schedule.priority_driven.
+
+Print respects_JLDP_policy_at_preemption_point.  (* .unfold *)
+(*|
+This means that when a job ``j`` is backlogged at some preemption instant ``t``,
+all scheduled jobs ``j_hp`` at that instant ``t`` have higher or equal priority.
+
+.. omitted prosa.model.schedule.work_conserving
+   omitted prosa.model.aggregate.workload
+   omitted prosa.model.aggregate.service_of_jobs
+
+.. test maths :math:`\sum_{i=1}^n i^2`
 |*)
 
 (*|
