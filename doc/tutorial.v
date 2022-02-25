@@ -499,12 +499,17 @@ Require Import prosa.behavior.schedule.
 
 Print schedule.  (* .unfold *)
 (*|
-processor states returned by the schedule can then be inspected to know whether
+Processor states returned by the schedule can then be inspected to know whether
 a given job is scheduled in this state
 |*)
 Check scheduled_in.  (* .unfold *)
 (*|
-and what amount of service it is given
+The above means that given a job ``j`` of some type ``?Job``,
+a processor state ``s`` of some type ``?State``, then
+``scheduled_in j s`` is a boolean telling whether the job ``j``
+is scheduled in state ``s``.
+
+The amount of service given to a job in a processor state is defined similarly
 |*)
 Check service_in.  (* .unfold *)
 
@@ -620,6 +625,12 @@ than the previous `behavior/` directory. It will then be only partially covered
 here, so that this document remains self-contained. The material detailled below
 should however be enough to get a good grasp of the kind of things formalized
 in this `model/` directory.
+
+Ideal Uniprocessor
+------------------
+
+The file `model/processor/ideal.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/processor/ideal.v>`_
+
 
 * processor.ideal <- one proof
 * processor.platform_properties.
