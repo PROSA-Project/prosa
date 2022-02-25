@@ -613,7 +613,13 @@ Require Import prosa.behavior.all.
 Model
 =====
 
-TODO describe model
+The `model/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/model>`_
+directory of Prosa provides common specifications used by the real-time
+analyses proved in the remaining of the library. This directory is larger
+than the previous `behavior/` directory. It will then be only partially covered
+here, so that this document remains self-contained. The material detailled below
+should however be enough to get a good grasp of the kind of things formalized
+in this `model/` directory.
 
 * processor.ideal <- one proof
 * processor.platform_properties.
