@@ -197,6 +197,11 @@ available on its `git repository
 Behavior
 ========
 
+The `behavior/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/behavior>`_
+directory of Prosa defines the behavior of real-time systems, as used
+in the remaining of the library. This set of basic definitions is meant
+to remain as small as possible, thus we exhaustively cover it here.
+
 Notion of Time
 --------------
 
