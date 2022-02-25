@@ -27,11 +27,9 @@ Section DeadlineFacts.
         ~~ completed_by sched j t ->
         t < job_deadline j.
     Proof.
-      move=> j t MET INCOMP.
-      apply contraT; rewrite -leqNgt => PAST_DL.
-      have DL_MISS: ~~ completed_by sched j (job_deadline j)
-        by apply incompletion_monotonic with (t' := t) => //.
-      by move: DL_MISS => /negP.
+      move=> j t MET INCOMP; apply: contraT; rewrite -leqNgt => PAST_DL.
+      have /negP// : ~~ completed_by sched j (job_deadline j).
+      exact: incompletion_monotonic INCOMP.
     Qed.
 
     (** Furthermore, a job that both meets its deadline and is incomplete at a
@@ -46,11 +44,8 @@ Section DeadlineFacts.
       move=> j t MET INCOMP.
       apply: cumulative_service_implies_scheduled.
       rewrite -(ltn_add2l (service sched j t)) addn0.
-      rewrite service_cat;
-        last by (apply ltnW; apply incomplete_implies_later_deadline).
-      apply leq_trans with (n := job_cost j);
-        first by rewrite less_service_than_cost_is_incomplete.
-      by apply MET.
+      rewrite service_cat; last exact/ltnW/incomplete_implies_later_deadline.
+      by apply: leq_trans MET; rewrite less_service_than_cost_is_incomplete.
     Qed.
 
   End Incompletion.
@@ -77,8 +72,8 @@ Section DeadlineFacts.
         t < job_deadline j.
     Proof.
       move=> j t MET SCHED_AT.
-      apply (incomplete_implies_later_deadline sched) => //.
-      by apply scheduled_implies_not_completed.
+      apply: (incomplete_implies_later_deadline sched) => //.
+      exact: scheduled_implies_not_completed.
     Qed.
 
   End IdealProgressSchedules.
@@ -101,8 +96,7 @@ Section DeadlineFacts.
         (job_meets_deadline sched j <-> job_meets_deadline sched' j).
     Proof.
       move=> j SERVICE.
-      split;
-        by rewrite /job_meets_deadline /completed_by -SERVICE.
+      by split; rewrite /job_meets_deadline /completed_by -SERVICE.
     Qed.
 
   End EqualProgress.

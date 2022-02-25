@@ -35,29 +35,11 @@ Section MaxAndLastNonpreemptiveSegment.
 
   (** We observe that the conversion indeed is an equivalent way of
       representing the set of preemption points. *)
-  Remark conversion_preserves_equivalence:
+  Remark conversion_preserves_equivalence :
     forall (j : Job) (ρ : work),
       ρ <= job_cost j ->
       job_preemptable j ρ <-> ρ \in job_preemption_points j.
-  Proof.
-    intros ? ? LE.
-    case: (posnP (job_cost j)) => [ZERO|POS].
-    { unfold job_preemption_points.
-      split; intros PP.
-      - move: LE; rewrite ZERO leqn0; move => /eqP EQ; subst.
-        by simpl; rewrite PP.
-      - rewrite ZERO in PP; simpl in PP.
-        destruct (job_preemptable j 0) eqn:EQ; last by done.
-        by move: PP => /orP [/eqP A1| FF]; subst.
-    }
-    have F: job_cost j == 0 = false.
-    { by apply/eqP/neqP; rewrite -lt0n. }
-    split; intros PP.
-    all: unfold job_preemption_points in *.
-    - rewrite mem_filter; apply/andP; split; first by done.
-      by rewrite mem_iota subn0 add0n //; apply/andP; split.
-    - by move: PP; rewrite mem_filter; move => /andP [PP _].
-  Qed.
+  Proof. by move=> j rho le; rewrite mem_filter mem_index_iota ltnS le/= andbT. Qed.
 
   (** We further define a function that, for a given job, yields the sequence
       of lengths of its nonpreemptive segments. *)

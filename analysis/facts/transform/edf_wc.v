@@ -267,7 +267,6 @@ Section MakeEDFWorkConservationLemmas.
          apply fsc_swap_maintains_work_conservation => //.
          -  by rewrite scheduled_at_def; apply /eqP => //.
          - apply (scheduled_at_implies_later_deadline sched) => //.
-           + by apply ideal_proc_model_ensures_ideal_progress.
            + rewrite /all_deadlines_met in  (H_no_deadline_misses).
              now apply (H_no_deadline_misses s t_edf); rewrite scheduled_at_def; apply /eqP.
            + by rewrite scheduled_at_def; apply/eqP => //.
@@ -380,4 +379,3 @@ Section EDFTransformWorkConservationLemmas.
   Qed.
 
 End EDFTransformWorkConservationLemmas.
-

@@ -20,7 +20,7 @@ Section PrefixDefinition.
 
   (** In other words, two schedules with a shared prefix are completely
       interchangeable w.r.t. whether a job is scheduled (in the prefix). *)
-  Fact identical_prefix_scheduled_at:
+  Fact identical_prefix_scheduled_at :
     forall sched sched' h,
       identical_prefix sched sched' h ->
       forall j t,
@@ -33,16 +33,10 @@ Section PrefixDefinition.
 
   (** Trivially, any prefix of an identical prefix is also an identical
       prefix. *)
-  Fact identical_prefix_inclusion:
-    forall sched sched' h,
-      identical_prefix sched sched' h ->
-      forall h',
-        h' <= h ->
-        identical_prefix sched sched' h'.
-  Proof.
-    move=> sched sched' h IDENT h' INCL t LT_h'.
-    apply IDENT.
-    now apply (leq_trans LT_h').
-  Qed.
+  Fact identical_prefix_inclusion :
+    forall sched sched' h h',
+      h' <= h ->
+      identical_prefix sched sched' h -> identical_prefix sched sched' h'.
+  Proof. by move=> sched sched' h h' h'_le_h + t t_lt_h'; apply; apply: leq_trans h'_le_h. Qed.
 
 End PrefixDefinition.

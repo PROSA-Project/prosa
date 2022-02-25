@@ -30,27 +30,19 @@ Section Composition.
   Lemma service_during_geq:
     forall t1 t2,
       t1 >= t2 -> service_during sched j t1 t2 = 0.
-  Proof.
-    move=> t1 t2 t1t2.
-    by rewrite /service_during big_geq //.
-  Qed.
+  Proof. by move=> ? ? ?; rewrite /service_during big_geq. Qed.
 
   (** Equally trivially, no job has received service prior to time zero. *)
   Corollary service0:
     service sched j 0 = 0.
-  Proof.
-    by rewrite /service service_during_geq //.
-  Qed.
+  Proof. by rewrite /service service_during_geq. Qed.
 
   (** Trivially, an interval consisting of one time unit is equivalent to
      [service_at].  *)
   Lemma service_during_instant:
     forall t,
       service_during sched j t t.+1 = service_at sched j t.
-  Proof.
-    move => t.
-    by rewrite /service_during big_nat_recr ?big_geq //.
-  Qed.
+  Proof. by move=> ?; rewrite /service_during big_nat_recr// big_geq. Qed.
 
   (** Next, we observe that we can look at the service received during an
      interval <<[t1, t3)>> as the sum of the service during [t1, t2) and [t2, t3)
@@ -61,10 +53,7 @@ Section Composition.
       t1 <= t2 <= t3 ->
       (service_during sched j t1 t2) + (service_during sched j t2 t3)
       = service_during sched j t1 t3.
-  Proof.
-    move => t1 t2 t3 /andP [t1t2 t2t3].
-    by rewrite /service_during -big_cat_nat /=.
-  Qed.
+  Proof. by move => ? ? ? /andP[? ?]; rewrite -big_cat_nat. Qed.
 
   (** Since [service] is just a special case of [service_during], the same holds
      for [service]. *)
@@ -73,10 +62,7 @@ Section Composition.
       t1 <= t2 ->
       (service sched j t1) + (service_during sched j t1 t2)
       = service sched j t2.
-  Proof.
-    move=> t1 t2 t1t2.
-    by rewrite /service service_during_cat //.
-  Qed.
+  Proof. move=> ? ? ?; exact: service_during_cat. Qed.
 
   (** As a special case, we observe that the service during an interval can be
      decomposed into the first instant and the rest of the interval. *)
@@ -86,10 +72,7 @@ Section Composition.
       (service_at sched j t1) + (service_during sched j t1.+1 t2)
       = service_during sched j t1 t2.
   Proof.
-    move => t1 t2 t1t2.
-    have TIMES: t1 <= t1.+1 <= t2 by rewrite /(_ && _) ifT //.
-    have SPLIT := service_during_cat t1 t1.+1 t2 TIMES.
-    by rewrite -service_during_instant //.
+    by move=> ? ? ?; rewrite -service_during_instant service_during_cat// leqnSn.
   Qed.
 
   (** Symmetrically, we have the same for the end of the interval. *)
@@ -99,9 +82,8 @@ Section Composition.
       (service_during sched j t1 t2) + (service_at sched j t2)
       = service_during sched j t1 t2.+1.
   Proof.
-    move=> t1 t2 t1t2.
-    rewrite -(service_during_cat t1 t2 t2.+1); last by rewrite /(_ && _) ifT //.
-    by rewrite service_during_instant //.
+    move=> t1 t2 ?; rewrite -(service_during_cat t1 t2 t2.+1) ?leqnSn ?andbT//.
+    by rewrite service_during_instant.
   Qed.
 
   (** And hence also for [service]. *)
@@ -109,10 +91,7 @@ Section Composition.
     forall t,
       (service sched j t) + (service_at sched j t)
       = service sched j t.+1.
-  Proof.
-    move=> t.
-    by rewrite /service -service_during_last_plus_before //.
-  Qed.
+  Proof. move=> ?; exact: service_during_last_plus_before. Qed.
 
   (** Finally, we deconstruct the service received during an interval <<[t1, t3)>>
      into the service at a midpoint t2 and the service in the intervals before
@@ -123,9 +102,9 @@ Section Composition.
       (service_during sched j t1 t2) + (service_at sched j t2) + (service_during sched j t2.+1 t3)
       = service_during sched j t1 t3.
   Proof.
-    move => t1 t2 t3 /andP [t1t2 t2t3].
-    rewrite -addnA service_during_first_plus_later// service_during_cat// /(_ && _) ifT//.
-    by exact: ltnW.
+    move => t1 t2 t3 /andP[t1t2 t2t3].
+    rewrite -addnA service_during_first_plus_later// service_during_cat//.
+    by rewrite t1t2 ltnW.
   Qed.
 
 End Composition.
@@ -150,18 +129,14 @@ Section UnitService.
   (** First, we prove that the instantaneous service cannot be greater than 1, ... *)
   Lemma service_at_most_one:
     forall t, service_at sched j t <= 1.
-  Proof.
-    by move=> t; rewrite /service_at.
-  Qed.
+  Proof. by rewrite /service_at. Qed.
 
   (** ... which implies that the instantaneous service always equals to 0 or 1.  *)
   Corollary service_is_zero_or_one:
     forall t, service_at sched j t = 0 \/ service_at sched j t = 1.
   Proof.
-    intros. 
-    have Lewf := service_at_most_one t.
-    remember (service_at sched j t) as ρ.
-    by destruct ρ; last destruct ρ; [left| right | exfalso]. 
+    move=> t.
+    by case: service_at (service_at_most_one t) => [|[|//]] _; [left|right].
   Qed.
 
   (** Next we prove that the cumulative service received by job [j] in
@@ -169,10 +144,8 @@ Section UnitService.
   Lemma cumulative_service_le_delta:
     forall t delta, service_during sched j t (t + delta) <= delta.
   Proof.
-    unfold service_during; intros t delta.
-    apply leq_trans with (n := \sum_(t <= t0 < t + delta) 1);
-      last by rewrite sum_of_ones.
-    by apply: leq_sum => t' _; apply: service_at_most_one.
+    move=> t delta; rewrite -[X in _ <= X](sum_of_ones t).
+    apply: leq_sum => t' _; exact: service_at_most_one.
   Qed.
 
   (** Conversely, we prove that if the cumulative service received by
@@ -182,28 +155,16 @@ Section UnitService.
     forall t delta ρ,
       ρ <= service_during sched j t (t + delta) ->
       ρ <= delta.
-  Proof.
-    induction delta; intros ? LE.
-    - by rewrite service_during_geq in LE; lia.
-    - rewrite addnS -service_during_last_plus_before in LE; last by lia.
-      destruct (service_is_zero_or_one (t + delta)) as [EQ|EQ]; rewrite EQ in LE.
-      + rewrite addn0 in LE.
-        by apply IHdelta in LE; rewrite (leqRW LE).
-      + rewrite addn1 in LE.
-        destruct ρ; first by done.
-        by rewrite ltnS in LE; apply IHdelta in LE; rewrite (leqRW LE).
-  Qed.
-  
+  Proof. move=> ??? /leq_trans; apply; exact: cumulative_service_le_delta. Qed.
 
   Section ServiceIsUnitGrowthFunction.
 
     (** We show that the service received by any job [j] is a unit growth function. *)
-    Lemma service_is_unit_growth_function:
+    Lemma service_is_unit_growth_function :
       unit_growth_function (service sched j).
     Proof.
-      rewrite /unit_growth_function => t.
-      rewrite addn1 -service_last_plus_before leq_add2l.
-      by apply service_at_most_one.
+      move=> t; rewrite addn1 -service_last_plus_before leq_add2l.
+      exact: service_at_most_one.
     Qed.
 
     (** Next, consider any time [t]... *)
@@ -221,15 +182,12 @@ Section UnitService.
         t' < t /\
         service sched j t' = s.
     Proof.
-      feed (exists_intermediate_point (service sched j));
-        [by apply service_is_unit_growth_function | intros EX].
-      feed (EX 0 t); first by done.
-      feed (EX s); first by rewrite /service /service_during big_geq //.
-      by move: EX => /= [x_mid EX]; exists x_mid.
+      apply: (exists_intermediate_point _ service_is_unit_growth_function 0) => //.
+      by rewrite service0.
     Qed.
 
   End ServiceIsUnitGrowthFunction.
-  
+
 End UnitService.
 
 (** We establish a basic fact about the monotonicity of service. *)
@@ -250,10 +208,7 @@ Section Monotonicity.
     forall t1 t2,
       t1 <= t2 ->
       service sched j t1 <= service sched j t2.
-  Proof.
-    move=> t1 t2 let1t2.
-    by rewrite -(service_cat sched j t1 t2 let1t2); apply: leq_addr.
-  Qed.
+  Proof. by move=> t1 t2 ?; rewrite -(service_cat _ _ t1 t2)// leq_addr. Qed.
 
 End Monotonicity.
 
@@ -271,37 +226,29 @@ Section RelationToScheduled.
 
   (** We observe that a job that isn't scheduled in a given processor
       state cannot possibly receive service in that state. *)
-  Lemma service_in_implies_scheduled_in : forall s,
-    ~~ scheduled_in j s -> service_in j s = 0.
+  Lemma service_in_implies_scheduled_in :
+    forall s,
+      ~~ scheduled_in j s -> service_in j s = 0.
   Proof.
-    move=> s /existsP Hsched.
-    apply/eqP.
-    rewrite sum_nat_eq0.
-    apply/forallP => c /=.
-    rewrite service_on_implies_scheduled_on => //.
-    apply/negP => Hsch.
-    apply: Hsched.
-    by exists c.
+    move=> s.
+    move=> /existsP Hsched; apply/eqP; rewrite sum_nat_eq0; apply/forallP => c.
+    rewrite service_on_implies_scheduled_on//.
+    by apply/negP => ?; apply: Hsched; exists c.
   Qed.
 
   (** In particular, it cannot receive service at any given time. *)
   Corollary not_scheduled_implies_no_service:
     forall t,
       ~~ scheduled_at sched j t -> service_at sched j t = 0.
-  Proof.
-    rewrite /service_at /scheduled_at.
-    move=> t NOT_SCHED.
-    by rewrite service_in_implies_scheduled_in.
-  Qed.
+  Proof. move=> ?; exact: service_in_implies_scheduled_in. Qed.
 
   (** Conversely, if a job receives service, then it must be scheduled. *)
-  Lemma service_at_implies_scheduled_at:
+  Lemma service_at_implies_scheduled_at :
     forall t,
       service_at sched j t > 0 -> scheduled_at sched j t.
   Proof.
-    move=> t.
-    destruct (scheduled_at sched j t) eqn:SCHEDULED; first trivial.
-    by rewrite not_scheduled_implies_no_service // negbT.
+    move=> t; case SCHEDULED: scheduled_at => //.
+    by rewrite not_scheduled_implies_no_service// negbT.
   Qed.
 
   (** Thus, if the cumulative amount of service changes, then it must be
@@ -310,9 +257,8 @@ Section RelationToScheduled.
     forall t,
       service sched j t < service sched j t.+1 -> scheduled_at sched j t.
   Proof.
-    move => t.
-    rewrite -service_last_plus_before -{1}(addn0 (service sched j t)) ltn_add2l.
-    by apply: service_at_implies_scheduled_at.
+    move=> t; rewrite -service_last_plus_before -ltn_subLR// subnn.
+    exact: service_at_implies_scheduled_at.
   Qed.
 
   (** We observe that a job receives cumulative service during some interval iff
@@ -325,32 +271,10 @@ Section RelationToScheduled.
         t1 <= t < t2 /\
         service_at sched j t > 0.
   Proof.
-    split.
-    {
-      move=> NONZERO.
-      case (boolP([exists t: 'I_t2,
-                      (t >= t1) && (service_at sched j t > 0)])) => [EX | ALL].
-      - move: EX => /existsP [x /andP [GE SERV]].
-        exists x; split => //.
-        apply /andP; by split.
-      - rewrite negb_exists in ALL; move: ALL => /forallP ALL.
-        rewrite /service_during big_nat_cond in NONZERO.
-        rewrite big1 ?ltn0 // in NONZERO => i.
-        rewrite andbT; move => /andP [GT LT].
-        specialize (ALL (Ordinal LT)); simpl in ALL.
-        rewrite GT andTb -eqn0Ngt in ALL.
-        by apply /eqP.
-    }
-    {
-      move=> [t [TT SERVICE]].
-      case (boolP (0 < service_during sched j t1 t2)) => // NZ.
-      exfalso.
-      rewrite -eqn0Ngt in NZ. move/eqP: NZ.
-      rewrite big_nat_eq0 => IS_ZERO.
-      have NO_SERVICE := IS_ZERO t TT.
-      apply lt0n_neq0 in SERVICE.
-      by move/neqP in SERVICE; contradiction.
-    }
+    move=> t1 t2.
+    split=> [|[t titv_nz_serv]].
+    - by move=> /sum_seq_gt0P[t]; rewrite mem_index_iota => ?; exists t.
+    - by apply/sum_seq_gt0P; exists t; rewrite mem_index_iota.
   Qed.
 
   (** Thus, any job that receives some service during an interval must be
@@ -362,12 +286,9 @@ Section RelationToScheduled.
         t1 <= t < t2 /\
         scheduled_at sched j t.
   Proof.
-    move=> t1 t2.
-    rewrite service_during_service_at.
-    move=> [t' [TIMES SERVICED]].
-    exists t'; split => //.
-    by apply: service_at_implies_scheduled_at.
- Qed.
+    move=> t1 t2; rewrite service_during_service_at => -[t' [TIMES SERVICED]].
+    exists t'; split=> //; exact: service_at_implies_scheduled_at.
+  Qed.
 
   (** ...which implies that any job with positive cumulative service must have
      been scheduled at some point. *)
@@ -375,12 +296,9 @@ Section RelationToScheduled.
     forall t,
       service sched j t > 0 -> exists t', (t' < t /\ scheduled_at sched j t').
   Proof.
-    move=> t2.
-    rewrite /service => NONZERO.
-    have EX_SCHED := cumulative_service_implies_scheduled 0 t2 NONZERO.
-    by move: EX_SCHED => [t [TIMES SCHED_AT]]; exists t; split.
+    by move=> t /cumulative_service_implies_scheduled[t' ?]; exists t'.
   Qed.
- 
+
   (** If we can assume that a scheduled job always receives service,
       we can further prove the converse. *)
   Section GuaranteedService.
@@ -394,11 +312,10 @@ Section RelationToScheduled.
       forall t,
         ~~ scheduled_at sched j t <-> service_at sched j t = 0.
     Proof.
-      move=> t. rewrite /scheduled_at /service_at.
-      split => [NOT_SCHED | NO_SERVICE].
-      - by rewrite service_in_implies_scheduled_in.
-      - apply (contra (H_scheduled_implies_serviced j (sched t))).
-        by rewrite -eqn0Ngt; apply /eqP.
+      move=> t.
+      split => [|NO_SERVICE]; first exact: service_in_implies_scheduled_in.
+      apply: (contra (H_scheduled_implies_serviced j (sched t))).
+      by rewrite -eqn0Ngt -NO_SERVICE.
     Qed.
 
     (** Then, if a job does not receive any service during an interval, it
@@ -409,13 +326,10 @@ Section RelationToScheduled.
         forall t,
           t1 <= t < t2 -> ~~ scheduled_at sched j t.
     Proof.
-      move=> t1 t2 ZERO_SUM t /andP [GT_t1 LT_t2].
-      rewrite no_service_not_scheduled.
-      move: ZERO_SUM.
-      rewrite /service_during big_nat_eq0 => IS_ZERO.
-      by apply (IS_ZERO t); apply/andP.
+      move=> t1 t2.
+      by move=> + t titv; rewrite no_service_not_scheduled big_nat_eq0; apply.
     Qed.
-    
+
     (** Conversely, if a job is not scheduled during an interval, then
         it does not receive any service in that interval *)
     Lemma not_scheduled_during_implies_zero_service:
@@ -423,9 +337,8 @@ Section RelationToScheduled.
         (forall t, t1 <= t < t2 -> ~~ scheduled_at sched j t) -> 
         service_during sched j t1 t2 = 0.
     Proof.
-      intros t1 t2 NSCHED.
-      apply big_nat_eq0; move=> t NEQ.
-      by apply no_service_not_scheduled, NSCHED.
+      move=> t1 t2; rewrite big_nat_eq0 => + t titv => /(_ t titv).
+      by rewrite no_service_not_scheduled.
     Qed.
 
     (** If a job is scheduled at some point in an interval, it receives
@@ -437,11 +350,8 @@ Section RelationToScheduled.
             scheduled_at sched j t) ->
         service_during sched j t1 t2 > 0.
     Proof.
-      move=> t1 t2 [t' [TIMES SCHED]].
-      rewrite service_during_service_at.
-      exists t'; split => //.
-      move: SCHED. rewrite /scheduled_at /service_at.
-      by apply (H_scheduled_implies_serviced j (sched t')).
+      move=> t1 t2 [t [titv sch]]; rewrite service_during_service_at.
+      exists t; split=> //; exact: H_scheduled_implies_serviced.
     Qed.
 
     (** ...which again applies to total service, too. *)
@@ -452,9 +362,8 @@ Section RelationToScheduled.
             scheduled_at sched j t') ->
         service sched j t > 0.
     Proof.
-      move=> t [t' [TT SCHED]].
-      rewrite /service. apply scheduled_implies_cumulative_service.
-      by exists t'.
+      move=> t.
+      by move=> [t' ?]; apply: scheduled_implies_cumulative_service; exists t'.
     Qed.
 
   End GuaranteedService.
@@ -476,22 +385,15 @@ Section RelationToScheduled.
         service sched j t > 0 ->
         exists t', (job_arrival j <= t' < t /\ scheduled_at sched j t').
     Proof.
-      move=> t SERVICE.
-      have EX_SCHED := positive_service_implies_scheduled_before t SERVICE.
-      inversion EX_SCHED as [t'' [TIMES SCHED_AT]].
-      exists t''; split; last by done.
-      rewrite /(_ && _) ifT //.
-      move: H_jobs_must_arrive. rewrite /jobs_must_arrive_to_execute /has_arrived => ARR.
-      by apply: ARR.
+      move=> t /positive_service_implies_scheduled_before[t' [t't sch]].
+      exists t'; split=> //; rewrite t't andbT; exact: H_jobs_must_arrive.
     Qed.
 
     Lemma not_scheduled_before_arrival:
       forall t, t < job_arrival j -> ~~ scheduled_at sched j t.
     Proof.
-      move=> t EARLY.
-      apply: (contra (H_jobs_must_arrive j t)).
-      by rewrite /has_arrived -ltnNge.
-   Qed.
+      by move=> t ?; apply: (contra (H_jobs_must_arrive j t)); rewrite -ltnNge.
+    Qed.
 
     (** We show that job [j] does not receive service at any time [t] prior to its
         arrival. *)
@@ -500,8 +402,8 @@ Section RelationToScheduled.
         t < job_arrival j ->
         service_at sched j t = 0.
     Proof.
-      move=> t NOT_ARR.
-      by rewrite not_scheduled_implies_no_service // not_scheduled_before_arrival.
+      move=> t NOT_ARR; rewrite not_scheduled_implies_no_service//.
+      exact: not_scheduled_before_arrival.
     Qed.
 
     (** Note that the same property applies to the cumulative service. *)
@@ -510,14 +412,8 @@ Section RelationToScheduled.
         t2 <= job_arrival j ->
         service_during sched j t1 t2 = 0.
     Proof.
-      move=> t1 t2 EARLY.
-      rewrite /service_during.
-      have ZERO_SUM: \sum_(t1 <= t < t2) service_at sched j t = \sum_(t1 <= t < t2) 0;
-        last by rewrite ZERO_SUM sum0.
-      rewrite big_nat_cond [in RHS]big_nat_cond.
-      apply: eq_bigr => i /andP [TIMES _]. move: TIMES => /andP [le_t1_i lt_i_t2].
-      apply (service_before_job_arrival_zero i).
-      by apply leq_trans with (n := t2).
+      move=> t1 t2 early; rewrite big_nat_eq0 => t /andP[_ t_lt_t2].
+      apply: service_before_job_arrival_zero; exact: leq_trans early.
     Qed.
 
     (** Hence, one can ignore the service received by a job before its arrival
@@ -528,20 +424,16 @@ Section RelationToScheduled.
         t2 >= job_arrival j ->
         service_during sched j t1 t2 = service_during sched j (job_arrival j) t2.
     Proof.
-      move=> t1 t2 le_t1 le_t2.
-      rewrite -(service_during_cat sched j t1 (job_arrival j) t2).
-      rewrite cumulative_service_before_job_arrival_zero //.
-      by apply/andP.
+      move=> t1 t2 t1_le t2_ge.
+      rewrite -(service_during_cat sched _ _ (job_arrival j)); last exact/andP.
+      by rewrite cumulative_service_before_job_arrival_zero.
     Qed.
 
     (** ... which we can also state in terms of cumulative service. *)
     Corollary no_service_before_arrival:
       forall t,
         t <= job_arrival j -> service sched j t = 0.
-    Proof.
-      move=> t EARLY.
-      by rewrite /service cumulative_service_before_job_arrival_zero.
-    Qed.
+    Proof. exact: cumulative_service_before_job_arrival_zero. Qed.
 
   End AfterArrival.
 
@@ -563,9 +455,8 @@ Section RelationToScheduled.
     Lemma constant_service_implies_no_service_during:
       service_during sched j t1 t2 = 0.
     Proof.
-      move: H_same_service.
-      rewrite -(service_cat sched j t1 t2) // -[service sched j t1 in LHS]addn0 => /eqP.
-      by rewrite eqn_add2l => /eqP.
+      move: H_same_service; rewrite -(service_cat _ _ t1 t2)// => /eqP.
+      by rewrite -[X in X == _]addn0 eqn_add2l => /eqP.
     Qed.
 
     (** ...which of course implies that it does not receive service at any
@@ -574,11 +465,9 @@ Section RelationToScheduled.
       forall t,
         t1 <= t < t2 -> service_at sched j t = 0.
     Proof.
-      move=> t /andP [GE_t1 LT_t2].
-      move: constant_service_implies_no_service_during.
-      rewrite /service_during big_nat_eq0 => IS_ZERO.
-      apply IS_ZERO.
-      by apply /andP.
+      move=> t titv.
+      have := constant_service_implies_no_service_during.
+      rewrite big_nat_eq0; exact.
     Qed.
 
     (** We show that job [j] receives service at some point [t < t1]
@@ -587,22 +476,13 @@ Section RelationToScheduled.
       [exists t: 'I_t1, service_at sched j t > 0] =
       [exists t': 'I_t2, service_at sched j t' > 0].
     Proof.
-      apply /idP/idP => /existsP [t SERVICED].
-      {
-        have LE: t < t2 by apply: (leq_trans _ H_t1_le_t2) => //.
-        by apply /existsP; exists (Ordinal LE).
-      }
-      {
-        case (boolP (t < t1)) => LE.
-        - by apply /existsP; exists (Ordinal LE).
-        - exfalso.
-          have TIMES: t1 <= t < t2
-            by apply /andP; split => //; rewrite leqNgt //.
-          have NO_SERVICE := constant_service_implies_not_scheduled t TIMES.
-          by rewrite NO_SERVICE in SERVICED.
-      }
+      apply/idP/idP => /existsP[t serv].
+      { by apply/existsP; exists (widen_ord H_t1_le_t2 t). }
+      have [t_lt_t1|t1_le_t] := ltnP t t1.
+      { by apply/existsP; exists (Ordinal t_lt_t1). }
+      exfalso; move: serv; apply/negP; rewrite -eqn0Ngt.
+      by apply/eqP/constant_service_implies_not_scheduled; rewrite t1_le_t /=.
     Qed.
-
 
     (** Then, under the assumption that scheduled jobs receives service,
         we can translate this into a claim about scheduled_at. *)
@@ -616,18 +496,14 @@ Section RelationToScheduled.
       [exists t: 'I_t1, scheduled_at sched j t] =
       [exists t': 'I_t2, scheduled_at sched j t'].
     Proof.
-      have CONV: forall B, [exists b: 'I_B, scheduled_at sched j b]
-                           = [exists b: 'I_B, service_at sched j b > 0].
-      {
-        move=> B. apply/idP/idP => /existsP [b P]; apply /existsP; exists b.
-        - by move: P; rewrite /scheduled_at /service_at;
-            apply (H_scheduled_implies_serviced j (sched b)).
-        - by apply service_at_implies_scheduled_at.
-      }
-      rewrite !CONV.
-      by apply same_service_implies_serviced_at_earlier_times.
+      have CONV B : [exists b: 'I_B, scheduled_at sched j b]
+                    = [exists b: 'I_B, service_at sched j b > 0].
+      { apply/idP/idP => /existsP[b P]; apply/existsP; exists b.
+        - exact: H_scheduled_implies_serviced.
+        - exact: service_at_implies_scheduled_at. }
+      by rewrite !CONV same_service_implies_serviced_at_earlier_times.
     Qed.
-    
+
   End TimesWithSameService.
 
 End RelationToScheduled.
@@ -662,11 +538,7 @@ Section ServiceInTwoSchedules.
         is also the same. *)
     Lemma same_service_during:
       service_during sched1 j t1 t2 = service_during sched2 j t1 t2.
-    Proof.
-      rewrite /service_during.
-      apply eq_big_nat.
-      by apply H_sched1_sched2_same_service_at.
-    Qed.
+    Proof. exact/eq_big_nat/H_sched1_sched2_same_service_at. Qed.
 
   End ServiceDuringEquivalentInterval.
 
@@ -678,9 +550,8 @@ Section ServiceInTwoSchedules.
       (forall t, t1 <= t < t2 -> sched1 t = sched2 t) ->
       forall j, service_during sched1 j t1 t2 = service_during sched2 j t1 t2.
   Proof.
-    move=> t1 t2 SCHED_EQ j.
-    apply same_service_during => t' RANGE.
-    by rewrite /service_at SCHED_EQ.
+    move=> t1 t2 sch j; apply: same_service_during => t' t'itv.
+    by rewrite /service_at sch.
   Qed.
 
   (** For convenience, we restate the corollary also at the level of
@@ -689,8 +560,6 @@ Section ServiceInTwoSchedules.
     forall h,
       identical_prefix sched1 sched2 h ->
       forall j, service sched1 j h = service sched2 j h.
-  Proof.
-    by move=> h IDENT j; apply equal_prefix_implies_same_service_during.
-  Qed.
+  Proof. move=> ? ? ?; exact: equal_prefix_implies_same_service_during. Qed.
 
 End ServiceInTwoSchedules.

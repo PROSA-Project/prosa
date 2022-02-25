@@ -196,9 +196,8 @@ Section MakeEDFAtFacts.
       job_deadline j > t.
   Proof.
     move=> j t SCHED.
-    apply (scheduled_at_implies_later_deadline sched) => //.
-    - by apply ideal_proc_model_ensures_ideal_progress.
-    - by apply (H_no_deadline_misses _ t).
+    apply: (scheduled_at_implies_later_deadline sched) => //.
+    exact: (H_no_deadline_misses _ t).
   Qed.
 
   (** We analyze [make_edf_at] applied to an arbitrary point in time,
@@ -244,7 +243,6 @@ Section MakeEDFAtFacts.
         by rewrite scheduled_at_def; apply /eqP.
       move: (scheduled_job_in_sched_has_later_deadline _ _ SCHED') => DL_orig.
       apply edf_swap_no_deadline_misses_introduced => //.
-      - by apply ideal_proc_model_ensures_ideal_progress.
       - by apply fsc_range1 => //.
       - move=> j1 j2 SCHED_j1 SCHED_j2.
         apply: (fsc_found_job_deadline sched _ j_orig t_edf _ _ _ _ _ t_edf) => //.
@@ -274,7 +272,6 @@ Section MakeEDFAtFacts.
     move=> j t SCHED.
     apply (scheduled_at_implies_later_deadline sched') => //.
     - by apply mea_completed_jobs.
-    - by apply ideal_proc_model_ensures_ideal_progress.
     - by apply mea_no_deadline_misses with (t := t).
   Qed.
 
@@ -579,8 +576,7 @@ Section EDFPrefixFacts.
     move=> j t SCHED.
     move: edf_prefix_well_formedness => [COMP [ARR DL_MET]].
     apply (scheduled_at_implies_later_deadline sched') => //.
-    - by apply ideal_proc_model_ensures_ideal_progress.
-    - by apply (DL_MET j t).
+    exact: (DL_MET j t).
   Qed.
 
   (** Since no jobs are lost or added to the schedule by

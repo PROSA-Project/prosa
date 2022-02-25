@@ -85,8 +85,7 @@ Section Equivalence.
     { apply /andP; split => //.
       - apply /andP; split => //.
         apply (incompletion_monotonic _ j _ _ LEQ).
-        apply scheduled_implies_not_completed => //.
-        by apply ideal_proc_model_ensures_ideal_progress.
+        by apply scheduled_implies_not_completed.
       - apply /negP; move => SCHED''.
         by exploit (ideal_proc_model_is_a_uniprocessor_model j j_hp sched t). }
   Qed.

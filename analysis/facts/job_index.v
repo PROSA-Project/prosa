@@ -148,14 +148,14 @@ Section JobIndexLemmas.
   Proof.
     intros * IN1 IN2 LE.
     move_neq_up LT; move_neq_down LE.
-    rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between in IN1 => //.
+    rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between_P in IN1 => //.
     rewrite !index_cat ifT; last by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     rewrite ifF.
-    - eapply leq_trans; [ | now erewrite leq_addr].
+    - eapply leq_trans; [ | by erewrite leq_addr].
       rewrite index_mem.
-      now eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
+      by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     - apply Bool.not_true_is_false; intro T.
-      now apply job_arrival_between in T; try lia.
+      by apply job_arrival_between_P in T; try lia.
   Qed.
   
   (** We observe that index of job [j1] is same in the 
@@ -168,7 +168,8 @@ Section JobIndexLemmas.
     rewrite leq_eqVlt => /orP [/eqP LT|LT]; first by rewrite /task_arrivals_up_to_job_arrival LT H_same_task.
     specialize (arrival_lt_implies_strict_prefix _ H_consistent_arrivals (job_task j1) j1 j2) => SUB.
     feed_n 5 SUB => //; move: SUB => [xs2 [NEMPT2 CAT2]].
-    now rewrite -CAT2 index_cat ifT; last by apply arrives_in_task_arrivals_up_to => //.
+    rewrite -CAT2 index_cat ifT //=.
+    by apply arrives_in_task_arrivals_up_to => //.
   Qed.
 
   (** We show that the [job_index] of a job [j1] is strictly less than
@@ -177,7 +178,7 @@ Section JobIndexLemmas.
     job_index arr_seq j1 < size (task_arrivals_up_to_job_arrival arr_seq j1).
   Proof.
     rewrite /job_index index_mem.
-    now apply arrives_in_task_arrivals_up_to.
+    exact: arrives_in_task_arrivals_up_to.
   Qed.
 
   (** Finally, we show that a lower job index implies an earlier arrival time. *)
@@ -195,7 +196,7 @@ Section JobIndexLemmas.
     - now eapply leq_trans;
         [apply index_job_lt_size_task_arrivals_up_to_job | rewrite leq_addr].
     - apply Bool.not_true_is_false; intro T.
-      now apply job_arrival_between in T; try lia.
+      now apply job_arrival_between_P in T; try lia.
   Qed.
 
   (** We show that if job [j1] arrives earlier than job [j2]
