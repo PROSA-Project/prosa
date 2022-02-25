@@ -28,8 +28,7 @@ Section AbstractRTARunToCompletionThreshold.
   Context `{JobPreemptable Job}.
 
   (** Consider any kind of uni-service ideal processor state model. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
 
@@ -181,7 +180,7 @@ Section AbstractRTARunToCompletionThreshold.
       move => t ES.
       set (job_cost j - job_rtct j) as job_last.
       have LSNP := @job_nonpreemptive_after_run_to_completion_threshold
-                     Job H2 H3 _ _ arr_seq sched _ j _ t.
+                     Job H2 H3 _ arr_seq sched _ j _ t.
       apply negbNE; apply/negP; intros CONTR.
       have SCHED: forall t', t <= t' <= t + job_last -> scheduled_at sched j t'.
       { move => t' /andP [GE LT].

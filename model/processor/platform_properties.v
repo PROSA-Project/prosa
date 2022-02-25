@@ -10,8 +10,7 @@ Section ProcessorModels.
       implicit context) because it is the primary subject of the following
       definitions. *)
   Context {Job : JobType}.
-  Variable PState : Type.
-  Context `{ProcessorState Job PState}.
+  Variable PState : ProcessorState Job.
 
   (** We say that a processor model provides unit service if no job ever
       receives more than one unit of service at any time. *)

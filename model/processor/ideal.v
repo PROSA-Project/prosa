@@ -17,33 +17,26 @@ Section State.
   (** Consider any type of jobs. *)
   Variable Job: JobType.
 
-  (** We define the ideal "processor state" as an [option Job], which means
-      that it is either [Some j] (where [j] is a [Job]) or [None] (which we use
-      to indicate an idle instant). *)
-  Definition processor_state := option Job.
-
-  (** Based on this definition, we say that a given job [j] is scheduled in a
-      given state [s] iff [s] is [Some j]. *)
-  Let ideal_scheduled_at (j : Job) (s : processor_state) := s == Some j.
-
-  (** Similarly, we say that a given job [j] receives service in a given state
-      [s] iff [s] is [Some j]. *)
-  Let ideal_service_in (j : Job) (s : processor_state) := s == Some j.
-
-  (** Next, we connect the just-defined notion of an ideal processor state with
+  (** We connect the notion of an ideal processor state with
       the generic interface for the processor-state abstraction in Prosa by
       declaring a so-called instance of the [ProcessorState] typeclass. *)
-  Global Program Instance pstate_instance : ProcessorState Job processor_state :=
+  Global Program Instance processor_state : ProcessorState Job :=
     {
+      (** We define the ideal "processor state" as an [option Job],
+          which means that it is either [Some j] (where [j] is a
+          [Job]) or [None] (which we use to indicate an idle
+          instant). *)
+      State := option Job;
       (** As this is a uniprocessor model, cores are implicitly defined
           as the [unit] type containing a single element as a placeholder. *)
-      scheduled_on j s (_ : unit) := ideal_scheduled_at j s;
-      service_on j s (_ : unit) := ideal_service_in j s;
+      (** We say that a given job [j] is scheduled in a
+          given state [s] iff [s] is [Some j]. *)
+      scheduled_on j s (_ : unit) := s == Some j;
+      (** Similarly, we say that a given job [j] receives service in a
+          given state [s] iff [s] is [Some j]. *)
+      service_on j s (_ : unit) := s == Some j;
     }.
-  Next Obligation.
-    rewrite /ideal_service_in /nat_of_bool.
-    by case: ifP H =>// SOME /negP [].
-  Defined.
+  Next Obligation. by rewrite /nat_of_bool; case: ifP H => // ? /negP[]. Qed.
 
 End State.
 

@@ -9,8 +9,7 @@ Section SwappedFacts.
   (** For any given type of jobs... *)
   Context {Job : JobType}.
   (** ... any given type of processor states: *)
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ...consider any given reference schedule. *)
   Variable sched: schedule PState.
@@ -282,8 +281,7 @@ Section SwappedScheduleProperties.
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
   (** ... any given type of processor states: *)
-  Context {PState: eqType}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ...consider any given reference schedule. *)
   Variable sched: schedule PState.
@@ -364,8 +362,7 @@ Section EDFSwap.
   (** For any given type of jobs with costs and deadlines... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job}.
   (** ... any given type of processor states... *)
-  Context {PState: eqType}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ...consider a given reference schedule... *)
   Variable sched: schedule PState.
@@ -469,4 +466,4 @@ Section EDFSwap.
       + by apply uninvolved_implies_deadline_met.
   Qed.
 
- End EDFSwap.
+End EDFSwap.

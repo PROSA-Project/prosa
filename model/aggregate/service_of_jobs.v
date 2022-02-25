@@ -15,8 +15,7 @@ Section ServiceOfJobs.
   Context `{JobTask Job Task}.
   
   (** Consider any kind of processor model, ... *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** ... any job arrival sequence, ... *) 
   Variable arr_seq : arrival_sequence Job.

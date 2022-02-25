@@ -59,7 +59,7 @@ Section WCTransformation.
   (** The point-wise transformation procedure: given a schedule and a
       time [t1], ensure that the schedule is work-conserving at time
       [t1]. *)
-  Definition make_wc_at sched t1 :=
+  Definition make_wc_at sched t1 : schedule PState :=
     match sched t1 with
     | Some j => sched (* leave working instants alone *)
     | None =>

@@ -54,7 +54,7 @@ Section PriorityInversionIsBounded.
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** We assume that the schedule is valid and that all jobs come from the arrival sequence. *)
@@ -577,7 +577,7 @@ Section PriorityInversionIsBounded.
               have Fact: exists Δ, t' = t1 + Δ.
               { by exists (t' - t1); apply/eqP; rewrite eq_sym; apply/eqP; rewrite subnKC. }
               move: Fact => [Δ EQ]; subst t'.
-              have NPPJ := @no_intermediate_preemption_point (@service _ _ _ sched jlp (t1 + Δ)).
+              have NPPJ := @no_intermediate_preemption_point (@service _ _ sched jlp (t1 + Δ)).
               apply proj1 in CORR; specialize (CORR jlp ARRs).
               move: CORR => [_ [_ [T _] ]].
               apply T; apply: NPPJ; apply/andP; split.

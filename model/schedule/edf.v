@@ -31,8 +31,7 @@ Section AlternativeDefinitionOfEDF.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... and any processor model. *)
-  Context {PState: eqType}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** We say that a schedule is _locally EDF-compliant_ at a given point in
       time [t] if the job [j] scheduled at time [t] has a deadline that is
@@ -59,10 +58,3 @@ Section AlternativeDefinitionOfEDF.
   Definition EDF_schedule (sched: schedule PState) := forall t, EDF_at sched t.
 
 End AlternativeDefinitionOfEDF.
-
-
-
-
-
-
-

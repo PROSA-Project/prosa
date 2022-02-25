@@ -10,8 +10,7 @@ Section DeadlineFacts.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job}.
 
   (** ... any given type of processor states. *)
-  Context {PState: eqType}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** First, we derive two properties from the fact that a job is incomplete at
       some point in time. *)

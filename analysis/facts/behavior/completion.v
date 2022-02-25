@@ -14,8 +14,7 @@ Section CompletionFacts.
   Context `{JobArrival Job}.
 
   (** ...any kind of processor model,... *)
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ...and a given schedule. *)
   Variable sched: schedule PState.
@@ -163,8 +162,7 @@ Section ServiceAndCompletionFacts.
   Context `{JobCost Job}.
 
   (** ...any kind of processor model,... *)
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ...and a given schedule. *)
   Variable sched: schedule PState.
@@ -277,8 +275,7 @@ Section PositiveCost.
   Context `{JobArrival Job}.
 
   (** ...any kind of processor model,... *)
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ...and a given schedule. *)
   Variable sched: schedule PState.
@@ -325,8 +322,7 @@ End PositiveCost.
 Section CompletedJobs.
   
   (** Consider any kinds of jobs and any kind of processor state. *)
-  Context {Job : JobType} {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {Job : JobType} {PState : ProcessorState Job}.
 
   (** Consider any schedule... *)
   Variable sched : schedule PState.
@@ -335,7 +331,7 @@ Section CompletedJobs.
      readiness. *)
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
-  Context `{JobReady Job PState}.
+  Context {jr : JobReady Job PState}.
 
   (** We observe that a given job is ready only if it is also incomplete... *)
   Lemma ready_implies_incomplete:
@@ -393,7 +389,8 @@ Global Hint Resolve valid_schedule_implies_completed_jobs_dont_execute : basic_f
 (** Next, we relate the completion of jobs in schedules with identical prefixes. *)
 Section CompletionInTwoSchedules.
   (** Consider any processor model and any type of jobs with costs, arrival times, and a notion of readiness. *)
-  Context {PState: Type} {Job: JobType} `{ProcessorState Job PState} `{JobReady Job PState}.
+  Context {Job: JobType} {PState: ProcessorState Job}.
+  Context {jc : JobCost Job} {ja : JobArrival Job} {jr : JobReady Job PState}.
 
   (** If two schedules share a common prefix, then (in the prefix) jobs
       complete in one schedule iff they complete in the other. *)
@@ -424,5 +421,3 @@ Section CompletionInTwoSchedules.
 
 
 End CompletionInTwoSchedules.
-
-

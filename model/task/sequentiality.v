@@ -17,8 +17,7 @@ Section PropertyOfSequentiality.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor model. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Consider any arrival sequence ... *) 
   Variable arr_seq : arrival_sequence Job.
@@ -44,6 +43,5 @@ Section PropertyOfSequentiality.
     all 
       (fun j_tsk => completed_by sched j_tsk t) 
       (task_arrivals_before arr_seq (job_task j) (job_arrival j)).
-      
 
 End PropertyOfSequentiality.

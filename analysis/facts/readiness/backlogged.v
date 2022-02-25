@@ -10,10 +10,10 @@ Section BackloggedJobs.
   Context {Job : JobType} `{JobCost Job} `{JobArrival Job}.
 
   (** ... and any kind of processor model, ... *)
-  Context {PState : Type} `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** ... and allow for any notion of job readiness. *)
-  Context `{JobReady Job PState}.
+  Context {jr : JobReady Job PState}.
 
   (** Given an arrival sequence and a schedule ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -65,7 +65,7 @@ Section NonClairvoyance.
   Context {Job : JobType} `{JobCost Job} `{JobArrival Job}.
 
   (** ... any kind of processor model, ... *)
-  Context {PState : Type} `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** ... and allow for any non-clairvoyant notion of job readiness. *)
   Context {RM : JobReady Job PState}.

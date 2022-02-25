@@ -12,7 +12,7 @@ Section ScheduleWithLimitedPreemptions.
   Context {Job : JobType}.
 
   (** ... any processor model, ... *)
-  Context {PState : Type} `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   
   (** ... and any preemption model. *)
   Context `{JobPreemptable Job}.

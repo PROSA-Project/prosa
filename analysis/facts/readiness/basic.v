@@ -11,8 +11,7 @@ Section LiuAndLaylandReadiness.
   Context {Job : JobType}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Suppose jobs have an arrival time and a cost. *)
   Context `{JobArrival Job} `{JobCost Job}.

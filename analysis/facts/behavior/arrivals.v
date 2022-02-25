@@ -39,8 +39,7 @@ End ArrivalPredicates.
 Section Arrived.
   
   (** Consider any kinds of jobs and any kind of processor state. *)
-  Context {Job : JobType} {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {Job : JobType} {PState : ProcessorState Job}.
 
   (** Consider any schedule... *)
   Variable sched : schedule PState.
@@ -49,7 +48,7 @@ Section Arrived.
       notion of readiness. *)
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
-  Context `{JobReady Job PState}.
+  Context {jr : JobReady Job PState}.
 
   (** First, we note that readiness models are by definition consistent
       w.r.t. [pending]. *)
@@ -57,7 +56,7 @@ Section Arrived.
     forall j t,
       job_ready sched j t -> pending sched j t.
   Proof.
-    move: H5 => [is_ready CONSISTENT].
+    move: jr => [is_ready CONSISTENT].
     move=> j t READY.
     apply CONSISTENT.
     by exact READY.
@@ -345,4 +344,4 @@ Section ArrivalSequencePrefix.
 
   End ArrivalTimes.
 
-End ArrivalSequencePrefix. 
+End ArrivalSequencePrefix.

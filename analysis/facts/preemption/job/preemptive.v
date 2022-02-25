@@ -15,8 +15,7 @@ Section FullyPreemptiveModel.
   Context `{JobCost Job}.
 
   (** Consider any kind of processor state model, ... *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** ... any job arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -42,7 +41,7 @@ Section FullyPreemptiveModel.
     intros.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points. 
-      by rewrite H2; compute.
+      by rewrite H1; compute.
   Qed.
 
   (** ... or ε when [job_cost j > 0]. *)  
@@ -65,4 +64,4 @@ Section FullyPreemptiveModel.
   Qed.    
   
 End FullyPreemptiveModel.
-Global Hint Resolve valid_fully_preemptive_model : basic_facts. 
+Global Hint Resolve valid_fully_preemptive_model : basic_facts.

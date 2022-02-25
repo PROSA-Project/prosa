@@ -25,8 +25,7 @@ Section Abstract_RTA.
   Context `{JobPreemptable Job}.
 
   (** Consider any kind of uni-service ideal processor state model. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.  
   
@@ -271,7 +270,7 @@ Section Abstract_RTA.
             move: H_busy_interval => [[/andP [GT LT] _] _].
             have ESERV :=
               @j_receives_at_least_run_to_completion_threshold
-                _ _ H1 H2 H3 PState H5 _ _  arr_seq sched tsk interference interfering_workload
+                _ _ H1 H2 H3 PState _ _  arr_seq sched tsk interference interfering_workload
                 _ j _ _ _ t1 t2 _ (job_rtct j) _ ((A + F) - optimism). 
             feed_n 7 ESERV; eauto 2.
             specialize (ESERV H3 H4).
@@ -500,7 +499,7 @@ Section Abstract_RTA.
           simpl in IB; rewrite H_equivalent in IB; last by apply ltn_trans with A.
           have ESERV :=
             @j_receives_at_least_run_to_completion_threshold
-              _ _ H1 H2 H3 PState H5 _ _ arr_seq sched tsk
+              _ _ H1 H2 H3 PState _ _ arr_seq sched tsk
               interference interfering_workload _ j _ _ _ t1 t2 _ (job_rtct j) _ (A_sp + F_sp). 
           feed_n 7 ESERV; eauto 2.
           specialize (ESERV H3 H4).
@@ -552,4 +551,4 @@ Section Abstract_RTA.
                    with (j := j) (t1 := t1) (t2 := t2) (A_sp := A1) (F_sp := F1); auto.
   Qed.
 
-End Abstract_RTA. 
+End Abstract_RTA.

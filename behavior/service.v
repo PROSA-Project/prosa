@@ -6,8 +6,7 @@ Section Service.
   (** * Service of a Job *)
 
   (** Consider any kind of jobs and any kind of processor state. *)
-  Context {Job : JobType} {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {Job : JobType} {PState : ProcessorState Job}.
 
   (** Consider any schedule. *)
   Variable sched : schedule PState.

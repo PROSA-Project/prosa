@@ -20,8 +20,9 @@ Require Export prosa.behavior.arrival_sequence.
     In the most simple case (i.e., an ideal uniprocessor state—see
     [model/processor/ideal.v]), at any given time, either a particular job is
     scheduled or the processor is idle. *)
-Class ProcessorState (Job : JobType) (State : Type) :=
+Class ProcessorState (Job : JobType) :=
   {
+    State : Type;
     (** A [ProcessorState] instance provides a finite set of cores on which
         jobs can be scheduled. In the case of uniprocessors, this is irrelevant
         and may be ignored (by convention, the unit type is used as a
@@ -42,6 +43,7 @@ Class ProcessorState (Job : JobType) (State : Type) :=
     service_on_implies_scheduled_on :
       forall j s r, ~~ scheduled_on j s r -> service_on j s r = 0
   }.
+Coercion State : ProcessorState >-> Sortclass.
 
 (** The above definition of the [ProcessorState] interface provides
     the predicate [scheduled_on] and the function [service_on], which
@@ -57,7 +59,7 @@ Section ProcessorIn.
   (** Consider any type of jobs... *)
   Context {Job : JobType}.
   (** ...and any type of processor state. *)
-  Context {State : Type} `{ProcessorState Job State}.
+  Context {State : ProcessorState Job}.
 
   (** For a given processor state, the [scheduled_in] predicate checks
       whether a given job is running on any core in that state. *)
@@ -78,7 +80,8 @@ End ProcessorIn.
     each instant to a processor state, which reflects state of the computing
     platform at the specific time (e.g., which job is presently scheduled). *)
 
-Definition schedule (PState : Type) := instant -> PState.
+Definition schedule {Job : JobType} (PState : ProcessorState Job) :=
+  instant -> PState.
 
 (** The following line instructs Coq to not let proofs use knowledge of how
     [scheduled_on] and [service_on] are defined. Instead,

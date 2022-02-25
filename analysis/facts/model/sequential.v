@@ -12,8 +12,7 @@ Section ExecutionOrder.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor state model. *)
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
 
   (** Consider any arrival sequence ... *) 

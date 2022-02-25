@@ -18,11 +18,10 @@ Section WorkBearingReadiness.
   Context {Job : JobType} {Task : TaskType} `{JobArrival Job} `{JobCost Job}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Further, allow for any notion of job readiness. *)
-  Context `{JobReady Job PState}.
+  Context {jr : JobReady Job PState}.
 
   (** Consider any job arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.

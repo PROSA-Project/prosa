@@ -13,8 +13,7 @@ Section NonpreemptiveSchedule.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor model. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   
   (** We say that a given schedule is _nonpreemptive_ if every job,
       once it is scheduled, remains scheduled until completion. *)

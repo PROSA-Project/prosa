@@ -40,7 +40,7 @@ Section ExistsBusyIntervalJLFP.
   Context `{JLFP_policy Job}.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** For simplicity, let's define some local names. *)
@@ -301,7 +301,7 @@ Section ExistsBusyIntervalJLFP.
       rewrite -{3}[Δ](sum_of_ones t1) exchange_big //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split.
       { rewrite leq_sum // => t' _.
-        have SCH := @service_of_jobs_le_1 _ _ _ _ _ sched predT (arrivals_between 0 (t1 + Δ)).        
+        have SCH := @service_of_jobs_le_1 _ _ _ _ sched predT (arrivals_between 0 (t1 + Δ)).        
         by eapply leq_trans; last apply SCH; eauto using arrivals_uniq with basic_facts. }
       { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=
                 leq_sum // => t' /andP [/andP [LT GT] _]; apply/sum_seq_gt0P.

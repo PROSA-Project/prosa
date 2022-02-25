@@ -63,7 +63,7 @@ Section PreemptionFacts.
   Context {Job : JobType}.
   Context `{Arrival : JobArrival Job}.
   Context `{Cost : JobCost Job}.
-  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
 
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.

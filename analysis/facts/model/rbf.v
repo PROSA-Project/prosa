@@ -28,7 +28,7 @@ Section ProofWorkloadBound.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
   (** ... any schedule corresponding to this arrival sequence, ... *)
-  Context {PState : Type} `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.

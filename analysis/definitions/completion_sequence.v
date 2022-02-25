@@ -11,8 +11,7 @@ Section CompletionSequence.
 
   (** Consider any kind of jobs with a cost
      and any kind of processor state. *)
-  Context {Job : JobType} `{JobCost Job} {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {Job : JobType} `{JobCost Job} {PState : ProcessorState Job}.
 
   (** Consider any job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.

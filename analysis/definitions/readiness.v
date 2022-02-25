@@ -12,7 +12,7 @@ Section ReadinessModelProperties.
   Context {Job : JobType} `{JobCost Job} `{JobArrival Job}.
 
   (** ... and any kind of processor model, ... *)
-  Context {PState: Type} `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ... consider a  notion of job readiness. *)
   Variable ReadinessModel : JobReady Job PState.
@@ -46,5 +46,3 @@ Section ReadinessModelProperties.
         ~~ job_preemptable j (service sched j t) -> job_ready sched j t.
   
 End ReadinessModelProperties.
-
-

@@ -11,8 +11,7 @@ Section SchedulePrefixMap.
   Context {Job : JobType}.
 
   (** ... any given type of processor states ... *)
-  Context {PState: eqType}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** ... we define a procedure that applies a given function to every
      point in a given finite prefix of the schedule.

@@ -18,8 +18,7 @@ Section Task.
   Context `{JobTask Job Task}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Consider any job arrival sequence... *)
   Variable arr_seq: arrival_sequence Job.
@@ -65,8 +64,7 @@ Section Schedulability.
   Context `{JobTask Job Task}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   
   (** Consider any job arrival sequence... *)
   Variable arr_seq: arrival_sequence Job.
@@ -115,8 +113,7 @@ Section AllDeadlinesMet.
   Context `{JobDeadline Job}.
 
   (** ... any given type of processor states. *)
-  Context {PState: eqType}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** We say that all deadlines are met if every job scheduled at some
      point in the schedule meets its deadline. Note that this is a

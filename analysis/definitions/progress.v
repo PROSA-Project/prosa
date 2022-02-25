@@ -12,8 +12,7 @@ Section Progress.
   Context `{JobCost Job}.
 
   (** ... and any kind of schedule. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** For a given job and a given schedule... *)
   Variable sched : schedule PState.

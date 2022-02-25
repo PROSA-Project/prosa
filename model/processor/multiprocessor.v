@@ -22,8 +22,7 @@ Section Schedule.
   Variable Job: JobType.
 
   (** ... and consider any type of per-processor state. *)
-  Variable processor_state: Type.
-  Context `{ProcessorState Job processor_state}.
+  Variable processor_state: ProcessorState Job.
 
   (** Given a desired number of processors [num_cpus], we define a finite type
       of integers from [0] to [num_cpus - 1]. The purpose of this definition is
@@ -59,16 +58,17 @@ Section Schedule.
 
   (** Finally, we connect the above definitions with the generic Prosa
       interface for processor models. *)
-  Global Program Instance multiproc_state : ProcessorState Job multiprocessor_state :=
+  Global Program Instance multiproc_state : ProcessorState Job :=
     {
+      State := multiprocessor_state;
       scheduled_on := multiproc_scheduled_on;
       service_on := multiproc_service_on
     }.
   Next Obligation.
-    move: j s r H0.
+    move: j s r H.
     move=> j mps cpu.
     by apply: service_in_implies_scheduled_in.
-  Defined.
+  Qed.
 
   (** From the instance [multiproc_state], we get the function [service_in].
       The service received by a given job [j] in a given multiprocessor state

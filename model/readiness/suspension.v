@@ -22,8 +22,7 @@ Section ReadinessOfSelfSuspendingJobs.
   Context {Job : JobType}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Suppose jobs have an arrival time, a cost, and that they exhibit
       self-suspensions. *)
@@ -49,11 +48,11 @@ Section ReadinessOfSelfSuspendingJobs.
       job_ready sched j t := suspension_has_passed sched j t && ~~ completed_by sched j t
     }.
   Next Obligation.
-    move: H3 => /andP [PASSED UNFINISHED].
+    move: H2 => /andP [PASSED UNFINISHED].
     rewrite /pending. apply /andP. split => //.
     move: PASSED. rewrite /suspension_has_passed /has_arrived => /andP [ARR _].
     by move: ARR; apply leq_addk.
-  Defined.
+  Qed.
 
 End ReadinessOfSelfSuspendingJobs.
 

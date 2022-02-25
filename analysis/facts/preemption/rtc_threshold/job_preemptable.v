@@ -17,8 +17,7 @@ Section RunToCompletionThreshold.
   Context `{JobPreemptable Job}.
 
   (** Consider any kind of processor state model, ... *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** ... any job arrival sequence, ... *)
   Variable arr_seq: arrival_sequence Job.

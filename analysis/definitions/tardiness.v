@@ -18,8 +18,7 @@ Section Tardiness.
   Context `{JobTask Job Task}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Further, consider any job arrival sequence... *)
   Variable arr_seq: arrival_sequence Job.

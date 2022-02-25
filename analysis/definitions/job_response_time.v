@@ -10,8 +10,7 @@ Section JobResponseTimeExceeds.
   Context `{JobArrival Job}.
 
   (** ... and any kind of processor state. *)
-  Context `{PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context `{PState : ProcessorState Job}.
 
   (** Consider any schedule. *)
   Variable sched : schedule PState.

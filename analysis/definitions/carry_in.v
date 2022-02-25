@@ -18,7 +18,7 @@ Section NoCarryIn.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
   (** ... and the resultant schedule. *)
-  Context {PState : Type} `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
 
   (** There is no carry-in at time [t] iff every job (regardless of priority)

@@ -23,8 +23,7 @@ Section GenericModelLemmas.
   Context `{JobCost Job}.
 
   (** Consider any kind of processor state model, ... *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** ... any job arrival sequence with consistent arrivals, .... *)
   Variable arr_seq : arrival_sequence Job.
@@ -103,8 +102,7 @@ Section UnitServiceModelLemmas.
   Context `{JobCost Job}.
 
   (** Consider any kind of unit-service processor state model. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
   
   (** Consider any arrival sequence with consistent arrivals. *)
@@ -245,8 +243,7 @@ Section UnitServiceUniProcessorModelLemmas.
   Context `{JobCost Job}.
 
   (** Consider any kind of unit-service uniprocessor state model. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
   Hypothesis H_uniprocessor_model : uniprocessor_model PState.
   
@@ -400,5 +397,4 @@ Section IdealModelLemmas.
     by rewrite eqxx.
   Qed.
 
-  
 End IdealModelLemmas.

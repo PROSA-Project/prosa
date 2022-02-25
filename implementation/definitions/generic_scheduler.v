@@ -11,7 +11,7 @@ Require Export prosa.analysis.transform.swap.
 Section PointwisePolicy.
   (** Consider any type of jobs and type of schedule. *)
   Context {Job : JobType}.
-  Variable PState : Type.
+  Variable PState : ProcessorState Job.
 
   (** A pointwise scheduling policy is a function that, given a schedule prefix
       that is valid up to time [t - 1], decides what to schedule at time
@@ -21,8 +21,7 @@ End PointwisePolicy.
 
 Section GenericSchedule.
   (** Consider any type of jobs and type of schedule. *)
-  Context {Job : JobType} {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {Job : JobType} {PState : ProcessorState Job}.
 
   (** Suppose we are given a policy function that, given a schedule prefix that
       is valid up to time [t - 1], decides what to schedule at time [t]. *)
@@ -52,4 +51,3 @@ Section GenericSchedule.
     schedule_up_to t t.
 
 End GenericSchedule.
-

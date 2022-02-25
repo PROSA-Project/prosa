@@ -10,8 +10,7 @@ Require Export prosa.analysis.facts.transform.replace_at.
 
 Section GenericScheduleProperties.
   (** For any type of jobs and type of schedule, ... *)
-  Context {Job : JobType} {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {Job : JobType} {PState : ProcessorState Job}.
 
   (** ... any scheduling policy, and ... *)
   Variable policy : PointwisePolicy PState.
@@ -61,7 +60,7 @@ Section GenericScheduleProperties.
     elim: h => [LT|h IH LT].
     { rewrite /schedule_up_to rest_of_schedule_invariant // => ZERO.
       now subst. }
-    { rewrite /schedule_up_to rest_of_schedule_invariant -/(schedule_up_to _ h t);
+    { rewrite /schedule_up_to rest_of_schedule_invariant -/(schedule_up_to _ _ h t);
         first by apply IH => //; apply ltn_trans with (n := h.+1).
       move=> EQ. move: LT.
       now rewrite EQ ltnn. }

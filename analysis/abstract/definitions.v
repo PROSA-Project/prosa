@@ -22,8 +22,7 @@ Section AbstractRTADefinitions.
     Context `{JobCost Job}.
 
     (** Consider any kind of processor state model. *)
-    Context {PState : Type}.
-    Context `{ProcessorState Job PState}.
+    Context {PState : ProcessorState Job}.
     
     (** Consider any arrival sequence... *) 
     Variable arr_seq : arrival_sequence Job.

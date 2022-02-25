@@ -424,8 +424,7 @@ Section MakeEDFAtFacts.
         have ARR_j: job_arrival j <= t_edf by apply fsc_found_job_arrival with (sched := sched) (j1 := j_orig) => //; rewrite scheduled_at_def.
         now rewrite -EQ'.
       + move=> SCHED_j.
-        apply H_jobs_must_arrive_to_execute.
-        now rewrite scheduled_at_def /scheduled_in /pstate_instance.
+        by apply H_jobs_must_arrive_to_execute; rewrite scheduled_at_def.
   Qed.
 
   (** We connect the fact that a job is scheduled in [sched'] to the

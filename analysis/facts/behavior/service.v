@@ -14,8 +14,7 @@ Section Composition.
   
   (** Consider any job type and any processor state. *)
   Context {Job: JobType}.
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** For any given schedule... *)
   Variable sched: schedule PState.
@@ -137,8 +136,7 @@ Section UnitService.
 
   (** Consider any job type and any processor state. *)
   Context {Job : JobType}.
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Let's consider a unit-service model... *)
   Hypothesis H_unit_service: unit_service_proc_model PState.
@@ -239,8 +237,7 @@ Section Monotonicity.
 
   (** Consider any job type and any processor model. *)
   Context {Job: JobType}.
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** Consider any given schedule... *)
   Variable sched: schedule PState.
@@ -264,8 +261,7 @@ End Monotonicity.
 Section RelationToScheduled.
 
   Context {Job: JobType}.
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** Consider any given schedule... *)
   Variable sched: schedule PState.
@@ -640,8 +636,7 @@ Section ServiceInTwoSchedules.
   
   (** Consider any job type and any processor model. *)
   Context {Job: JobType}.
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** Consider any two given schedules... *)
   Variable sched1 sched2: schedule PState.

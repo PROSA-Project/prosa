@@ -50,7 +50,7 @@ Section ExistsNoCarryIn.
   Let quiet_time := quiet_time arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job (ideal.processor_state Job) _ Cost Arrival}.
+  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
   
   (** Assume that the schedule is work-conserving, ... *)

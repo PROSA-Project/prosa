@@ -19,8 +19,7 @@ Section SequentialTasksReadiness.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Consider any job arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -34,8 +33,6 @@ Section SequentialTasksReadiness.
       pending sched j t &&
       prior_jobs_complete arr_seq sched j t
     }.
-  Next Obligation.
-    by move: H3 => /andP [T _].
-  Defined.
-  
+  Next Obligation. by move: H2 => /andP[]. Qed.
+
 End SequentialTasksReadiness.

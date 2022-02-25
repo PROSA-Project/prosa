@@ -30,7 +30,7 @@ Section Priority.
 
   (** ... and consider any preemption model and notion of readiness. *)
   Context `{JobPreemptable Job}.
-  Context `{JobReady Job (ideal.processor_state Job)}.
+  Context {jr : JobReady Job (ideal.processor_state Job)}.
 
   (** Given any job arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
@@ -53,4 +53,3 @@ Section Priority.
       hep_job_at t j_hp j.
 
 End Priority.
-

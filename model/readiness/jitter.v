@@ -23,8 +23,7 @@ Section ReadinessOfJitteryJobs.
   Context {Job : JobType}.
 
   (** ... and any kind of processor state. *)
-  Context {PState : Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState : ProcessorState Job}.
 
   (** Suppose jobs have an arrival time, a cost, and exhibit release jitter. *)
   Context `{JobArrival Job} `{JobCost Job} `{JobJitter Job}.
@@ -41,10 +40,10 @@ Section ReadinessOfJitteryJobs.
       job_ready sched j t := is_released j t && ~~ completed_by sched j t
     }.
   Next Obligation.
-    move: H3 => /andP [REL UNFINISHED].
+    move: H2 => /andP [REL UNFINISHED].
     rewrite /pending. apply /andP. split => //.
     move: REL. rewrite /is_released /has_arrived.
     by apply leq_addk.
-  Defined.
+  Qed.
 
 End ReadinessOfJitteryJobs.

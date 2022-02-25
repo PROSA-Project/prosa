@@ -20,11 +20,10 @@ Section WorkConserving.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor model. *)
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
+  Context {PState: ProcessorState Job}.
 
   (** Further, allow for any notion of job readiness. *)
-  Context `{JobReady Job PState}.
+  Context {jr : JobReady Job PState}.
 
   (** Given an arrival sequence and a schedule ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -47,4 +46,3 @@ Section WorkConserving.
     [seq j <- arrivals_up_to arr_seq t | backlogged sched j t].
 
 End WorkConserving.
-
