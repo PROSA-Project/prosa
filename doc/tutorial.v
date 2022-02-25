@@ -629,12 +629,35 @@ in this `model/` directory.
 Ideal Uniprocessor
 ------------------
 
-The file `model/processor/ideal.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/processor/ideal.v>`_
+The file `model/processor/ideal.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/processor/ideal.v>`_ defines ideal uniprocessors as processors
+that are at each instant either idle or executing a single job.
+To do this, a processor state, as introduced in schedule_ above,
+is defined using the ``option`` type of Coq's standard library
+|*)
+Require Import prosa.model.processor.ideal.
+
+Print processor_state.  (* .unfold *)
+
+Print option.  (* .unfold *)
+(*|
+A value of type ``option Job`` is either ``Some j`` with ``j`` of type
+``Job`` or ``None``, respectively meaning that the processor is executing
+job ``j`` or is idle. The function ``is_idle``
+|*)
+Check is_idle.  (* .unfold *)
+(*|
+is then defined as the function which, given a schedule and an instant,
+tells whether the processor is idle in the given schedule at the given instant.
+
+.. processor.platform_properties
+
+Concept of Task
+---------------
+
+The file `model/task/concept.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/task/concept.v>`_ defines the concept of *task*.
 
 
-* processor.ideal <- one proof
-* processor.platform_properties.
-* task.concept
+
 * priority.classes <- one proof
 * task.arrivals
 * task.sequentiality
