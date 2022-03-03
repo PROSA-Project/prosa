@@ -101,6 +101,8 @@ provided by the `Coq platform <https://coq.inria.fr/download>`_
 for Linux, MacOS and Windows. This will install both Coq
 and some common libraries, including all Prosa dependencies.
 
+TODO: see whether we need to recommend installing Msys2 on Windows.
+
 Installing a Coq interface
 --------------------------
 
