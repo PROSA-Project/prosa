@@ -941,15 +941,17 @@ Section Monotonicity.
       is monotonic by definition. *)
   Lemma service_monotonic : forall t1 t2, t1 <= t2 ->
     service sched j t1 <= service sched j t2.
-  Proof. by move=> t1 t2 ?; rewrite -(service_cat _ _ t1 t2)// leq_addr. Qed.
+  Proof.
+    by move=> t1 t2 ?; rewrite -(service_cat _ _ t1 t2)// leq_addr.
+  Qed.
 
 End Monotonicity.
 (*|
 The whole `Section` business should now be familiar to the reader.
 The `Lemma` keyword is new. It is used to introduce a lemma,
-followed by its name, a colon sign and the statement of the theorem itself,
+followed by its name, a colon sign and the statement of the result itself,
 ending with a dot, as any Coq sentence.
-The line between `Proof` and `Qed` can be ignored for now.
+The cryptic line between `Proof` and `Qed` can be ignored for now.
 It instructs Coq how to perform the proof of the previously stated lemma.
 The only thing to notice is that this proof is terminated by a `Qed`
 (for the latin words "Quod Erat Demonstrandum") meaning that,
@@ -963,72 +965,144 @@ is now available for use in future proofs.
    one can find a few generic advices in
    `doc/guidelines.md <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/doc/guidelines.md#naming-conventions>`_.
 
-Search avec pattern
+.. note::
+   Coq has many synonyms of `Lemma`. The commands `Lemma`, `Theorem`, `Fact`,
+   `Remark`, `Corollary` and `Proposition` all behave in the exact
+   same way. The user is free to choose any of them to better comment her code.
 
-mentionner la doc de Coq
+Similarly to behavior, the files
+`ideal/schedule.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/model/ideal/schedule.v>`_,
+`task_arrivals.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/model/task_arrivals.v>`_,
+`sequential.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/model/sequential.v>`_,
+`service_of_jobs.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/model/service_of_jobs.v>`_,
+`preemption.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/model/preemption.v>`_
+and
+`workload.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/model/workload.v>`_,
+in the 
+`analysis/facts/model/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/model/>`_
+directory provide basic lemmas about definitions introduced in the model_
+section above.
 
-retrieve material below about first proof.
+The files
+`job/preemptive.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/preemption/job/preemptive.v>`_,
+`task/preemptive.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/preemption/task/preemptive.v>`_,
+`rtc_threshold/job_preemptable.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/preemption/rtc_threshold/job_preemptable.v>`_
+and
+`rtc_threshold/preemptive.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/preemption/rtc_threshold/preemptive.v>`_,
+in the
+`analysis/facts/preemption/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/preemption/>`_
+directory provide basic lemmas about preemption.
 
-* facts.behavior.service
-* facts.behavior.arrivals
-* facts.behavior.completion
-* facts.behavior.deadlines
-* facts.behavior.all
+.. omitted definitions.request_bound_function
+   omitted facts.model.rbf
 
-* facts.model.ideal_schedule
-* facts.model.task_arrivals
-* facts.model.sequential
-* facts.model.service_of_jobs
-* facts.model.preemption
-* facts.model.workload
+Readiness
+---------
 
-* facts.preemption.job.preemptive
-* facts.preemption.task.preemptive
-* facts.preemption.rtc_threshold.job_preemptable
-* facts.preemption.rtc_threshold.preemptive
+The file 
+`analysis/definitions/readiness.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/definitions/readiness.v>`_
+contains definitions of `nonclairvoyant_readiness`
+and `nonpreemptive_readiness` while the file
+`analysis/definitions/work_bearing_readiness.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/definitions/work_bearing_readiness.v>`_
+defines `work_bearing_readiness`.
+Basic facts about the sequential task readiness model can be found in
+`analysis/facts/readiness/sequential.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/readiness/sequential.v>`_.
 
-* definitions.request_bound_function
-* facts.model.rbf
+Busy Intervals
+--------------
 
-* definitions.readiness
-* definitions.work_bearing_readiness
-* facts.readiness.sequential
+Busy Intervals constitute a central tool in classic real time analyses.
+They are defined in
+`definitions/busy_interval.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/definitions/busy_interval.v>`_
+and
+`definitions/priority_inversion.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/definitions/priority_inversion.v>`_
+and basic lemmas about them are to be found in
+`facts/busy_interval/busy_interval.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/busy_interval/busy_interval.v>`_
+and
+`facts/busy_interval/priority_inversion.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/busy_interval/priority_inversion.v>`_.
 
-* definitions.busy_interval
-* definitions.priority_inversion
-* facts.busy_interval.busy_interval
-* facts.busy_interval.priority_inversion
+Abstract RTA
+------------
 
-* abstract.definitions
-* abstract.search_space
-* abstract.run_to_completion
+The directory
+`analysis/abstract/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/abstract/>`_
+contains proofs of classic real time analyses in a setting as abstract
+as possible. These proofs will later be instantiated in more concrete settings.
 
-* definitions.schedulability
-* abstract.abstract_rta
+First, a few more definitions are needed and can be found in the file
+`analysis/abstract/definitions.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/abstract/definitions.v>`_
 
-* definitions.task_schedule
-* abstract.abstract_seq_rta
+Then the notion of *search space* is exploited to refine the set of behaviors
+that can exhibit worst case response times.
+These results can be found in
+`analysis/abstract/search_space.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/abstract/search_space.v>`_
 
-* abstract.ideal_jlfp_rta
+The fact that jobs that jobs with bounded interference receive at least some amount of service is proved in
+`analysis/abstract/lower_bound_on_service.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/abstract/lower_bound_on_service.v>`_
+
+The response time of tasks is defined as `task_response_time_bound` in
+`analysis/definitions/schedulability.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/definitions/schedulability.v>`_
+which enables to state and prove the main theorem
+`uniprocessor_response_time_bound` in
+`analysis/abstract/abstract_rta.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/abstract/abstract_rta.v>`_.
+Basically, this theorem states that under a bunch of hypotheses,
+if some `R` satisfies the inequality in hypothesis `H_R_is_maximum`,
+then `R` is a response time bound.
+
+The file
+`analysis/abstract/ideal/abstract_seq_rta.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/abstract/ideal/abstract_seq_rta.v>`_.
+offers a more precise theorem `uniprocessor_response_time_bound_seq`
+for sequential tasks.
+
+.. omitted definitions.task_schedule
+
+Finally, the file
+`analysis/abstract/ideal/iw_instantiation.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/abstract/ideal/iw_instantiation.v>`_.
+provides lemmas for Job Level Fixed Priority policies for ideal
+uniprocessors.
+|*)
+
+(*|
+.. _results:
 
 Results
 =======
 
-* fixed_priority.rta.bounded_pi
-* fixed_priority.rta.bounded_nps
-* fixed_priority.rta.fully_preemptive
+The `results/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/results>`_
+directory instantiates some of the above results in well known settings.
+For instance, the main result for fixed priority tasks on a fully preemptive uniprocessor.
+lies in the file
+`results/fixed_priority/rta/fully_preemptive.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/results/fixed_priority/rta/fully_preemptive.v>`_.
+After about hundred lines to state the fixed priority fully preemptive
+setting on ideal uniprocessors (this could probably be way shorter,
+were the definitions more structured, but for the sake of flexibility, Prosa choses a flat model
+with lot of individual hypotheses), the main hypothesis are the ones about `L` and `R`
+and they enable to prove the theorem
+`uniprocessor_response_time_bound_fully_preemptive_fp`
+that simply states that `R` is a response time bound.
 
-describe results/fixed_priority/rta/fully_preemptive.v
-(probably very short)
+.. omitted fixed_priority.rta.bounded_pi
+   omitted fixed_priority.rta.bounded_nps
 |*)
 
 (*|
+.. _contributing:
+
 Contributing
 ============
 
-TODO short conclusion, you should now be able to read doc by yourself
+The reader should now be able to navigate through the extensive
+documentation of the Prosa library. The library being developped in a literate
+programming style, one can simply read the source files, although
+when looking for precise results, the querying commands of Coq
+`Check`, `Print`, `About` and `Search` can be of great help
+(particularly considering that Prosa makes extensive use of the `Section`
+mechanism which may sometimes obfuscate what are the exact hypotheses of
+a given lemma).
 
-TODO Prosa open source, contributions welcome (link to the end of the README)
+Prosa follows an open source development process.
+Contributions are welcomed, as stated at the end of its
+`README <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/#commit-and-development-rules>`_.
 |*)
 
 (*|
