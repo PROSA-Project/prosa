@@ -856,10 +856,118 @@ all scheduled jobs ``j_hp`` at that instant ``t`` have higher or equal priority.
 Analysis
 ========
 
-TODO describe needed analysis for results/fixed_priority/rta/fully_preemptive.v
+The `analysis/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis>`_
+directory contains the proofs of real-time analyses themselves.
+Even more than pen&paper proofs, formal proofs need to be appropriately
+factored out into small reusable lemmas. Thus, the `analysis/` directory
+also contains many basic lemmas about all the definitions introduced above.
+Since this document only attempts to present a specific analysis, namely
+fixed priority tasks on a fully preemptive uniprocessor, we only introduce
+here the lemmas used in that analysis. However, at the end of the section,
+the reader should be able to navigate herself through all the lemmas
+of the directory.
 
-* definitions.job_properties
-* definitions.schedule_prefix
+First Lemmas
+------------
+
+Some definitions are used only internally into `analysis/`,
+thus they aren't located in `behavior/` nor `model/`.
+Among them, let's mention
+|*)
+Require Import prosa.analysis.definitions.job_properties.
+
+Print job_cost_positive.
+(*|
+and
+|*)
+Require Import prosa.analysis.definitions.schedule_prefix.
+
+Print identical_prefix.
+(*|
+
+Equipped with all these definitions, we can finally introduce
+our first lemmas. The files in the directory
+`analysis/facts/behavior/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/behavior>`_
+contain many lemmas establishing basic facts about all the definitions
+introduced in the behavior_ section above.
+The user can load all those lemmas by simply requiring
+|*)
+Require Import prosa.analysis.facts.behavior.all.
+(*|
+The files in `analysis/facts/behavior/` are developed in a literate
+programming style like the remaining of Prosa. Thus, they can be read
+inextenso like any other file in the library. However, lemmas are mostly
+made to be used inside proofs and such reading is a very ineffective way to
+find the lemma one needs when carrying a proof. Indeed, once one gets a Coq
+interface up and running, it is much more convenient to just load the files
+with the above `Require` command and use the `Search` utility of Coq.
+For instance, to find all lemmas about `scheduled_at` and `service_at`,
+one can type
+|*)
+Search scheduled_at service_at.
+(*|
+The `Search` command can also be used with a pattern, for instance
+to look for lemmas of the shape
+`service at some point <= service at some other point`, one can type
+|*)
+Search (service _ _ _ <= service _ _ _). (* .unfold *)
+(*|
+The `Search` command is even more powerful, as documented in
+`Coq's reference manual <https://coq.inria.fr/distrib/current/refman/proof-engine/vernacular-commands.html#coq:cmd.Search>`_.
+
+.. note::
+   The `reference manual of Coq <https://coq.inria.fr/distrib/current/refman/>`_
+   is of high quality nowadays. It is a good first place to learn about the
+   details of any Coq feature.
+
+Back to the `service_monotonic` lemma found above, if one looks in
+the file
+`analysis/facts/behavior/service.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/analysis/facts/behavior/service.v>`_,
+one will find the following text
+|*)
+(** We establish a basic fact about the monotonicity of service. *)
+Section Monotonicity.
+
+  (** Consider any job type and any processor model. *)
+  Context {Job : JobType} {PState : ProcessorState Job}.
+
+  (** Consider any given schedule... *)
+  Variable sched: schedule PState.
+
+  (** ...and a given job that is to be scheduled. *)
+  Variable j: Job.
+
+  (** We observe that the amount of service received
+      is monotonic by definition. *)
+  Lemma service_monotonic : forall t1 t2, t1 <= t2 ->
+    service sched j t1 <= service sched j t2.
+  Proof. by move=> t1 t2 ?; rewrite -(service_cat _ _ t1 t2)// leq_addr. Qed.
+
+End Monotonicity.
+(*|
+The whole `Section` business should now be familiar to the reader.
+The `Lemma` keyword is new. It is used to introduce a lemma,
+followed by its name, a colon sign and the statement of the theorem itself,
+ending with a dot, as any Coq sentence.
+The line between `Proof` and `Qed` can be ignored for now.
+It instructs Coq how to perform the proof of the previously stated lemma.
+The only thing to notice is that this proof is terminated by a `Qed`
+(for the latin words "Quod Erat Demonstrandum") meaning that,
+if Coq can compile the `Qed` it managed to check the proof and the new lemma
+is now available for use in future proofs.
+
+.. note::
+   Naming lemmas is a delicate business. Some libraries have very specific
+   and elaborated naming schemes, usually based on the statement of the
+   theorem itself. Although there is no such strict naming scheme in Prosa,
+   one can find a few generic advices in
+   `doc/guidelines.md <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/doc/guidelines.md#naming-conventions>`_.
+
+Search avec pattern
+
+mentionner la doc de Coq
+
+retrieve material below about first proof.
 
 * facts.behavior.service
 * facts.behavior.arrivals
@@ -912,55 +1020,6 @@ Results
 
 describe results/fixed_priority/rta/fully_preemptive.v
 (probably very short)
-|*)
-
-(*|
-First Lemmas
-------------
-
-TODO: old material, will probably disappear
-
-Based on the previous definitions, some lemmas can be proved.
-Prosa indeed proves a lot of more or less basic lemmas.
-we only present here one such simple lemma from the file
-`analysis/facts/behavior/service.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/analysis/facts/behavior/service.v>`_
-|*)
-Require Import prosa.analysis.facts.behavior.service.
-
-(** We establish a basic fact about the monotonicity of service. *)
-Section Monotonicity.
-
-  (** Consider any job type and any processor model. *)
-  Context {Job: JobType}.
-  Context {PState: Type}.
-  Context `{ProcessorState Job PState}.
-
-  (** Consider any given schedule... *)
-  Variable sched: schedule PState.
-
-  (** ...and a given job that is to be scheduled. *)
-  Variable j: Job.
-
-  (** We observe that the amount of service received
-      is monotonic by definition. *)
-  Lemma service_monotonic:
-    forall t1 t2,
-      t1 <= t2 ->
-      service sched j t1 <= service sched j t2.
-  Proof.
-    move=> t1 t2 let1t2.
-    rewrite -(service_cat _ _ t1 t2) //.
-    exact: leq_addr.
-  Qed.
-
-End Monotonicity.
-(*|
-The three lines between `Proof` and `Qed` can be ignored for now.
-The instruct Coq how to perform the proof of the previously stated lemma.
-The only thing to notice is that this proof is terminated by a `Qed`
-(for the latin "words Quod Erat Demonstrandum") meaning that,
-if Coq can compile the `Qed` it managed to check the proof and the new lemma
-is now available for use in future proofs.
 |*)
 
 (*|
