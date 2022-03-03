@@ -11,6 +11,7 @@ Makefile*
 *.v#
 *.cache
 *~
+*.swp
 *.orig
 */.#*
 #*#

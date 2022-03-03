@@ -8,7 +8,7 @@
 		"buildEnv": {
 			"COQBIN": "#{@opam/coq.bin}/",
 			"COQLIB": "#{@opam/coq.lib}/coq/",
-			"COQPATH": "#{coq-mathcomp-ssreflect.install}/user-contrib",
+			"COQPATH": "#{@opam/coq.lib}/coq/user-contrib:#{coq-mathcomp.install}/user-contrib",
 			"DESTDIR": "#{self.install}"
 		},
 		"build": [
@@ -22,34 +22,62 @@
 		"doc": "make html -j"
 	},
 	"dependencies": {
-		"@opam/coq": "8.13.2",
+		"@opam/coq": ">=8.13 <8.16",
 		"@opam/ocamlfind": "1.8.1",
-		"coq-mathcomp-ssreflect": "1.12.0"
+		"coq-mathcomp": ">=1.12 <1.15",
+		"coq-mathcomp-zify": "*"
 	},
 	"devDependencies": {},
 	"resolutions": {
-		"coq-mathcomp-ssreflect": {
-			"source": "github:math-comp/math-comp#6bff567e84b01c1b3502985ec936b9e74ea252b4",
-			"version": "1.12.0",
+		"coq-mathcomp": {
+			"source": "github:math-comp/math-comp#d09daeec7572ff9cb488e021245f7f5cd4680410",
 			"override": {
 				"dependencies": {
-					"@opam/coq": "8.13.2"
+					"@opam/coq": "*"
 				},
 				"buildsInSource": true,
 				"buildEnv": {
 					"HOME": "#{self.target_dir}",
 					"COQBIN": "#{@opam/coq.bin}/",
 					"COQLIB": "#{@opam/coq.lib}/coq/",
-					"COQPATH": "#{@opam/coq.lib}/coq/user-contrib",
+					"COQPATH": "#{@opam/coq.lib}/coq/user-contrib:#{self.target_dir}",
 					"COQMAKEFILEOPTIONS": "DESTDIR = '#{self.install}' COQMF_WINDRIVE = '#{@opam/coq.lib}/coq'"
 				},
 				"build": [
-					[ "make", "-C", "mathcomp/ssreflect", "-j" ]
+					[ "make", "-C", "mathcomp/ssreflect", "-j" ],
+					[ "make", "-C", "mathcomp/fingroup", "-j" ],
+					[ "make", "-C", "mathcomp/algebra", "-j" ]
 				],
 				"install": [
-					[ "make", "-C", "mathcomp/ssreflect", "install" ]
+					[ "make", "-C", "mathcomp/ssreflect", "install" ],
+					[ "make", "-C", "mathcomp/fingroup", "install" ],
+					[ "make", "-C", "mathcomp/algebra", "install" ]
+				]
+			}
+		},
+		"coq-mathcomp-zify": {
+			"source": "github:math-comp/mczify#63a5a1557758fec39782eaacca80befd17ac0ed2",
+			"override": {
+				"dependencies": {
+					"@opam/coq": ">=8.13",
+					"coq-mathcomp": "*"
+				},
+				"buildsInSource": true,
+				"buildEnv": {
+					"HOME": "#{self.target_dir}",
+					"COQBIN": "#{@opam/coq.bin}/",
+					"COQLIB": "#{@opam/coq.lib}/coq/",
+					"COQPATH": "#{@opam/coq.lib}/coq/user-contrib:#{coq-mathcomp.install}/user-contrib",
+					"COQMAKEFILEOPTIONS": "DESTDIR = '#{self.install}' COQMF_WINDRIVE = '#{@opam/coq.lib}/coq'"
+				},
+				"build": [
+					[ "make", "-j" ]
+				],
+				"install": [
+					[ "make", "install" ]
 				]
 			}
 		}
 	}
 }
+
