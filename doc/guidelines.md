@@ -75,6 +75,26 @@ Exception to this rule: ssreflect and other standard library imports.
 cannot shadow a definition in Prosa. For example, require `mathcomp` modules before any modules in the `prosa` namespace. 
 
 
+## Stating Lemmas and Theorems
+
+Prosa adheres to the following style
+
+```
+Lemma my_lemma : forall foo (bar : foo) x y z, property bar x y z.
+Proof.
+move=> foo bar x y z.
+```
+which is strictly equivalent to the (more concise but less explicit)
+```
+Lemma my_lemma foo (bar : foo) x y z : property bar x y z.
+Proof.
+```
+
+As discussed in [#86](https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/issues/86), this choice of style is deliberate. Roughly speaking, the rationale is that the explicit use of  `forall` increases readability for novice users and those using Prosa primarily in "read-only mode." 
+
+While the explicit `forall` use is admittedly slightly more verbose and cumbersome for proof authors, the majority of project participants feels that the positives (self-explanatory syntax, readability) outweigh the costs (annoyance felt by more experienced users). Therefore, when stating and proving new lemmas, or when refactoring existing lemmas, please adhere to the preferred style, which is to make the `forall` explicit. 
+
+
 ## Writing Proofs
 
 When writing new proofs, please adhere to the following rules.
