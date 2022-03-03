@@ -71,6 +71,16 @@ programming style.
 |*)
 
 (*|
+Audience
+========
+
+Real-Time specialist not familiar with Coq constitue the main audience
+of this document. It should also be of interest for readers acquainted
+to Coq but with less knowledge about real-time, although this is not
+the main audience.
+|*)
+
+(*|
 Getting Started
 ===============
 
