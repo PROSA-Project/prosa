@@ -156,8 +156,8 @@ Alt-down, Alt-up or Alt-right under VSCode).
 
 It is first needed to load a few libraries.
 |*)
-From mathcomp Require Export all_ssreflect.
-Require Import prosa.util.notation.
+From mathcomp Require Import all_ssreflect. (* .in *)
+Require Import prosa.util.notation. (* .in *)
 
 (*|
 .. _architecture:
@@ -507,7 +507,7 @@ defines a very generic notion of `ProcessorState` and `schedule`.
 It is worth noting that a `schedule` is a function from time instants
 to processor states.
 |*)
-Require Import prosa.behavior.schedule.
+Require Import prosa.behavior.schedule. (* .in *)
 
 Print schedule.  (* .unfold *)
 (*|
@@ -622,7 +622,7 @@ Finally, the
 `behavior/all.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/behavior/all.v>`_
 file provides a simple way to load all the above definitions by just typing
 |*)
-Require Import prosa.behavior.all.
+Require Import prosa.behavior.all.  (* .in *)
 
 (*|
 .. _model:
@@ -646,7 +646,7 @@ that are at each instant either idle or executing a single job.
 To do this, a processor state, as introduced in schedule_ above,
 is defined using the ``option`` type of Coq's standard library
 |*)
-Require Import prosa.model.processor.ideal.
+Require Import prosa.model.processor.ideal.  (* .in *)
 
 Print processor_state.  (* .unfold *)
 
@@ -671,7 +671,7 @@ defines the concept of *task*.
 A task is simply defined as a type with decidable equality.
 
 |*)
-Require Import model.task.concept.
+Require Import model.task.concept.  (* .in *)
 
 Print TaskType.  (* .unfold *)
 (*|
@@ -714,7 +714,7 @@ and two instants ``t1`` and ``t2``, then
 ``task_arrivals_between arr_seq tsk t1 t2`` is the set of all jobs
 of task ``tsk`` arriving between ``t1`` and ``t2`` in ``arr_seq``.
 |*)
-Require Import prosa.model.task.arrivals.
+Require Import prosa.model.task.arrivals.  (* .in *)
 
 Print task_arrivals_between.  (* .unfold *)
 (*|
@@ -727,7 +727,7 @@ defines the notion of sequential tasks.
 A task is called *sequential* when all its jobs execute
 in a non overlapping manner. This is formally defined in
 |*)
-Require Import prosa.model.task.sequentiality.
+Require Import prosa.model.task.sequentiality.  (* .in *)
 
 Print sequential_tasks.
 (*|
@@ -742,7 +742,7 @@ defines main classes of priority policies.
 In this document, we are interested in Fixed Priority (FP) policies,
 defined by the typeclass
 |*)
-Require Import prosa.model.priority.classes.
+Require Import prosa.model.priority.classes.  (* .in *)
 
 Print FP_policy.  (* .unfold *)
 (*|
@@ -782,7 +782,7 @@ defines the notion of preemption.
 In Prosa, the various preemption models are represented with a single
 predicate
 |*)
-Require Import prosa.model.preemption.parameter.
+Require Import prosa.model.preemption.parameter.  (* .in *)
 
 Print JobPreemptable.
 (*|
@@ -812,7 +812,7 @@ The file `model/task/arrival/curves.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-p
 defines (min and max) arrival curves.
 The typeclass ``MaxArrivals`` gives the type of arrival curves.
 |*)
-Require Import prosa.model.task.arrival.curves.
+Require Import prosa.model.task.arrival.curves.  (* .in *)
 
 Print MaxArrivals.  (* .unfold *)
 (*|
@@ -840,7 +840,7 @@ In file `model/schedule/preemption_time.v <https://gitlab.mpi-sws.org/RT-PROOFS/
 the notion of preemption time in a schedule is defined according
 to the scheduled job at each instant, if any.
 |*)
-Require Import prosa.model.schedule.preemption_time.
+Require Import prosa.model.schedule.preemption_time.  (* .in *)
 
 Print preemption_time.  (* .unfold *)
 (*|
@@ -848,7 +848,7 @@ This allows to, finally, define what it means for a schedule to
 respect a given priority policy in file
 `model/schedule/priority_driven.v <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/master/model/schedule/priority_driven.v>`_
 |*)
-Require Import prosa.model.schedule.priority_driven.
+Require Import prosa.model.schedule.priority_driven.  (* .in *)
 
 Print respects_JLDP_policy_at_preemption_point.  (* .unfold *)
 (*|
@@ -886,13 +886,13 @@ Some definitions are used only internally into `analysis/`,
 thus they aren't located in `behavior/` nor `model/`.
 Among them, let's mention
 |*)
-Require Import prosa.analysis.definitions.job_properties.
+Require Import prosa.analysis.definitions.job_properties.  (* .in *)
 
 Print job_cost_positive.
 (*|
 and
 |*)
-Require Import prosa.analysis.definitions.schedule_prefix.
+Require Import prosa.analysis.definitions.schedule_prefix.  (* .in *)
 
 Print identical_prefix.
 (*|
@@ -904,7 +904,7 @@ contain many lemmas establishing basic facts about all the definitions
 introduced in the behavior_ section above.
 The user can load all those lemmas by simply requiring
 |*)
-Require Import prosa.analysis.facts.behavior.all.
+Require Import prosa.analysis.facts.behavior.all.  (* .in *)
 (*|
 The files in `analysis/facts/behavior/` are developed in a literate
 programming style like the remaining of Prosa. Thus, they can be read
@@ -922,7 +922,7 @@ The `Search` command can also be used with a pattern, for instance
 to look for lemmas of the shape
 `service at some point <= service at some other point`, one can type
 |*)
-Search (service _ _ _ <= service _ _ _). (* .unfold *)
+Search (service _ _ _ <= service _ _ _).  (* .unfold *)
 (*|
 The `Search` command is even more powerful, as documented in
 `Coq's reference manual <https://coq.inria.fr/distrib/current/refman/proof-engine/vernacular-commands.html#coq:cmd.Search>`_.
