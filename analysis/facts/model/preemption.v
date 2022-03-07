@@ -96,7 +96,7 @@ Section PreemptionFacts.
       apply/allP; intros t'.
       by rewrite mem_index_iota ltnS -eqn_leq; move => /eqP <-.  
     }
-    have MATE : jobs_must_arrive_to_execute sched by eauto with basic_facts. 
+    have MATE : jobs_must_arrive_to_execute sched by rt_eauto. 
     move :  (H_sched_valid) =>  [COME_ARR READY].
     have MIN := ex_minnP EX. 
     move: MIN => [mpt /andP [/andP [LT1 SCHEDsmpt] /allP ALL] MIN]; clear EX.

@@ -165,9 +165,9 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         ideal_proc_model_sched_case_analysis_eq sched t jo.
         { exfalso; clear HYP1 HYP2.
           destruct H_valid_schedule as [A B].
-          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try by eauto 2 with basic_facts.
+          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try by rt_eauto.
           move: BUSY => [PREF _].
-          by eapply not_quiet_implies_not_idle; eauto 2 with basic_facts. }
+          by eapply not_quiet_implies_not_idle; rt_eauto. }
         { clear EqSched_jo; move: Sched_jo; rewrite scheduled_at_def; move => /eqP EqSched_jo.
           rewrite EqSched_jo in HYP1, HYP2. 
           move: HYP1 HYP2.
@@ -196,11 +196,11 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       intros j ARR TSK POS.
       destruct H_valid_schedule as [COME MUST ].
       edestruct exists_busy_interval_from_total_workload_bound
-        with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; eauto 2 with basic_facts.
+        with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
       { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
       { exists t1, t2; split; first by done.
         split; first by done.
-        by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts. }
+        by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto. }
     Qed.
     
     (** In this section, we prove that, under FIFO scheduling, the cumulative priority inversion experienced
@@ -236,7 +236,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         destruct (leqP (job_arrival j) t).
         { destruct (completed_by sched j t) eqn : COMPL; last first.
           { apply /negP.
-            eapply (FIFO_implies_no_priority_inversion arr_seq); eauto with basic_facts.
+            eapply (FIFO_implies_no_priority_inversion arr_seq); rt_eauto.
             by apply /andP; split; [| rewrite COMPL]. }
           { rewrite scheduled_at_def in INTER.
             rewrite /is_priority_inversion. 
@@ -249,11 +249,11 @@ Section AbstractRTAforFIFOwithArrivalCurves.
               - by move : INTER => /eqP INTER; rewrite -scheduled_at_def in INTER.
               - by rewrite -ltnNge; apply leq_ltn_trans with (job_arrival j). } 
             apply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval;
-              eauto 2 with basic_facts;last by done.
+              rt_eauto;last by done.
             move : H_busy_interval => [ [_ [_ [QUIET /andP [ARR _ ]]]] _].
             destruct (leqP t t1) as [LE | LT].
             { have EQ : t = job_arrival j by apply eq_trans with t1; lia.
-              rewrite EQ in COMPL; apply completed_on_arrival_implies_zero_cost in COMPL; eauto with basic_facts.
+              rewrite EQ in COMPL; apply completed_on_arrival_implies_zero_cost in COMPL; rt_eauto.
               by move: (H_job_cost_positive); rewrite /job_cost_positive COMPL. }
             { specialize (QUIET t); feed QUIET.
               - apply /andP; split; first by done.
@@ -284,9 +284,9 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
       erewrite (cumulative_priority_inversion_is_bounded j ARRj JPOS t1 t2); rewrite //= add0n.
       rewrite (instantiated_cumulative_interference_of_hep_jobs_equal_total_interference_of_hep_jobs arr_seq) //=; 
-              try by (try rewrite instantiated_quiet_time_equivalent_quiet_time); eauto 2 with basic_facts.
-      eapply leq_trans; first by apply service_of_jobs_le_workload; eauto 2 with basic_facts.
-      rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)); eauto 2 with basic_facts.
+              try by (try rewrite instantiated_quiet_time_equivalent_quiet_time); rt_eauto.
+      eapply leq_trans; first by apply service_of_jobs_le_workload; rt_eauto.
+      rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)); rt_eauto.
       specialize (workload_minus_job_cost j) => ->.
       { rewrite /workload_of_jobs /IBF (big_rem tsk) //= (addnC (rbf tsk (job_arrival j - t1 + ε))).
         rewrite -addnBA; last first.
@@ -386,12 +386,12 @@ Section AbstractRTAforFIFOwithArrivalCurves.
             have GE: task_cost tsk <= R; last by lia.
             rewrite !add0n in LE1.
             rewrite -(leqRW LE2) -(leqRW LE1).
-            by eapply (task_cost_le_sum_rbf arr_seq); eauto with basic_facts. }
+            by eapply (task_cost_le_sum_rbf arr_seq); rt_eauto. }
         { rewrite subnK; first by done.
           rewrite !add0n in LE1. apply leq_trans with F; last by done.
           apply leq_trans with (\sum_(tsko <- ts) rbf tsko ε); last by done.
           apply leq_trans with (task_cost tsk); first by lia.
-          eapply task_cost_le_sum_rbf; eauto with basic_facts. }
+          eapply task_cost_le_sum_rbf; rt_eauto. }
       Qed.
       
     End SolutionOfResponseTimeReccurenceExists.
@@ -412,7 +412,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       (interference_bound_function := fun tsk A R => IBF tsk A R) (L0 := L) ) ||
     eapply uniprocessor_response_time_bound with
       (interference := interference) (interfering_workload := interfering_workload)
-      (interference_bound_function := fun tsk A R => IBF tsk A R) (L := L)); eauto 2 with basic_facts.
+      (interference_bound_function := fun tsk A R => IBF tsk A R) (L := L)); rt_eauto.
     - by apply instantiated_i_and_w_are_coherent_with_schedule.
     - by apply instantiated_busy_intervals_are_bounded.
     - by apply instantiated_interference_is_bounded.

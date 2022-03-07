@@ -151,6 +151,6 @@ Section Priorities.
 
 End Priorities.
 
-(** We add the above observation into the "Hint Database" basic_facts, so Coq
+(** We add the above observation into the "Hint Database" basic_rt_facts, so Coq
     will be able to apply it automatically. *)
-Global Hint Resolve respects_sequential_tasks : basic_facts.
+Global Hint Resolve respects_sequential_tasks : basic_rt_facts.

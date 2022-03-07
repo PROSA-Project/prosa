@@ -31,11 +31,11 @@ Section Properties.
 
 End Properties.
 
-(** We add the above lemmas into a "Hint Database" basic_facts, so Coq
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
     will be able to apply them automatically. *)
 Global Hint Resolve
      FIFO_is_reflexive
      FIFO_is_transitive
      FIFO_is_total
-  : basic_facts.
+  : basic_rt_facts.
 

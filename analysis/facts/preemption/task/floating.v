@@ -106,8 +106,8 @@ Section FloatingNonPreemptiveRegionsModel.
 
 End FloatingNonPreemptiveRegionsModel.
 
-(** We add the above lemma into a "Hint Database" basic_facts, so Coq will be able to apply them automatically. *)
+(** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)
 Global Hint Resolve
      valid_fixed_preemption_points_model_lemma
      floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions
-     floating_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions : basic_facts.
+     floating_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions : basic_rt_facts.

@@ -46,11 +46,11 @@ Section Properties.
 
 End Properties.
 
-(** We add the above lemmas into a "Hint Database" basic_facts, so Coq
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
     will be able to apply them automatically. *)
 Global Hint Resolve
      NFP_is_reflexive
      NFP_is_transitive
      NFP_is_total
-  : basic_facts.
+  : basic_rt_facts.
 

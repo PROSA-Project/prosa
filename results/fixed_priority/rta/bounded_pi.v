@@ -200,8 +200,8 @@ Section AbstractRTAforFPwithArrivalCurves.
           * by exfalso.
           * by subst s; rewrite scheduled_at_def //; apply/eqP. 
         + exfalso; clear HYP1 HYP2.
-          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto with basic_facts.
-          by move: BUSY => [PREF _]; eapply not_quiet_implies_not_idle; eauto 2 with basic_facts; apply/eqP.
+          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
+          by move: BUSY => [PREF _]; eapply not_quiet_implies_not_idle; rt_eauto; apply/eqP.
       - move: (HYP); rewrite scheduled_at_def; move => /eqP HYP2; apply/negP.
         rewrite /interference /ideal_jlfp_rta.interference /is_priority_inversion
                   /is_interference_from_another_hep_job HYP2 negb_or.
@@ -219,8 +219,8 @@ Section AbstractRTAforFPwithArrivalCurves.
     Proof.
       intros j t1 t2 ARR TSK POS BUSY.
       move: H_sched_valid => [CARR MBR].
-      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto with basic_facts.
-      eapply all_jobs_have_completed_equiv_workload_eq_service; eauto with basic_facts.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
+      eapply all_jobs_have_completed_equiv_workload_eq_service; rt_eauto.
       intros s ARRs TSKs.
       move: (BUSY) => [[_ [QT _]] _].
       apply QT.
@@ -243,11 +243,11 @@ Section AbstractRTAforFPwithArrivalCurves.
       intros j ARR TSK POS.
       move: H_sched_valid => [CARR MBR].
       edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]];
-        eauto 2 with basic_facts.
+        rt_eauto.
       { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_hep_rbf. }
       exists t1, t2; split; first by done.
       split; first by done.
-      by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
+      by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
     Qed.
 
     (** Next, we prove that [IBF_other] is indeed an interference bound.
@@ -271,8 +271,8 @@ Section AbstractRTAforFPwithArrivalCurves.
       move: H_sched_valid => [CARR MBR].
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
-      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto 2 with basic_facts.
-      rewrite /interference; erewrite cumulative_task_interference_split; eauto 2 with basic_facts; last first.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
+      rewrite /interference; erewrite cumulative_task_interference_split; rt_eauto; last first.
       { move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _].
           by eapply arrived_between_implies_in_arrivals; eauto 2. }
       unfold IBF_other, interference.
@@ -297,7 +297,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
           move: (TSK) => /eqP <-; apply total_workload_le_total_ohep_rbf; try done.
           by move: (TSK) => /eqP ->. } 
-        all: eauto 2 using arr_seq with basic_facts. }
+        all: eauto 2 using arr_seq with basic_rt_facts. }
     Qed.
 
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
@@ -368,7 +368,7 @@ Section AbstractRTAforFPwithArrivalCurves.
     move: H_sched_valid => [CARR MBR].
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
-    eapply uniprocessor_response_time_bound_seq; eauto 2 with basic_facts.
+    eapply uniprocessor_response_time_bound_seq; rt_eauto.
     - by apply instantiated_i_and_w_are_consistent_with_schedule. 
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks. 
     - by apply instantiated_busy_intervals_are_bounded.

@@ -171,7 +171,7 @@ Section ExistsNoCarryIn.
       Proof.
         unfold total_service. 
         rewrite -{3}[Δ]addn0 -{2}(subnn t) addnBA // [in X in _ <= X]addnC.
-        apply service_of_jobs_le_length_of_interval'; auto with basic_facts.
+        apply service_of_jobs_le_length_of_interval'; rt_auto.
         by eapply arrivals_uniq; eauto 2.
       Qed.
 
@@ -228,7 +228,7 @@ Section ExistsNoCarryIn.
                           H_jobs_must_arrive_to_execute
                           H_completed_jobs_dont_execute
                           predT 0 t t.
-          feed_n 2 COMPL; auto with basic_facts.
+          feed_n 2 COMPL; rt_auto.
           { intros j A B; apply H_no_carry_in.
             - eapply in_arrivals_implies_arrived; eauto 2.
             - eapply in_arrivals_implies_arrived_between in A; eauto 2.
@@ -247,8 +247,7 @@ Section ExistsNoCarryIn.
           by apply H_workload_is_bounded.
         }  
         intros s ARR BEF.
-        eapply workload_eq_service_impl_all_jobs_have_completed; eauto with basic_facts.
-        by eapply arrived_between_implies_in_arrivals.
+        by eapply workload_eq_service_impl_all_jobs_have_completed; rt_eauto.
       Qed.
 
     End ProcessorIsNotTooBusyInduction.

@@ -125,7 +125,7 @@ Section PriorityInversionIsBounded.
         ~ is_idle sched t.
       Proof.
         intros IDLE.
-        by exfalso; apply: not_quiet_implies_not_idle; eauto 2 with basic_facts.
+        by exfalso; apply: not_quiet_implies_not_idle; rt_eauto.
       Qed.
       
       (** Next we consider two cases: (1) when [t] is less than [t2 - 1] and (2) [t] is equal to [t2 - 1]. *)
@@ -202,7 +202,7 @@ Section PriorityInversionIsBounded.
             now rewrite -pred_Sn.
           }
           have PEND: pending sched j t2.-1
-            by rewrite -ARR; apply job_pending_at_arrival => //; eauto with basic_facts.
+            by rewrite -ARR; apply job_pending_at_arrival => //; rt_eauto.
           apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [PENDhp HEPhp]]].
           eapply NOTHP, (H_priority_is_transitive 0); last by apply HEPhp.
           apply (H_respects_policy _ _ t2.-1); auto.
@@ -259,13 +259,13 @@ Section PriorityInversionIsBounded.
         move: (H_t_in_busy_interval) => /andP [GEt LEt].
         have HP := scheduled_at_preemption_time_implies_higher_or_equal_priority _ Sched_jhp.
         move: (Sched_jhp) => PENDING.
-        eapply scheduled_implies_pending in PENDING; eauto 2 with basic_facts.
+        eapply scheduled_implies_pending in PENDING; rt_eauto.
         apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _]. 
         apply contraT; rewrite -ltnNge; intro LT; exfalso.
         feed (QUIET jhp); first by eapply CONS, Sched_jhp.
         specialize (QUIET HP LT).
         have COMP: job_completed_by jhp t by apply: completion_monotonic QUIET.
-        apply completed_implies_not_scheduled in COMP; eauto with basic_facts.
+        apply completed_implies_not_scheduled in COMP; rt_eauto.
         by move: COMP => /negP COMP; apply COMP.
       Qed.
       
@@ -331,14 +331,14 @@ Section PriorityInversionIsBounded.
       } 
       repeat split; try done. 
       move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET EXj]]]; move: (Sched_jhp) => PENDING.
-      eapply scheduled_implies_pending in PENDING; eauto with basic_facts.
+      eapply scheduled_implies_pending in PENDING; rt_eauto.
       apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
       apply contraT; rewrite -ltnNge; intro LT; exfalso.
       feed (QUIET jhp); first by eapply H_jobs_come_from_arrival_sequence, Sched_jhp.
       specialize (QUIET HP LT).
       have COMP: job_completed_by jhp t.
       { apply: completion_monotonic QUIET; exact: leq_trans LEtp. }
-      apply completed_implies_not_scheduled in COMP; eauto with basic_facts.
+      apply completed_implies_not_scheduled in COMP; rt_eauto.
       by move : COMP => /negP COMP; apply : COMP.
     Qed. 
     
@@ -388,10 +388,10 @@ Section PriorityInversionIsBounded.
       apply/negP; intros SCHED2.
       specialize (QT jhp).
       feed_n 3 QT; eauto.
-      - have MATE: jobs_must_arrive_to_execute sched by eauto with basic_facts.
+      - have MATE: jobs_must_arrive_to_execute sched by rt_eauto.
         have HA: has_arrived jhp t by apply MATE.
         by done.
-      apply completed_implies_not_scheduled in QT; eauto with basic_facts.
+      apply completed_implies_not_scheduled in QT; rt_eauto.
       by move: QT => /negP NSCHED; apply: NSCHED.
     Qed.
 
@@ -677,7 +677,7 @@ Section PriorityInversionIsBounded.
             specialize (EXPP (service jlp t1)).
             feed EXPP.
             { apply/andP; split; first by done.
-              apply service_at_most_cost; eauto with basic_facts.
+              apply service_at_most_cost; rt_eauto.
             }
             move: EXPP => [pt [NEQ PP]].
             exists pt; apply/andP; split; by done.

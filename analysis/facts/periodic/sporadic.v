@@ -87,6 +87,6 @@ Section PeriodicTasksAsSporadicTasks.
   
 End PeriodicTasksAsSporadicTasks.
 
-(** We add the [periodic_task_respects_sporadic_task_model] lemma into a "Hint Database" basic_facts,
+(** We add the [periodic_task_respects_sporadic_task_model] lemma into a "Hint Database" basic_rt_facts,
     so Coq will be able to apply it automatically. *)
-Global Hint Extern 1 => apply periodic_task_respects_sporadic_task_model : basic_facts.
+Global Hint Extern 1 => apply periodic_task_respects_sporadic_task_model : basic_rt_facts.

@@ -49,7 +49,7 @@ Section FullyNonPreemptiveModel.
       + rewrite /completed_by -ltnNge.
         move: NCOMPL; rewrite neq_ltn; move => /orP [LE|GE]; [by done | exfalso].
         move: GE; rewrite ltnNge; move => /negP GE; apply: GE.
-        apply completion.service_at_most_cost; eauto 2 with basic_facts.
+        apply completion.service_at_most_cost; rt_eauto.
     - intros t NSCHED SCHED.
       rewrite /job_preemptable /fully_nonpreemptive_model.
       apply/orP; left. 
@@ -66,7 +66,7 @@ Section FullyNonPreemptiveModel.
           have <-: (service_at sched j t.+1) = 1.
           { by apply/eqP; rewrite service_at_def eqb1 -scheduled_at_def. }
             by rewrite -big_nat_recr //=.
-            by apply completion.service_at_most_cost; eauto 2 with basic_facts.
+            by apply completion.service_at_most_cost; rt_eauto.
   Qed.
 
   (** We also prove that under the fully non-preemptive model
@@ -127,7 +127,7 @@ Section FullyNonPreemptiveModel.
   Qed.
   
 End FullyNonPreemptiveModel.
-Global Hint Resolve valid_fully_nonpreemptive_model : basic_facts.
+Global Hint Resolve valid_fully_nonpreemptive_model : basic_rt_facts.
 
 (** In this section, we prove the equivalence between no preemptions and a non-preemptive schedule. *)
 Section NoPreemptionsEquivalence.

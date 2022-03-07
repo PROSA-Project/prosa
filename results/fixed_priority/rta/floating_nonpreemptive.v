@@ -148,7 +148,7 @@ Section RTAforFloatingModelwithArrivalCurves.
     move: (H_valid_task_model_with_floating_nonpreemptive_regions) => [LIMJ JMLETM].
     move: (LIMJ) => [BEG [END _]].
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.
-    all: eauto 2 with basic_facts.
+    all: rt_eauto.
     - by apply sequential_readiness_implies_work_bearing_readiness.
     - by apply sequential_readiness_implies_sequential_tasks.
     - intros A SP.

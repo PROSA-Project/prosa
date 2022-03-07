@@ -67,7 +67,7 @@ Section TaskArrivalsSize.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].
     move: (ARRA); move: (ARRB); rewrite /arrivals_at => A_IN B_IN.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
-    have SPO : respects_sporadic_task_model arr_seq tsk; try by auto with basic_facts.
+    have SPO : respects_sporadic_task_model arr_seq tsk; try by rt_auto.
     have EQ_ARR_A : (job_arrival a = t) by apply H_consistent_arrivals.
     have EQ_ARR_B : (job_arrival b = t) by apply H_consistent_arrivals.
     specialize (SPO a b); feed_n 6 SPO => //; try by lia.
@@ -129,7 +129,7 @@ Section TaskArrivalsSize.
       move : (jobs_exists_later n) => [j' [ARR [TSK [ARRIVAL IND]]]].
       apply (only_j_in_task_arrivals_at_j
                arr_seq H_consistent_arrivals H_uniq_arr_seq tsk) in ARR => //;
-        last by auto with basic_facts.
+        last by rt_auto.
       rewrite /task_arrivals_at_job_arrival TSK in ARR.
       now rewrite -ARRIVAL ARR.
     Qed.

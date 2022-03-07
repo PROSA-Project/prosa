@@ -35,9 +35,9 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
     intros; split.
     - by rewrite /task_rtc_bounded_by_cost.
     - intros j ARR TSK.
-      apply leq_trans with (job_cost j); eauto 2 with basic_facts.
+      apply leq_trans with (job_cost j); rt_eauto.
       by move: TSK => /eqP <-; apply H_valid_job_cost.
   Qed.
   
 End TaskRTCThresholdFloatingNonPreemptiveRegions.
-Global Hint Resolve floating_preemptive_valid_task_run_to_completion_threshold : basic_facts.
+Global Hint Resolve floating_preemptive_valid_task_run_to_completion_threshold : basic_rt_facts.

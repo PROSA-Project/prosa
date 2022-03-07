@@ -514,7 +514,7 @@ Section JLFPInstantiation.
             rewrite eqn_add2r; unfold hep_job.
             erewrite H_priority_is_reflexive; eauto 2.
             rewrite eqn_leq; apply/andP; split; try eauto 2.
-              by apply service_at_most_cost; eauto with basic_facts.
+              by apply service_at_most_cost; rt_eauto.
         Qed.
  
         (** The equivalence trivially follows from the lemmas above. *)

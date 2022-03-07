@@ -208,7 +208,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         intros t _; case: (sched t); last by done.
           by intros s; destruct (hep_job s j).
       }
-      edestruct @preemption_time_exists as [ppt [PPT NEQ2]]; eauto 2 with basic_facts.
+      edestruct @preemption_time_exists as [ppt [PPT NEQ2]]; rt_eauto.
       move: NEQ2 => /andP [GE LE].
       apply leq_trans with (cumulative_priority_inversion sched j t1 ppt);
         last apply leq_trans with (ppt - t1).
@@ -222,7 +222,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         rewrite big_nat_cond big1 //; move => t /andP [/andP [GEt LTt] _ ].
         case SCHED: (sched t) => [s | ]; last by done. 
         edestruct @not_quiet_implies_exists_scheduled_hp_job
-          with (K := ppt - t1) (t := t) as [j_hp [ARRB [HP SCHEDHP]]]; eauto 2 with basic_facts.
+          with (K := ppt - t1) (t := t) as [j_hp [ARRB [HP SCHEDHP]]]; rt_eauto.
         { exists ppt; split.  by done.  by rewrite subnKC //; apply/andP; split. } 
         { by rewrite subnKC //; apply/andP; split. }
         apply/eqP; rewrite eqb0 Bool.negb_involutive.
@@ -273,7 +273,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Theorem uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments:
       response_time_bounded_by tsk R.
     Proof.
-      eapply uniprocessor_response_time_bound_edf; eauto 2 with basic_facts.
+      eapply uniprocessor_response_time_bound_edf; rt_eauto.
       - eapply EDF_implies_sequential_tasks; eauto 2.
         + by apply basic.basic_readiness_is_work_bearing_readiness, EDF_is_reflexive.
       - by apply priority_inversion_is_bounded. 

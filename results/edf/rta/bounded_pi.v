@@ -226,9 +226,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
         move => /andP [HYP1 HYP2].
         ideal_proc_model_sched_case_analysis_eq sched t jo.
         { exfalso; clear HYP1 HYP2.
-          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto 2 with basic_facts.
+          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
           move: BUSY => [PREF _].
-          by eapply not_quiet_implies_not_idle; eauto 2 with basic_facts. }
+          by eapply not_quiet_implies_not_idle; rt_eauto. }
         { clear EqSched_jo; move: Sched_jo; rewrite scheduled_at_def; move => /eqP EqSched_jo.
           rewrite EqSched_jo in HYP1, HYP2. 
           move: HYP1 HYP2.
@@ -258,8 +258,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
       unfold EDF in *.
       intros j t1 t2 ARR TSK POS BUSY.
       move: H_sched_valid => [CARR MBR].
-      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; eauto 2 with basic_facts.
-      eapply all_jobs_have_completed_equiv_workload_eq_service; eauto 2 with basic_facts.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
+      eapply all_jobs_have_completed_equiv_workload_eq_service; rt_eauto.
       intros s INs TSKs.
       rewrite /arrivals_between in INs. 
       move: (INs) => NEQ.
@@ -286,11 +286,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
       intros j ARR TSK POS.
       move: H_sched_valid => [CARR MBR].
       edestruct exists_busy_interval_from_total_workload_bound
-        with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; eauto 2 with basic_facts.
+        with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
       { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
       exists t1, t2; split; first by done.
       split; first by done.
-      by eapply instantiated_busy_interval_equivalent_busy_interval; eauto 2 with basic_facts.
+      by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
     Qed.
     
     (** Next, we prove that [IBF_other] is indeed an interference bound. *)
@@ -346,7 +346,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             + by rewrite /is_priority_inversion leq_addr.
             + by rewrite ltnW.
           - apply H_priority_inversion_is_bounded; try done.
-            eapply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval; eauto 2 with basic_facts.
+            eapply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval; rt_eauto.
             by move: H_busy_interval => [PREF _].
         Qed.
 
@@ -367,9 +367,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
           move: H_sched_valid => [CARR MBR].
           erewrite instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks;
-            eauto 2 with basic_facts.
+            rt_eauto.
           - by move: (H_job_of_tsk) => /eqP ->; rewrite /jobs.
-          - by rewrite instantiated_quiet_time_equivalent_quiet_time; eauto 2 with basic_facts.
+          - by rewrite instantiated_quiet_time_equivalent_quiet_time; rt_eauto.
         Qed.
 
         (** By lemma [service_of_jobs_le_workload], the total
@@ -380,7 +380,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           service_of_jobs sched (EDF_not_from tsk) jobs t1 (t1 + Δ)
           <= workload_of_jobs (EDF_not_from tsk) jobs.
         Proof.
-            by apply service_of_jobs_le_workload; eauto 2 with basic_facts.
+            by apply service_of_jobs_le_workload; rt_eauto.
         Qed.
 
         (** Next, we prove that the total workload of jobs
@@ -577,7 +577,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             by rewrite /completed_by /completed_by ZERO. 
         - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _]. 
           rewrite (cumulative_task_interference_split arr_seq sched _ _ _ tsk j);
-            eauto 2 with basic_facts; last first.
+            rt_eauto; last first.
           { by eapply arrived_between_implies_in_arrivals; eauto. }
           rewrite /I leq_add //.  
           + by apply cumulative_priority_inversion_is_bounded with t2.
@@ -683,7 +683,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L) ) ||
     eapply uniprocessor_response_time_bound_seq with
         (interference := interference) (interfering_workload := interfering_workload)
-        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); eauto 2 with basic_facts.
+        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
     - by apply instantiated_i_and_w_are_coherent_with_schedule.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - by apply instantiated_busy_intervals_are_bounded.

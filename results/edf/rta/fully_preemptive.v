@@ -129,7 +129,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
                  /fully_preemptive.fully_preemptive_model subnn big1_eq. } 
     try ( eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L) ) ||
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L) .
-    all: eauto 2 with basic_facts.
+    all: rt_eauto.
     - move => A /andP [LT NEQ].
       specialize (H_R_is_maximum A); feed H_R_is_maximum.
       { by apply/andP; split. }

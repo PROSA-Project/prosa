@@ -173,7 +173,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         by intros s; case: (hep_job s j). 
       } 
       move: NEQ => /negP /negP; rewrite -ltnNge; move => BOUND.
-      edestruct (@preemption_time_exists) as [ppt [PPT NEQ]]; eauto 2 with basic_facts.
+      edestruct (@preemption_time_exists) as [ppt [PPT NEQ]]; rt_eauto.
       move: NEQ => /andP [GE LE].
       apply leq_trans with (cumulative_priority_inversion sched j t1 ppt);
         last apply leq_trans with (ppt - t1); first last.
@@ -196,7 +196,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         case SCHED: (sched t) => [s | ]; last by done.
         edestruct (@not_quiet_implies_exists_scheduled_hp_job)
           with (K := ppt - t1) (t1 := t1) (t2 := t2) (t := t)
-          as [j_hp [ARRB [HP SCHEDHP]]]; eauto 2 with basic_facts.
+          as [j_hp [ARRB [HP SCHEDHP]]]; rt_eauto.
         { by exists ppt; split; [done | rewrite subnKC //; apply/andP]. } 
         { by rewrite subnKC //; apply/andP; split. }
         apply/eqP; rewrite eqb0 Bool.negb_involutive.
@@ -242,7 +242,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       response_time_bounded_by tsk R.
     Proof.
       eapply uniprocessor_response_time_bound_fp;
-        eauto using priority_inversion_is_bounded with basic_facts. 
+        eauto using priority_inversion_is_bounded with basic_rt_facts. 
     Qed.
     
   End ResponseTimeBound.

@@ -319,7 +319,7 @@ Section RequestBoundFunctions.
   Proof.
     move => t GE.
     destruct t; first by done.
-    eapply leq_trans; first by apply task_rbf_1_ge_task_cost; eauto with basic_facts.
+    eapply leq_trans; first by apply task_rbf_1_ge_task_cost; rt_eauto.
     rewrite /total_request_bound_function.
     erewrite big_rem; last by exact H_tsk_in_ts.
     apply leq_trans with (task_request_bound_function tsk t.+1); last by apply leq_addr.

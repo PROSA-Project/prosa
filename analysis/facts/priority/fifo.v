@@ -56,7 +56,7 @@ Section BasicLemmas.
     apply /negP; rewrite negb_and.
     apply /orP; right; apply /negPn.
     have -> : scheduled_at sched s t -> completed_by sched j t => //.
-    eapply (early_hep_job_is_scheduled); try eauto 2 with basic_facts.
+    eapply (early_hep_job_is_scheduled); try rt_eauto.
     - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=].
   Qed.
 
@@ -74,7 +74,7 @@ Section BasicLemmas.
     move => j' t SCHED j_hp ARRjhp HEP.
     have EARLIER: job_arrival j_hp < job_arrival j' by rewrite -ltnNge in HEP.
     eapply (early_hep_job_is_scheduled arr_seq _ sched _ _ _ _ j_hp j' _ _ _ t).
-    Unshelve. all : eauto with basic_facts.
+    Unshelve. all : rt_eauto.
     move=> t'; apply /andP; split => //.
     by apply ltnW.
   Qed.
@@ -91,7 +91,7 @@ Section BasicLemmas.
     Lemma tasks_execute_sequentially : sequential_tasks arr_seq sched.
     Proof.
       move => j1 j2 t ARRj1 ARRj2 SAME_TASKx LT => //.
-      eapply (early_hep_job_is_scheduled); try eauto 2 with basic_facts.
+      eapply (early_hep_job_is_scheduled); try rt_eauto.
       by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=].
     Qed.
 
@@ -117,7 +117,7 @@ Section BasicLemmas.
     { specialize (H_work_conservation j t).
       destruct H_work_conservation as [j_other SCHEDj_other]; first by eapply (COME j t.-1 SCHED1).
       - do 2 (apply /andP; split; last by done).
-        eapply scheduled_implies_pending in SCHED1; try eauto with basic_facts.
+        eapply scheduled_implies_pending in SCHED1; try rt_eauto.
         move : SCHED1 => /andP [HAS COMPL].
         by apply leq_trans with t.-1; [exact HAS| lia].
       - move: SCHEDj_other IDLE.
@@ -130,8 +130,8 @@ Section BasicLemmas.
         by repeat (apply /andP ; split; try by done).
       }
       rewrite /hep_job /fifo.FIFO -ltnNge in HEP. 
-      eapply (early_hep_job_is_scheduled arr_seq ) in SCHED1; try eauto 2 with basic_facts.
-      - apply scheduled_implies_not_completed in INTER; eauto with basic_facts.
+      eapply (early_hep_job_is_scheduled arr_seq ) in SCHED1; try rt_eauto.
+      - apply scheduled_implies_not_completed in INTER; rt_eauto.
         by eapply (incompletion_monotonic sched s t.-1 t) in INTER; [move: INTER => /negP|lia].
       - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=]. }
   Qed.

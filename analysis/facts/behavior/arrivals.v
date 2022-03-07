@@ -81,13 +81,6 @@ Section Arrived.
 
 End Arrived.
 
-(** We add some of the above lemmas to the "Hint Database"
-    [basic_facts], so the [auto] tactic will be able to use them. *)
-Global Hint Resolve
-       valid_schedule_implies_jobs_must_arrive_to_execute
-       jobs_must_arrive_to_be_ready
-  : basic_facts.
-
 (** In this section, we establish useful facts about arrival sequence prefixes. *)
 Section ArrivalSequencePrefix.
 
@@ -295,3 +288,75 @@ Section ArrivalSequencePrefix.
   End ArrivalTimes.
 
 End ArrivalSequencePrefix.
+
+(** In this section, we establish a few auxiliary facts about the
+    relation between the property of being scheduled and arrival
+    predicates to facilitate automation. *)
+Section ScheduledImpliesArrives.
+
+  (** Consider any type of jobs. *) 
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+
+  (** Consider any kind of processor state model, ... *)
+  Context {PState : ProcessorState Job}.
+
+  (** ... any job arrival sequence with consistent arrivals, .... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
+
+  (** ... and any schedule of this arrival sequence ... *)
+  Variable sched : schedule PState.
+  Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
+
+  (** ... where jobs do not execute before their arrival. *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+
+
+  (** Next, consider a job [j] ... *)
+  Variable j : Job.
+  
+  (** ... which is scheduled at a time instant [t]. *)
+  Variable t : instant.
+  Hypothesis H_scheduled_at : scheduled_at sched j t.
+  
+  (** Then we show that [j] arrives in [arr_seq]. *) 
+  Lemma arrives_in_jobs_come_from_arrival_sequence :
+    arrives_in arr_seq j.
+  Proof.
+    by apply: H_jobs_come_from_arrival_sequence H_scheduled_at.
+  Qed.
+  
+  (** Job [j] has arrived by time instant [t]. *) 
+  Lemma arrived_between_jobs_must_arrive_to_execute :
+    has_arrived j t.
+  Proof.
+    by apply: H_jobs_must_arrive_to_execute H_scheduled_at.
+  Qed.
+
+  (** Finally, for any future time [t'], job [j] arrives before [t']. *) 
+  Lemma arrivals_before_scheduled_at :
+    forall t',
+      t < t' ->
+      j \in arrivals_before arr_seq t'.
+  Proof.
+    move=> t' LTtt'.
+    apply: arrived_between_implies_in_arrivals => //.
+    - by apply: arrives_in_jobs_come_from_arrival_sequence. 
+    - apply: leq_ltn_trans LTtt'.
+      by apply: arrived_between_jobs_must_arrive_to_execute.
+  Qed.
+
+End ScheduledImpliesArrives.
+
+(** We add some of the above lemmas to the "Hint Database"
+    [basic_rt_facts], so the [auto] tactic will be able to use them. *)
+Global Hint Resolve
+ arrivals_before_scheduled_at
+ arrivals_uniq
+ arrived_between_implies_in_arrivals 
+ arrived_between_jobs_must_arrive_to_execute
+ arrives_in_jobs_come_from_arrival_sequence
+ jobs_must_arrive_to_be_ready
+ valid_schedule_implies_jobs_must_arrive_to_execute
+  : basic_rt_facts.

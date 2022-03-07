@@ -77,4 +77,4 @@ Section TaskRTCThresholdFullyNonPreemptive.
   Qed.
     
 End TaskRTCThresholdFullyNonPreemptive.
-Global Hint Resolve fully_nonpreemptive_valid_task_run_to_completion_threshold : basic_facts.
+Global Hint Resolve fully_nonpreemptive_valid_task_run_to_completion_threshold : basic_rt_facts.

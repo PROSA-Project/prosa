@@ -29,9 +29,9 @@ Section PropertiesOfEDF.
 
 End PropertiesOfEDF.
 
-(** We add the above lemma into a "Hint Database" basic_facts, so Coq
+(** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq
     will be able to apply it automatically. *)
-Global Hint Resolve EDF_respects_sequential_tasks : basic_facts.
+Global Hint Resolve EDF_respects_sequential_tasks : basic_rt_facts.
 
 
 Require Export prosa.model.task.sequentiality.
@@ -98,7 +98,7 @@ Section SequentialEDF.
   Proof.
     intros ? ? ? ARR1 ARR2 SAME LT.
     eapply early_hep_job_is_scheduled => //; eauto 2.
-    - by auto with basic_facts.
+    - by rt_auto.
     - move : H_valid_model_with_bounded_nonpreemptive_segments => [VALID _]; apply VALID.
     - clear t; intros ?.
       move: SAME => /eqP SAME.

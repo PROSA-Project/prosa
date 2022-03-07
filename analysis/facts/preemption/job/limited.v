@@ -225,4 +225,4 @@ Section ModelWithLimitedPreemptions.
   Qed.
   
 End ModelWithLimitedPreemptions.
-Global Hint Resolve valid_fixed_preemption_points_model_lemma : basic_facts.
+Global Hint Resolve valid_fixed_preemption_points_model_lemma : basic_rt_facts.

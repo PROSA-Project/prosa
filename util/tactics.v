@@ -83,6 +83,20 @@ Ltac feed_n n H := match constr:(n) with
   | (S ?m) => feed H ; [| feed_n m H]
   end.
 
+(** We introduce tactics [rt_auto] and [rt_eauto] as a shorthand for
+    [(e)auto with basic_rt_facts] to facilitate automation. Here, we
+    use scope [basic_rt_facts] that contains a collection of basic
+    real-time theory lemmas. *)
+(** Note: constant [3] was chosen because most of the basic rt facts
+    have the structure [A1 -> A2 -> ... B], where [Ai] is a hypothesis
+    usually present in the context, which gives the depth of the
+    search which is equal to two. One additional level of depth (3)
+    was added to support rare exceptions to this rule. At the same
+    time, the constant should not be too large to avoid slowdowns in
+    case of an unsuccessful application of automation. *)
+Ltac rt_auto := auto 3 with basic_rt_facts.
+Ltac rt_eauto := eauto 3 with basic_rt_facts.
+
 (* ************************************************************************** *)
 (** * Handier movement of inequalities. *)
 (* ************************************************************************** *)

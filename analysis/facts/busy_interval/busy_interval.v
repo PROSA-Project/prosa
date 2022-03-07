@@ -46,7 +46,6 @@ Section ExistsBusyIntervalJLFP.
   (** For simplicity, let's define some local names. *)
   Let job_pending_at := pending sched.
   Let job_completed_by := completed_by sched.
-  Let arrivals_between := arrivals_between arr_seq.
   
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
@@ -107,7 +106,7 @@ Section ExistsBusyIntervalJLFP.
     Proof.
       rename H_quiet into QUIET, H_not_quiet into NOTQUIET.
       destruct (has (fun j_hp => (~~ job_completed_by j_hp t2) && hep_job j_hp j)
-                    (arrivals_between t1 t2)) eqn:COMP.
+                    (arrivals_between arr_seq t1 t2)) eqn:COMP.
       { move: COMP => /hasP [j_hp ARR /andP [NOTCOMP HP]].
         move: (ARR) => INarr.
         apply in_arrivals_implies_arrived_between in ARR; last by done.
@@ -189,7 +188,7 @@ Section ExistsBusyIntervalJLFP.
       - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
       - have EX: exists hp__seq: seq Job,
         forall j__hp, j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ job_pending_at j__hp t /\ hep_job j__hp j.
-        { exists (filter (fun jo => (job_pending_at jo t) && (hep_job jo j)) (arrivals_between 0 t.+1)).
+        { exists (filter (fun jo => (job_pending_at jo t) && (hep_job jo j)) (arrivals_between arr_seq 0 t.+1)).
           intros; split; intros T.
           - move: T; rewrite mem_filter; move => /andP [/andP [PEN HP] IN].
             repeat split; eauto using in_arrivals_implies_arrived.
@@ -260,7 +259,7 @@ Section ExistsBusyIntervalJLFP.
         time interval <<[t1, t1 + Δ)>>. *)
     Let service_received_by_hep_jobs_released_during t_beg t_end :=
       service_of_higher_or_equal_priority_jobs
-        sched (arrivals_between t_beg t_end) j t1 (t1 + Δ).
+        sched (arrivals_between arr_seq t_beg t_end) j t1 (t1 + Δ).
 
     (** We prove that jobs with higher-than-or-equal priority that
         released before time instant [t1] receive no service after time
@@ -271,12 +270,11 @@ Section ExistsBusyIntervalJLFP.
     Proof.
       intros.
       rewrite /service_received_by_hep_jobs_released_during
-              /service_of_higher_or_equal_priority_jobs
-              /service_of_jobs /arrivals_between.
+              /service_of_higher_or_equal_priority_jobs /service_of_jobs.
       rewrite [in X in _ = X](arrivals_between_cat _ _ t1);
         [ | | rewrite leq_addr]; try done.
       rewrite big_cat //=.
-      rewrite -{1}[\sum_(j <- arrivals_between _ (t1 + Δ) | _)
+      rewrite -{1}[\sum_(j <- arrivals_between arr_seq _ (t1 + Δ) | _)
                     service_during sched j t1 (t1 + Δ)]add0n.
       apply/eqP. rewrite eqn_add2r eq_sym exchange_big //=.
       rewrite big1_seq //.
@@ -295,14 +293,14 @@ Section ExistsBusyIntervalJLFP.
     (** Next we prove that the total service within a "non-quiet" 
         time interval <<[t1, t1 + Δ)>> is exactly [Δ]. *)
     Lemma no_idle_time_within_non_quiet_time_interval:
-      service_of_jobs sched predT (arrivals_between 0 (t1 + Δ)) t1 (t1 + Δ) = Δ.
+      service_of_jobs sched predT (arrivals_between arr_seq 0 (t1 + Δ)) t1 (t1 + Δ) = Δ.
     Proof.
       intros; unfold service_of_jobs, service_of_higher_or_equal_priority_jobs. 
       rewrite -{3}[Δ](sum_of_ones t1) exchange_big //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split.
       { rewrite leq_sum // => t' _.
-        have SCH := @service_of_jobs_le_1 _ _ _ _ sched predT (arrivals_between 0 (t1 + Δ)).        
-        by eapply leq_trans; last apply SCH; eauto using arrivals_uniq with basic_facts. }
+        have SCH := @service_of_jobs_le_1 _ _ _ _ sched predT (arrivals_between arr_seq 0 (t1 + Δ)).        
+        by eapply leq_trans; last apply SCH; rt_eauto. }
       { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=
                 leq_sum // => t' /andP [/andP [LT GT] _]; apply/sum_seq_gt0P.
         ideal_proc_model_sched_case_analysis_eq sched t' jo.
@@ -355,14 +353,14 @@ Section ExistsBusyIntervalJLFP.
         a given interval <<[t1, t2)>> that have higher-or-equal
         priority w.r.t. the job [j] being analyzed. *)
     Let hp_workload t1 t2 :=
-      workload_of_higher_or_equal_priority_jobs j (arrivals_between t1 t2).
+      workload_of_higher_or_equal_priority_jobs j (arrivals_between arr_seq t1 t2).
 
     (** With regard to the jobs with higher-or-equal priority that are released
            in a given interval <<[t1, t2)>>, we also recall the service received by these
            jobs in the same interval <<[t1, t2)>>. *)
     Let hp_service t1 t2 :=
       service_of_higher_or_equal_priority_jobs
-        sched (arrivals_between t1 t2) j t1 t2.
+        sched (arrivals_between arr_seq t1 t2) j t1 t2.
 
     (** Now we begin the proof. First, we show that the busy interval is bounded. *)
     Section BoundingBusyInterval.
@@ -483,7 +481,7 @@ Section ExistsBusyIntervalJLFP.
                 { rewrite leqn0 big1_seq // /service_at => i Hi.
                   by rewrite service_in_def SCHED. }
                 { case PRIO1: (hep_job j1 j) => /=; first last.
-                  - apply service_of_jobs_le_1; auto with basic_facts.
+                  - apply service_of_jobs_le_1; rt_auto.
                     by apply arrivals_uniq.
                   - rewrite leqn0 big1_seq; first by done.
                     move => j2 /andP [PRIO2 ARRj2].
@@ -515,11 +513,11 @@ Section ExistsBusyIntervalJLFP.
             have PEND := not_quiet_implies_exists_pending_job.
             rename H_no_quiet_time into NOTQUIET, 
             H_is_busy_prefix into PREFIX.
-            set l := arrivals_between t1 (t1 + delta).
+            set l := arrivals_between arr_seq t1 (t1 + delta).
             set hep := hep_job.
             unfold hp_service, service_of_higher_or_equal_priority_jobs, service_of_jobs,
             hp_workload, workload_of_higher_or_equal_priority_jobs, workload_of_jobs.
-            fold arrivals_between l hep.
+            fold l hep.
             move: (PREFIX) => [_ [QUIET _]].
             move: (NOTQUIET) => NOTQUIET'.
             feed (NOTQUIET' (t1 + delta)).

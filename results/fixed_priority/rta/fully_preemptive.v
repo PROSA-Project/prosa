@@ -136,7 +136,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
                /fully_preemptive.fully_preemptive_model subnn big1_eq. } 
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.      
-    all: eauto 2 with basic_facts.
+    all: rt_eauto.
     rewrite /work_bearing_readiness.
     - by apply sequential_readiness_implies_work_bearing_readiness.
     - by apply sequential_readiness_implies_sequential_tasks => //.

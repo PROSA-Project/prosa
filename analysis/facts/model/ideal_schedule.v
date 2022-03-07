@@ -247,11 +247,11 @@ Section IncrementalService.
 End IncrementalService.
 
 (** * Automation *)
-(** We add the above lemmas into a "Hint Database" basic_facts, so Coq
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
     will be able to apply them automatically. *)
 Global Hint Resolve ideal_proc_model_is_a_uniprocessor_model
      ideal_proc_model_ensures_ideal_progress
-     ideal_proc_model_provides_unit_service : basic_facts.
+     ideal_proc_model_provides_unit_service : basic_rt_facts.
 
 (** We also provide tactics for case analysis on ideal processor state. *)
 

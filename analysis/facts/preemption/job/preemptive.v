@@ -64,4 +64,4 @@ Section FullyPreemptiveModel.
   Qed.    
   
 End FullyPreemptiveModel.
-Global Hint Resolve valid_fully_preemptive_model : basic_facts.
+Global Hint Resolve valid_fully_preemptive_model : basic_rt_facts.

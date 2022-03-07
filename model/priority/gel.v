@@ -75,11 +75,11 @@ Section PropertiesOfGEL.
 
 End PropertiesOfGEL.
 
-(** We add the above facts into a "Hint Database" basic_facts, so Coq
+(** We add the above facts into a "Hint Database" basic_rt_facts, so Coq
     will be able to apply them automatically where needed. *)
 Global Hint Resolve
      GEL_is_reflexive
      GEL_is_transitive
      GEL_is_total
-  : basic_facts.
+  : basic_rt_facts.
 
