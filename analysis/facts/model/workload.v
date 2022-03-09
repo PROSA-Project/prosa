@@ -99,5 +99,45 @@ Section WorkloadFacts.
     Qed.
 
   End Subset.
+    
+  (** In this section, we prove a few useful properties regarding the
+      predicate of [workload_of_jobs]. *)
+  Section PredicateProperties.
 
+    (** First, we show that workload of jobs for an unsatisfiable
+        predicate is equal to 0. *) 
+    Lemma workload_of_jobs_pred0 :
+      workload_of_jobs pred0 jobs = 0.
+    Proof. by rewrite /workload_of_jobs; apply big_pred0. Qed.
+    
+    (** Next, consider two arbitrary predicates [P] and [P']. *) 
+    Variable P P' : pred Job.
+
+    (** We show that [workload_of_jobs] conditioned on [P] can be split into two summands: 
+        (1) [workload_of_jobs] conditioned on [P /\ P'] and 
+        (2) [workload_of_jobs] conditioned on [P /\ ~~ P']. *) 
+    Lemma workload_of_jobs_case_on_pred :
+      workload_of_jobs P jobs =
+        workload_of_jobs (fun j => P j && P' j) jobs + workload_of_jobs (fun j => P j && ~~ P' j) jobs.
+    Proof.
+      rewrite /workload_of_jobs !big_mkcond [in X in _ = X]big_mkcond
+              [in X in _ = _ + X]big_mkcond //= -big_split //=.
+      apply: eq_big_seq => j' IN.
+      by destruct (P _), (P' _); simpl; lia.
+    Qed.
+
+    (** We show that if [P] is indistinguishable from [P'] on set
+        [jobs], then [workload_of_jobs] conditioned on [P] is equal to
+        [workload_of_jobs] conditioned on [P']. *) 
+    Lemma workload_of_jobs_equiv_pred :
+      {in jobs, P =1 P'} -> 
+      workload_of_jobs P jobs = workload_of_jobs P' jobs.
+    Proof.
+      intros * EQUIV.
+      rewrite /workload_of_jobs !big_mkcond [in X in _ = X]big_mkcond //=.
+      by apply: eq_big_seq => j' IN; rewrite EQUIV.
+    Qed.
+
+  End PredicateProperties.
+  
 End WorkloadFacts.
