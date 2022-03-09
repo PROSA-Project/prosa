@@ -66,7 +66,7 @@ Section ServiceOfJobs.
 
   End PerJobPriority.
 
-  (** Finally, we define the notion of cumulative service received by
+  (** We define the notion of cumulative service received by
       the jobs of a given task. *)  
   Section ServiceOfTask.
     
@@ -82,5 +82,22 @@ Section ServiceOfJobs.
       service_of_jobs (job_of_task tsk) jobs t1 t2.
 
   End ServiceOfTask.
+
+  (** Finally, we define the notion of total service received by a set of jobs. *) 
+  Section TotalService.
+
+    (** Let [jobs] denote any (finite) set of jobs. *)
+    Variable jobs : seq Job.
+
+    (** We define the total service of [jobs] in an interval <<[t1,t2)>> simply
+        as a sum of the service of individual jobs in interval <<[t1,t2)>>.
+
+        (The predicate [predT] is the trivial predicate that always evaluates to
+        [true], meaning that no jobs are filtered, and hence all jobs are
+        accounted for.) *)
+    Definition total_service_of_jobs_in (t1 t2 : instant) :=
+      service_of_jobs predT jobs t1 t2.
+
+  End TotalService.  
 
 End ServiceOfJobs.
