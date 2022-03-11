@@ -34,7 +34,7 @@ Section State.
       scheduled_on j s (_ : unit) := s == Some j;
       (** Similarly, we say that a given job [j] receives service in a
           given state [s] iff [s] is [Some j]. *)
-      service_on j s (_ : unit) := s == Some j;
+      service_on j s (_ : unit) := if s == Some j then 1 else 0;
     }.
   Next Obligation. by rewrite /nat_of_bool; case: ifP H => // ? /negP[]. Qed.
 
