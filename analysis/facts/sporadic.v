@@ -1,4 +1,4 @@
-Require Export prosa.model.task.arrival.periodic.
+Require Export prosa.model.task.arrival.sporadic.
 Require Export prosa.analysis.facts.job_index.
 
 (** * The Sporadic Model *)
@@ -54,9 +54,7 @@ End SporadicModelIndexLemmas.
 Section DifferentJobsImplyDifferentArrivalTimes.
 
   (** Consider sporadic tasks ... *)
-  Context {Task : TaskType}.
-  Context `{TaskMaxInterArrival Task}.
-  Context `{SporadicModel Task}.
+  Context {Task : TaskType} `{SporadicModel Task}.
 
   (** ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -116,7 +114,7 @@ End DifferentJobsImplyDifferentArrivalTimes.
 Section SporadicArrivals.
 
   (** Consider sporadic tasks  ... *)
-  Context {Task : TaskType} `{SporadicModel Task} `{TaskMaxInterArrival Task}.
+  Context {Task : TaskType} `{SporadicModel Task}.
 
   (** ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
