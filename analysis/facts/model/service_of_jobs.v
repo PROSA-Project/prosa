@@ -3,8 +3,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.behavior.completion.
-Require Export prosa.analysis.facts.model.ideal_schedule.
-Require Import prosa.model.processor.ideal.
+
 
 (** * Lemmas about Service Received by Sets of Jobs *)
 (** In this file, we establish basic facts about the service received by _sets_ of jobs. *)
@@ -86,6 +85,91 @@ Section GenericModelLemmas.
       by rewrite {3}/service_of_jobs -big_cat //=.
     Qed.
 
+    
+    (** In the following, we consider an arbitrary sequence of jobs [jobs]. *)
+    Variable jobs : seq Job.
+
+    (** Also, consider an interval <<[t1, t2)>>... *)
+    Variable t1 t2 : instant.
+
+    (** ...and two additional predicates [P1] and [P2]. *) 
+    Variable P1 P2 : pred Job.
+
+    (** For brevity, in the following comments we denote a subset of [jobs]
+        satisfying a predicate [P] by [{jobs | P}]. *)
+
+    (** First, we prove that the service received by [{jobs | P1}] can be split
+        into: (1) the service received by [{jobs | P1 ∧ P2}] and (2) the service
+        received by the a subset [{jobs | P1 ∧ ¬ P2}]. *)
+    Lemma service_of_jobs_case_on_pred :
+      service_of_jobs sched P1 jobs t1 t2 =
+        service_of_jobs sched (fun j => P1 j && P2 j) jobs t1 t2
+        + service_of_jobs sched (fun j => P1 j && ~~ P2 j) jobs t1 t2.
+    Proof.
+      rewrite /service_of_jobs big_mkcond //=.
+      rewrite [in X in _ = X + _]big_mkcond //=.
+      rewrite [in X in _ = _ + X]big_mkcond //=.
+      rewrite -big_split; apply eq_big_seq; intros j IN.
+      by destruct (P1 _), (P2 _); simpl; lia.
+    Qed.      
+    
+    (** We show that the service received by [{jobs | P}] is equal to the
+        difference between the total service received by [jobs] and the service
+        of [{jobs | ¬ P}]. *)
+    Lemma service_of_jobs_negate_pred :
+      service_of_jobs sched P jobs t1 t2 =
+        total_service_of_jobs_in sched jobs t1 t2 - service_of_jobs sched (fun j => ~~ P j) jobs t1 t2.
+    Proof.
+      rewrite /total_service_of_jobs_in /service_of_jobs.
+      rewrite big_mkcond [in X in _ = X - _]big_mkcond [in X in _ = _ - X]big_mkcond //=.
+      rewrite -sum_seq_diff.
+      - apply eq_big_seq; intros j IN.
+        by destruct (P _); simpl; lia.
+      - intros j IN.
+        by destruct (P _).
+    Qed.
+
+    (** We show that [service_of_jobs] is monotone with respect to the
+        predicate. That is, given the fact [∀ j ∈ jobs: P1 j ==> P2 j], we show
+        that the service of [{jobs | P1}] is bounded by the service of [{jobs | P2}]. *)
+    Lemma service_of_jobs_pred_impl :
+      (forall j : Job, j \in jobs -> P1 j -> P2 j) -> 
+      service_of_jobs sched P1 jobs t1 t2 <= service_of_jobs sched P2 jobs t1 t2.
+    Proof. by intros IMPL; apply leq_sum_seq_pred; eauto. Qed.
+
+    (** Similarly, we show that if [P1] is equivalent to [P2], then the service
+        of [{jobs | P1}] is equal to the service of [{jobs | P2}]. *)
+    Lemma service_of_jobs_equiv_pred :
+      {in jobs, P1 =1 P2} -> 
+      service_of_jobs sched P1 jobs t1 t2 = service_of_jobs sched P2 jobs t1 t2.
+    Proof.
+      intros * EQUIV.
+      rewrite /service_of_jobs !big_mkcond [in X in _ = X]big_mkcond //=; apply: eq_big_seq.
+      intros j IN; specialize (EQUIV j IN); simpl in EQUIV; rewrite EQUIV; clear EQUIV.
+      by case: (P2 j) => //.
+    Qed.
+    
+    (** Next, we show an auxiliary lemma that allows us to change the order of
+        summation.
+
+        Recall that [service_of_jobs] is defined as a sum over all jobs in
+        [jobs] of <<[service_during j [t1,t2)]>>. We show that [service_of_jobs]
+        over an interval <<[t1,t2)>> is equal to the sum over individual time
+        instances (in <<[t1,t2)>>) of [service_of_jobs_at].
+
+        In other words, we show that <<[∑_{j ∈ jobs} ∑_{t \in [t1,t2)} service
+        of j at t]>> is equal to <<[∑_{t \in [t1,t2)} ∑_{j ∈ jobs} service of j
+        at t]>>. *)
+    Lemma service_of_jobs_sum_over_time_interval :
+      service_of_jobs sched P jobs t1 t2
+      = \sum_(t1 <= t < t2) service_of_jobs_at sched P jobs t.
+    Proof. by apply exchange_big. Qed.
+
+    (** Finally, we show that service of [{jobs | false}] is equal to 0. *) 
+    Lemma service_of_jobs_pred0 :
+      service_of_jobs sched pred0 jobs t1 t2 = 0.
+    Proof. by apply big_pred0. Qed.
+    
 End GenericModelLemmas.
 
 (** In this section, we prove some properties about service
@@ -177,7 +261,7 @@ Section UnitServiceModelLemmas.
         rewrite cumulative_service_before_job_arrival_zero // add0n.
         rewrite <- sum_majorant_eqn with (E1 := fun j => service_during sched j t1 t_compl)
                                         (xs := arrivals_between arr_seq t1 t2) (P := P); try done.
-        by intros; apply cumulative_service_le_job_cost; auto using ideal_proc_model_provides_unit_service.
+        by intros; apply cumulative_service_le_job_cost; eauto.
     Qed.
 
     (** And vice versa, the fact that any job in [jobs] is completed by time [t_compl]
@@ -225,8 +309,8 @@ Section UnitServiceModelLemmas.
       - by apply workload_eq_service_impl_all_jobs_have_completed.
     Qed.
 
-  End WorkloadServiceAndCompletion. 
-
+  End WorkloadServiceAndCompletion.
+  
 End UnitServiceModelLemmas.
 
 (** In this section, we prove some properties about service
@@ -273,7 +357,7 @@ Section UnitServiceUniProcessorModelLemmas.
           
     (** We prove that the overall service of [jobs] at a single time instant is at most [1]. *)
     Lemma service_of_jobs_le_1:
-      forall t, \sum_(j <- jobs | P j) service_at sched j t <= 1.
+      forall t, service_of_jobs_at sched P jobs t <= 1. 
     Proof.
       intros t.
       eapply leq_trans.
@@ -331,70 +415,3 @@ Section UnitServiceUniProcessorModelLemmas.
   End ServiceOfJobsIsBoundedByLength.
 
 End UnitServiceUniProcessorModelLemmas.
-
-(** In this section, we prove some properties about service
-   of sets of jobs for ideal uni-processor model. *)
-Section IdealModelLemmas.
-
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-
-  (**  ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
-
-  (** Consider any arrival sequence with consistent arrivals. *)
-  Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
-    
-  (** ... where jobs do not execute before their arrival or after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
-  (** Let [P] be any predicate over jobs. *)
-  Variable P : pred Job.
-
-  (** We prove that if the total service within some time interval <<[t1,t2)>>
-      is smaller than <<t2 - t1>>, then there is an idle time instant [t ∈ [t1,t2)]. *)
-  Lemma low_service_implies_existence_of_idle_time :
-    forall t1 t2,
-      service_of_jobs sched predT (arrivals_between arr_seq 0 t2) t1 t2 < t2 - t1 ->
-      exists t, t1 <= t < t2 /\ is_idle sched t.
-  Proof.
-    intros ? ? SERV.
-    destruct (t1 <= t2) eqn:LE; last first.
-    { move: LE => /negP/negP; rewrite -ltnNge.
-      move => LT; apply ltnW in LT; rewrite -subn_eq0 in LT.
-      by move: LT => /eqP -> in SERV; rewrite ltn0 in SERV.
-    }
-    have EX: exists δ, t2 = t1 + δ.
-    { by exists (t2 - t1); rewrite subnKC // ltnW. }
-    move: EX => [δ EQ]; subst t2; clear LE.
-    rewrite {3}[t1 + δ]addnC -addnBA // subnn addn0 in SERV.
-    rewrite /service_of_jobs exchange_big //= in SERV.
-    apply sum_le_summation_range in SERV.
-    move: SERV => [x [/andP [GEx LEx] L]].
-    exists x; split; first by apply/andP; split.
-    apply/negPn; apply/negP; intros NIDLE.
-    unfold is_idle in NIDLE.
-    destruct(sched x) eqn:SCHED; last by done.
-    move: SCHED => /eqP SCHED; clear NIDLE; rewrite -scheduled_at_def/= in SCHED.
-    move: L => /eqP; rewrite -sum_nat_eq0_nat; move => /allP L.
-    specialize (L s); feed L. 
-    { unfold arrivals_between.
-      eapply arrived_between_implies_in_arrivals; eauto 2.
-      by apply H_jobs_must_arrive_to_execute in SCHED; apply leq_ltn_trans with x.
-    } 
-    move: SCHED L => /=.
-    rewrite scheduled_at_def service_at_def => /eqP-> /eqP.
-    by rewrite eqxx.
-  Qed.
-
-End IdealModelLemmas.

@@ -4,6 +4,7 @@ Require Export prosa.analysis.facts.busy_interval.busy_interval.
 
 (** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import prosa.model.processor.ideal.
+Require Export prosa.analysis.facts.model.ideal.service_of_jobs.
 
 (** * Existence of No Carry-In Instant *)
 

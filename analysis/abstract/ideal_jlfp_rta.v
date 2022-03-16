@@ -370,7 +370,7 @@ Section JLFPInstantiation.
             eapply leq_trans; last first. 
             + apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
                             ideal_proc_model_is_a_uniprocessor_model.
-            + erewrite leq_sum => // i _.
+            + rewrite /service_of_jobs_at; erewrite leq_sum => // i _.
               by rewrite service_at_def.
           - rewrite leqn0 big1 //; intros joo PRIO2.
             apply/eqP; rewrite eqb0; apply/eqP; intros C.
@@ -415,7 +415,7 @@ Section JLFPInstantiation.
             eapply leq_trans; last first. 
             + by apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
                             ideal_proc_model_is_a_uniprocessor_model.
-            + erewrite leq_sum => // i _.
+            + rewrite /service_of_jobs_at; erewrite leq_sum => // i _.
               by rewrite service_at_def.
           - rewrite leqn0 big1 //; intros joo PRIO2.
             apply/eqP; rewrite eqb0; apply/eqP; intros C.

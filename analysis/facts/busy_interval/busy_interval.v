@@ -7,6 +7,7 @@ Require Export prosa.analysis.definitions.work_bearing_readiness.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
+Require Import prosa.analysis.facts.model.ideal_schedule.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of
@@ -299,8 +300,8 @@ Section ExistsBusyIntervalJLFP.
       rewrite -{3}[Δ](sum_of_ones t1) exchange_big //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split.
       { rewrite leq_sum // => t' _.
-        have SCH := @service_of_jobs_le_1 _ _ _ _ sched predT (arrivals_between arr_seq 0 (t1 + Δ)).        
-        by eapply leq_trans; last apply SCH; rt_eauto. }
+        have SCH := @service_of_jobs_le_1 _ _ _ _ sched predT (arrivals_between arr_seq 0 (t1 + Δ)).
+        by eapply leq_trans; [apply leqnn | apply SCH; eauto using arrivals_uniq with basic_rt_facts]. }
       { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=
                 leq_sum // => t' /andP [/andP [LT GT] _]; apply/sum_seq_gt0P.
         ideal_proc_model_sched_case_analysis_eq sched t' jo.
@@ -343,7 +344,7 @@ Section ExistsBusyIntervalJLFP.
 
     (** ... and there are no duplicate job arrivals, ... *)
     Hypothesis H_arrival_sequence_is_a_set:
-      arrival_sequence_uniq arr_seq.        
+      arrival_sequence_uniq arr_seq.
 
     (** ... and the priority relation is reflexive and transitive. *)
     Hypothesis H_priority_is_reflexive: reflexive_priorities.
