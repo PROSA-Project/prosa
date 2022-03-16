@@ -3,68 +3,61 @@ Require Export prosa.analysis.facts.job_index.
 
 (** * The Sporadic Model *)
 
-(** In this section we prove a few basic properties involving 
+(** In this section we prove a few basic properties involving
     job indices in context of the sporadic model. *)
 Section SporadicModelIndexLemmas.
-        
-  (** Consider sporadic tasks with an offset ... *)
-  Context {Task : TaskType}.
-  Context `{TaskOffset Task}.
-  Context `{TaskMaxInterArrival Task}.
-  Context `{SporadicModel Task}.
-  
+
+  (** Consider sporadic tasks ... *)
+  Context {Task : TaskType} `{SporadicModel Task}.
+
   (** ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
+  Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
 
   (** Consider any unique arrival sequence with consistent arrivals, ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
   Hypothesis H_uniq_arrseq: arrival_sequence_uniq arr_seq.
-  
+
   (** ... and any sporadic task [tsk] that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
   Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
 
-  (** Consider any two jobs from the arrival sequence that stem 
-      from task [tsk]. *)  
+  (** Consider any two jobs from the arrival sequence that stem
+      from task [tsk]. *)
   Variable j1 : Job.
   Variable j2 : Job.
   Hypothesis H_j1_from_arrseq: arrives_in arr_seq j1.
   Hypothesis H_j2_from_arrseq: arrives_in arr_seq j2.
   Hypothesis H_j1_task: job_task j1 = tsk.
   Hypothesis H_j2_task: job_task j2 = tsk.
-  
-  (** We first show that for any two jobs [j1] and [j2], [j2] arrives after [j1] 
-   provided [job_index] of [j2] strictly exceeds the [job_index] of [j1]. *)
+
+  (** We first show that for any two jobs [j1] and [j2], [j2] arrives after [j1]
+      provided [job_index] of [j2] strictly exceeds the [job_index] of [j1]. *)
   Lemma lower_index_implies_earlier_arrival:
       job_index arr_seq j1 < job_index arr_seq j2 ->
       job_arrival j1 < job_arrival j2.
   Proof.
-    intro IND.
-    move: (H_sporadic_model j1 j2) => SPORADIC; feed_n 6 SPORADIC => //. 
-    - rewrite -> diff_jobs_iff_diff_indices => //; eauto.
-       + now lia.
-       + now rewrite H_j1_task. 
+    move=> LT_IND.
+    move: (H_sporadic_model j1 j2) => SPORADIC; feed_n 6 SPORADIC => //.
+    - rewrite -> diff_jobs_iff_diff_indices => //; eauto; first by lia.
+      by subst.
     - apply (index_lte_implies_arrival_lte arr_seq); try eauto.
-      now rewrite H_j1_task.
+      by subst.
     - have POS_IA : task_min_inter_arrival_time tsk > 0 by auto.
-      now lia.
+      by lia.
   Qed.
 
 End SporadicModelIndexLemmas.
 
-(** ** Different jobs have different arrival times. *) 
+(** ** Different jobs have different arrival times. *)
 Section DifferentJobsImplyDifferentArrivalTimes.
 
-  (** Consider sporadic tasks with an offset ... *)
+  (** Consider sporadic tasks ... *)
   Context {Task : TaskType}.
-  Context `{TaskOffset Task}.
   Context `{TaskMaxInterArrival Task}.
   Context `{SporadicModel Task}.
-  
+
   (** ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
@@ -74,7 +67,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
   Hypothesis H_uniq_arrseq: arrival_sequence_uniq arr_seq.
-  
+
   (** ... and any sporadic task [tsk] that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
@@ -98,7 +91,7 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     rewrite -> diff_jobs_iff_diff_indices in UNEQ => //; eauto; last by rewrite H_j1_task.
     move /neqP: UNEQ; rewrite neq_ltn => /orP [LT|LT].
     all: try ( now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; lia ) ||
-      now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; lia.
+             now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; lia.
   Qed.
 
   (** We prove a stronger version of the above lemma by showing 
@@ -115,23 +108,18 @@ Section DifferentJobsImplyDifferentArrivalTimes.
     move /neqP: NEQ; rewrite neq_ltn => /orP [LT|LT].
     all: try ( now apply lower_index_implies_earlier_arrival with (tsk0 := tsk) in LT => //; lia ) || now apply lower_index_implies_earlier_arrival with (tsk := tsk) in LT => //; lia.
   Qed.
-    
+
 End DifferentJobsImplyDifferentArrivalTimes.
 
 (** In this section we prove a few properties regarding task arrivals
     in context of the sporadic task model. *)
 Section SporadicArrivals.
 
-  (** Consider sporadic tasks with an offset ... *)
-  Context {Task : TaskType}.
-  Context `{TaskOffset Task}.
-  Context `{SporadicModel Task}.
-  Context `{TaskMaxInterArrival Task}.
+  (** Consider sporadic tasks  ... *)
+  Context {Task : TaskType} `{SporadicModel Task} `{TaskMaxInterArrival Task}.
 
   (** ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
+  Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
 
   (** Consider any unique arrival sequence with consistent arrivals, ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -140,15 +128,14 @@ Section SporadicArrivals.
 
   (** ... and any sporadic task [tsk] to be analyzed. *)
   Variable tsk : Task.
-  
-  (** Assume all tasks have valid minimum inter-arrival times, valid offsets, and respect the 
+
+  (** Assume all tasks have valid minimum inter-arrival times, valid offsets, and respect the
       sporadic task model. *)
   Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
   Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
-  Hypothesis H_valid_offset: valid_offset arr_seq tsk.
 
-  (** Consider any two jobs from the arrival sequence that stem 
-      from task [tsk]. *)  
+  (** Consider any two jobs from the arrival sequence that stem
+      from task [tsk]. *)
   Variable j1 j2 : Job.
   Hypothesis H_j1_from_arrival_sequence: arrives_in arr_seq j1.
   Hypothesis H_j2_from_arrival_sequence: arrives_in arr_seq j2.
@@ -180,7 +167,7 @@ Section SporadicArrivals.
 
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
       the same time as [j1], and thus the task arrivals at [job arrival j1]
-      consists only of job [j1]. *) 
+      consists only of job [j1]. *)
   Lemma only_j_in_task_arrivals_at_j:
     task_arrivals_at_job_arrival arr_seq j1 = [::j1].
   Proof.
@@ -190,7 +177,7 @@ Section SporadicArrivals.
       by intros; now destruct (size seq) as [ | [ | ]]; try auto.
     move: SIZE_CASE => [Z|[ONE|GTONE]].
     - apply size0nil in Z.
-      now rewrite Z in J_IN_FILTER. 
+      now rewrite Z in J_IN_FILTER.
     - repeat (destruct seq; try by done).
       rewrite mem_seq1 in J_IN_FILTER; move : J_IN_FILTER => /eqP J1_S.
       now rewrite J1_S.
@@ -202,35 +189,35 @@ Section SporadicArrivals.
 
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
       the same time as [j1], and thus the task arrivals at [job arrival j1]
-      consists only of job [j1]. *) 
+      consists only of job [j1]. *)
   Lemma only_j_at_job_arrival_j:
     forall t,
       job_arrival j1 = t ->
-      task_arrivals_at arr_seq tsk t = [::j1]. 
+      task_arrivals_at arr_seq tsk t = [::j1].
   Proof.
     intros t ARR.
     rewrite -ARR.
     specialize (only_j_in_task_arrivals_at_j) => J_AT.
     now rewrite /task_arrivals_at_job_arrival H_j1_task in J_AT.
   Qed.
-  
-  (** We show that a job [j1] is the first job that arrives 
-      in task arrivals at [job_arrival j1] by showing that the 
+
+  (** We show that a job [j1] is the first job that arrives
+      in task arrivals at [job_arrival j1] by showing that the
       index of job [j1] in [task_arrivals_at_job_arrival arr_seq j1] is 0. *)
   Lemma index_j_in_task_arrivals_at:
     index j1 (task_arrivals_at_job_arrival arr_seq j1) = 0.
   Proof.
     now rewrite only_j_in_task_arrivals_at_j //= eq_refl.
   Qed.
-  
-  (** We observe that for any job [j] the arrival time of [prev_job j] is 
+
+  (** We observe that for any job [j] the arrival time of [prev_job j] is
       strictly less than the arrival time of [j] in context of periodic tasks. *)
   Lemma prev_job_arr_lt:
     job_index arr_seq j1 > 0 ->
     job_arrival (prev_job arr_seq j1) < job_arrival j1.
   Proof.
     intros IND.
-    have PREV_ARR_LTE : job_arrival (prev_job arr_seq j1) <= job_arrival j1 by apply prev_job_arr_lte => //. 
+    have PREV_ARR_LTE : job_arrival (prev_job arr_seq j1) <= job_arrival j1 by apply prev_job_arr_lte => //.
     rewrite ltn_neqAle; apply /andP.
     split => //; apply /eqP.
     try ( apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j1) => //; try by rewrite H_j1_task ) ||
@@ -242,8 +229,8 @@ Section SporadicArrivals.
       now lia.
   Qed.
 
-  (** We show that task arrivals at [job_arrival j1] is the 
-      same as task arrivals that arrive between [job_arrival j1] 
+  (** We show that task arrivals at [job_arrival j1] is the
+      same as task arrivals that arrive between [job_arrival j1]
       and [job_arrival j1 + 1]. *)
   Lemma task_arrivals_at_as_task_arrivals_between:
     task_arrivals_at_job_arrival arr_seq j1 = task_arrivals_between arr_seq tsk (job_arrival j1) (job_arrival j1).+1.
@@ -251,9 +238,9 @@ Section SporadicArrivals.
     rewrite /task_arrivals_at_job_arrival /task_arrivals_at /task_arrivals_between /arrivals_between.
     now rewrite big_nat1 H_j1_task.
   Qed.
-  
-  (** We show that the task arrivals up to the previous job [j1] concatenated with 
-      the sequence [::j1] (the sequence containing only the job [j1]) is same as 
+
+  (** We show that the task arrivals up to the previous job [j1] concatenated with
+      the sequence [::j1] (the sequence containing only the job [j1]) is same as
       task arrivals up to [job_arrival j1]. *)
   Lemma prev_job_cat:
     job_index arr_seq j1 > 0 ->
@@ -268,5 +255,5 @@ Section SporadicArrivals.
     rewrite no_jobs_between_consecutive_jobs => //.
     now rewrite cat0s H_j1_task.
   Qed.
-    
+
 End SporadicArrivals.
