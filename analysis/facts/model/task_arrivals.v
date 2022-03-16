@@ -133,17 +133,21 @@ Section TaskArrivals.
     now apply arrived_between_implies_in_arrivals.
   Qed.
 
+  (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] is also
+      contained in [arrivals_between arr_seq t1 t2]. *)
+  Lemma task_arrivals_between_subset:
+    forall t1 t2 j,
+      j \in task_arrivals_between arr_seq tsk t1 t2 ->
+      j \in arrivals_between arr_seq t1 t2.
+  Proof. move=> t1 t2 j. by rewrite mem_filter; move => /andP [/eqP TSK JB_IN]. Qed.
+
   (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] arrives 
       in the arrival sequence [arr_seq]. *)
-  Lemma arrives_in_task_arrivals_implies_arrived:
+  Corollary arrives_in_task_arrivals_implies_arrived:
     forall t1 t2 j,
       j \in task_arrivals_between arr_seq tsk t1 t2 ->
       arrives_in arr_seq j.
-  Proof.
-    intros * JB_IN.
-    move : JB_IN; rewrite mem_filter; move => /andP [/eqP TSK JB_IN].
-    now apply in_arrivals_implies_arrived in JB_IN.
-  Qed.
+  Proof. move=> t1 t2 j IN; apply/in_arrivals_implies_arrived/task_arrivals_between_subset; exact IN. Qed.
 
   (** Any job [j] in [task_arrivals_before arr_seq tsk t] has an arrival
       time earlier than [t]. *)
@@ -158,9 +162,9 @@ Section TaskArrivals.
     by apply in_arrivals_implies_arrived_between in IN => //.
   Qed.
 
-  (** Any job [j] in [task_arrivals_before arr_seq tsk t] is a job of task [tsk]. *) 
+  (** Any job [j] in [task_arrivals_before arr_seq tsk t] is a job of task [tsk]. *)
   Lemma arrives_in_task_arrivals_implies_job_task :
-    forall j t, 
+    forall j t,
       j \in task_arrivals_before arr_seq tsk t ->
       job_task j == tsk.
   Proof.
@@ -168,7 +172,32 @@ Section TaskArrivals.
     unfold task_arrivals_before, task_arrivals_between in *.
     by move: IN; rewrite mem_filter => /andP [TSK _].
   Qed.
-  
+
+  (** We repeat the observation for [task_arrivals_between]. *)
+  Lemma in_task_arrivals_between_implies_job_of_task :
+    forall t1 t2 j,
+      j \in task_arrivals_between arr_seq tsk t1 t2 ->
+      job_task j = tsk.
+  Proof.
+    move=> t1 t2 j.
+    rewrite mem_filter => /andP [JT _].
+    by move: JT; rewrite /job_of_task => /eqP.
+  Qed.
+
+  (** If a job arrives between to points in time, then the corresponding interval is nonempty... *)
+  Lemma task_arrivals_nonempty :
+    forall t1 t2 j,
+      j \in task_arrivals_between arr_seq tsk t1 t2 ->
+      t1 < t2.
+  Proof. move=> t1 t2 j IN. by apply /(arrivals_between_nonempty arr_seq _ _ j)/task_arrivals_between_subset. Qed.
+
+  (** ... which we can also express in terms of [number_of_task_arrivals] being nonzero. *)
+  Corollary number_of_task_arrivals_nonzero :
+    forall t1 t2,
+      number_of_task_arrivals arr_seq tsk t1 t2 > 0 ->
+      t1 < t2.
+  Proof. by move=> t1 t2; rewrite -has_predT => /hasP [j IN] _; eapply task_arrivals_nonempty; eauto. Qed.
+
   (** An arrival sequence with non-duplicate arrivals implies that the 
       task arrivals also contain non-duplicate arrivals. *)
   Lemma uniq_task_arrivals:
@@ -180,9 +209,16 @@ Section TaskArrivals.
     apply filter_uniq.
     now apply arrivals_uniq.
   Qed.
+
+  (** The same observation applies to [task_arrivals_between]. *)
+  Lemma task_arrivals_between_uniq :
+    forall t1 t2,
+      arrival_sequence_uniq arr_seq ->
+      uniq (task_arrivals_between arr_seq tsk t1 t2).
+  Proof. move=> t1 t2 UNIQ. by apply/filter_uniq/arrivals_uniq. Qed.
   
   (** A job cannot arrive before it's arrival time. *) 
-  Lemma job_notin_task_arrivals_before:
+  Lemma job_notin_task_arrivals_before :
     forall j t, 
       arrives_in arr_seq j ->
       job_arrival j > t ->

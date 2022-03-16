@@ -312,6 +312,12 @@ Section ArrivalSequencePrefix.
         arrivals_between arr_seq t1 t2  = [::].
     Proof. by move=> ? ? ?; rewrite /arrivals_between big_geq. Qed.
 
+    (** Conversely, if a job arrives, the considered interval is non-empty. *)
+    Corollary arrivals_between_nonempty :
+      forall t1 t2 j,
+        j \in arrivals_between arr_seq t1 t2 -> t1 < t2.
+    Proof. by move=> j1 j2 t; apply: contraPltn=> LEQ; rewrite arrivals_between_geq. Qed.
+
     (** Given jobs [j1] and [j2] in [arrivals_between_P arr_seq P t1 t2], the fact that
         [j2] arrives strictly before [j1] implies that [j2] also belongs in the sequence
         [arrivals_between_P arr_seq P t1 (job_arrival j1)]. *)
