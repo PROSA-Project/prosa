@@ -127,6 +127,7 @@ End Interval.
    Nonetheless we introduce it here because an additional (even though
    arguably redundant) lemma doesn't hurt, and for newcomers the apparent
    absence of the mirror case of [leq_ltn_trans] can be somewhat confusing.  *)
-#[deprecated(since="0.4",note="Use leq_trans instead since n < m is just a notation for n.+1 <= m (c.f., comment in util/nat.v).")]
-Lemma ltn_leq_trans [n m p] : m < n -> n <= p -> m < p.
+Lemma ltn_leq_trans_deprecated [n m p] : m < n -> n <= p -> m < p.
 Proof. exact: leq_trans. Qed.
+#[deprecated(since="0.4",note="Use leq_trans instead since n < m is just a notation for n.+1 <= m (c.f., comment in util/nat.v).")]
+Notation ltn_leq_trans := ltn_leq_trans_deprecated.
