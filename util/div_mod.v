@@ -170,7 +170,23 @@ Section DivFloorCeil.
         apply leq_ltn_trans with (a %/ T + b %/T + 1); last by lia.
         by apply leq_divDl.
   Qed.
-  
+
+  (** We observe that when dividing a value exceeding [T * n], then
+      the ceiling exceeds [n]. *)
+  Lemma div_ceil_multiple :
+    forall Δ T n,
+      T > 0 ->
+      (T * n) < Δ ->
+      n < div_ceil Δ T.
+  Proof.
+    move=> delta T n GT0 LT.
+    rewrite /div_ceil.
+    case DIV: (T %| delta);
+      first by rewrite -(ltn_pmul2l GT0) [_ * (_ %/ _)]mulnC divnK.
+    rewrite -[(_ %/ _).+1]addn1  -divnDMl // -(ltn_pmul2l GT0) [_ * (_ %/ _)]mulnC mul1n.
+    by lia.
+  Qed.
+
   (** We show that for any two integers [a] and [b], 
       [a] is less than [a %/ b * b + b] given that [b] is positive. *)
   Lemma div_floor_add_g:
