@@ -1,5 +1,5 @@
 Require Export prosa.analysis.facts.periodic.sporadic.
-Require Export prosa.analysis.facts.sporadic.
+Require Export prosa.analysis.facts.sporadic.arrival_times.
 
 (** In this section we show that the separation between job 
     arrivals of a periodic task is some multiple of their 

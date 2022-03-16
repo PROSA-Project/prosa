@@ -1,5 +1,6 @@
 Require Export prosa.analysis.facts.periodic.arrival_times.
 Require Export prosa.analysis.definitions.infinite_jobs.
+Require Export prosa.analysis.facts.sporadic.arrival_sequence.
 
 (** In this file we prove some properties concerning the size 
  of task arrivals in context of the periodic model. *)
