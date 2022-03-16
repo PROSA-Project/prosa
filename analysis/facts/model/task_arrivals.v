@@ -268,5 +268,18 @@ Section TaskArrivals.
     rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
     now rewrite size_big_nat bigcat_nat_filter_eq_filter_bigcat_nat.
   Qed.
-  
+
+  (** We note that, trivially, the list of task arrivals
+      [task_arrivals_between] is sorted by arrival times because the
+      underlying [arrivals_between] is sorted, as established by the
+      lemma [arrivals_between_sorted]. *)
+  Corollary task_arrivals_between_sorted :
+    forall t1 t2,
+      sorted by_arrival_times (task_arrivals_between arr_seq tsk t1 t2).
+  Proof.
+    move=> t1 t2. apply sorted_filter;
+      first by rewrite /by_arrival_times /transitive; lia.
+    exact: arrivals_between_sorted.
+  Qed.
+
 End TaskArrivals.

@@ -329,6 +329,66 @@ Section ArrivalSequencePrefix.
       - by rewrite (job_arrival_between_ge j2arr).
     Qed.
 
+
+    (** We observe that, by construction, the sequence of arrivals is
+        sorted by arrival times. To this end, we first define the
+        order relation. *)
+    Definition by_arrival_times (j1 j2 : Job) : bool := job_arrival j1 <= job_arrival j2.
+
+    (** Trivially, the arrivals at any one point in time are ordered
+        w.r.t. arrival times. *)
+    Lemma arrivals_at_sorted :
+      forall t,
+        sorted by_arrival_times (arrivals_at arr_seq t).
+    Proof.
+      move=> t.
+      have AT_t : forall j, j \in (arrivals_at arr_seq t) -> job_arrival j = t
+        by move=> j; apply job_arrival_at.
+      case: (arrivals_at arr_seq t) AT_t => // j' js AT_t.
+      apply /(pathP j') => i LT.
+      rewrite /by_arrival_times !AT_t //;
+        last by apply mem_nth; auto.
+      rewrite in_cons; apply /orP; right.
+      by exact: mem_nth.
+   Qed.
+
+    (** By design, the list of arrivals in any interval is sorted. *)
+    Lemma arrivals_between_sorted :
+      forall t1 t2,
+        sorted by_arrival_times (arrivals_between arr_seq t1 t2).
+    Proof.
+      move=> t1 t2.
+      rewrite /arrivals_between.
+      elim: t2 => [|t2 SORTED];
+        first by rewrite big_nil.
+      case: (leqP t1 t2) => T1T2;
+        last by rewrite big_geq.
+      rewrite (big_cat_nat _ _ _ T1T2 _) //=.
+      case A1: (\cat_(t1<=t<t2)arrivals_at arr_seq t) => [|j js];
+        first by rewrite cat0s big_nat1; exact: arrivals_at_sorted.
+      have CAT : path by_arrival_times j (\cat_(t1<=t<t2)arrivals_at arr_seq t ++ \cat_(t2<=i<t2.+1)arrivals_at arr_seq i).
+      { rewrite cat_path; apply /andP; split.
+        { move: SORTED. rewrite /sorted A1 => PATH_js.
+          by rewrite /path -/(path _ _ js) /by_arrival_times; apply /andP; split. }
+        { rewrite big_nat1.
+          case A2: (arrivals_at arr_seq t2) => // [j' js'].
+          apply path_le with (x' := j').
+          { by rewrite /transitive/by_arrival_times; lia. }
+          { rewrite /by_arrival_times.
+            have -> : job_arrival j' = t2
+              by apply job_arrival_at; rewrite A2; apply mem_head.
+            set L := (last j (\cat_(t1<=t<t2)arrivals_at arr_seq t)).
+            have EX : exists t', L \in arrivals_at arr_seq t' /\ t1 <= t' < t2
+              by apply mem_bigcat_nat_exists; rewrite /L A1 last_cons; exact: mem_last.
+            move: EX => [t' [IN /andP [t1t' t't2]]].
+            have -> : job_arrival L = t' by apply job_arrival_at.
+            by lia. }
+          { move: (arrivals_at_sorted t2); rewrite /sorted A2 => PATH'.
+            rewrite /path -/(path _ _ js') {1}/by_arrival_times.
+            by apply /andP; split => //. } } }
+      by move: CAT; rewrite /sorted A1 cat_cons {1}/path -/(path _ _ (js ++ _)) => /andP [_ CAT].
+   Qed.
+
   End ArrivalTimes.
 
 End ArrivalSequencePrefix.
