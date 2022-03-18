@@ -65,7 +65,8 @@ Section SequentialTasksReadiness.
     - move: READY => /andP [PEND /allP ALL]; apply: ALL.
       rewrite mem_filter; apply/andP; split; first by done.
       by apply arrived_between_implies_in_arrivals => //.
-    - by apply H_valid_schedule in SCHED; rewrite SCHED in NREADY.
+    - exfalso; apply/(negP NREADY)/job_scheduled_implies_ready => //.
+      exact: (valid_schedule_jobs_must_be_ready_to_execute sched arr_seq).
   Qed.
 
   (* Finally, we show that the sequential readiness model is a

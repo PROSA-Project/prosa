@@ -26,6 +26,20 @@ Section ArrivalPredicates.
       has_arrived j t.
   Proof. move=> ? ?; exact: ltnW. Qed.
 
+  (** Furthermore, we restate a common hypothesis to make its
+      implication easier to discover. *)
+  Lemma consistent_times_valid_arrival :
+    forall arr_seq,
+      valid_arrival_sequence arr_seq -> consistent_arrival_times arr_seq.
+  Proof. by move=> ? []. Qed.
+
+  (** We restate another common hypothesis to make its implication
+      easier to discover. *)
+  Lemma uniq_valid_arrival :
+    forall arr_seq,
+      valid_arrival_sequence arr_seq -> arrival_sequence_uniq arr_seq.
+  Proof. by move=> ? []. Qed.
+
 End ArrivalPredicates.
 
 (** In this section, we relate job readiness to [has_arrived]. *)
@@ -78,6 +92,28 @@ Section Arrived.
     forall j t,
       backlogged sched j t -> ~~ completed_by sched j t.
   Proof. by move=> ? ? /andP[/any_ready_job_is_pending /andP[]]. Qed.
+
+  (** Finally, we restate common hypotheses on the well-formedness of
+      schedules to make their implications more easily
+      discoverable. First, on the readiness of scheduled jobs, ... *)
+  Lemma job_scheduled_implies_ready :
+    jobs_must_be_ready_to_execute sched ->
+    forall j t,
+      scheduled_at sched j t -> job_ready sched j t.
+  Proof. exact. Qed.
+
+  (** ... second, on the origin of scheduled jobs, and ... *)
+  Lemma valid_schedule_jobs_come_from_arrival_sequence :
+    forall arr_seq,
+      valid_schedule sched arr_seq ->
+      jobs_come_from_arrival_sequence sched arr_seq.
+  Proof. by move=> ? []. Qed.
+
+  (** ... third, on the readiness of jobs in valid schedules. *)
+  Lemma valid_schedule_jobs_must_be_ready_to_execute :
+    forall arr_seq,
+      valid_schedule sched arr_seq -> jobs_must_be_ready_to_execute sched.
+  Proof. by move=> ? []. Qed.
 
 End Arrived.
 
@@ -155,16 +191,24 @@ Section ArrivalSequencePrefix.
     (** Assume that job arrival times are consistent. *)
     Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
 
-    (** To simplify subsequent proofs, we restate the
-        [H_consistent_arrival_times] assumption as a trivial corollary. *)
+    (** To make the hypothesis and its implication easier to discover,
+        we restate it as a trivial lemma. *)
+    Lemma job_arrival_arrives_at :
+      forall {j t},
+        arrives_at arr_seq j t -> job_arrival j = t.
+    Proof. exact: H_consistent_arrival_times. Qed.
+
+    (** Similarly, to simplify subsequent proofs, we restate the
+        [H_consistent_arrival_times] assumption as a trivial
+        corollary. *)
     Lemma job_arrival_at :
       forall {j t},
         j \in arrivals_at arr_seq t -> job_arrival j = t.
     Proof. exact: H_consistent_arrival_times. Qed.
 
-    (** First, we observe that any job in the set of all arrivals
-        between time instants [t1] and [t2] must arrive in the
-        interval <<[t1,t2)>>. *)
+    (** To begin with actual properties, we observe that any job in
+        the set of all arrivals between time instants [t1] and [t2]
+        must arrive in the interval <<[t1,t2)>>. *)
     Lemma job_arrival_between :
       forall {j t1 t2},
         j \in arrivals_between arr_seq t1 t2 -> t1 <= job_arrival j < t2.

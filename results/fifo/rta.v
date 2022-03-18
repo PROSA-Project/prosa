@@ -163,8 +163,9 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       { rewrite negb_or /is_priority_inversion /is_priority_inversion
                 /is_interference_from_another_hep_job => /andP [HYP1 HYP2].
         ideal_proc_model_sched_case_analysis_eq sched t jo.
-        { exfalso; clear HYP1 HYP2.
-          destruct H_valid_schedule as [A B].
+        { exfalso=> {HYP1 HYP2}.
+          have A : jobs_come_from_arrival_sequence sched arr_seq.
+          { exact: valid_schedule_jobs_come_from_arrival_sequence. }
           eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try by rt_eauto.
           move: BUSY => [PREF _].
           by eapply not_quiet_implies_not_idle; rt_eauto. }
@@ -194,7 +195,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
     Proof.
       intros j ARR TSK POS.
-      destruct H_valid_schedule as [COME MUST ].
+      have COME : jobs_come_from_arrival_sequence sched arr_seq.
+      { exact: valid_schedule_jobs_come_from_arrival_sequence. }
       edestruct exists_busy_interval_from_total_workload_bound
         with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
       { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
@@ -202,7 +204,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         split; first by done.
         by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto. }
     Qed.
-    
+
     (** In this section, we prove that, under FIFO scheduling, the cumulative priority inversion experienced
         by a job [j] in any interval within its busy window is always [0]. We later use this fact to prove the bound on 
         the cumulative interference. *)
@@ -249,7 +251,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
               - by move : INTER => /eqP INTER; rewrite -scheduled_at_def in INTER.
               - by rewrite -ltnNge; apply leq_ltn_trans with (job_arrival j). } 
             apply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval;
-              rt_eauto;last by done.
+              rt_eauto; last by [].
             move : H_busy_interval => [ [_ [_ [QUIET /andP [ARR _ ]]]] _].
             destruct (leqP t t1) as [LE | LT].
             { have EQ : t = job_arrival j by apply eq_trans with t1; lia.
@@ -260,17 +262,17 @@ Section AbstractRTAforFIFOwithArrivalCurves.
                 by apply leq_trans with (t1 +  Δ) ; [| apply ltnW].
               - by contradict QUIET. }
             by destruct H_valid_schedule as [COME MUST]. } }
-        { destruct H_valid_schedule as [READY MUST].
+        { have MUST : jobs_must_be_ready_to_execute sched.
+          { exact: (valid_schedule_jobs_must_be_ready_to_execute sched arr_seq). }
           have HAS : has_arrived s t by eapply (jobs_must_arrive_to_be_ready  sched).
           rewrite scheduled_at_def in INTER.
           unfold is_priority_inversion.
-          move: INTER => /eqP ->.
-          apply /negP; rewrite Bool.negb_involutive.
-          by apply leq_trans with t; [apply HAS | apply ltnW]. }
-        Unshelve.
-        all: try by done.
+          move: INTER => /eqP ->; apply /negP; rewrite Bool.negb_involutive.
+          by apply leq_trans with t; [apply HAS | apply ltnW].
+          Unshelve.
+          all: by []. }
       Qed.
-      
+
     End PriorityInversion.
 
     (** Using the above lemma, we prove that IBF is indeed an interference bound. *)
@@ -278,7 +280,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       job_interference_is_bounded_by arr_seq sched tsk interference interfering_workload  IBF.
     Proof.
       move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL.
-      move: H_valid_schedule => [READY MUST ].
+      have COME : jobs_come_from_arrival_sequence sched arr_seq.
+      { exact: valid_schedule_jobs_come_from_arrival_sequence. }
       rewrite /cumul_interference cumulative_interference_split.
       have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
       move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
@@ -294,27 +297,27 @@ Section AbstractRTAforFIFOwithArrivalCurves.
           ( try ( apply (task_rbf_1_ge_task_cost arr_seq) with (j0 := j) => //= ) ||
           apply (task_rbf_1_ge_task_cost arr_seq) with (j := j) => //=); first by auto.
           by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia]. }
-        { eapply leq_trans; last first.
-          by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
-          rewrite addnBA.
-          { rewrite leq_sub2r //; eapply leq_trans.
-            - apply sum_over_partitions_le => j' inJOBS.
-              by apply H_all_jobs_from_taskset, (in_arrivals_implies_arrived _ _ _ _ inJOBS). 
-            - rewrite (big_rem tsk) //= addnC leq_add //; last by rewrite subnKC.
-              rewrite big_seq_cond [in X in _ <= X]big_seq_cond big_mkcond [in X in _ <= X]big_mkcond //=. 
-              apply leq_sum => tsk' _; rewrite andbC //=.
-              destruct (tsk' \in rem (T:=Task) tsk ts) eqn:IN; last by done.
-              apply rem_in in IN.
-              eapply leq_trans; last first.
-              + by apply (task_workload_le_task_rbf _ _ _ IN H_valid_job_cost H_is_arrival_curve t1).
-              + by rewrite addnBAC //= subnKC //= addn1; apply leqW. } 
-          { rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=.
-            - by rewrite TSKj; apply leq_addr.
-            - apply job_in_arrivals_between => //.
-              by apply /andP; split; [| rewrite subnKC; [rewrite addn1 |]].  } } }
+        eapply leq_trans; last first.
+        by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
+        rewrite addnBA.
+        { rewrite leq_sub2r //; eapply leq_trans.
+          - apply sum_over_partitions_le => j' inJOBS.
+            by apply H_all_jobs_from_taskset, (in_arrivals_implies_arrived _ _ _ _ inJOBS). 
+          - rewrite (big_rem tsk) //= addnC leq_add //; last by rewrite subnKC.
+            rewrite big_seq_cond [in X in _ <= X]big_seq_cond big_mkcond [in X in _ <= X]big_mkcond //=. 
+            apply leq_sum => tsk' _; rewrite andbC //=.
+            destruct (tsk' \in rem (T:=Task) tsk ts) eqn:IN; last by [].
+            apply rem_in in IN.
+            eapply leq_trans; last first.
+            + by apply (task_workload_le_task_rbf _ _ _ IN H_valid_job_cost H_is_arrival_curve t1).
+            + by rewrite addnBAC //= subnKC //= addn1; apply leqW. }
+        rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=.
+        - by rewrite TSKj; apply leq_addr.
+        - apply job_in_arrivals_between => //.
+          by apply /andP; split; [| rewrite subnKC; [rewrite addn1 |]].  }
       apply: arrivals_uniq => //.
       apply: job_in_arrivals_between => //.
-      by apply /andP; split; [ | rewrite addn1]. 
+      by apply /andP; split; [ | rewrite addn1].
     Qed.
 
     (** Finally, we show that there exists a solution for the response-time equation. *)

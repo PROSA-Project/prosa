@@ -84,10 +84,9 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       move=> j t.
       rewrite /find_swap_candidate.
       destruct search_arg eqn:RES; last first.
-      { move: (H_jobs_must_be_ready j t).
-        rewrite /scheduled_at scheduled_in_def => READY SCHED_J.
-        apply READY in SCHED_J.
-        by apply (ready_implies_arrived sched). }
+      { rewrite -scheduled_in_def => sched_j.
+        apply: (ready_implies_arrived sched).
+        exact: job_scheduled_implies_ready. }
       { move=> /eqP SCHED_J.
         move: RES => /search_arg_pred.
         rewrite SCHED_J //. }
@@ -100,8 +99,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Proof.
       move=> j t SCHED_AT.
       move: (swap_job_scheduled_cases _ _ _ _ _ SCHED_AT)=> [OTHER |[AT_T1 | AT_T2]].
-      { have READY: job_ready sched j t by apply H_jobs_must_be_ready; rewrite -OTHER //.
-          by apply (ready_implies_arrived sched). }
+      { apply: (ready_implies_arrived sched).
+        by apply: job_scheduled_implies_ready; rewrite // -OTHER. }
       { set t2 := find_swap_candidate arr_seq sched t1 in AT_T1.
         move: AT_T1 => [EQ_T1 SCHED_AT'].
         apply fsc_respects_has_arrived.
@@ -110,18 +109,18 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         rewrite EQ_T1 in SCHED_AT'.
         rewrite SCHED_AT' /scheduled_at.
         by rewrite scheduled_in_def. }
-      { set t2 := find_swap_candidate arr_seq sched t1 in AT_T2.
-        move: AT_T2 => [EQ_T2 SCHED_AT'].
-        have ORDER: t1<=t2 by apply swap_candidate_is_in_future.
-        have READY: job_ready sched j t1 by apply H_jobs_must_be_ready; rewrite -SCHED_AT' //.
-        rewrite /job_ready /basic_ready_instance /pending /completed_by in READY.
-        move: READY => /andP [ARR _].
-        rewrite EQ_T2.
-        rewrite /has_arrived in ARR.
-        apply leq_trans with (n := t1) => //. }
+      set t2 := find_swap_candidate arr_seq sched t1 in AT_T2.
+      move: AT_T2 => [EQ_T2 SCHED_AT'].
+      have ORDER: t1<=t2 by apply swap_candidate_is_in_future.
+      have READY: job_ready sched j t1.
+      { by apply: job_scheduled_implies_ready; rewrite // -SCHED_AT'. }
+      rewrite /job_ready /basic_ready_instance /pending /completed_by in READY.
+      move: READY => /andP [ARR _].
+      rewrite EQ_T2.
+      exact: (leq_trans ARR).
     Qed.
 
-    (** Finally we show that, in the transformed schedule, jobs are scheduled 
+    (** Finally we show that, in the transformed schedule, jobs are scheduled
         only if they are ready. *)
     Lemma fsc_jobs_must_be_ready_to_execute:
       jobs_must_be_ready_to_execute sched'.
