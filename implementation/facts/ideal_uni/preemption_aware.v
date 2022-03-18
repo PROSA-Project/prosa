@@ -249,5 +249,3 @@ Section NPUniprocessorScheduler.
   End PreemptionCompliance.
 
 End NPUniprocessorScheduler.
-
-

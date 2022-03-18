@@ -1,9 +1,6 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 Require Export prosa.model.task.concept.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.  
-
 (** * Definitions for Abstract Response-Time Analysis *)
 (** In this module, we propose a set of definitions for the general framework for response-time analysis (RTA) 
     of uni-processor scheduling of real-time tasks with arbitrary arrival models. *)

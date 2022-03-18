@@ -5,7 +5,6 @@ Require Export prosa.analysis.facts.model.ideal_schedule.
     schedule of a task for the ideal uni-processor model. This is not
     a fundamental limitation and the notion can be further generalized
     to an arbitrary model. *)
-Require Export prosa.model.processor.ideal.
 
 (** * Schedule of task *)
 (** In this section we define properties of the schedule of a task. *)

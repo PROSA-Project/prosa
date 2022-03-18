@@ -11,9 +11,6 @@ Require Export prosa.analysis.transform.swap.
     an ideal uniprocessor schedule for a given arrival sequence. The scheduler
     respects nonpreemptive sections and arbitrary readiness models. *)
 
-(** The following definitions assume ideal uniprocessor schedules. *)
-Require prosa.model.processor.ideal.
-
 Section UniprocessorScheduler.
 
   (** Consider any type of jobs with costs and arrival times, ... *)
@@ -102,4 +99,3 @@ Section UniprocessorScheduler.
   End PriorityAware.
 
 End UniprocessorScheduler.
-

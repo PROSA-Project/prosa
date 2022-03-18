@@ -11,8 +11,6 @@ Require Export prosa.analysis.facts.readiness.basic.
     EDF schedule, and ending with proofs of individual properties of
     the obtained EDF schedule. *)
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import prosa.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import prosa.model.readiness.basic.
 

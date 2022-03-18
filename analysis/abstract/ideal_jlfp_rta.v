@@ -2,9 +2,6 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.abstract.abstract_seq_rta.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.
-
 (** * JLFP instantiation of Interference and Interfering Workload for ideal uni-processor. *)
 (** In this module we instantiate functions Interference and Interfering Workload 
     for an arbitrary JLFP-policy that satisfies the sequential tasks hypothesis. 

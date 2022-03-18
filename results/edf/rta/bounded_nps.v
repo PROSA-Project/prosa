@@ -4,9 +4,6 @@ Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.results.edf.rta.bounded_pi.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
 
-(** Throughout this file, we assume ideal uni-processor schedules ... *)
-Require Import prosa.model.processor.ideal.
-
 (** ... and the classic (i.e., Liu & Layland) model of readiness
     without jitter or self-suspensions, wherein pending jobs are
     always ready. *)

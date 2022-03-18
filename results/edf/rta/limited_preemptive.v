@@ -12,7 +12,6 @@ Require Export prosa.analysis.facts.readiness.basic.
     uni-processor schedules, and the classic (i.e., Liu & Layland)
     readiness model. *)
 Require Import prosa.model.priority.edf.
-Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.basic.
 
 (** Furthermore, we assume the task model with fixed preemption points. *)

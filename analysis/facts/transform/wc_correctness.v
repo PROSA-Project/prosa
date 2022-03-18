@@ -6,7 +6,6 @@ Require Export prosa.analysis.transform.wc_trans.
 Require Export prosa.analysis.facts.transform.swaps.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.list.
-Require Import prosa.model.processor.ideal.
 
 (** * Correctness of the work-conservation transformation *)
 (** This file contains the main argument of the work-conservation proof,

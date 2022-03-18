@@ -12,8 +12,6 @@ Require Export prosa.analysis.facts.readiness.backlogged.
     is also an (ideal) EDF schedule that is work-conserving in which all
     deadlines are met. *)
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import prosa.model.processor.ideal.
 (** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
 Require Import prosa.model.readiness.basic.
 

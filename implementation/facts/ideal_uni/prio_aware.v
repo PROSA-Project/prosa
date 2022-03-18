@@ -5,9 +5,6 @@ Require Export prosa.implementation.facts.ideal_uni.preemption_aware.
 (** This file establishes facts about the reference model of a priority- and
     preemption-model-aware ideal uniprocessor scheduler. *)
 
-(** The following results assume ideal uniprocessor schedules. *)
-Require Import prosa.model.processor.ideal.
-
 Section PrioAwareUniprocessorScheduler.
 
   (** Consider any type of jobs with costs and arrival times, ... *)

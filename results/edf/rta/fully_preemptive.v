@@ -11,7 +11,6 @@ Require Export prosa.analysis.facts.readiness.basic.
 (** Throughout this file, we assume the EDF priority policy, ideal uni-processor 
     schedules, and the basic readiness model. *)
 Require Import prosa.model.priority.edf.
-Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.basic.
 
 (** Furthermore, we assume the fully preemptive task model. *)

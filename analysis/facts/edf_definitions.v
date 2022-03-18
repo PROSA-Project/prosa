@@ -19,10 +19,9 @@ Require Export prosa.model.schedule.priority_driven.
 
     In this file, we show that both definitions are equivalent assuming:
 
-    (1) ideal uniprocessor schedules, ... *)
-Require Import prosa.model.processor.ideal.
+    (1) ideal uniprocessor schedules,
 
-(** ... (2) the classic Liu & Layland model of readiness without jitter and
+    (2) the classic Liu & Layland model of readiness without jitter and
     without self-suspensions, where pending jobs are always ready, and ... *)
 Require Import prosa.model.readiness.basic.
 

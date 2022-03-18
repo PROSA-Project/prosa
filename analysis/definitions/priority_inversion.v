@@ -1,6 +1,4 @@
 Require Export prosa.analysis.definitions.busy_interval.
-
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Import prosa.model.processor.ideal.
 
 (** * Cumulative Priority Inversion for JLFP-models *)

@@ -9,9 +9,8 @@ Require Export prosa.analysis.facts.edf_definitions.
     schedule), then there is also an (ideal) EDF schedule in which all
     deadlines are met. *)
 
-(** The following results assume ideal uniprocessor schedules,... *)
-Require prosa.model.processor.ideal.
-(** ... the basic (i.e., Liu & Layland) readiness model under which any
+(** The following results assume ideal uniprocessor schedules,
+    the basic (i.e., Liu & Layland) readiness model under which any
     pending job is always ready, ... *)
 Require prosa.model.readiness.basic.
 (** ... the EDF priority policy, ... *)

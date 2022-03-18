@@ -4,9 +4,6 @@ Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.
-
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)
 
 (** In this section we instantiate the Abstract RTA for FP-schedulers

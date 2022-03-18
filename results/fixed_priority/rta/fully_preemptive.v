@@ -4,7 +4,6 @@ Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.facts.readiness.sequential.
-Require Import prosa.model.processor.ideal.
 
 (** * RTA for Fully Preemptive FP Model *)
 (** In this section we prove the RTA theorem for the fully preemptive FP model *)

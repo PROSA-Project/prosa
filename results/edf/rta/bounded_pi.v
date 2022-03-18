@@ -8,9 +8,6 @@ Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
 
-(** Throughout this file, we assume ideal uni-processor schedules ... *)
-Require Import prosa.model.processor.ideal.
-
 (** ... and the classic (i.e., Liu & Layland) model of readiness
     without jitter or self-suspensions, wherein pending jobs are
     always ready. *)

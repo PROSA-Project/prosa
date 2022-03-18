@@ -12,9 +12,6 @@ Require Export prosa.model.schedule.preemption_time.
     NB: For legacy reasons, the below definition is currently specific to ideal
         uniprocessor schedules. Removal of this limitation is future work. *)
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require prosa.model.processor.ideal.
-
 Section Priority.
 
   (** Consider any type of tasks ... *)
