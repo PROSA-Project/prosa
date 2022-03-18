@@ -3,14 +3,13 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
 Require Export prosa.analysis.facts.readiness.sequential.
-
+Require Import prosa.model.processor.ideal.
 
 (** * RTA for Model with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating non-preemptive regions FP model. *)
 
-(** Throughout this file, we assume the FP priority policy, ideal uni-processor 
+(** Throughout this file, we assume the FP priority policy,
     schedules, and the sequential readiness model. *)
-Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.sequential.
 
 (** Furthermore, we assume the task model with floating non-preemptive regions. *)
@@ -20,6 +19,9 @@ Require Import prosa.model.task.preemption.floating_nonpreemptive.
 (** ** Setup and Assumptions *)
 
 Section RTAforFloatingModelwithArrivalCurves.
+
+  (** We assume ideal uni-processor schedules. *)
+  #[local] Existing Instance ideal.processor_state.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

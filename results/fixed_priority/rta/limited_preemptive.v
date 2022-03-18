@@ -3,15 +3,14 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.facts.readiness.sequential.
-
+Require Import prosa.model.processor.ideal.
 
 (** * RTA for FP-schedulers with Fixed Preemption Points *)
 (** In this module we prove the RTA theorem for FP-schedulers with
     fixed preemption points. *)
 
-(** Throughout this file, we assume the FP priority policy, ideal uni-processor 
+(** Throughout this file, we assume the FP priority policy,
     schedules, and the sequential readiness model. *)
-Require Import prosa.model.processor.ideal.
 Require Import prosa.model.readiness.sequential.
 
 (** Furthermore, we assume the task model with fixed preemption points. *)
@@ -21,6 +20,9 @@ Require Import prosa.model.task.preemption.limited_preemptive.
 (** ** Setup and Assumptions *)
 
 Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
+
+  (** We assume ideal uni-processor schedules. *)
+  #[local] Existing Instance ideal.processor_state.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

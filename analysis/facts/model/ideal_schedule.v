@@ -1,8 +1,6 @@
 Require Export prosa.util.all.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.facts.behavior.service.
-
-(** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
 
 (** Note: we do not re-export the basic definitions to avoid littering the global
@@ -10,6 +8,9 @@ Require Import prosa.model.processor.ideal.
 
 (** In this section we establish the classes to which an ideal schedule belongs. *)
 Section ScheduleClass.
+
+  (** We assume ideal uni-processor schedules. *)
+  #[local] Existing Instance ideal.processor_state.
 
   Local Transparent scheduled_in scheduled_on.
   (** Consider any job type and the ideal processor model. *)

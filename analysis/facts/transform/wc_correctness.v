@@ -6,6 +6,7 @@ Require Export prosa.analysis.transform.wc_trans.
 Require Export prosa.analysis.facts.transform.swaps.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.list.
+Require Import prosa.model.processor.ideal.
 
 (** * Correctness of the work-conservation transformation *)
 (** This file contains the main argument of the work-conservation proof,
@@ -14,16 +15,17 @@ Require Export prosa.util.list.
     and ending with the proofs of individual properties of the obtained
     work-conserving schedule. *)
 
-(** Throughout this file, we assume ideal uniprocessor schedules and
-    the basic (i.e., Liu & Layland) readiness model under which any
-    pending job is ready. *)
-Require Import prosa.model.processor.ideal.
+(** Throughout this file, we assume the basic (i.e., Liu & Layland)
+    readiness model under which any pending job is ready. *)
 Require Import prosa.model.readiness.basic.
 
 (** In order to discuss the correctness of the work-conservation transformation at a high level,
     we first need a set of lemmas about the inner parts of the procedure. *)
 Section AuxiliaryLemmasWorkConservingTransformation.
-  
+
+  (** We assume ideal uni-processor schedules. *)
+  #[local] Existing Instance ideal.processor_state.
+
   (** Consider any type of jobs with arrival times, costs, and deadlines... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.

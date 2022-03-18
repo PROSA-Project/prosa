@@ -2,8 +2,6 @@ Require Export prosa.analysis.transform.swap.
 Require Export prosa.analysis.transform.prefix.
 Require Export prosa.util.search_arg.
 Require Export prosa.util.list.
-
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
 Require Export prosa.model.processor.ideal.
 
 (** In this file we define the transformation from any ideal uniprocessor schedule 
@@ -12,7 +10,10 @@ Require Export prosa.model.processor.ideal.
     its arrival, therefore there could still exist idle instants between any two
     job allocations. *)
 Section WCTransformation.
-  
+
+  (** We assume ideal uni-processor schedules. *)
+  #[local] Existing Instance ideal.processor_state.
+
   (** Consider any type of jobs with arrival times, costs, and deadlines... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.

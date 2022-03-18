@@ -20,8 +20,8 @@ Section State.
   (** We connect the notion of an ideal processor state with
       the generic interface for the processor-state abstraction in Prosa by
       declaring a so-called instance of the [ProcessorState] typeclass. *)
-  Global Program Instance processor_state : ProcessorState Job :=
-    {
+  Program Definition processor_state : ProcessorState Job :=
+    {|
       (** We define the ideal "processor state" as an [option Job],
           which means that it is either [Some j] (where [j] is a
           [Job]) or [None] (which we use to indicate an idle
@@ -35,7 +35,7 @@ Section State.
       (** Similarly, we say that a given job [j] receives service in a
           given state [s] iff [s] is [Some j]. *)
       service_on j s (_ : unit) := if s == Some j then 1 else 0;
-    }.
+    |}.
   Next Obligation. by rewrite /nat_of_bool; case: ifP H => // ? /negP[]. Qed.
 
 End State.
