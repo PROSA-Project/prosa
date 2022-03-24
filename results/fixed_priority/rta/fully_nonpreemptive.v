@@ -32,6 +32,11 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
+  (** We assume that jobs and tasks are fully nonpreemptive. *)
+  #[local] Existing Instance fully_nonpreemptive_job_model.
+  #[local] Existing Instance fully_nonpreemptive_task_model.
+  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
+  
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.

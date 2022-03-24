@@ -20,11 +20,6 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** We assume ideal uni-processor schedules. *)
   #[local] Existing Instance ideal.processor_state.
 
-  (** We assume that jobs and tasks are fully preemptive. *)
-  #[local] Existing Instance fully_preemptive_job_model.
-  #[local] Existing Instance fully_preemptive_task_model.
-  #[local] Existing Instance fully_preemptive_rtc_threshold.
-
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -35,6 +30,11 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
+   (** We assume that jobs and tasks are fully preemptive. *)
+   #[local] Existing Instance fully_preemptive_job_model.
+   #[local] Existing Instance fully_preemptive_task_model.
+   #[local] Existing Instance fully_preemptive_rtc_threshold.
+   
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.

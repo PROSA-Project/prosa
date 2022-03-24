@@ -2,9 +2,7 @@ Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.analysis.facts.model.ideal_schedule.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.nonpreemptive.
-
-(** Furthermore, we assume the fully non-preemptive job model. *)
-Require Import prosa.model.preemption.fully_nonpreemptive.
+Require Export prosa.model.preemption.fully_nonpreemptive.
 
 (** * Platform for Fully Non-Preemptive model *)
 
@@ -17,7 +15,10 @@ Section FullyNonPreemptiveModel.
   Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
-  
+
+  (** We assume that jobs are fully non-preemptive. *)
+  #[local] Existing Instance fully_nonpreemptive_job_model.
+
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
@@ -41,7 +42,7 @@ Section FullyNonPreemptiveModel.
     valid_preemption_model arr_seq sched.
   Proof.
     intros j; split; [by apply/orP; left | split; [by apply/orP; right | split]].
-    - move => t; rewrite /job_preemptable /fully_nonpreemptive_model Bool.negb_orb -lt0n; move => /andP [POS NCOMPL].
+    - move => t; rewrite /job_preemptable /fully_nonpreemptive_job_model Bool.negb_orb -lt0n; move => /andP [POS NCOMPL].
       move: (incremental_service_during _ _ _ _ _ POS) => [ft [/andP [_ LT] [SCHED SERV]]].
       apply H_nonpreemptive_sched with ft.
       + by apply ltnW. 
@@ -51,7 +52,7 @@ Section FullyNonPreemptiveModel.
         move: GE; rewrite ltnNge; move => /negP GE; apply: GE.
         apply completion.service_at_most_cost; rt_eauto.
     - intros t NSCHED SCHED.
-      rewrite /job_preemptable /fully_nonpreemptive_model.
+      rewrite /job_preemptable /fully_nonpreemptive_job_model.
       apply/orP; left. 
       apply/negP; intros CONTR; move: CONTR => /negP; rewrite -lt0n; intros POS. 
       move: (incremental_service_during _ _ _ _ _ POS) => [ft [/andP [_ LT] [SCHEDn SERV]]].
@@ -76,7 +77,7 @@ Section FullyNonPreemptiveModel.
   Proof.
     intros.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
-            /job_preemption_points /job_preemptable /fully_nonpreemptive_model.
+            /job_preemption_points /job_preemptable /fully_nonpreemptive_job_model.
     case: (posnP (job_cost j)) => [ZERO|POS].
     { by rewrite ZERO; compute. }
     have ->: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n].
@@ -104,7 +105,7 @@ Section FullyNonPreemptiveModel.
   Proof.
     intros.
     rewrite /job_last_nonpreemptive_segment /lengths_of_segments
-            /job_preemption_points /job_preemptable /fully_nonpreemptive_model.
+            /job_preemption_points /job_preemptable /fully_nonpreemptive_job_model.
     case: (posnP (job_cost j)) => [ZERO|POS].
     { by rewrite ZERO; compute. }
     have ->: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n].

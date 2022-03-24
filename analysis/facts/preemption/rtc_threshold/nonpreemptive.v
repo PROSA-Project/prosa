@@ -9,6 +9,7 @@ Require Import prosa.model.task.preemption.fully_nonpreemptive.
 Section TaskRTCThresholdFullyNonPreemptive.
 
   (** We assume the fully non-preemptive task model. *)
+  #[local] Existing Instance fully_nonpreemptive_job_model.
   #[local] Existing Instance fully_nonpreemptive_task_model.
   #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
   

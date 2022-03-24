@@ -10,6 +10,7 @@ Require Import prosa.model.task.preemption.fully_nonpreemptive.
 Section FullyNonPreemptiveModel.
 
   (** We assume the fully non-preemptive task model. *)
+  #[local] Existing Instance fully_nonpreemptive_job_model.  
   #[local] Existing Instance fully_nonpreemptive_task_model.
   #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
 
@@ -53,7 +54,7 @@ Section FullyNonPreemptiveModel.
     move: (F (progr)) => [EQ | GT].
     { exists progr; split.
         - by apply/andP; split; [done | rewrite leq_addr].
-        - rewrite /job_preemptable /fully_nonpreemptive_model.
+        - rewrite /job_preemptable /fully_nonpreemptive_job_model.
             by apply/orP; left; rewrite EQ.
     }
     { exists (maxn progr (job_cost j)).

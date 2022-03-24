@@ -12,9 +12,9 @@ Section FullyNonPreemptiveModel.
 
   (** We say that the model is fully non-preemptive iff no job
       can be preempted until its completion. *)
-  Global Instance fully_nonpreemptive_model : JobPreemptable Job :=
-    {
-      job_preemptable (j : Job) (ρ : work) := (ρ == 0) || (ρ == job_cost j)
-    }.
+  #[local] Instance fully_nonpreemptive_job_model : JobPreemptable Job :=
+  {
+    job_preemptable (j : Job) (ρ : work) := (ρ == 0) || (ρ == job_cost j)
+  }.
 
 End FullyNonPreemptiveModel.
