@@ -23,8 +23,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   #[local] Existing Instance basic_ready_instance.
 
   (** We assume that jobs and tasks are fully preemptive. *)
-  #[local] Existing Instance
-    model.preemption.fully_preemptive.fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive_job_model.
   #[local] Existing Instance fully_preemptive_task_model.
   #[local] Existing Instance fully_preemptive_rtc_threshold.
 

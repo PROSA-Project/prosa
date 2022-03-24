@@ -24,7 +24,7 @@ Section Optimality.
   #[local] Existing Instance basic_ready_instance.
 
   (** We assume that jobs are fully preemptive. *)
-  #[local] Existing Instance fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive_job_model.
 
   (** For any given type of jobs, each characterized by execution
       costs, an arrival time, and an absolute deadline,... *)

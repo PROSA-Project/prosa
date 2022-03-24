@@ -10,7 +10,9 @@ Section FullyPreemptiveModel.
   Context {Job : JobType}.
 
   (** In the fully preemptive model, any job can be preempted at any time. *)
-  Definition fully_preemptive_model : JobPreemptable Job :=
-    fun (_ : Job) (_ : work) => true.
+  #[local] Instance fully_preemptive_job_model : JobPreemptable Job :=
+  {
+    job_preemptable (_ : Job) (_ : work) := true
+  }.
 
 End FullyPreemptiveModel.

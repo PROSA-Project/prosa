@@ -1,5 +1,5 @@
 Require Export prosa.model.task.preemption.parameters.
-Require Import prosa.model.preemption.fully_preemptive.
+Require Export prosa.model.preemption.fully_preemptive.
 
 (** * Preemptions in Fully Preemptive Model *)
 (** In this section, we prove that instantiation of predicate
@@ -8,7 +8,7 @@ Require Import prosa.model.preemption.fully_preemptive.
 Section FullyPreemptiveModel.
 
   (** We assume that jobs are fully preemptive. *)
-  #[local] Existing Instance fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive_job_model.
 
   (**  Consider any type of jobs. *)
   Context {Job : JobType}.
@@ -54,7 +54,7 @@ Section FullyPreemptiveModel.
     intros ? POS.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points.
-    rewrite /job_preemptable /fully_preemptive_model.
+    rewrite /job_preemptable /fully_preemptive_job_model.
     rewrite filter_predT.
     apply max0_of_uniform_set.
     - rewrite /range /index_iota subn0.
