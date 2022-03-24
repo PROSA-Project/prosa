@@ -1,14 +1,14 @@
 Require Export prosa.analysis.facts.preemption.task.floating.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
-
-(** Furthermore, we assume the task model with floating non-preemptive regions. *)
-Require Import prosa.model.preemption.limited_preemptive.
 Require Import prosa.model.task.preemption.floating_nonpreemptive.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we instantiate function [task run to completion
     threshold] for the model with floating non-preemptive regions. *)
 Section TaskRTCThresholdFloatingNonPreemptiveRegions.
+
+  (** Furthermore, we assume the task model with floating non-preemptive regions. *)
+  #[local] Existing Instance floating_preemptive.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

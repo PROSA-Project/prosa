@@ -59,9 +59,7 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
       information about the placement of preemption points in all jobs, i.e.,
       it is impossible to predict when exactly a job will be preemptable. Thus,
       the only safe run-to-completion threshold is [task cost]. *)
-  Global Program Instance fully_preemptive : TaskRunToCompletionThreshold Task :=
-    {
-      task_rtct (tsk : Task) := task_cost tsk
-    }.
+  Definition floating_preemptive : TaskRunToCompletionThreshold Task :=
+    fun tsk : Task => task_cost tsk.
 
 End TaskRTCThresholdFloatingNonPreemptiveRegions.
