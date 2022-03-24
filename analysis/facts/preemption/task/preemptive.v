@@ -1,7 +1,5 @@
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.preemption.job.preemptive.
-
-(** Furthermore, we assume the fully non-preemptive task model. *)
 Require Import prosa.model.task.preemption.fully_preemptive.
 
 (** * Platform for Fully Preemptive Model *)
@@ -10,6 +8,12 @@ Require Import prosa.model.task.preemption.fully_preemptive.
     preemptive model indeed defines a valid preemption model with
     bounded non-preemptive regions. *)
 Section FullyPreemptiveModel.
+
+  (** We assume that jobs and tasks are fully preemptive. *)
+  #[local] Existing Instance
+    model.preemption.fully_preemptive.fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

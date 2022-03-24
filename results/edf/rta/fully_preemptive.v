@@ -5,15 +5,13 @@ Require Import prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.facts.readiness.basic.
+Require Import prosa.model.task.preemption.fully_preemptive.
 
 (** * RTA for Fully Preemptive EDF *)
 (** In this section we prove the RTA theorem for the fully preemptive EDF model *)
 
 (** Throughout this file, we assume the EDF priority policy. *)
 Require Import prosa.model.priority.edf.
-
-(** Furthermore, we assume the fully preemptive task model. *)
-Require Import prosa.model.task.preemption.fully_preemptive.
 
 (** ** Setup and Assumptions *)
 
@@ -23,6 +21,12 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
   #[local] Existing Instance basic_ready_instance.
+
+  (** We assume that jobs and tasks are fully preemptive. *)
+  #[local] Existing Instance
+    model.preemption.fully_preemptive.fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

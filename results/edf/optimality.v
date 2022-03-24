@@ -1,4 +1,5 @@
 Require Import prosa.model.readiness.basic.
+Require Import prosa.model.preemption.fully_preemptive.
 Require Export prosa.analysis.facts.transform.edf_opt.
 Require Export prosa.analysis.facts.transform.edf_wc.
 Require Export prosa.analysis.facts.edf_definitions.
@@ -12,8 +13,6 @@ Require Export prosa.analysis.facts.edf_definitions.
 
 (** The following results assume the EDF priority policy, ... *)
 Require prosa.model.priority.edf.
-(** ...and a fully preemptive job model. *)
-Require prosa.model.preemption.fully_preemptive.
 
 (** ** Optimality Theorem *)
 
@@ -23,6 +22,9 @@ Section Optimality.
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
   #[local] Existing Instance basic_ready_instance.
+
+  (** We assume that jobs are fully preemptive. *)
+  #[local] Existing Instance fully_preemptive_model.
 
   (** For any given type of jobs, each characterized by execution
       costs, an arrival time, and an absolute deadline,... *)

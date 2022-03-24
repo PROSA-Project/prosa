@@ -10,9 +10,7 @@ Section FullyPreemptiveModel.
   Context {Job : JobType}.
 
   (** In the fully preemptive model, any job can be preempted at any time. *)
-  Global Program Instance fully_preemptive_model : JobPreemptable Job :=
-    {
-      job_preemptable (_ : Job) (_ : work) := true
-    }.
+  Definition fully_preemptive_model : JobPreemptable Job :=
+    fun (_ : Job) (_ : work) => true.
 
 End FullyPreemptiveModel.

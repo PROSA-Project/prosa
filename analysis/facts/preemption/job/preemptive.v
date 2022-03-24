@@ -1,6 +1,4 @@
 Require Export prosa.model.task.preemption.parameters.
-
-(** Furthermore, we assume the fully preemptive job model. *)
 Require Import prosa.model.preemption.fully_preemptive.
 
 (** * Preemptions in Fully Preemptive Model *)
@@ -8,6 +6,9 @@ Require Import prosa.model.preemption.fully_preemptive.
     [job_preemptable] to the fully preemptive model indeed defines
     a valid preemption model. *)
 Section FullyPreemptiveModel.
+
+  (** We assume that jobs are fully preemptive. *)
+  #[local] Existing Instance fully_preemptive_model.
 
   (**  Consider any type of jobs. *)
   Context {Job : JobType}.

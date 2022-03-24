@@ -9,6 +9,12 @@ Require Import prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
     indeed defines a valid run-to-completion threshold function. *)
 Section TaskRTCThresholdFullyPreemptiveModel.
 
+  (** We assume that jobs and tasks are fully preemptive. *)
+  #[local] Existing Instance
+    model.preemption.fully_preemptive.fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive_model.
+  #[local] Existing Instance fully_preemptive.
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
