@@ -1,6 +1,6 @@
 From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-Require Export prosa.behavior.all.
 
+Require Export prosa.behavior.all.
 Require Import prosa.util.nat.
 
 
@@ -35,10 +35,10 @@ Section ReadinessOfJitteryJobs.
   (** Based on the predicate [is_released], it is easy to state the notion of
       readiness for jobs subject to release jitter: a job is ready only if it
       is released and not yet complete. *)
-  Global Program Instance jitter_ready_instance : JobReady Job PState :=
-    {
-      job_ready sched j t := is_released j t && ~~ completed_by sched j t
-    }.
+  #[local,program] Instance jitter_ready_instance : JobReady Job PState :=
+  {
+    job_ready sched j t := is_released j t && ~~ completed_by sched j t
+  }.
   Next Obligation.
     move: H2 => /andP [REL UNFINISHED].
     rewrite /pending. apply /andP. split => //.
