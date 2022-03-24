@@ -1,6 +1,6 @@
 Require Export prosa.analysis.facts.preemption.task.floating.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
-Require Import prosa.model.task.preemption.floating_nonpreemptive.
+Require Export prosa.model.task.preemption.floating_nonpreemptive.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we instantiate function [task run to completion

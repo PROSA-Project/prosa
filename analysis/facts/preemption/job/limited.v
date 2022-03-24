@@ -3,10 +3,7 @@ Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.model.ideal_schedule.
-
-(** Throughout this file, we assume the job model with limited
-    preemption points. *)
-Require Import prosa.model.preemption.limited_preemptive.
+Require Export prosa.model.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)
 (** In this section, we prove that instantiation of predicate
@@ -25,8 +22,11 @@ Section ModelWithLimitedPreemptions.
   Context `{JobCost Job}.
 
   (** In addition, assume the existence of a function that maps a job
-      to the sequence of its preemption points. *)
+      to the sequence of its preemption points... *)
   Context `{JobPreemptionPoints Job}.
+
+  (** ..., i.e., we assume limited-preemptive jobs. *)
+  #[local] Existing Instance limited_preemptive_job_model.
 
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
@@ -176,7 +176,7 @@ Section ModelWithLimitedPreemptions.
         last0 (filter (fun x => 0 < x) (distances (job_preemption_points j))).
     Proof.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
-      unfold parameter.job_preemption_points, job_preemptable, limited_preemptions_model.
+      unfold parameter.job_preemption_points, job_preemptable, limited_preemptive_job_model.
       intros; rewrite distances_iota_filtered; eauto.
       rewrite -A2 //.
         by intros; apply last_is_max_in_nondecreasing_seq; eauto 2.
@@ -191,7 +191,7 @@ Section ModelWithLimitedPreemptions.
       max0 (distances (job_preemption_points j)).
     Proof.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
-      unfold parameter.job_preemption_points, job_preemptable, limited_preemptions_model.
+      unfold parameter.job_preemption_points, job_preemptable, limited_preemptive_job_model.
       intros; rewrite distances_iota_filtered; eauto 2.
       rewrite max0_rem0 //.
       rewrite -A2 //.

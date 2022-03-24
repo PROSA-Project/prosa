@@ -31,10 +31,10 @@ Section LimitedPreemptions.
 
   (** ...a job [j] is preemptable at a given point of progress [ρ] iff [ρ] is
       one of the preemption points of [j]. *)
-  Global Instance limited_preemptions_model : JobPreemptable Job :=
-    {
-      job_preemptable (j : Job) (ρ : work) := ρ \in job_preemption_points j
-    }.
+  #[local] Instance limited_preemptive_job_model : JobPreemptable Job :=
+  {
+    job_preemptable (j : Job) (ρ : work) := ρ \in job_preemption_points j
+  }.
 
   (** ** Model Validity *)
 

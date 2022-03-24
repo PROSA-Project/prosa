@@ -1,4 +1,4 @@
-Require Import prosa.model.preemption.limited_preemptive.
+Require Export prosa.model.preemption.limited_preemptive.
 Require Export prosa.model.task.preemption.parameters.
 
 (** * Task Model with Floating Non-Preemptive Regions *)
@@ -26,6 +26,9 @@ Section ValidModelWithFloatingNonpreemptiveRegions.
   (** ... with execution costs and specific preemption points. *)
   Context `{JobCost Job}.
   Context `{JobPreemptionPoints Job}.
+
+  (** We assume limited-preemptive jobs. *)
+  #[local] Existing Instance limited_preemptive_job_model.
 
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.

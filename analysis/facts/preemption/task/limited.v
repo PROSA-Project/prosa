@@ -1,8 +1,5 @@
 Require Export prosa.analysis.facts.preemption.job.limited.
-
-(** Furthermore, we assume the task model with fixed preemption points. *)
-Require Import prosa.model.task.preemption.limited_preemptive.
-Require Import prosa.model.preemption.limited_preemptive.
+Require Export prosa.model.task.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)
 (** In this section, we prove that instantiation of functions
@@ -21,10 +18,12 @@ Section LimitedPreemptionsModel.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   
-  (** In addition, we assume the existence of functions mapping a
-      job and task to the sequence of its preemption points. *)
+  (** We assume that jobs are preemptable only at specific points during their
+      execution, ... *)
   Context `{JobPreemptionPoints Job}.
   Context `{TaskPreemptionPoints Task}.
+  (** ... i.e., we assume limited-preemptive jobs. *)
+  #[local] Existing Instance limited_preemptive_job_model.
   
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
@@ -60,7 +59,7 @@ Section LimitedPreemptionsModel.
     - split.
       rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
               /lengths_of_segments /parameter.job_preemption_points; rewrite ZERO; simpl.
-      rewrite /job_preemptable /limited_preemptions_model; erewrite zero_in_preemption_points; eauto 2.
+      rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
       + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.
           by eapply zero_in_preemption_points; eauto 2.
@@ -74,7 +73,7 @@ Section LimitedPreemptionsModel.
         set ptl := nth 0 (job_preemption_points j) x.
         set ptr := nth 0 (job_preemption_points j) x.+1.
         exists ptr; split; first last.
-        * by unfold job_preemptable, limited_preemptions_model; apply mem_nth.
+        * by unfold job_preemptable, limited_preemptive_job_model; apply mem_nth.
         * apply/andP; split; first by apply ltnW.
           apply leq_trans with (ptl + (job_max_nonpreemptive_segment j - ε) + 1); first last.
           -- rewrite addn1 ltn_add2r; apply N1. 

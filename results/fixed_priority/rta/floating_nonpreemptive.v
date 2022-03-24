@@ -11,10 +11,6 @@ Require Export prosa.analysis.facts.readiness.sequential.
     schedules, and the sequential readiness model. *)
 Require Import prosa.model.readiness.sequential.
 
-(** Furthermore, we assume the task model with floating non-preemptive regions. *)
-Require Import prosa.model.preemption.limited_preemptive.
-Require Import prosa.model.task.preemption.floating_nonpreemptive.
-
 (** ** Setup and Assumptions *)
 
 Section RTAforFloatingModelwithArrivalCurves.
@@ -31,6 +27,9 @@ Section RTAforFloatingModelwithArrivalCurves.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
+
+  (** We assume that jobs are limited-preemptive. *)
+  #[local] Existing Instance limited_preemptive_job_model.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.

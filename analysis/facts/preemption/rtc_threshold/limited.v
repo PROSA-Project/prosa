@@ -12,6 +12,7 @@ Require Import prosa.model.preemption.limited_preemptive.
 Section TaskRTCThresholdLimitedPreemptions.
 
   (** We assume the task model with fixed preemption points. *)
+  #[local] Existing Instance limited_preemptive_job_model.
   #[local] Existing Instance limited_preemptions_rtc_threshold.
 
   (** Consider any type of tasks ... *)
