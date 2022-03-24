@@ -13,7 +13,7 @@ Section FullyPreemptiveModel.
   (** In the fully preemptive model, any job can be preempted at any
       time. Thus, the maximal non-preemptive segment has length at most ε
       (i.e., one time unit such as a processor cycle). *)
-  Definition fully_preemptive_model : TaskMaxNonpreemptiveSegment Task :=
+  Definition fully_preemptive_task_model : TaskMaxNonpreemptiveSegment Task :=
     fun tsk : Task => ε.
 
 End FullyPreemptiveModel.
@@ -32,7 +32,7 @@ Section TaskRTCThresholdFullyPreemptiveModel.
   (** In the fully preemptive model, any job can be preempted at any
       time. Thus, the only safe run-to-completion threshold for a task
       is its WCET. *)
-  Definition fully_preemptive : TaskRunToCompletionThreshold Task :=
+  Definition fully_preemptive_rtc_threshold : TaskRunToCompletionThreshold Task :=
     fun tsk : Task => task_cost tsk.
 
 End TaskRTCThresholdFullyPreemptiveModel.

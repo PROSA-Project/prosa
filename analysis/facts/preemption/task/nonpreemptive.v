@@ -10,8 +10,8 @@ Require Import prosa.model.task.preemption.fully_nonpreemptive.
 Section FullyNonPreemptiveModel.
 
   (** We assume the fully non-preemptive task model. *)
-  #[local] Existing Instance fully_nonpreemptive_model.
-  #[local] Existing Instance fully_nonpreemptive.
+  #[local] Existing Instance fully_nonpreemptive_task_model.
+  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

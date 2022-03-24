@@ -8,7 +8,7 @@ Require Import prosa.model.task.preemption.floating_nonpreemptive.
 Section TaskRTCThresholdFloatingNonPreemptiveRegions.
 
   (** Furthermore, we assume the task model with floating non-preemptive regions. *)
-  #[local] Existing Instance floating_preemptive.
+  #[local] Existing Instance floating_preemptive_rtc_threshold.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

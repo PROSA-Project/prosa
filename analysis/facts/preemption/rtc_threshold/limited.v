@@ -12,7 +12,7 @@ Require Import prosa.model.preemption.limited_preemptive.
 Section TaskRTCThresholdLimitedPreemptions.
 
   (** We assume the task model with fixed preemption points. *)
-  #[local] Existing Instance limited_preemptions.
+  #[local] Existing Instance limited_preemptions_rtc_threshold.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -104,7 +104,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     split; first by rewrite /task_rtc_bounded_by_cost leq_subr.
     intros ? ARR__j TSK__j. move: (H_valid_fixed_preemption_points_model) => [LJ LT].
     move: (LJ) (LT) => [ZERO__job [COST__job SORT__job]] [ZERO__task [COST__task [SORT__task [T4 [T5 T6]]]]].
-    rewrite /job_rtct /task_rtct /limited_preemptions
+    rewrite /job_rtct /task_rtct /limited_preemptions_rtc_threshold
             /job_last_nonpreemptive_segment /task_last_nonpr_segment /lengths_of_segments.
     case: (posnP (job_cost j)) => [Z|POS]; first by rewrite Z; compute.
     have J_RTCT__pos : 0 < job_last_nonpreemptive_segment j

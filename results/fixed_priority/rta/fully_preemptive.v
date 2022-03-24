@@ -23,8 +23,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** We assume that jobs and tasks are fully preemptive. *)
   #[local] Existing Instance
     model.preemption.fully_preemptive.fully_preemptive_model.
-  #[local] Existing Instance fully_preemptive_model.
-  #[local] Existing Instance fully_preemptive.
+  #[local] Existing Instance fully_preemptive_task_model.
+  #[local] Existing Instance fully_preemptive_rtc_threshold.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -139,7 +139,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Proof.
     have BLOCK: blocking_bound ts tsk = 0.
     { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-               /fully_preemptive.fully_preemptive_model subnn big1_eq. } 
+               /fully_preemptive_task_model subnn big1_eq. } 
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.      
     all: rt_eauto.
     rewrite /work_bearing_readiness.

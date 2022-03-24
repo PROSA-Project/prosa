@@ -9,9 +9,9 @@ Require Import prosa.model.task.preemption.fully_nonpreemptive.
 Section TaskRTCThresholdFullyNonPreemptive.
 
   (** We assume the fully non-preemptive task model. *)
-  #[local] Existing Instance fully_nonpreemptive_model.
-  #[local] Existing Instance fully_nonpreemptive.
-
+  #[local] Existing Instance fully_nonpreemptive_task_model.
+  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
+  
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}. 
   Context `{TaskCost Task}.
@@ -72,7 +72,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
     intros; split.
     - by unfold task_rtc_bounded_by_cost.
     - intros j ARR TSK.
-      move: TSK => /eqP <-; rewrite /fully_nonpreemptive.
+      move: TSK => /eqP <-; rewrite /fully_nonpreemptive_rtc_threshold.
       edestruct (posnP (job_cost j)) as [ZERO|POS].
       + by rewrite job_rtc_threshold_is_0.
       + by erewrite job_rtc_threshold_is_ε; eauto 2. 
