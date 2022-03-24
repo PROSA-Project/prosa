@@ -72,7 +72,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
   (** ... and the schedule respects the policy defined by the [job_preemptable]
      function (i.e., jobs have bounded non-preemptive segments). *)
-  Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched EDF.
 
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.

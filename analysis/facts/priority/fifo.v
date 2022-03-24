@@ -32,7 +32,7 @@ Section BasicLemmas.
 
   (** Assume that the schedule respects the FIFO scheduling policy whenever jobs
       are preemptable. *)
-  Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
 
   (** We observe that there is no priority inversion in a
       FIFO-compliant schedule. *)

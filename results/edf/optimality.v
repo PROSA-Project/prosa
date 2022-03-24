@@ -111,7 +111,7 @@ Section Optimality.
         valid_schedule priority_compliant_sched arr_seq /\
         all_deadlines_of_arrivals_met arr_seq priority_compliant_sched /\
         work_conserving arr_seq priority_compliant_sched /\
-        respects_policy_at_preemption_point arr_seq priority_compliant_sched.
+        respects_JLFP_policy_at_preemption_point arr_seq priority_compliant_sched (EDF Job).
   Proof.
     move /EDF_WC_optimality => [edf_sched [[ARR READY] [DL_MET [WC EDF]]]].
     exists edf_sched.

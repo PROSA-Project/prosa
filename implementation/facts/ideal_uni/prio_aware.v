@@ -30,7 +30,7 @@ Section PrioAwareUniprocessorScheduler.
   Hypothesis H_valid_preemption_behavior: valid_nonpreemptive_readiness RM.
 
   (** ... and reflexive, total, and transitive JLDP priority policy. *)
-  Context `{JLDP_policy Job}.
+  Context `{JLDP : JLDP_policy Job}.
   Hypothesis H_reflexive_priorities: reflexive_priorities.
   Hypothesis H_total: total_priorities.
   Hypothesis H_transitive: transitive_priorities.
@@ -118,7 +118,7 @@ Section PrioAwareUniprocessorScheduler.
     (** From the preceding facts, we conclude that [uni_schedule arr_seq]
         respects the priority policy at preemption times. *)
     Theorem schedule_respects_policy :
-      respects_policy_at_preemption_point arr_seq schedule.
+      respects_JLDP_policy_at_preemption_point arr_seq schedule JLDP.
     Proof.
       move=> j1 j2 t ARRIVES PREEMPT BACK_j1 SCHED_j2.
       case: (boolP (scheduled_at (uni_schedule arr_seq) j1 t)) => [SCHED_j1|NOT_SCHED_j1].

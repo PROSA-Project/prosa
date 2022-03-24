@@ -38,13 +38,28 @@ Section Priority.
   (** ...and an ideal uniprocessor schedule of these jobs, *)
   Variable sched : schedule (ideal.processor_state Job).
 
-  (** we say that a JLDP policy ...*)
-  Context `{JLDP_policy Job}.
-
-  (** ...is respected by the schedule iff, at every preemption point, the
-     priority of the scheduled job is higher than or equal to the priority of
-     any backlogged job. *)
-  Definition respects_policy_at_preemption_point :=
+  (** we say that a priority policy is respected by the schedule iff, 
+      at every preemption point, the priority of the scheduled job is 
+      higher than or equal to the priority of any backlogged job.
+      We define three separate notions of priority policy compliance 
+      based on the three types of scheduling policies : [JLDP]... *)
+  Definition respects_JLDP_policy_at_preemption_point (policy: JLDP_policy Job) :=
+    forall j j_hp t,
+      arrives_in arr_seq j ->
+      preemption_time sched t ->
+      backlogged sched j t ->
+      scheduled_at sched j_hp t ->
+      hep_job_at t j_hp j. 
+   (** ... [JLFP], and... *)
+  Definition respects_JLFP_policy_at_preemption_point (policy: JLFP_policy Job) :=
+    forall j j_hp t,
+      arrives_in arr_seq j ->
+      preemption_time sched t ->
+      backlogged sched j t ->
+      scheduled_at sched j_hp t ->
+      hep_job_at t j_hp j.
+  (** [FP].  *)
+  Definition respects_FP_policy_at_preemption_point (policy: FP_policy Task) :=
     forall j j_hp t,
       arrives_in arr_seq j ->
       preemption_time sched t ->

@@ -17,7 +17,7 @@ Section SequentialJLFP.
   
   (** Consider a JLFP-policy that indicates a higher-or-equal priority
       relation, and assume that this relation is transitive. *)             
-  Context `{JLFP_policy Job}.
+  Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_transitive : transitive_priorities.
   
   (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
@@ -40,7 +40,7 @@ Section SequentialJLFP.
   (** Next, we assume that the schedule respects the policy defined by
      the [job_preemptable] function (i.e., jobs have bounded
      non-preemptive segments)... *)
-  Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** ... and that jobs must arrive to execute. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.

@@ -57,7 +57,7 @@ Section Equivalence.
       predicate. *)
   Lemma EDF_schedule_implies_respects_policy_at_preemption_point :
     EDF_schedule sched ->
-    respects_policy_at_preemption_point arr_seq sched.
+    respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
   Proof.
     move=> EDF j' j t ARR PREEMPTION BL SCHED.
     have suff: exists t' : nat, t <= t' < job_deadline j' /\ scheduled_at sched j' t'.
@@ -73,7 +73,7 @@ Section Equivalence.
       the [respects_policy_at_preemption_point] predicate is also an EDF
       schedule in the sense of [EDF_schedule]. *)
   Lemma respects_policy_at_preemption_point_implies_EDF_schedule :
-    respects_policy_at_preemption_point arr_seq sched ->
+    respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job) ->
     EDF_schedule sched.
   Proof.
     move=> H_priority_driven t j_hp SCHED t' j LEQ SCHED' EARLIER_ARR.
@@ -94,7 +94,7 @@ Section Equivalence.
       definitions are indeed equivalent, which we note with the following
       corollary. *)
   Corollary EDF_schedule_equiv:
-    EDF_schedule sched <-> respects_policy_at_preemption_point arr_seq sched.
+    EDF_schedule sched <-> respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
   Proof.
     split.
     - by apply EDF_schedule_implies_respects_policy_at_preemption_point.

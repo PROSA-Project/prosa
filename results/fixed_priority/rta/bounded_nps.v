@@ -36,7 +36,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** Consider an FP policy that indicates a higher-or-equal priority
       relation, and assume that the relation is reflexive and
       transitive. *)
-  Context `{FP_policy Task}.
+  Context {FP : FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
   
@@ -69,7 +69,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   
   (** ... and the schedule respects the policy defined by the [job_preemptable]
      function (i.e., jobs have bounded non-preemptive segments). *)
-  Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
+  Hypothesis H_respects_policy : respects_FP_policy_at_preemption_point arr_seq sched FP.
 
   (** Assume we have sequential tasks, i.e, jobs from the 
       same task execute in the order of their arrival. *)

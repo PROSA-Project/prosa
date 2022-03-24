@@ -84,7 +84,7 @@ Section SequentialEDF.
   (** Next, we assume that the schedule respects the policy defined by
       the [job_preemptable] function (i.e., jobs have bounded
       non-preemptive segments). *)
-  Hypothesis H_respects_policy : respects_policy_at_preemption_point arr_seq sched.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
 
   (** To prove sequentiality, we use lemma
       [early_hep_job_is_scheduled]. Clearly, under the EDF priority

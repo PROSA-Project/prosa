@@ -89,7 +89,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   Hypothesis H_valid_run_to_completion_threshold : valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** We also assume that the schedule respects the policy defined by the preemption model. *)
-  Hypothesis H_respects_policy_at_preemption_point : respects_policy_at_preemption_point arr_seq sched. 
+  Hypothesis H_respects_policy_at_preemption_point : respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job). 
 
   (** We introduce [rbf] as an abbreviation of the task request bound function,
       which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a given task [T]. *)
