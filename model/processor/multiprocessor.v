@@ -58,12 +58,12 @@ Section Schedule.
 
   (** Finally, we connect the above definitions with the generic Prosa
       interface for processor models. *)
-  Global Program Instance multiproc_state : ProcessorState Job :=
-    {
+  #[local] Program Instance multiproc_state : ProcessorState Job :=
+    {|
       State := multiprocessor_state;
       scheduled_on := multiproc_scheduled_on;
       service_on := multiproc_service_on
-    }.
+    |}.
   Next Obligation.
     move: j s r H.
     move=> j mps cpu.
