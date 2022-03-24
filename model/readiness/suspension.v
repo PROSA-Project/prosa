@@ -43,10 +43,11 @@ Section ReadinessOfSelfSuspendingJobs.
   (** Based on [suspension_has_passed], we state the notion of readiness for
       self-suspending jobs: a job [t] is ready at time [t] in a schedule
       [sched] only if it is not self-suspended or complete at time [t]. *)
-  Global Program Instance suspension_ready_instance : JobReady Job PState :=
-    {
-      job_ready sched j t := suspension_has_passed sched j t && ~~ completed_by sched j t
-    }.
+  #[local,program] Instance suspension_ready_instance : JobReady Job PState :=
+  {
+    job_ready sched j t := suspension_has_passed sched j t
+                             && ~~ completed_by sched j t
+  }.
   Next Obligation.
     move: H2 => /andP [PASSED UNFINISHED].
     rewrite /pending. apply /andP. split => //.
