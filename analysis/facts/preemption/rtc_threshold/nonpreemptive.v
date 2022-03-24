@@ -1,6 +1,4 @@
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
-
-(** Furthermore, we assume the fully non-preemptive task model. *)
 Require Import prosa.model.preemption.fully_nonpreemptive.
 Require Import prosa.model.task.preemption.fully_nonpreemptive.
  
@@ -9,6 +7,10 @@ Require Import prosa.model.task.preemption.fully_nonpreemptive.
     to completion threshold] to the fully non-preemptive model
     indeed defines a valid run-to-completion threshold function. *)
 Section TaskRTCThresholdFullyNonPreemptive.
+
+  (** We assume the fully non-preemptive task model. *)
+  #[local] Existing Instance fully_nonpreemptive_model.
+  #[local] Existing Instance fully_nonpreemptive.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}. 

@@ -13,10 +13,8 @@ Section FullyNonPreemptiveModel.
   (** In the fully non-preemptive model, no job can be preempted until its
       completion. The maximal non-preemptive segment of a job [j] has length
       [job_cost j], which is bounded by [task_cost tsk].*)
-  Global Program Instance fully_nonpreemptive_model : TaskMaxNonpreemptiveSegment Task :=
-    {
-      task_max_nonpreemptive_segment (tsk : Task) := task_cost tsk
-    }.
+  Definition fully_nonpreemptive_model : TaskMaxNonpreemptiveSegment Task :=
+    fun tsk : Task => task_cost tsk.
 
 End FullyNonPreemptiveModel.
 
@@ -33,9 +31,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
       completion. In other words, once a job starts running, it is guaranteed
       to finish. Thus, we can set the task-level run-to-completion threshold
       to ε. *)
-  Global Program Instance fully_nonpreemptive : TaskRunToCompletionThreshold Task :=
-    {
-      task_rtct (tsk : Task) := ε
-    }.
+  Definition fully_nonpreemptive : TaskRunToCompletionThreshold Task :=
+    fun tsk : Task => ε.
 
 End TaskRTCThresholdFullyNonPreemptive.
