@@ -7,10 +7,6 @@ Require Export prosa.analysis.facts.readiness.sequential.
 (** * RTA for Model with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating non-preemptive regions FP model. *)
 
-(** Throughout this file, we assume the FP priority policy,
-    schedules, and the sequential readiness model. *)
-Require Import prosa.model.readiness.sequential.
-
 (** ** Setup and Assumptions *)
 
 Section RTAforFloatingModelwithArrivalCurves.

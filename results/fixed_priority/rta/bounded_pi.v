@@ -1,5 +1,5 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Import prosa.analysis.abstract.ideal_jlfp_rta.
+Require Export prosa.analysis.abstract.ideal_jlfp_rta.
 Require Export prosa.analysis.facts.busy_interval.busy_interval.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)

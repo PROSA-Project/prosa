@@ -4,12 +4,10 @@ Require Import prosa.model.readiness.basic.
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
 Require Export prosa.analysis.facts.readiness.sequential.
+Require Import prosa.model.priority.edf.
 
 (** * RTA for EDF with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating non-preemptive regions EDF model. *)
-
-(** Throughout this file, we assume the EDF priority policy. *)
-Require Import prosa.model.priority.edf.
 
 (** ** Setup and Assumptions *)
 

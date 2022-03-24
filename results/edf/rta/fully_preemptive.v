@@ -6,12 +6,10 @@ Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Import prosa.model.task.preemption.fully_preemptive.
+Require Import prosa.model.priority.edf.
 
 (** * RTA for Fully Preemptive EDF *)
 (** In this section we prove the RTA theorem for the fully preemptive EDF model *)
-
-(** Throughout this file, we assume the EDF priority policy. *)
-Require Import prosa.model.priority.edf.
 
 (** ** Setup and Assumptions *)
 

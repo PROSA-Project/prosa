@@ -1,20 +1,15 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-Require Import prosa.model.readiness.basic.
+Require Export prosa.model.readiness.basic.
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.facts.readiness.basic.
+Require Export prosa.model.task.preemption.limited_preemptive.
+Require Export prosa.model.priority.edf.
 
 (** * RTA for EDF with Fixed Preemption Points *)
 (** In this module we prove the RTA theorem for EDF-schedulers with
     fixed preemption points. *)
-
-(** Throughout this file, we assume the EDF priority policy. *)
-Require Import prosa.model.priority.edf.
-
-(** Furthermore, we assume the task model with fixed preemption points. *)
-Require Import prosa.model.preemption.limited_preemptive.
-Require Import prosa.model.task.preemption.limited_preemptive.
 
 (** ** Setup and Assumptions *)
 

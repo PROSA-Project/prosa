@@ -5,16 +5,11 @@ Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.nonpreemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.nonpreemptive.
 Require Export prosa.analysis.facts.readiness.basic.
-
+Require Export prosa.model.task.preemption.fully_nonpreemptive.
+Require Import prosa.model.priority.edf.
 
 (** * RTA for Fully Non-Preemptive EDF *)
 (** In this module we prove the RTA theorem for the fully non-preemptive EDF model. *)
-
-(** Throughout this file, we assume the EDF priority policy. *)
-Require Import prosa.model.priority.edf.
-
-(** Furthermore, we assume the fully non-preemptive task model. *)
-Require Import prosa.model.task.preemption.fully_nonpreemptive.
 
 (** ** Setup and Assumptions *)
 
