@@ -48,12 +48,12 @@ Section State.
 
   (** Finally, we connect the above definitions with the generic Prosa
       interface for abstract processor states. *)
-  Global Program Instance pstate_instance : ProcessorState Job :=
-    {
+  Program Definition pstate_instance : ProcessorState Job :=
+    {|
       State := processor_state;
       scheduled_on := spin_scheduled_on;
       service_on   := spin_service_on
-    }.
+    |}.
   Next Obligation.
     move: r H.
     case: s=>//= j' _.
