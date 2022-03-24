@@ -1,13 +1,9 @@
+Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.edf.
 Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.results.edf.rta.bounded_pi.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
-
-(** ... and the classic (i.e., Liu & Layland) model of readiness
-    without jitter or self-suspensions, wherein pending jobs are
-    always ready. *)
-Require Import prosa.model.readiness.basic.
 
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
@@ -23,6 +19,11 @@ Require Import prosa.model.readiness.basic.
     execution of non-preemptive segments is bounded. Thus the Abstract
     RTA for EDF-schedulers is applicable to this instantiation. *)
 Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

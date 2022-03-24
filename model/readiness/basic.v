@@ -17,9 +17,9 @@ Section LiuAndLaylandReadiness.
   Context `{JobArrival Job} `{JobCost Job}.
 
   (** In the basic Liu & Layland model, a job is ready iff it is pending. *)
-  Global Program Instance basic_ready_instance : JobReady Job PState :=
-    {
-      job_ready sched j t := pending sched j t
-    }.
+  #[local,program] Instance basic_ready_instance : JobReady Job PState :=
+  {
+    job_ready sched j t := pending sched j t
+  }.
 
 End LiuAndLaylandReadiness.

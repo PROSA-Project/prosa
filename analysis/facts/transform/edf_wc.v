@@ -1,3 +1,4 @@
+Require Import prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.transform.edf_opt.
 Require Export prosa.analysis.facts.transform.wc_correctness.
 Require Export prosa.analysis.facts.behavior.deadlines.
@@ -12,15 +13,17 @@ Require Export prosa.analysis.facts.readiness.backlogged.
     is also an (ideal) EDF schedule that is work-conserving in which all
     deadlines are met. *)
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import prosa.model.readiness.basic.
-
 (** ** Non-Idle Swaps *)
 
 (** We start by showing that [swapped], a function used in the inner-most level
     of [edf_transform], maintains work conservation if the two instants being
     swapped are not idle. *)
 Section NonIdleSwapWorkConservationLemmas.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
@@ -165,6 +168,11 @@ End NonIdleSwapWorkConservationLemmas.
     of [edf_transform], which is [find_swap_candidate]. *)
 Section FSCWorkConservationLemmas.
 
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
@@ -228,6 +236,11 @@ End FSCWorkConservationLemmas.
     next level of [edf_transform], which is [make_edf_at]. *)
 Section MakeEDFWorkConservationLemmas.
 
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
@@ -277,6 +290,11 @@ End MakeEDFWorkConservationLemmas.
 (** On to the next layer, we prove that the [transform_prefix] function at the
     core of the EDF transformation maintains work conservation *)
 Section EDFPrefixWorkConservationLemmas.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** For any given type of jobs, each characterized by execution
       costs, an arrival time, and an absolute deadline,... *)
@@ -334,6 +352,11 @@ End EDFPrefixWorkConservationLemmas.
     conservation, we go ahead and prove that [edf_transform] maintains work
     conservation, too. *)
 Section EDFTransformWorkConservationLemmas.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** For any given type of jobs, each characterized by execution
       costs, an arrival time, and an absolute deadline,... *)

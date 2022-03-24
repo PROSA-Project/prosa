@@ -2,16 +2,12 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 
 Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.analysis.definitions.schedulability.
+Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
-
-(** ... and the classic (i.e., Liu & Layland) model of readiness
-    without jitter or self-suspensions, wherein pending jobs are
-    always ready. *)
-Require Import prosa.model.readiness.basic.
 
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)
@@ -32,6 +28,11 @@ Require Import prosa.model.readiness.basic.
     bounded. *)
 
 Section AbstractRTAforEDFwithArrivalCurves.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.

@@ -1,4 +1,5 @@
 From mathcomp Require Import ssrnat ssrbool fintype.
+Require Import prosa.model.readiness.basic.
 Require Export prosa.model.schedule.edf.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.transform.edf_trans.
@@ -11,12 +12,14 @@ Require Export prosa.analysis.facts.readiness.basic.
     EDF schedule, and ending with proofs of individual properties of
     the obtained EDF schedule. *)
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import prosa.model.readiness.basic.
-
 (** We start by analyzing the helper function [find_swap_candidate],
     which is a problem-specific wrapper around [search_arg]. *)
 Section FindSwapCandidateFacts.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
@@ -851,6 +854,12 @@ End EDFTransformFacts.
 
 (** Finally, we state the theorems that jointly make up the EDF optimality claim. *)
 Section Optimality.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 

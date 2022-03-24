@@ -1,3 +1,4 @@
+Require Import prosa.model.readiness.basic.
 Require Export prosa.model.task.sequentiality.
 Require Export prosa.model.schedule.nonpreemptive.
 Require Export prosa.model.priority.fifo.
@@ -5,11 +6,12 @@ Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import prosa.model.readiness.basic.
-
 (** In this section, we prove some fundamental properties of the FIFO policy. *)
 Section BasicLemmas.
+
+  (** We assume the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** Consider any type of jobs with arrival times and execution costs. *)
   Context `{Job : JobType} {Arrival : JobArrival Job} {Cost : JobCost Job}.
@@ -144,4 +146,3 @@ Section BasicLemmas.
   Qed.
 
 End BasicLemmas.
-

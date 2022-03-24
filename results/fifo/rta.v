@@ -1,14 +1,10 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
-Require Import prosa.analysis.facts.priority.fifo. 
+Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.fifo.
+Require Import prosa.analysis.facts.priority.fifo.
 Require Import prosa.analysis.abstract.ideal_jlfp_rta.
 Require Export prosa.analysis.facts.busy_interval.carry_in.
-
-(** ... and the classic (i.e., Liu & Layland) model of readiness
-    without jitter or self-suspensions, wherein pending jobs are
-    always ready. *)
-Require Import prosa.model.readiness.basic.
 
 (** * Abstract RTA for FIFO-schedulers *)
 (** In this module we instantiate the Abstract Response-Time analysis
@@ -22,6 +18,11 @@ Require Import prosa.model.readiness.basic.
     interval, etc. *)
 
 Section AbstractRTAforFIFOwithArrivalCurves.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** Consider any type of tasks, each characterized by a WCET, a relative
       deadline, and a run-to-completion threshold, ... *)

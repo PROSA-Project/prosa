@@ -1,5 +1,6 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
+Require Import prosa.model.readiness.basic.
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.nonpreemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.nonpreemptive.
@@ -9,10 +10,8 @@ Require Export prosa.analysis.facts.readiness.basic.
 (** * RTA for Fully Non-Preemptive EDF *)
 (** In this module we prove the RTA theorem for the fully non-preemptive EDF model. *)
 
-(** Throughout this file, we assume the EDF priority policy, ideal uni-processor 
-    schedules, and the basic readiness model. *)
+(** Throughout this file, we assume the EDF priority policy. *)
 Require Import prosa.model.priority.edf.
-Require Import prosa.model.readiness.basic.
 
 (** Furthermore, we assume the fully non-preemptive task model. *)
 Require Import prosa.model.task.preemption.fully_nonpreemptive.
@@ -21,6 +20,11 @@ Require Import prosa.model.task.preemption.fully_nonpreemptive.
 
 Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.

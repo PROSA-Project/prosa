@@ -1,6 +1,7 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Require Export prosa.model.schedule.work_conserving.
+Require Import prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.model.ideal_schedule.
 Require Export prosa.analysis.transform.wc_trans.
 Require Export prosa.analysis.facts.transform.swaps.
@@ -14,16 +15,16 @@ Require Export prosa.util.list.
     and ending with the proofs of individual properties of the obtained
     work-conserving schedule. *)
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland)
-    readiness model under which any pending job is ready. *)
-Require Import prosa.model.readiness.basic.
-
 (** In order to discuss the correctness of the work-conservation transformation at a high level,
     we first need a set of lemmas about the inner parts of the procedure. *)
 Section AuxiliaryLemmasWorkConservingTransformation.
 
   (** We assume ideal uni-processor schedules. *)
   #[local] Existing Instance ideal.processor_state.
+
+  (** We assume the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** Consider any type of jobs with arrival times, costs, and deadlines... *)
   Context {Job : JobType}.
@@ -572,6 +573,10 @@ End AuxiliaryLemmasWorkConservingTransformation.
     work-conservation transformation. *)
 Section WorkConservingTransformation.
   
+  (** We assume the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** Consider any type of jobs with arrival times, costs, and deadlines... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.

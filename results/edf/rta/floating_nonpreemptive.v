@@ -1,5 +1,6 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
+Require Import prosa.model.readiness.basic.
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
 Require Export prosa.analysis.facts.readiness.sequential.
@@ -7,10 +8,8 @@ Require Export prosa.analysis.facts.readiness.sequential.
 (** * RTA for EDF with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating non-preemptive regions EDF model. *)
 
-(** Throughout this file, we assume the EDF priority policy, ideal uni-processor 
-    schedules, and the basic readiness. *)
+(** Throughout this file, we assume the EDF priority policy. *)
 Require Import prosa.model.priority.edf.
-Require Import prosa.model.readiness.basic.
 
 (** Furthermore, we assume the task model with floating non-preemptive regions. *)
 Require Import prosa.model.preemption.limited_preemptive.
@@ -20,6 +19,11 @@ Require Import prosa.model.task.preemption.floating_nonpreemptive.
 
 Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.

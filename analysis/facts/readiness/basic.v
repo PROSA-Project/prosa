@@ -1,12 +1,14 @@
+Require Import prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.definitions.readiness.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 
-(** Throughout this file, we assume the basic (i.e., Liu & Layland) readiness model. *)
-Require Import prosa.model.readiness.basic.
-
 Section LiuAndLaylandReadiness.
   
+  (** We assume the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** Consider any kind of jobs ... *)
   Context {Job : JobType}.
 

@@ -4,6 +4,7 @@ Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.model.priority.edf.
 Require Export prosa.model.schedule.edf.
 Require Export prosa.model.schedule.priority_driven.
+Require Import prosa.model.readiness.basic.
 
 (** * Equivalence of EDF Definitions *)
 
@@ -23,12 +24,15 @@ Require Export prosa.model.schedule.priority_driven.
 
     (2) the classic Liu & Layland model of readiness without jitter and
     without self-suspensions, where pending jobs are always ready, and ... *)
-Require Import prosa.model.readiness.basic.
 
 (** ... (3) that jobs are fully preemptive. *)
 Require Import prosa.model.preemption.fully_preemptive.
 
 Section Equivalence.
+
+  (** We assume the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** For any given type of jobs, each characterized by an arrival time,
       an execution cost, and an absolute deadline, ... *)
