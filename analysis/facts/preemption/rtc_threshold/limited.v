@@ -1,19 +1,12 @@
 Require Export prosa.analysis.facts.preemption.task.limited.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
-Require Import prosa.model.task.preemption.limited_preemptive.
-
-(** Furthermore, we assume the task model with fixed preemption points. *)
-Require Import prosa.model.preemption.limited_preemptive.
+Require Export prosa.model.task.preemption.limited_preemptive.
 
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run
     to completion threshold] to the model with limited preemptions
     indeed defines a valid run-to-completion threshold function. *)
 Section TaskRTCThresholdLimitedPreemptions.
-
-  (** We assume the task model with fixed preemption points. *)
-  #[local] Existing Instance limited_preemptive_job_model.
-  #[local] Existing Instance limited_preemptions_rtc_threshold.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -26,6 +19,10 @@ Section TaskRTCThresholdLimitedPreemptions.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobPreemptionPoints Job}.
+
+  (** We assume a task model with fixed preemption points. *)
+  #[local] Existing Instance limited_preemptive_job_model.
+  #[local] Existing Instance limited_preemptions_rtc_threshold.
   
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.

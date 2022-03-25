@@ -7,9 +7,6 @@ Require Export prosa.model.task.preemption.floating_nonpreemptive.
     threshold] for the model with floating non-preemptive regions. *)
 Section TaskRTCThresholdFloatingNonPreemptiveRegions.
 
-  (** Furthermore, we assume the task model with floating non-preemptive regions. *)
-  #[local] Existing Instance floating_preemptive_rtc_threshold.
-
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -19,7 +16,10 @@ Section TaskRTCThresholdFloatingNonPreemptiveRegions.
   Context `{JobTask Job Task}.
   Context `{JobCost Job}.
   Context `{JobPreemptable Job}.
-  
+
+  (** We assume a task model with floating non-preemptive regions. *)
+  #[local] Existing Instance floating_preemptive_rtc_threshold.
+
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 

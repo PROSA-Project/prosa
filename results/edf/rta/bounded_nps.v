@@ -20,11 +20,6 @@ Require Export prosa.analysis.facts.busy_interval.priority_inversion.
     RTA for EDF-schedulers is applicable to this instantiation. *)
 Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -37,6 +32,11 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Context `{JobTask Job Task}.
   Context `{Arrival : JobArrival Job}.
   Context `{Cost : JobCost Job}.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** For clarity, let's denote the relative deadline of a task as [D]. *)
   Let D tsk := task_deadline tsk.

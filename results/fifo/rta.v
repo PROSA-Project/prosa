@@ -19,11 +19,6 @@ Require Export prosa.analysis.facts.busy_interval.carry_in.
 
 Section AbstractRTAforFIFOwithArrivalCurves.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any type of tasks, each characterized by a WCET, a relative
       deadline, and a run-to-completion threshold, ... *)
   Context {Task : TaskType}.
@@ -38,6 +33,11 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   Context {Arrival : JobArrival Job}.
   Context {Cost : JobCost Job}.
   Context `{JobPreemptable Job}.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.

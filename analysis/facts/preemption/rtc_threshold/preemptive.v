@@ -1,18 +1,12 @@
-(** Furthermore, we assume the fully preemptive task model. *)
-Require Import prosa.model.preemption.fully_preemptive.
-Require Import prosa.model.task.preemption.fully_preemptive.
-Require Import prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
+Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
+Require Export prosa.model.preemption.fully_preemptive.
+Require Export prosa.model.task.preemption.fully_preemptive.
 
 (** * Task's Run to Completion Threshold *)
-(** In this section, we prove that instantiation of function [task run
-    to completion threshold] to the fully preemptive model
-    indeed defines a valid run-to-completion threshold function. *)
-Section TaskRTCThresholdFullyPreemptiveModel.
 
-  (** We assume that jobs and tasks are fully preemptive. *)
-  #[local] Existing Instance fully_preemptive_job_model.
-  #[local] Existing Instance fully_preemptive_task_model.
-  #[local] Existing Instance fully_preemptive_rtc_threshold.
+(** In this section, we prove that the instantiation of the task
+    run-to-completion threshold for the fully preemptive model is valid. *)
+Section TaskRTCThresholdFullyPreemptiveModel.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -22,7 +16,12 @@ Section TaskRTCThresholdFullyPreemptiveModel.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobCost Job}.
-  
+
+  (** Assume that jobs and tasks are fully preemptive. *)
+  #[local] Existing Instance fully_preemptive_job_model.
+  #[local] Existing Instance fully_preemptive_task_model.
+  #[local] Existing Instance fully_preemptive_rtc_threshold.  
+
   (** Next, consider any arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
 

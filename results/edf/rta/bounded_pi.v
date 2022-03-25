@@ -29,11 +29,6 @@ Require Import prosa.analysis.facts.readiness.basic.
 
 Section AbstractRTAforEDFwithArrivalCurves.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -47,6 +42,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Context {Cost : JobCost Job}.
   Context `{JobPreemptable Job}. 
   
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
+
   (** For clarity, let's denote the relative deadline of a task as D. *)
   Let D tsk := task_deadline tsk.
   

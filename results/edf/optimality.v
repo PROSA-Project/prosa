@@ -3,6 +3,7 @@ Require Import prosa.model.preemption.fully_preemptive.
 Require Export prosa.analysis.facts.transform.edf_opt.
 Require Export prosa.analysis.facts.transform.edf_wc.
 Require Export prosa.analysis.facts.edf_definitions.
+Require prosa.model.priority.edf.
 
 (** * Optimality of EDF on Ideal Uniprocessors *)
 
@@ -11,12 +12,17 @@ Require Export prosa.analysis.facts.edf_definitions.
     schedule), then there is also an (ideal) EDF schedule in which all
     deadlines are met. *)
 
-(** The following results assume the EDF priority policy, ... *)
-Require prosa.model.priority.edf.
-
 (** ** Optimality Theorem *)
 
 Section Optimality.
+
+  (** Consider any given type of jobs, each characterized by execution
+      costs, an arrival time, and an absolute deadline,... *)
+  Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+
+  (** ... and any valid arrival sequence of such jobs. *)
+  Variable arr_seq: arrival_sequence Job.
+  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
 
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
@@ -26,18 +32,9 @@ Section Optimality.
   (** We assume that jobs are fully preemptive. *)
   #[local] Existing Instance fully_preemptive_job_model.
 
-  (** For any given type of jobs, each characterized by execution
-      costs, an arrival time, and an absolute deadline,... *)
-  Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
-
-  (** ... and any valid job arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
-
-  (** We observe that EDF is optimal in the sense that, if there exists
-     any schedule in which all jobs of [arr_seq] meet their deadline,
-     then there also exists an EDF schedule in which all deadlines are
-     met. *)
+  (** Under these assumptions, EDF is optimal in the sense that, if there
+      exists any schedule in which all jobs of [arr_seq] meet their deadline,
+      then there also exists an EDF schedule in which all deadlines are met. *)
   Theorem EDF_optimality:
     (exists any_sched : schedule (ideal.processor_state Job),
         valid_schedule any_sched arr_seq /\

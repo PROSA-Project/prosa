@@ -1,11 +1,11 @@
 Require Export prosa.analysis.facts.preemption.job.limited.
-Require Import prosa.model.task.preemption.floating_nonpreemptive.
-Require Import prosa.model.preemption.limited_preemptive.
-
+Require Export prosa.model.task.preemption.floating_nonpreemptive.
+Require Export prosa.model.preemption.limited_preemptive.
 
 (** * Platform for Floating Non-Preemptive Regions Model *)
+
 (** In this section, we prove that instantiation of functions
-    [job_preemptable and task_max_nonpreemptive_segment] to the model
+    [job_preemptable] and [task_max_nonpreemptive_segment] for the model
     with floating non-preemptive regions indeed defines a valid
     preemption model with bounded non-preemptive regions. *)
 Section FloatingNonPreemptiveRegionsModel.

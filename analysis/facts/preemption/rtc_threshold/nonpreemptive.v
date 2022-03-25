@@ -1,6 +1,5 @@
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
-Require Import prosa.model.preemption.fully_nonpreemptive.
-Require Import prosa.model.task.preemption.fully_nonpreemptive.
+Require Export prosa.model.task.preemption.fully_nonpreemptive.
  
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run
@@ -8,11 +7,6 @@ Require Import prosa.model.task.preemption.fully_nonpreemptive.
     indeed defines a valid run-to-completion threshold function. *)
 Section TaskRTCThresholdFullyNonPreemptive.
 
-  (** We assume the fully non-preemptive task model. *)
-  #[local] Existing Instance fully_nonpreemptive_job_model.
-  #[local] Existing Instance fully_nonpreemptive_task_model.
-  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
-  
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}. 
   Context `{TaskCost Task}.
@@ -22,6 +16,11 @@ Section TaskRTCThresholdFullyNonPreemptive.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
+
+  (** We assume a fully non-preemptive task model. *)
+  #[local] Existing Instance fully_nonpreemptive_job_model.
+  #[local] Existing Instance fully_nonpreemptive_task_model.
+  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
   
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.

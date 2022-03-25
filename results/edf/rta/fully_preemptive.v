@@ -15,11 +15,6 @@ Require Import prosa.model.priority.edf.
 
 Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** We assume that jobs and tasks are fully preemptive. *)
   #[local] Existing Instance fully_preemptive_job_model.
   #[local] Existing Instance fully_preemptive_task_model.
@@ -35,6 +30,11 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.

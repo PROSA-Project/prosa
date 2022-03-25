@@ -1,18 +1,13 @@
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
-Require Import prosa.model.preemption.fully_nonpreemptive.
-Require Import prosa.model.task.preemption.fully_nonpreemptive.
+Require Export prosa.model.task.preemption.fully_nonpreemptive.
 
 (** * Platform for Fully Non-Preemptive Model *)
+
 (** In this section, we prove that instantiation of functions
-    [job_preemptable and task_max_nonpreemptive_segment] to the fully
+    [job_preemptable] and [task_max_nonpreemptive_segment] to the fully
     non-preemptive model indeed defines a valid preemption model with
     bounded non-preemptive regions. *)
 Section FullyNonPreemptiveModel.
-
-  (** We assume the fully non-preemptive task model. *)
-  #[local] Existing Instance fully_nonpreemptive_job_model.  
-  #[local] Existing Instance fully_nonpreemptive_task_model.
-  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -23,6 +18,11 @@ Section FullyNonPreemptiveModel.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
+
+  (** Assume a fully non-preemptive task model. *)
+  #[local] Existing Instance fully_nonpreemptive_job_model.  
+  #[local] Existing Instance fully_nonpreemptive_task_model.
+  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
 
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
@@ -40,7 +40,7 @@ Section FullyNonPreemptiveModel.
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
 
-  (** Then we prove that [fully_nonpreemptive_model] function
+  (** Then we prove that the [fully_nonpreemptive_model] function
       defines a model with bounded non-preemptive regions.*) 
   Lemma fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions: 
     model_with_bounded_nonpreemptive_segments arr_seq.

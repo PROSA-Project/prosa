@@ -15,11 +15,6 @@ Require Export prosa.model.priority.edf.
 
 Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -30,6 +25,11 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  #[local] Existing Instance basic_ready_instance.
 
   (** We assume that jobs are limited-preemptive. *)
   #[local] Existing Instance limited_preemptive_job_model.

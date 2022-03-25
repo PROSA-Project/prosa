@@ -1,18 +1,13 @@
-Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.preemption.job.preemptive.
-Require Import prosa.model.task.preemption.fully_preemptive.
+Require Export prosa.model.task.preemption.fully_preemptive.
 
 (** * Platform for Fully Preemptive Model *)
-(** In this section, we prove that instantiation of functions
-    [job_preemptable and task_max_nonpreemptive_segment] to the fully
+
+(** In this section, we prove that the instantiations of the functions
+    [job_preemptable] and [task_max_nonpreemptive_segment] for the fully
     preemptive model indeed defines a valid preemption model with
     bounded non-preemptive regions. *)
 Section FullyPreemptiveModel.
-
-  (** We assume that jobs and tasks are fully preemptive. *)
-  #[local] Existing Instance fully_preemptive_job_model.
-  #[local] Existing Instance fully_preemptive_task_model.
-  #[local] Existing Instance fully_preemptive_rtc_threshold.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -24,6 +19,11 @@ Section FullyPreemptiveModel.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
+  (** Assume that jobs and tasks are fully preemptive. *)
+  #[local] Existing Instance fully_preemptive_job_model.
+  #[local] Existing Instance fully_preemptive_task_model.
+  #[local] Existing Instance fully_preemptive_rtc_threshold.
+
   (** Consider any kind of processor state model, ... *)
   Context {PState : ProcessorState Job}.
 
@@ -33,7 +33,7 @@ Section FullyPreemptiveModel.
   (** ... and any given schedule. *)
   Variable sched : schedule PState.
 
-  (** We prove that [fully_preemptive_model] function
+  (** We prove that the [fully_preemptive_model] function
       defines a model with bounded non-preemptive regions.*)
   Lemma fully_preemptive_model_is_model_with_bounded_nonpreemptive_regions:
     model_with_bounded_nonpreemptive_segments arr_seq.
