@@ -56,14 +56,14 @@ Section ValidModelWithFixedPreemptionPoints.
   Definition consistent_job_segment_count :=
     forall j,
       arrives_in arr_seq j ->
-      size (job_preemption_points j) = size (task_preemption_points (job_task j)).
+      size (job_preemptive_points j) = size (task_preemption_points (job_task j)).
 
   (** (5) We require the lengths of the nonpreemptive segments of a job to be
           bounded by the lengths of the corresponding segments of its task.  *)
   Definition job_respects_segment_lengths :=
     forall j n,
       arrives_in arr_seq j ->
-      nth 0 (distances (job_preemption_points j)) n
+      nth 0 (distances (job_preemptive_points j)) n
       <= nth 0 (distances (task_preemption_points (job_task j))) n.
 
   (** (6) Lastly, we ban empty nonpreemptive segments at the task level. *)

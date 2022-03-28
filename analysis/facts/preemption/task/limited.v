@@ -58,20 +58,20 @@ Section LimitedPreemptionsModel.
     case: (posnP (job_cost j)) => [ZERO|POS].
     - split.
       rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
-              /lengths_of_segments /parameter.job_preemption_points; rewrite ZERO; simpl.
+              /lengths_of_segments /job_preemption_points; rewrite ZERO; simpl.
       rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
       + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.
           by eapply zero_in_preemption_points; eauto 2.
-    - split; last (move => progr /andP [_ LE]; destruct (progr \in job_preemption_points j) eqn:NotIN).
+    - split; last (move => progr /andP [_ LE]; destruct (progr \in job_preemptive_points j) eqn:NotIN).
       + rewrite /job_respects_max_nonpreemptive_segment
                 /job_max_nonpreemptive_segment /lengths_of_segments; erewrite job_parameters_max_np_to_job_limited; eauto.
           by apply max_of_dominating_seq; intros; apply A5.
       + exists progr; split; first apply/andP; first split; rewrite ?leq_addr; by done. 
       + move: NotIN => /eqP; rewrite eqbF_neg; move => NotIN. 
         edestruct (work_belongs_to_some_nonpreemptive_segment arr_seq) as [x [SIZE2 N]]; eauto 2. move: N => /andP [N1 N2].
-        set ptl := nth 0 (job_preemption_points j) x.
-        set ptr := nth 0 (job_preemption_points j) x.+1.
+        set ptl := nth 0 (job_preemptive_points j) x.
+        set ptr := nth 0 (job_preemptive_points j) x.+1.
         exists ptr; split; first last.
         * by unfold job_preemptable, limited_preemptive_job_model; apply mem_nth.
         * apply/andP; split; first by apply ltnW.

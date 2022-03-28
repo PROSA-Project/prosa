@@ -126,9 +126,9 @@ Section TaskRTCThresholdLimitedPreemptions.
     rewrite subnBA // subnBA // -addnBAC // -addnBAC // !addn1 ltnS.
     erewrite job_parameters_last_np_to_job_limited; eauto 2.
     rewrite distances_positive_undup //; last by apply SORT__job. 
-    have -> : job_cost j = last0 (undup (job_preemption_points j)) by rewrite last0_undup; [rewrite -COST__job | apply SORT__job].
+    have -> : job_cost j = last0 (undup (job_preemptive_points j)) by rewrite last0_undup; [rewrite -COST__job | apply SORT__job].
     rewrite last_seq_minus_last_distance_seq; last by apply nondecreasing_sequence_undup, SORT__job. 
-    apply leq_trans with( nth 0 (job_preemption_points j) ((size (job_preemption_points j)).-2)); first by apply undup_nth_le; eauto 2.
+    apply leq_trans with( nth 0 (job_preemptive_points j) ((size (job_preemptive_points j)).-2)); first by apply undup_nth_le; eauto 2.
     have -> : task_cost tsk = last0 (task_preemption_points tsk) by rewrite COST__task. 
     rewrite last_seq_minus_last_distance_seq; last by apply SORT__task.
     move: TSK__j => /eqP TSK__j; rewrite -TSK__j.
