@@ -31,9 +31,7 @@ Section UniprocessorScheduler.
   (** ** Preemption-Aware Scheduler *)
 
   (** First, we define the notion of a generic uniprocessor scheduler that is
-      cognizant of non-preemptive sections, ... *)
-
-  (** ... so consider any preemption model. *)
+      cognizant of non-preemptive sections, so consider any preemption model. *)
   Context `{JobPreemptable Job}.
 
   Section NonPreemptiveSectionAware.
@@ -61,7 +59,8 @@ Section UniprocessorScheduler.
         match t with
         | 0 => false
         | S t' => if sched_prefix t' is Some j then
-                    ~~job_preemptable j (service sched_prefix j t)
+                   job_ready sched_prefix j t &&
+                   ~~job_preemptable j (service sched_prefix j t)
                   else
                     false
         end.
@@ -76,8 +75,8 @@ Section UniprocessorScheduler.
           choose_job t (jobs_backlogged_at arr_seq sched_prefix t).
     End JobAllocation.
 
-    (* A preemption-policy-aware ideal uniprocessor schedule is then produced
-       when using [allocation_at] as the policy for the generic scheduler. *)
+    (** A preemption-policy-aware ideal uniprocessor schedule is then produced
+        when using [allocation_at] as the policy for the generic scheduler. *)
     Definition np_uni_schedule : schedule PState := generic_schedule allocation_at idle_state.
 
   End NonPreemptiveSectionAware.

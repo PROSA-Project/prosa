@@ -41,8 +41,8 @@ Section ReadinessModelProperties.
       ready. Consequently, in a valid preemption-policy-compliant schedule, a
       nonpreemptive job must remain ready until at least the end of its
       nonpreemptive section. *)
-  Definition valid_nonpreemptive_readiness :=
-     forall sched j t,
+  Definition valid_nonpreemptive_readiness sched :=
+     forall j t,
         ~~ job_preemptable j (service sched j t) -> job_ready sched j t.
   
 End ReadinessModelProperties.
