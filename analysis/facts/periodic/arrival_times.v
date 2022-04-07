@@ -1,6 +1,6 @@
+Require Export prosa.model.task.arrival.periodic_as_sporadic.
 Require Export prosa.analysis.facts.periodic.max_inter_arrival.
 Require Export prosa.analysis.facts.model.offset.
-Require Export prosa.analysis.facts.periodic.sporadic.
 
 (** In this module, we'll prove the known arrival
     times of jobs that stem from periodic tasks. *)

@@ -1,4 +1,4 @@
-Require Export prosa.analysis.facts.periodic.sporadic.
+Require Export prosa.model.task.arrival.periodic_as_sporadic.
 Require Export prosa.analysis.facts.sporadic.arrival_times.
 
 (** In this section we show that the separation between job 
