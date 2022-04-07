@@ -27,6 +27,13 @@ Section SporadicArrivalCurve.
     exact: div_ceil_monotone1.
   Qed.
 
+  (** For convenience, we lift the preceding observation to the level
+      of entire task sets. *)
+  Remark sporadic_task_sets_arrival_curve_valid :
+    forall ts,
+      valid_taskset_arrival_curve ts max_arrivals.
+  Proof. move=> ? ? ?; exact: sporadic_arrival_curve_valid. Qed.
+
    (** Next, we note that it is indeed an arrival bound. To this end,
        consider any type of jobs stemming from these tasks ... *)
   Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
@@ -36,16 +43,43 @@ Section SporadicArrivalCurve.
   Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
   Hypothesis H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
 
-  (** Let [tsk] denote any valid sporadic task to be analyzed. *)
-  Variable tsk : Task.
-  Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
-  Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
+  (** We establish the validity of the defined curve. *)
+  Section Validity.
 
-  (** We observe that [max_sporadic_arrivals] is indeed an upper bound
-      on the maximum number of arrivals. *)
-  Lemma sporadic_arrival_curve_respects_max_arrivals :
-    respects_max_arrivals arr_seq tsk (max_sporadic_arrivals tsk).
-  Proof. move=> t1 t2 LEQ. exact: sporadic_task_arrivals_bound. Qed.
+    (** Let [tsk] denote any valid sporadic task to be analyzed. *)
+    Variable tsk : Task.
+    Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
+    Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
+
+    (** We observe that [max_sporadic_arrivals] is indeed an upper bound
+        on the maximum number of arrivals. *)
+    Lemma sporadic_arrival_curve_respects_max_arrivals :
+      respects_max_arrivals arr_seq tsk (max_sporadic_arrivals tsk).
+    Proof. move=> t1 t2 LEQ. exact: sporadic_task_arrivals_bound. Qed.
+
+  End Validity.
+
+  (** For convenience, we lift the preceding observation to the level
+      of entire task sets. *)
+  Remark sporadic_task_sets_respects_max_arrivals :
+    forall ts,
+      valid_taskset_inter_arrival_times ts ->
+      taskset_respects_sporadic_task_model ts arr_seq ->
+      taskset_respects_max_arrivals arr_seq ts.
+  Proof.
+    move=> ts VAL SPO tsk IN.
+    apply: sporadic_arrival_curve_respects_max_arrivals.
+    - by apply: SPO.
+    - by apply: VAL.
+  Qed.
 
 End SporadicArrivalCurve.
 
+(** We add the lemmas into the "Hint Database" basic_rt_facts so that
+    they become available for proof automation. *)
+Global Hint Resolve
+  sporadic_arrival_curve_valid
+  sporadic_task_sets_arrival_curve_valid
+  sporadic_arrival_curve_respects_max_arrivals
+  sporadic_task_sets_respects_max_arrivals
+  : basic_rt_facts.

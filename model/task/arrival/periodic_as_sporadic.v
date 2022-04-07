@@ -67,13 +67,13 @@ Section PeriodicTasksAsSporadicTasks.
 
   (** First, we show that all tasks in a task set with valid periods
       also have valid min inter-arrival times. *)
-  Remark valid_periods_are_valid_inter_arrival_times:
+  Remark valid_periods_are_valid_inter_arrival_times :
     forall ts, valid_periods ts -> valid_taskset_inter_arrival_times ts.
   Proof. trivial. Qed.
 
   (** Second, we show that each task in a periodic task set respects
       the sporadic task model. *)
-  Remark periodic_task_sets_respect_sporadic_task_model:
+  Remark periodic_task_sets_respect_sporadic_task_model :
     forall ts,
       valid_periods ts ->
       taskset_respects_periodic_task_model arr_seq ts ->
@@ -87,6 +87,11 @@ Section PeriodicTasksAsSporadicTasks.
   
 End PeriodicTasksAsSporadicTasks.
 
-(** We add the [periodic_task_respects_sporadic_task_model] lemma into a "Hint Database" basic_rt_facts,
-    so Coq will be able to apply it automatically. *)
-Global Hint Extern 1 => apply periodic_task_respects_sporadic_task_model : basic_rt_facts.
+(** We add the lemmas into the "Hint Database" basic_rt_facts so that
+    they become available for proof automation. *)
+Global Hint Resolve
+  periodic_task_respects_sporadic_task_model
+  valid_period_is_valid_inter_arrival_time
+  valid_periods_are_valid_inter_arrival_times
+  periodic_task_sets_respect_sporadic_task_model
+  : basic_rt_facts.
