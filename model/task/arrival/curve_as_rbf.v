@@ -172,3 +172,12 @@ Section ArrivalCurveToRBF.
   End Facts.
   
 End ArrivalCurveToRBF.
+
+(** We add the lemmas into the "Hint Database" basic_rt_facts so that
+    they become available for proof automation. *)
+Global Hint Resolve
+  valid_arrival_curve_to_max_rbf
+  respects_arrival_curve_to_max_rbf
+  valid_taskset_arrival_curve_to_max_rbf
+  taskset_respects_arrival_curve_to_max_rbf
+  : basic_rt_facts.
