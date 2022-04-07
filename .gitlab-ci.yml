@@ -41,7 +41,7 @@ stages:
   extends:
     - .preferred-stable-version
   script:
-    - opam update; opam install coq-mathcomp-zify
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
     - ./create_makefile.sh --without-classic
     - make -j ${NJOBS}
 
@@ -50,7 +50,7 @@ stages:
   extends:
     - .preferred-stable-version
   script:
-    - opam update; opam install coq-mathcomp-zify
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
     - ./create_makefile.sh --only-classic
     - make -j ${NJOBS}
 
@@ -87,7 +87,7 @@ stages:
     - .preferred-stable-version
   stage: process
   script:
-    - opam update; opam install coq-mathcomp-zify
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
     - make html -j ${NJOBS}
     - mv html with-proofs
     - make gallinahtml -j ${NJOBS}
@@ -158,7 +158,7 @@ validate:
   dependencies:
     - compile
   script:
-    - opam update; opam install coq-mathcomp-zify
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
     - make -j ${NJOBS} # CI gotcha — get any spurious recompilation out of the way
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh validation-results.txt
@@ -172,7 +172,7 @@ validate-classic:
   dependencies:
     - compile-classic
   script:
-    - opam update; opam install coq-mathcomp-zify
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
     - make validate
 
 doc:
@@ -211,7 +211,7 @@ proof-state:
   image: bbbrandenburg/alectryon-ci:1.14.0-coq-8.15.0
   script:
     - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
-    - opam update; opam install coq-mathcomp-zify
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
     - ./create_makefile.sh --without-classic
     - make -j ${NJOBS} alectryon
   artifacts:
