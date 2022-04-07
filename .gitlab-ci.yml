@@ -98,21 +98,6 @@ stages:
 
 ###################### The Jobs ######################
 
-1.12.0-coq-8.13:
-  extends:
-    - .build
-    - .not_in_wip_branches
-
-1.12.0-coq-8.14:
-  extends:
-    - .build
-    - .not_in_wip_branches
-
-1.13.0-coq-8.13:
-  extends:
-    - .build
-    - .not_in_wip_branches
-
 1.13.0-coq-8.14:
   extends:
     - .build
@@ -148,8 +133,8 @@ spell-check:
   script:
     - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
 
-# mathcomp-dev with stable Coq 8.13
-coq-8.13:
+# mathcomp-dev with stable Coq
+coq-8.15:
   extends:
     - .build-dev
     - .not_in_wip_branches    
