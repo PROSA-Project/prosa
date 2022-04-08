@@ -36,8 +36,8 @@ Section SumsOverSequences.
     (** We start showing that having every member of [r] equal to zero is equivalent to
         having the sum of all the elements of [r] equal to zero, and vice-versa. *)
     (* TODO: PR MathComp
-       this should probably be named sum_nat_eq0,
-       but there is already a sum_nat_eq0 that is less generic? *)
+       this should probably be named [sum_nat_eq0],
+       but there is already a [sum_nat_eq0] that is less generic? *)
     Lemma sum_nat_eq0_nat :
       (\sum_(i <- r | P i) F i == 0) = all (fun x => F x == 0) [seq x <- r | P x].
     Proof.
@@ -91,7 +91,7 @@ Section SumsOverSequences.
         guarantee that the set inclusion [r <= rs] implies the actually
         required multiset inclusion. *)
     (* TODO: PR MathComp
-       - add a condition P i *)
+       - add a condition [P i] *)
     Lemma leq_sum_sub_uniq (rs : seq I) :
       uniq r -> {subset r <= rs} ->
       \sum_(i <- r) F i <= \sum_(i <- rs) F i.
@@ -133,7 +133,7 @@ Section SumsOverSequences.
     (** In the same way, if [E1] equals [E2] in all the points considered above, then also the two
         sums will be identical. *)
     (* TODO: PR MathComp
-       - generalize as eq_big_seq_cond (nothing specific to addn here)
+       - generalize as [eq_big_seq_cond] (nothing specific to [addn] here)
        - replace == with = ? *)
     Lemma eq_sum_seq:
       (forall i, i \in r -> P i -> E1 i == E2 i) ->
@@ -148,7 +148,7 @@ Section SumsOverSequences.
         points, then the sum of [E] conditioned by [P2] will dominate
         the sum of [E] conditioned by [P1]. *)
     (* TODO: PR MathComp
-       - maybe leq_sum_seq above should be leq_sum_seqr and this one leq_sum_seql *)
+       - maybe [leq_sum_seq] above should be [leq_sum_seqr] and this one [leq_sum_seql] *)
     Lemma leq_sum_seq_pred:
       (forall i, i \in r -> P1 i -> P2 i) ->
       \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
