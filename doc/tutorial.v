@@ -68,30 +68,38 @@ here. Readers interested in more advanced aspects of the scheduling
 theory and their implementation in Prosa should consult the Prosa
 source code itself which is highly documented in a literate
 programming style.
+
+Real-Time specialists not familiar with Coq constitute the main audience
+of this document. A priori knowledge of Coq is welcome but
+should not be needed to understand the document as main
+concepts will be introduced on the fly.
+It should also be of interest for readers acquainted
+to Coq but with less knowledge about real-time, although this is not
+the main audience.
 |*)
 
 (*|
-Audience
-========
+How to read this tutorial
+=========================
 
-Real-Time specialist not familiar with Coq constitue the main audience
-of this document. It should also be of interest for readers acquainted
-to Coq but with less knowledge about real-time, although this is not
-the main audience.
+This tutorial can be comfortably read as a webpage. However, Coq being
+an interactive theorem prover, there is no better way to become
+acquainted with it than actually interacting with the system. This
+tutorial itself is a proper Coq file (available at
+`<https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/tutorial/doc/tutorial.v>`_
+(TODO update URL once merged)) and the
+reader is advised to step through it with Coq. The next section thus provides
+guidance to install and run the Coq system.
+In a first reading, it is then possible to skip this part and go
+directly to `the next one <#architecture>`_.
 |*)
 
 (*|
 Getting Started
 ===============
 
-In a first reading, it is possible to skip this part and go directly
-to `the next one <#architecture>`_ However, for a deeper understanding of the
-Prosa library, it is advisable to install the Coq system and
-interactively replay the examples proposed in this document. The
-current section thus provides some minimal information to get a
-working Coq environment. A priori knowledge of Coq is welcome but
-should not be needed to understand the current document as main
-concepts will be introduced on the fly.
+The current section provides some minimal information to get a
+working Coq environment.
 
 Installing Coq
 --------------
@@ -143,13 +151,15 @@ Compilation then proceeds as follows
    make
    make install
 
-Reading this Tutorial
----------------------
+Stepping through this Tutorial
+------------------------------
 
-This tutorial is actually a Coq file that can be downloaded at (TODO
-URL) so one can step through it with Coq and thus replay the examples
+This tutorial is actually a Coq file that can be downloaded at
+`<https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/tutorial/doc/tutorial.v>`_
+(TODO update URL once merged)
+so one can step through it with Coq and thus replay the examples
 and experiment with them while reading the tutorial.
-When Coq is installed, it is then advisable to download this file and step
+Once Coq is installed, it is then advisable to download this file and step
 through it in your editor/IDE (essential keyboard shortcuts are C-c C-n,
 C-c C-u and C-c RET to go down, up ot to the cursor under Emacs,
 Alt-down, Alt-up or Alt-right under VSCode).
@@ -165,7 +175,7 @@ Require Import prosa.util.notation. (* .in *)
 Architecture of Prosa
 =====================
 
-Th code of the Prosa library is split in a few main directories:
+The code of the Prosa library is split in a few main directories:
 
 * `behavior/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/behavior>`_
   defines the behavior of real-time systems, as used in the remaining
