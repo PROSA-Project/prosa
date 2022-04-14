@@ -75,9 +75,9 @@ Section UniprocessorScheduler.
           choose_job t (jobs_backlogged_at arr_seq sched_prefix t).
     End JobAllocation.
 
-    (** A preemption-policy-aware ideal uniprocessor schedule is then produced
+    (** A preemption-model-compliant ideal uniprocessor schedule is then produced
         when using [allocation_at] as the policy for the generic scheduler. *)
-    Definition np_uni_schedule : schedule PState := generic_schedule allocation_at idle_state.
+    Definition pmc_uni_schedule : schedule PState := generic_schedule allocation_at idle_state.
 
   End NonPreemptiveSectionAware.
 
@@ -94,7 +94,7 @@ Section UniprocessorScheduler.
 
     (** ... to obtain a priority- and preemption-model-aware ideal uniprocessor
         schedule. *)
-    Definition uni_schedule : schedule PState := np_uni_schedule choose_highest_prio_job.
+    Definition uni_schedule : schedule PState := pmc_uni_schedule choose_highest_prio_job.
   End PriorityAware.
 
 End UniprocessorScheduler.

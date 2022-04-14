@@ -37,7 +37,7 @@ Section NPUniprocessorScheduler.
 
   (** ... consider the schedule produced by the preemption-aware scheduler for
       the policy induced by [choose_job]. *)
-  Let schedule := np_uni_schedule arr_seq choose_job.
+  Let schedule := pmc_uni_schedule arr_seq choose_job.
   Let policy := allocation_at arr_seq choose_job.
 
   (** To begin with, we establish that the preemption-aware scheduler does not
@@ -75,7 +75,7 @@ Section NPUniprocessorScheduler.
         jobs_backlogged_at arr_seq schedule t = [::].
     Proof.
       move=> t.
-      rewrite /is_idle /schedule /np_uni_schedule /generic_schedule => /eqP.
+      rewrite /is_idle /schedule /pmc_uni_schedule /generic_schedule => /eqP.
       move=> NONE. move: (NONE).
       rewrite schedule_up_to_def => IDLE.
       apply allocation_at_idle in IDLE.
@@ -134,7 +134,7 @@ Section NPUniprocessorScheduler.
     Lemma np_schedule_jobs_from_arrival_sequence:
       jobs_come_from_arrival_sequence schedule arr_seq.
     Proof.
-      move=> j t; rewrite scheduled_at_def /schedule /np_uni_schedule /generic_schedule.
+      move=> j t; rewrite scheduled_at_def /schedule /pmc_uni_schedule /generic_schedule.
       elim: t => [/eqP | t'  IH /eqP].
       - rewrite schedule_up_to_def  /allocation_at  /prev_job_nonpreemptive => IN.
         move: (H_chooses_from_set _ _ _ IN).
@@ -158,7 +158,7 @@ Section NPUniprocessorScheduler.
       move: SCHED; rewrite mem_filter => /andP [/andP[READY _] IN].
       rewrite (H_nonclairvoyant_readiness _ (sched_prefix t) j t) //.
       move=> t' LEQt'.
-      rewrite /schedule /np_uni_schedule /generic_schedule
+      rewrite /schedule /pmc_uni_schedule /generic_schedule
               schedule_up_to_def /sched_prefix.
       destruct t => //=.
       rewrite -schedule_up_to_def.
@@ -171,7 +171,7 @@ Section NPUniprocessorScheduler.
       jobs_must_be_ready_to_execute schedule.
     Proof.
       move=> j t SCHED.
-      rewrite scheduled_at_def /schedule /uni_schedule /np_uni_schedule
+      rewrite scheduled_at_def /schedule /uni_schedule /pmc_uni_schedule
               /allocation_at /generic_schedule schedule_up_to_def //= in SCHED.
       destruct (prev_job_nonpreemptive _) eqn:PREV.
       { destruct t => //; rewrite //= in SCHED, PREV.
@@ -181,7 +181,7 @@ Section NPUniprocessorScheduler.
         injection SCHED => EQ; rewrite -> EQ in *.
         erewrite (H_nonclairvoyant_readiness _ _ j t.+1); [by apply READY| |by done].
         move=> t' LT.
-        rewrite /schedule /np_uni_schedule /generic_schedule //=.
+        rewrite /schedule /pmc_uni_schedule /generic_schedule //=.
         rewrite /allocation_at //=.
         by apply (schedule_up_to_prefix_inclusion policy). }
       { by apply chosen_job_is_ready. }
@@ -192,7 +192,7 @@ Section NPUniprocessorScheduler.
       valid_schedule schedule arr_seq.
     Proof.
       rewrite /valid_schedule; split; first by apply np_schedule_jobs_from_arrival_sequence.
-      move=> j t; rewrite scheduled_at_def /schedule /np_uni_schedule /generic_schedule.
+      move=> j t; rewrite scheduled_at_def /schedule /pmc_uni_schedule /generic_schedule.
       elim: t => [/eqP |t'  IH /eqP].
       { rewrite schedule_up_to_def  /allocation_at  /prev_job_nonpreemptive => IN.
         move: (H_chooses_from_set _ _ _ IN).
@@ -206,7 +206,7 @@ Section NPUniprocessorScheduler.
           move: (H_chooses_from_set _ _ _ IN).
           rewrite mem_filter /backlogged => /andP [/andP [READY _]  _].
           rewrite -(H_nonclairvoyant_job_readiness (schedule_up_to policy idle_state t') schedule j t'.+1) //.
-          rewrite /identical_prefix /schedule /np_uni_schedule /generic_schedule => t'' LT.
+          rewrite /identical_prefix /schedule /pmc_uni_schedule /generic_schedule => t'' LT.
           now rewrite (schedule_up_to_prefix_inclusion _  _  t'' t') //. }
         case: (schedule_up_to _ _ t' t') => [j' | IN]; last by apply JOB.
         destruct (job_ready _ _ _ && ~~ job_preemptable j' _) eqn:NP => [EQ|IN]; last by apply JOB.
@@ -255,7 +255,7 @@ Section NPUniprocessorScheduler.
         ~~ preemption_time schedule t.
     Proof.
       elim => [|t _]; first by rewrite /prev_job_nonpreemptive.
-      rewrite /schedule /np_uni_schedule /generic_schedule /preemption_time
+      rewrite /schedule /pmc_uni_schedule /generic_schedule /preemption_time
               schedule_up_to_def /prefix /allocation_at => NP.
       rewrite ifT // -pred_Sn.
       move: NP; rewrite /prev_job_nonpreemptive.
@@ -300,7 +300,7 @@ Section NPUniprocessorScheduler.
         move: (not_scheduled_implies_no_service _ _ _ NOT_SCHED) => NO_SERVICE.
         rewrite -(service_last_plus_before) NO_SERVICE addn0 in NP; apply IH in NP => //.
         by move /negP in NOT_SCHED. }
-      rewrite !scheduled_at_def /schedule/np_uni_schedule/generic_schedule => /eqP SCHED.
+      rewrite !scheduled_at_def /schedule/pmc_uni_schedule/generic_schedule => /eqP SCHED.
       rewrite -SCHED (schedule_up_to_prefix_inclusion _ _ t' t'.+1) // np_job_remains_scheduled //.
       rewrite /prev_job_nonpreemptive SCHED.
       rewrite (identical_prefix_service _ schedule); last by apply schedule_up_to_identical_prefix.

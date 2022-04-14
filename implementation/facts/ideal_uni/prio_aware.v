@@ -109,7 +109,7 @@ Section PrioAwareUniprocessorScheduler.
         now apply np_consistent. }
       move: SCHED.
       rewrite scheduled_at_def => /eqP.
-      rewrite {1}/schedule/uni_schedule/np_uni_schedule/generic_schedule schedule_up_to_def /allocation_at -/(prefix t).
+      rewrite {1}/schedule/uni_schedule/pmc_uni_schedule/generic_schedule schedule_up_to_def /allocation_at -/(prefix t).
       rewrite ifF //.
       now apply negbTE.
     Qed.
@@ -128,7 +128,7 @@ Section PrioAwareUniprocessorScheduler.
         { apply backlogged_prefix_invariance' with (h := t) => //.
           rewrite /identical_prefix /uni_schedule /prefix => t' LT.
           induction t => //.
-          rewrite /np_uni_schedule /generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
+          rewrite /pmc_uni_schedule/generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
           rewrite /prefix scheduled_at_def.
           induction t => //.
           now rewrite schedule_up_to_empty. }
