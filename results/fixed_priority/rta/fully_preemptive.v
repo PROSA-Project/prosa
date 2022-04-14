@@ -59,7 +59,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Recall that we assume sequential readiness. *)
-  Instance sequential_readiness : JobReady _ _ :=
+  #[local] Instance sequential_readiness : JobReady _ _ :=
     sequential_ready_instance arr_seq.
 
   (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)

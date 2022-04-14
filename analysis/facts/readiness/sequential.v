@@ -3,7 +3,9 @@ Require Export prosa.analysis.definitions.work_bearing_readiness.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.facts.model.task_arrivals.
 
-(** Throughout this file, we assume the sequential task readiness model. *)
+(** Throughout this file, we assume the sequential task readiness model, which
+    means that a job is ready to execute only if all prior jobs of the same task
+    have completed. *)
 Require Export prosa.model.readiness.sequential.
 
 (** In this section, we show some useful properties of the sequential
@@ -24,12 +26,11 @@ Section SequentialTasksReadiness.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   
-  (* As it was mentioned in the beginning of this file, 
-     we assume the sequential task readiness model. *)
-  Instance sequential_ready_instance : JobReady Job PState :=
-    sequential.sequential_ready_instance arr_seq.
+  (** Recall that we assume sequential tasks. *)
+  #[local] Instance sequential_readiness : JobReady Job PState :=
+    sequential_ready_instance arr_seq.
   
-  (* Consider any valid schedule of [arr_seq]. *)
+  (** Consider any valid schedule of [arr_seq]. *)
   Variable sched : schedule PState.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   
@@ -40,7 +41,7 @@ Section SequentialTasksReadiness.
 
   (** First, we show that the sequential readiness model is non-clairvoyant. *) 
   Fact sequential_readiness_nonclairvoyance :
-    nonclairvoyant_readiness sequential_ready_instance.
+    nonclairvoyant_readiness sequential_readiness.
   Proof.
     intros sched1 sched2 ? ? ID ? LE; rewrite //=.
     erewrite identical_prefix_pending; eauto 2.
@@ -69,7 +70,7 @@ Section SequentialTasksReadiness.
       exact: (valid_schedule_jobs_must_be_ready_to_execute sched arr_seq).
   Qed.
 
-  (* Finally, we show that the sequential readiness model is a
+  (** Finally, we show that the sequential readiness model is a
      work-bearing readiness model. That is, if a job [j] is pending
      but not ready at a time instant [t], then there exists another
      (earlier) job of the same task that is pending and ready at time

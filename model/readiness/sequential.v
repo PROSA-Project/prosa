@@ -24,7 +24,7 @@ Section SequentialTasksReadiness.
   (** Consider any job arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
 
-  (* A job [j] is ready at a time instant [t] iff all jobs from task
+  (** A job [j] is ready at a time instant [t] iff all jobs from task
      [job_task j] that arrived earlier than job [j] are already
      completed by time [t]. *)
   #[local,program] Instance sequential_ready_instance : JobReady Job PState :=
