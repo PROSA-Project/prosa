@@ -4,6 +4,16 @@ Require Export prosa.util.notation.
 Require Export prosa.util.rel.
 Require Export prosa.util.nat.
 
+Lemma leq_sum_subseq (I : eqType) (r r' : seq I) (P : pred I) (F : I -> nat) :
+  subseq r r' -> \sum_(i <- r | P i) F i <= \sum_(i <- r' | P i) F i.
+Proof.
+elim: r r' => [|x r IH] r'; first by rewrite big_nil.
+elim: r' => [//|x' r' IH'] /=; have [<- /IH {}IH|_ /IH' {}IH'] := eqP.
+  by rewrite !big_cons; case: (P x); rewrite // leq_add2l.
+rewrite [X in _ <= X]big_cons; case: (P x') => //.
+exact: leq_trans (leq_addl _ _).
+Qed.
+
 Section SumsOverSequences.
 
   (** Consider any type [I] with a decidable equality ... *)
@@ -19,7 +29,7 @@ Section SumsOverSequences.
       yielding natural numbers. *)
   Section SumOfOneFunction.
 
-    (** Consider any function that yields natural numbers. *)
+    (** Consider any function that yields natural numbers... *)
     Variable (F : I -> nat).
 
     (** We start showing that having every member of [r] equal to zero is equivalent to
@@ -71,8 +81,27 @@ Section SumsOverSequences.
       \sum_(r <- r | P r) F r = \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
     Proof. by rewrite [X in X - _](bigID P)/= addnK. Qed.
 
-  End SumOfOneFunction.
+    (** Summing natural numbers over a superset can only yields a greater sum.
+        Requiring the absence of duplicate in [r] is a simple way to
+        guarantee that the set inclusion [r <= rs] implies the actually
+        required multiset inclusion. *)
+    Lemma leq_sum_sub_uniq (rs : seq I) :
+      uniq r -> {subset r <= rs} ->
+      \sum_(i <- r) F i <= \sum_(i <- rs) F i.
+    Proof.
+      move=> uniq_r sub_r_rs.
+      rewrite [X in _ <= X](bigID (fun x => x \in r))/=.
+      apply: leq_trans (leq_addr _ _).
+      rewrite (perm_big (undup [seq x <- rs | x \in r])).
+      - rewrite -filter_undup big_filter_cond/=.
+        under eq_bigl => ? do rewrite andbT; exact/leq_sum_subseq/undup_subseq.
+      - apply: uniq_perm; rewrite ?undup_uniq// => x.
+        rewrite mem_undup mem_filter.
+        by case xinr: (x \in r); rewrite // (sub_r_rs _ xinr).
+    Qed.
 
+  End SumOfOneFunction.
+  
   (** In this section, we show some properties of the sum performed over two different functions. *)
   Section SumOfTwoFunctions.
 
@@ -120,44 +149,6 @@ Section SumsOverSequences.
   End SumOfTwoFunctions.
 
 End SumsOverSequences.
-
-(** For technical (and temporary) reasons related to the proof style, the next
-    two lemmas are stated outside of the section, but conceptually make use of a
-    similar context.
-
-    First, we observe that summing over a subset of a given sequence, if all
-    summands are natural numbers, cannot yield a larger sum. *)
-Lemma leq_sum_subseq (I : eqType) (r r' : seq I) (P : pred I) (F : I -> nat) :
-  subseq r r' ->
-  \sum_(i <- r | P i) F i <= \sum_(i <- r' | P i) F i.
-Proof.
-  elim: r r' => [|x r IH] r'; first by rewrite big_nil.
-  elim: r' => [//|x' r' IH'] /=; have [<- /IH {}IH|_ /IH' {}IH'] := eqP.
-  - by rewrite !big_cons; case: (P x); rewrite // leq_add2l.
-  - rewrite [X in _ <= X]big_cons; case: (P x') => //.
-    exact: leq_trans (leq_addl _ _).
-Qed.
-
-(** Second, we repeat the above observation that summing a superset of natural
-    numbers cannot yield a lesser sum, but phrase the claim differently.
-
-    Requiring the absence of duplicate in [r] is a simple way to guarantee that
-    the set inclusion [r <= rs] implies the actually required multiset
-    inclusion. *)
-Lemma leq_sum_sub_uniq (I : eqType) (r : seq I) (F : I -> nat) (rs : seq I) :
-  uniq r -> {subset r <= rs} ->
-  \sum_(i <- r) F i <= \sum_(i <- rs) F i.
-Proof.
-  move=> uniq_r sub_r_rs.
-  rewrite [X in _ <= X](bigID (fun x => x \in r))/=.
-  apply: leq_trans (leq_addr _ _).
-  rewrite (perm_big (undup [seq x <- rs | x \in r])).
-  - rewrite -filter_undup big_filter_cond/=.
-    under eq_bigl => ? do rewrite andbT; exact/leq_sum_subseq/undup_subseq.
-  - apply: uniq_perm; rewrite ?undup_uniq// => x.
-    rewrite mem_undup mem_filter.
-    by case xinr: (x \in r); rewrite // (sub_r_rs _ xinr).
-Qed.
 
 (** We continue establishing properties of sums over sequences, but start a new
     section here because some of the below proofs depend lemmas in the preceding
