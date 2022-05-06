@@ -49,6 +49,11 @@ Instance FP_to_JLFP (Job: JobType) (Task: TaskType)
 Instance JLFP_to_JLDP (Job: JobType) `{JLFP_policy Job} : JLDP_policy Job :=
   fun _ j1 j2 => hep_job j1 j2.
 
+(** We add coercions to enable automatic conversion from [JLFP] to [JLDP]... *)
+Coercion JLFP_to_JLDP : JLFP_policy >-> JLDP_policy.
+(** ...and from [FP] to [JLFP]. *)
+Coercion FP_to_JLFP : FP_policy >-> JLFP_policy.
+
 (** ** Properties of Priority Policies *)
 
 (** In the following section, we define key properties of common priority

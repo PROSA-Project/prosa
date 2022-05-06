@@ -46,22 +46,14 @@ Section Priority.
       preemption_time sched t ->
       backlogged sched j t ->
       scheduled_at sched j_hp t ->
-      hep_job_at t j_hp j. 
+      hep_job_at t j_hp j.
+  
    (** ... [JLFP], and... *)
   Definition respects_JLFP_policy_at_preemption_point (policy: JLFP_policy Job) :=
-    forall j j_hp t,
-      arrives_in arr_seq j ->
-      preemption_time sched t ->
-      backlogged sched j t ->
-      scheduled_at sched j_hp t ->
-      hep_job_at t j_hp j.
+    respects_JLDP_policy_at_preemption_point policy.
+     
   (** [FP].  *)
   Definition respects_FP_policy_at_preemption_point (policy: FP_policy Task) :=
-    forall j j_hp t,
-      arrives_in arr_seq j ->
-      preemption_time sched t ->
-      backlogged sched j t ->
-      scheduled_at sched j_hp t ->
-      hep_job_at t j_hp j.
+    respects_JLDP_policy_at_preemption_point (FP_to_JLFP Job Task ).
 
 End Priority.
