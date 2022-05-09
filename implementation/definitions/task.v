@@ -1,4 +1,5 @@
 Require Export prosa.implementation.definitions.arrival_bound.
+Require Export prosa.model.task.arrival.curves.
 Require Export prosa.model.priority.numeric_fixed_priority.
 
 (** * Implementation of Tasks and Jobs *)
@@ -70,6 +71,20 @@ Record concrete_job :=
   ; job_task: [eqType of concrete_task]
   }.
 
+(** For convenience, we define a function that converts each possible arrival
+    bound (periodic, sporadic, and arrival-curve prefix) into an arrival-curve
+    prefix... *)
+Definition get_arrival_curve_prefix tsk :=
+  match task_arrival tsk with
+  | Periodic p => inter_arrival_to_prefix p
+  | Sporadic m => inter_arrival_to_prefix m
+  | ArrivalPrefix steps => steps
+  end.
+
+(** ... and define the "arrival bound" concept for concrete tasks. *)
+Definition concrete_max_arrivals tsk Δ :=
+  extrapolated_arrival_curve (get_arrival_curve_prefix tsk) Δ.
+
 (** To make it compatible with ssreflect, we define a decidable
     equality for concrete jobs. *)
 Definition job_eqdef (j1 j2: concrete_job) :=
@@ -122,10 +137,12 @@ Section Parameters.
   #[global,program] Instance TaskCost : TaskCost Task := task_cost.
   #[global,program] Instance TaskPriority : TaskPriority Task := task_priority.
   #[global,program] Instance TaskDeadline : TaskDeadline Task := task_deadline.
+  #[global,program] Instance ConcreteMaxArrivals : MaxArrivals Task := concrete_max_arrivals.
 
   (** Second, we do the same for the above definition of job. *)
   Let Job := [eqType of concrete_job].
   #[global,program] Instance JobTask : JobTask Job Task := job_task.
   #[global,program] Instance JobArrival : JobArrival Job := job_arrival.
   #[global,program] Instance JobCost : JobCost Job := job_cost.
+
 End Parameters.
