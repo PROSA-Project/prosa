@@ -917,3 +917,13 @@ Definition prefix (T : eqType) (xs ys : seq T) := exists xs_tail, xs ++ xs_tail 
 Definition strict_prefix (T : eqType) (xs ys : seq T) :=
   exists xs_tail, xs_tail <> [::] /\ xs ++ xs_tail = ys.
 
+(** We define a helper function that shifts a sequence of numbers forward
+    by a constant offset, and an analogous version that shifts them backwards,
+    removing any number that, in the absence of Coq' s saturating subtraction,
+    would become negative. These functions are very useful in transforming
+    abstract RTA 's search space. *)
+Definition shift_points_pos (xs : seq nat) (s : nat) : seq nat :=
+  map (addn s) xs.
+Definition shift_points_neg (xs : seq nat) (s : nat) : seq nat :=
+  let nonsmall := filter (fun x => x >= s) xs in
+  map (fun x => x - s) nonsmall.

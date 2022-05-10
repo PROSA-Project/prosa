@@ -87,13 +87,14 @@ Alternatively, `esy shell` opens a shell within its environment.
 
 Besides on Coq itself, Prosa depends on 
 
-1. the `ssreflect` library of the [Mathematical Components project](https://math-comp.github.io) and
-2. the [Micromega support for the Mathematical Components library](https://github.com/math-comp/mczify) provided by `mczify`.
+1. the `ssreflect` library of the [Mathematical Components project](https://math-comp.github.io),
+2. the [Micromega support for the Mathematical Components library](https://github.com/math-comp/mczify) provided by `mczify`, and
+3. the [The Coq Effective Algebra Library](https://github.com/coq-community/coqeal).
 
 These dependencies can be easily installed with OPAM.
 
 ```
-opam install -y coq-mathcomp-ssreflect coq-mathcomp-zify
+opam install -y coq-mathcomp-ssreflect coq-mathcomp-zify coq-coqeal
 ```
 
 Prosa always tracks the latest stable versions of Coq and ssreflect. We do not maintain compatibility with older versions of either Coq or ssreflect.
