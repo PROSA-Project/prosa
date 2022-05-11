@@ -42,7 +42,7 @@ stages:
 .install-dependencies:
   script:
    - opam update
-   - opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+   - opam install -y -v -j ${NJOBS} coq-mathcomp-zify coq-coqeal
 
 .make-html:
   script:
