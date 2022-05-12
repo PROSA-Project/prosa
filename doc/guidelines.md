@@ -104,7 +104,7 @@ When writing new proofs, please adhere to the following rules.
 1. Keep proofs short. Aim for just a few lines, and definitely not more than 30-40. Long arguments should be structured into many individual lemmas (in their own section) that correspond to high-level proof steps. Some exceptions may be needed, but such cases should truly remain *exceptional*.  
 Note: We employ an automatic proof-length checker that runs as part of continuous integration to enforce this.
 2. However, making proofs as concise as possible is a *non-goal*. We are **not** playing [code golf](https://en.wikipedia.org/wiki/Code_golf). If a proof is too long, the right answer is usually **not** to maximally compress it; rather, one should identify semantically meaningful steps that can be factored out and documented as local  "helper" lemmas. Many small steps are good for readability.
-3. Make use of the structured sub-proofs feature (i.e., indentation with `{` and `}`, or bulleted sub-proofs with `-`, `+`, `*`) to structure code.
+3. Make use of the structured sub-proofs feature (i.e., indentation with `{` and `}`, or bulleted sub-proofs with `-`, `+`, `*`) to structure code.  Please use the bullets in the order `-`, `+`, `*` so that Proof General indents them correctly. You may keep going with `--`, `++`, and `**`. 
 4. Make proofs "step-able." This means preferring `.` over `;` (within reason). This makes it easier for novices to learn from existing proofs.
 
 
