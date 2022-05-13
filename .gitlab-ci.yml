@@ -39,6 +39,19 @@ stages:
   image: mathcomp/mathcomp-dev:${CI_JOB_NAME}
   extends: .build-common
 
+.install-dependencies:
+  script:
+   - opam update
+   - opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+
+.make-html:
+  script:
+    - make html -j ${NJOBS}
+    - mv html with-proofs
+    - make gallinahtml -j ${NJOBS}
+    - mv html without-proofs
+    - make htmlpretty -j ${NJOBS}
+    - mv html pretty    
 
 ###################### The Jobs ######################
 
@@ -58,15 +71,10 @@ compile-and-doc:
     - .only_in_wip_branches
     - .preferred-stable-version
   script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+    - !reference [.install-dependencies, script]
     - ./create_makefile.sh --without-classic
     - make -j ${NJOBS}
-    - make html -j ${NJOBS}
-    - mv html with-proofs
-    - make gallinahtml -j ${NJOBS}
-    - mv html without-proofs
-    - make htmlpretty -j ${NJOBS}
-    - mv html pretty    
+    - !reference [.make-html, script]
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -81,15 +89,9 @@ compile-and-doc-and-validate:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+    - !reference [.install-dependencies, script]
     - ./create_makefile.sh --without-classic
-    - make -j ${NJOBS}
-    - make html -j ${NJOBS}
-    - mv html with-proofs
-    - make gallinahtml -j ${NJOBS}
-    - mv html without-proofs
-    - make htmlpretty -j ${NJOBS}
-    - mv html pretty
+    - !reference [.make-html, script]
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh validation-results.txt    
   artifacts:
@@ -106,15 +108,10 @@ classic-compile-and-doc-and-validate:
     - .preferred-stable-version
     - .not_in_wip_branches
   script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+    - !reference [.install-dependencies, script]
     - ./create_makefile.sh --only-classic
     - make -j ${NJOBS}
-    - make html -j ${NJOBS}
-    - mv html with-proofs
-    - make gallinahtml -j ${NJOBS}
-    - mv html without-proofs
-    - make htmlpretty -j ${NJOBS}
-    - mv html pretty
+    - !reference [.make-html, script]
     - make validate
   artifacts:
     name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
@@ -161,7 +158,7 @@ proof-state:
   image: bbbrandenburg/alectryon-ci:1.14.0-coq-8.15.0
   script:
     - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+    - !reference [.install-dependencies, script]
     - ./create_makefile.sh --without-classic
     - make -j ${NJOBS} alectryon
   artifacts:
