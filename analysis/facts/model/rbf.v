@@ -272,7 +272,7 @@ Section RequestBoundFunctions.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_of_task tsk j.
 
-  (** Then we prove that [task_rbf] at [ε] is greater than or equal to task cost. *)
+  (** Then we prove that [task_rbf] at [ε] is greater than or equal to the task's WCET. *)
   Lemma task_rbf_1_ge_task_cost:
     task_rbf ε >= task_cost tsk.
   Proof.
@@ -294,6 +294,18 @@ Section RequestBoundFunctions.
     move: H_j_arrives => [t ARR]; move: (ARR) => CONS.
     apply H_arrival_times_are_consistent in CONS.
     by rewrite CONS.
+  Qed.
+
+  (** As a corollary, we prove that the [task_rbf] at any point [A] greater than
+      [0] is no less than the task's WCET. *)
+  Lemma task_rbf_ge_task_cost:
+    forall A,
+      A > 0 ->
+      task_rbf A >= task_cost tsk.
+  Proof.
+    case => // A GEQ.
+    apply: (leq_trans task_rbf_1_ge_task_cost).
+    exact: task_rbf_monotone.
   Qed.
 
   (** Assume that [tsk] has a positive cost. *)
