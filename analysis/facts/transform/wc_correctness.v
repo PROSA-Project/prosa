@@ -2,7 +2,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
 Require Export prosa.model.schedule.work_conserving.
 Require Import prosa.model.readiness.basic.
-Require Export prosa.analysis.facts.model.ideal_schedule.
+Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.transform.wc_trans.
 Require Export prosa.analysis.facts.transform.swaps.
 Require Export prosa.analysis.definitions.schedulability.

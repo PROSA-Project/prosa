@@ -7,7 +7,7 @@ Require Export prosa.analysis.facts.behavior.completion.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
-Require Export prosa.analysis.facts.model.ideal_schedule.
+Require Export prosa.analysis.facts.model.ideal.schedule.
 
 (** * Service Received by Sets of Jobs in Ideal Uni-Processor Schedules *)
 

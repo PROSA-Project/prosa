@@ -1,4 +1,4 @@
-Require Export prosa.analysis.facts.model.ideal_schedule.
+Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.facts.behavior.deadlines.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.model.priority.edf.

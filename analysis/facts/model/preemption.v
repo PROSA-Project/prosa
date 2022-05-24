@@ -1,7 +1,6 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.model.ideal_schedule.
+Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.facts.behavior.completion.
-
 
 (** In this section, we establish two basic facts about preemption times. *)
 Section PreemptionTimes.

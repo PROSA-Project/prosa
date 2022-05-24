@@ -1,5 +1,5 @@
 Require Export prosa.analysis.facts.behavior.all.
-Require Export prosa.analysis.facts.model.ideal_schedule.
+Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.nonpreemptive.
 Require Export prosa.model.preemption.fully_nonpreemptive.

@@ -7,7 +7,7 @@ Require Export prosa.analysis.definitions.work_bearing_readiness.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
-Require Import prosa.analysis.facts.model.ideal_schedule.
+Require Import prosa.analysis.facts.model.ideal.schedule.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of

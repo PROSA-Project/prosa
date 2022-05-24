@@ -1,7 +1,6 @@
 Require Export prosa.implementation.facts.generic_schedule.
 Require Export prosa.implementation.definitions.ideal_uni_scheduler.
-Require Export prosa.analysis.facts.model.ideal_schedule.
-Require Export prosa.model.task.sequentiality.
+Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.model.schedule.limited_preemptive.
 
 (** * Properties of the Preemption-Aware Ideal Uniprocessor Scheduler *)
