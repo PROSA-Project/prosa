@@ -157,7 +157,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
     (** Using the above lemma, we prove that the priority inversion of the task is bounded by blocking_bound. *) 
     Lemma priority_inversion_is_bounded:
-      priority_inversion_is_bounded_by
+      priority_inversion_is_bounded_by_constant
         arr_seq sched tsk blocking_bound.
     Proof.
       intros j ARR TSK POS t1 t2 PREF.

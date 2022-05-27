@@ -128,7 +128,7 @@ Section AbstractRTAforFPwithArrivalCurves.
      inversions incurred by any other tasks. *)
   Variable priority_inversion_bound : duration.
   Hypothesis H_priority_inversion_is_bounded:
-    priority_inversion_is_bounded_by
+    priority_inversion_is_bounded_by_constant
       arr_seq sched tsk priority_inversion_bound.
 
   (** Let L be any positive fixed point of the busy interval recurrence. *)

@@ -77,10 +77,7 @@ Section PriorityInversionIsBounded.
   (** Finally, we introduce the notion of the maximal length of
        (potential) priority inversion at a time instant [t], which is
        defined as the maximum length of nonpreemptive segments among
-       all jobs that arrived so far. Note that the value
-       [job_max_nonpreemptive_segment j_lp] is at least [ε] for any job
-       [j_lp], so the maximal length of priority inversion cannot be
-       negative. *)
+       all jobs that arrived so far. *)
   Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
     \max_(j_lp <- arrivals_before arr_seq t | ~~ hep_job j_lp j)
      (job_max_nonpreemptive_segment j_lp - ε).

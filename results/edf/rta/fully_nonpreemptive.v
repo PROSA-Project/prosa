@@ -75,7 +75,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       job_preemptable function (i.e., jobs have bounded nonpreemptive
       segments). *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
-
+   
   (** ** Total Workload and Length of Busy Interval *)
 
   (** We introduce the abbreviation [rbf] for the task request bound function,
@@ -91,8 +91,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   Let total_rbf := total_request_bound_function ts.
   
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
-  Let blocking_bound :=
-    \max_(tsk_o <- ts | (tsk_o != tsk) && (task_deadline tsk_o > task_deadline tsk))
+  Let blocking_bound A :=
+    \max_(tsk_o <- ts | (tsk_o != tsk) && (task_deadline tsk_o > task_deadline tsk + A))
      (task_cost tsk_o - ε).
   
   (** Next, we define an upper bound on interfering workload received from jobs 
@@ -109,7 +109,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   (** ** Response-Time Bound *)
     
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-  Let is_in_search_space := is_in_search_space ts tsk L.
+  Let is_in_search_space := is_in_search_space ts tsk blocking_bound L.
   
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
@@ -119,7 +119,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     forall A,
       is_in_search_space A -> 
       exists F,
-        A + F >= blocking_bound + (task_rbf (A + ε) - (task_cost tsk - ε))
+        A + F >= blocking_bound A + (task_rbf (A + ε) - (task_cost tsk - ε))
                 + bound_on_total_hep_workload A (A + F) /\
         R >= F + (task_cost tsk - ε).
 

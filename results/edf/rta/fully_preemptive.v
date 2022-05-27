@@ -91,6 +91,10 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
+  (** If jobs are fully preemptive, lower priority jobs do not cause priority inversion. 
+      Hence, the blocking bound is always 0 for any [A]. *)
+  Let blocking_bound (A : duration) := 0.
+
   (** Next, we define an upper bound on interfering workload received from jobs 
       of other tasks with higher-than-or-equal priority. *)
   Let bound_on_total_hep_workload A Δ :=
@@ -105,7 +109,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   (** ** Response-Time Bound *)
   
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)      
-  Let is_in_search_space := is_in_search_space ts tsk L.
+  Let is_in_search_space := is_in_search_space ts tsk blocking_bound L.
   
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
@@ -128,19 +132,19 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Theorem uniprocessor_response_time_bound_fully_preemptive_edf:
     response_time_bounded_by tsk R.
   Proof.
-    have BLOCK: blocking_bound  ts tsk = 0.
-    { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-                 /fully_preemptive_task_model subnn big1_eq. } 
     try ( eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L) ) ||
-    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L) .
-    all: rt_eauto.
-    - move => A /andP [LT NEQ].
-      specialize (H_R_is_maximum A); feed H_R_is_maximum.
-      { by apply/andP; split. }
-      move: H_R_is_maximum => [F [FIX BOUND]].
-      exists F; split.
-      + by rewrite BLOCK add0n subnn subn0. 
-      + by rewrite subnn addn0.
+    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L); rt_eauto.
+    move => A /andP [LT CHANGE].
+    have BLOCK: forall A', bounded_nps.blocking_bound ts tsk A' = blocking_bound A'.
+    { by move=> A'; rewrite /bounded_nps.blocking_bound /parameters.task_max_nonpreemptive_segment
+         /fully_preemptive_task_model subnn big1_eq. }
+    specialize (H_R_is_maximum A); feed H_R_is_maximum.
+    { apply/andP; split; first by done.
+      by move: CHANGE; rewrite /priority_inversion_changes_at /is_in_search_space !BLOCK. }
+    move: H_R_is_maximum => [F [FIX BOUND]].
+    exists F; split.
+    + by rewrite BLOCK add0n subnn subn0.
+    + by rewrite subnn addn0.
   Qed.
-    
+
 End RTAforFullyPreemptiveEDFModelwithArrivalCurves.

@@ -62,7 +62,7 @@ Section ExistsBusyIntervalJLFP.
   Let quiet_time_dec t1 := quiet_time_dec arr_seq sched j t1.
   Let busy_interval_prefix t1 t2 := busy_interval_prefix arr_seq sched j t1 t2.
   Let busy_interval t1 t2 := busy_interval arr_seq sched j t1 t2.
-  Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by arr_seq sched j K.
+  Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by_constant arr_seq sched j K.
   
   (** We begin by proving a basic lemma about busy intervals. *)
   Section BasicLemma.
