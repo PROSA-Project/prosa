@@ -5,7 +5,7 @@ maintainer: "Pierre Roux <pierre.roux@onera.fr>"
 homepage: "https://prosa.mpi-sws.org/"
 dev-repo: "git+https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs.git"
 bug-reports: "https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/issues"
-license: "BSD"
+license: "BSD-2-Clause"
 
 build: [
   ["./create_makefile.sh"]
