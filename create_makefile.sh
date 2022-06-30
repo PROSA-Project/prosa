@@ -9,6 +9,9 @@ do
         --without-classic)
             FIND_OPTS+=( ! -path './classic/*' )
             ;;
+        --without-refinements)
+            FIND_OPTS+=( ! -path './implementation/refinements/*' )
+            ;;            
         --only-classic)
             FIND_OPTS+=( ! -path './analysis/*' ! -path './behavior/*' ! -path './model/*' \
                          ! -path './implementation/*' ! -path './results/*')

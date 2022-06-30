@@ -39,7 +39,7 @@ All results published prior to 2020 build on this "classic" version of Prosa.
 
 Prosa can be installed using the [OPAM package manager](https://opam.ocaml.org/) (>= 2.0).
 
-```
+```bash
 opam repo add coq-released https://coq.inria.fr/opam/released
 # or for the dev version (git master): https://coq.inria.fr/opam/extra-dev
 opam update
@@ -50,7 +50,7 @@ opam install coq-prosa
 
 OPAM can also be used to install a local checkout. For example, this is done in the CI setup (see `.gitlab-ci.yaml`).
 
-```
+```bash
 opam repo add coq-released https://coq.inria.fr/opam/released
 opam update
 opam pin add -n -y -k path coq-prosa .
@@ -65,7 +65,8 @@ Prosa can be installed using [esy](https://esy.sh/).
 
 `esy` itself can typically be installed through `npm`.
 It should look something like this on most `apt`-based systems:
-```
+
+```bash
 sudo apt install npm
 sudo npm install --global esy@latest
 ```
@@ -73,7 +74,8 @@ sudo npm install --global esy@latest
 #### Installing Prosa
 
 With `esy` in place, it is easy to compile Prosa in one go. To download and compile all of Prosa's dependencies (including Coq), and then to compile Prosa itself, simply issue the command:
-```
+
+```bash
 esy
 ```
 
@@ -89,11 +91,11 @@ Besides on Coq itself, Prosa depends on
 
 1. the `ssreflect` library of the [Mathematical Components project](https://math-comp.github.io),
 2. the [Micromega support for the Mathematical Components library](https://github.com/math-comp/mczify) provided by `mczify`, and
-3. the [The Coq Effective Algebra Library](https://github.com/coq-community/coqeal).
+3. the [The Coq Effective Algebra Library](https://github.com/coq-community/coqeal) (optional, needed only for POET-related refinements).
 
 These dependencies can be easily installed with OPAM.
 
-```
+```bash
 opam install -y coq-mathcomp-ssreflect coq-mathcomp-zify coq-coqeal
 ```
 
@@ -105,21 +107,29 @@ Assuming all dependencies are available (either via OPAM or compiled from source
 
 First, create an appropriate `Makefile`.
 
-```
+```bash
 ./create_makefile.sh
 ```
 
 Alternatively, to avoid compiling the older "classic" Prosa, specify the `--without-classic` option. This can speed up compilation considerably and is a good idea during development.  (It's also possible to *only* compile the "classic" Prosa by specifying the `--only-classic` option, but this is rarely needed.)
 
-```
+```bash
 ./create_makefile.sh --without-classic
+```
+
+To avoid compiling the POET-related refinements (which require CoqEAL to be installed and inject a dependency on the *proof irrelevance* axiom), specify the switch `--without-refinements`. For example, to skip both "classic" Prosa and the refinements library, use the following command:
+
+```bash
+./create_makefile.sh --without-classic --without-refinements
 ```
 
 Second, compile the library.
 
-```
+```bash
 make -j
 ```
+
+Depending on how powerful your machine is, this will take a few minutes.
 
 ## Generating HTML Documentation
 
