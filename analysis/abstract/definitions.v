@@ -175,7 +175,6 @@ Section AbstractRTADefinitions.
           job_of_task tsk j ->
           job_cost j > 0 ->
           exists t1 t2,
-            t1 <= job_arrival j < t2 /\
             t2 <= t1 + L /\
             busy_interval j t1 t2.
 

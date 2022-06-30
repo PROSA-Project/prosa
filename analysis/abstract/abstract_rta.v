@@ -439,7 +439,7 @@ Section Abstract_RTA.
           specialize (L1 H0).
           feed_n 2 L1; try done.
           { move: (H_busy_interval_exists j H_j_arrives H_job_of_tsk H_job_cost_positive)
-            => [t1' [t2' [_ [BOUND BUSY]]]].
+            => [t1' [t2' [BOUND BUSY]]].
             have EQ:= busy_interval_is_unique _ _ _ _ _ _ _ _ H_busy_interval BUSY.
             destruct EQ as [EQ1 EQ2].
             subst t1' t2'; clear BUSY.
@@ -467,7 +467,7 @@ Section Abstract_RTA.
         Lemma relative_arrival_is_bounded: A < L.
         Proof.
           rewrite /A.
-          move: (H_busy_interval_exists j H_j_arrives H_job_of_tsk H_job_cost_positive) => [t1' [t2' [_ [BOUND BUSY]]]].
+          move: (H_busy_interval_exists j H_j_arrives H_job_of_tsk H_job_cost_positive) => [t1' [t2' [BOUND BUSY]]].
           have EQ:= busy_interval_is_unique _ _ _ _ _ _ _ _ H_busy_interval BUSY. destruct EQ as [EQ1 EQ2].
           subst t1' t2'; clear BUSY.
           apply leq_trans with (t2 - t1); last by rewrite leq_subLR.
@@ -535,8 +535,8 @@ Section Abstract_RTA.
     intros j ARR JOBtsk. unfold job_response_time_bound.
     move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
     { by rewrite /completed_by ZERO. } 
-    move: (H_busy_interval_exists j ARR JOBtsk POS) => [t1 [t2 [NEQ [T2 BUSY]]]].
-    move: (NEQ) (BUSY)=> /andP [GE LT] [_ QTt2].
+    move: (H_busy_interval_exists j ARR JOBtsk POS) => [t1 [t2 [T2 BUSY]]].
+    move: (BUSY) => [[/andP [GE LT] _] QTt2].
     have A2LTL := relative_arrival_is_bounded _ ARR JOBtsk POS _ _ BUSY.
     set (A2 := job_arrival j - t1) in *.
     move: (representative_exists tsk _ interference_bound_function _ A2LTL) => [A1 [ALEA2 [EQΦ INSP]]].

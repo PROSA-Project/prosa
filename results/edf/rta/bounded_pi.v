@@ -292,7 +292,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
         with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
       { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
       exists t1, t2; split; first by done.
-      split; first by done.
       by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
     Qed.
     
