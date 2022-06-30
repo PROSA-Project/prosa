@@ -29,19 +29,11 @@ Section AbstractRTADefinitions.
 
     (** Let [tsk] be any task that is to be analyzed *)
     Variable tsk : Task.
-    
-    (** For simplicity, let's define some local names. *)
-    Let job_scheduled_at := scheduled_at sched.
-    Let job_completed_by := completed_by sched.
-
-    (** Recall that a job [j] is pending_earlier_and_at a time instant [t] iff job
-       [j] arrived before time [t] and is still not completed by time [t]. *)
-    Let job_pending_earlier_and_at := pending_earlier_and_at sched.
 
     (** We are going to introduce two main variables of the analysis: 
        (a) interference, and (b) interfering workload. *)
 
-    (** a) Interference *)
+    (** ** (a) Interference *)
     (** Execution of a job may be postponed by the environment and/or the system due to different
        factors (preemption by higher-priority jobs, jitter, black-out periods in hierarchical 
        scheduling, lack of budget, etc.), which we call interference. 
@@ -59,7 +51,7 @@ Section AbstractRTADefinitions.
        for the sake of simplicity and generality. *)
     Variable interference : Job -> instant -> bool.
 
-    (** b) Interfering Workload *)
+    (** ** (b) Interfering Workload *)
     (** In addition to interference, the analysis assumes that at any time [t], we know an upper 
        bound on the potential cumulative interference that can be incurred in the future by any
        job (i.e., the total remaining potential delays). Based on that, assume a function 
@@ -76,7 +68,7 @@ Section AbstractRTADefinitions.
     Definition cumul_interference j t1 t2 := \sum_(t1 <= t < t2) interference j t.
     Definition cumul_interfering_workload j t1 t2 := \sum_(t1 <= t < t2) interfering_workload j t.
 
-    (** Definition of Busy Interval *)
+    (** ** Definition of Busy Interval *)
     (** Further analysis will be based on the notion of a busy interval. The overall idea of the 
        busy interval is to take into account the workload that cause a job under consideration to 
        incur interference. In this section, we provide a definition of an abstract busy interval. *)
@@ -92,7 +84,7 @@ Section AbstractRTADefinitions.
          released now), to ensure that the busy window captures the execution of job [j]. *)
       Definition quiet_time (j : Job) (t : instant) :=
         cumul_interference j 0 t = cumul_interfering_workload j 0 t /\
-        ~~ job_pending_earlier_and_at j t.
+        ~~ pending_earlier_and_at sched j t.
       
       (** Based on the definition of quiet time, we say that interval <<[t1, t2)>> is 
          a (potentially unbounded) busy-interval prefix w.r.t. job [j] iff the 
@@ -169,18 +161,19 @@ Section AbstractRTADefinitions.
           job_cost j > 0 ->
           busy_interval j t1 t2 ->
           t1 <= t < t2 ->
-          ~ interference j t <-> job_scheduled_at j t.
+          ~ interference j t <-> scheduled_at sched j t.
 
-      (** Next, we say that busy intervals of task [tsk] are bounded by [L] iff, for any job [j] of task
-         [tsk], there exists a busy interval with length at most L. Note that the existence of such a
-         bounded busy interval is not guaranteed if the schedule is overloaded with work. 
-         Therefore, in the later concrete analyses, we will have to introduce an additional 
-         condition that prevents overload. *)
+      (** Next, we say that busy intervals of task [tsk] are bounded by [L] iff,
+          for any job [j] of task [tsk], there exists a busy interval with
+          length at most [L]. Note that the existence of such a bounded busy
+          interval is not guaranteed if the system is overloaded.  Therefore, in
+          the later concrete analyses, we will have to introduce an additional
+          condition that rules out overload. *)
       Definition busy_intervals_are_bounded_by L :=
         forall j,
           arrives_in arr_seq j ->
           job_of_task tsk j ->
-          job_cost j > 0 -> 
+          job_cost j > 0 ->
           exists t1 t2,
             t1 <= job_arrival j < t2 /\
             t2 <= t1 + L /\
@@ -206,7 +199,7 @@ Section AbstractRTADefinitions.
           t1 + delta < t2 ->
           (** Next, we require the IBF to bound the interference only until the job is 
              completed, after which the function can behave arbitrarily. *)
-          ~~ job_completed_by j (t1 + delta) ->
+          ~~ completed_by sched j (t1 + delta) ->
           (** And finally, the IBF function might depend not only on the length 
              of the interval, but also on the relative arrival time of job [j] (offset). *)
           (** While the first three conditions are needed for discarding excessive cases, offset adds 
