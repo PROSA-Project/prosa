@@ -15,8 +15,8 @@ install: [make "install"]
 depends: [
   "coq" {((>= "8.13" & < "8.16~") | = "dev")}
   "coq-mathcomp-ssreflect" {((>= "1.12" & < "1.15~") | = "dev")}
-  "coq-mathcomp-zify"
-  "coq-coqeal"
+  "coq-mathcomp-zify" {>= "1.2.0"}
+  "coq-coqeal" {>= "1.1.0"}
 ]
 
 tags: [
