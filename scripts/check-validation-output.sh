@@ -1,7 +1,22 @@
 #!/bin/sh
 set -e
 
-RESULTS="$1"
+while ! [ -z "$1" ]
+do
+    case "$1" in
+        --accept-proof-irrelevance)
+            ACCEPT_PI=1
+            ;;
+        -*)
+            echo "Unrecognized option: $1"
+            exit 1
+            ;;
+        *)
+        	RESULTS="$1"
+        	;;
+    esac
+    shift
+done
 
 [ -e "$RESULTS" ] || exit 2
 
@@ -11,7 +26,9 @@ EXPECTED="/tmp/expected-validation-output"
 # strip the list of files and COQDEP output
 grep -v 'COQDEP VFILES' "$RESULTS" | grep -v '"coqchk" -silent' > "$OBSERVED"
 
-cat > $EXPECTED <<EOF
+if [ -z "$ACCEPT_PI" ]
+then
+	cat > $EXPECTED <<EOF
 
 CONTEXT SUMMARY
 ===============
@@ -27,17 +44,8 @@ CONTEXT SUMMARY
 * Inductives whose positivity is assumed: <none>
   
 EOF
-
-if ! diff --brief "$OBSERVED" "$EXPECTED" > /dev/null
-then
-    echo "[!!] Validation output does not match expected output."
-    echo "[II] Trying workaround for https://github.com/coq/coq/issues/13324"
-
-    # strip the list of files, COQDEP output, and 
-    # filter bogus ltac: axioms (see Coq issue 13324)
-    grep -v 'COQDEP VFILES' "$RESULTS" | grep -v '"coqchk" -silent' | grep -v "ltac_gen_subproof" > "$OBSERVED"
-    # the list of axioms should now be an empty list
-    cat > $EXPECTED <<EOF
+else
+	cat > $EXPECTED <<EOF
 
 CONTEXT SUMMARY
 ===============
@@ -45,6 +53,7 @@ CONTEXT SUMMARY
 * Theory: Set is predicative
   
 * Axioms:
+    Coq.Logic.ProofIrrelevance.proof_irrelevance
   
 * Constants/Inductives relying on type-in-type: <none>
   
@@ -53,10 +62,21 @@ CONTEXT SUMMARY
 * Inductives whose positivity is assumed: <none>
   
 EOF
-    if ! diff --brief "$OBSERVED" "$EXPECTED" > /dev/null
+fi
+
+if ! diff --brief "$EXPECTED" "$OBSERVED"  > /dev/null
+then
+    echo "[!!] Validation output does not match expected output."
+    echo "[II] Trying workaround for https://github.com/coq/coq/issues/13324"
+
+    # strip the list of files, COQDEP output, and 
+    # filter bogus ltac: axioms (see Coq issue 13324)
+    grep -v 'COQDEP VFILES' "$RESULTS" | grep -v '"coqchk" -silent' | grep -v "ltac_gen_subproof" > "$OBSERVED"
+    # the list of axioms should now be an empty list
+    if ! diff --brief  "$EXPECTED" "$OBSERVED" > /dev/null
     then
         echo "[!!] Validation output still does not match expected output."
-        diff -u "$OBSERVED" "$EXPECTED"
+        diff -u  "$EXPECTED" "$OBSERVED"
         exit 3
     fi
 fi

@@ -91,9 +91,10 @@ compile-and-doc-and-validate:
   script:
     - !reference [.install-dependencies, script]
     - ./create_makefile.sh --without-classic
+    - make -j ${NJOBS}
     - !reference [.make-html, script]
     - make validate 2>&1 | tee validation-results.txt
-    - scripts/check-validation-output.sh validation-results.txt    
+    - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -101,6 +102,19 @@ compile-and-doc-and-validate:
       - "without-proofs/"
       - "pretty/"
     expire_in: 1 week
+
+# Check that proof irrelevance shows up only due to refinements.
+compile-and-validate:
+  stage: build
+  extends:
+    - .not_in_wip_branches
+    - .preferred-stable-version
+  script:
+    - !reference [.install-dependencies, script]
+    - ./create_makefile.sh --without-classic --without-refinements
+    - make -j ${NJOBS}    
+    - make validate 2>&1 | tee validation-results.txt
+    - scripts/check-validation-output.sh validation-results.txt
 
 classic-compile-and-doc-and-validate:
   stage: build
