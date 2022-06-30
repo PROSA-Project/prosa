@@ -9,13 +9,16 @@ workflow:
 
 stages:
   - build
-  - process
 
 ###################### Rules and Scripts ##################
 
 .not_in_wip_branches:
   rules:
     - if: ($CI_COMMIT_BRANCH !~ /^wip-.*$/) || ($CI_PIPELINE_SOURCE == "merge_request_event")
+
+.only_in_wip_branches:
+  rules:
+    - if: ($CI_COMMIT_BRANCH =~ /^wip-.*$/) && ($CI_PIPELINE_SOURCE != "merge_request_event")
 
 .build-common:
   stage: build
@@ -36,65 +39,6 @@ stages:
   image: mathcomp/mathcomp-dev:${CI_JOB_NAME}
   extends: .build-common
 
-.compile:
-  stage: build
-  extends:
-    - .preferred-stable-version
-  script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
-    - ./create_makefile.sh --without-classic
-    - make -j ${NJOBS}
-
-.compile-classic:
-  stage: build
-  extends:
-    - .preferred-stable-version
-  script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
-    - ./create_makefile.sh --only-classic
-    - make -j ${NJOBS}
-
-.collect-vo-files: 
-  # Keep track of all compiled output and the build infrastructure
-  artifacts:
-    name: prosa-build-files
-    paths:
-    - Makefile
-    - Makefile.conf
-    # Ugly hack around https://gitlab.com/gitlab-org/gitlab-runner/issues/2620
-    - "*/*.vo"
-    - "*/*/*.vo"
-    - "*/*/*/*.vo"
-    - "*/*/*/*/*.vo"
-    - "*/*/*/*/*/*.vo"
-    - "*/*/*/*/*/*/*.vo"
-    - "*/*/*/*/*/*/*/*.vo"
-    - "*/*/*/*/*/*/*/*/*.vo"
-    - "*/*/*/*/*/*/*/*/*/*.vo"
-    - "*/*.glob"
-    - "*/*/*.glob"
-    - "*/*/*/*.glob"
-    - "*/*/*/*/*.glob"
-    - "*/*/*/*/*/*.glob"
-    - "*/*/*/*/*/*/*.glob"
-    - "*/*/*/*/*/*/*/*.glob"
-    - "*/*/*/*/*/*/*/*/*.glob"
-    - "*/*/*/*/*/*/*/*/*/*.glob"
-    expire_in: 1 week
-
-.doc: 
-  extends:
-    - .preferred-stable-version
-  stage: process
-  script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
-    - make html -j ${NJOBS}
-    - mv html with-proofs
-    - make gallinahtml -j ${NJOBS}
-    - mv html without-proofs
-    - make htmlpretty -j ${NJOBS}
-    - mv html pretty
-
 
 ###################### The Jobs ######################
 
@@ -108,16 +52,77 @@ stages:
     - .build
     - .not_in_wip_branches
 
-compile:
+compile-and-doc:
+  stage: build
   extends:
-    - .compile
-    - .collect-vo-files
+    - .only_in_wip_branches
+    - .preferred-stable-version
+  script:
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+    - ./create_makefile.sh --without-classic
+    - make -j ${NJOBS}
+    - make html -j ${NJOBS}
+    - mv html with-proofs
+    - make gallinahtml -j ${NJOBS}
+    - mv html without-proofs
+    - make htmlpretty -j ${NJOBS}
+    - mv html pretty    
+  artifacts:
+    name: "prosa-spec-$CI_COMMIT_REF_NAME"
+    paths:
+      - "with-proofs/"
+      - "without-proofs/"
+      - "pretty/"
+    expire_in: 1 week
 
-compile-classic:
+compile-and-doc-and-validate:
+  stage: build
   extends:
     - .not_in_wip_branches
-    - .compile-classic
-    - .collect-vo-files
+    - .preferred-stable-version
+  script:
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+    - ./create_makefile.sh --without-classic
+    - make -j ${NJOBS}
+    - make html -j ${NJOBS}
+    - mv html with-proofs
+    - make gallinahtml -j ${NJOBS}
+    - mv html without-proofs
+    - make htmlpretty -j ${NJOBS}
+    - mv html pretty
+    - make validate 2>&1 | tee validation-results.txt
+    - scripts/check-validation-output.sh validation-results.txt    
+  artifacts:
+    name: "prosa-spec-$CI_COMMIT_REF_NAME"
+    paths:
+      - "with-proofs/"
+      - "without-proofs/"
+      - "pretty/"
+    expire_in: 1 week
+
+classic-compile-and-doc-and-validate:
+  stage: build
+  extends:
+    - .preferred-stable-version
+    - .not_in_wip_branches
+  script:
+    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
+    - ./create_makefile.sh --only-classic
+    - make -j ${NJOBS}
+    - make html -j ${NJOBS}
+    - mv html with-proofs
+    - make gallinahtml -j ${NJOBS}
+    - mv html without-proofs
+    - make htmlpretty -j ${NJOBS}
+    - mv html pretty
+    - make validate
+  artifacts:
+    name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
+    paths:
+      - "with-proofs/"
+      - "without-proofs/"
+      - "pretty/"
+    expire_in: 1 week
 
 proof-length:
   stage: build
@@ -134,75 +139,20 @@ spell-check:
     - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
 
 # mathcomp-dev with stable Coq
-coq-8.15:
-  extends:
-    - .build-dev
-    - .not_in_wip_branches    
-  # it's ok to fail with an unreleased version of ssreflect
-  allow_failure: true
+#coq-8.15:
+#  extends:
+#    - .build-dev
+#    - .not_in_wip_branches    
+#  # it's ok to fail with an unreleased version of ssreflect
+#  allow_failure: true
 
 # mathcomp-dev with coq-dev
-coq-dev:
-  extends:
-    - .build-dev
-    - .not_in_wip_branches    
-  # it's ok to fail with an unreleased version of ssreflect and Coq
-  allow_failure: true
-
-validate:
-  extends:
-    - .not_in_wip_branches
-    - .preferred-stable-version
-  stage: process
-  needs: ["compile"]
-  dependencies:
-    - compile
-  script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
-    - make -j ${NJOBS} # CI gotcha — get any spurious recompilation out of the way
-    - make validate 2>&1 | tee validation-results.txt
-    - scripts/check-validation-output.sh validation-results.txt
-
-validate-classic:
-  extends:
-    - .not_in_wip_branches  
-    - .preferred-stable-version
-  stage: process
-  needs: ["compile-classic"]
-  dependencies:
-    - compile-classic
-  script:
-    - opam update; opam install -y -v -j ${NJOBS} coq-mathcomp-zify
-    - make validate
-
-doc:
-  extends:
-    - .doc
-  needs: ["compile"]
-  dependencies:
-    - compile
-  artifacts:
-    name: "prosa-spec-$CI_COMMIT_REF_NAME"
-    paths:
-      - "with-proofs/"
-      - "without-proofs/"
-      - "pretty/"
-    expire_in: 1 week
-
-doc-classic:
-  extends:
-    - .not_in_wip_branches  
-    - .doc
-  needs: ["compile-classic"]
-  dependencies:
-    - compile-classic
-  artifacts:
-    name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
-    paths:
-      - "with-proofs/"
-      - "without-proofs/"
-      - "pretty/"
-    expire_in: 1 week
+#coq-dev:
+#  extends:
+#    - .build-dev
+#    - .not_in_wip_branches    
+#  # it's ok to fail with an unreleased version of ssreflect and Coq
+#  allow_failure: true
 
 proof-state:
   extends:
