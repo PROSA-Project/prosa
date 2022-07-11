@@ -121,7 +121,7 @@ Section DivFloorCeil.
     have LEQd: m %/ d <= n %/ d by apply leq_div2r.
     destruct (d %| m) eqn:Mm; destruct (d %| n) eqn:Mn => //; first by lia.
     rewrite ltn_divRL //.
-    apply ltn_leq_trans with m => //.
+    apply: (leq_trans _ LEQ).
     move: (leq_trunc_div m d) => LEQm.
     destruct (ltngtP (m %/ d * d) m) => //.
     move: e => /eqP EQ; rewrite -dvdn_eq in EQ.

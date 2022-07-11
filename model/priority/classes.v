@@ -40,12 +40,14 @@ Class JLDP_policy (Job: JobType) := hep_job_at : instant -> rel Job.
 
 (** First, any FP policy can be interpreted as an JLFP policy by comparing jobs
     according to the priorities of their respective tasks. *)
+#[global]
 Instance FP_to_JLFP (Job: JobType) (Task: TaskType)
          `{JobTask Job Task} `{FP_policy Task} : JLFP_policy Job :=
   fun j1 j2 => hep_task (job_task j1) (job_task j2).
 
 (** Second, any JLFP policy implies a JLDP policy that simply ignores the time
     parameter. *)
+#[global]
 Instance JLFP_to_JLDP (Job: JobType) `{JLFP_policy Job} : JLDP_policy Job :=
   fun _ j1 j2 => hep_job j1 j2.
 

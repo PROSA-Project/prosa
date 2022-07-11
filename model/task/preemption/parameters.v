@@ -52,6 +52,7 @@ End MaxAndLastNonpreemptiveSegment.
 (** To avoid having to specify redundant information, we allow Coq to
     automatically infer a task's maximum non-preemptive segment length if its
     preemption points are known. *)
+#[global]
 Instance TaskPreemptionPoints_to_TaskMaxNonpreemptiveSegment_conversion
          (Task : TaskType) `{TaskPreemptionPoints Task} : TaskMaxNonpreemptiveSegment Task := task_max_nonpr_segment.
 

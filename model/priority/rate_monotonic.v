@@ -7,7 +7,7 @@ Require Export prosa.model.task.arrival.sporadic.
 (** We define the notion of rate-monotonic task priorities for sporadic tasks,
     i.e., the classic FP policy in which sporadic tasks are prioritized in
     order of their minimum inter-arrival times (or periods). *)
-Instance RM (Task : TaskType) `{SporadicModel Task} : FP_policy Task :=
+#[export] Instance RM (Task : TaskType) `{SporadicModel Task} : FP_policy Task :=
 {
   hep_task (tsk1 tsk2 : Task) := task_min_inter_arrival_time tsk1 <= task_min_inter_arrival_time tsk2
 }.

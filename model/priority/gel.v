@@ -40,7 +40,7 @@ End AbsolutePriorityPoint.
     priority is higher than or equal to a job [j2]'s priority iff
     [j1]'s absolute priority point is no later than [j2]'s absolute
     priority point.  *)
-Instance GEL_priority (Job : JobType) (Task : TaskType)
+#[export] Instance GEL_priority (Job : JobType) (Task : TaskType)
           `{PriorityPoint Task} `{JobArrival Job} `{JobTask Job Task} : JLFP_policy Job :=
 {
   hep_job (j1 j2 : Job) := (job_priority_point j1 <=? job_priority_point j2)%Z

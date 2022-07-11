@@ -6,7 +6,7 @@ Require Export prosa.model.priority.classes.
     scheduled in order of their urgency, i.e., jobs are ordered according to
     their absolute deadlines. The EDF policy belongs to the class of JLFP
     policies. *)
-Instance EDF (Job : JobType) `{JobDeadline Job} : JLFP_policy Job :=
+#[export] Instance EDF (Job : JobType) `{JobDeadline Job} : JLFP_policy Job :=
 {
   hep_job (j1 j2 : Job) := job_deadline j1 <= job_deadline j2
 }.

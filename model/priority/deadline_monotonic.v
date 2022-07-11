@@ -5,7 +5,7 @@ Require Export prosa.model.priority.classes.
 (** We define the notion of deadline-monotonic task priorities, i.e., the
     classic FP policy in which tasks are prioritized in order of their relative
     deadlines. *)
-Instance DM (Task : TaskType) `{TaskDeadline Task} : FP_policy Task :=
+#[export] Instance DM (Task : TaskType) `{TaskDeadline Task} : FP_policy Task :=
 {
   hep_task (tsk1 tsk2 : Task) := task_deadline tsk1 <= task_deadline tsk2
 }.
