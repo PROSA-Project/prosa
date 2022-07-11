@@ -95,7 +95,7 @@ Section ArrivalCurvePrefixSortedLeq.
       exists v, (t + ε, v) \in steps_of ac_prefix.
   Proof.
     intros ? LT.
-    unfold prefix, value_at, step_at in LT.
+    unfold value_at, step_at in LT.
     destruct ac_prefix as [h2 steps]; simpl in LT.
     rewrite [in X in _ < X](sorted_split _ _ fst t) in LT.
     { rewrite [in X in _ ++ X](eq_filter (a2 := fun x => fst x == t + ε)) in LT; last first.
