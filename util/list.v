@@ -910,11 +910,11 @@ End IotaRange.
 (** A sequence [xs] is a prefix of another sequence [ys] iff
     there exists a sequence [xs_tail] such that [ys] is a 
     concatenation of [xs] and [xs_tail]. *)
-Definition prefix (T : eqType) (xs ys : seq T) := exists xs_tail, xs ++ xs_tail = ys.
+Definition prefix_of {T : eqType} (xs ys : seq T) := exists xs_tail, xs ++ xs_tail = ys.
 
 (** Furthermore, every prefix of a sequence is said to be 
     strict if it is not equal to the sequence itself. *)
-Definition strict_prefix (T : eqType) (xs ys : seq T) :=
+Definition strict_prefix_of {T : eqType} (xs ys : seq T) :=
   exists xs_tail, xs_tail <> [::] /\ xs ++ xs_tail = ys.
 
 (** We define a helper function that shifts a sequence of numbers forward

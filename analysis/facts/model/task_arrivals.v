@@ -49,7 +49,7 @@ Section TaskArrivals.
       arrives_in arr_seq j2 ->
       job_task j1 = job_task j2 ->
       job_arrival j1 <= job_arrival j2 ->
-      prefix Job (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
+      prefix_of (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
   Proof.
     intros j1 j2 ARR1 ARR2 TSK ARR_LT.
     exists (task_arrivals_between arr_seq (job_task j1) (job_arrival j1 + 1) (job_arrival j2 + 1)).
@@ -240,7 +240,7 @@ Section TaskArrivals.
       arrives_in arr_seq j1 ->
       arrives_in arr_seq j2 -> 
       job_arrival j1 < job_arrival j2 ->
-      strict_prefix _ (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
+      strict_prefix_of (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
   Proof.
     intros j1 j2 TSK1 TSK2 ARR_1 ARR_2 ARR_INEQ.
     exists (task_arrivals_between arr_seq tsk ((job_arrival j1).+1) ((job_arrival j2).+1)).
