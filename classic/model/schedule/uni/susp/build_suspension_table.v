@@ -228,7 +228,7 @@ Module SuspensionTableConstruction.
           by rewrite EQ /= in ALL; apply/eqP; rewrite eqb0.
         }
         move => /existsP [t0 /andP [/eqP EQ SUSP0]].
-        have MAX := @arg_maxP _ t0 (fun x=>(S j x == S j (ex j t)) && susp_at j x) id. 
+        have MAX := @arg_maxnP _ t0 (fun x=>(S j x == S j (ex j t)) && susp_at j x) id. 
         feed MAX; simpl in MAX; first by rewrite EQ eq_refl SUSP0.
         move: MAX => [m /andP [/eqP EQserv SUSPm] ALL]; clear EQ SUSP0 t0.
         case (ltnP t m) => [LTm | GEm].

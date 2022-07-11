@@ -108,7 +108,7 @@ Section PickMin.
         set argmin := arg_min (Ordinal LT) p id.
         specialize (NONE argmin).
         suff ARGMIN: (pred_min_nat n p) argmin by rewrite ARGMIN in NONE.
-        rewrite /argmin; case: arg_minP; first by done.
+        rewrite /argmin; case: arg_minnP; first by done.
         intros y Py MINy.
         apply/andP; split; first by done.
         by apply/forallP; intros y0; apply/implyP; intros Py0; apply MINy.
@@ -144,7 +144,7 @@ Section PickMin.
         set argmin := arg_min (Ordinal LT) p id.
         specialize (NONE argmin).
         suff ARGMIN: (pred_min_nat n p) argmin by rewrite ARGMIN in NONE.
-        rewrite /argmin; case: arg_minP; first by done.
+        rewrite /argmin; case: arg_minnP; first by done.
         intros y Py MINy.
         apply/andP; split; first by done.
         by apply/forallP; intros y0; apply/implyP; intros Py0; apply MINy.
@@ -183,7 +183,7 @@ Section PickMax.
         set argmax := arg_max (Ordinal LT) p id.
         specialize (NONE argmax).
         suff ARGMAX: (pred_max_nat n p) argmax by rewrite ARGMAX in NONE.
-        rewrite /argmax; case: arg_maxP; first by done.
+        rewrite /argmax; case: arg_maxnP; first by done.
         intros y Py MAXy.
         apply/andP; split; first by done.
         by apply/forallP; intros y0; apply/implyP; intros Py0; apply MAXy.
@@ -219,7 +219,7 @@ Section PickMax.
         set argmax := arg_max (Ordinal LT) p id.
         specialize (NONE argmax).
         suff ARGMAX: (pred_max_nat n p) argmax by rewrite ARGMAX in NONE.
-        rewrite /argmax; case: arg_maxP; first by done.
+        rewrite /argmax; case: arg_maxnP; first by done.
         intros y Py MAXy.
         apply/andP; split; first by done.
         by apply/forallP; intros y0; apply/implyP; intros Py0; apply MAXy.
