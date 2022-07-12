@@ -109,7 +109,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   (** ** Response-Time Bound *)
   
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)      
-  Let is_in_search_space := is_in_search_space ts tsk blocking_bound L.
+  Let is_in_search_space := bounded_nps.is_in_search_space ts tsk L.
   
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
@@ -132,15 +132,12 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Theorem uniprocessor_response_time_bound_fully_preemptive_edf:
     response_time_bounded_by tsk R.
   Proof.
-    try ( eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L) ) ||
-    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L); rt_eauto.
+    apply: uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments; rt_eauto.
     move => A /andP [LT CHANGE].
     have BLOCK: forall A', bounded_nps.blocking_bound ts tsk A' = blocking_bound A'.
     { by move=> A'; rewrite /bounded_nps.blocking_bound /parameters.task_max_nonpreemptive_segment
          /fully_preemptive_task_model subnn big1_eq. }
-    specialize (H_R_is_maximum A); feed H_R_is_maximum.
-    { apply/andP; split; first by done.
-      by move: CHANGE; rewrite /priority_inversion_changes_at /is_in_search_space !BLOCK. }
+    specialize (H_R_is_maximum A); feed H_R_is_maximum; first by apply/andP; split; done.
     move: H_R_is_maximum => [F [FIX BOUND]].
     exists F; split.
     + by rewrite BLOCK add0n subnn subn0.

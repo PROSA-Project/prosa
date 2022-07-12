@@ -92,7 +92,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
   Let blocking_bound A :=
-    \max_(tsk_o <- ts | (tsk_o != tsk) && (task_deadline tsk_o > task_deadline tsk + A))
+    \max_(tsk_o <- ts | (blocking_relevant tsk_o)
+                         && (task_deadline tsk_o > task_deadline tsk + A))
      (task_cost tsk_o - ε).
   
   (** Next, we define an upper bound on interfering workload received from jobs 
@@ -109,7 +110,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   (** ** Response-Time Bound *)
     
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-  Let is_in_search_space := is_in_search_space ts tsk blocking_bound L.
+  Let is_in_search_space := bounded_nps.is_in_search_space ts tsk L.
   
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
@@ -140,7 +141,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
         rewrite ZERO in NEQ.
         by apply/eqP; rewrite -leqn0.
       }
-        by rewrite /job_response_time_bound /completed_by ZEROj.
+      by rewrite /job_response_time_bound /completed_by ZEROj.
     }
     try ( eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L0 := L) ) ||
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L).

@@ -1,6 +1,7 @@
 Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.edf.
 Require Export prosa.analysis.facts.model.rbf.
+Require Export prosa.analysis.facts.model.arrival_curves.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.results.edf.rta.bounded_pi.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
@@ -125,27 +126,119 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** Let's define some local names for clarity. *)
   Let max_length_of_priority_inversion :=
     max_length_of_priority_inversion arr_seq.
-  Let task_rbf_changes_at A := task_rbf_changes_at tsk A.
-  Let bound_on_total_hep_workload_changes_at :=
-    bound_on_total_hep_workload_changes_at ts tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-  Let is_in_search_space := is_in_search_space ts tsk.
 
-  (** For a job with the relative arrival offset [A] within its busy window, we define
-      the following blocking bound. *)
-   Definition blocking_bound (A : duration)  :=
-     \max_(tsk_o <- ts | (tsk_o != tsk) && (D tsk_o > D tsk + A))
-       (task_max_nonpreemptive_segment tsk_o - ε).
+  (** For a job with the relative arrival offset [A] within its busy window, we
+      define the following blocking bound. Only other tasks that potentially
+      release non-zero-cost jobs are relevant, so we define a predicate to
+      exclude pathological cases. *)
+  Definition blocking_relevant (tsk_o : Task) :=
+    (max_arrivals tsk_o ε > 0) && (task_cost tsk_o > 0).
+  Definition blocking_bound (A : duration)  :=
+    \max_(tsk_o <- ts | blocking_relevant tsk_o && (D tsk_o > D tsk + A))
+     (task_max_nonpreemptive_segment tsk_o - ε).
+
+  (** ** Search Space *)
+
+  (** If priority inversion is caused exclusively by non-preemptive sections,
+      then we do not need to consider the priority-inversion bound in the search
+      space. Hence we define the following search space, which refines the more
+      general [bounded_pi.is_in_search_space] for our specific setting. *)
+  Definition is_in_search_space (L A : duration) :=
+    (A < L) && (task_rbf_changes_at tsk A
+                || bound_on_total_hep_workload_changes_at ts tsk A).
+
+  (** For the following proof, we exploit the fact that the blocking bound is
+      monotonically decreasing in [A], which we note here. *)
+  Fact blocking_bound_decreasing :
+    forall A1 A2,
+      A1 <= A2 ->
+      blocking_bound A1 >= blocking_bound A2.
+  Proof.
+    move=> A1 A2 LEQ.
+    rewrite /blocking_bound.
+    apply: bigmax_subset => tsk_o IN /andP[/andP[OTHER LT] ARR].
+    by repeat (apply /andP; split) => //; lia.
+  Qed.
+
+  (** To use the refined search space with the abstract theorem, we must show
+      that it still includes all relevant points. To this end, we first observe
+      that a step in the blocking bound implies the existence of a task that
+      could release a job with an absolute deadline equal to the absolute
+      deadline of the job under analysis. *)
+  Lemma task_with_equal_deadline_exists :
+    forall {A},
+      priority_inversion_changes_at blocking_bound A ->
+      exists tsk_o, (tsk_o \in ts)
+                 && (blocking_relevant tsk_o)
+                 && (tsk_o != tsk)
+                 && (D tsk_o == D tsk + A).
+  Proof.
+    move=> A. rewrite /priority_inversion_changes_at => NEQ.
+    have LEQ: blocking_bound A <= blocking_bound (A - ε) by apply: blocking_bound_decreasing; lia.
+    have LT: blocking_bound A < blocking_bound (A - ε) by lia.
+    move: LT; rewrite /blocking_bound => LT {LEQ} {NEQ}.
+    move: (bigmax_witness_diff LT) => [tsk_o [IN [NOT HOLDS]]].
+    move: HOLDS => /andP[REL LTeps].
+    exists tsk_o; repeat (apply /andP; split) => //;
+      first by apply /eqP => EQ; move: LTeps; rewrite EQ; lia.
+    move: NOT; rewrite negb_and => /orP[/negP // |].
+    by move: LTeps; rewrite /ε => LTeps; lia.
+  Qed.
+
+  (** With the above setup in place, we can show that the search space defined
+      above by [is_in_search_space] covers the the more abstract search space
+      defined by [bounded_pi.is_in_search_space]. *)
+  Lemma search_space_inclusion :
+     forall {A L},
+       bounded_pi.is_in_search_space ts tsk blocking_bound L A ->
+       is_in_search_space L A.
+   Proof.
+     move=> A L /andP[BOUND STEP].
+     apply /andP; split => //; apply /orP.
+     move: STEP => /orP[/orP[STEP|RBF] | IBF]; [right| by left| by right].
+     move: (task_with_equal_deadline_exists STEP) => [tsk_o /andP[/andP[/andP[IN REL] OTHER] EQ]].
+     rewrite /bound_on_total_hep_workload_changes_at.
+     apply /hasP; exists tsk_o => //.
+     apply /andP; split; first by rewrite eq_sym.
+     move: EQ. rewrite /D => /eqP EQ.
+     rewrite /task_request_bound_function EQ.
+     move: REL; rewrite /blocking_relevant => /andP [ARRIVES COST].
+     rewrite eqn_pmul2l //.
+     have -> : A + task_deadline tsk - (task_deadline tsk + A)
+              = 0 by lia.
+     have -> : A + ε + task_deadline tsk - (task_deadline tsk + A)
+              = ε by lia.
+     by move: (H_valid_arrival_curve tsk_o IN) => [-> _]; lia.
+   Qed.
+
 
   (** ** Priority inversion is bounded *)
   (** In this section, we prove that a priority inversion for task [tsk] is bounded by 
       the maximum length of non-preemptive segments among the tasks with lower priority. *)
   Section PriorityInversionIsBounded.
 
-    (** First, we prove that the maximum length of a priority
-        inversion of job j is bounded by the maximum length of a
-        non-preemptive section of a task with lower-priority task
-        (i.e., the blocking term). *)
+    (** First, we observe that the maximum non-preemptive segment length of any
+        task that releases a job with an earlier absolute deadline (w.r.t. a
+        given job [j]) and non-zero execution cost upper-bounds the maximum
+        possible length of priority inversion (of said job [j]).  *)
+    Lemma priority_inversion_is_bounded_by_max_np_segment :
+      forall {j t1},
+        max_length_of_priority_inversion j t1
+        <= \max_(j_lp <- arrivals_between arr_seq 0 t1 | (~~ EDF j_lp j)
+                                                         && (job_cost j_lp > 0))
+           (task_max_nonpreemptive_segment (job_task j_lp) - ε).
+    Proof.
+      move=> j t1.
+      rewrite /max_length_of_priority_inversion/priority_inversion.max_length_of_priority_inversion.
+      apply: leq_big_max => j' JINB NOTHEP.
+      rewrite leq_sub2r //.
+      apply in_arrivals_implies_arrived in JINB.
+      by apply H_valid_model_with_bounded_nonpreemptive_segments.
+    Qed.
+
+    (** Second, we prove that the maximum length of a priority inversion of a
+        given job [j] is indeed bounded by defined the blocking bound. *)
     Lemma priority_inversion_is_bounded_by_blocking:
       forall j t1 t2,
         arrives_in arr_seq j ->
@@ -155,43 +248,28 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Proof.
       intros j t1 t2 ARR TSK BUSY; unfold max_length_of_priority_inversion, blocking_bound.
       destruct BUSY as [TT [QT [_ LE]]]; move: LE => /andP [GE LT].
-      apply leq_trans with
-          (\max_(j_lp <- arrivals_between arr_seq 0 t1 | ~~ EDF j_lp j)
-            (task_max_nonpreemptive_segment (job_task j_lp) - ε)).
-      - apply leq_big_max.
-        intros j' JINB NOTHEP.        
-        rewrite leq_sub2r //.
-        apply in_arrivals_implies_arrived in JINB.
-          by apply H_valid_model_with_bounded_nonpreemptive_segments. 
-      - apply /bigmax_leq_seqP. 
-        intros j' JINB NOTHEP.
-        apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1). 
-        { apply H_all_jobs_from_taskset.
-          apply mem_bigcat_nat_exists in JINB.
-           by inversion JINB as [ta' [JIN' _]]; exists ta'. }
-        eapply in_arrivals_implies_arrived_between in JINB; last by eauto 2.
-        move: JINB; move => /andP [_ TJ'].
-        { have NINTSK: job_task j' != tsk.
-          { apply/eqP; intros TSKj'.
-            rewrite /EDF -ltnNge in NOTHEP.
-            rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline in NOTHEP.
-            move: TSK => /eqP -> in NOTHEP. rewrite TSKj' ltn_add2r in NOTHEP.
-            move: NOTHEP; rewrite ltnNge. move => /negP T. apply: T.
-            apply leq_trans with t1; [by apply ltnW | done]. 
-          }
-          apply/andP; split; first by done.
-          rewrite /EDF -ltnNge in NOTHEP.
-          move: TSK => /eqP <-.
-          have ARRLE: job_arrival j' < job_arrival j by apply leq_trans with t1.
-          rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline in NOTHEP.
-          rewrite /D.
-          have EQ1: task_deadline (job_task j)
-                    < job_arrival j' + task_deadline (job_task j') - job_arrival j
-            by lia.
-          have EQ2: job_arrival j - job_arrival j' >  (job_arrival j - t1) by lia.
-          by lia.
-        }
-      Qed.
+      apply: leq_trans; first by apply: priority_inversion_is_bounded_by_max_np_segment.
+      apply /bigmax_leq_seqP => j' JINB NOTHEP.
+      have ARR': arrives_in arr_seq j'
+        by apply: in_arrivals_implies_arrived; exact: JINB.
+      apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
+        first by apply H_all_jobs_from_taskset.
+      eapply in_arrivals_implies_arrived_between in JINB; last by eauto 2.
+      move: JINB; move => /andP [_ TJ'].
+      repeat (apply/andP; split); last first.
+      { rewrite /EDF -ltnNge in NOTHEP.
+        move: TSK => /eqP <-.
+        have ARRLE: job_arrival j' < job_arrival j by apply leq_trans with t1.
+        move: NOTHEP; rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline /D.
+        by lia. }
+      { move: NOTHEP => /andP [_ NZ].
+        move: (H_valid_job_cost j' ARR'); rewrite /valid_job_cost.
+        by lia. }
+      { apply: non_pathological_max_arrivals; last first.
+          - exact: ARR'.
+          - by rewrite /job_of_task.
+          - by apply H_is_arrival_curve, H_all_jobs_from_taskset, ARR'. }
+    Qed.
 
     (** Using the lemma above, we prove that the priority inversion of the task is bounded by 
        the maximum length of a nonpreemptive section of lower-priority tasks. *)
@@ -256,7 +334,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Variable R : duration.
     Hypothesis H_R_is_maximum:
       forall (A : duration),
-        is_in_search_space blocking_bound L A -> 
+        is_in_search_space L A ->
         exists (F : duration),
           A + F >= blocking_bound A
                   + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
@@ -274,10 +352,12 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Proof.
       eapply uniprocessor_response_time_bound_edf; rt_eauto.
       - eapply EDF_implies_sequential_tasks; eauto 2.
-        + by apply basic.basic_readiness_is_work_bearing_readiness, EDF_is_reflexive.
-      - by apply priority_inversion_is_bounded. 
+        by apply basic.basic_readiness_is_work_bearing_readiness, EDF_is_reflexive.
+      - by apply priority_inversion_is_bounded.
+      - move=> A BPI_SP.
+        by apply H_R_is_maximum, search_space_inclusion.
     Qed.
-           
+
   End ResponseTimeBound.
 
 End RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.

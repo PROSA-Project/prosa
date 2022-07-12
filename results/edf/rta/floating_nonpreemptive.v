@@ -99,7 +99,8 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   
   (** We define a bound for the priority inversion caused by jobs with lower priority. *)
   Definition blocking_bound A :=
-    \max_(tsk_other <- ts | (tsk_other != tsk) && (task_deadline tsk_other > task_deadline tsk + A))
+    \max_(tsk_other <- ts | (blocking_relevant tsk_other)
+                             && (task_deadline tsk_other > task_deadline tsk + A))
      (task_max_nonpreemptive_segment tsk_other - ε).
   
   (** Next, we define an upper bound on interfering workload received from jobs 
@@ -116,7 +117,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   (** ** Response-Time Bound *)
   
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
-  Let is_in_search_space := is_in_search_space ts tsk blocking_bound L.
+  Let is_in_search_space := bounded_nps.is_in_search_space ts tsk L.
   
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
