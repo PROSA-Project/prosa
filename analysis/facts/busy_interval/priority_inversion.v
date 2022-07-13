@@ -6,6 +6,7 @@ Require Export prosa.analysis.definitions.busy_interval.
 Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.facts.busy_interval.busy_interval.
 Require Export prosa.analysis.facts.model.preemption.
+Require Export prosa.analysis.facts.behavior.completion.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
@@ -79,7 +80,7 @@ Section PriorityInversionIsBounded.
        defined as the maximum length of nonpreemptive segments among
        all jobs that arrived so far. *)
   Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
-    \max_(j_lp <- arrivals_before arr_seq t | ~~ hep_job j_lp j)
+    \max_(j_lp <- arrivals_before arr_seq t | (~~ hep_job j_lp j) && (job_cost j_lp > 0))
      (job_max_nonpreemptive_segment j_lp - ε).
 
   (** Next we prove that a priority inversion of a job is bounded by 
@@ -648,15 +649,19 @@ Section PriorityInversionIsBounded.
             rewrite leq_add2l.
             unfold max_length_of_priority_inversion.
             rewrite (big_rem jlp) //=.
-            { rewrite H_jlp_low_priority; simpl.
-              apply leq_trans with (job_max_nonpreemptive_segment jlp - ε); last by rewrite leq_maxl.
-                by rewrite leq_add2l in LE. }
+            { rewrite H_jlp_low_priority //=.
+              have NZ: service sched jlp t1 < job_cost jlp
+                by apply: service_lt_cost; rt_eauto.
+              rewrite ifT; last by lia.
+              apply leq_trans with (job_max_nonpreemptive_segment jlp - ε);
+                first by rewrite leq_add2l in LE.
+              by rewrite leq_maxl. }
             eapply arrived_between_implies_in_arrivals; eauto 2.
             apply/andP; split; first by done.
             eapply low_priority_job_arrives_before_busy_interval_prefix with t1; eauto 2.
-              by move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]]; apply/andP; split.
+            by move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]]; apply/andP; split.
           Qed.
-          
+
         End FirstPreemptionPointOfjlp.
 
         (** Next we combine the facts above to conclude the lemma. *)
@@ -683,16 +688,15 @@ Section PriorityInversionIsBounded.
           have Fact: exists Δ, sm_pt = service jlp t1 + Δ.
           { exists (sm_pt - service jlp t1).
             apply/eqP; rewrite eq_sym; apply/eqP; rewrite subnKC //.
-              by move: NEQ => /andP [T _]. }
+            by move: NEQ => /andP [T _]. }
           move: Fact => [Δ EQ]; subst sm_pt; rename Δ into sm_pt.
           exists (t1 + sm_pt); split.
           - apply first_preemption_time.
             all: unfold service.service; try done.
             intros; apply MIN; apply/andP; split; by done.
-          - apply preemption_time_le_max_len_of_priority_inversion.
-            by unfold service.service.
+          - by apply preemption_time_le_max_len_of_priority_inversion.
         Qed.
-        
+
       End Case3.
       
     End CaseAnalysis.
