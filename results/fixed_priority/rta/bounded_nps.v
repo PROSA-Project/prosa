@@ -132,27 +132,25 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         max_length_of_priority_inversion j t <= blocking_bound.
     Proof.
       intros j t ARR TSK; move: TSK => /eqP TSK.
-      rewrite /max_length_of_priority_inversion /blocking_bound /FP_to_JLFP
+      rewrite /max_length_of_priority_inversion /blocking_bound
               /priority_inversion.max_length_of_priority_inversion.
-      apply leq_trans with
-          (\max_(j_lp <- arrivals_between arr_seq 0 t
+      apply: (@leq_trans (\max_(j_lp <- arrivals_before arr_seq t | ~~ hep_job j_lp j)
+                           (job_max_nonpreemptive_segment j_lp - ε)));
+        first by apply: bigmax_subset => j' IN /andP [not_hep _].
+      apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t
                 | ~~ hep_task (job_task j_lp) tsk)
-             (task_max_nonpreemptive_segment (job_task j_lp) - ε)).
-      { rewrite /hep_job TSK.
-        apply leq_big_max.
-        intros j' JINB NOTHEP.
+            (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
+      { rewrite /hep_job /FP_to_JLFP TSK.
+        apply leq_big_max => j' JINB NOTHEP.
         rewrite leq_sub2r //.
         apply H_valid_model_with_bounded_nonpreemptive_segments.
-          by eapply in_arrivals_implies_arrived; eauto 2.
-      }
-      { apply /bigmax_leq_seqP. 
-        intros j' JINB NOTHEP.
+        by eapply in_arrivals_implies_arrived; eauto 2. }
+      { apply /bigmax_leq_seqP => j' JINB NOTHEP.
         apply leq_bigmax_cond_seq with
-            (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1); last by done.
+            (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
+          last by done.
         apply H_all_jobs_from_taskset.
-        apply mem_bigcat_nat_exists in JINB.
-          by inversion JINB as [ta' [JIN' _]]; exists ta'.
-      }
+        by apply: in_arrivals_implies_arrived (JINB). }
     Qed.
 
     (** Using the above lemma, we prove that the priority inversion of the task is bounded by blocking_bound. *) 
