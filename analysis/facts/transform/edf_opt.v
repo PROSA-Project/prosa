@@ -887,24 +887,18 @@ Section Optimality.
     Theorem edf_schedule_is_valid:
       valid_schedule equivalent_edf_schedule arr_seq.
     Proof.
-      move: H_sched_valid => [COME READY].
       rewrite /valid_schedule; split;
-        first by apply edf_transform_jobs_come_from_arrival_sequence.
-      have ARR  := jobs_must_arrive_to_be_ready sched READY.
-      have COMP := completed_jobs_are_not_ready sched READY.
+        first by apply edf_transform_jobs_come_from_arrival_sequence; rt_eauto.
       apply basic_readiness_compliance.
-      - by apply edf_transform_jobs_must_arrive.
-      - by apply edf_transform_completed_jobs_dont_execute.
+      - by apply edf_transform_jobs_must_arrive; rt_eauto.
+      - by apply edf_transform_completed_jobs_dont_execute; rt_eauto.
     Qed.
 
     (** ...and no scheduled job misses its deadline. *)
     Theorem edf_schedule_meets_all_deadlines:
       all_deadlines_met equivalent_edf_schedule.
     Proof.
-      move: H_sched_valid => [COME READY].
-      have ARR  := jobs_must_arrive_to_be_ready sched READY.
-      have COMP := completed_jobs_are_not_ready sched READY.
-      now apply edf_transform_deadlines_met.
+      by apply edf_transform_deadlines_met; rt_eauto.
     Qed.
 
   End AllDeadlinesMet.
@@ -930,14 +924,14 @@ Section Optimality.
       destruct (job_cost j ==  0) eqn:COST.
       - move: COST => /eqP COST.
         rewrite /job_meets_deadline /completed_by COST.
-        now apply leq0n.
+        by apply leq0n.
       - move: (neq0_lt0n COST) => NONZERO.
         move: (H_no_deadline_misses_of_arrivals j ARR_j). rewrite {1}/job_meets_deadline => COMP_j.
         move: (completed_implies_scheduled_before sched j NONZERO ARR (job_deadline j) COMP_j) => [t' [_ SCHED']].
         move: (all_deadlines_met_in_valid_schedule arr_seq sched COME H_no_deadline_misses_of_arrivals) => NO_MISSES.
         move: (edf_transform_job_scheduled' sched ARR COMP NO_MISSES j t' SCHED') => [t'' SCHED''].
         move: (edf_schedule_meets_all_deadlines NO_MISSES) => DL_MET.
-        now apply: (DL_MET j t'' SCHED'').
+        by apply: (DL_MET j t'' SCHED'').
     Qed.
 
   End AllDeadlinesOfArrivalsMet.

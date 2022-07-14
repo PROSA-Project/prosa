@@ -115,7 +115,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
   Definition blocking_bound :=
     \max_(tsk_other <- ts | ~~ hep_task tsk_other tsk)
-     (task_max_nonpreemptive_segment tsk_other - ε).
+      (task_max_nonpreemptive_segment tsk_other - ε).
   
   (** ** Priority inversion is bounded *)
   (** In this section, we prove that a priority inversion for task [tsk] is bounded by 
@@ -137,7 +137,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       apply leq_trans with
           (\max_(j_lp <- arrivals_between arr_seq 0 t
                 | ~~ hep_task (job_task j_lp) tsk)
-            (task_max_nonpreemptive_segment (job_task j_lp) - ε)).
+             (task_max_nonpreemptive_segment (job_task j_lp) - ε)).
       { rewrite /hep_job TSK.
         apply leq_big_max.
         intros j' JINB NOTHEP.
@@ -161,7 +161,6 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         arr_seq sched tsk blocking_bound.
     Proof.
       intros j ARR TSK POS t1 t2 PREF.
-      move: H_sched_valid => [CARR MBR].
       case NEQ: (t2 - t1 <= blocking_bound). 
       { apply leq_trans with (t2 - t1); last by done.
         rewrite /cumulative_priority_inversion /is_priority_inversion.

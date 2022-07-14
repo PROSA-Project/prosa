@@ -603,11 +603,9 @@ Section WorkConservingTransformation.
   Lemma wc_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched_wc arr_seq.
   Proof.
-    rewrite /sched_wc /wc_transform.
     move=> j t.
-    move: H_sched_valid => [ARR READY].
     rewrite /scheduled_at -/(scheduled_at _ j t).
-    by apply (wc_prefix_jobs_come_from_arrival_sequence arr_seq sched t.+1 ARR).
+    eapply (wc_prefix_jobs_come_from_arrival_sequence arr_seq sched t.+1); rt_eauto.
   Qed.
 
   (** Similarly, jobs are only scheduled if they are ready. *)
@@ -615,10 +613,9 @@ Section WorkConservingTransformation.
     jobs_must_be_ready_to_execute sched_wc.
   Proof.
     move=> j t.
-    move: H_sched_valid => [ARR READY].
     rewrite /scheduled_at /sched_wc /wc_transform -/(scheduled_at _ j t) => SCHED_AT.
     have READY': job_ready (wc_transform_prefix arr_seq sched t.+1) j t
-      by apply wc_prefix_jobs_must_be_ready_to_execute => //.
+       by apply wc_prefix_jobs_must_be_ready_to_execute => //; rt_eauto.
     move: READY'.
     rewrite /job_ready /basic.basic_ready_instance
             /pending /completed_by /service.

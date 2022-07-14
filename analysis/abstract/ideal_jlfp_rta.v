@@ -1,6 +1,11 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.abstract.abstract_seq_rta.
+Require Export prosa.analysis.facts.busy_interval.busy_interval.
+Require Export prosa.analysis.facts.busy_interval.quiet_time.
+Require Export prosa.analysis.definitions.work_bearing_readiness.
+Require Export prosa.model.priority.classes.
+
 
 (** * JLFP instantiation of Interference and Interfering Workload for ideal uni-processor. *)
 (** In this module we instantiate functions Interference and Interfering Workload 
@@ -158,6 +163,17 @@ Section JLFPInstantiation.
      reuse existing lemmas, we need to prove equivalence of the instantiated functions to 
      some conventional notions. The instantiations given in this file are equivalent to 
      service and workload. Further, we prove these equivalences formally. *)
+
+   (** In order to avoid confusion, we denote the notion of a quiet
+        time in the _classical_ sense as [quiet_time_cl], and the
+        notion of quiet time in the _abstract_ sense as
+        [quiet_time_ab]. *)
+    Let quiet_time_cl := busy_interval.quiet_time arr_seq sched.
+    Let quiet_time_ab := definitions.quiet_time sched interference interfering_workload.
+
+    (** Same for the two notions of a busy interval. *)
+    Let busy_interval_cl := busy_interval.busy_interval arr_seq sched.
+    Let busy_interval_ab := definitions.busy_interval sched interference interfering_workload.
   
   (** Before we present the formal proofs of the equivalences, we recall
      the notion of workload of higher or equal priority jobs. *)
@@ -308,17 +324,6 @@ Section JLFPInstantiation.
       Qed.
       
     End InstantiatedWorkloadEquivalence.
-
-    (** In order to avoid confusion, we denote the notion of a quiet
-        time in the _classical_ sense as [quiet_time_cl], and the
-        notion of quiet time in the _abstract_ sense as
-        [quiet_time_ab]. *)
-    Let quiet_time_cl := busy_interval.quiet_time arr_seq sched.
-    Let quiet_time_ab := definitions.quiet_time sched interference interfering_workload.
-
-    (** Same for the two notions of a busy interval. *)
-    Let busy_interval_cl := busy_interval.busy_interval arr_seq sched.
-    Let busy_interval_ab := definitions.busy_interval sched interference interfering_workload.
     
     (** In this section we prove that the (abstract) cumulative interference of jobs with higher or 
        equal priority is equal to total service of jobs with higher or equal priority. *)
@@ -443,8 +448,6 @@ Section JLFPInstantiation.
         Lemma quiet_time_cl_implies_quiet_time_ab:
           forall t, quiet_time_cl j t -> quiet_time_ab j t.
         Proof.
-          have zero_is_quiet_time: forall j, quiet_time_cl j 0.
-          { by intros jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
           intros t QT; split.
           { intros.
             have CIS := cumulative_interference_split.
@@ -459,10 +462,10 @@ Section JLFPInstantiation.
             rewrite eq_sym; apply/eqP.
             apply all_jobs_have_completed_equiv_workload_eq_service;
               eauto using ideal_proc_model_provides_unit_service.
-            intros; apply QT.
-            - by apply in_arrivals_implies_arrived in H4.
-            - by move: H5 => /andP [H6 H7]. 
-            - by apply in_arrivals_implies_arrived_between in H4.
+            intros j0 IN HEP; apply QT.
+            - by apply in_arrivals_implies_arrived in IN.
+            - by move: HEP => /andP [H6 H7]. 
+            - by apply in_arrivals_implies_arrived_between in IN.
           }
           { rewrite negb_and Bool.negb_involutive; apply/orP.
             case ARR: (arrived_before j t); [right | by left]. 
@@ -473,8 +476,6 @@ Section JLFPInstantiation.
         Lemma quiet_time_ab_implies_quiet_time_cl:
           forall t, quiet_time_ab j t -> quiet_time_cl j t.
         Proof.
-          have zero_is_quiet_time: forall j, quiet_time_cl j 0.
-          { by intros jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
           have CIS := cumulative_interference_split.
           have IC1 := instantiated_cumulative_interference_of_hep_jobs_equal_total_interference_of_hep_jobs.
           rewrite /cumulative_interference /service_of_other_hep_jobs in CIS, IC1.
@@ -551,5 +552,125 @@ Section JLFPInstantiation.
       End BusyIntervalEquivalence.
 
   End Equivalences.
+
+  (** In this section we prove some properties about the interference 
+      and interfering workload as defined in this file. *)
+  Section I_IW_correctness.
+
+    (** Consider work-bearing readiness. *)
+    Context `{@JobReady Job (ideal.processor_state Job) _ _}.
+    Hypothesis H_work_bearing_readiness : work_bearing_readiness arr_seq sched.
+
+    (** Assume that the schedule is valid and work-conserving. *)
+    Hypothesis  H_sched_valid : @valid_schedule Job (ideal.processor_state Job)
+                                  sched _ _ _ arr_seq.
+    Hypothesis H_work_conserving :  work_conserving arr_seq sched.
+
+    (** Assume the scheduling policy under consideration is reflexive. *) 
+    Hypothesis policy_reflexive : reflexive_priorities.
+
+    (** In this section, we prove the correctness of interference 
+        inside the busy interval, i.e., we prove that if interference
+        for a job is [false] then the job is scheduled and vice versa.
+        This property is referred to as abstract work conservation. *)
+
+    Let work_conservation_ab := definitions.work_conserving arr_seq sched interference interfering_workload.
+    
+    Section Abstract_Work_Conservation.
+
+      (** Consider a job [j] that is in the arrival sequence
+          and has a positive job cost. *)
+      Variable j : Job.
+      Hypothesis H_arrives : arrives_in arr_seq j.
+      Hypothesis H_job_cost_positive : 0 < job_cost j.
+
+      (** Let the busy interval of the job be <<[t1,t2)>>. *)
+      Variable t1 t2 : instant.
+      Hypothesis H_busy_interval : busy_interval_ab j t1 t2.
+
+      (** Consider a time [t] inside the busy interval of the job. *)
+      Variable t : instant.
+      Hypothesis H_t_in_busy_interval : t1 <= t < t2.
+
+    (** First, we prove that if interference is [false] at a time [t]
+        then the job is scheduled. *)
+    Lemma not_interference_implies_scheduled :
+        ~ interference j t -> scheduled_at sched j t.
+    Proof.
+      move => /negP HYP; move : HYP.
+      rewrite negb_or !/is_priority_inversion
+        /is_interference_from_another_hep_job.
+      move => /andP [HYP1 HYP2].
+      ideal_proc_model_sched_case_analysis_eq sched t jo.
+      {
+        exfalso; clear HYP1 HYP2.
+        eapply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval; rt_eauto.
+        move: H_busy_interval => [PREF _].
+        eapply not_quiet_implies_not_idle; rt_eauto. }
+      {
+        clear EqSched_jo; move: Sched_jo; rewrite scheduled_at_def; move => /eqP EqSched_jo.
+        rewrite EqSched_jo in HYP1, HYP2.
+        move: HYP1 HYP2.
+        rewrite / priority_inversion.is_priority_inversion EqSched_jo.
+        move => /negPn HYP1.
+        rewrite  negb_and.
+        move => /orP [/negP HYP2|/negPn /eqP HYP2]; first by done.
+        by rewrite -HYP2 scheduled_at_def EqSched_jo. }
+    Qed.
+
+    (** Conversely, if the job is scheduled at [t] then interference is [false]. *)
+    Lemma scheduled_implies_no_interference :
+      scheduled_at sched j t -> ~ interference j t.
+    Proof.
+      rewrite scheduled_at_def => /eqP HYP.
+      apply /negP.
+      rewrite /interference /is_priority_inversion
+        /is_interference_from_another_hep_job
+        HYP negb_or.
+      apply/andP; split.
+      - rewrite /priority_inversion.is_priority_inversion HYP.
+        apply /negPn.
+        by apply (policy_reflexive 0).
+      - rewrite  negb_and.
+        by apply /orP; right; apply /negPn.
+    Qed.
+
+    End Abstract_Work_Conservation.
+
+    (** Using the above two lemmas, we can prove that abstract work conservation
+        always holds for these instantiations of [I] and [IW]. *)
+    Corollary instantiated_i_and_w_are_coherent_with_schedule :
+      work_conservation_ab.
+    Proof.
+      move =>  j t1 t2 t ARR POS BUSY NEQ; split.
+      + by apply (not_interference_implies_scheduled j ARR POS  t1 t2); try done.
+      + by apply (scheduled_implies_no_interference j t ); try done. 
+    Qed.
+    
+    (** Next, in order to prove that these definitions of [I] and [IW] are consistent
+        with sequential tasks, we need to assume that the policy under consideration
+        respects sequential tasks. *)
+    Hypothesis H_policy_respects_sequential_tasks : policy_respects_sequential_tasks.
+
+    (** We prove that these definitions of [I] and [IW] are consistent with sequential 
+        tasks. *)
+    Lemma instantiated_interference_and_workload_consistent_with_sequential_tasks :
+      interference_and_workload_consistent_with_sequential_tasks
+        arr_seq sched tsk interference interfering_workload.          
+    Proof.
+      move => j t1 t2 ARR /eqP TSK POS BUSY.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
+      eapply all_jobs_have_completed_equiv_workload_eq_service; rt_eauto.
+      move => s INs /eqP TSKs.
+      move: (INs) => NEQ. 
+      eapply in_arrivals_implies_arrived_between in NEQ; eauto 2.
+      move: NEQ => /andP [_ JAs].
+      move: (BUSY) => [[ _ [QT [_ /andP [JAj _]]] _]].
+      apply QT; try done; first by eapply in_arrivals_implies_arrived; eauto 2.
+      apply H_policy_respects_sequential_tasks; first by rewrite  TSK TSKs.
+      by apply leq_trans with t1; [lia | done]. 
+    Qed.
+    
+  End I_IW_correctness.
 
 End JLFPInstantiation. 

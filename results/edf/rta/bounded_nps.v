@@ -199,7 +199,6 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       priority_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
     Proof.
       move => j ARR TSK POS t1 t2 PREF; move: (PREF) => [_ [_ [_ /andP [T _]]]].
-      move: H_sched_valid => [COARR MBR].
       destruct (leqP (t2 - t1) (blocking_bound (job_arrival j - t1))) as [NEQ|NEQ].
       { apply leq_trans with (t2 - t1); last by done. 
         rewrite /cumulative_priority_inversion /is_priority_inversion. 

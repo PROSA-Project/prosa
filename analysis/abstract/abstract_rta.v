@@ -20,8 +20,8 @@ Section Abstract_RTA.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+  Context {JA : JobArrival Job}.
+  Context {JC : JobCost Job}.
   Context `{JobPreemptable Job}.
 
   (** Consider any kind of uni-service ideal processor state model. *)
@@ -64,7 +64,7 @@ Section Abstract_RTA.
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** Let's define some local names for clarity. *)
-  Let work_conserving := work_conserving arr_seq sched tsk.
+  Let work_conserving := work_conserving arr_seq sched.
   Let busy_intervals_are_bounded_by := busy_intervals_are_bounded_by arr_seq sched tsk.
   Let job_interference_is_bounded_by := job_interference_is_bounded_by arr_seq sched tsk.
   
@@ -266,14 +266,14 @@ Section Abstract_RTA.
           Lemma j_is_completed_by_t1_A_F_optimist_last :
             completed_by sched j (t1 + (A + F - optimism) + job_last).
           Proof.
-            have HelpAuto: forall m n, n <= n + m; first by intros; rewrite leq_addr.
             move: H_busy_interval => [[/andP [GT LT] _] _].
             have ESERV :=
               @j_receives_at_least_run_to_completion_threshold
-                _ _ H1 H2 H3 PState _ _  arr_seq sched tsk interference interfering_workload
-                _ j _ _ _ t1 t2 _ (job_rtct j) _ ((A + F) - optimism). 
-            feed_n 7 ESERV; eauto 2.
-            specialize (ESERV H3 H4).
+                _ _  _  PState _ _  arr_seq sched interference interfering_workload
+                _ j _ _  t1 t2 _ (job_rtct j) _ ((A + F) - optimism).
+            specialize (ESERV JA JC).              
+            feed_n 6  ESERV; eauto 2.
+            specialize (ESERV JC _).
             feed_n 2 ESERV.
             { eapply job_run_to_completion_threshold_le_job_cost; eauto. }
             { rewrite -{2}(leqRW H_A_F_fixpoint).
@@ -281,11 +281,11 @@ Section Abstract_RTA.
               rewrite -[in X in _ <= X]addnBAC; last by rewrite leq_subr.
               rewrite {2}/optimism.
               rewrite subKn; last by apply H_valid_run_to_completion_threshold.
-              rewrite leq_add2l.              
+              rewrite leq_add2l.
               apply leq_trans with (cumul_interference j t1 (t1 + (A + F))).
-              { rewrite /cumul_interference /definitions.cumul_interference;
-                  rewrite [in X in _ <= X](@big_cat_nat _ _ _ (t1 + (A + F - optimism))) //=.
-                  by rewrite leq_add2l leq_subr. }
+              { rewrite /cumul_interference /definitions.cumul_interference
+                   [in X in _ <= X](@big_cat_nat _ _ _ (t1 + (A + F - optimism))) //=.
+                all: by lia. }
               { apply H_job_interference_is_bounded with t2; try done.
                 - by rewrite -H_Asp_Fsp_eq_A_F.
                 - apply/negP; intros CONTR.
@@ -293,9 +293,7 @@ Section Abstract_RTA.
                   apply completion_monotonic with (t1 + (A + F)); try done.
                   rewrite addnA subnKC // leq_add2l.
                   apply leq_trans with F_sp; first by done.
-                    by apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)).
-              }
-            }
+                  by lia. } }
             apply: job_completes_after_reaching_run_to_completion_threshold; eauto 2.
           Qed.
 
@@ -312,43 +310,33 @@ Section Abstract_RTA.
             Lemma relative_arrival_le_interference_bound:
               A <= interference_bound_function tsk A (A + F).
             Proof.
-              have HelpAuto: forall m n, n <= n + m; first by intros; rewrite leq_addr.
               move: H_j_not_completed; clear H_j_not_completed; move => /negP CONTRc.
               move: (H_busy_interval) => [[/andP [GT LT] _] _].
               apply leq_trans with (cumul_interference j t1 (t1 + (A+F))).
-              { unfold cumul_interference.
+              { rewrite /cumul_interference.
                 apply leq_trans with
-                    (\sum_(t1 <= t < t1 + A) interference j t); last first.
-                { unfold definitions.cumul_interference.
-                  rewrite [in X in _ <= X](@big_cat_nat _ _ _ (t1 + A)) //=; last by rewrite addnA. }
+                  (\sum_(t1 <= t < t1 + A) interference j t);last by
+                  rewrite /definitions.cumul_interference [in X in _ <= X](@big_cat_nat _ _ _ (t1 + A)) //=; try by lia. 
                 { rewrite -{1}[A](sum_of_ones t1).
                   rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond.
                   rewrite leq_sum //.
                   move => t /andP [/andP [NEQ1 NEQ2] _].
                   rewrite lt0b.
-                  unfold work_conserving in H_work_conserving.
                   move: (H_work_conserving j t1 t2 t) => CONS. 
-                  feed_n 5 CONS; try done.
+                  feed_n 4 CONS; try done.
                   { apply/andP; split; first by done.
-                    apply leq_trans with (t1 + A); first by done.
-                      by rewrite /A subnKC // ltnW. 
-                  }
+                    by apply leq_trans with (t1 + A); [done | lia]. }
                   move: CONS => [CONS1 _].
                   apply/negP; intros CONTR.
                   move: (CONS1 CONTR) => SCHED; clear CONS1 CONTR.
                   apply H_jobs_must_arrive_to_execute in SCHED.
                   move: NEQ2; rewrite ltnNge; move => /negP NEQ2; apply: NEQ2.
-                    by rewrite subnKC.                   
-                }
-              }
+                    by rewrite subnKC. } }
               { apply H_job_interference_is_bounded with t2; try done.
                 - by rewrite -H_Asp_Fsp_eq_A_F.
-                - apply/negP; intros CONTR; apply: CONTRc. 
-                  apply completion_monotonic with (t1 + (A + F)); last by done. 
-                  rewrite !addnA subnKC // leq_add2l.
-                  apply leq_trans with F_sp; first by done.
-                    by apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)).
-              }
+                - apply /negP; move =>  CONTR.
+                  apply: CONTRc. 
+                  by apply completion_monotonic with (t1 + (A + F)); [lia | done]. }
             Qed.
             
             (** As two trivial corollaries, we show that 
@@ -356,24 +344,18 @@ Section Abstract_RTA.
             Corollary tsk_run_to_completion_threshold_le_Fsp :
               task_rtct tsk <= F_sp.
             Proof.
-              have HH : task_rtct tsk <= F.
-              { move: H_A_F_fixpoint => EQ.
-                have L1 := relative_arrival_le_interference_bound.
-                lia.
-              }
-              apply leq_trans with F; auto.
+              move: H_A_F_fixpoint => EQ.
+              have L1 := relative_arrival_le_interference_bound. 
+              by lia.
             Qed.
             
             (** ... and optimism is at most [F]. *)
             Corollary optimism_le_F :
               optimism <= F.
             Proof.
-              have HH : task_rtct tsk <= F.
-              { move: H_A_F_fixpoint => EQ.
-                have L1 := relative_arrival_le_interference_bound.
-                lia.
-              }
-                by apply leq_trans with (task_rtct tsk); first rewrite /optimism leq_subr.
+              move: H_A_F_fixpoint => EQ.
+              have L1 := relative_arrival_le_interference_bound.
+              by lia.
             Qed.
             
           End AuxiliaryInequalities.
@@ -404,10 +386,9 @@ Section Abstract_RTA.
               apply leq_trans with (F_sp - optimism + job_last ); first by rewrite leq_add2r leq_sub2r. 
               apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)); last by done. 
               rewrite /optimism subnBA; last by apply PRT2.
-              rewrite -addnBAC //.
-              rewrite /job_last.
-              rewrite addnBA; last by eapply job_run_to_completion_threshold_le_job_cost; eauto.
-              rewrite -addnBAC; last by rewrite leq_addl.
+              rewrite -addnBAC // /job_last.
+              rewrite addnBA; last by eapply job_run_to_completion_threshold_le_job_cost; eauto 2.
+              rewrite -addnBAC; last by lia.
               rewrite -addnBA // subnn addn0.
               rewrite addnBA; last by apply PRT1.
               rewrite addnBAC; last by done.
@@ -431,25 +412,23 @@ Section Abstract_RTA.
         Lemma job_completed_by_arrival_plus_R_2:
           completed_by sched j (job_arrival j + R).
         Proof.
-          have HelpAuto: forall m n, n <= n + m; first by intros; rewrite leq_addr.
           move: H_busy_interval => [[/andP [GT LT] _] _].
           have L1 := solution_for_A_exists
                        tsk L (fun tsk A R => task_rtct tsk
                                           + interference_bound_function tsk A R) A_sp F_sp.
-          specialize (L1 H0).
+          specialize (L1 _).
           feed_n 2 L1; try done.
           { move: (H_busy_interval_exists j H_j_arrives H_job_of_tsk H_job_cost_positive)
-            => [t1' [t2' [BOUND BUSY]]].
+                => [t1' [t2' [BOUND BUSY]]].
             have EQ:= busy_interval_is_unique _ _ _ _ _ _ _ _ H_busy_interval BUSY.
-            destruct EQ as [EQ1 EQ2].
+            move : EQ => [EQ1 EQ2].
             subst t1' t2'; clear BUSY.
-              by rewrite -(ltn_add2l t1); apply leq_trans with t2.
+            by rewrite -(ltn_add2l t1); apply leq_trans with t2.
           }
-          specialize (L1 A); feed_n 2 L1.
-          { by apply/andP; split. }
-          { by intros x LTG; apply/eqP; rewrite eqn_add2l H_equivalent. }
-          move: L1 => [F [EQSUM [F2LEF1 FIX2]]].
-          apply/negP; intros CONTRc; move: CONTRc => /negP CONTRc.
+          specialize (L1 A); feed_n 2 L1; first by apply/andP; split. 
+          + by intros x LTG; apply/eqP; rewrite eqn_add2l H_equivalent. 
+            move: L1 => [F [EQSUM [F2LEF1 FIX2]]].
+            apply/negP; intros CONTRc; move: CONTRc => /negP CONTRc.
             by eapply j_is_completed_earlier_contradiction in CONTRc; eauto 2.
         Qed.
         
@@ -472,7 +451,7 @@ Section Abstract_RTA.
           subst t1' t2'; clear BUSY.
           apply leq_trans with (t2 - t1); last by rewrite leq_subLR.
           move: (H_busy_interval)=> [[/andP [T1 T3] [_ _]] _].
-            by apply ltn_sub2r; first apply leq_ltn_trans with (job_arrival j).
+          by apply ltn_sub2r; first apply leq_ltn_trans with (job_arrival j).
         Qed.                  
 
         (** We can use [j_receives_at_least_run_to_completion_threshold] to prove that the service 
@@ -484,7 +463,7 @@ Section Abstract_RTA.
           move: (NEQ) => /andP [GT LT]. 
           move: (H_job_interference_is_bounded t1 t2 (A_sp + F_sp) j) => IB. 
           feed_n 5 IB; try done.
-          { apply/negP; intros COMPL.
+          { apply/negP => COMPL.
             apply completion_monotonic with (t' := t1 + A) in COMPL; try done; last first.
             { by rewrite leq_add2l; apply ltnW. }
             { rewrite /A subnKC in COMPL; last by done.
@@ -498,14 +477,15 @@ Section Abstract_RTA.
           have ALTT := relative_arrival_is_bounded.
           simpl in IB; rewrite H_equivalent in IB; last by apply ltn_trans with A.
           have ESERV :=
-            @j_receives_at_least_run_to_completion_threshold
-              _ _ H1 H2 H3 PState _ _ arr_seq sched tsk
-              interference interfering_workload _ j _ _ _ t1 t2 _ (job_rtct j) _ (A_sp + F_sp). 
-          feed_n 7 ESERV; eauto 2.
-          specialize (ESERV H3 H4).
+              @j_receives_at_least_run_to_completion_threshold
+                _ _  _  PState _ _  arr_seq sched interference interfering_workload
+                _ j _ _  t1 t2 _ (job_rtct j) _ (A_sp + F_sp).
+          specialize (ESERV JA JC).
+          feed_n 6 ESERV; eauto 2.
+          specialize (ESERV JC _).
           feed_n 2 ESERV; eauto using job_run_to_completion_threshold_le_job_cost.
           by rewrite -{2}(leqRW H_Asp_Fsp_fixpoint) leq_add //; apply H_valid_run_to_completion_threshold.
-        Qed.
+          Qed.
 
         (** However, this is a contradiction. Since job [j] has not yet arrived, its service 
            is equal to [0]. However, run-to-completion threshold is always positive. *)
@@ -533,7 +513,7 @@ Section Abstract_RTA.
     response_time_bounded_by tsk R. 
   Proof. 
     intros j ARR JOBtsk. unfold job_response_time_bound.
-    move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
+    move: (posnP (@job_cost _ JC j)) => [ZERO|POS].
     { by rewrite /completed_by ZERO. } 
     move: (H_busy_interval_exists j ARR JOBtsk POS) => [t1 [t2 [T2 BUSY]]].
     move: (BUSY) => [[/andP [GE LT] _] QTt2].

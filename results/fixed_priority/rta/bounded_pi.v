@@ -176,57 +176,6 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** In this section we prove that all preconditions necessary to use the abstract theorem are satisfied. *)
   Section FillingOutHypothesesOfAbstractRTATheorem.
 
-    (** First, we prove that in the instantiation of interference and interfering workload, 
-       we really take into account everything that can interfere with [tsk]'s jobs, and thus, 
-       the scheduler satisfies the abstract notion of work conserving schedule. *) 
-    Lemma instantiated_i_and_w_are_consistent_with_schedule:
-      work_conserving_ab tsk interference interfering_workload.
-    Proof.
-      intros j t1 t2 t ARR TSK POS BUSY NEQ; split; intros HYP.
-      - move: HYP => /negP.
-        rewrite negb_or /is_priority_inversion /is_priority_inversion
-                /is_interference_from_another_hep_job.
-        move => /andP [HYP1 HYP2].
-        move: H_sched_valid => [CARR MBR].
-        case SCHED: (sched t) => [s | ].
-        + rewrite SCHED in HYP1, HYP2.
-          move: HYP1 HYP2. 
-          rewrite !Bool.negb_involutive negb_and Bool.negb_involutive.
-          move => HYP1 /orP [/negP HYP2| /eqP HYP2].
-          * by exfalso.
-          * by subst s; rewrite scheduled_at_def //; apply/eqP. 
-        + exfalso; clear HYP1 HYP2.
-          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
-          by move: BUSY => [PREF _]; eapply not_quiet_implies_not_idle; rt_eauto; apply/eqP.
-      - move: (HYP); rewrite scheduled_at_def; move => /eqP HYP2; apply/negP.
-        rewrite /interference /ideal_jlfp_rta.interference /is_priority_inversion
-                  /is_interference_from_another_hep_job HYP2 negb_or.
-         apply/andP; split.
-         + rewrite Bool.negb_involutive; eauto 2.
-             by eapply H_priority_is_reflexive with (t := 0).
-         + by rewrite negb_and Bool.negb_involutive; apply/orP; right.
-    Qed.
-
-    (** Next, we prove that the interference and interfering workload 
-       functions are consistent with sequential tasks. *)
-    Lemma instantiated_interference_and_workload_consistent_with_sequential_tasks: 
-      interference_and_workload_consistent_with_sequential_tasks
-        arr_seq sched tsk interference interfering_workload.
-    Proof.
-      intros j t1 t2 ARR TSK POS BUSY.
-      move: H_sched_valid => [CARR MBR].
-      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
-      eapply all_jobs_have_completed_equiv_workload_eq_service; rt_eauto.
-      intros s ARRs TSKs.
-      move: (BUSY) => [[_ [QT _]] _].
-      apply QT.
-      - by apply in_arrivals_implies_arrived in ARRs.
-      - move: TSK TSKs => /eqP TSK /eqP TSKs.
-        rewrite /hep_job /FP_to_JLFP TSK -TSKs; eauto 2.
-        by eapply (H_priority_is_reflexive 0); eauto.
-      - by eapply in_arrivals_implies_arrived_before; eauto 2.
-    Qed.
-
     (** Recall that L is assumed to be a fixed point of the busy interval recurrence. Thanks to
        this fact, we can prove that every busy interval (according to the concrete definition) 
        is bounded. In addition, we know that the conventional concept of busy interval and the 
@@ -236,8 +185,7 @@ Section AbstractRTAforFPwithArrivalCurves.
     Lemma instantiated_busy_intervals_are_bounded:
       busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
     Proof.
-      intros j ARR TSK POS.
-      move: H_sched_valid => [CARR MBR].
+      move => j ARR TSK POS.
       edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]];
         rt_eauto.
       { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_hep_rbf. }
@@ -263,7 +211,6 @@ Section AbstractRTAforFPwithArrivalCurves.
         arr_seq sched tsk interference interfering_workload (fun t A R => IBF_other R).
     Proof.
       intros ? ? ? ? ARR TSK ? NCOMPL BUSY; simpl.
-      move: H_sched_valid => [CARR MBR].
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
       eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
@@ -353,6 +300,7 @@ Section AbstractRTAforFPwithArrivalCurves.
 
   End FillingOutHypothesesOfAbstractRTATheorem.
 
+  
   (** ** Final Theorem *)
   (** Based on the properties established above, we apply the abstract analysis 
      framework to infer that [R] is a response-time bound for [tsk]. *) 
@@ -360,12 +308,11 @@ Section AbstractRTAforFPwithArrivalCurves.
     response_time_bounded_by tsk R.
   Proof.
     intros js ARRs TSKs.
-    move: H_sched_valid => [CARR MBR].
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
     eapply uniprocessor_response_time_bound_seq; rt_eauto.
-    - by apply instantiated_i_and_w_are_consistent_with_schedule. 
-    - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks. 
+    - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto. 
+    - by eapply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto. 
     - by apply instantiated_busy_intervals_are_bounded.
     - by apply instantiated_task_interference_is_bounded.
     - by eapply correct_search_space; eauto 2. 

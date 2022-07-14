@@ -154,7 +154,7 @@ Section Sequential_Abstract_RTA.
 
     (** We assume that the schedule is work-conserving. *)
     Hypothesis H_work_conserving:
-      work_conserving arr_seq sched tsk interference interfering_workload.
+      work_conserving arr_seq sched interference interfering_workload.
 
     (** Unlike the previous theorem [uniprocessor_response_time_bound], we assume
        that (1) tasks are sequential, moreover (2) functions interference and
@@ -410,7 +410,7 @@ Section Sequential_Abstract_RTA.
               replace (interference j t) with true; last first.
               { have NEQT: t1 <= t < t2.
                 { by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x). }
-                move: (H_work_conserving j t1 t2 t H_j_arrives H_job_of_tsk H_job_cost_positive H_busy_interval NEQT) => [Hn _].
+                move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive H_busy_interval NEQT) => [Hn _].
                 apply/eqP;rewrite eq_sym eqb_id; apply/negPn/negP; intros CONTR; move: CONTR => /negP CONTR.
                 apply Hn in CONTR; rewrite scheduled_at_def in CONTR; simpl in CONTR.
                 by move: CONTR; rewrite H_sched => /eqP EQ; inversion EQ; subst; move: H_j_neq_j' => /eqP.
@@ -463,7 +463,7 @@ Section Sequential_Abstract_RTA.
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def.
               rewrite H_sched; move: H_job_of_tsk => /eqP ->; rewrite eq_refl eq_refl addn0 //=.
-              move: (H_work_conserving j _ _ t H_j_arrives H_job_of_tsk H_job_cost_positive H_busy_interval) => WORK.
+              move: (H_work_conserving j _ _ t H_j_arrives H_job_cost_positive H_busy_interval) => WORK.
               feed WORK.
               { move: H_t_in_interval => /andP [NEQ1 NEQ2].
                 by apply/andP; split; last apply ltn_trans with (t1 + x). }

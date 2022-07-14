@@ -12,14 +12,9 @@ Require Export prosa.analysis.abstract.definitions.
    is bounded by a certain constant then a job executes long enough to reach its
    run-to-completion threshold and become non-preemptive. *)
 Section AbstractRTARunToCompletionThreshold.
-
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-  Context `{TaskCost Task}.
-
-  (**  ... and any type of jobs associated with these tasks. *)
+  
+  (**  Consider any type of jobs. *)
   Context {Job : JobType}.
-  Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
@@ -38,19 +33,13 @@ Section AbstractRTARunToCompletionThreshold.
   
   (** ... and any schedule of this arrival sequence. *)
   Variable sched : schedule PState.
-
-  (** Assume that the job costs are no larger than the task costs. *)
-  Hypothesis H_jobs_respect_taskset_costs : arrivals_have_valid_job_costs arr_seq.
-
-  (** Let [tsk] be any task that is to be analyzed. *)
-  Variable tsk : Task.
-
+  
   (** Assume we are provided with abstract functions for interference and interfering workload. *)
   Variable interference : Job -> instant -> bool.
   Variable interfering_workload : Job -> instant -> duration.
 
   (** For simplicity, let's define some local names. *)
-  Let work_conserving := work_conserving arr_seq sched tsk.
+  Let work_conserving := work_conserving arr_seq sched.
   Let cumul_interference := cumul_interference interference.
   Let cumul_interfering_workload := cumul_interfering_workload interfering_workload.
   Let busy_interval := busy_interval sched interference interfering_workload.
@@ -61,7 +50,6 @@ Section AbstractRTARunToCompletionThreshold.
   (** Let [j] be any job of task [tsk] with positive cost. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
-  Hypothesis H_job_of_tsk : job_of_task tsk j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
 
   (** Next, consider any busy interval <<[t1, t2)>> of job [j]. *)
@@ -102,7 +90,7 @@ Section AbstractRTARunToCompletionThreshold.
       rewrite big_nat [in RHS]big_nat.
       apply: eq_bigr=> x /andP[Lo Hi].
       move: (H_work_conserving j t1 t2 x) => Workj.
-      feed_n 5 Workj; try done.
+      feed_n 4 Workj; try done.
       { by apply/andP; split; eapply leq_trans; eauto 2. }
       destruct interference.
       - replace (service_in _ _) with 0; auto; symmetry.
@@ -181,7 +169,7 @@ Section AbstractRTARunToCompletionThreshold.
       move => t ES.
       set (job_cost j - job_rtct j) as job_last.
       have LSNP := @job_nonpreemptive_after_run_to_completion_threshold
-                     Job H2 H3 _ arr_seq sched _ j _ t.
+                     Job H0 H1 _ arr_seq sched _ j _ t.
       apply negbNE; apply/negP; intros CONTR.
       have SCHED: forall t', t <= t' <= t + job_last -> scheduled_at sched j t'.
       { move => t' /andP [GE LT].

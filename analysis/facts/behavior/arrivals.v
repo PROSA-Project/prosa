@@ -469,4 +469,6 @@ Global Hint Resolve
  arrives_in_jobs_come_from_arrival_sequence
  jobs_must_arrive_to_be_ready
  valid_schedule_implies_jobs_must_arrive_to_execute
+ valid_schedule_jobs_come_from_arrival_sequence
+ valid_schedule_jobs_must_be_ready_to_execute 
   : basic_rt_facts.

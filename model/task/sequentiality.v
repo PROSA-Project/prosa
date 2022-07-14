@@ -36,7 +36,7 @@ Section PropertyOfSequentiality.
       scheduled_at sched j2 t ->
       completed_by sched j1 t.
 
-  (* Given a job [j] and a time instant [t], we say that all prior
+  (** Given a job [j] and a time instant [t], we say that all prior
      jobs are completed if any job [j_tsk] of task [job_task j] that
      arrives before time [job_arrival j] is completed by time [t]. *)
   Definition prior_jobs_complete (j : Job) (t : instant) :=

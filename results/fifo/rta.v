@@ -150,39 +150,6 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   (** In this section we prove that all hypotheses necessary to use the abstract theorem are satisfied. *)
   Section FillingOutHypothesesOfAbstractRTATheorem.
 
-    (** First, we prove that, in the instantiation of interference and interfering workload, 
-        we really take into account everything that can interfere with [tsk]'s jobs, and thus, 
-        the scheduler satisfies the abstract notion of a work conserving schedule. *)
-    Lemma instantiated_i_and_w_are_coherent_with_schedule:
-      work_conserving_ab tsk interference interfering_workload.
-    Proof.
-      intros j t1 t2 t ARR TSK POS BUSY NEQ.
-      split; [move=>/negP |rewrite scheduled_at_def => /eqP HYP].
-      { rewrite negb_or /is_priority_inversion /is_priority_inversion
-                /is_interference_from_another_hep_job => /andP [HYP1 HYP2].
-        ideal_proc_model_sched_case_analysis_eq sched t jo.
-        { exfalso=> {HYP1 HYP2}.
-          have A : jobs_come_from_arrival_sequence sched arr_seq.
-          { exact: valid_schedule_jobs_come_from_arrival_sequence. }
-          eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; try by rt_eauto.
-          move: BUSY => [PREF _].
-          by eapply not_quiet_implies_not_idle; rt_eauto. }
-        { clear EqSched_jo; move: Sched_jo; rewrite scheduled_at_def; move => /eqP EqSched_jo.
-          rewrite EqSched_jo in HYP1, HYP2. 
-          move: HYP1 HYP2.
-          rewrite Bool.negb_involutive negb_and.
-          move => HYP1 /orP [/negP HYP2| /eqP HYP2] //.
-          rewrite Bool.negb_involutive in HYP2.
-          move: HYP2 => /eqP /eqP HYP2.
-          by subst jo; rewrite scheduled_at_def EqSched_jo. } }
-      { apply/negP;
-        rewrite /interference /ideal_jlfp_rta.interference /is_priority_inversion
-                /is_interference_from_another_hep_job HYP negb_or.
-        apply/andP; split.
-        - by rewrite Bool.negb_involutive /hep_job /fifo.FIFO.
-        - by rewrite negb_and Bool.negb_involutive; apply/orP; right. }
-    Qed.
-
     (** Recall that L is assumed to be a fixed point of the busy interval recurrence. Thanks to
         this fact, we can prove that every busy interval (according to the concrete definition) 
         is bounded. In addition, we know that the conventional concept of busy interval and the 
@@ -192,9 +159,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     Lemma instantiated_busy_intervals_are_bounded:
       busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
     Proof.
-      intros j ARR TSK POS.
-      have COME : jobs_come_from_arrival_sequence sched arr_seq.
-      { exact: valid_schedule_jobs_come_from_arrival_sequence. }
+      move => j ARR TSK POS.
       edestruct exists_busy_interval_from_total_workload_bound
         with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
       { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
@@ -257,8 +222,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
             { specialize (QUIET t); feed QUIET.
               - apply /andP; split; first by done.
                 by apply leq_trans with (t1 +  Δ) ; [| apply ltnW].
-              - by contradict QUIET. }
-            by destruct H_valid_schedule as [COME MUST]. } }
+              - by contradict QUIET. } } }
         { have MUST : jobs_must_be_ready_to_execute sched.
           { exact: (valid_schedule_jobs_must_be_ready_to_execute sched arr_seq). }
           have HAS : has_arrived s t by eapply (jobs_must_arrive_to_be_ready  sched).
@@ -277,8 +241,6 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       job_interference_is_bounded_by arr_seq sched tsk interference interfering_workload  IBF.
     Proof.
       move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL.
-      have COME : jobs_come_from_arrival_sequence sched arr_seq.
-      { exact: valid_schedule_jobs_come_from_arrival_sequence. }
       rewrite /cumul_interference cumulative_interference_split.
       have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
       move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
@@ -413,7 +375,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     eapply uniprocessor_response_time_bound with
       (interference := interference) (interfering_workload := interfering_workload)
       (interference_bound_function := fun tsk A R => IBF tsk A R) (L := L)); rt_eauto.
-    - by apply instantiated_i_and_w_are_coherent_with_schedule.
+    -  by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto; last
+       by move => j1 j2 SAME ARR.
     - by apply instantiated_busy_intervals_are_bounded.
     - by apply instantiated_interference_is_bounded.
     - eapply (exists_solution_for_abstract_response_time_recurrence js) => //=.

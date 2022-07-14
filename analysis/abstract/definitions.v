@@ -157,7 +157,6 @@ Section AbstractRTADefinitions.
       Definition work_conserving :=
         forall j t1 t2 t,
           arrives_in arr_seq j ->
-          job_of_task tsk j ->
           job_cost j > 0 ->
           busy_interval j t1 t2 ->
           t1 <= t < t2 ->

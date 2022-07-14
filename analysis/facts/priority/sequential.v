@@ -59,7 +59,6 @@ Section SequentialJLFP.
   Proof.
     move=> j1 j2 ARR LE AHP t SCHED.
     apply/negPn/negP; intros NCOMPL.
-    move: H_sched_valid => [COARR MBR].
     edestruct scheduling_of_any_segment_starts_with_preemption_time
       as [pt [LET [PT ALL_SCHED]]]; try eauto 2.
     move: LET => /andP [LE1 LE2].
