@@ -78,8 +78,8 @@ Section SequentialEDF.
 
   (** ... and assume that it defines a valid preemption model with
       bounded non-preemptive segments. *)
-  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
-    valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
+  Hypothesis H_valid_preemption_model:
+    valid_preemption_model arr_seq sched.
 
   (** Next, we assume that the schedule respects the policy defined by
       the [job_preemptable] function (i.e., jobs have bounded
@@ -97,17 +97,13 @@ Section SequentialEDF.
     sequential_tasks arr_seq sched.
   Proof.
     intros ? ? ? ARR1 ARR2 SAME LT.
-    eapply early_hep_job_is_scheduled => //; eauto 2.
-    - by rt_auto.
-    - move : H_valid_model_with_bounded_nonpreemptive_segments => [VALID _]; apply VALID.
-    - clear t; intros ?.
-      move: SAME => /eqP SAME.
-      apply /andP.
-      rewrite /hep_job_at /JLFP_to_JLDP /hep_job /edf.EDF /job_deadline
-               /absolute_deadline.job_deadline_from_task_deadline SAME. 
-      split.
-      + by rewrite leq_add2r ltnW.
-      + by rewrite -ltnNge ltn_add2r. 
+    eapply early_hep_job_is_scheduled => //; rt_eauto.
+    clear t; intros ?.
+    move: SAME => /eqP SAME.
+    apply /andP.
+    rewrite /hep_job_at  /JLFP_to_JLDP /hep_job /edf.EDF /job_deadline
+      /absolute_deadline.job_deadline_from_task_deadline SAME.
+    by lia.
   Qed.
 
 End SequentialEDF.
