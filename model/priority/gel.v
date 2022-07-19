@@ -1,8 +1,9 @@
 Require Export prosa.model.priority.classes.
 Require Export BinInt.
 
+From mathcomp Require Import ssrZ.
 
-(** * GEL Priority Policy * *)
+(** * GEL Priority Policy  *)
 
 (** We define the class of "Global-EDF-like" (GEL) priority policies,
     as first introduced by Leontyev et al. ("Multiprocessor Extensions
@@ -40,7 +41,7 @@ End AbsolutePriorityPoint.
     priority is higher than or equal to a job [j2]'s priority iff
     [j1]'s absolute priority point is no later than [j2]'s absolute
     priority point.  *)
-#[export] Instance GEL_priority (Job : JobType) (Task : TaskType)
+#[export] Instance GEL (Job : JobType) (Task : TaskType)
           `{PriorityPoint Task} `{JobArrival Job} `{JobTask Job Task} : JLFP_policy Job :=
 {
   hep_job (j1 j2 : Job) := (job_priority_point j1 <=? job_priority_point j2)%Z
@@ -66,12 +67,7 @@ Section PropertiesOfGEL.
 
   (** GEL is total. *)
   Fact GEL_is_total : total_priorities.
-  Proof.
-    move=> t j1 j2; apply /orP.
-    case: (boolP (job_priority_point j1 <=? job_priority_point j2)%Z) => REL; [left | right] => //.
-    move: REL; rewrite -Z.ltb_antisym => /Z.ltb_spec0 REL.
-    by move: (Z.lt_le_incl _ _  REL) => /Z.leb_spec0.
-  Qed.
+  Proof. by move=> t j1 j2; apply ZInstances.leZ_total. Qed.
 
 End PropertiesOfGEL.
 
@@ -82,4 +78,3 @@ Global Hint Resolve
      GEL_is_transitive
      GEL_is_total
   : basic_rt_facts.
-
