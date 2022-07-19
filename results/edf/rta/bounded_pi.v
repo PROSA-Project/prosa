@@ -211,6 +211,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** In this section we prove that all hypotheses necessary 
       to use the abstract theorem are satisfied. *)
   Section FillingOutHypothesesOfAbstractRTATheorem.
+
     
     (** First, we prove that [IBF_other] is indeed an interference bound. *)
     Section TaskInterferenceIsBoundedByIBF_other.
@@ -257,7 +258,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
         Lemma cumulative_priority_inversion_is_bounded:
           cumulative_priority_inversion sched j t1 (t1 + Δ) <= priority_inversion_bound (job_arrival j - t1).
         Proof.
-          unfold priority_inversion_is_bounded_by, EDF in *.
           apply leq_trans with (cumulative_priority_inversion sched j t1 t2).
           - rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1  + Δ)) //=.
             + by rewrite leq_addr.
@@ -309,7 +309,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
           workload_of_jobs (EDF_not_from tsk) jobs
           <= \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (EDF_from tsk_o) jobs.
         Proof.
-          unfold EDF_from.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
           intros.
           rewrite (exchange_big_dep (EDF_not_from tsk)) //=.
@@ -319,9 +318,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
             rewrite /EDF_from HEQ eq_refl TSKo andTb andTb leq_addr //.
           - eapply H_all_jobs_from_taskset, in_arrivals_implies_arrived; eauto 2.
           - move => tsko jo /negP NEQ /andP [EQ1 /eqP EQ2].
-            rewrite /EDF_not_from EQ1 Bool.andb_true_l; apply/negP; intros CONTR.
+            rewrite /EDF_not_from EQ1 Bool.andb_true_l; apply/negP => CONTR.
             apply: NEQ; clear EQ1.
-              by rewrite -EQ2.
+            by rewrite -EQ2.
         Qed.
 
         (** Next we focus on one task [tsk_o ≠ tsk] and consider two cases. *)
@@ -380,8 +379,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
               interval [t1, t1 + Δ] is bounded by workload over time
               interval [t1, t1 + A + ε + D tsk - D tsk_o]. 
               The intuition behind this inequality is that jobs which arrive 
-              after time instant [t1 + A + ε + D tsk - D tsk_o] has smaller priority than job [j] due to 
-              the term [D tsk - D tsk_o]. *)
+              after time instant [t1 + A + ε + D tsk - D tsk_o] has smaller priority 
+              than job [j] due to the term [D tsk - D tsk_o]. *)
           Lemma total_workload_shorten_range:
             workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + Δ)) 
             <= workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + (A + ε + D tsk - D tsk_o))).
@@ -401,23 +400,21 @@ Section AbstractRTAforEDFwithArrivalCurves.
             edestruct (leqP (D tsk_o) (A + ε + D tsk)) as [NEQ2|NEQ2]. 
             - move: ARRIN; rewrite leqNgt; move => /negP ARRIN; apply: ARRIN.
               rewrite -(ltn_add2r (D tsk_o)).
-              apply leq_ltn_trans with (job_arrival j + D tsk); first by move: (H_job_of_tsk) => /eqP <-; rewrite -TSKo.
+              apply leq_ltn_trans with (job_arrival j + D tsk);
+                first by move: (H_job_of_tsk) => /eqP <-; rewrite -TSKo.
               rewrite addnBA // addnA addnA subnKC // subnK.
               + by rewrite ltn_add2r addn1.
               + apply leq_trans with (A + ε + D tsk); first by done.
-                  by rewrite !leq_add2r leq_subr. 
-            - move: HEP; rewrite /EDF /edf.EDF leqNgt; move => /negP HEP; apply: HEP.                      
-              apply leq_ltn_trans with (job_arrival jo + (A + D tsk)). 
-              + rewrite addnBAC // addnBA.
-                rewrite [in X in _ <= X]addnC -addnBA.
-                * rewrite /job_deadline /job_deadline_from_task_deadline;
+                by lia.  
+            - move: HEP; rewrite /EDF /edf.EDF leqNgt; move => /negP HEP; apply: HEP. 
+              apply leq_ltn_trans with (job_arrival jo + (A + D tsk)).
+              + rewrite addnBAC // addnBA; last by lia.
+                rewrite [in X in _ <= X]addnC -addnBA; last by lia.
+                rewrite /job_deadline /job_deadline_from_task_deadline;
                     by move: (H_job_of_tsk) => /eqP ->; rewrite leq_addr.
-                * by apply leq_trans with (t1 + (A + ε + D tsk - D tsk_o)); first rewrite leq_addr.
-                    by apply leq_trans with (job_arrival j); [ | by rewrite leq_addr].
               + rewrite ltn_add2l.
-                apply leq_ltn_trans with (A + ε + D tsk).
-                * by rewrite leq_add2r leq_addr.
-                * by rewrite TSKo.
+                apply leq_ltn_trans with (A + ε + D tsk); first by lia.
+                by rewrite TSKo.
           Qed.
           
           (** And similarly to the previous case, by definition of
@@ -461,11 +458,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
           <= bound_on_total_hep_workload A Δ.
         Proof.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
-          apply leq_sum_seq; intros tsko INtsko NEQT.
+          apply leq_sum_seq => tsko INtsko NEQT.
           edestruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; [ | apply ltnW in NEQ].
           - by apply workload_le_rbf.
           - eapply leq_trans; first by eapply total_workload_shorten_range; eauto 2.
-              by eapply workload_le_rbf'.
+            by eapply workload_le_rbf'.
         Qed.
         
     End Inequalities.
@@ -486,25 +483,20 @@ Section AbstractRTAforEDFwithArrivalCurves.
         task_interference_is_bounded_by
           arr_seq sched tsk interference interfering_workload (fun tsk A R => IBF_other A R).
       Proof.
-        unfold EDF in *.
         move => j R2 t1 t2 ARR TSK N NCOMPL BUSY.
         move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
-            by rewrite /completed_by /completed_by ZERO. 
-        - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _]. 
-          rewrite (cumulative_task_interference_split arr_seq sched _ _ _ tsk j);
-            rt_eauto; last first.
-          { by eapply arrived_between_implies_in_arrivals; eauto. }
-          eapply EDF_implies_sequential_tasks; rt_eauto. 
-
-          
-          rewrite /I leq_add //.  
-          + by apply cumulative_priority_inversion_is_bounded with t2.
-          + eapply leq_trans. eapply cumulative_interference_is_bounded_by_total_service; eauto 2.
+          by rewrite /completed_by /completed_by ZERO.
+        - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
+          rewrite (cumulative_task_interference_split arr_seq sched _ _ _ tsk j); rt_eauto. 
+          + rewrite /I leq_add //; first by apply cumulative_priority_inversion_is_bounded with t2.
+            eapply leq_trans. eapply cumulative_interference_is_bounded_by_total_service; eauto 2.
             eapply leq_trans. eapply total_service_is_bounded_by_total_workload; eauto 2.
             eapply leq_trans. eapply reorder_summation; eauto 2.
             eapply leq_trans. eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
-            by done. 
+            by done.
+          + eapply EDF_implies_sequential_tasks; rt_auto.
+          + by eapply arrived_between_implies_in_arrivals; eauto 2. 
       Qed.
 
     End TaskInterferenceIsBoundedByIBF_other.
@@ -570,11 +562,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
           A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF_other A (A + F) /\
           R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
-        edestruct H_R_is_maximum as [F [FIX NEQ]].
-        - by apply A_is_in_concrete_search_space.
-        - exists F; split; last by done.
-          rewrite -{2}(leqRW FIX).
-          by rewrite addnA [_ + priority_inversion_bound A]addnC -!addnA.
+        edestruct H_R_is_maximum as [F [FIX NEQ]]; first by apply A_is_in_concrete_search_space.
+        exists F; split; last by done.
+        rewrite -{2}(leqRW FIX).
+        by rewrite addnA [_ + priority_inversion_bound A]addnC -!addnA.
       Qed.
          
       End SolutionOfResponseTimeReccurenceExists.       

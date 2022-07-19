@@ -21,10 +21,9 @@ Section PropertiesOfEDF.
   Lemma EDF_respects_sequential_tasks:
     policy_respects_sequential_tasks.
   Proof.
-    intros j1 j2 TSK ARR.
-    move: TSK => /eqP TSK.
-    unfold hep_job, EDF, job_deadline, job_deadline_from_task_deadline; rewrite TSK.
-      by rewrite leq_add2r.
+    move => j1 j2 /eqP TSK ARR.
+    rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline TSK.
+    by lia.
   Qed.
 
 End PropertiesOfEDF.
@@ -96,12 +95,9 @@ Section SequentialEDF.
   Lemma EDF_implies_sequential_tasks:
     sequential_tasks arr_seq sched.
   Proof.
-    intros ? ? ? ARR1 ARR2 SAME LT.
-    eapply early_hep_job_is_scheduled => //; rt_eauto.
-    clear t; intros ?.
-    move: SAME => /eqP SAME.
-    apply /andP.
-    rewrite /hep_job_at  /JLFP_to_JLDP /hep_job /edf.EDF /job_deadline
+    move => j1 j2 t ARR1 ARR2 /eqP SAME LT.
+    eapply early_hep_job_is_scheduled => //; rt_eauto => t'.
+    rewrite /hep_job_at  /JLFP_to_JLDP /hep_job /EDF /job_deadline
       /absolute_deadline.job_deadline_from_task_deadline SAME.
     by lia.
   Qed.
