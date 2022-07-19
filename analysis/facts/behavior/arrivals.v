@@ -462,13 +462,18 @@ End ScheduledImpliesArrives.
 (** We add some of the above lemmas to the "Hint Database"
     [basic_rt_facts], so the [auto] tactic will be able to use them. *)
 Global Hint Resolve
- arrivals_before_scheduled_at
- arrivals_uniq
- arrived_between_implies_in_arrivals 
- arrived_between_jobs_must_arrive_to_execute
- arrives_in_jobs_come_from_arrival_sequence
- jobs_must_arrive_to_be_ready
- valid_schedule_implies_jobs_must_arrive_to_execute
- valid_schedule_jobs_come_from_arrival_sequence
- valid_schedule_jobs_must_be_ready_to_execute 
+       any_ready_job_is_pending
+       arrivals_before_scheduled_at
+       arrivals_uniq
+       arrived_between_implies_in_arrivals 
+       arrived_between_jobs_must_arrive_to_execute
+       arrives_in_jobs_come_from_arrival_sequence
+       backlogged_implies_arrived
+       job_scheduled_implies_ready
+       jobs_must_arrive_to_be_ready
+       jobs_must_arrive_to_be_ready
+       ready_implies_arrived
+       valid_schedule_implies_jobs_must_arrive_to_execute
+       valid_schedule_jobs_come_from_arrival_sequence
+       valid_schedule_jobs_must_be_ready_to_execute
   : basic_rt_facts.
