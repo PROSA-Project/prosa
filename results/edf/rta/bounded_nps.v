@@ -351,9 +351,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       response_time_bounded_by tsk R.
     Proof.
       eapply uniprocessor_response_time_bound_edf; rt_eauto.
-      - eapply EDF_implies_sequential_tasks; eauto 2.
-        by apply basic.basic_readiness_is_work_bearing_readiness, EDF_is_reflexive.
-      - by apply priority_inversion_is_bounded.
+      - by  apply priority_inversion_is_bounded.
       - move=> A BPI_SP.
         by apply H_R_is_maximum, search_space_inclusion.
     Qed.

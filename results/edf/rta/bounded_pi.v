@@ -81,10 +81,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
   
-  (** Assume we have sequential tasks, i.e, jobs from the 
-      same task execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
-  
   (** Consider an arbitrary task set ts. *)
   Variable ts : list Task.
 
@@ -136,6 +132,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_rbf L.
+
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched EDF.
 
   (** Next, we define an upper bound on interfering workload received from jobs 
      of other tasks with higher-than-or-equal priority. *)
@@ -497,6 +495,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
           rewrite (cumulative_task_interference_split arr_seq sched _ _ _ tsk j);
             rt_eauto; last first.
           { by eapply arrived_between_implies_in_arrivals; eauto. }
+          eapply EDF_implies_sequential_tasks; rt_eauto. 
+
+          
           rewrite /I leq_add //.  
           + by apply cumulative_priority_inversion_is_bounded with t2.
           + eapply leq_trans. eapply cumulative_interference_is_bounded_by_total_service; eauto 2.
@@ -596,6 +597,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         (interference := interference) (interfering_workload := interfering_workload)
         (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
     - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
+      * eapply EDF_implies_sequential_tasks; rt_eauto.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
     - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_task_interference_is_bounded.
