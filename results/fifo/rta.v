@@ -150,23 +150,6 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   (** In this section we prove that all hypotheses necessary to use the abstract theorem are satisfied. *)
   Section FillingOutHypothesesOfAbstractRTATheorem.
 
-    (** Recall that L is assumed to be a fixed point of the busy interval recurrence. Thanks to
-        this fact, we can prove that every busy interval (according to the concrete definition) 
-        is bounded. In addition, we know that the conventional concept of busy interval and the 
-        one obtained from the abstract definition (with the interference and interfering 
-        workload) coincide. Thus, it follows that any busy interval (in the abstract sense) 
-        is bounded. *)
-    Lemma instantiated_busy_intervals_are_bounded:
-      busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
-    Proof.
-      move => j ARR TSK POS.
-      edestruct exists_busy_interval_from_total_workload_bound
-        with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
-      { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
-      { exists t1, t2; split; first by done.
-        by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto. }
-    Qed.
-
     (** In this section, we prove that, under FIFO scheduling, the cumulative priority inversion experienced
         by a job [j] in any interval within its busy window is always [0]. We later use this fact to prove the bound on 
         the cumulative interference. *)
@@ -377,7 +360,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       (interference_bound_function := fun tsk A R => IBF tsk A R) (L := L)); rt_eauto.
     -  by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto; last
        by move => j1 j2 SAME ARR.
-    - by apply instantiated_busy_intervals_are_bounded.
+    - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_interference_is_bounded.
     - eapply (exists_solution_for_abstract_response_time_recurrence js) => //=.
       apply leq_trans with (job_cost js) => //.

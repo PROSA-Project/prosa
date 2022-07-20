@@ -213,26 +213,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** In this section we prove that all hypotheses necessary 
       to use the abstract theorem are satisfied. *)
   Section FillingOutHypothesesOfAbstractRTATheorem.
-
-    (** Recall that L is assumed to be a fixed point of the busy interval recurrence. Thanks to
-       this fact, we can prove that every busy interval (according to the concrete definition) 
-       is bounded. In addition, we know that the conventional concept of busy interval and the 
-       one obtained from the abstract definition (with the interference and interfering 
-       workload) coincide. Thus, it follows that any busy interval (in the abstract sense) 
-       is bounded. *)
-    Lemma instantiated_busy_intervals_are_bounded:
-      busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
-    Proof.
-      unfold EDF in *.
-      move => j ARR TSK POS.
-      edestruct exists_busy_interval_from_total_workload_bound
-        with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
-      { by intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
-      exists t1, t2; split; first by done.
-      by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
-    Qed.
     
-    (** Next, we prove that [IBF_other] is indeed an interference bound. *)
+    (** First, we prove that [IBF_other] is indeed an interference bound. *)
     Section TaskInterferenceIsBoundedByIBF_other.
 
       (** We show that task_interference_is_bounded_by is bounded by [IBF_other] by 
@@ -615,7 +597,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
     - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
-    - by apply instantiated_busy_intervals_are_bounded.
+    - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_task_interference_is_bounded.
     - by eapply correct_search_space; eauto 2.
   Qed.

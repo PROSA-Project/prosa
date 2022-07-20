@@ -5,6 +5,7 @@ Require Export prosa.analysis.facts.busy_interval.busy_interval.
 Require Export prosa.analysis.facts.busy_interval.quiet_time.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 Require Export prosa.model.priority.classes.
+Require Export prosa.analysis.facts.busy_interval.carry_in. 
 
 
 (** * JLFP instantiation of Interference and Interfering Workload for ideal uni-processor. *)
@@ -670,6 +671,45 @@ Section JLFPInstantiation.
       apply H_policy_respects_sequential_tasks; first by rewrite  TSK TSKs.
       by apply leq_trans with t1; [lia | done]. 
     Qed.
+
+    (** Since interfering and interfering workload are sufficient to define the busy window,
+        next, we reason about the bound on the length of the busy window. *)
+    Section BusyWindowBound.
+
+      (** Consider an arrival curve. *)
+      Context `{MaxArrivals Task}.
+
+      (** Consider a set of tasks that respects the arrival curve. *)
+      Variable ts : list Task.
+      Hypothesis H_taskset_respects_max_arrivals : taskset_respects_max_arrivals arr_seq ts.
+
+      (** Assume that all jobs come from this task set. *)
+      Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+      (** Consider a constant [L] such that... *)
+      Variable L : duration.
+      (** ... [L] is greater than [0], and... *)
+      Hypothesis H_L_positive : L > 0.
+
+      (** [L] is the fixed point of the following equation. *)
+      Hypothesis H_fixed_point : L = total_request_bound_function ts L.
+
+      (** Assume all jobs have a valid job cost. *)
+      Hypothesis H_arrivals_have_valid_job_costs : arrivals_have_valid_job_costs arr_seq.
+
+      (** Then, we prove that [L] is a bound on the length of the busy window. *)
+      Lemma instantiated_busy_intervals_are_bounded:
+        busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
+      Proof.
+        move => j ARR TSK POS.
+        edestruct exists_busy_interval_from_total_workload_bound
+          with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
+        {  intros; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf; try by done. }
+        exists t1, t2; split; first by done.
+        eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
+      Qed.
+
+    End BusyWindowBound.
     
   End I_IW_correctness.
 
