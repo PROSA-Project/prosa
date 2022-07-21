@@ -31,3 +31,6 @@ The file [rta/floating_nonpreemptive.v](rta/floating_nonpreemptive.v) provides a
 
 The file [rta/limited_preemptive.v](rta/limited_preemptive.v) provides an RTA based on (2) for tasks that consist of a sequence of non-preemptive segments, separated by fixed preemption points. 
 
+### (7) FP RTA for Fully Preemptive Jobs with Computed Fixpoints
+
+The RTA provided in [rta/comp/fully_preemptive.v](rta/comp/fully_preemptive.v) is a refinement of (3), in which the fixpoints upon which the analysis rests are assumed to have been computed with the functions provided in [util/fixpoint.v](../../util/fixpoint.v). See the comment at the start of the file for further explanation. 
