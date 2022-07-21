@@ -551,6 +551,18 @@ Section AdditionalLemmas.
     by rewrite nth_uniq.
   Qed.
   
+
+  (** The predicate [all] implies the predicate [has], if the sequence is not empty. *)
+  Lemma has_all_nilp {T : eqType}:
+    forall (s : seq T) (P : pred T),
+      all P s ->
+      ~~ nilp s ->
+      has P s.
+  Proof.
+    case => // a s P /allP ALL _.
+    by apply /hasP; exists a; [|move: (ALL a); apply]; exact: mem_head.
+  Qed.
+
 End AdditionalLemmas.
 
 
