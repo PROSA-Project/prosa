@@ -37,9 +37,7 @@ Section SequentialJLFP.
   (** ... and assume that it defines a valid preemption model. *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
-  (** Next, we assume that the schedule respects the policy defined by
-     the [job_preemptable] function (i.e., jobs have bounded
-     non-preemptive segments)... *)
+  (** Next, we assume that the schedule respects the scheduling policy at every preemption point.... *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** ... and that jobs must arrive to execute. *)

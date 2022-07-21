@@ -71,9 +71,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.  
   
-  (** ... and the schedule respects the policy defined by the
-      job_preemptable function (i.e., jobs have bounded nonpreemptive
-      segments). *)
+  (** ... and the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
    
   (** ** Total Workload and Length of Busy Interval *)

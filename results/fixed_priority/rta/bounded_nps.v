@@ -64,8 +64,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
-  (** ... and the schedule respects the policy defined by the [job_preemptable]
-     function (i.e., jobs have bounded non-preemptive segments). *)
+  (** ... and the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_FP_policy_at_preemption_point arr_seq sched FP.
 
   (** Assume we have sequential tasks, i.e, jobs from the 
@@ -135,11 +134,11 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       rewrite /max_length_of_priority_inversion /blocking_bound
               /priority_inversion.max_length_of_priority_inversion.
       apply: (@leq_trans (\max_(j_lp <- arrivals_before arr_seq t | ~~ hep_job j_lp j)
-                           (job_max_nonpreemptive_segment j_lp - ε)));
+                            (job_max_nonpreemptive_segment j_lp - ε)));
         first by apply: bigmax_subset => j' IN /andP [not_hep _].
       apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t
                 | ~~ hep_task (job_task j_lp) tsk)
-            (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
+                            (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
       { rewrite /hep_job /FP_to_JLFP TSK.
         apply leq_big_max => j' JINB NOTHEP.
         rewrite leq_sub2r //.

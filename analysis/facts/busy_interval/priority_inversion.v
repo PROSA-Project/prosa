@@ -65,9 +65,7 @@ Section PriorityInversionIsBounded.
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   
-  (** ... and the schedule respects the policy defined by the
-       predicate [job_preemptable] (i.e., bounded nonpreemptive
-       segments). *)
+  (** ... and the schedule respects the scheduling policy at every preemption point. *)
   Hypothesis H_respects_policy:
     respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
   

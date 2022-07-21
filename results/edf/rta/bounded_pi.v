@@ -63,9 +63,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
   Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
 
-  (** Next, consider any valid ideal uni-processor schedule of this arrival sequence ... *)
+  (** Next, consider any valid ideal uni-processor schedule of this arrival sequence
+      that follows the scheduling policy. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched EDF.
 
   (** Note that we differentiate between abstract and 
      classical notions of work conserving schedule. *)
@@ -132,8 +134,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_rbf L.
-
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched EDF.
 
   (** Next, we define an upper bound on interfering workload received from jobs 
      of other tasks with higher-than-or-equal priority. *)
