@@ -2,6 +2,8 @@ Require Import prosa.model.readiness.basic.
 Require Export prosa.model.task.sequentiality.
 Require Export prosa.model.schedule.nonpreemptive.
 Require Export prosa.model.priority.fifo.
+Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
@@ -27,11 +29,11 @@ Section BasicLemmas.
 
   (** Suppose jobs have preemption points ... *)
   Context `{JobPreemptable Job}.
-
+  
   (** ...and that the preemption model is valid. *)
   Hypothesis H_valid_preemption_model :
-    valid_preemption_model arr_seq sched.
-
+    valid_preemption_model arr_seq sched.  
+  
   (** Assume that the schedule respects the FIFO scheduling policy whenever jobs
       are preemptable. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
@@ -42,26 +44,14 @@ Section BasicLemmas.
     forall j t,
       arrives_in arr_seq j ->
       pending sched j t ->
-      ~~ is_priority_inversion sched j t.
+      ~ priority_inversion sched j t.
   Proof.
-    move => j t ARRIVES PENDINGj.
-    rewrite /is_priority_inversion.
-    move: (ideal_proc_model_sched_case_analysis sched t) => [/eqP -> //|[s INTER]].
-    have -> : sched t = Some s; first by apply /eqP; rewrite -scheduled_at_def.
-    apply /negP; apply /negPn.
-    rewrite Bool.negb_involutive.
-    destruct (s == j) eqn:EQ; first by move: EQ => /eqP ->; rewrite /hep_job /fifo.FIFO.
-    destruct (hep_job s j) eqn:HEP; first by done.
-    move : HEP => /negP/negP HEP.
-    rewrite -ltnNge in HEP.
-    contradict PENDINGj.
-    apply /negP; rewrite negb_and.
-    apply /orP; right; apply /negPn.
-    have -> : scheduled_at sched s t -> completed_by sched j t => //.
-    eapply (early_hep_job_is_scheduled); try rt_eauto.
-    - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=].
+    move => j t ARRIVES /andP [ARRIVED /negP NCOMPL] [NSCHED [jlp /andP [SCHED PRIO]]].
+    move: PRIO; rewrite /hep_job /FIFO -ltnNge => LT.
+    apply: NCOMPL; eapply early_hep_job_is_scheduled; rt_eauto.
+    by intros t'; apply/andP; split; unfold hep_job_at, JLFP_to_JLDP, hep_job, FIFO; lia.
   Qed.
-
+  
   (** We prove that in a FIFO-compliant schedule, if a job [j] is
       scheduled, then all jobs with higher priority than [j] have been
       completed. *)

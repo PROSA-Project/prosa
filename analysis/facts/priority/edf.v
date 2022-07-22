@@ -1,6 +1,7 @@
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
-
+Require Import prosa.model.task.preemption.parameters.
+     
 (** In this section, we prove a few properties about EDF policy. *)
 Section PropertiesOfEDF.
 

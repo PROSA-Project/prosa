@@ -1,11 +1,12 @@
 Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.edf.
+Require Import prosa.model.schedule.work_conserving.
+Require Import prosa.model.task.preemption.parameters.
 Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.facts.model.arrival_curves.
 Require Export prosa.analysis.facts.model.sequential.
+Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded.
 Require Export prosa.results.edf.rta.bounded_pi.
-Require Export prosa.analysis.facts.busy_interval.priority_inversion.
-
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
@@ -229,7 +230,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
            (task_max_nonpreemptive_segment (job_task j_lp) - ε).
     Proof.
       move=> j t1.
-      rewrite /max_length_of_priority_inversion/priority_inversion.max_length_of_priority_inversion.
+      rewrite /max_length_of_priority_inversion /max_length_of_priority_inversion.
       apply: leq_big_max => j' JINB NOTHEP.
       rewrite leq_sub2r //.
       apply in_arrivals_implies_arrived in JINB.
@@ -276,45 +277,41 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       priority_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
     Proof.
       move => j ARR TSK POS t1 t2 PREF; move: (PREF) => [_ [_ [_ /andP [T _]]]].
+      move: H_sched_valid => [COARR MBR].
       destruct (leqP (t2 - t1) (blocking_bound (job_arrival j - t1))) as [NEQ|NEQ].
-      { apply leq_trans with (t2 - t1); last by done. 
-        rewrite /cumulative_priority_inversion /is_priority_inversion. 
+      { apply leq_trans with (t2 - t1); last by done.
+        rewrite /cumulative_priority_inversion.
         rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat. 
-        rewrite leq_sum //.
-        intros t _; case: (sched t); last by done.
-          by intros s; destruct (hep_job s j).
+        by rewrite leq_sum //; intros t _; destruct (priority_inversion_dec).
       }
       edestruct @preemption_time_exists as [ppt [PPT NEQ2]]; rt_eauto.
       move: NEQ2 => /andP [GE LE].
-      apply leq_trans with (cumulative_priority_inversion sched j t1 ppt);
+      apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt);
         last apply leq_trans with (ppt - t1).
-      - rewrite /cumulative_priority_inversion /is_priority_inversion. 
+      - rewrite /cumulative_priority_inversion. 
         rewrite (@big_cat_nat _ _ _ ppt) //=; last first.
         { rewrite ltn_subRL in NEQ.
           apply leq_trans with (t1 + blocking_bound (job_arrival j - t1)); last by apply ltnW. 
           apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
-            by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2. }
+          by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2; apply/eqP. }
         rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
         rewrite big_nat_cond big1 //; move => t /andP [/andP [GEt LTt] _ ].
-        case SCHED: (sched t) => [s | ]; last by done. 
         edestruct @not_quiet_implies_exists_scheduled_hp_job
           with (K := ppt - t1) (t := t) as [j_hp [ARRB [HP SCHEDHP]]]; rt_eauto.
-        { exists ppt; split.  by done.  by rewrite subnKC //; apply/andP; split. } 
+        { by exists ppt; split; [done | rewrite subnKC //; apply/andP; split]. } 
         { by rewrite subnKC //; apply/andP; split. }
-        apply/eqP; rewrite eqb0 Bool.negb_involutive.
-        enough (EQ : s = j_hp); first by subst.
-        move: SCHED => /eqP SCHED; rewrite -scheduled_at_def in SCHED.
-          by eapply ideal_proc_model_is_a_uniprocessor_model; [exact SCHED | exact SCHEDHP].
-      - rewrite /cumulative_priority_inversion /is_priority_inversion. 
+        apply/eqP; rewrite eqb0; apply/negP; move => /priority_inversion_P INV.
+        feed_n 3 INV; rt_eauto; last move: INV => [_ [j_lp /andP[SCHED PRIO]]].
+        enough (EQ : j_lp = j_hp); first by subst; rewrite HP in PRIO.
+        by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto. 
+      - rewrite /cumulative_priority_inversion. 
         rewrite -[X in _ <= X]addn0 -[ppt - t1]mul1n -iter_addn -big_const_nat. 
-        rewrite leq_sum //.
-        intros t _; case: (sched t); last by done.
-          by intros s; destruct (hep_job s j).
-      -  rewrite leq_subLR.
-         apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
-           by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
+        by rewrite leq_sum //; intros t _; destruct (priority_inversion_dec).
+      - rewrite leq_subLR.
+        apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
+        by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2; apply/eqP.
     Qed.
-      
+    
   End PriorityInversionIsBounded.
         
   (** ** Response-Time Bound *)

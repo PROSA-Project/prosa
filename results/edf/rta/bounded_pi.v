@@ -193,7 +193,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** We say that job j incurs interference at time t iff it cannot execute due to 
      a higher-or-equal-priority job being scheduled, or if it incurs a priority inversion. *)
   Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference sched j t.
+    ideal_jlfp_rta.interference arr_seq sched j t.
 
   (** Instantiation of Interfering Workload *)
   (** The interfering workload, in turn, is defined as the sum of the priority inversion 
@@ -206,7 +206,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       interference from other jobs of the same task. For EDF, we define [IBF_other] as 
       the sum of the priority interference bound and the higher-or-equal-priority workload. *)
   Let IBF_other (A R : duration) := priority_inversion_bound A + bound_on_total_hep_workload A R.
-
+  
   (** ** Filling Out Hypothesis Of Abstract RTA Theorem *)
   (** In this section we prove that all hypotheses necessary 
       to use the abstract theorem are satisfied. *)
@@ -256,13 +256,13 @@ Section AbstractRTAforEDFwithArrivalCurves.
             [priority_inversion_bound] bounds cumulative priority inversion 
             follows from assumption [H_priority_inversion_is_bounded]. *)
         Lemma cumulative_priority_inversion_is_bounded:
-          cumulative_priority_inversion sched j t1 (t1 + Δ) <= priority_inversion_bound (job_arrival j - t1).
+          cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ) <= priority_inversion_bound (job_arrival j - t1).
         Proof.
-          apply leq_trans with (cumulative_priority_inversion sched j t1 t2).
+          apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2).
           - rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1  + Δ)) //=.
             + by rewrite leq_addr.
-            + by rewrite /is_priority_inversion leq_addr.
-            + by rewrite ltnW.
+            + by rewrite leq_addr.            
+            + by rewrite ltnW. 
           - apply H_priority_inversion_is_bounded; try done.
             eapply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval; rt_eauto.
             by move: H_busy_interval => [PREF _].
@@ -283,9 +283,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
           <= service_of_jobs sched (EDF_not_from tsk) jobs t1 (t1 + Δ).
         Proof.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
-          erewrite instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks;
-            rt_eauto.
-          - by move: (H_job_of_tsk) => /eqP ->; rewrite /jobs.
+          erewrite cumulative_i_thep_eq_service_of_othep; rt_eauto.
+          - by rewrite /another_task_hep_job; move: (H_job_of_tsk) => /eqP ->; rewrite /jobs.
           - by rewrite instantiated_quiet_time_equivalent_quiet_time; rt_eauto.
         Qed.
 
@@ -486,19 +485,19 @@ Section AbstractRTAforEDFwithArrivalCurves.
         move => j R2 t1 t2 ARR TSK N NCOMPL BUSY.
         move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
-          by rewrite /completed_by /completed_by ZERO.
+          by rewrite /completed_by /completed_by ZERO. 
         - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
-          rewrite (cumulative_task_interference_split arr_seq sched _ _ _ tsk j); rt_eauto. 
-          + rewrite /I leq_add //; first by apply cumulative_priority_inversion_is_bounded with t2.
-            eapply leq_trans. eapply cumulative_interference_is_bounded_by_total_service; eauto 2.
-            eapply leq_trans. eapply total_service_is_bounded_by_total_workload; eauto 2.
-            eapply leq_trans. eapply reorder_summation; eauto 2.
-            eapply leq_trans. eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
-            by done.
-          + eapply EDF_implies_sequential_tasks; rt_auto.
-          + by eapply arrived_between_implies_in_arrivals; eauto 2. 
+          rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ tsk j); rt_eauto; last first.
+          + by eapply arrived_between_implies_in_arrivals; eauto.
+          + by eapply EDF_implies_sequential_tasks; rt_eauto.
+            rewrite /I leq_add //.  
+            * by apply cumulative_priority_inversion_is_bounded with t2.
+            * eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
+              eapply leq_trans; first by eapply total_service_is_bounded_by_total_workload; rt_eauto.
+              eapply leq_trans; first by eapply reorder_summation; rt_eauto.
+              by eapply leq_trans; first eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; rt_eauto.
       Qed.
-
+      
     End TaskInterferenceIsBoundedByIBF_other.
     
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
@@ -595,4 +594,4 @@ Section AbstractRTAforEDFwithArrivalCurves.
     - by eapply correct_search_space; eauto 2.
   Qed.
   
-End AbstractRTAforEDFwithArrivalCurves. 
+End AbstractRTAforEDFwithArrivalCurves.

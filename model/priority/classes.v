@@ -158,6 +158,36 @@ Section Priorities.
 
 End Priorities.
 
+(** ** Derived Priority Relations *)
+
+(** In the following section, we derive two auxiliary priority
+    relations. *)
+Section DerivedPriorityRleations.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  
+  (** Consider a JLFP-policy that indicates a higher-or-equal priority relation. *)             
+  Context `{JLFP_policy Job}.
+
+  (** First, we introduce a relation that defines whether job [j1] has
+      a higher-than-or-equal-priority than job [j2] and [j1] is not
+      equal to [j2]. *)
+  Definition another_hep_job : JLFP_policy Job :=
+    fun j1 j2 => hep_job j1 j2 && (j1 != j2).
+
+  (** Next, we introduce a relation that defines whether a job [j1]
+      has a higher-or-equal-priority than job [j2] and the task of
+      [j1] is not equal to task of [j2]. *)
+  Definition another_task_hep_job : JLFP_policy Job :=
+    fun j1 j2 => hep_job j1 j2 && (job_task j1 != job_task j2).
+
+End DerivedPriorityRleations.
+
 (** We add the above observation into the "Hint Database" basic_rt_facts, so Coq
     will be able to apply it automatically. *)
 Global Hint Resolve respects_sequential_tasks : basic_rt_facts.

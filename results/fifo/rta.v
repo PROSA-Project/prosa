@@ -134,7 +134,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   (** ** Instantiation of Interference *)
   (** We say that job [j] incurs interference at time [t] iff it cannot execute due to 
      a higher-or-equal-priority job being scheduled, or if it incurs a priority inversion. *)
-  Let interference (j : Job) (t : instant) := ideal_jlfp_rta.interference sched j t.
+  Let interference (j : Job) (t : instant) := ideal_jlfp_rta.interference arr_seq sched j t.
 
   (** ** Instantiation of Interfering Workload *)
   (** The interfering workload, in turn, is defined as the sum of the priority inversion 
@@ -174,47 +174,30 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
       (** We prove that the cumulative priority inversion in the interval <<[t1, t1 + Δ)>> is [0]. *)
       Lemma cumulative_priority_inversion_is_bounded:
-        cumulative_priority_inversion sched j t1 (t1 + Δ) = 0.
+        cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ) = 0.
       Proof.
-        apply big_nat_eq0 => t /andP [T1 T2].
-        apply /eqP; rewrite eqb0; apply /negP.
-        move: (ideal_proc_model_sched_case_analysis sched t) => [/eqP IDLE|[s INTER]];
-                                                                 first by rewrite  /is_priority_inversion IDLE.
-        destruct (leqP (job_arrival j) t).
-        { destruct (completed_by sched j t) eqn : COMPL; last first.
-          { apply /negP.
-            eapply (FIFO_implies_no_priority_inversion arr_seq); rt_eauto.
-            by apply /andP; split; [| rewrite COMPL]. }
-          { rewrite scheduled_at_def in INTER.
-            rewrite /is_priority_inversion. 
-            move: INTER => /eqP INTER; rewrite INTER.
-            apply /negP; rewrite Bool.negb_involutive /hep_job /FIFO.
-            move_neq_up CONTR.
-             have QTIme' : quiet_time arr_seq sched j t.
-            { move => j_hp ARRjhp HEP ARRbef.
-              eapply (scheduled_implies_higher_priority_completed arr_seq _ _ _ _ s); try by done.
-              - by move : INTER => /eqP INTER; rewrite -scheduled_at_def in INTER.
-              - by rewrite -ltnNge; apply leq_ltn_trans with (job_arrival j). } 
-            apply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval;
-              rt_eauto; last by [].
-            move : H_busy_interval => [ [_ [_ [QUIET /andP [ARR _ ]]]] _].
-            destruct (leqP t t1) as [LE | LT].
-            { have EQ : t = job_arrival j by apply eq_trans with t1; lia.
-              rewrite EQ in COMPL; apply completed_on_arrival_implies_zero_cost in COMPL; rt_eauto.
-              by move: (H_job_cost_positive); rewrite /job_cost_positive COMPL. }
-            { specialize (QUIET t); feed QUIET.
-              - apply /andP; split; first by done.
-                by apply leq_trans with (t1 +  Δ) ; [| apply ltnW].
-              - by contradict QUIET. } } }
-        { have MUST : jobs_must_be_ready_to_execute sched.
-          { exact: (valid_schedule_jobs_must_be_ready_to_execute sched arr_seq). }
-          have HAS : has_arrived s t by eapply (jobs_must_arrive_to_be_ready  sched).
-          rewrite scheduled_at_def in INTER.
-          unfold is_priority_inversion.
-          move: INTER => /eqP ->; apply /negP; rewrite Bool.negb_involutive.
-          by apply leq_trans with t; [apply HAS | apply ltnW].
-          Unshelve.
-          all: by []. }
+        apply big_nat_eq0 => t /andP [T1 T2]; apply /eqP; rewrite eqb0.
+        apply/negP; intros T; move: T => /priority_inversion_P INV.
+        feed_n 3 INV; rt_eauto.
+        case: INV => [NSCHED [j__lp /andP [SCHED LP]]].
+        move: LP; rewrite /hep_job /FIFO -ltnNge => LT.
+        have COMPL := early_hep_job_is_scheduled
+                        _ _ _ _ H_valid_schedule _ H_respects_policy_at_preemption_point _ _ _ LT _ _ SCHED.
+        feed_n 5 COMPL; rt_eauto.
+        { by intros ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FIFO -ltnNge; apply/andP; split; first apply ltnW. }
+        move: (H_busy_interval) => [[/andP [ARR1 ARR2] [_ NQT]] _].
+        move: T1; rewrite leq_eqVlt => /orP [/eqP EQ | GT].
+        { subst t; apply completed_implies_scheduled_before in COMPL; rt_eauto.
+          by case: COMPL => [t' [/andP [ARR3 LT__temp] SCHED__temp]]; lia.
+        }
+        { apply: NQT; first (apply/andP; split; [exact GT | lia]).
+          apply quiet_time_cl_implies_quiet_time_ab; rt_eauto.
+          { by intros ? ? _ LE; unfold hep_job, FIFO. }
+          clear ARR2 ARR1 T2 H_Δ_in_busy Δ GT.
+          intros ? ARR HEP ARRB; rewrite /hep_job /FIFO in HEP.
+          eapply early_hep_job_is_scheduled; rt_eauto; first by lia.
+          by move => t'; apply/andP; split; rewrite /hep_job_at /FIFO /JLFP_to_JLDP /hep_job //=; lia.
+        }
       Qed.
 
     End PriorityInversion.
@@ -224,12 +207,13 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       job_interference_is_bounded_by arr_seq sched tsk interference interfering_workload  IBF.
     Proof.
       move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL.
-      rewrite /cumul_interference cumulative_interference_split.
+      rewrite /cumul_interference cumulative_interference_split; rt_eauto.
       have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
-      move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
-      erewrite (cumulative_priority_inversion_is_bounded j ARRj JPOS t1 t2); rewrite //= add0n.
-      rewrite (instantiated_cumulative_interference_of_hep_jobs_equal_total_interference_of_hep_jobs arr_seq) //=; 
-              try by (try rewrite instantiated_quiet_time_equivalent_quiet_time); rt_eauto.
+      move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]]. 
+      have CPIB := cumulative_priority_inversion_is_bounded j ARRj JPOS t1 t2.
+      rewrite /cumulative_priority_inversion in CPIB; rewrite /ideal_jlfp_rta.cumulative_priority_inversion CPIB //= add0n.
+      rewrite (cumulative_i_ohep_eq_service_of_ohep arr_seq) //=;
+              try by (try rewrite instantiated_quiet_time_equivalent_quiet_time); rt_eauto.      
       eapply leq_trans; first by apply service_of_jobs_le_workload; rt_eauto.
       rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)); rt_eauto.
       specialize (workload_minus_job_cost j) => ->.
@@ -255,13 +239,12 @@ Section AbstractRTAforFIFOwithArrivalCurves.
             + by rewrite addnBAC //= subnKC //= addn1; apply leqW. }
         rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=.
         - by rewrite TSKj; apply leq_addr.
-        - apply job_in_arrivals_between => //.
-          by apply /andP; split; [| rewrite subnKC; [rewrite addn1 |]].  }
-      apply: arrivals_uniq => //.
+        - by apply job_in_arrivals_between => //; apply /andP; split; [| rewrite subnKC; [rewrite addn1 |]].  }
+      apply: arrivals_uniq => //. 
       apply: job_in_arrivals_between => //.
       by apply /andP; split; [ | rewrite addn1].
     Qed.
-
+    
     (** Finally, we show that there exists a solution for the response-time equation. *)
     Section SolutionOfResponseTimeReccurenceExists.
 
@@ -300,7 +283,6 @@ Section AbstractRTAforFIFOwithArrivalCurves.
           apply eq_big_seq => //= task IN.
           by move: (EQ2 task IN) => /negPn /eqP. }
       Qed.
-
       
       (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
       Corollary exists_solution_for_abstract_response_time_recurrence:

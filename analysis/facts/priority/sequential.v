@@ -1,5 +1,6 @@
 Require Export prosa.analysis.definitions.always_higher_priority.
-Require Export prosa.analysis.facts.busy_interval.priority_inversion.
+Require Export prosa.analysis.definitions.work_bearing_readiness.
+Require Export prosa.analysis.facts.model.preemption.        
 
 (** In this section, we prove that, given two jobs [j1] and [j2], if
     job [j1] arrives earlier than job [j2] and [j1] always has higher

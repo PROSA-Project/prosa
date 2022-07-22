@@ -8,6 +8,7 @@ Require Export prosa.analysis.definitions.work_bearing_readiness.
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
 Require Import prosa.analysis.facts.model.ideal.schedule.
+Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of
@@ -20,7 +21,7 @@ Section ExistsBusyIntervalJLFP.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
-  Context `{JobTask Job Task}.
+  Context {JobTask : JobTask Job Task}.
   Context {Arrival: JobArrival Job}.
   Context {Cost : JobCost Job}.
 
@@ -294,9 +295,9 @@ Section ExistsBusyIntervalJLFP.
     (** Next we prove that the total service within a "non-quiet" 
         time interval <<[t1, t1 + Δ)>> is exactly [Δ]. *)
     Lemma no_idle_time_within_non_quiet_time_interval:
-      service_of_jobs sched predT (arrivals_between arr_seq 0 (t1 + Δ)) t1 (t1 + Δ) = Δ.
+      total_service_of_jobs_in sched (arrivals_between arr_seq 0 (t1 + Δ)) t1 (t1 + Δ) = Δ.
     Proof.
-      intros; unfold service_of_jobs, service_of_higher_or_equal_priority_jobs. 
+      intros; unfold total_service_of_jobs_in, service_of_jobs, service_of_higher_or_equal_priority_jobs. 
       rewrite -{3}[Δ](sum_of_ones t1) exchange_big //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split.
       { rewrite leq_sum // => t' _.
@@ -422,7 +423,7 @@ Section ExistsBusyIntervalJLFP.
         Qed.             
 
       End LowerBound.
-
+      
       (** Next we prove that, if there is a point where the requested
           workload is upper-bounded by the supply, then the busy
           interval eventually ends. *)
@@ -434,8 +435,8 @@ Section ExistsBusyIntervalJLFP.
         
         (** Let [priority_inversion_bound] be a constant that bounds
             the length of any priority inversion. *)
-        Variable priority_inversion_bound: instant.
-        Hypothesis H_priority_inversion_is_bounded:
+        Variable priority_inversion_bound : instant.
+        Hypothesis H_priority_inversion_is_bounded :
           is_priority_inversion_bounded_by priority_inversion_bound.
         
         (** Next, assume that for some positive delta, the sum of requested workload
@@ -465,47 +466,46 @@ Section ExistsBusyIntervalJLFP.
           Lemma busy_interval_has_uninterrupted_service: 
             delta <= priority_inversion_bound + hp_service t1 (t1 + delta).
           Proof. 
-            move: H_is_busy_prefix => [H_strictly_larger [H_quiet [_ EXj]]].
+            move: H_is_busy_prefix => [H_strictly_larger [H_quiet [_ EXj]]]. 
             destruct (delta <= priority_inversion_bound) eqn:KLEΔ.
             { by apply leq_trans with priority_inversion_bound; last rewrite leq_addr. }
-            apply negbT in KLEΔ; rewrite -ltnNge in KLEΔ. 
-            apply leq_trans with (cumulative_priority_inversion sched j t1 (t1 + delta) + hp_service t1 (t1 + delta)).
-            { rewrite /hp_service hep_jobs_receive_no_service_before_quiet_time //.
-              rewrite /service_of_higher_or_equal_priority_jobs /service_of_jobs sum_pred_diff. 
-              rewrite addnBA; last by rewrite big_mkcond //= leq_sum //; intros j' _; case (hep_job j' j).
-              rewrite addnC -addnBA.
-              { have TT := no_idle_time_within_non_quiet_time_interval.
-                by unfold service_of_jobs in TT; rewrite TT // leq_addr. } 
-              { rewrite /cumulative_priority_inversion /is_priority_inversion exchange_big //=.
-                apply leq_sum_seq; move => t II _.
-                rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
-                case SCHED: (sched t) => [j1 | ]; simpl; first last.
-                { rewrite leqn0 big1_seq // /service_at => i Hi.
-                  by rewrite service_in_def SCHED. }
-                { case PRIO1: (hep_job j1 j) => /=; first last.
-                  - apply service_of_jobs_le_1; rt_auto.
-                    by apply arrivals_uniq.
-                  - rewrite leqn0 big1_seq; first by done.
-                    move => j2 /andP [PRIO2 ARRj2].
-                    case EQ: (j1 == j2).
-                    + by move: EQ => /eqP EQ; subst j2; rewrite PRIO1 in PRIO2.
-                    + apply/eqP.
-                      rewrite service_at_def eqb0.
-                      apply/negP => /eqP CONTR. rewrite SCHED in CONTR.
-                      by inversion CONTR; subst j2; rewrite PRIO1 in PRIO2. } } }
+            apply negbT in KLEΔ; rewrite -ltnNge in KLEΔ.
+            apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + delta) + hp_service t1 (t1 + delta)).
+            { rewrite /hp_service hep_jobs_receive_no_service_before_quiet_time // /service_of_higher_or_equal_priority_jobs.
+              rewrite service_of_jobs_negate_pred // addnBA; last by apply service_of_jobs_pred_impl; eauto 2.
+              rewrite addnC -addnBA; first by rewrite no_idle_time_within_non_quiet_time_interval // leq_addr.
+              rewrite service_of_jobs_sum_over_time_interval //.
+              apply leq_sum_seq; move => t II _; rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
+              move: (@ideal_proc_model_sched_case_analysis _ sched t) => [IDLE | [j' SCHED]].
+              { apply leq_trans with 0; [rewrite leqn0; apply/eqP | by apply leq0n].
+                by apply big1; intros; apply ideal_not_idle_implies_sched. }
+              { destruct (hep_job j' j) eqn:PRIO1.
+                - rewrite service_of_jobs_nsched_or_unsat; first by done.
+                  intros j'' IN; apply/andP; intros [NHEP SCHED''].
+                  have EQ: j'' = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto 2.
+                  by subst j''; rewrite PRIO1 in NHEP. 
+                - have SCH := @service_of_jobs_le_1 _ _ _ _ _ (fun i => ~~ hep_job i j) (arrivals_between arr_seq 0 (t1 + delta)).
+                  eapply leq_trans; first by apply: SCH; eauto using arrivals_uniq with basic_rt_facts.
+                  clear SCH; rewrite lt0b; apply/andP; split.
+                  + apply/negP; intros SCHED'.
+                    have EQ: j = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto 2.
+                    subst; move: PRIO1 => /negP PRIO1; apply: PRIO1.
+                    by specialize (H_priority_is_reflexive 0 j').
+                  + apply/hasP; exists j'.
+                    * apply arrived_between_implies_in_arrivals; eauto 2.
+                      apply H_jobs_must_arrive_to_execute in SCHED.
+                      by unfold has_arrived, arrived_between in *; lia.
+                    * by apply/andP; split; [done | rewrite PRIO1]. } }
             { rewrite leq_add2r.
               destruct (t1 + delta <= t_busy.+1) eqn:NEQ; [ | apply negbT in NEQ; rewrite -ltnNge in NEQ].
-              - apply leq_trans with (cumulative_priority_inversion sched j t1 t_busy.+1); last eauto 2.
-                by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + delta)) //=; rewrite leq_addr.
+              - apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t_busy.+1); last eauto 2.
+                by rewrite [in X in _ <= X](cumulative_priority_inversion_cat _ _ _ (t1 + delta)) //= leq_addr.
               -  apply H_priority_inversion_is_bounded; repeat split; try done.
                  + by rewrite -addn1 leq_add2l.
-                 + move => t' /andP [LT GT]; apply H_no_quiet_time.
-                   by apply/andP; split; [ | rewrite ltnW ].
-                 + move: EXj => /andP [T1 T2].
-                   by apply/andP; split; [done | apply ltn_trans with (t_busy.+1)].
-            }
+                 + by move => t' /andP [LT GT]; apply H_no_quiet_time; apply/andP; split; last rewrite ltnW.
+                 + by move: EXj => /andP [T1 T2]; apply/andP; split; last apply ltn_trans with (t_busy.+1). }
           Qed.
-          
+            
           (** Moreover, the fact that the interval is not quiet also
               implies that there's more workload requested than
               service received. *)
@@ -523,9 +523,7 @@ Section ExistsBusyIntervalJLFP.
             move: (PREFIX) => [_ [QUIET _]].
             move: (NOTQUIET) => NOTQUIET'.
             feed (NOTQUIET' (t1 + delta)).
-            { by apply/andP; split; first
-                by rewrite -addn1 leq_add2l.
-            }
+            { by apply/andP; split; first rewrite -addn1 leq_add2l. } 
             feed (PEND t1 (t1 + delta)); first by apply leq_addr.
             specialize (PEND QUIET NOTQUIET').
             move: PEND => [j0 [ARR0 [/andP [GE0 LT0] [HP0 NOTCOMP0]]]].
@@ -538,8 +536,7 @@ Section ExistsBusyIntervalJLFP.
             rewrite /hep HP0.
             rewrite -add1n addnA [1 + _]addnC addn1.
             apply leq_add; last first.
-            {
-              apply leq_sum; intros j1 NEQ.
+            { apply leq_sum; intros j1 NEQ.
               destruct (hep_job j1 j); last by done.
                 by apply cumulative_service_le_job_cost, ideal_proc_model_provides_unit_service.
             }
@@ -557,7 +554,7 @@ Section ExistsBusyIntervalJLFP.
             apply leq_ltn_trans with (priority_inversion_bound + hp_service t1 (t1 + delta)).
             apply busy_interval_has_uninterrupted_service.
             rewrite ltn_add2l.
-            apply busy_interval_too_much_workload.
+            by apply busy_interval_too_much_workload.
           Qed.
           
         End CannotBeBusyForSoLong.  
@@ -625,7 +622,7 @@ Section ExistsBusyIntervalJLFP.
         is_priority_inversion_bounded_by priority_inversion_bound.
 
       (** Assume that for some positive delta, the sum of requested workload at
-             time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
+          time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
       Variable delta: duration.
       Hypothesis H_delta_positive: delta > 0.
       Hypothesis H_workload_is_bounded:
@@ -654,9 +651,10 @@ Section ExistsBusyIntervalJLFP.
         }
         move: PREFIX => [t1 [PREFIX /andP [GE1 GEarr]]].
         have BOUNDED := busy_interval_is_bounded
-                          (job_arrival j) t1  PREFIX priority_inversion_bound _ delta
+                          (job_arrival j) _ t1  PREFIX priority_inversion_bound _ delta
                           H_delta_positive.            
-        feed_n 2 BOUNDED; try done.
+        feed_n 3 BOUNDED; try done.
+        { by apply job_pending_at_arrival. } 
         move: BOUNDED => [t2 [GE2 BUSY]].
         exists t1, t2; split.
         { apply/andP; split; first by done.
@@ -665,9 +663,8 @@ Section ExistsBusyIntervalJLFP.
           feed (NOTQUIET t2); first by apply/andP; split.
             by exfalso; apply NOTQUIET.
         }
-          by split. 
+        by split. 
       Qed.
-
       
     End BusyIntervalFromWorkloadBound.
 

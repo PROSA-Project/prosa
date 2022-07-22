@@ -100,7 +100,6 @@ Section AbstractRTAforFPwithArrivalCurves.
      any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
-
   
   (** For clarity, let's define some local names. *)
   Let job_pending_at := pending sched.
@@ -158,7 +157,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** We say that job j incurs interference at time t iff it cannot execute due to 
      a higher-or-equal-priority job being scheduled, or if it incurs a priority inversion. *)
   Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference sched j t.
+    ideal_jlfp_rta.interference arr_seq sched j t.
 
   (** Instantiation of Interfering Workload *)
   (** The interfering workload, in turn, is defined as the sum of the
@@ -167,9 +166,12 @@ Section AbstractRTAforFPwithArrivalCurves.
   Let interfering_workload (j : Job) (t : instant) :=
     ideal_jlfp_rta.interfering_workload arr_seq sched j t.
   
-  (** Finally, we define the interference bound function ([IBF_other]). [IBF_other] bounds the interference if tasks are sequential.
-      Since tasks are sequential, we exclude interference from other jobs of the same task. For FP, we define [IBF_other] as the sum of the priority 
-      interference bound and the higher-or-equal-priority workload. *)
+  (** Finally, we define the interference bound function
+      ([IBF_other]). [IBF_other] bounds the interference if tasks are
+      sequential. Since tasks are sequential, we exclude interference
+      from other jobs of the same task. For FP, we define [IBF_other]
+      as the sum of the priority interference bound and the
+      higher-or-equal-priority workload. *)
   Let IBF_other (R : duration) := priority_inversion_bound + total_ohep_rbf R.
 
   (** ** Filling Out Hypotheses Of Abstract RTA Theorem *)
@@ -186,13 +188,12 @@ Section AbstractRTAforFPwithArrivalCurves.
       busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
     Proof.
       move => j ARR TSK POS.
-      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]];
-        rt_eauto.
+      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
       { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_hep_rbf. }
       exists t1, t2; split; first by done.
       by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
     Qed.
-
+    
     (** Next, we prove that [IBF_other] is indeed an interference bound.
 
        Recall that in module abstract_seq_RTA hypothesis task_interference_is_bounded_by expects 
@@ -216,20 +217,19 @@ Section AbstractRTAforFPwithArrivalCurves.
       eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
       rewrite /interference; erewrite cumulative_task_interference_split; rt_eauto; last first.
       { move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _].
-          by eapply arrived_between_implies_in_arrivals; eauto 2. }
+        by eapply arrived_between_implies_in_arrivals; eauto 2. }
       unfold IBF_other, interference.
       rewrite leq_add; try done. 
-      { move: (H_priority_inversion_is_bounded j ARR TSK) => BOUND.
-        apply leq_trans with (cumulative_priority_inversion sched j t1 (t1 + R0)); first by done.
-        apply leq_trans with (cumulative_priority_inversion sched j t1 t2); last first.
-        { by apply BOUND; move: BUSY => [PREF QT2]. }
+      { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + R0)); first by done.
+        apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2); last first.
+        { by apply H_priority_inversion_is_bounded; rt_eauto; move: BUSY => [PREF QT2]. }
         rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + R0)) //=.
         - by rewrite leq_addr.
         - by rewrite leq_addr.
         - by rewrite ltnW.
       }
-      { erewrite instantiated_cumulative_interference_of_hep_tasks_equal_total_interference_of_hep_tasks;
-          eauto 2; last by unfold quiet_time; move: BUSY => [[_ [T1 T2]] _]. 
+      { erewrite cumulative_i_thep_eq_service_of_othep; eauto 2;
+          last by unfold quiet_time; move: BUSY => [[_ [T1 T2]] _]. 
         apply leq_trans with
             (workload_of_jobs
                (fun jhp : Job => (FP_to_JLFP _ _) jhp j && (job_task jhp != job_task j))
@@ -241,7 +241,7 @@ Section AbstractRTAforFPwithArrivalCurves.
           by move: (TSK) => /eqP ->. } 
         all: eauto 2 using arr_seq with basic_rt_facts. }
     Qed.
-
+    
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
     Section SolutionOfResponseTimeRecurrenceExists.
 
