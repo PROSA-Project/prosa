@@ -84,7 +84,7 @@ Section GenericModelLemmas.
       rewrite [in X in _ = X](arrivals_between_cat _ _ t) //.
       by rewrite {3}/service_of_jobs -big_cat //=.
     Qed.
-
+    
     
     (** In the following, we consider an arbitrary sequence of jobs [jobs]. *)
     Variable jobs : seq Job.
@@ -163,10 +163,33 @@ Section GenericModelLemmas.
       = \sum_(t1 <= t < t2) service_of_jobs_at sched P jobs t.
     Proof. by apply exchange_big. Qed.
 
-    (** Finally, we show that service of [{jobs | false}] is equal to 0. *) 
+    (** We show that service of [{jobs | false}] is equal to 0. *) 
     Lemma service_of_jobs_pred0 :
       service_of_jobs sched pred0 jobs t1 t2 = 0.
     Proof. by apply big_pred0. Qed.
+
+    (** More generally, if none of the jobs inside [jobs] is scheduled
+        at time [t] or satisfies [P], then total service of [jobs] at
+        time [t] is equal to 0. *) 
+    Lemma service_of_jobs_nsched_or_unsat :
+      forall (t : instant),
+        (forall j, j \in jobs -> ~~ (P j && scheduled_at sched j t)) -> 
+        service_of_jobs_at sched P jobs t = 0.
+    Proof.
+      intros ? ALL.
+      induction jobs.
+      - by rewrite /service_of_jobs_at big_nil.
+      - feed IHl.
+        { by intros j' IN; apply ALL; rewrite in_cons; apply/orP; right. }
+        rewrite /service_of_jobs_at big_cons; rewrite /service_of_jobs_at in IHl.
+        destruct (P a) eqn: Pa; last by done.
+        rewrite IHl addn0.
+        specialize (ALL a); feed ALL.
+        { by rewrite in_cons; apply/orP; left. }
+        rewrite Pa Bool.andb_true_l in ALL.
+        by apply not_scheduled_implies_no_service.
+    Qed.
+
     
 End GenericModelLemmas.
 
