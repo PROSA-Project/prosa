@@ -1,6 +1,9 @@
 Require Export prosa.analysis.facts.model.workload.
+Require Export prosa.analysis.facts.model.arrival_curves.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.request_bound_function.
+Require Export prosa.analysis.definitions.schedulability.
+
 
 (** * Facts about Request Bound Functions (RBFs) *)
 
@@ -38,7 +41,7 @@ Section ProofWorkloadBound.
   Let jlfp_higher_eq_priority := FP_to_JLFP Job Task.
 
   (** Further, consider a task set [ts]... *)
-  Variable ts : list Task.
+  Variable ts : seq Task.
 
   (** ... and let [tsk] be any task in [ts]. *)
   Variable tsk : Task.
@@ -339,3 +342,135 @@ Section RequestBoundFunctions.
   Qed.
 
 End RequestBoundFunctions.
+
+
+(** ** Monotonicity of the Total RBF *)
+
+(** In the following section, we note some trivial facts about the monotonicity
+    of various total RBF variants. *)
+Section TotalRBFMonotonic.
+
+  (** Consider a set of tasks characterized by WCETs and arrival curves. *)
+  Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task}.
+  Variable ts : seq Task.
+  Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
+
+  (** We observe that the total RBF is monotonically increasing. *)
+  Lemma total_rbf_monotone :
+    monotone leq (total_request_bound_function ts).
+  Proof.
+    apply: sum_leq_mono => tsk IN.
+    by apply task_rbf_monotone; rt_auto.
+  Qed.
+
+  (** Furthermore, for any fixed-priority policy, ... *)
+  Context `{FP_policy Task}.
+
+  (** ... the total RBF of higher- or equal-priority tasks is also monotonic, ... *)
+  Lemma total_hep_rbf_monotone :
+    forall tsk,
+      monotone leq (total_hep_request_bound_function_FP ts tsk).
+  Proof.
+    move=> tsk.
+    apply: sum_leq_mono => tsk' IN.
+    by apply task_rbf_monotone; rt_auto.
+  Qed.
+
+  (** ... as is the variant that excludes the reference task. *)
+  Lemma total_ohep_rbf_monotone :
+    forall tsk,
+      monotone leq (total_ohep_request_bound_function_FP ts tsk).
+  Proof.
+    move=> tsk.
+    apply: sum_leq_mono => tsk' IN.
+    by apply task_rbf_monotone; rt_auto.
+  Qed.
+
+End TotalRBFMonotonic.
+
+(** ** RBFs Equal to Zero for Duration ε *)
+
+(** In the following section, we derive simple properties that follow in
+    the pathological case of an RBF that yields zero for duration ε. *)
+Section DegenerateTotalRBFs.
+
+  (** Consider a set of tasks characterized by WCETs and arrival curves ... *)
+  Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task}.
+  Variable ts : seq Task.
+
+  (** ... and any consistent arrival sequence of valid jobs of these tasks. *)
+  Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job} `{JobCost Job}.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arrival_times_are_consistent: consistent_arrival_times arr_seq.
+  Hypothesis H_valid_job_cost: arrivals_have_valid_job_costs arr_seq.
+
+  (** Suppose the arrival curves are correct. *)
+  Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
+  Hypothesis H_is_arrival_curve :  taskset_respects_max_arrivals arr_seq ts.
+
+  (** Consider any valid schedule corresponding to this arrival sequence. *)
+  Context {PState : ProcessorState Job}.
+  Variable sched : schedule PState.
+  Hypothesis H_jobs_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
+
+  (** First, we observe that, if a task's RBF is zero for a duration [ε], then it
+      trivially has a response-time bound of zero. *)
+  Lemma pathological_rbf_response_time_bound :
+    forall tsk,
+      tsk \in ts ->
+      task_request_bound_function tsk ε = 0 ->
+      task_response_time_bound arr_seq sched tsk 0.
+  Proof.
+    move=> tsk IN ZERO j ARR TASK.
+    rewrite /job_response_time_bound/completed_by.
+    move: ZERO. rewrite /task_request_bound_function => /eqP.
+    rewrite muln_eq0 => /orP [/eqP COST|/eqP NEVER].
+    { apply: leq_trans.
+      - by apply: H_valid_job_cost.
+      - move: TASK. rewrite /job_of_task => /eqP ->.
+        by rewrite COST. }
+    { exfalso.
+      have: 0 < max_arrivals tsk ε
+        by apply: (non_pathological_max_arrivals tsk arr_seq _ j); rt_auto.
+      by rewrite NEVER. }
+  Qed.
+
+  (** Second, given a fixed-priority policy with reflexive priorities, ... *)
+  Context `{FP_policy Task}.
+  Hypothesis H_reflexive : reflexive_priorities.
+
+  (** ... if the total RBF of all equal- and higher-priority tasks is zero, then
+      the reference task's response-time bound is also trivially zero. *)
+  Lemma pathological_total_hep_rbf_response_time_bound :
+    forall tsk,
+      tsk \in ts ->
+      total_hep_request_bound_function_FP ts tsk ε = 0 ->
+      task_response_time_bound arr_seq sched tsk 0.
+  Proof.
+    move=> tsk IN ZERO j ARR TASK.
+    apply: pathological_rbf_response_time_bound; eauto.
+    apply /eqP.
+    move: ZERO => /eqP; rewrite sum_nat_eq0_nat => /allP; apply.
+    rewrite mem_filter; apply /andP; split => //.
+    move: (H_reflexive 0 j).
+    rewrite /hep_job_at/JLFP_to_JLDP/hep_job/FP_to_JLFP.
+    by move: TASK; rewrite /job_of_task => /eqP ->.
+  Qed.
+
+  (** Thus we we can prove any response-time bound from such a pathological
+      case, which is useful to eliminate this case in higher-level analyses. *)
+  Corollary pathological_total_hep_rbf_any_bound :
+    forall tsk,
+      tsk \in ts ->
+      total_hep_request_bound_function_FP ts tsk ε = 0 ->
+      forall R,
+        task_response_time_bound arr_seq sched tsk R.
+  Proof.
+    move=> tsk IN ZERO R.
+    move: (pathological_total_hep_rbf_response_time_bound tsk IN ZERO).
+    rewrite /task_response_time_bound/job_response_time_bound => COMP j INj TASK.
+    apply: completion_monotonic; last by apply: COMP.
+    by lia.
+  Qed.
+
+End DegenerateTotalRBFs.
