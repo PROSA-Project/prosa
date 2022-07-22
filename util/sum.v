@@ -1,6 +1,7 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
 
 Require Export prosa.util.notation.
+Require Export prosa.util.rel.
 Require Export prosa.util.nat.
 
 Section SumsOverSequences.
@@ -387,3 +388,35 @@ Section SumOverPartitions.
   End Equality.
 
 End SumOverPartitions.
+
+(** We observe a trivial monotonicity-preserving property with regard to
+    [leq]. *)
+Section Monotonicity.
+
+  (** Consider any type of indices, any predicate, ... *)
+  Variables (I : eqType) (P : pred I).
+
+  (** ... and any function that maps each index to a [nat -> nat] function. *)
+  Variable F : I -> nat -> nat.
+
+  (** Consider any set of indices ... *)
+  Variable r : seq I.
+
+  (** ... and suppose that [F i] is monotonic with regard to [leq] for every
+      index in [r]. *)
+  Hypothesis H_mono : forall i, i \in r -> monotone leq (F i).
+
+  (** Consider the sum of [F] over [r], for any given [x]. *)
+  Let f x := \sum_(i <- r | P i) F i x.
+
+  (** We note that this sum [f] is monotonic with regard to [leq] in [x]. *)
+  Lemma sum_leq_mono :
+    monotone leq f.
+  Proof.
+    move=> x y LEQ.
+    rewrite /f big_seq_cond [in X in _ <= X]big_seq_cond.
+    apply: leq_sum => i /andP [IN _].
+    by apply: H_mono.
+  Qed.
+
+End Monotonicity.
