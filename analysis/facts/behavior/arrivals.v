@@ -226,7 +226,55 @@ Section ArrivalSequencePrefix.
         j \in arrivals_between arr_seq t1 t2 -> job_arrival j < t2.
     Proof. by move=> ? ? ? /job_arrival_between/andP[]. Qed.
 
-    (** Second, we prove that if a job belongs to the prefix
+    (** Consequently, if we filter the list of arrivals in an interval
+        <<[t1,t2)>> with an arrival-time threshold less than [t1], we are
+        left with an empty list. *)
+    Lemma arrivals_between_filter_nil :
+      forall t1 t2 t,
+        t < t1 ->
+        [seq j <- arrivals_between arr_seq t1 t2 | job_arrival j < t] = [::].
+    Proof.
+      move=> t1 t2 t LT.
+      case: (leqP t1 t2) => RANGE;
+        last by rewrite /arrivals_between big_geq //=; lia.
+      rewrite filter_in_pred0 // => j IN.
+      rewrite -ltnNge.
+      apply: (ltn_trans LT).
+      rewrite ltnS.
+      by apply: job_arrival_between_ge; eauto.
+    Qed.
+
+    (** Furthermore, if we filter the list of arrivals in an interval
+        <<[t1,t2)>> with an arrival-time threshold less than [t2],
+        we can simply discard the tail past the threshold. *)
+    Lemma arrivals_between_filter :
+      forall t1 t2 t,
+        t <= t2 ->
+        arrivals_between arr_seq t1 t
+        = [seq j <- arrivals_between arr_seq t1 t2 | job_arrival j < t].
+    Proof.
+      move=> t1 t2 t LE2.
+      case: (leqP t1 t2) => RANGE;
+        last by rewrite /arrivals_between !big_geq //=; lia.
+      case: (leqP t1 t) => LE1;
+        last by rewrite [LHS]/arrivals_between big_geq; try lia; rewrite arrivals_between_filter_nil.
+      rewrite /arrivals_between bigcat_nat_filter_eq_filter_bigcat_nat.
+      rewrite (big_cat_nat _ _ _ LE1 LE2) //=.
+      rewrite !big_nat [X in _ ++ X]big1; last first.
+      { move=> t' /andP[LO HI].
+        rewrite filter_in_pred0 // => j IN.
+        have -> : job_arrival j = t' by apply: job_arrival_at; eauto.
+        rewrite -leqNgt.
+        exact: LO. }
+      { rewrite cats0.
+        apply: eq_bigr => t' /andP[LO HI].
+        apply esym.
+        apply /all_filterP/allP => j IN.
+        have -> : job_arrival j = t' by apply: job_arrival_at; eauto.
+        exact: HI. }
+    Qed.
+
+    (** Next, we prove that if a job belongs to the prefix
         (jobs_arrived_before t), then it arrives in the arrival
         sequence. *)
     Lemma in_arrivals_implies_arrived:
