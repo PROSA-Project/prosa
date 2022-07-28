@@ -15,15 +15,52 @@ Section WorkloadFacts.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Further, consider any job arrival sequence. *)
+  (** To begin with, we establish an auxiliary rewriting lemma that allows us to
+      introduce a [filter] on the considered set of jobs, provided the filter
+      predicate [P2] is implied by the job-selection predicate [P1]. *)
+  Lemma workload_of_jobs_filter :
+    forall (P1 P2 : pred Job) (jobs : seq Job),
+      (forall j, j \in jobs -> P1 j -> P2 j) ->
+      workload_of_jobs P1 jobs = workload_of_jobs P1 [seq j <- jobs | P2 j ].
+  Proof.
+    move=> P1 P2 jobs IMPL.
+    rewrite /workload_of_jobs big_filter_cond big_seq_cond [RHS]big_seq_cond.
+    apply: eq_bigl => j.
+    case: (boolP (j \in jobs)) => // IN.
+    rewrite !andTb.
+    case: (boolP (P1 j)) => //= P1j; first by rewrite (IMPL j IN P1j).
+    by rewrite andbF.
+  Qed.
+
+  (** Next, consider any job arrival sequence consistent with the arrival times
+      of the jobs. *)
   Variable arr_seq : arrival_sequence Job.
-  
+  Hypothesis H_consistent : consistent_arrival_times arr_seq.
+
+  (** If at some point in time [t] the predicate [P] by which we select jobs
+      from the set of arrivals in an interval <<[t1, t2)>> becomes certainly
+      false, then we may disregard all jobs arriving at time [t] or later. *)
+  Lemma workload_of_jobs_nil_tail :
+    forall {P t1 t2 t},
+      t <= t2 ->
+      (forall j, j \in (arrivals_between arr_seq t1 t2) -> job_arrival j >= t -> ~~ P j) ->
+      workload_of_jobs P (arrivals_between arr_seq t1 t2)
+      = workload_of_jobs P (arrivals_between arr_seq t1 t).
+  Proof.
+    move=> P t1 t2 t LE IMPL.
+    have -> : arrivals_between arr_seq t1 t = [seq j <- (arrivals_between arr_seq t1 t2) | job_arrival j < t]
+      by apply: arrivals_between_filter.
+    rewrite (workload_of_jobs_filter _ (fun j => job_arrival j < t)) // => j IN Pj.
+    case: (leqP t (job_arrival j)) => // TAIL.
+    by move: (IMPL j IN TAIL) => /negP.
+  Qed.
+
   (** For simplicity, let's define a local name. *)
   Let arrivals_between := arrivals_between arr_seq.
-  
+
   (** We observe that the cumulative workload of all jobs arriving in a time
       interval <<[t1, t2)>> and respecting a predicate [P] can be split into two parts. *)
-  Lemma workload_of_jobs_cat:
+   Lemma workload_of_jobs_cat:
     forall t t1 t2 P,
       t1 <= t <= t2 ->
       workload_of_jobs P (arrivals_between t1 t2) =
@@ -63,6 +100,7 @@ Section WorkloadFacts.
     by rewrite EQUAL mem_rem_uniqF in INjobs.
   Qed.
 
+  
   (** In this section, we prove the relation between two different ways of constraining 
       [workload_of_jobs] to only those jobs that arrive prior to a given time. *)
   Section Subset.
