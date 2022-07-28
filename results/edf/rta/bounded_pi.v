@@ -269,36 +269,17 @@ Section AbstractRTAforEDFwithArrivalCurves.
             workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + Δ))
             <= workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + (A + ε + D tsk - D tsk_o))).
           Proof.
-            unfold workload_of_jobs, EDF_from.
-            move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
-            set (V := A + ε + D tsk - D tsk_o) in *.
-            rewrite (arrivals_between_cat _ _ (t1 + V)); [ |rewrite leq_addr //|rewrite leq_add2l //].
-            rewrite big_cat //=.
-            rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
-            rewrite big_seq_cond.
-            apply/eqP; apply big_pred0.
-            intros jo; apply/negP; intros CONTR.
-            move: CONTR => /andP [ARRIN /andP [HEP /eqP TSKo]].
-            eapply in_arrivals_implies_arrived_between in ARRIN; eauto 2.
-            move: ARRIN => /andP [ARRIN _]; unfold V in ARRIN.
-            edestruct (leqP (D tsk_o) (A + ε + D tsk)) as [NEQ2|NEQ2].
-            - move: ARRIN; rewrite leqNgt; move => /negP ARRIN; apply: ARRIN.
-              rewrite -(ltn_add2r (D tsk_o)).
-              apply leq_ltn_trans with (job_arrival j + D tsk);
-                first by move: (H_job_of_tsk) => /eqP <-; rewrite -TSKo.
-              rewrite addnBA // addnA addnA subnKC // subnK.
-              + by rewrite ltn_add2r addn1.
-              + apply leq_trans with (A + ε + D tsk); first by done.
-                by lia.
-            - move: HEP; rewrite /EDF /edf.EDF leqNgt; move => /negP HEP; apply: HEP.
-              apply leq_ltn_trans with (job_arrival jo + (A + D tsk)).
-              + rewrite addnBAC // addnBA; last by lia.
-                rewrite [in X in _ <= X]addnC -addnBA; last by lia.
-                rewrite /job_deadline /job_deadline_from_task_deadline;
-                    by move: (H_job_of_tsk) => /eqP ->; rewrite leq_addr.
-              + rewrite ltn_add2l.
-                apply leq_ltn_trans with (A + ε + D tsk); first by lia.
-                by rewrite TSKo.
+            have BOUNDED: t1 + (A + ε + D tsk - D tsk_o) <= t1 + Δ by lia.
+            rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN'.
+            rewrite /EDF_from /ε => ARR'.
+            case: (eqVneq (job_task j') tsk_o) => TSK';
+              last by rewrite andbF.
+            rewrite andbT; apply: contraT  => /negPn.
+            rewrite /EDF/edf.EDF/job_deadline/job_deadline_from_task_deadline.
+            move: H_job_of_tsk; rewrite TSK' /job_of_task => /eqP -> HEP.
+            have LATEST: job_arrival j' <= t1 + A + D tsk - D tsk_o by rewrite /D/A; lia.
+            have EARLIEST: t1 <= job_arrival j' by apply: job_arrival_between_ge; eauto.
+            by case: (leqP (A + 1 + D tsk) (D tsk_o)); [rewrite /D/A|]; lia.
           Qed.
 
         End ShortenRange.
