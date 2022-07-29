@@ -82,6 +82,15 @@ Section PriorityInversion.
           by apply NN; apply /andP; split => //.
     Qed.
 
+    (** Similarly, we prove that the negated counterparts are also equivalent. *)
+    Corollary priority_inversion_negP :
+      forall t, reflect (~ priority_inversion t) (~~ priority_inversion_dec t).
+    Proof.
+      intros t; apply /introP.
+      - by move => /priority_inversion_P DEC.
+      - by move=> /negPn /priority_inversion_P; auto.
+    Qed.
+
   End PriorityInversionReflection.
 
   (** Cumulative priority inversion incurred by a job within some time
