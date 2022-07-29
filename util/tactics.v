@@ -128,17 +128,16 @@ Ltac interval_to_duration t1 t2 k :=
       [exists (t2 - t1); rewrite subnKC; auto using ltnW | ];
       destruct EX as [k EQ]; subst t2; clear H
     )
-  | [ H: is_true (t1 <= t2) |- _ ] =>
+  | [ H: is_true(t1 <= t2) |- _ ] =>
     ltac:(
       assert (EX : exists (k: nat), t2 = t1 + k);
-      [exists (t2 - t1); rewrite subnKC; auto | ];
+      [exists (t2 - t1); rewrite subnKC; auto using ltnW | ];
       destruct EX as [k EQ]; subst t2; clear H
     )
-  | [ H: is_true (t1 < t2) |- _ ] =>
+  | [ H: is_true(t1 < t2) |- _ ] =>
     ltac:(
       assert (EX : exists (k: nat), t2 = t1 + k);
       [exists (t2 - t1); rewrite subnKC; auto using ltnW | ];
       destruct EX as [k EQ]; subst t2; clear H
     )
   end.
-
