@@ -22,7 +22,7 @@ Section SumsOverSequences.
     (** Consider any function that yields natural numbers. *)
     Variable (F : I -> nat).
 
-    (** We start showing that having every member of [r] equal to zero is equivalent to 
+    (** We start showing that having every member of [r] equal to zero is equivalent to
         having the sum of all the elements of [r] equal to zero, and vice-versa. *)
     Lemma sum_nat_eq0_nat :
       (\sum_(i <- r | P i) F i == 0) = all (fun x => F x == 0) [seq x <- r | P x].
@@ -31,7 +31,7 @@ Section SumsOverSequences.
       by case: ifP; rewrite ?addn_eq0 IH.
     Qed.
 
-    (** In the same way, if at least one element of [r] is not zero, then the sum of all 
+    (** In the same way, if at least one element of [r] is not zero, then the sum of all
         elements of [r] must be strictly positive, and vice-versa. *)
     Lemma sum_nat_gt0 :
       (0 < \sum_(i <- r | P i) F i) = has (fun x => 0 < F x) [seq x <- r | P x].
@@ -40,7 +40,7 @@ Section SumsOverSequences.
       by apply/eq_all => ?; rewrite /= lt0n negbK.
     Qed.
 
-    (** Next, we show that if a number [a] is not contained in [r], then filtering or not 
+    (** Next, we show that if a number [a] is not contained in [r], then filtering or not
         filtering [a] when summing leads to the same result. *)
     Lemma sum_notin_rem_eqn a :
       a \notin r ->
@@ -83,7 +83,7 @@ Section SumsOverSequences.
     Variable (P1 P2 : pred I).
 
     (** Assume that [E2] dominates [E1] in all the points contained in the set [r] and respecting
-        the predicate [P]. We prove that, if we sum both function over those points, then the sum 
+        the predicate [P]. We prove that, if we sum both function over those points, then the sum
         of [E2] will dominate the sum of [E1]. *)
     Lemma leq_sum_seq :
       (forall i, i \in r -> P i -> E1 i <= E2 i) ->
@@ -214,13 +214,13 @@ End SumsOverSequences.
 (** In this section, we prove a variety of properties of sums performed over ranges. *)
 Section SumsOverRanges.
 
-  (** First, we prove that the sum of Δ ones is equal to Δ. *)
+  (** First, we prove that the sum of Δ ones is equal to Δ     . *)
   Lemma sum_of_ones:
     forall t Δ,
-      \sum_(t <= x < t + Δ) 1 = Δ. 
+      \sum_(t <= x < t + Δ) 1 = Δ.
   Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
 
-  (** Next, we show that a sum of natural numbers equals zero if and only 
+  (** Next, we show that a sum of natural numbers equals zero if and only
       if all terms are zero. *)
   Lemma big_nat_eq0 m n F:
     \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
@@ -235,7 +235,7 @@ Section SumsOverRanges.
       exact: big1_eq.
   Qed.
 
-  (** Moreover, the fact that the sum is smaller than the range of the summation 
+  (** Moreover, the fact that the sum is smaller than the range of the summation
       implies the existence of a zero element. *)
   Lemma sum_le_summation_range:
     forall f t Δ,
@@ -254,9 +254,9 @@ Section SumsOverRanges.
       apply/andP; split; first by done.
       by rewrite ltnS ltnW. }
   Qed.
-  
+
   (** Next, we prove that the summing over the difference of two functions is
-      the same as summing over the two functions separately, and then taking the 
+      the same as summing over the two functions separately, and then taking the
       difference of the two sums. Since we are using natural numbers, we have to
       require that one function dominates the other in the summing range. *)
   Lemma sumnB_nat m n F G :
@@ -283,11 +283,11 @@ Section SumOfTwoIntervals.
   (** ...and two functions [F1] and [F2]. *)
   Variable (F1 F2 : nat -> nat).
 
-  (** Assume that the two functions match point-wise with each other, with the points taken 
+  (** Assume that the two functions match point-wise with each other, with the points taken
       in their respective interval. *)
   Hypothesis equal_before_d: forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
 
-  (** The then summations of [F1] over <<[t1, t1 + d)>> and [F2] over 
+  (** The then summations of [F1] over <<[t1, t1 + d)>> and [F2] over
       <<[t2, t2 + d)>> are equal. *)
   Lemma big_sum_eq_in_eq_sized_intervals:
     \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
@@ -297,7 +297,7 @@ Section SumOfTwoIntervals.
     rewrite IHn //=; last by move=> g G_LTl; apply (equal_before_d g); lia.
     by rewrite equal_before_d.
   Qed.
-  
+
 End SumOfTwoIntervals.
 
 
@@ -310,10 +310,10 @@ Section SumOverPartitions.
   (** [x_to_y] is the mapping from an item to the partition it is contained in. *)
   Variable x_to_y : X -> Y.
 
-  (** Consider [f], a function from [X] to [nat]. *) 
+  (** Consider [f], a function from [X] to [nat]. *)
   Variable f : X -> nat.
 
-  (** Consider an arbitrary predicate [P] on [X]. *) 
+  (** Consider an arbitrary predicate [P] on [X]. *)
   Variable P : pred X.
 
   (** Consider a sequence of items [xs] and a sequence of partitions [ys]. *)
@@ -323,11 +323,11 @@ Section SumOverPartitions.
   (** We assume that any item in [xs] has its corresponding partition in the sequence of partitions [ys]. *)
   Hypothesis H_no_partition_missing : forall x, x \in xs -> x_to_y x \in ys.
 
-  (** Consider the sum of [f x] over all [x] in a given partition [y]. *) 
+  (** Consider the sum of [f x] over all [x] in a given partition [y]. *)
   Let sum_of_partition y := \sum_(x <- xs | P x && (x_to_y x == y)) f x.
 
-  (** We prove that summation of [f x] over all [x] is less than or equal to the summation of 
-      [sum_of_partition] over all partitions. *) 
+  (** We prove that summation of [f x] over all [x] is less than or equal to the summation of
+      [sum_of_partition] over all partitions. *)
   Lemma sum_over_partitions_le :
     \sum_(x <- xs | P x) f x
     <= \sum_(y <- ys) sum_of_partition y.
@@ -347,17 +347,37 @@ Section SumOverPartitions.
     by apply H_no_partition_missing, mem_head.
   Qed.
 
+  (** Consider a partition [y']. *)
+  Variable y' : Y.
+
+  (** We prove that the sum of items excluding all items from a partition [y']
+      is less-than-or-equal to the sum over all partitions except [y']. *)
+  Lemma reorder_summation : \sum_(x <- xs | P x && (x_to_y x != y')) f x <=
+                \sum_(y <- ys | y != y') sum_of_partition y.
+  Proof.
+    rewrite (exchange_big_dep (fun x =>P x && (x_to_y x != y'))) //=.
+    - rewrite  big_seq_cond [X in _ <= X]big_seq_cond.
+      apply leq_sum => x' /andP [ARRo /andP [Px' NEQ]].
+      rewrite (big_rem (x_to_y x')) //=.
+      rewrite Px' eq_refl NEQ andTb andTb leq_addr //.
+      by apply H_no_partition_missing.
+    - move => y_of_x' x' /negP NEQ /andP [EQ1 /eqP EQ2].
+      rewrite EQ1 Bool.andb_true_l; apply/negP; intros CONTR.
+      apply: NEQ; clear EQ1.
+      by rewrite -EQ2.
+  Qed.
+
   (** In this section, we prove a stronger result about the equality between
       the sum over all items and the sum over all partitions of those items. *)
   Section Equality.
 
-    (** In order to prove the stronger result of equality, we additionally 
+    (** In order to prove the stronger result of equality, we additionally
         assume that the sequences [xs] and [ys] are sets, i.e., that each
         element is contained at most once. *)
     Hypothesis H_xs_unique : uniq xs.
     Hypothesis H_ys_unique : uniq ys.
 
-    (** We prove that summation of [f x] over all [x] is equal to the summation of 
+    (** We prove that summation of [f x] over all [x] is equal to the summation of
       [sum_of_partition] over all partitions. *)
     Lemma sum_over_partitions_eq :
       \sum_(x <- xs | P x) f x
@@ -375,8 +395,8 @@ Section SumOverPartitions.
       { rewrite //= -big_filter.
         have -> : [seq i <- ys | x_to_y x' == i] = [:: x_to_y x']; last by rewrite unlock //= addn0.
         have -> : [seq i <- ys | x_to_y x' == i] = [seq i <- ys | i == x_to_y x'].
-        { clear H_no_partition_missing LE_TAIL. 
-          induction ys as [| y' ys' LE_TAILy]; first by done.
+        { clear H_no_partition_missing LE_TAIL.
+          induction ys as [| y'' ys' LE_TAILy]; first by done.
           feed LE_TAILy; first by move: H_ys_unique; rewrite cons_uniq => /andP [??].
           by rewrite //=  LE_TAILy //= eq_sym. }
         apply filter_pred1_uniq => //.
