@@ -933,7 +933,7 @@ Definition strict_prefix_of {T : eqType} (xs ys : seq T) :=
     by a constant offset, and an analogous version that shifts them backwards,
     removing any number that, in the absence of Coq' s saturating subtraction,
     would become negative. These functions are very useful in transforming
-    abstract RTA 's search space. *)
+    abstract RTA's search space. *)
 Definition shift_points_pos (xs : seq nat) (s : nat) : seq nat :=
   map (addn s) xs.
 Definition shift_points_neg (xs : seq nat) (s : nat) : seq nat :=

@@ -32,7 +32,7 @@ Require Export prosa.util.all.
 Definition ArrivalCurvePrefix : Type := duration * seq (duration * nat).
 
 (** Given an inter-arrival time [p] (or period [p]), the corresponding
-    arrival-curve prefix can be defined as [(p, [:: (1, 1)])]. *) 
+    arrival-curve prefix can be defined as [(p, [:: (1, 1)])]. *)
 Definition inter_arrival_to_prefix (p : nat) : ArrivalCurvePrefix := (p, [:: (1, 1)]).
 
 (** The first component of arrival-curve prefix [ac_prefix] is called horizon. *)
@@ -60,11 +60,11 @@ Definition value_at (ac_prefix : ArrivalCurvePrefix) (t : duration) :=
 (** Finally, we define a function [extrapolated_arrival_curve] that
     performs the periodic extension of the arrival-curve prefix (and
     hence, defines an arrival curve).
-    
-    Value of [extrapolated_arrival_curve t] is defined as 
-    [t %/ h * value_at horizon] plus [value_at (t mod horizon)]. 
-    The first summand corresponds to [k] full repetitions of the 
-    arrival-curve prefix inside interval <<[0,t)>>. The second summand 
+
+    Value of [extrapolated_arrival_curve t] is defined as
+    [t %/ h * value_at horizon] plus [value_at (t mod horizon)].
+    The first summand corresponds to [k] full repetitions of the
+    arrival-curve prefix inside interval <<[0,t)>>. The second summand
     corresponds to the residual change inside interval <<[k*h, t)>>. *)
 Definition extrapolated_arrival_curve (ac_prefix : ArrivalCurvePrefix) (t : duration) :=
   let h := horizon_of ac_prefix in
@@ -81,9 +81,24 @@ Section ValidArrivalCurvePrefix.
   Definition large_horizon (ac_prefix : ArrivalCurvePrefix) :=
     forall s, s \in time_steps_of ac_prefix -> s <= horizon_of ac_prefix.
 
+  (** We define an alternative, decidable version of [large_horizon]... *)
+  Definition large_horizon_dec (ac_prefix : ArrivalCurvePrefix) : bool :=
+    all (fun s => s <= horizon_of ac_prefix) (time_steps_of ac_prefix).
+
+  (** ... and prove that the two definitions are equivalent. *)
+  Lemma large_horizon_P :
+    forall (ac_prefix : ArrivalCurvePrefix),
+      reflect (large_horizon ac_prefix) (large_horizon_dec ac_prefix).
+  Proof.
+    move=> ac.
+    apply /introP; first by move=> /allP ?.
+    apply ssr.ssrbool.contraNnot => ?.
+    by apply /allP.
+  Qed.
+
   (** There should be no infinite arrivals; that is, [value_at 0 = 0]. *)
   Definition no_inf_arrivals (ac_prefix : ArrivalCurvePrefix) :=
-    value_at ac_prefix 0 = 0.
+    value_at ac_prefix 0 == 0.
 
   (** Bursts must be specified; that is, [steps_of] should contain a
       pair [(ε, b)]. *)
@@ -103,6 +118,27 @@ Section ValidArrivalCurvePrefix.
     /\ no_inf_arrivals ac_prefix
     /\ specified_bursts ac_prefix
     /\ sorted_ltn_steps ac_prefix.
+
+  (** We define an alternative, decidable version of [valid_arrival_curve_prefix]... *)
+  Definition valid_arrival_curve_prefix_dec (ac_prefix : ArrivalCurvePrefix) : bool :=
+    (positive_horizon ac_prefix)
+    && (large_horizon_dec ac_prefix)
+    && (no_inf_arrivals ac_prefix)
+    && (specified_bursts ac_prefix)
+    && (sorted_ltn_steps ac_prefix).
+
+  (** ... and prove that the two definitions are equivalent. *)
+  Lemma valid_arrival_curve_prefix_P :
+    forall (ac_prefix : ArrivalCurvePrefix),
+      reflect (valid_arrival_curve_prefix ac_prefix) (valid_arrival_curve_prefix_dec ac_prefix).
+  Proof.
+    move=> ac.
+    apply /introP.
+    - by move => /andP[/andP[/andP[/andP[? /large_horizon_P ?] ?]?]?].
+    - apply ssr.ssrbool.contraNnot.
+      move=> [?[/large_horizon_P ?[?[??]]]].
+      by repeat (apply /andP; split => //).
+  Qed.
 
   (** We also define a predicate for non-decreasing order that is
       more convenient for proving some of the claims. *)

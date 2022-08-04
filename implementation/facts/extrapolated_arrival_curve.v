@@ -4,20 +4,20 @@ Require Export prosa.util.all.
 Require Export prosa.implementation.definitions.extrapolated_arrival_curve.
 
 (** In this file, we prove basic properties of the arrival-curve
-    prefix and the [extrapolated_arrival_curve] function. *) 
+    prefix and the [extrapolated_arrival_curve] function. *)
 
 (** We start with basic facts about the relations [ltn_steps] and [leq_steps]. *)
 Section BasicFacts.
 
-  (** We show that the relation [ltn_steps] is transitive. *) 
+  (** We show that the relation [ltn_steps] is transitive. *)
   Lemma ltn_steps_is_transitive :
     transitive ltn_steps.
   Proof.
     move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    by apply /andP; split; lia. 
+    by apply /andP; split; lia.
   Qed.
 
-  (** Next, we show that the relation [leq_steps] is reflexive... *) 
+  (** Next, we show that the relation [leq_steps] is reflexive... *)
   Lemma leq_steps_is_reflexive :
     reflexive leq_steps.
   Proof.
@@ -26,12 +26,12 @@ Section BasicFacts.
     by apply /andP; split.
   Qed.
 
-  (** ... and transitive. *) 
+  (** ... and transitive. *)
   Lemma leq_steps_is_transitive :
     transitive leq_steps.
   Proof.
     move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    by apply /andP; split; lia. 
+    by apply /andP; split; lia.
   Qed.
 
 End BasicFacts.
@@ -47,7 +47,7 @@ Section ArrivalCurvePrefixSortedLeq.
   Variable ac_prefix : ArrivalCurvePrefix.
   Hypothesis H_sorted_leq : sorted_leq_steps ac_prefix.
   Hypothesis H_no_inf_arrivals : no_inf_arrivals ac_prefix.
-  
+
   (** We prove that [value_at] is monotone with respect to the relation [<=]. *)
   Lemma value_at_monotone :
     monotone leq (value_at ac_prefix).
@@ -59,21 +59,21 @@ Section ArrivalCurvePrefixSortedLeq.
       forall t__d1 v__d1 t__d2 v__d2,
         v__d1 <= v__d2 ->
         all (leq_steps (t__d1, v__d1)) steps ->
-        all (leq_steps (t__d2, v__d2)) steps ->              
+        all (leq_steps (t__d2, v__d2)) steps ->
         snd (last (t__d1, v__d1) [seq step <- steps | fst step <= t1]) <= snd (last (t__d2, v__d2) [seq step <- steps | fst step <= t2]).
     { induction steps as [ | [t__c v__c] steps]; first by done.
       simpl; intros *; move => LEv /andP [LTN1 /allP ALL1] /andP [LTN2 /allP ALL2].
       move: (H_sorted_leq); rewrite //= (@path_sorted_inE _ predT leq_steps); first last.
-      { by apply/allP. } 
+      { by apply/allP. }
       { by intros ? ? ? _ _ _; apply leq_steps_is_transitive. }
-      move => /andP [ALL SORT].          
-      destruct (leqP (fst (t__c, v__c)) t1) as [R1 | R1], (leqP (fst (t__c, v__c)) t2) as [R2 | R2]; simpl in *. 
-      { rewrite R1 R2 //=; apply IHsteps; try done. } 
+      move => /andP [ALL SORT].
+      destruct (leqP (fst (t__c, v__c)) t1) as [R1 | R1], (leqP (fst (t__c, v__c)) t2) as [R2 | R2]; simpl in *.
+      { rewrite R1 R2 //=; apply IHsteps; try done. }
       { by lia. }
       { rewrite ltnNge -eqbF_neg in R1; move: R1 => /eqP ->; rewrite R2 //=; apply IHsteps; try done.
-        - by move: LTN1; rewrite /leq_steps => /andP //= [_ LEc]. 
+        - by move: LTN1; rewrite /leq_steps => /andP //= [_ LEc].
         - by apply/allP.
-      } 
+      }
       { rewrite ltnNge -eqbF_neg in R1; move: R1 => /eqP ->.
         rewrite ltnNge -eqbF_neg in R2; move: R2 => /eqP ->.
         apply IHsteps; try done.
@@ -99,7 +99,7 @@ Section ArrivalCurvePrefixSortedLeq.
     destruct ac_prefix as [h2 steps]; simpl in LT.
     rewrite [in X in _ < X](sorted_split _ _ fst t) in LT.
     { rewrite [in X in _ ++ X](eq_filter (a2 := fun x => fst x == t + ε)) in LT; last first.
-      { by intros [a b]; simpl; rewrite -addn1 /ε eqn_leq. } 
+      { by intros [a b]; simpl; rewrite -addn1 /ε eqn_leq. }
       { destruct ([seq x <- steps | fst x == t + ε]) eqn:LST.
         { rewrite LST in LT.
           rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT; last first.
@@ -107,7 +107,7 @@ Section ArrivalCurvePrefixSortedLeq.
             destruct (leqP a t).
             - by rewrite Bool.andb_true_r; apply/eqP; lia.
             - by rewrite Bool.andb_false_r.
-          } 
+          }
           { by rewrite cats0 ltnn in LT. }
         }
         { destruct p as [t__c v__c]; exists v__c.
@@ -127,7 +127,7 @@ Section ArrivalCurvePrefixSortedLeq.
       by move: LE => /allP LE; specialize (LE _ IN); move: LE => /andP [LT _].
     }
   Qed.
-  
+
 End ArrivalCurvePrefixSortedLeq.
 
 (* In the next section, we make the stronger assumption that
@@ -140,10 +140,10 @@ Section ArrivalCurvePrefixSortedLtn.
   Variable ac_prefix : ArrivalCurvePrefix.
   Hypothesis H_sorted_ltn : sorted_ltn_steps ac_prefix. (* Stronger assumption. *)
   Hypothesis H_no_inf_arrivals : no_inf_arrivals ac_prefix.
-  
+
   (** First, we show that an [ltn]-sorted arrival-curve prefix is an
       [leq]-sorted arrival-curve prefix. *)
-  Lemma sorted_ltn_steps_imply_sorted_leq_steps_steps : 
+  Lemma sorted_ltn_steps_imply_sorted_leq_steps_steps :
     sorted_leq_steps ac_prefix.
   Proof.
     destruct ac_prefix; unfold sorted_leq_steps, sorted_ltn_steps in *; simpl in *.
@@ -164,16 +164,14 @@ Section ArrivalCurvePrefixSortedLtn.
     have EM : [seq step <- steps | fst step <= 0] = [::].
     { apply filter_in_pred0; intros [t' v'] IN.
       move: ALL => /allP ALL; specialize (ALL _ IN); simpl in ALL.
-      by rewrite -ltnNge //=; move: ALL; rewrite /ltn_steps //= => /andP [T _ ]; lia.
-    }
+      by rewrite -ltnNge //=; move: ALL; rewrite /ltn_steps //= => /andP [T _ ]; lia. }
     rewrite EM; destruct (posnP t) as [Z | POS].
     { subst t; simpl.
       move: H_no_inf_arrivals; rewrite /no_inf_arrivals /value_at /step_at //= EM //=.
-      by move => EQ; subst v.
-    } 
-    { by rewrite leqNgt POS //=. } 
+      by move => /eqP EQ; subst v. }
+    { by rewrite leqNgt POS //=. }
   Qed.
-  
+
   (** We show that functions [steps_of] and [step_at] are consistent.
       That is, if a pair [(t, v)] is in steps of [ac_prefix], then
       [step_at t] is equal to [(t, v)]. *)
@@ -188,9 +186,9 @@ Section ArrivalCurvePrefixSortedLtn.
     move: H0; rewrite //= path_sortedE; auto using ltn_steps_is_transitive; rewrite //= leqnn => /andP [ALL SORT].
     simpl; replace (filter _ _ ) with (@nil (nat * nat)); first by done.
     symmetry; apply filter_in_pred0; intros x IN; rewrite -ltnNge.
-    by move: ALL => /allP ALL; specialize (ALL _ IN); move: ALL; rewrite /ltn_steps //= => /andP [LT _ ]. 
+    by move: ALL => /allP ALL; specialize (ALL _ IN); move: ALL; rewrite /ltn_steps //= => /andP [LT _ ].
   Qed.
-  
+
 End ArrivalCurvePrefixSortedLtn.
 
 (** In this section, we prove a few basic properties of
@@ -199,23 +197,23 @@ End ArrivalCurvePrefixSortedLtn.
     [extrapolated_arrival_curve] makes a step at time [t + ε]. *)
 Section ExtrapolatedArrivalCurve.
 
-  (** Consider an arbitrary [leq]-sorted arrival-curve prefix without infinite arrivals. *)    
-  Variable ac_prefix : ArrivalCurvePrefix.    
+  (** Consider an arbitrary [leq]-sorted arrival-curve prefix without infinite arrivals. *)
+  Variable ac_prefix : ArrivalCurvePrefix.
   Hypothesis H_positive : positive_horizon ac_prefix.
   Hypothesis H_sorted_leq : sorted_leq_steps ac_prefix.
 
   (** Let [h] denote the horizon of [ac_prefix] ... *)
   Let h := horizon_of ac_prefix.
 
-  (** ... and [prefix] be shorthand for [value_at ac_prefix]. *) 
+  (** ... and [prefix] be shorthand for [value_at ac_prefix]. *)
   Let prefix := value_at ac_prefix.
-  
-  (** We show that [extrapolated_arrival_curve] is monotone. *) 
+
+  (** We show that [extrapolated_arrival_curve] is monotone. *)
   Lemma extrapolated_arrival_curve_is_monotone :
     monotone leq (extrapolated_arrival_curve ac_prefix).
   Proof.
     intros t1 t2 LE; unfold extrapolated_arrival_curve.
-    replace (horizon_of _) with h; last by done. 
+    replace (horizon_of _) with h; last by done.
     move: LE; rewrite leq_eqVlt => /orP [/eqP EQ | LTs].
     { by subst t2. }
     { have ALT : (t1 %/ h == t2 %/ h) \/ (t1 %/ h < t2 %/ h).
@@ -223,12 +221,12 @@ Section ExtrapolatedArrivalCurve.
       move: ALT => [/eqP EQ | LT].
       { rewrite EQ leq_add2l; apply value_at_monotone => //.
         by apply eqdivn_leqmodn; lia.
-      } 
+      }
       { have EQ: exists k, t1 + k = t2 /\ k > 0.
-        { exists (t2 - t1); split; lia. } 
+        { exists (t2 - t1); split; lia. }
         destruct EQ as [k [EQ POS]]; subst t2; clear LTs.
         rewrite divnD; last by done.
-        rewrite !mulnDl -!addnA leq_add2l.          
+        rewrite !mulnDl -!addnA leq_add2l.
         destruct (leqP h k) as [LEk|LTk].
         { eapply leq_trans; last by apply leq_addr.
           move: LEk; rewrite leq_eqVlt => /orP [/eqP EQk | LTk].
@@ -248,9 +246,9 @@ Section ExtrapolatedArrivalCurve.
     }
   Qed.
 
-  (** Finally, we show that if 
-      [extrapolated_arrival_curve t <> extrapolated_arrival_curve (t + ε)], 
-      then either (1) [t + ε] divides [h] or (2) [prefix (t mod h) < prefix ((t + ε) mod h)]. *) 
+  (** Finally, we show that if
+      [extrapolated_arrival_curve t <> extrapolated_arrival_curve (t + ε)],
+      then either (1) [t + ε] divides [h] or (2) [prefix (t mod h) < prefix ((t + ε) mod h)]. *)
   Lemma extrapolated_arrival_curve_change :
     forall t,
       extrapolated_arrival_curve ac_prefix t != extrapolated_arrival_curve ac_prefix (t + ε) ->
@@ -269,12 +267,12 @@ Section ExtrapolatedArrivalCurve.
         s1 < s2 \/ s1 = s2 /\ x < y.
     {  clear; intros * LEs LT.
        move: LEs; rewrite leq_eqVlt => /orP [/eqP EQ | LTs].
-       { by subst s2; rename s1 into s; right; split; [ done | lia]. } 
+       { by subst s2; rename s1 into s; right; split; [ done | lia]. }
        { by left. }
-    }         
+    }
     apply AF with (m := prefix h).
     { by apply leq_div2r, leq_addr. }
     { by rewrite ![prefix _ * _]mulnC; apply LT. }
   Qed.
-  
+
 End ExtrapolatedArrivalCurve.
