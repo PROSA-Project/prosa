@@ -7,6 +7,7 @@ Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
+Require Export prosa.analysis.abstract.ideal_jlfp_rta.
 
 (** In this section, we prove some fundamental properties of the FIFO policy. *)
 Section BasicLemmas.
@@ -29,11 +30,11 @@ Section BasicLemmas.
 
   (** Suppose jobs have preemption points ... *)
   Context `{JobPreemptable Job}.
-  
+
   (** ...and that the preemption model is valid. *)
   Hypothesis H_valid_preemption_model :
-    valid_preemption_model arr_seq sched.  
-  
+    valid_preemption_model arr_seq sched.
+
   (** Assume that the schedule respects the FIFO scheduling policy whenever jobs
       are preemptable. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
@@ -51,7 +52,60 @@ Section BasicLemmas.
     apply: NCOMPL; eapply early_hep_job_is_scheduled; rt_eauto.
     by intros t'; apply/andP; split; unfold hep_job_at, JLFP_to_JLDP, hep_job, FIFO; lia.
   Qed.
-  
+
+  (** In this section, we prove the cumulative priority inversion for any task
+      is bounded by [0]. *)
+  Section PriorityInversionBounded.
+
+    (** Consider any kind of tasks. *)
+    Context `{Task : TaskType} `{JobTask Job Task}.
+
+    (** Consider a task [tsk]. *)
+    Variable tsk : Task.
+
+    (** Assume the arrival times are consistent. *)
+    Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
+
+    (** Assume that the schedule follows the FIFO policy at preemption time. *)
+    Hypothesis H_respects_policy_at_preemption_point :
+      respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
+
+    (** Assume the schedule is valid. *)
+    Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+
+    (** Assume there are no duplicates in the arrival sequence. *)
+    Hypothesis H_arrival_sequence_is_a_set : arrival_sequence_uniq arr_seq.
+
+    (** Then we prove that the amount of priority inversion is bounded by 0. *)
+    Lemma FIFO_implies_no_pi :
+      priority_inversion_is_bounded_by_constant arr_seq sched tsk 0.
+    Proof.
+      move=> j ARRIN TASK POS t1 t2 BUSY.
+      rewrite /priority_inversion.cumulative_priority_inversion.
+      have -> : \sum_(t1 <= t < t2) priority_inversion_dec arr_seq sched j t = 0;
+        last by done.
+      rewrite big_nat_eq0 => t /andP[T1 T2].
+      apply /eqP; rewrite eqb0.
+      apply /negP => /priority_inversion_P INV.
+      feed_n 3 INV; rt_eauto.
+      move: INV => [NSCHED [j__lp /andP [SCHED LP]]].
+      move: LP; rewrite /hep_job /FIFO -ltnNge => LT.
+      have COMPL: completed_by sched j t.
+      { apply: early_hep_job_is_scheduled; rt_eauto.
+        move=> t'; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FIFO -ltnNge.
+        by apply/andP; split; first apply ltnW. }
+      move : BUSY => [LE [QT [NQT /andP[ARR1 ARR2]]]].
+      move: T1; rewrite leq_eqVlt => /orP [/eqP EQ | GT].
+      { subst t; apply completed_implies_scheduled_before in COMPL; rt_eauto.
+        by case: COMPL => [t' [/andP [ARR3 LT__temp] SCHED__temp]]; lia. }
+      { apply: NQT; first (apply/andP; split; [exact GT | lia]).
+        intros ? ARR HEP ARRB; rewrite /hep_job /FIFO in HEP.
+        eapply early_hep_job_is_scheduled; rt_eauto; first by lia.
+        by move => t'; apply/andP; split; rewrite /hep_job_at /FIFO /JLFP_to_JLDP /hep_job //=; lia. }
+    Qed.
+
+  End PriorityInversionBounded.
+
   (** We prove that in a FIFO-compliant schedule, if a job [j] is
       scheduled, then all jobs with higher priority than [j] have been
       completed. *)
@@ -87,6 +141,10 @@ Section BasicLemmas.
       by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=].
     Qed.
 
+    (** We also note that the [FIFO] policy respects sequential tasks. *)
+    Fact fifo_respects_sequential_tasks : policy_respects_sequential_tasks.
+    Proof. by move => j1 j2 SAME ARRLE; rewrite /hep_job /FIFO. Qed.
+
   End SequentialTasks.
 
   (** Finally, let us further assume that there are no needless
@@ -121,7 +179,7 @@ Section BasicLemmas.
         apply H_no_superfluous_preemptions; last by done.
         by repeat (apply /andP ; split; try by done).
       }
-      rewrite /hep_job /fifo.FIFO -ltnNge in HEP. 
+      rewrite /hep_job /fifo.FIFO -ltnNge in HEP.
       eapply (early_hep_job_is_scheduled arr_seq ) in SCHED1; try rt_eauto.
       - apply scheduled_implies_not_completed in INTER; rt_eauto.
         by eapply (incompletion_monotonic sched s t.-1 t) in INTER; [move: INTER => /negP|lia].
@@ -136,3 +194,9 @@ Section BasicLemmas.
   Qed.
 
 End BasicLemmas.
+
+(** We add the following lemmas to the basic facts database *)
+Global Hint Resolve
+  fifo_respects_sequential_tasks
+  tasks_execute_sequentially
+  : basic_rt_facts.
