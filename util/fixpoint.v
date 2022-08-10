@@ -1,8 +1,7 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop path.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrfun ssrnat seq fintype bigop path.
 
 Require Export prosa.util.rel.
 Require Export prosa.util.list.
-Require Export prosa.util.option.
 Require Export prosa.util.minmax.
 
 (** * Fixpoint Search *)
@@ -206,7 +205,7 @@ Definition find_max_fixpoint_of_seq (f : nat -> nat -> nat)
           (sp : seq nat) (h : nat) : option nat :=
   let is_some opt := opt != None in
   let fixpoints := [seq find_fixpoint (f s) h | s <- sp] in
-  let max := \max_(fp <- fixpoints | is_some fp) unwrap fp in
+  let max := \max_(fp <- fixpoints | is_some fp) (odflt 0) fp in
   if all is_some fixpoints then Some max else None.
 
 (** We prove that the result of the [find_max_fixpoint_of_seq] is a fixpoint of
@@ -251,8 +250,10 @@ Proof.
   have ALL : all (fun opt => opt != None) fps
     by case: (all _ _) H => //.
   move: H. rewrite ifT //; move => [] H IN.
-  exists (unwrap (find_fixpoint (f s) h)).
-  - apply: unwrap_inv.
+  exists ((odflt 0) (find_fixpoint (f s) h)).
+  - case FFP: (find_fixpoint _ _) => //=; exfalso.
+    suff: find_fixpoint (f s) h != None;
+      first by move=> /eqP.
     move: ALL => /allP //=; apply.
     by rewrite /fps; exact: map_f.
   - rewrite H.
