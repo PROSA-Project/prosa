@@ -1,5 +1,6 @@
 personal_ws-1.1 en 0
 Prosa
+Prosa's
 Coq
 ssreflect's
 ssreflect
@@ -88,3 +89,5 @@ fixpoint
 fixpoints
 RTA's
 parametrized
+Bedarkar
+RTSS
