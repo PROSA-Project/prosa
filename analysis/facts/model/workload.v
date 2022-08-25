@@ -2,7 +2,7 @@ Require Export prosa.model.aggregate.workload.
 Require Export prosa.analysis.facts.behavior.arrivals.
 
 (** * Lemmas about Workload of Sets of Jobs *)
-(** In this file, we establish basic facts about the workload of sets of jobs. *)  
+(** In this file, we establish basic facts about the workload of sets of jobs. *)
 Section WorkloadFacts.
 
   (** Consider any type of tasks ... *)
@@ -100,14 +100,13 @@ Section WorkloadFacts.
     by rewrite EQUAL mem_rem_uniqF in INjobs.
   Qed.
 
-  
-  (** In this section, we prove the relation between two different ways of constraining 
+
+  (** In this section, we prove the relation between two different ways of constraining
       [workload_of_jobs] to only those jobs that arrive prior to a given time. *)
   Section Subset.
 
     (** Assume that arrival times are consistent and that arrivals are unique. *)
-    Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
-    Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+    Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
     (** Consider a time interval <<[t1, t2)>> and a time instant [t]. *)
     Variable t1 t2 t : instant.
@@ -127,7 +126,7 @@ Section WorkloadFacts.
       clear H_jobs_uniq H_j_in_jobs H_t1_le_t2.
       rewrite /workload_of_jobs big_seq_cond.
       rewrite -[in X in X <= _]big_filter -[in X in _ <= X]big_filter.
-      apply leq_sum_sub_uniq; first by apply filter_uniq, arrivals_uniq.
+      apply leq_sum_sub_uniq; first by apply filter_uniq, arrivals_uniq; rt_eauto.
       move => j'; rewrite mem_filter => [/andP [/andP [A /andP [C D]] _]].
       rewrite mem_filter; apply/andP; split; first by done.
       apply job_in_arrivals_between; eauto.
@@ -137,23 +136,23 @@ Section WorkloadFacts.
     Qed.
 
   End Subset.
-    
+
   (** In this section, we prove a few useful properties regarding the
       predicate of [workload_of_jobs]. *)
   Section PredicateProperties.
 
     (** First, we show that workload of jobs for an unsatisfiable
-        predicate is equal to 0. *) 
+        predicate is equal to 0. *)
     Lemma workload_of_jobs_pred0 :
       workload_of_jobs pred0 jobs = 0.
     Proof. by rewrite /workload_of_jobs; apply big_pred0. Qed.
-    
-    (** Next, consider two arbitrary predicates [P] and [P']. *) 
+
+    (** Next, consider two arbitrary predicates [P] and [P']. *)
     Variable P P' : pred Job.
 
-    (** We show that [workload_of_jobs] conditioned on [P] can be split into two summands: 
-        (1) [workload_of_jobs] conditioned on [P /\ P'] and 
-        (2) [workload_of_jobs] conditioned on [P /\ ~~ P']. *) 
+    (** We show that [workload_of_jobs] conditioned on [P] can be split into two summands:
+        (1) [workload_of_jobs] conditioned on [P /\ P'] and
+        (2) [workload_of_jobs] conditioned on [P /\ ~~ P']. *)
     Lemma workload_of_jobs_case_on_pred :
       workload_of_jobs P jobs =
         workload_of_jobs (fun j => P j && P' j) jobs + workload_of_jobs (fun j => P j && ~~ P' j) jobs.
@@ -166,9 +165,9 @@ Section WorkloadFacts.
 
     (** We show that if [P] is indistinguishable from [P'] on set
         [jobs], then [workload_of_jobs] conditioned on [P] is equal to
-        [workload_of_jobs] conditioned on [P']. *) 
+        [workload_of_jobs] conditioned on [P']. *)
     Lemma workload_of_jobs_equiv_pred :
-      {in jobs, P =1 P'} -> 
+      {in jobs, P =1 P'} ->
       workload_of_jobs P jobs = workload_of_jobs P' jobs.
     Proof.
       intros * EQUIV.
@@ -177,5 +176,5 @@ Section WorkloadFacts.
     Qed.
 
   End PredicateProperties.
-  
+
 End WorkloadFacts.

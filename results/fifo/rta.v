@@ -64,8 +64,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   (** Consider any arrival sequence [arr_seq] with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** *** Absence of Self-Suspensions and WCET Compliance *)
 
@@ -310,7 +309,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       eapply leq_trans; first by apply service_of_jobs_le_workload; rt_eauto.
       rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)); rt_eauto.
       rewrite (workload_minus_job_cost j); rt_eauto;
-        last by rewrite /ε; apply job_in_arrivals_between; auto; lia.
+        last by rewrite /ε; apply job_in_arrivals_between; rt_auto; lia.
       rewrite /workload_of_jobs /IBF (big_rem tsk) //=
         (addnC (task_request_bound_function tsk (job_arrival j - t1 + ε))).
       rewrite -addnBA; last first.
@@ -334,7 +333,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         + move : H_job_of_task => TSKj.
           rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=;
             first by rewrite TSKj; apply leq_addr.
-          apply job_in_arrivals_between => //.
+          apply job_in_arrivals_between => //; rt_eauto.
           by apply /andP; split; [| rewrite subnKC; [rewrite addn1 |]].
     Qed.
 
@@ -409,7 +408,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         erewrite task_rbf_0_zero; eauto 2.
         rewrite add0n ; apply leq_trans with (task_cost tsk).
         - by eapply leq_trans; eauto 2.
-        - by eapply task_rbf_1_ge_task_cost; eauto. }
+        - by eapply task_rbf_1_ge_task_cost; rt_eauto. }
       { apply /andP; split; first by done.
         apply /hasPn.
         move => EQ2. unfold IBF in INSP2.

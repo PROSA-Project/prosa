@@ -3,7 +3,7 @@ Require Export prosa.analysis.facts.periodic.task_arrivals_size.
 Require Export prosa.model.task.concept.
 Require Export prosa.analysis.facts.hyperperiod.
 
-(** In this file we define a new function for job costs 
+(** In this file we define a new function for job costs
     in an observation interval and prove its validity. *)
 Section ValidJobCostsShifted.
 
@@ -19,22 +19,21 @@ Section ValidJobCostsShifted.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobDeadline Job}.
-  
+
   (** Consider a consistent arrival sequence with non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
-  Hypothesis H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Furthermore, assume that arrivals have valid job costs. *) 
+  (** Furthermore, assume that arrivals have valid job costs. *)
   Hypothesis H_arrivals_have_valid_job_costs: arrivals_have_valid_job_costs arr_seq.
-  
+
   (** Consider a periodic task set [ts] such that all tasks in
       [ts] have valid periods and offsets. *)
   Variable ts : TaskSet Task.
   Hypothesis H_periodic_taskset: taskset_respects_periodic_task_model arr_seq ts.
-  Hypothesis H_valid_periods_in_taskset: valid_periods ts. 
+  Hypothesis H_valid_periods_in_taskset: valid_periods ts.
   Hypothesis H_valid_offsets_in_taskset: valid_offsets arr_seq ts.
-  
+
   (** Consider a job [j] that stems from the arrival sequence. *)
   Variable j : Job.
   Hypothesis H_j_from_arrival_sequence: arrives_in arr_seq j.
@@ -46,18 +45,18 @@ Section ValidJobCostsShifted.
 
   (** We now define a new function for job costs in the observation interval. *)
 
-  (** Given that job [j] arrives after [O_max], the cost of a job [j'] 
-   that arrives in the interval <<[O_max + HP, O_max + 2HP)>> is defined to 
+  (** Given that job [j] arrives after [O_max], the cost of a job [j']
+   that arrives in the interval <<[O_max + HP, O_max + 2HP)>> is defined to
    be the same as the job cost of its corresponding job in [j]'s hyperperiod. *)
   Definition job_costs_shifted (j' : Job) :=
     if (job_arrival j >= O_max) && (O_max + HP <= job_arrival j' < O_max + 2 * HP) then
       job_cost (corresponding_job_in_hyperperiod ts arr_seq j' (starting_instant_of_corresponding_hyperperiod ts j) (job_task j'))
     else job_cost j'.
-  
-  (** Assume that we have an infinite sequence of jobs. *)
-  Hypothesis H_infinite_jobs: infinite_jobs arr_seq. 
 
-  (** Assume all jobs in the arrival sequence [arr_seq] belong to some task 
+  (** Assume that we have an infinite sequence of jobs. *)
+  Hypothesis H_infinite_jobs: infinite_jobs arr_seq.
+
+  (** Assume all jobs in the arrival sequence [arr_seq] belong to some task
    in [ts]. *)
   Hypothesis H_jobs_from_taskset: all_jobs_from_taskset arr_seq ts.
 
@@ -81,7 +80,7 @@ Section ValidJobCostsShifted.
     have IN : job_task j' \in ts by apply H_jobs_from_taskset.
     apply H_arrivals_have_valid_job_costs, corresponding_job_arrives => //.
     + now apply H_valid_offsets_in_taskset.
-    + now apply H_valid_periods_in_taskset.  
+    + now apply H_valid_periods_in_taskset.
     + now apply H_periodic_taskset.
     + now lia.
   Qed.

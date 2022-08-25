@@ -14,7 +14,7 @@ Require Import prosa.model.priority.edf.
 (** ** Setup and Assumptions *)
 
 Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
-  
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -38,8 +38,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
@@ -69,11 +68,11 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
-  Hypothesis H_work_conserving : work_conserving arr_seq sched.  
-  
+  Hypothesis H_work_conserving : work_conserving arr_seq sched.
+
   (** ... and the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
-   
+
   (** ** Total Workload and Length of Busy Interval *)
 
   (** We introduce the abbreviation [rbf] for the task request bound function,
@@ -84,39 +83,39 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       for the task request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
 
-  (** Using the sum of individual request bound functions, we define the request bound 
+  (** Using the sum of individual request bound functions, we define the request bound
      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
-  
+
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
   Let blocking_bound A :=
     \max_(tsk_o <- ts | (blocking_relevant tsk_o)
                          && (task_deadline tsk_o > task_deadline tsk + A))
      (task_cost tsk_o - ε).
-  
-  (** Next, we define an upper bound on interfering workload received from jobs 
+
+  (** Next, we define an upper bound on interfering workload received from jobs
        of other tasks with higher-than-or-equal priority. *)
   Let bound_on_total_hep_workload A Δ :=
     \sum_(tsk_o <- ts | tsk_o != tsk)
      rbf tsk_o (minn ((A + ε) + task_deadline tsk - task_deadline tsk_o) Δ).
-  
+
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_rbf L.
 
   (** ** Response-Time Bound *)
-    
+
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := bounded_nps.is_in_search_space ts tsk L.
-  
+
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
       response-time bound recurrence which is bounded by [R]. *)
   Variable R: nat.
   Hypothesis H_R_is_maximum:
     forall A,
-      is_in_search_space A -> 
+      is_in_search_space A ->
       exists F,
         A + F >= blocking_bound A + (task_rbf (A + ε) - (task_cost tsk - ε))
                 + bound_on_total_hep_workload A (A + F) /\
@@ -145,5 +144,5 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L).
     all: rt_eauto.
   Qed.
-  
+
 End RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.

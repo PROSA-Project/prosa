@@ -12,18 +12,17 @@ Require Export prosa.model.task.arrival.periodic.
     parameter. *)
 
 Section PeriodicTasksAsSporadicTasks.
-  
+
   (** Any type of periodic tasks ... *)
   Context {Task : TaskType} `{PeriodicModel Task}.
-  
-  (** ... and their corresponding jobs from a consistent arrival sequence with 
+
+  (** ... and their corresponding jobs from a consistent arrival sequence with
       non-duplicate arrivals ... *)
   Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
 
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
-  Hypothesis H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
-  
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
   (** ... may be interpreted as a type of sporadic tasks by using each task's
       period as its minimum inter-arrival time ... *)
   Global Instance periodic_as_sporadic : SporadicModel Task :=
@@ -36,7 +35,7 @@ Section PeriodicTasksAsSporadicTasks.
   Remark valid_period_is_valid_inter_arrival_time:
     forall tsk, valid_period tsk -> valid_task_min_inter_arrival_time tsk.
   Proof. trivial. Qed.
-  
+
   (** ... and the separation of job arrivals. *)
   Remark periodic_task_respects_sporadic_task_model:
     forall tsk, valid_period tsk ->
@@ -54,14 +53,14 @@ Section PeriodicTasksAsSporadicTasks.
       apply index_lte_implies_arrival_lte in JB_IND_LTE => //; try by rewrite TSK_PJ.
       rewrite PJ_ARR.
       have POS_PERIOD : task_period tsk > 0 by auto.
-      now lia. }
+      by lia. }
     specialize (H_PERIODIC j2); feed_n 3 H_PERIODIC => //; try by lia.
     move: H_PERIODIC => [pj [ARR_PJ [IND_PJ [TSK_PJ PJ_ARR]]]].
     have JB_IND_LTE : job_index arr_seq j1 <= job_index arr_seq pj by lia.
     apply index_lte_implies_arrival_lte in JB_IND_LTE => //; try by rewrite TSK_PJ.
-    now rewrite PJ_ARR; lia.
+    by rewrite PJ_ARR; lia.
   Qed.
-    
+
   (** For convenience, we state these obvious correspondences also at the level
       of entire task sets. *)
 
@@ -80,11 +79,11 @@ Section PeriodicTasksAsSporadicTasks.
       taskset_respects_sporadic_task_model ts arr_seq.
   Proof.
     intros ts VALID_PERIODS H_PERIODIC tsk TSK_IN.
-    specialize (H_PERIODIC tsk TSK_IN). 
+    specialize (H_PERIODIC tsk TSK_IN).
     apply periodic_task_respects_sporadic_task_model => //.
-    now apply VALID_PERIODS.
+    by apply VALID_PERIODS.
   Qed.
-  
+
 End PeriodicTasksAsSporadicTasks.
 
 (** We add the lemmas into the "Hint Database" basic_rt_facts so that

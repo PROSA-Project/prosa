@@ -40,8 +40,7 @@ Section SporadicArrivalCurve.
 
   (** ... and any well-formed arrival sequence of such jobs. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
-  Hypothesis H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** We establish the validity of the defined curve. *)
   Section Validity.
@@ -55,7 +54,7 @@ Section SporadicArrivalCurve.
         on the maximum number of arrivals. *)
     Lemma sporadic_arrival_curve_respects_max_arrivals :
       respects_max_arrivals arr_seq tsk (max_sporadic_arrivals tsk).
-    Proof. move=> t1 t2 LEQ. exact: sporadic_task_arrivals_bound. Qed.
+    Proof. move=> t1 t2 LEQ. by apply sporadic_task_arrivals_bound; rt_eauto. Qed.
 
   End Validity.
 

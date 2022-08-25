@@ -14,7 +14,7 @@ Require Export prosa.model.priority.edf.
 (** ** Setup and Assumptions *)
 
 Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
-  
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -33,11 +33,10 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
 
   (** We assume that jobs are limited-preemptive. *)
   #[local] Existing Instance limited_preemptive_job_model.
-   
+
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
@@ -48,9 +47,9 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   (** ... and the cost of a job cannot be larger than the task cost. *)
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
-  
+
   (** Next, we assume we have the model with fixed preemption points.
-     I.e., each task is divided into a number of non-preemptive segments 
+     I.e., each task is divided into a number of non-preemptive segments
      by inserting statically predefined preemption points. *)
   Context `{JobPreemptionPoints Job}.
   Context `{TaskPreemptionPoints Task}.
@@ -78,7 +77,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-  
+
   (** ... and the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
 
@@ -92,7 +91,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
      for the task request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
 
-  (** Using the sum of individual request bound functions, we define the request bound 
+  (** Using the sum of individual request bound functions, we define the request bound
      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
@@ -101,44 +100,44 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     \max_(tsk_other <- ts | (blocking_relevant tsk_other)
                              && (task_deadline tsk_other > task_deadline tsk + A))
      (task_max_nonpreemptive_segment tsk_other - ε).
-  
-  (** Next, we define an upper bound on interfering workload received from jobs 
+
+  (** Next, we define an upper bound on interfering workload received from jobs
      of other tasks with higher-than-or-equal priority. *)
   Let bound_on_total_hep_workload A Δ :=
     \sum_(tsk_o <- ts | tsk_o != tsk)
      rbf tsk_o (minn ((A + ε) + task_deadline tsk - task_deadline tsk_o) Δ).
-  
+
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_rbf L.
 
   (** ** Response-Time Bound *)
-  
+
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := bounded_nps.is_in_search_space ts tsk L.
-  
+
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
       response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum:
     forall (A : duration),
-      is_in_search_space A -> 
+      is_in_search_space A ->
       exists (F : duration),
         A + F >= blocking_bound A
-                + (task_rbf (A + ε) - (task_last_nonpr_segment tsk - ε)) 
+                + (task_rbf (A + ε) - (task_last_nonpr_segment tsk - ε))
                 + bound_on_total_hep_workload A (A + F) /\
         R >= F + (task_last_nonpr_segment tsk - ε).
-  
+
   (** Now, we can leverage the results for the abstract model with bounded non-preemptive segments
       to establish a response-time bound for the more concrete model of fixed preemption points.  *)
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
   Theorem uniprocessor_response_time_bound_edf_with_fixed_preemption_points:
-    response_time_bounded_by tsk R.  
-  Proof. 
+    response_time_bounded_by tsk R.
+  Proof.
     move: (H_valid_model_with_fixed_preemption_points) => [MLP [BEG [END [INCR [HYP1 [HYP2 HYP3]]]]]].
     move: (MLP) => [BEGj [ENDj _]].
     case: (posnP (task_cost tsk)) => [ZERO|POSt].
@@ -153,17 +152,17 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     rewrite subKn; first by done.
     rewrite /task_last_nonpr_segment  -(leq_add2r 1) subn1 !addn1 prednK; last first.
     - rewrite /last0 -nth_last.
-      apply HYP3; try by done. 
+      apply HYP3; try by done.
       rewrite -(ltn_add2r 1) !addn1 prednK //.
       move: (number_of_preemption_points_in_task_at_least_two
                _ _ H_valid_model_with_fixed_preemption_points _ H_tsk_in_ts POSt) => Fact2.
       move: (Fact2) => Fact3.
       by rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2.
     - apply leq_trans with (task_max_nonpreemptive_segment tsk).
-      + by apply last_of_seq_le_max_of_seq. 
+      + by apply last_of_seq_le_max_of_seq.
       + rewrite -END; last by done.
         apply ltnW; rewrite ltnS; try done.
         by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
   Qed.
-  
+
 End RTAforFixedPreemptionPointsModelwithArrivalCurves.

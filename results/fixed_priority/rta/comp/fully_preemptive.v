@@ -35,9 +35,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
    #[local] Existing Instance fully_preemptive_rtc_threshold.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
-  Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+   Variable arr_seq : arrival_sequence Job.
+   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Consider an arbitrary task set [ts], ... *)
   Variable ts : list Task.

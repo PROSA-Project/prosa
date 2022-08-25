@@ -146,7 +146,7 @@ Section ArrivalSequencePrefix.
      in the case of arrivals that satisfy a predicate [P]. *)
     Lemma arrivals_P_cat:
       forall P t t1 t2,
-        t1 <= t < t2 -> 
+        t1 <= t < t2 ->
         arrivals_between_P arr_seq P t1 t2 =
         arrivals_between_P arr_seq P t1 t ++ arrivals_between_P arr_seq P t t2.
     Proof.
@@ -205,6 +205,21 @@ Section ArrivalSequencePrefix.
       forall {j t},
         j \in arrivals_at arr_seq t -> job_arrival j = t.
     Proof. exact: H_consistent_arrival_times. Qed.
+
+    (** Next, we  prove that if [j] is a part of the arrival sequence,
+        then the converse of the above also holds. *)
+    Lemma job_in_arrivals_at :
+      forall j t,
+        arrives_in arr_seq j ->
+        job_arrival j = t ->
+        j \in arrivals_at arr_seq t.
+    Proof.
+      move => j t [t' IN] => /eqP.
+      apply contraTT => /negP NOTIN.
+      apply /neqP => ARR.
+      have ARR' := (H_consistent_arrival_times _ t' IN).
+      by move: IN; rewrite -ARR' ARR.
+    Qed.
 
     (** To begin with actual properties, we observe that any job in
         the set of all arrivals between time instants [t1] and [t2]
@@ -452,7 +467,7 @@ End ArrivalSequencePrefix.
     predicates to facilitate automation. *)
 Section ScheduledImpliesArrives.
 
-  (** Consider any type of jobs. *) 
+  (** Consider any type of jobs. *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
 
@@ -473,26 +488,26 @@ Section ScheduledImpliesArrives.
 
   (** Next, consider a job [j] ... *)
   Variable j : Job.
-  
+
   (** ... which is scheduled at a time instant [t]. *)
   Variable t : instant.
   Hypothesis H_scheduled_at : scheduled_at sched j t.
-  
-  (** Then we show that [j] arrives in [arr_seq]. *) 
+
+  (** Then we show that [j] arrives in [arr_seq]. *)
   Lemma arrives_in_jobs_come_from_arrival_sequence :
     arrives_in arr_seq j.
   Proof.
     by apply: H_jobs_come_from_arrival_sequence H_scheduled_at.
   Qed.
-  
-  (** Job [j] has arrived by time instant [t]. *) 
+
+  (** Job [j] has arrived by time instant [t]. *)
   Lemma arrived_between_jobs_must_arrive_to_execute :
     has_arrived j t.
   Proof.
     by apply: H_jobs_must_arrive_to_execute H_scheduled_at.
   Qed.
 
-  (** Finally, for any future time [t'], job [j] arrives before [t']. *) 
+  (** Finally, for any future time [t'], job [j] arrives before [t']. *)
   Lemma arrivals_before_scheduled_at :
     forall t',
       t < t' ->
@@ -500,7 +515,7 @@ Section ScheduledImpliesArrives.
   Proof.
     move=> t' LTtt'.
     apply: arrived_between_implies_in_arrivals => //.
-    - by apply: arrives_in_jobs_come_from_arrival_sequence. 
+    - by apply: arrives_in_jobs_come_from_arrival_sequence.
     - apply: leq_ltn_trans LTtt'.
       by apply: arrived_between_jobs_must_arrive_to_execute.
   Qed.
@@ -513,7 +528,7 @@ Global Hint Resolve
        any_ready_job_is_pending
        arrivals_before_scheduled_at
        arrivals_uniq
-       arrived_between_implies_in_arrivals 
+       arrived_between_implies_in_arrivals
        arrived_between_jobs_must_arrive_to_execute
        arrives_in_jobs_come_from_arrival_sequence
        backlogged_implies_arrived
@@ -524,4 +539,7 @@ Global Hint Resolve
        valid_schedule_implies_jobs_must_arrive_to_execute
        valid_schedule_jobs_come_from_arrival_sequence
        valid_schedule_jobs_must_be_ready_to_execute
+       uniq_valid_arrival
+       consistent_times_valid_arrival
+       job_arrival_arrives_at
   : basic_rt_facts.

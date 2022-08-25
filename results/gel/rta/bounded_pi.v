@@ -40,8 +40,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       we model arrivals using an arrival sequence. We assume
       that the arrival is consistent and does not contain duplicates. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** We consider a valid, ideal uniprocessor schedule... *)
   Variable sched : schedule (ideal.processor_state Job).
@@ -193,7 +192,7 @@ Section AbstractRTAforGELwithArrivalCurves.
                  (Z.to_nat (Z.of_nat t1 + interval tsk_o A))).
         Proof.
           have BOUNDED: Z.to_nat (Z.of_nat t1 + (interval tsk_o A)) <= t1 + Δ by lia.
-          rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
+          rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'; rt_eauto.
           rewrite /GEL_from.
           case: (eqVneq (job_task j') tsk_o) => TSK';
                                                last by rewrite andbF.
@@ -249,7 +248,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
         rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ tsk j); rt_eauto.
         + rewrite /I leq_add //.
-          apply : (cumulative_priority_inversion_is_bounded _ _ arr_seq _ _ _ _ tsk j _ _ _ t1  t2 _ R2 _ priority_inversion_bound  _ ); rt_eauto.
+          eapply cumulative_priority_inversion_is_bounded; rt_eauto.
           eapply leq_trans. eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
           eapply leq_trans. apply service_of_jobs_le_workload; rt_eauto.
           eapply leq_trans. eapply reorder_summation; eauto 2 => j' IN.
@@ -259,8 +258,8 @@ Section AbstractRTAforGELwithArrivalCurves.
           eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
           by apply /eqP.
           by done.
-        +  eapply GEL_implies_sequential_tasks; rt_auto.
-        + by eapply arrived_between_implies_in_arrivals; eauto 2.
+        + by eapply GEL_implies_sequential_tasks; rt_auto.
+        + by eapply arrived_between_implies_in_arrivals; rt_eauto.
     Qed.
 
   (** ** F. Defining the Search Space *)
@@ -323,7 +322,7 @@ Section AbstractRTAforGELwithArrivalCurves.
         apply contraT => /negPn /eqP ZERO.
         rewrite -(ltnn 0) {2}ZERO add0n.
         apply: (@leq_trans (task_cost tsk));
-          last by apply: task_rbf_1_ge_task_cost; eauto.
+          last by apply: task_rbf_1_ge_task_cost; rt_eauto.
         apply: (@leq_trans (job_cost j)) => //.
         move: (H_job_of_tsk) => /eqP <-.
         by apply: (H_valid_job_cost _ H_j_arrives). }
@@ -417,7 +416,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
     - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
       * eapply GEL_implies_sequential_tasks; rt_eauto.
-    - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
+    - by eapply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
     - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_task_interference_is_bounded.
     - by eapply correct_search_space; eauto 2.

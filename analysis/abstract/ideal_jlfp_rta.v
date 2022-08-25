@@ -25,17 +25,15 @@ Section JLFPInstantiation.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider any arrival sequence with consistent arrivals. *)
+  (** Consider any valid arrival sequence with consistent arrivals... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set: arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
+  (** ... and any ideal uni-processor schedule of this arrival sequence... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
-    jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
-  (** ... where jobs do not execute before their arrival or after completion. *)
+  (** ... where jobs do not execute before their arrival nor after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
@@ -412,7 +410,7 @@ Section JLFPInstantiation.
         - rewrite idle_implies_no_priority_inversion //.
         - destruct (hep_job s j) eqn:PRIO.
           + by destruct (priority_inversion_dec _ _ _), (is_interference_from_another_hep_job _ _).
-          + erewrite sched_lp_implies_priority_inversion; eauto 2.
+          + erewrite sched_lp_implies_priority_inversion; rt_eauto.
             by rewrite PRIO.
       }
       { intros t _.
@@ -420,8 +418,8 @@ Section JLFPInstantiation.
         - rewrite idle_implies_no_priority_inversion //.
         - destruct (hep_job s j) eqn:PRIO.
           + erewrite sched_hep_implies_no_priority_inversion; eauto 2.
-          + erewrite sched_lp_implies_priority_inversion; eauto 2.
-            erewrite sched_alp_implies_interference_ahep_false; eauto 2.
+          + erewrite sched_lp_implies_priority_inversion; rt_eauto.
+            erewrite sched_alp_implies_interference_ahep_false; rt_eauto.
             all: by rewrite PRIO.
       }
     Qed.
@@ -466,9 +464,9 @@ Section JLFPInstantiation.
         + by erewrite task_interference_eq_false; eauto 1.
         + move: TSKs => /eqP/eqP TSKs; erewrite sched_athep_implies_task_interference, sched_athep_implies_interference_athep; eauto 1.
           by destruct (priority_inversion_dec).
-        + erewrite sched_lp_implies_priority_inversion; eauto 2; last by rewrite HP.
+        + erewrite sched_lp_implies_priority_inversion; rt_eauto; last by rewrite HP.
           by destruct (task_interference_received_before), (is_interference_from_hep_job_from_another_task).
-        + erewrite sched_lp_implies_priority_inversion; eauto 2; last by rewrite HP.
+        + erewrite sched_lp_implies_priority_inversion; rt_eauto; last by rewrite HP.
           by destruct (task_interference_received_before), (is_interference_from_hep_job_from_another_task).
       - rewrite /is_priority_inversion; ideal_proc_model_sched_case_analysis_eq sched t s;
           first by rewrite idle_implies_no_priority_inversion //= idle_implies_no_hep_task_interference.
@@ -479,8 +477,8 @@ Section JLFPInstantiation.
           apply/negP; intros NEQ; move: NCOMPL => /negP NCOMPL; apply: NCOMPL.
           apply completion_monotonic with t; first by rewrite mem_iota in IN; apply ltnW; lia.
           apply/negP; intros NCOMPL; move: NCOMPL => /negP NCOMPL.
-          move: NEQ => /negP NEQ; apply: NEQ; apply H_JLFP_respects_sequential_tasks; eauto 2.
-          by eapply scheduler_executes_job_with_earliest_arrival; eauto 2.
+          move: NEQ => /negP NEQ; apply: NEQ; apply H_JLFP_respects_sequential_tasks; rt_eauto.
+          by eapply scheduler_executes_job_with_earliest_arrival; rt_eauto.
         + erewrite priority_inversion_equiv_sched_lower_priority; rt_eauto.
           have TSKn : ~~ job_of_task tsk s.
             by apply/negP; intros ?; move: TSKEQ => /eqP TSKEQ; apply:TSKEQ; move: (H4) (TSK) => /eqP -> /eqP ->.
@@ -572,34 +570,32 @@ Section JLFPInstantiation.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (another_hep_job jo j) eqn:PRIO; last by done.
           rewrite (big_rem jo) /=; first by rewrite PRIO service_at_def EQ eq_refl.
-          apply arrived_between_implies_in_arrivals; try done.
-          - by apply H_jobs_come_from_arrival_sequence with x.
+          apply arrived_between_implies_in_arrivals; try done; rt_eauto.
           - rewrite /arrived_between; apply/andP; split.
             + move: PRIO => /andP [PRIO1 PRIO2].
               rewrite leqNgt; apply/negP; intros AB.
               move: (Sched_jo). rewrite -[scheduled_at _ _ _]Bool.negb_involutive;
                                   move => /negP SCHED2; apply: SCHED2.
-              apply completed_implies_not_scheduled; eauto.
+              apply completed_implies_not_scheduled; rt_eauto.
               apply completion_monotonic with t1; try done.
-              apply H_quiet_time; try done.
-              eapply H_jobs_come_from_arrival_sequence; eauto.
-            + by apply leq_ltn_trans with x; [apply H_jobs_must_arrive_to_execute | done].
-        }
+              by apply H_quiet_time; try done; rt_eauto.
+              move : EQ => /eqP EQ.
+              rewrite -scheduled_at_def in EQ.
+              eapply has_arrived_scheduled in EQ; rt_eauto.
+              apply leq_ltn_trans with x; rt_eauto. }
         { erewrite eq_bigr; last by move=> i _; rewrite service_at_def /=.
           ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (another_hep_job jo j) eqn:PRIO.
           - rewrite -EQ. have SCH := service_of_jobs_le_1 _ _ sched _ (arrivals_between arr_seq t1 t) _ x.
             eapply leq_trans; last first.
-            + apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
-                            ideal_proc_model_is_a_uniprocessor_model.
+            + apply SCH; rt_eauto.
             + rewrite /service_of_jobs_at; erewrite leq_sum => // i _.
               by rewrite service_at_def.
           - rewrite leqn0 big1 //; intros joo PRIO2.
             apply/eqP; rewrite eqb0; apply/eqP; intros C.
             inversion C; subst joo; clear C.
-            by rewrite PRIO2 in PRIO.
-        }
+            by rewrite PRIO2 in PRIO. }
       Qed.
 
       (** The same applies to the alternative definition of interference. *)
@@ -617,18 +613,19 @@ Section JLFPInstantiation.
           move: (Sched_jo); rewrite scheduled_at_def; move => /eqP EQ; rewrite EQ.
           destruct (another_task_hep_job jo j) eqn:PRIO; last by done.
           rewrite (big_rem jo) /=; first by rewrite PRIO service_at_def EQ eq_refl.
-          apply arrived_between_implies_in_arrivals; try done.
-          - by apply H_jobs_come_from_arrival_sequence with x.
+          apply arrived_between_implies_in_arrivals; try done; rt_eauto.
           - rewrite /arrived_between; apply/andP; split.
             + move: PRIO => /andP [PRIO1 PRIO2].
               rewrite leqNgt; apply/negP; intros AB.
               move: (Sched_jo). rewrite -[scheduled_at _ _ _]Bool.negb_involutive;
                                   move => /negP SCHED2; apply: SCHED2.
-              apply completed_implies_not_scheduled; eauto.
+              apply completed_implies_not_scheduled; rt_eauto.
               apply completion_monotonic with t1; try done.
-              apply H_quiet_time; try done.
-              by eapply H_jobs_come_from_arrival_sequence; eauto.
-            + by apply leq_ltn_trans with x; [apply H_jobs_must_arrive_to_execute | done].
+              apply H_quiet_time; try done; rt_eauto.
+            + move : EQ => /eqP EQ; rewrite -scheduled_at_def in EQ.
+              eapply has_arrived_scheduled in EQ; rt_eauto.
+              by apply leq_ltn_trans with x; rt_eauto.
+
         }
         { erewrite eq_bigr; last by move=> i _; rewrite service_at_def /=.
           ideal_proc_model_sched_case_analysis_eq sched x jo; first by rewrite big1_eq.
@@ -636,8 +633,7 @@ Section JLFPInstantiation.
           destruct (another_task_hep_job jo j) eqn:PRIO.
           - rewrite -EQ. have SCH := service_of_jobs_le_1 _ _ sched _ (arrivals_between arr_seq t1 t) _ x.
             eapply leq_trans; last first.
-            + by apply SCH; eauto using arrivals_uniq, ideal_proc_model_provides_unit_service,
-                            ideal_proc_model_is_a_uniprocessor_model.
+            + by apply SCH; rt_eauto.
             + rewrite /service_of_jobs_at; erewrite leq_sum => // i _.
               by rewrite service_at_def.
           - rewrite leqn0 big1 //; intros joo PRIO2.
@@ -675,11 +671,11 @@ Section JLFPInstantiation.
           { erewrite cumulative_interference_split, cumulative_interfering_workload_split; apply/eqP; rewrite eqn_add2l.
             rewrite cumulative_i_ohep_eq_service_of_ohep //= cumulative_iw_hep_eq_workload_of_ohep eq_sym; apply/eqP.
             apply all_jobs_have_completed_equiv_workload_eq_service;
-              eauto using ideal_proc_model_provides_unit_service.
+              rt_eauto.
             intros j0 IN HEP; apply QT.
             - by apply in_arrivals_implies_arrived in IN.
             - by move: HEP => /andP [H6 H7].
-            - by apply in_arrivals_implies_arrived_between in IN.
+            - by apply in_arrivals_implies_arrived_between in IN; rt_eauto.
           }
         Qed.
 
@@ -690,8 +686,7 @@ Section JLFPInstantiation.
           { by intros jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
           intros t [T0 T1] jhp ARR HP ARB.
           eapply all_jobs_have_completed_equiv_workload_eq_service with
-              (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t);
-            eauto using arrived_between_implies_in_arrivals, ideal_proc_model_provides_unit_service.
+              (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t); rt_eauto.
           erewrite service_of_jobs_case_on_pred with (P2 := fun j' => j' != j); rt_eauto.
           erewrite workload_of_jobs_case_on_pred with (P' := fun j' => j' != j); rt_eauto.
           replace ((fun j0 : Job => hep_job j0 j && (j0 != j))) with (another_hep_job^~j); last by rewrite /another_hep_job.
@@ -702,7 +697,7 @@ Section JLFPInstantiation.
             { intros j__copy IN; apply negbTE.
               rewrite negb_and; apply/orP; right; apply/negPn/eqP => EQ; subst j__copy.
               move: NA => /negP CONTR; apply: CONTR.
-              by apply in_arrivals_implies_arrived_between in IN. }
+              by apply in_arrivals_implies_arrived_between in IN; rt_eauto. }
             erewrite service_of_jobs_equiv_pred with (P2 := pred0); last by done.
             erewrite workload_of_jobs_equiv_pred with (P' := pred0); last by done.
             move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split => /eqP; rewrite eqn_add2l => /eqP EQ.
@@ -720,10 +715,8 @@ Section JLFPInstantiation.
             move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split => /eqP; rewrite eqn_add2l => /eqP EQ.
             rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
             apply/eqP; eapply all_jobs_have_completed_equiv_workload_eq_service with
-              (P := eq_op j) (t1 := 0) (t2 := t);
-              eauto using arrived_between_implies_in_arrivals, ideal_proc_model_provides_unit_service.
-            by move => j__copy _ /eqP EQ; subst j__copy.
-          }
+              (P := eq_op j) (t1 := 0) (t2 := t); rt_eauto.
+            by move => j__copy _ /eqP EQ; subst j__copy. }
         Qed.
 
         (** The equivalence trivially follows from the lemmas above. *)
@@ -884,7 +877,7 @@ Section JLFPInstantiation.
       eapply all_jobs_have_completed_equiv_workload_eq_service; rt_eauto.
       move => s INs /eqP TSKs.
       move: (INs) => NEQ.
-      eapply in_arrivals_implies_arrived_between in NEQ; eauto 2.
+      eapply in_arrivals_implies_arrived_between in NEQ; rt_eauto.
       move: NEQ => /andP [_ JAs].
       move: (BUSY) => [[ _ [QT [_ /andP [JAj _]]] _]].
       apply QT; try done; first by eapply in_arrivals_implies_arrived; eauto 2.

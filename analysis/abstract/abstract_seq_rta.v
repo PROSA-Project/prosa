@@ -29,12 +29,11 @@ Section Sequential_Abstract_RTA.
   Context `{JobCost Job}.
   Context `{JobPreemptable Job}.
 
-  (** Consider any arrival sequence with consistent, non-duplicate arrivals... *)
+  (** Consider any valid arrival sequence with consistent, non-duplicate arrivals...*)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence...*)
+  (** ... and any ideal schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
@@ -235,9 +234,7 @@ Section Sequential_Abstract_RTA.
         move: (posnP (@job_cost _ H3 j2)) => [-> | POS]; first by done.
         move: (H_interference_and_workload_consistent_with_sequential_tasks j1 t1 t2) => SWEQ.
         feed_n 4 SWEQ; try by done.
-        apply all_jobs_have_completed_equiv_workload_eq_service with (j := j2) in SWEQ => //.
-        - by apply ideal_proc_model_provides_unit_service.
-        - by apply arrived_between_implies_in_arrivals.
+        by apply all_jobs_have_completed_equiv_workload_eq_service with (j := j2) in SWEQ => //; rt_eauto.
       Qed.
 
       (** Next we prove that if a job is pending after the beginning
@@ -333,18 +330,17 @@ Section Sequential_Abstract_RTA.
               case INT: (interference j t); last by done.
               rewrite /= lt0b.
               apply/hasP; exists j; last by done.
-              rewrite mem_filter; apply/andP; split; first by done.
-              by apply arrived_between_implies_in_arrivals.
+              by rewrite mem_filter; apply/andP; split; rt_eauto.
             Qed.
 
           End Case1.
-            
+
           Section Case2.
 
             (** Assume a job [j'] from another task is scheduled at time [t]. *)
             Variable j' : Job.
             Hypothesis H_sched :  sched t = Some j'.
-            Hypothesis H_not_job_of_tsk : ~~ job_of_task tsk j'. 
+            Hypothesis H_not_job_of_tsk : ~~ job_of_task tsk j'.
 
             (** If a job [j]' from another task is scheduled at time [t],
                then [interference j t = 1, scheduled_at j t = 0]. But
@@ -360,23 +356,23 @@ Section Sequential_Abstract_RTA.
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def/=.
-              have ARRs: arrives_in arr_seq j'; first by apply H_jobs_come_from_arrival_sequence with t; rewrite scheduled_at_def; apply/eqP.
+              move : H_sched => /eqP SCHED.
+              have ARRs: arrives_in arr_seq j' by rewrite -scheduled_at_def in SCHED;rt_eauto.
               rewrite H_sched H_not_job_of_tsk; simpl.
               have ->: Some j' == Some j = false; last rewrite addn0.
               { apply/negP => /eqP CONTR; inversion CONTR; subst j'.
-                by move: (H_not_job_of_tsk); rewrite H_job_of_tsk. } 
+                by move: (H_not_job_of_tsk); rewrite H_job_of_tsk. }
               erewrite eq_bigr; last by move=> i _; rewrite service_at_def H_sched.
               have ZERO: \sum_(i <- arrivals_between t1 (t1 + A + ε) | job_task i == tsk) (Some j' == Some i) = 0.
               { apply big1 => j2 TSK.
-                apply/eqP; rewrite eqb0; apply/negP => /eqP EQ; inversion EQ; subst j'.                
+                apply/eqP; rewrite eqb0; apply/negP => /eqP EQ; inversion EQ; subst j'.
                 by move: (H_not_job_of_tsk); rewrite / job_of_task TSK.
               }
               rewrite {}ZERO ?addn0 add0n /=.
               case INT: (interference j t); last by done.
               rewrite /= lt0b.
               apply/hasP; exists j; last by done.
-              rewrite  mem_filter; apply/andP; split; first by done.
-              by eapply arrived_between_implies_in_arrivals.
+              by rewrite  mem_filter; apply/andP; split; rt_eauto.
             Qed.
 
           End Case2.
@@ -386,7 +382,7 @@ Section Sequential_Abstract_RTA.
             (** Assume a job [j'] (different from j) of task [tsk] is scheduled at time [t]. *)
             Variable j' : Job.
             Hypothesis H_sched :  sched t = Some j'.
-            Hypothesis H_not_job_of_tsk : job_of_task tsk j'. 
+            Hypothesis H_not_job_of_tsk : job_of_task tsk j'.
             Hypothesis H_j_neq_j' : j != j'.
 
             (** If a job [j'] (different from [j]) of task [tsk] is scheduled at time [t], then
@@ -403,7 +399,9 @@ Section Sequential_Abstract_RTA.
                       /Sequential_Abstract_RTA.cumul_task_interference /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def/=.
-              have ARRs: arrives_in arr_seq j'; first by apply H_jobs_come_from_arrival_sequence with t; rewrite scheduled_at_def; apply/eqP.
+              move : H_sched =>/eqP SCHED.
+              rewrite -scheduled_at_def in SCHED.
+              have ARRs: arrives_in arr_seq j' by rt_eauto.
               move: (H_not_job_of_tsk) => /eqP; rewrite H_sched => ->; rewrite eq_refl addn0; simpl.
               have ->: Some j' == Some j = false by
                   apply/negP => /eqP EQ; inversion EQ; subst j'; move:H_j_neq_j' => /negP NEQ; apply: NEQ.
@@ -421,19 +419,16 @@ Section Sequential_Abstract_RTA.
               { intros. have ARR:= arrives_after_beginning_of_busy_interval j j' _ _ _ _ _ t1 t2 _ t.
                 feed_n 8 ARR; try (done || by move: H_t_in_interval => /andP [T1 T2]).
                 { move: H_sched => /eqP SCHEDt.
-                  apply scheduled_implies_pending;
-                    auto using ideal_proc_model_ensures_ideal_progress.
-                  by rewrite scheduled_at_def. }
+                  apply scheduled_implies_pending; rt_eauto. }
                 case_eq (job_arrival j' <= job_arrival j) => ARRNEQ.
                 { move: ARR => /andP [РР _].
-                  eapply arrived_between_implies_in_arrivals; eauto 2.
+                  eapply arrived_between_implies_in_arrivals; rt_eauto.
                   by apply/andP; split; last rewrite /A subnKC // addn1 ltnS. }
                 { exfalso.
                   apply negbT in ARRNEQ; rewrite -ltnNge in ARRNEQ.
                   move: (H_sequential_tasks j j' t) => CONTR.
                   feed_n 5 CONTR; try done.
-                  { by rewrite /same_task eq_sym; move: (H_job_of_tsk) => /eqP ->. } 
-                  { by move: H_sched => /eqP SCHEDt; rewrite scheduled_at_def. }
+                  { by rewrite /same_task eq_sym; move: (H_job_of_tsk) => /eqP ->. }
                   move: H_job_j_is_not_completed => /negP T; apply: T.
                   apply completion_monotonic with t; try done.
                   by apply ltnW; move: H_t_in_interval => /andP [_ NEQ]. } }
@@ -454,7 +449,7 @@ Section Sequential_Abstract_RTA.
               task_interference_received_before tsk t2 t.
             Proof.
               have j_is_in_arrivals_between: j \in arrivals_between t1 (t1 + A + ε).
-              { eapply arrived_between_implies_in_arrivals; eauto 2.
+              { eapply arrived_between_implies_in_arrivals; rt_eauto.
                 move: (H_busy_interval) => [[/andP [GE _] [_ _]] _].
                 by apply/andP; split; last rewrite /A subnKC // addn1.
               } intros.
@@ -487,15 +482,15 @@ Section Sequential_Abstract_RTA.
               + task_interference_received_before tsk t2 t.
           Proof.
             move: (H_busy_interval) => [[/andP [BUS LT] _] _].
-            case SCHEDt: (sched t) => [j1 | ].
-            2: by apply interference_plus_sched_le_serv_of_task_plus_task_interference_idle.
-            have ARRs: arrives_in arr_seq j1;
-              first by apply H_jobs_come_from_arrival_sequence with t; rewrite scheduled_at_def; apply/eqP.
-            case_eq (job_task j1 == tsk) => TSK.
-            2: by eapply interference_plus_sched_le_serv_of_task_plus_task_interference_task; [eassumption| apply/negbT].
-            case EQ: (j == j1); [move: EQ => /eqP EQ; subst j1 | ].
-            1: by apply interference_plus_sched_le_serv_of_task_plus_task_interference_j.
-            eapply interference_plus_sched_le_serv_of_task_plus_task_interference_job;
+            case SCHEDt: (sched t) => [j1 | ];
+             last by apply interference_plus_sched_le_serv_of_task_plus_task_interference_idle.
+            have ARRs: arrives_in arr_seq j1
+              by move: SCHEDt => /eqP; rewrite -scheduled_at_def; rt_eauto.
+            case_eq (job_task j1 == tsk) => TSK;
+              last by eapply interference_plus_sched_le_serv_of_task_plus_task_interference_task; [eassumption| apply/negbT].
+            case EQ: (j == j1); [move: EQ => /eqP EQ; subst j1 | ];
+             first by apply interference_plus_sched_le_serv_of_task_plus_task_interference_j.
+            by eapply interference_plus_sched_le_serv_of_task_plus_task_interference_job;
               auto; repeat split; eauto; apply/eqP; move: EQ => /eqP EQ; auto.
           Qed.
 
@@ -508,7 +503,7 @@ Section Sequential_Abstract_RTA.
               - service_during sched j t1 (t1 + x)) + cumul_task_interference t2 t1 (t1 + x).
         Proof.
           have j_is_in_arrivals_between: j \in arrivals_between t1 (t1 + A + ε).
-          { eapply arrived_between_implies_in_arrivals; eauto 2.
+          { eapply arrived_between_implies_in_arrivals; rt_eauto.
             move: (H_busy_interval) => [[/andP [GE _] [_ _]] _].
             by apply/andP; split; last rewrite /A subnKC // addn1.
           }
@@ -534,7 +529,7 @@ Section Sequential_Abstract_RTA.
             + cumul_task_interference t2 t1 (t1 + x).
         Proof.
           have j_is_in_arrivals_between: j \in arrivals_between t1 (t1 + A + ε).
-          { eapply arrived_between_implies_in_arrivals; eauto 2.
+          { eapply arrived_between_implies_in_arrivals; rt_eauto.
             move: (H_busy_interval) => [[/andP [GE _] [_ _]] _].
             by apply/andP; split; last rewrite /A subnKC // addn1.
           }
@@ -545,7 +540,7 @@ Section Sequential_Abstract_RTA.
           rewrite  H_job_of_tsk addnC -addnBA; last by done.
           rewrite [X in _ <= X - _]addnC -addnBA; last by done.
           rewrite !subnn !addn0.
-          by apply service_of_jobs_le_workload; auto using ideal_proc_model_provides_unit_service.
+          by apply service_of_jobs_le_workload; rt_eauto.
         Qed.
 
         (** Finally, we show that the cumulative interference of job j in the interval <<[t1, t1 + x)>>
@@ -560,8 +555,8 @@ Section Sequential_Abstract_RTA.
               (task_service_of_jobs_in (arrivals_between t1 (t1 + A + ε)) t1 (t1 + x)
                - service_during sched j t1 (t1 + x)
                + cumul_task_interference t2 t1 (t1 + x));
-            [ apply cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference
-            | apply serv_of_task_le_workload_of_task_plus].
+            [ by apply cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference
+            | by apply serv_of_task_le_workload_of_task_plus].
         Qed.
 
       End TaskInterferenceBoundsInterference.
@@ -580,11 +575,14 @@ Section Sequential_Abstract_RTA.
           rewrite -addnA -{2}[(A+1)](addKn t1).
           by apply H_is_arrival_curve; auto using leq_addr. }
         have Fact6: j \in arrivals_between (t1 + A) (t1 + A + ε).
-        { apply arrived_between_implies_in_arrivals; try done.
+        { apply arrived_between_implies_in_arrivals; rt_eauto.
           apply/andP; split; rewrite /A subnKC //.
           by rewrite addn1 ltnSn //. }
         have Fact4: j \in arrivals_at arr_seq (t1 + A).
-        { by move: ARR => [t ARR]; rewrite subnKC //; feed (H_arrival_times_are_consistent j t); try (subst t). }
+        {
+          have CONSISTENT : consistent_arrival_times arr_seq by rt_eauto.
+          by move: ARR => [t ARR]; rewrite subnKC //; feed (CONSISTENT j t); try (subst t).
+        }
         have Fact1: 1 <= number_of_task_arrivals arr_seq tsk (t1 + A) (t1 + A + ε).
         { rewrite /number_of_task_arrivals /task_arrivals_between /arrival_sequence.arrivals_between.
           by rewrite size_filter -has_count; apply/hasP; exists j; last rewrite TSK.
@@ -620,14 +618,14 @@ Section Sequential_Abstract_RTA.
       Proof.
         set (y := t1 + x) in *.
         have IN: j \in arrivals_between t1 (t1 + A + ε).
-        { eapply arrived_between_implies_in_arrivals; eauto 2.
+        { eapply arrived_between_implies_in_arrivals; rt_eauto.
           move: (H_busy_interval) => [[/andP [GE _] _] _].
           by apply/andP; split; last rewrite /A subnKC // addn1.
         }
         apply leq_trans with (task_workload_between t1 (t1+A+ε) - job_cost j + cumul_task_interference t2 t1 y).
         - by apply cumulative_job_interference_le_task_interference_bound.
         - rewrite leq_add2r.
-          eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 2.
+          by eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 2.
       Qed.
 
     End BoundOfCumulativeJobInterference.
@@ -662,7 +660,7 @@ Section Sequential_Abstract_RTA.
         rewrite addnA leq_add2r.
         rewrite addnBA; last first.
         { apply leq_trans with (task_rbf 1).
-          eapply task_rbf_1_ge_task_cost; eauto 2.
+          eapply task_rbf_1_ge_task_cost; rt_eauto.
           eapply task_rbf_monotone; eauto 2.
           by rewrite addn1.
         }
@@ -680,22 +678,18 @@ Section Sequential_Abstract_RTA.
       intros j ARR TSK.
       eapply uniprocessor_response_time_bound with
           (interference_bound_function :=
-             fun tsk A R => task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A R); eauto 2.
-      apply ideal_proc_model_ensures_ideal_progress.
-      apply ideal_proc_model_provides_unit_service.
-      { clear ARR TSK H_R_is_maximum_seq R j.
-        intros t1 t2 R j BUSY NEQ ARR TSK COMPL.
+             fun tsk A R => task_rbf (A + ε) - task_cost tsk + task_interference_bound_function tsk A R); rt_eauto.
+      { clear ARR TSK j.
+        intros t1 t2 R' j BUSY NEQ ARR TSK COMPL.
         move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
         { exfalso.
           move: COMPL => /negP COMPL; apply: COMPL.
-          by rewrite /service.completed_by /completed_by ZERO.
-        }
+          by rewrite /service.completed_by /completed_by ZERO. }
         set (A := job_arrival j - t1) in *.
         apply leq_trans with
-            (task_rbf (A + ε) - task_cost tsk + cumul_task_interference t2 t1 (t1 + R)).
+            (task_rbf (A + ε) - task_cost tsk + cumul_task_interference t2 t1 (t1 + R')).
         - by eapply cumulative_job_interference_bound; eauto 2.
-        - by rewrite leq_add2l; apply H_task_interference_is_bounded.
-      }
+        - by rewrite leq_add2l; apply H_task_interference_is_bounded. }
       { by eapply max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis; eauto. }
     Qed.
 

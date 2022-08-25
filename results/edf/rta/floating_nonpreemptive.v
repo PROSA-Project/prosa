@@ -12,7 +12,7 @@ Require Import prosa.model.priority.edf.
 (** ** Setup and Assumptions *)
 
 Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
-  
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -31,11 +31,10 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
 
   (** We assume that jobs are limited-preemptive. *)
   #[local] Existing Instance limited_preemptive_job_model.
-  
+
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Assume we have the model with floating non-preemptive regions.
       I.e., for each task only the length of the maximal non-preemptive
@@ -45,7 +44,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
           `{TaskMaxNonpreemptiveSegment Task}.
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions:
     valid_model_with_floating_nonpreemptive_regions arr_seq.
-  
+
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
 
@@ -77,7 +76,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-  
+
   (** ... and the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
 
@@ -91,39 +90,39 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
       for the task request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
 
-  (** Using the sum of individual request bound functions, we define the request bound 
+  (** Using the sum of individual request bound functions, we define the request bound
       function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
-  
+
   (** We define a bound for the priority inversion caused by jobs with lower priority. *)
   Definition blocking_bound A :=
     \max_(tsk_other <- ts | (blocking_relevant tsk_other)
                              && (task_deadline tsk_other > task_deadline tsk + A))
      (task_max_nonpreemptive_segment tsk_other - ε).
-  
-  (** Next, we define an upper bound on interfering workload received from jobs 
+
+  (** Next, we define an upper bound on interfering workload received from jobs
       of other tasks with higher-than-or-equal priority. *)
   Let bound_on_total_hep_workload A Δ :=
     \sum_(tsk_o <- ts | tsk_o != tsk)
      rbf tsk_o (minn ((A + ε) + task_deadline tsk - task_deadline tsk_o) Δ).
-  
+
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_rbf L.
 
   (** ** Response-Time Bound *)
-  
+
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := bounded_nps.is_in_search_space ts tsk L.
-  
+
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
       response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum:
     forall (A : duration),
-      is_in_search_space A -> 
+      is_in_search_space A ->
       exists (F : duration),
         A + F >= blocking_bound A + task_rbf (A + ε) + bound_on_total_hep_workload A (A + F) /\
         R >= F.
@@ -136,7 +135,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
   Theorem uniprocessor_response_time_bound_edf_with_floating_nonpreemptive_regions:
-    response_time_bounded_by tsk R.  
+    response_time_bounded_by tsk R.
   Proof.
     move: (H_valid_task_model_with_floating_nonpreemptive_regions) => [LIMJ JMLETM].
     move: (LIMJ) => [BEG [END _]].
@@ -150,5 +149,5 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
     exists F.
     by rewrite subn0 addn0; split.
   Qed.
-  
+
 End RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.

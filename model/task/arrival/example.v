@@ -23,9 +23,8 @@ Section AutoArrivalModelConversion.
   Variable ts : TaskSet Task.
 
   (** ... and a valid arrival sequence, ...*)
-  Variable arr_seq : arrival_sequence Job.  Hypothesis
-  H_consistent_arrivals: consistent_arrival_times arr_seq.  Hypothesis
-  H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** ... if the tasks are valid periodic tasks, ...*)
   Hypothesis H_respects : taskset_respects_periodic_task_model arr_seq ts.

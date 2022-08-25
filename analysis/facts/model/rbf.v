@@ -27,8 +27,7 @@ Section ProofWorkloadBound.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals, ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** ... any schedule corresponding to this arrival sequence, ... *)
   Context {PState : ProcessorState Job}.
@@ -70,7 +69,7 @@ Section ProofWorkloadBound.
   Let total_rbf := total_request_bound_function ts.
   Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
-  
+
   (** In this section, we prove that the workload of all jobs is
       no larger than the request bound function. *)
   Section WorkloadIsBoundedByRBF.
@@ -98,7 +97,7 @@ Section ProofWorkloadBound.
         apply H_valid_job_cost.
         by apply in_arrivals_implies_arrived in IN. }
     Qed.
-    
+
     (** As a corollary, we prove that workload of task is no larger the than
         task request bound function. *)
     Corollary task_workload_le_task_rbf:
@@ -109,7 +108,7 @@ Section ProofWorkloadBound.
       rewrite -{2}[Δ](addKn t).
       by apply H_is_arrival_bound; last rewrite leq_addr.
     Qed.
-    
+
     (** Next, we prove that total workload of tasks is no larger than the total
         request bound function. *)
     Lemma total_workload_le_total_rbf:
@@ -140,7 +139,7 @@ Section ProofWorkloadBound.
     Variable j : Job.
     Hypothesis H_j_arrives : arrives_in arr_seq j.
     Hypothesis H_job_of_tsk : job_of_task tsk j.
-    
+
     (** We say that two jobs [j1] and [j2] are in relation
       [other_higher_eq_priority], iff [j1] has higher or equal priority than [j2] and
       is produced by a different task. *)
@@ -313,19 +312,19 @@ Section RequestBoundFunctions.
 
   (** Assume that [tsk] has a positive cost. *)
   Hypothesis H_positive_cost : 0 < task_cost tsk.
-  
+
   (** Then, we prove that [task_rbf] at [ε] is greater than [0]. *)
   Lemma task_rbf_epsilon_gt_0 : 0 < task_rbf ε.
   Proof.
     apply leq_trans with (task_cost tsk); first by done.
-    by eapply task_rbf_1_ge_task_cost; eauto. 
+    by eapply task_rbf_1_ge_task_cost; eauto.
   Qed.
-            
+
   (** Consider a set of tasks [ts] containing the task [tsk]. *)
   Variable ts : seq Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Next, we prove that cost of [tsk] is less than or equal to the 
+  (** Next, we prove that cost of [tsk] is less than or equal to the
       [total_request_bound_function]. *)
   Lemma task_cost_le_sum_rbf :
     forall t,

@@ -19,7 +19,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
-  
+
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
@@ -30,18 +30,17 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
    #[local] Existing Instance fully_preemptive_job_model.
    #[local] Existing Instance fully_preemptive_task_model.
    #[local] Existing Instance fully_preemptive_rtc_threshold.
-   
+
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
 
   (** ... assume that all jobs come from the task set, ... *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
-  
+
   (** ... and the cost of a job cannot be larger than the task cost. *)
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
@@ -76,9 +75,9 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-  
+
   (** ... and the schedule respects the scheduling policy. *)
-  Hypothesis H_respects_policy : respects_FP_policy_at_preemption_point arr_seq sched FP.  
+  Hypothesis H_respects_policy : respects_FP_policy_at_preemption_point arr_seq sched FP.
 
   (** ** Total Workload and Length of Busy Interval *)
 
@@ -98,25 +97,25 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** ... and the request bound function of all tasks with higher
       priority other than task [tsk]. *)
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
-  
-  (** Let L be any positive fixed point of the busy interval recurrence, determined by 
+
+  (** Let L be any positive fixed point of the busy interval recurrence, determined by
       the sum of blocking and higher-or-equal-priority workload. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_hep_rbf L.
 
   (** ** Response-Time Bound *)
-  
+
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := is_in_search_space tsk L.
-  
+
   (** Next, consider any value [R], and assume that for any given
        arrival [A] from search space there is a solution of the
        response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum:
     forall (A : duration),
-      is_in_search_space A -> 
+      is_in_search_space A ->
       exists (F : duration),
         A + F >= task_rbf (A + ε) + total_ohep_rbf (A + F) /\
         R >= F.
@@ -127,18 +126,18 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       scheduling. *)
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-  
+
   Theorem uniprocessor_response_time_bound_fully_preemptive_fp:
     response_time_bounded_by tsk R.
   Proof.
     have BLOCK: blocking_bound ts tsk = 0.
     { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-               /fully_preemptive_task_model subnn big1_eq. } 
-    eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.      
+               /fully_preemptive_task_model subnn big1_eq. }
+    eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.
     all: rt_eauto.
     rewrite /work_bearing_readiness.
-    - by apply sequential_readiness_implies_work_bearing_readiness.
-    - by apply sequential_readiness_implies_sequential_tasks => //.
+    - by apply sequential_readiness_implies_work_bearing_readiness; rt_auto.
+    - by apply sequential_readiness_implies_sequential_tasks => //; rt_auto.
     - by rewrite BLOCK add0n.
     - move => A /andP [LT NEQ].
       edestruct H_R_is_maximum as [F [FIX BOUND]].
@@ -147,5 +146,5 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       + by rewrite BLOCK add0n subnn subn0.
       + by rewrite subnn addn0.
   Qed.
-  
-End RTAforFullyPreemptiveFPModelwithArrivalCurves. 
+
+End RTAforFullyPreemptiveFPModelwithArrivalCurves.

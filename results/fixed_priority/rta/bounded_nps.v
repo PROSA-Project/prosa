@@ -21,9 +21,9 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
-  Context `{TaskRunToCompletionThreshold Task}. 
+  Context `{TaskRunToCompletionThreshold Task}.
   Context `{TaskMaxNonpreemptiveSegment Task}.
-  
+
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
@@ -36,22 +36,21 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Context {FP : FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_priorities.
   Hypothesis H_priority_is_transitive : transitive_priorities.
-  
+
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  
+
   (** ... allow for any work-bearing notion of job readiness, ... *)
   Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** ... and assume that the schedule is valid.  *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  
+
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)
   Context `{JobPreemptable Job}.
@@ -63,24 +62,24 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-  
+
   (** ... and the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_FP_policy_at_preemption_point arr_seq sched FP.
 
-  (** Assume we have sequential tasks, i.e, jobs from the 
+  (** Assume we have sequential tasks, i.e, jobs from the
       same task execute in the order of their arrival. *)
   Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
-  
+
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
-  
+
   (** ... assume that all jobs come from the task set, ... *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
-  
+
   (** ... and the cost of a job cannot be larger than the task cost. *)
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
-  
+
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
      [tsk], and (2) it is a monotonic function that equals 0 for the
@@ -88,7 +87,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
-  
+
   (** Let [tsk] be any task in ts that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
@@ -102,7 +101,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
      any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
-  
+
   (** Let's define some local names for clarity. *)
   Let max_length_of_priority_inversion :=
     max_length_of_priority_inversion arr_seq.
@@ -110,24 +109,24 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-  
+
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
   Definition blocking_bound :=
     \max_(tsk_other <- ts | ~~ hep_task tsk_other tsk)
       (task_max_nonpreemptive_segment tsk_other - ε).
-  
+
   (** ** Priority inversion is bounded *)
-  (** In this section, we prove that a priority inversion for task [tsk] is bounded by 
+  (** In this section, we prove that a priority inversion for task [tsk] is bounded by
       the maximum length of non-preemptive segments among the tasks with lower priority. *)
   Section PriorityInversionIsBounded.
 
-    (** First, we prove that the maximum length of a priority inversion of a job j is 
-       bounded by the maximum length of a non-preemptive section of a task with 
+    (** First, we prove that the maximum length of a priority inversion of a job j is
+       bounded by the maximum length of a non-preemptive section of a task with
        lower-priority task (i.e., the blocking term). *)
     Lemma priority_inversion_is_bounded_by_blocking:
-      forall j t, 
+      forall j t,
         arrives_in arr_seq j ->
-        job_of_task tsk j -> 
+        job_of_task tsk j ->
         max_length_of_priority_inversion j t <= blocking_bound.
     Proof.
       intros j t ARR TSK; move: TSK => /eqP TSK.
@@ -151,18 +150,18 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         by apply: in_arrivals_implies_arrived (JINB). }
     Qed.
 
-    (** Using the above lemma, we prove that the priority inversion of the task is bounded by blocking_bound. *) 
+    (** Using the above lemma, we prove that the priority inversion of the task is bounded by blocking_bound. *)
     Lemma priority_inversion_is_bounded:
       priority_inversion_is_bounded_by_constant
         arr_seq sched tsk blocking_bound.
     Proof.
       intros j ARR TSK POS t1 t2 PREF.
-      case NEQ: (t2 - t1 <= blocking_bound). 
+      case NEQ: (t2 - t1 <= blocking_bound).
       { apply leq_trans with (t2 - t1); last by done.
         rewrite /cumulative_priority_inversion -[X in _ <= X]addn0
-                -[t2 - t1]mul1n -iter_addn -big_const_nat leq_sum //. 
+                -[t2 - t1]mul1n -iter_addn -big_const_nat leq_sum //.
         by intros t _; case: (priority_inversion_dec _ _ _).
-      } 
+      }
       move: NEQ => /negP /negP; rewrite -ltnNge; move => BOUND.
       edestruct (@preemption_time_exists) as [ppt [PPT NEQ]]; rt_eauto.
       move: NEQ => /andP [GE LE].
@@ -172,12 +171,12 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
         by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
         rewrite /cumulative_priority_inversion -[X in _ <= X]addn0
-                -[ppt - t1]mul1n -iter_addn -big_const_nat leq_sum //. 
+                -[ppt - t1]mul1n -iter_addn -big_const_nat leq_sum //.
         by intros t _; case: (priority_inversion_dec _ _ _).
       - rewrite /cumulative_priority_inversion.
         rewrite (@big_cat_nat _ _ _ ppt) //=; last first.
         { rewrite ltn_subRL in BOUND.
-          apply leq_trans with (t1 + blocking_bound); last by apply ltnW. 
+          apply leq_trans with (t1 + blocking_bound); last by apply ltnW.
           apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
           by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
         }
@@ -188,16 +187,16 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         edestruct (@not_quiet_implies_exists_scheduled_hp_job)
           with (K := ppt - t1) (t1 := t1) (t2 := t2) (t := t)
           as [j_hp [ARRB [HP SCHEDHP]]]; rt_eauto.
-        { by exists ppt; split; [done | rewrite subnKC //; apply/andP]. } 
+        { by exists ppt; split; [done | rewrite subnKC //; apply/andP]. }
         { by rewrite subnKC //; apply/andP; split. }
         enough (EQef : j__lp = j_hp); first by subst; rewrite HP in HEP.
         by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
     Qed.
-    
-  End PriorityInversionIsBounded. 
+
+  End PriorityInversionIsBounded.
 
   (** ** Response-Time Bound *)
-  (** In this section, we prove that the maximum among the solutions of the response-time 
+  (** In this section, we prove that the maximum among the solutions of the response-time
       bound recurrence is a response-time bound for [tsk]. *)
   Section ResponseTimeBound.
 
@@ -208,32 +207,32 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
     (** To reduce the time complexity of the analysis, recall the notion of search space. *)
     Let is_in_search_space := is_in_search_space tsk L.
-    
-    (** Next, consider any value R, and assume that for any given arrival offset A from the search 
+
+    (** Next, consider any value R, and assume that for any given arrival offset A from the search
        space there is a solution of the response-time bound recurrence that is bounded by R. *)
     Variable R : duration.
     Hypothesis H_R_is_maximum:
-      forall (A : duration), 
-        is_in_search_space A -> 
+      forall (A : duration),
+        is_in_search_space A ->
         exists (F : duration),
           A + F >= blocking_bound
                   + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                   + total_ohep_rbf (A + F) /\
           F + (task_cost tsk - task_rtct tsk) <= R.
 
-    (** Then, using the results for the general RTA for FP-schedulers, we establish a 
-       response-time bound for the more concrete model of bounded nonpreemptive segments. 
-       Note that in case of the general RTA for FP-schedulers, we just _assume_ that 
+    (** Then, using the results for the general RTA for FP-schedulers, we establish a
+       response-time bound for the more concrete model of bounded nonpreemptive segments.
+       Note that in case of the general RTA for FP-schedulers, we just _assume_ that
        the priority inversion is bounded. In this module we provide the preemption model
-       with bounded nonpreemptive segments and _prove_ that the priority inversion is 
+       with bounded nonpreemptive segments and _prove_ that the priority inversion is
        bounded. *)
     Theorem uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments:
       response_time_bounded_by tsk R.
     Proof.
       eapply uniprocessor_response_time_bound_fp;
-        eauto using priority_inversion_is_bounded with basic_rt_facts. 
+        eauto using priority_inversion_is_bounded with basic_rt_facts.
     Qed.
-    
+
   End ResponseTimeBound.
-  
+
 End RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.

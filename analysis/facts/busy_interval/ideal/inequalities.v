@@ -17,8 +17,7 @@ Section BusyIntervalInequalities.
 
   (** Consider a consistent arrival sequence that does not contain duplicates. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
-  Hypothesis H_arrival_sequence_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Consider any valid ideal uniprocessor schedule defined over this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).

@@ -28,7 +28,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Context `{TaskDeadline Task}.
   Context `{TaskRunToCompletionThreshold Task}.
   Context `{TaskMaxNonpreemptiveSegment Task}.
-  
+
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
@@ -44,20 +44,19 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Let D tsk := task_deadline tsk.
 
   (** Consider the EDF policy that indicates a higher-or-equal priority relation.
-     Note that we do not relate the EDF policy with the scheduler. However, we 
+     Note that we do not relate the EDF policy with the scheduler. However, we
      define functions for Interference and Interfering Workload that actively use
      the concept of priorities. *)
   Let EDF := EDF Job.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
-  
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
   (** Next, consider any valid ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  
+
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)
   Context `{JobPreemptable Job}.
@@ -108,16 +107,16 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** We introduce as an abbreviation [rbf] for the task request bound function,
      which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
   Let rbf := task_request_bound_function.
-  
+
   (** Next, we introduce [task_rbf] as an abbreviation for the task
      request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
-  
-  (** Using the sum of individual request bound functions, we define the request bound 
+
+  (** Using the sum of individual request bound functions, we define the request bound
      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
-  
-  (** Next, we define an upper bound on interfering workload received from jobs 
+
+  (** Next, we define an upper bound on interfering workload received from jobs
      of other tasks with higher-than-or-equal priority. *)
   Let bound_on_total_hep_workload  A Δ :=
     \sum_(tsk_o <- ts | tsk_o != tsk)
@@ -214,7 +213,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
 
   (** ** Priority inversion is bounded *)
-  (** In this section, we prove that a priority inversion for task [tsk] is bounded by 
+  (** In this section, we prove that a priority inversion for task [tsk] is bounded by
       the maximum length of non-preemptive segments among the tasks with lower priority. *)
   Section PriorityInversionIsBounded.
 
@@ -254,7 +253,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         by apply: in_arrivals_implies_arrived; exact: JINB.
       apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
         first by apply H_all_jobs_from_taskset.
-      eapply in_arrivals_implies_arrived_between in JINB; last by eauto 2.
+      eapply in_arrivals_implies_arrived_between in JINB; last by rt_eauto.
       move: JINB; move => /andP [_ TJ'].
       repeat (apply/andP; split); last first.
       { rewrite /EDF -ltnNge in NOTHEP.
@@ -271,7 +270,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           - by apply H_is_arrival_curve, H_all_jobs_from_taskset, ARR'. }
     Qed.
 
-    (** Using the lemma above, we prove that the priority inversion of the task is bounded by 
+    (** Using the lemma above, we prove that the priority inversion of the task is bounded by
        the maximum length of a nonpreemptive section of lower-priority tasks. *)
     Lemma priority_inversion_is_bounded:
       priority_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
@@ -281,41 +280,41 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       destruct (leqP (t2 - t1) (blocking_bound (job_arrival j - t1))) as [NEQ|NEQ].
       { apply leq_trans with (t2 - t1); last by done.
         rewrite /cumulative_priority_inversion.
-        rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat. 
+        rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat.
         by rewrite leq_sum //; intros t _; destruct (priority_inversion_dec).
       }
       edestruct @preemption_time_exists as [ppt [PPT NEQ2]]; rt_eauto.
       move: NEQ2 => /andP [GE LE].
       apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt);
         last apply leq_trans with (ppt - t1).
-      - rewrite /cumulative_priority_inversion. 
+      - rewrite /cumulative_priority_inversion.
         rewrite (@big_cat_nat _ _ _ ppt) //=; last first.
         { rewrite ltn_subRL in NEQ.
-          apply leq_trans with (t1 + blocking_bound (job_arrival j - t1)); last by apply ltnW. 
+          apply leq_trans with (t1 + blocking_bound (job_arrival j - t1)); last by apply ltnW.
           apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
           by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2; apply/eqP. }
         rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
         rewrite big_nat_cond big1 //; move => t /andP [/andP [GEt LTt] _ ].
         edestruct @not_quiet_implies_exists_scheduled_hp_job
           with (K := ppt - t1) (t := t) as [j_hp [ARRB [HP SCHEDHP]]]; rt_eauto.
-        { by exists ppt; split; [done | rewrite subnKC //; apply/andP; split]. } 
+        { by exists ppt; split; [done | rewrite subnKC //; apply/andP; split]. }
         { by rewrite subnKC //; apply/andP; split. }
         apply/eqP; rewrite eqb0; apply/negP; move => /priority_inversion_P INV.
         feed_n 3 INV; rt_eauto; last move: INV => [_ [j_lp /andP[SCHED PRIO]]].
         enough (EQ : j_lp = j_hp); first by subst; rewrite HP in PRIO.
-        by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto. 
-      - rewrite /cumulative_priority_inversion. 
-        rewrite -[X in _ <= X]addn0 -[ppt - t1]mul1n -iter_addn -big_const_nat. 
+        by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
+      - rewrite /cumulative_priority_inversion.
+        rewrite -[X in _ <= X]addn0 -[ppt - t1]mul1n -iter_addn -big_const_nat.
         by rewrite leq_sum //; intros t _; destruct (priority_inversion_dec).
       - rewrite leq_subLR.
         apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
         by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2; apply/eqP.
     Qed.
-    
+
   End PriorityInversionIsBounded.
-        
+
   (** ** Response-Time Bound *)
-  (** In this section, we prove that the maximum among the solutions of the response-time 
+  (** In this section, we prove that the maximum among the solutions of the response-time
       bound recurrence is a response-time bound for [tsk]. *)
   Section ResponseTimeBound.
 
@@ -323,7 +322,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Variable L : duration.
     Hypothesis H_L_positive : L > 0.
     Hypothesis H_fixed_point : L = total_rbf L.
-    
+
     (** Consider any value [R], and assume that for any given arrival
         offset [A] in the search space, there is a solution of the
         response-time bound recurrence which is bounded by [R]. *)
@@ -337,11 +336,11 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
                   + bound_on_total_hep_workload  A (A + F) /\
           R >= F + (task_cost tsk - task_rtct tsk).
 
-    (** Then, using the results for the general RTA for EDF-schedulers, we establish a 
+    (** Then, using the results for the general RTA for EDF-schedulers, we establish a
          response-time bound for the more concrete model of bounded nonpreemptive segments.
-         Note that in case of the general RTA for EDF-schedulers, we just _assume_ that 
+         Note that in case of the general RTA for EDF-schedulers, we just _assume_ that
          the priority inversion is bounded. In this module we provide the preemption model
-         with bounded nonpreemptive segments and _prove_ that the priority inversion is 
+         with bounded nonpreemptive segments and _prove_ that the priority inversion is
          bounded. *)
     Theorem uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments:
       response_time_bounded_by tsk R.

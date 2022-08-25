@@ -5,7 +5,7 @@ Require Export prosa.analysis.facts.model.offset.
 (** In this module, we'll prove the known arrival
     times of jobs that stem from periodic tasks. *)
 Section PeriodicArrivalTimes.
-  
+
   (** Consider periodic tasks with an offset ... *)
   Context {Task : TaskType}.
   Context `{TaskOffset Task}.
@@ -18,22 +18,20 @@ Section PeriodicArrivalTimes.
 
   (** Consider any unique arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
-  Hypothesis H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
-
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
   (** ... and any periodic task [tsk] with a valid offset and period. *)
     Variable tsk : Task.
     Hypothesis H_valid_offset: valid_offset arr_seq tsk.
     Hypothesis H_valid_period: valid_period tsk.
     Hypothesis H_task_respects_periodic_model: respects_periodic_task_model arr_seq tsk.
-        
-  (** We show that the nth job [j] of task [tsk] 
+
+  (** We show that the nth job [j] of task [tsk]
       arrives at the instant [task_offset tsk + n * task_period tsk]. *)
   Lemma periodic_arrival_times:
-    forall n (j : Job), 
+    forall n (j : Job),
       arrives_in arr_seq j ->
       job_task j = tsk ->
-      job_index arr_seq j = n -> 
+      job_index arr_seq j = n ->
       job_arrival j = task_offset tsk + n * task_period tsk.
   Proof.
     induction n.
@@ -50,7 +48,7 @@ Section PeriodicArrivalTimes.
     }
   Qed.
 
-  (** We show that for every job [j] of task [tsk] there exists a number 
+  (** We show that for every job [j] of task [tsk] there exists a number
    [n] such that [j] arrives at the instant [task_offset tsk + n * task_period tsk]. *)
   Lemma job_arrival_times:
     forall j,
@@ -61,10 +59,10 @@ Section PeriodicArrivalTimes.
     intros * ARR TSK.
     exists (job_index arr_seq j).
     specialize (periodic_arrival_times (job_index arr_seq j) j) => J_ARR.
-    now feed_n 3 J_ARR => //.
+    by feed_n 3 J_ARR => //.
   Qed.
 
-  (** If a job [j] of task [tsk] arrives at [task_offset tsk + n * task_period tsk] 
+  (** If a job [j] of task [tsk] arrives at [task_offset tsk + n * task_period tsk]
    then the [job_index] of [j] is equal to [n]. *)
   Lemma job_arr_index:
     forall n j,
@@ -76,13 +74,13 @@ Section PeriodicArrivalTimes.
     have F : task_period tsk > 0 by auto.
     induction n.
     + intros * ARR_J TSK ARR.
-      destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]] => //. 
-      now apply periodic_arrival_times in SUCC => //; lia.
+      destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]] => //.
+      by apply periodic_arrival_times in SUCC => //; lia.
     + intros * ARR_J TSK ARR.
       specialize (H_task_respects_periodic_model j); feed_n 3 H_task_respects_periodic_model => //.
       { rewrite lt0n; apply /eqP; intro EQ.
-        apply (first_job_arrival _ H_consistent_arrivals tsk) in EQ => //.
-        now rewrite EQ in ARR; lia.
+        apply (first_job_arrival _ H_valid_arrival_sequence tsk) in EQ => //.
+        by rewrite EQ in ARR; lia.
       }
       move : H_task_respects_periodic_model => [j' [ARR' [IND' [TSK' ARRIVAL']]]].
       specialize (IHn j'); feed_n 3 IHn => //; first by rewrite ARR in ARRIVAL'; lia.
@@ -91,5 +89,5 @@ Section PeriodicArrivalTimes.
       rewrite (first_job_arrival arr_seq _ tsk)// in ARR.
       by lia.
   Qed.
-  
+
 End PeriodicArrivalTimes.

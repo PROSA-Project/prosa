@@ -15,8 +15,7 @@ Section ArrivalTimes.
 
   (** Consider any unique arrival sequence with consistent arrivals, ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
-  Hypothesis H_uniq_arrseq: arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** ... and any sporadic task [tsk] that is to be analyzed. *)
   Variable tsk : Task.

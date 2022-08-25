@@ -5,7 +5,7 @@ Section JobIndexLemmas.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  
+
   (** ... and any jobs associated with the tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
@@ -13,54 +13,53 @@ Section JobIndexLemmas.
 
   (** Consider any arrival sequence with consistent and non-duplicate arrivals, ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals : consistent_arrival_times arr_seq. 
-  Hypothesis H_uniq_arr_seq : arrival_sequence_uniq arr_seq.
-  
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
   (** ... and any two jobs [j1] and [j2] from this arrival sequence
    that stem from the same task. *)
   Variable j1 j2 : Job.
   Hypothesis H_j1_from_arrival_sequence: arrives_in arr_seq j1.
   Hypothesis H_j2_from_arrival_sequence: arrives_in arr_seq j2.
   Hypothesis H_same_task: job_task j1 = job_task j2.
-  
+
   (** In the next section, we prove some basic properties about jobs with equal indices. *)
   Section EqualJobIndex.
 
-    (** Assume that the jobs [j1] and [j2] have the same [job_index] 
+    (** Assume that the jobs [j1] and [j2] have the same [job_index]
      in the arrival sequence. *)
-    Hypothesis H_equal_index: job_index arr_seq j1 = job_index arr_seq j2.  
-    
+    Hypothesis H_equal_index: job_index arr_seq j1 = job_index arr_seq j2.
+
     (** To show that jobs [j1] and [j2] are equal, we'll perform case
      analysis on the relation between their arrival times. *)
 
     (** Jobs with equal indices have to be equal regardless of their
-     arrival times because of the way [job_index] is defined (i.e., 
+     arrival times because of the way [job_index] is defined (i.e.,
      jobs are first ordered according to their arrival times and ties are
-     broken arbitrarily due to which no two unequal jobs have the same 
+     broken arbitrarily due to which no two unequal jobs have the same
      [job_index]). *)
-    
-    (** In case job [j2] arrives after or at the same time as [j1] arrives, we 
-        show that the jobs are equal. *)  
-    Lemma case_arrival_lte_implies_equal_job: 
+
+    (** In case job [j2] arrives after or at the same time as [j1] arrives, we
+        show that the jobs are equal. *)
+    Lemma case_arrival_lte_implies_equal_job:
       job_arrival j1 <= job_arrival j2 -> j1 = j2.
     Proof.
       move => ARR_LT.
-      move: H_equal_index => IND. 
+      move: H_equal_index => IND.
       try ( apply task_arrivals_up_to_prefix_cat with (arr_seq0 := arr_seq) in ARR_LT => // ) ||
       apply task_arrivals_up_to_prefix_cat with (arr_seq := arr_seq) in ARR_LT => //.
-      move : ARR_LT => [xs ARR_CAT]. 
+      move : ARR_LT => [xs ARR_CAT].
       try ( apply eq_ind_in_seq with (xs0 := task_arrivals_up_to_job_arrival arr_seq j2) => // ) ||
       apply eq_ind_in_seq with (xs := task_arrivals_up_to_job_arrival arr_seq j2) => //.
-      - now rewrite -/(job_index _ _) -IND -ARR_CAT index_cat ifT;
-          try apply arrives_in_task_arrivals_up_to.
+      - by rewrite -/(job_index _ _) -IND -ARR_CAT index_cat ifT;
+          try apply arrives_in_task_arrivals_up_to; rt_eauto.
       - rewrite -ARR_CAT mem_cat; apply /orP.
-        now left; apply arrives_in_task_arrivals_up_to.
-      - now apply arrives_in_task_arrivals_up_to.
+        by left; apply arrives_in_task_arrivals_up_to; rt_eauto.
+      - by apply arrives_in_task_arrivals_up_to; rt_eauto.
     Qed.
-        
+
     (** And similarly if [j1] arrives after [j2], we show that
         the jobs are equal. *)
-    Lemma case_arrival_gt_implies_equal_job: 
+    Lemma case_arrival_gt_implies_equal_job:
       job_arrival j1 > job_arrival j2 -> j1 = j2.
     Proof.
       move=> LT.
@@ -68,27 +67,27 @@ Section JobIndexLemmas.
       apply ltnW, (task_arrivals_up_to_prefix_cat arr_seq) in LT => //.
       move: LT => [xs ARR_CAT].
       apply (eq_ind_in_seq _ _ (task_arrivals_up_to_job_arrival arr_seq j1)) => //.
-      - now rewrite -/(job_index _ _) IND -ARR_CAT index_cat ifT;
-          try apply arrives_in_task_arrivals_up_to.
-      - now apply arrives_in_task_arrivals_up_to.
+      - by rewrite -/(job_index _ _) IND -ARR_CAT index_cat ifT;
+          try apply arrives_in_task_arrivals_up_to; rt_eauto.
+      - by apply arrives_in_task_arrivals_up_to; rt_eauto.
       - rewrite -ARR_CAT mem_cat; apply /orP.
-        now left; apply arrives_in_task_arrivals_up_to => //.
+        by left; apply arrives_in_task_arrivals_up_to => //; rt_eauto.
     Qed.
-    
-    (** And finally we show that irrespective of the relation between the arrival 
+
+    (** And finally we show that irrespective of the relation between the arrival
        of job [j1] and [j2], [j1] must be equal to [j2]. *)
     Lemma equal_index_implies_equal_jobs:
       j1 = j2.
     Proof.
       case: (ltngtP (job_arrival j1) (job_arrival j2)) => [LT|GT|EQ].
-      - now apply case_arrival_lte_implies_equal_job; lia.
-      - now apply case_arrival_gt_implies_equal_job; lia.
-      - now apply case_arrival_lte_implies_equal_job; lia.
+      - by apply case_arrival_lte_implies_equal_job; lia.
+      - by apply case_arrival_gt_implies_equal_job; lia.
+      - by apply case_arrival_lte_implies_equal_job; lia.
     Qed.
-    
+
   End EqualJobIndex.
 
-  (** We show that jobs of a task are different if and only if they 
+  (** We show that jobs of a task are different if and only if they
    have different indices. *)
   Lemma diff_jobs_iff_diff_indices:
     j1 <> j2 <->
@@ -96,25 +95,25 @@ Section JobIndexLemmas.
   Proof.
     split.
     + move => NEQJ EQ.
-      now apply equal_index_implies_equal_jobs in EQ.
+      by apply equal_index_implies_equal_jobs in EQ.
     + move => NEQ EQ.
-      now move: EQ NEQ => ->.
+      by move: EQ NEQ => ->.
   Qed.
 
-  (** We show that [job_index j] can be written as a sum of [size (task_arrivals_before_job_arrival j)] 
+  (** We show that [job_index j] can be written as a sum of [size (task_arrivals_before_job_arrival j)]
       and [index j (task_arrivals_at arr_seq (job_task j) (job_arrival j))]. *)
   Lemma index_as_sum_size_and_index:
     job_index arr_seq j1 =
     size (task_arrivals_before_job_arrival arr_seq j1)
     + index j1 (task_arrivals_at_job_arrival arr_seq j1).
   Proof.
-    rewrite /task_arrivals_at_job_arrival /job_index task_arrivals_up_to_cat //.  
+    rewrite /task_arrivals_at_job_arrival /job_index task_arrivals_up_to_cat //.
     rewrite index_cat ifF; first by reflexivity.
     apply Bool.not_true_is_false; intro T.
     move : T; rewrite mem_filter => /andP [/eqP SM_TSK JB_IN_ARR].
-    apply mem_bigcat_nat_exists in JB_IN_ARR; move : JB_IN_ARR => [ind [JB_IN IND_INTR]]. 
-    erewrite H_consistent_arrivals in IND_INTR; eauto 2.
-    now lia.
+    apply mem_bigcat_nat_exists in JB_IN_ARR; move : JB_IN_ARR => [ind [JB_IN IND_INTR]].
+    have ARR : job_arrival j1 =  ind by rt_eauto.
+    by lia.
   Qed.
 
   (** Given jobs [j1] and [j2] in [arrivals_between_P arr_seq P t1 t2], the fact that
@@ -122,7 +121,7 @@ Section JobIndexLemmas.
       [arrivals_between_P arr_seq P t1 (job_arrival j1)]. *)
   Lemma arrival_lt_implies_job_in_arrivals_between_P:
     forall (P : Job -> bool) (t1 t2 : instant),
-      (j1 \in arrivals_between_P arr_seq P t1 t2) -> 
+      (j1 \in arrivals_between_P arr_seq P t1 t2) ->
       (j2 \in arrivals_between_P arr_seq P t1 t2) ->
       job_arrival j2 < job_arrival j1 ->
       j2 \in arrivals_between_P arr_seq P t1 (job_arrival j1).
@@ -132,41 +131,42 @@ Section JobIndexLemmas.
     rewrite mem_filter; apply /andP; split => //.
     apply mem_bigcat_nat_exists in J2ARR; move : J2ARR => [i [J2_IN INEQ]].
     apply mem_bigcat_nat with (j := i) => //.
-    apply H_consistent_arrivals in J2_IN; rewrite J2_IN in ARR_LT.
-    now lia.
+    apply job_arrival_at in J2_IN; rt_eauto.
+    by lia.
   Qed.
-    
-  (** We show that jobs in the sequence [arrivals_between_P] are ordered by their arrival times, i.e., 
-      if index of a job [j2] is greater than or equal to index of any other job [j1] in the sequence, 
+
+  (** We show that jobs in the sequence [arrivals_between_P] are ordered by their arrival times, i.e.,
+      if index of a job [j2] is greater than or equal to index of any other job [j1] in the sequence,
       then [job_arrival j2] must be greater than or equal to [job_arrival j1]. *)
   Lemma index_lte_implies_arrival_lte_P:
     forall (P : Job -> bool) (t1 t2 : instant),
-      (j1 \in arrivals_between_P arr_seq P t1 t2) -> 
+      (j1 \in arrivals_between_P arr_seq P t1 t2) ->
       (j2 \in arrivals_between_P arr_seq P t1 t2) ->
       index j1 (arrivals_between_P arr_seq P t1 t2) <= index j2 (arrivals_between_P arr_seq P t1 t2) ->
       job_arrival j1 <= job_arrival j2.
   Proof.
     intros * IN1 IN2 LE.
     move_neq_up LT; move_neq_down LE.
-    rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between_P in IN1 => //.
+    rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between_P in IN1; rt_eauto.
     rewrite !index_cat ifT; last by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     rewrite ifF.
     - eapply leq_trans; [ | by erewrite leq_addr].
       rewrite index_mem.
       by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     - apply Bool.not_true_is_false; intro T.
-      by apply job_arrival_between_P in T; try lia.
+      by apply job_arrival_between_P in T; try lia; rt_eauto.
   Qed.
-  
-  (** We observe that index of job [j1] is same in the 
-   sequences [task_arrivals_up_to_job_arrival j1] and [task_arrivals_up_to_job_arrival j2] 
+
+  (** We observe that index of job [j1] is same in the
+   sequences [task_arrivals_up_to_job_arrival j1] and [task_arrivals_up_to_job_arrival j2]
    provided [j2] arrives after [j1]. *)
   Lemma job_index_same_in_task_arrivals:
     job_arrival j1 <= job_arrival j2 ->
     index j1 (task_arrivals_up_to_job_arrival arr_seq j1) = index j1 (task_arrivals_up_to_job_arrival arr_seq j2).
   Proof.
     rewrite leq_eqVlt => /orP [/eqP LT|LT]; first by rewrite /task_arrivals_up_to_job_arrival LT H_same_task.
-    specialize (arrival_lt_implies_strict_prefix _ H_consistent_arrivals (job_task j1) j1 j2) => SUB.
+    have CONSISTENT : consistent_arrival_times arr_seq by rt_eauto.
+    specialize (arrival_lt_implies_strict_prefix arr_seq CONSISTENT (job_task j1) j1 j2) => SUB.
     feed_n 5 SUB => //; move: SUB => [xs2 [NEMPT2 CAT2]].
     rewrite -CAT2 index_cat ifT //=.
     by apply arrives_in_task_arrivals_up_to => //.
@@ -178,7 +178,7 @@ Section JobIndexLemmas.
     job_index arr_seq j1 < size (task_arrivals_up_to_job_arrival arr_seq j1).
   Proof.
     rewrite /job_index index_mem.
-    exact: arrives_in_task_arrivals_up_to.
+    by apply arrives_in_task_arrivals_up_to; rt_eauto.
   Qed.
 
   (** Finally, we show that a lower job index implies an earlier arrival time. *)
@@ -191,12 +191,12 @@ Section JobIndexLemmas.
     move_neq_up ARR_GT; move_neq_down IND_LT.
     rewrite job_index_same_in_task_arrivals /task_arrivals_up_to_job_arrival; try by lia.
     rewrite -> task_arrivals_cat with (t_m := job_arrival j1); try by lia.
-    rewrite -H_same_task !index_cat ifT; try by apply arrives_in_task_arrivals_up_to.
+    rewrite -H_same_task !index_cat ifT; try by apply arrives_in_task_arrivals_up_to; rt_eauto.
     rewrite ifF.
-    - now eapply leq_trans;
+    - by eapply leq_trans;
         [apply index_job_lt_size_task_arrivals_up_to_job | rewrite leq_addr].
     - apply Bool.not_true_is_false; intro T.
-      now apply job_arrival_between_P in T; try lia.
+      by apply job_arrival_between_P in T; try lia; rt_eauto.
   Qed.
 
   (** We show that if job [j1] arrives earlier than job [j2]
@@ -207,16 +207,16 @@ Section JobIndexLemmas.
   Proof.
     intros ARR_LT.
     move_neq_up IND_LT; move_neq_down ARR_LT.
-    now apply index_lte_implies_arrival_lte.
+    by apply index_lte_implies_arrival_lte.
   Qed.
 
-  (** We prove a weaker version of the lemma [index_job_lt_size_task_arrivals_up_to_job], 
+  (** We prove a weaker version of the lemma [index_job_lt_size_task_arrivals_up_to_job],
       given that the [job_index] of [j] is positive. *)
   Lemma job_index_minus_one_lt_size_task_arrivals_up_to:
     job_index arr_seq j1 - 1 < size (task_arrivals_up_to_job_arrival arr_seq j1).
   Proof.
     apply leq_ltn_trans with (n := job_index arr_seq j1); try by lia.
-    now apply index_job_lt_size_task_arrivals_up_to_job.
+    by apply index_job_lt_size_task_arrivals_up_to_job.
   Qed.
 
   (** Since [task_arrivals_up_to_job_arrival arr_seq j] has at least the job
@@ -227,19 +227,19 @@ Section JobIndexLemmas.
     rewrite lt0n; apply /eqP; intro Z.
     apply size0nil in Z.
     have J_IN : (j1 \in task_arrivals_up_to_job_arrival arr_seq j1)
-      by apply arrives_in_task_arrivals_up_to => //.
-    now rewrite Z in J_IN.
+      by apply arrives_in_task_arrivals_up_to => //; rt_eauto.
+    by rewrite Z in J_IN.
   Qed.
-  
+
 End JobIndexLemmas.
 
-(** In this section, we prove a few basic properties of 
+(** In this section, we prove a few basic properties of
     function [prev_job]. *)
 Section PreviousJob.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  
+
   (** ... and any jobs associated with the tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
@@ -247,42 +247,41 @@ Section PreviousJob.
 
   (** Consider any unique arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals : consistent_arrival_times arr_seq. 
-  Hypothesis H_uniq_arr_seq : arrival_sequence_uniq arr_seq.
-  
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
   (** ... and an arbitrary job with a positive [job_index]. *)
   Variable j : Job.
   Hypothesis H_arrives_in_arr_seq: arrives_in arr_seq j.
   Hypothesis H_positive_job_index: job_index arr_seq j > 0.
-  
+
   (** We observe that the fact that job [j] is in the arrival sequence
       implies that job [prev_job j] is in the arrival sequence. *)
   Lemma prev_job_arr:
     arrives_in arr_seq (prev_job arr_seq j).
   Proof.
     destruct (default_or_in (job_index arr_seq j - 1) j (task_arrivals_up_to_job_arrival arr_seq j)) as [EQ|IN].
-    + now rewrite /prev_job EQ.
+    + by rewrite /prev_job EQ.
     + apply in_arrivals_implies_arrived with (t1 := 0) (t2 := (job_arrival j).+1).
-       now move: IN; rewrite mem_filter => /andP [_ IN].
+      by move: IN; rewrite mem_filter => /andP [_ IN].
   Qed.
 
-  (** We show that the index of [prev_job j] in task arrivals up to [j] is one less 
+  (** We show that the index of [prev_job j] in task arrivals up to [j] is one less
       than [job_index arr_seq j]. *)
   Lemma prev_job_index:
     index (prev_job arr_seq j) (task_arrivals_up_to_job_arrival arr_seq j) = job_index arr_seq j - 1.
   Proof.
-    apply index_uniq; last by apply uniq_task_arrivals.
+    apply index_uniq; last by apply uniq_task_arrivals; rt_eauto.
     apply leq_ltn_trans with (n := job_index arr_seq j); try by lia.
-    now apply index_job_lt_size_task_arrivals_up_to_job.
+    by apply index_job_lt_size_task_arrivals_up_to_job.
   Qed.
 
   (** Observe that job [j] and [prev_job j] stem from the same task. *)
   Lemma prev_job_task:
     job_task (prev_job arr_seq j) = job_task j.
   Proof.
-    specialize (job_index_minus_one_lt_size_task_arrivals_up_to arr_seq H_consistent_arrivals j H_arrives_in_arr_seq) => SIZEL.
-    rewrite -prev_job_index index_mem mem_filter in SIZEL. 
-    now move : SIZEL => /andP [/eqP TSK PREV_IN].
+    specialize (job_index_minus_one_lt_size_task_arrivals_up_to arr_seq H_valid_arrival_sequence j H_arrives_in_arr_seq) => SIZEL.
+    rewrite -prev_job_index index_mem mem_filter in SIZEL.
+    by move : SIZEL => /andP [/eqP TSK PREV_IN].
   Qed.
 
   (** We show that [prev_job arr_seq j] belongs in [task_arrivals_up_to_job_arrival arr_seq j]. *)
@@ -291,10 +290,10 @@ Section PreviousJob.
   Proof.
     rewrite /prev_job -index_mem index_uniq;
       try by apply job_index_minus_one_lt_size_task_arrivals_up_to.
-    now apply uniq_task_arrivals.
-  Qed.       
+    by apply uniq_task_arrivals; rt_eauto.
+  Qed.
 
-  (** We observe that for any job [j] the arrival time of [prev_job j] is 
+  (** We observe that for any job [j] the arrival time of [prev_job j] is
       strictly less than the arrival time of [j] in context of periodic tasks. *)
   Lemma prev_job_arr_lte:
     job_arrival (prev_job arr_seq j) <= job_arrival j.
@@ -302,8 +301,9 @@ Section PreviousJob.
     move : (prev_job_in_task_arrivals_up_to_j) => PREV_JOB_IN.
     rewrite mem_filter in PREV_JOB_IN; move : PREV_JOB_IN => /andP [TSK PREV_IN].
     apply mem_bigcat_nat_exists in PREV_IN; move : PREV_IN => [i [PREV_IN INEQ]].
-    apply H_consistent_arrivals in PREV_IN; rewrite -PREV_IN in INEQ.
-    now lia.
+    move : H_valid_arrival_sequence => [CONSISTENT UNIQ].
+    apply CONSISTENT in PREV_IN; rewrite -PREV_IN in INEQ.
+    by lia.
   Qed.
 
   (** We show that for any job [j] the job index of [prev_job j] is one less
@@ -314,13 +314,13 @@ Section PreviousJob.
   Proof.
     intros NZ_IND.
     rewrite -prev_job_index.
-    apply job_index_same_in_task_arrivals => //.
-    - now apply prev_job_arr.
-    - now apply prev_job_task.
-    - now apply prev_job_arr_lte.
+    apply job_index_same_in_task_arrivals => //; rt_eauto.
+    - by apply prev_job_arr.
+    - by apply prev_job_task.
+    - by apply prev_job_arr_lte.
   Qed.
-  
-  (** We also show that for any job [j] there are no task arrivals 
+
+  (** We also show that for any job [j] there are no task arrivals
       between [prev_job j] and [j].*)
   Lemma no_jobs_between_consecutive_jobs:
     job_index arr_seq j > 0 ->
@@ -332,20 +332,20 @@ Section PreviousJob.
     - rewrite EQ.
       apply/eqP/negPn/negP; rewrite -has_filter => /hasP [j' IN /eqP TASK].
       apply mem_bigcat_nat_exists in IN; move : IN => [i [J'_IN ARR_INEQ]].
-      now lia.
+      by lia.
     - apply/eqP/negPn/negP; rewrite -has_filter => /hasP [j3 IN /eqP TASK].
       apply mem_bigcat_nat_exists in IN; move : IN => [i [J3_IN ARR_INEQ]].
       have J3_ARR : (arrives_in arr_seq j3) by apply in_arrseq_implies_arrives with (t := i).
-      apply H_consistent_arrivals in J3_IN; rewrite -J3_IN in ARR_INEQ.
+      apply job_arrival_at in J3_IN; rt_eauto; rewrite -J3_IN in ARR_INEQ.
       move : ARR_INEQ => /andP [PJ_L_J3 J3_L_J].
-      apply (earlier_arrival_implies_lower_index arr_seq H_consistent_arrivals _ _) in PJ_L_J3 => //; try by
+      apply (earlier_arrival_implies_lower_index arr_seq H_valid_arrival_sequence _ _) in PJ_L_J3 => //; try by
           rewrite prev_job_task.
-      + apply (earlier_arrival_implies_lower_index arr_seq H_consistent_arrivals _ _) in J3_L_J => //.
-        now rewrite prev_job_index_j in PJ_L_J3; try by lia.
-      + now apply prev_job_arr.
+      + apply (earlier_arrival_implies_lower_index arr_seq H_valid_arrival_sequence _ _) in J3_L_J => //.
+        by rewrite prev_job_index_j in PJ_L_J3; try by lia.
+      + by apply prev_job_arr.
   Qed.
 
-  (** We show that there always exists a job of lesser [job_index] than a 
+  (** We show that there always exists a job of lesser [job_index] than a
    job with a positive [job_index] that arrives in the arrival sequence. *)
   Lemma exists_jobs_before_j:
     forall k,
@@ -362,23 +362,21 @@ Section PreviousJob.
     set (jk := nth j (task_arrivals_up_to_job_arrival arr_seq j) k).
     have K_LT_SIZE : (k < size (task_arrivals_up_to_job_arrival arr_seq j)) by
         apply leq_trans with (n := job_index arr_seq j) => //; first by apply index_size.
-    have JK_IN : (jk \in task_arrivals_up_to_job_arrival arr_seq j) by rewrite /jk; apply mem_nth => //. 
+    have JK_IN : (jk \in task_arrivals_up_to_job_arrival arr_seq j) by rewrite /jk; apply mem_nth => //.
     rewrite mem_filter in JK_IN; move : JK_IN => /andP [/eqP TSK JK_IN].
-    apply mem_bigcat_nat_exists in JK_IN; move : JK_IN => [i [JK_IN I_INEQ]]. 
+    apply mem_bigcat_nat_exists in JK_IN; move : JK_IN => [i [JK_IN I_INEQ]].
     have JK_ARR : (arrives_in arr_seq jk) by apply in_arrseq_implies_arrives with (t := i) => //.
     have INDJK : (index jk (task_arrivals_up_to_job_arrival arr_seq j) = k).
     { apply index_uniq => //.
-      now apply uniq_task_arrivals => //. }
-    repeat split => //.    
+      by apply uniq_task_arrivals => //; rt_eauto. }
+    repeat split => //.
     { rewrite -> diff_jobs_iff_diff_indices => //; eauto.
       rewrite /job_index; rewrite [in X in _ <> X] (job_index_same_in_task_arrivals _ _ jk j) => //.
-      - rewrite index_uniq -/(job_index arr_seq j)=> //; last by apply uniq_task_arrivals.
-        now lia.
-      - apply H_consistent_arrivals in JK_IN; rewrite -JK_IN in I_INEQ.
-        now lia. }
+      - rewrite index_uniq -/(job_index arr_seq j)=> //; last by apply uniq_task_arrivals; rt_eauto.
+        by lia.
+      - by apply job_arrival_at in JK_IN; rt_eauto; rewrite -JK_IN in I_INEQ. }
     { rewrite /job_index; rewrite [in X in X = _] (job_index_same_in_task_arrivals _ _ jk j) => //.
-      apply H_consistent_arrivals in JK_IN; rewrite -JK_IN in I_INEQ.
-      now lia. }
+      by apply job_arrival_at in JK_IN; rt_eauto; rewrite -JK_IN in I_INEQ. }
   Qed.
-  
+
 End PreviousJob.

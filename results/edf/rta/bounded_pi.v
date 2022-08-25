@@ -61,8 +61,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_arr_seq_is_a_set : arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Next, consider any valid ideal uni-processor schedule of this arrival sequence
       that follows the scheduling policy. *)
@@ -270,7 +269,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             <= workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + (A + ε + D tsk - D tsk_o))).
           Proof.
             have BOUNDED: t1 + (A + ε + D tsk - D tsk_o) <= t1 + Δ by lia.
-            rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN'.
+            rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN'; rt_eauto.
             rewrite /EDF_from /ε => ARR'.
             case: (eqVneq (job_task j') tsk_o) => TSK';
               last by rewrite andbF.
@@ -278,7 +277,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             rewrite /EDF/edf.EDF/job_deadline/job_deadline_from_task_deadline.
             move: H_job_of_tsk; rewrite TSK' /job_of_task => /eqP -> HEP.
             have LATEST: job_arrival j' <= t1 + A + D tsk - D tsk_o by rewrite /D/A; lia.
-            have EARLIEST: t1 <= job_arrival j' by apply: job_arrival_between_ge; eauto.
+            have EARLIEST: t1 <= job_arrival j' by apply: job_arrival_between_ge; rt_eauto.
             by case: (leqP (A + 1 + D tsk) (D tsk_o)); [rewrite /D/A|]; lia.
           Qed.
 
@@ -316,30 +315,31 @@ Section AbstractRTAforEDFwithArrivalCurves.
         task_interference_is_bounded_by
           arr_seq sched tsk interference interfering_workload (fun tsk A R => IBF_other A R).
       Proof.
-        unfold  task_interference_is_bounded_by.
+        rewrite /task_interference_is_bounded_by.
         move => j R2 t1 t2 ARR TSK N NCOMPL BUSY.
         move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
           by rewrite /completed_by /completed_by ZERO.
         - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
-          rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ tsk j); rt_eauto; last first.
-          + by eapply arrived_between_implies_in_arrivals; eauto.
+          rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ tsk j); rt_eauto;
+            last first.
+          + by eapply arrived_between_implies_in_arrivals; rt_eauto.
           + by eapply EDF_implies_sequential_tasks; rt_eauto.
-            rewrite /I leq_add //.
-            * by eapply (cumulative_priority_inversion_is_bounded _ _ _ _ _ _ _ tsk _ _ _ _ t1 t2);rt_eauto.
-            * eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
-              eapply leq_trans; first by eapply service_of_jobs_le_workload; rt_eauto.
-              eapply leq_trans.
-              eapply reorder_summation; rt_eauto.
+            rewrite /I leq_add //; first by eapply cumulative_priority_inversion_is_bounded; rt_eauto.
+            eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
+            eapply leq_trans; first by eapply service_of_jobs_le_workload; rt_eauto.
+            eapply leq_trans.
+            * eapply reorder_summation; rt_eauto.
               move => j' IN.
-              apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
-              move : TSK => /eqP TSK.
-              rewrite TSK.
-              eapply leq_trans; first eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; rt_eauto.
-              by apply /eqP.
-              Unshelve.
-              all : try by rt_eauto.
-              Qed.
+              apply H_all_jobs_from_taskset.
+              eapply in_arrivals_implies_arrived.
+              by exact IN.
+            *  move : TSK => /eqP TSK.
+               rewrite TSK.
+               move : TSK => /eqP TSK.
+               by eapply leq_trans;
+               first by eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; rt_eauto.
+      Qed.
 
 
     End TaskInterferenceIsBoundedByIBF_other.
@@ -375,7 +375,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           apply contraT => /negPn /eqP ZERO.
           rewrite -(ltnn 0) {2}ZERO add0n.
           apply: (@leq_trans (task_cost tsk));
-            last by apply: task_rbf_1_ge_task_cost; eauto.
+            last by apply: task_rbf_1_ge_task_cost; rt_eauto.
           apply: (@leq_trans (job_cost j)) => //.
           move: (H_job_of_tsk) => /eqP <-.
           by apply: (H_valid_job_cost _ H_j_arrives). }
@@ -432,7 +432,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
     - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
       * eapply EDF_implies_sequential_tasks; rt_eauto.
-    - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
+    - by eapply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
     - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_task_interference_is_bounded.
     - by eapply correct_search_space; eauto 2.

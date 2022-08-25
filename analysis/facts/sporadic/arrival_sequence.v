@@ -14,8 +14,7 @@ Section SporadicArrivals.
 
   (** Consider any unique arrival sequence with consistent arrivals, ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
-  Hypothesis H_uniq_arr_seq: arrival_sequence_uniq arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** ... and any sporadic task [tsk] to be analyzed. *)
   Variable tsk : Task.
@@ -44,16 +43,17 @@ Section SporadicArrivals.
   Proof.
     move => [j [SIZE_G [PERIODIC VALID_TMIA]]].
     specialize (exists_two (task_arrivals_at_job_arrival arr_seq j)) => EXISTS_TWO.
+    move : H_valid_arrival_sequence => [CONSISTENT UNIQ].
     destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by done | by apply filter_uniq | ].
     rewrite mem_filter in A_IN; rewrite mem_filter in B_IN.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].
     move: (ARRA); move: (ARRB); rewrite /arrivals_at => A_IN B_IN.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
-    have EQ_ARR_A : (job_arrival a = job_arrival j) by apply H_consistent_arrivals.
-    have EQ_ARR_B : (job_arrival b = job_arrival j) by apply H_consistent_arrivals.
+    have EQ_ARR_A : (job_arrival a = job_arrival j) by rt_eauto.
+    have EQ_ARR_B : (job_arrival b = job_arrival j) by rt_eauto.
     try ( apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j) in NEQ => // ) ||
     apply uneq_job_uneq_arr with (arr_seq := arr_seq) (tsk := job_task j) in NEQ => //.
-    now rewrite EQ_ARR_A EQ_ARR_B in NEQ.
+    by rewrite EQ_ARR_A EQ_ARR_B in NEQ.
   Qed.
 
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
@@ -63,19 +63,19 @@ Section SporadicArrivals.
     task_arrivals_at_job_arrival arr_seq j1 = [::j1].
   Proof.
     set (task_arrivals_at_job_arrival arr_seq j1) as seq in *.
-    have J_IN_FILTER : (j1 \in seq) by apply arrives_in_task_arrivals_at.
+    have J_IN_FILTER : (j1 \in seq) by apply arrives_in_task_arrivals_at; rt_auto.
     have SIZE_CASE : size seq = 0 \/ size seq = 1 \/ size seq > 1
       by intros; now destruct (size seq) as [ | [ | ]]; try auto.
     move: SIZE_CASE => [Z|[ONE|GTONE]].
     - apply size0nil in Z.
-      now rewrite Z in J_IN_FILTER.
+      by rewrite Z in J_IN_FILTER.
     - repeat (destruct seq; try by done).
       rewrite mem_seq1 in J_IN_FILTER; move : J_IN_FILTER => /eqP J1_S.
-      now rewrite J1_S.
+      by rewrite J1_S.
     - exfalso.
       apply size_task_arrivals_at_leq_one.
       exists j1.
-      now repeat split => //; try rewrite H_j1_task.
+      by repeat split => //; try rewrite H_j1_task.
   Qed.
 
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
@@ -89,7 +89,7 @@ Section SporadicArrivals.
     intros t ARR.
     rewrite -ARR.
     specialize (only_j_in_task_arrivals_at_j) => J_AT.
-    now rewrite /task_arrivals_at_job_arrival H_j1_task in J_AT.
+    by rewrite /task_arrivals_at_job_arrival H_j1_task in J_AT.
   Qed.
 
   (** We show that a job [j1] is the first job that arrives
@@ -98,7 +98,7 @@ Section SporadicArrivals.
   Lemma index_j_in_task_arrivals_at:
     index j1 (task_arrivals_at_job_arrival arr_seq j1) = 0.
   Proof.
-    now rewrite only_j_in_task_arrivals_at_j //= eq_refl.
+    by rewrite only_j_in_task_arrivals_at_j //= eq_refl.
   Qed.
 
   (** We observe that for any job [j] the arrival time of [prev_job j] is
@@ -113,11 +113,11 @@ Section SporadicArrivals.
     split => //; apply /eqP.
     try ( apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j1) => //; try by rewrite H_j1_task ) ||
     apply uneq_job_uneq_arr with (arr_seq := arr_seq) (tsk := job_task j1) => //; try by rewrite H_j1_task.
-    - now apply prev_job_arr.
-    - now apply prev_job_task.
+    - by apply prev_job_arr.
+    - by apply prev_job_task.
     - intro EQ.
       have SM_IND: job_index arr_seq j1 - 1 = job_index arr_seq j1 by rewrite -prev_job_index // EQ.
-      now lia.
+      by lia.
   Qed.
 
   (** We show that task arrivals at [job_arrival j1] is the
@@ -127,7 +127,7 @@ Section SporadicArrivals.
     task_arrivals_at_job_arrival arr_seq j1 = task_arrivals_between arr_seq tsk (job_arrival j1) (job_arrival j1).+1.
   Proof.
     rewrite /task_arrivals_at_job_arrival /task_arrivals_at /task_arrivals_between /arrivals_between.
-    now rewrite big_nat1 H_j1_task.
+    by rewrite big_nat1 H_j1_task.
   Qed.
 
   (** We show that the task arrivals up to the previous job [j1] concatenated with
@@ -144,7 +144,7 @@ Section SporadicArrivals.
         apply ltnW; apply prev_job_arr_lt.
     rewrite [in X in _ = _ ++ X] (task_arrivals_between_cat _ _ _ (job_arrival j1) _) => //; last by apply prev_job_arr_lt.
     rewrite no_jobs_between_consecutive_jobs => //.
-    now rewrite cat0s H_j1_task.
+    by rewrite cat0s H_j1_task.
   Qed.
 
 End SporadicArrivals.
