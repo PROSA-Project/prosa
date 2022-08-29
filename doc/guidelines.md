@@ -16,12 +16,12 @@ This project targets Coq *non*-experts. Accordingly, great emphasis is placed on
 - Use many, mostly short sections. Sections are a great way to structure code and to guide the reader; they serve the reader by establishing a local scope that is easier to remember.
 - Keep definitions and proofs in separate sections, and ideally in different files. This makes the definitions short, and more clearly separates the computation of the actual analysis results from their validity arguments.
 - Make extensive use of the `Hypothesis` feature. Hypotheses are very readable and are accessible even to non-Coq users, especially when paired with self-explanatory names.
-- Consider renaming general concepts with `let` bindings to introduce local names that are more meaningful. In many cases, this is also useful to bind necessary context to local names. For example:  
+- Consider renaming general concepts with `let` bindings to introduce local names that are more meaningful. In many cases, this is also useful to bind necessary context to local names. For example:
 ```
     Let no_deadline_is_missed :=
       task_misses_no_deadline sched tsk.
-``` 
-- Interleave running commentary *as if you were writing a paper* with the actual definitions and lemmas. This helps greatly with making the spec more accessible to everyone. Good example from [bertogna_fp_theory.v](../classic/analysis/global/basic/bertogna_fp_theory.v):  
+```
+- Interleave running commentary *as if you were writing a paper* with the actual definitions and lemmas. This helps greatly with making the spec more accessible to everyone. Good example from [bertogna_fp_theory.v](../classic/analysis/global/basic/bertogna_fp_theory.v):
 ```
    (** Assume any job arrival sequence... *)
     Context {arr_seq: arrival_sequence Job}.
@@ -40,22 +40,39 @@ This project targets Coq *non*-experts. Accordingly, great emphasis is placed on
 1. For consistency, start the name of hypotheses with `H_`.
 2. For case a case analysis of `foo`, use `foo_cases` as the lemma name.
 3. For a basic lemma that is intended as a rewriting rule to avoid unfolding a definition `foo` directly, use `foo_def` as the lemma name.
-4. Consistently name predicates that express that something "is valid" (i.e., satisfies basic assumptions) as `valid_*` or `respects_*`.  
-Examples: `valid_schedule`, `taskset_respects_sporadic_task_model`. 
-5. Consistently name sections that define what it means to be valid w.r.t. to some concept `Foo` as `ValidFoo`.  
+4. Consistently name predicates that express that something "is valid" (i.e., satisfies basic assumptions) as `valid_*` or `respects_*`.
+Examples: `valid_schedule`, `taskset_respects_sporadic_task_model`.
+5. Consistently name sections that define what it means to be valid w.r.t. to some concept `Foo` as `ValidFoo`.
 Examples: `ValidSchedule`,  `ValidTask`, `ValidJobOfTask`, `ValidJobsOfTask`.
-6. Job parameters are always prefixed with `job_`.  
-Examples: `job_cost`, `job_arrival`, `job_deadline`. 
-7. Task parameters are always prefixed with `task_`.  
+6. Job parameters are always prefixed with `job_`.
+Examples: `job_cost`, `job_arrival`, `job_deadline`.
+7. Task parameters are always prefixed with `task_`.
 Examples: `task_cost`, `task_deadline`.
-8. We do not follow ssreflect's concise but not so self-explanatory naming scheme. 
+8. We do not follow ssreflect's concise but not so self-explanatory naming scheme.
+9. Section and typeclass names should use [camel case](https://en.wikipedia.org/wiki/Camel_case) and lemma and definition names should use [snake case](https://en.wikipedia.org/wiki/Snake_case).
+
+## Use of Spaces
+1. Avoid trailing whitespace in all files. (Use `M-x delete-trailing-whitespace` in emacs to delete trailing white spaces. Add `(add-hook 'before-save-hook 'delete-trailing-whitespace)` to your `~/.emacs` file to automate this.)
+2. In lemmas, hypotheses, variable and definition declarations, follow modern Coq style by using a space before and after each colon. For example:
+
+```
+Variable foo : ItsType.
+
+Variables bar baz : TheirType.
+
+Context {SomeConcept : ATypeClass}.
+
+Hypothesis H_foo_at_least_3 : foo >= 3.
+
+Lemma foo_lower_bound : foo + 1 >= 4.
+```
 
 
 ## Coq Features
 
 - We use type classes sparingly. Primarily, type classes are used to introduce new job and task parameters, and to express key modeling assumptions (e.g., whether jobs can self-suspend or not).
 - We rely heavily on type inference. Top-level definitions do *not* require type annotations if the semantics are clear from context and Coq can figure out the specific types.
-- We tend to not use a lot of custom syntax/notation. Heavy use of custom syntax reduces readability because readers are forced to remember all local syntax definitions. 
+- We tend to not use a lot of custom syntax/notation. Heavy use of custom syntax reduces readability because readers are forced to remember all local syntax definitions.
 - We rely heavily on ssreflect notation.
 
 ## Structuring Specifications
@@ -63,16 +80,16 @@ Examples: `task_cost`, `task_deadline`.
 - Split specifications into succinct, logically self-contained files/modules.
 - As a rule of thumb, use one file/module per concept.
 - As stated above, use `Section`s liberally within each file.
-- However, avoid needless sections, i.e., a section without a single variable, context declaration, or hypothesis serves no purpose and can and should be removed. 
+- However, avoid needless sections, i.e., a section without a single variable, context declaration, or hypothesis serves no purpose and can and should be removed.
 
 ## Stating Dependencies with `Require Import` and `Require Export`
 
-1. Prefer `Require Export full.path.to.module.that.you.want` over `From full.path.to.module.that.you Require Export want` because (as of Coq 8.10) the latter is brittle w.r.t. Coq's auto-magic module finding heuristics (see also: Coq issues [9080](https://github.com/coq/coq/issues/9080), [9839](https://github.com/coq/coq/issues/9839), and [11124](https://github.com/coq/coq/issues/11124)).  
-Exception to this rule: ssreflect and other standard library imports. 
+1. Prefer `Require Export full.path.to.module.that.you.want` over `From full.path.to.module.that.you Require Export want` because (as of Coq 8.10) the latter is brittle w.r.t. Coq's auto-magic module finding heuristics (see also: Coq issues [9080](https://github.com/coq/coq/issues/9080), [9839](https://github.com/coq/coq/issues/9839), and [11124](https://github.com/coq/coq/issues/11124)).
+Exception to this rule: ssreflect and other standard library imports.
 2. Avoid repetitive, lengthy blocks of `Require Import` statements at the beginning of files through the judicious use of `Require Export`.
 3. As an important exception to the prior rule, do not re-export modules that contain type class instance definitions. Prosa uses type class instances to express key modeling choices; such assumptions should be made explicitly.
 4. Always require external libraries first, i.e., *before* stating any Prosa-internal dependencies. This way, an addition in external libraries
-cannot shadow a definition in Prosa. For example, require `mathcomp` modules before any modules in the `prosa` namespace. 
+cannot shadow a definition in Prosa. For example, require `mathcomp` modules before any modules in the `prosa` namespace.
 
 
 ## Stating Lemmas and Theorems
@@ -90,9 +107,9 @@ Lemma my_lemma foo (bar : foo) x y z : property bar x y z.
 Proof.
 ```
 
-As discussed in [#86](https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/issues/86), this choice of style is deliberate. Roughly speaking, the rationale is that the explicit use of  `forall` increases readability for novice users and those using Prosa primarily in "read-only mode." 
+As discussed in [#86](https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/issues/86), this choice of style is deliberate. Roughly speaking, the rationale is that the explicit use of  `forall` increases readability for novice users and those using Prosa primarily in "read-only mode."
 
-While the explicit `forall` use is admittedly slightly more verbose and cumbersome for proof authors, the majority of project participants feels that the positives (self-explanatory syntax, readability) outweigh the costs (annoyance felt by more experienced users). Therefore, when stating and proving new lemmas, or when refactoring existing lemmas, please adhere to the preferred style, which is to make the `forall` explicit. 
+While the explicit `forall` use is admittedly slightly more verbose and cumbersome for proof authors, the majority of project participants feels that the positives (self-explanatory syntax, readability) outweigh the costs (annoyance felt by more experienced users). Therefore, when stating and proving new lemmas, or when refactoring existing lemmas, please adhere to the preferred style, which is to make the `forall` explicit.
 
 
 ## Writing Proofs
@@ -101,10 +118,10 @@ When writing new proofs, please adhere to the following rules.
 
 ### Structure
 
-1. Keep proofs short. Aim for just a few lines, and definitely not more than 30-40. Long arguments should be structured into many individual lemmas (in their own section) that correspond to high-level proof steps. Some exceptions may be needed, but such cases should truly remain *exceptional*.  
+1. Keep proofs short. Aim for just a few lines, and definitely not more than 30-40. Long arguments should be structured into many individual lemmas (in their own section) that correspond to high-level proof steps. Some exceptions may be needed, but such cases should truly remain *exceptional*.
 Note: We employ an automatic proof-length checker that runs as part of continuous integration to enforce this.
 2. However, making proofs as concise as possible is a *non-goal*. We are **not** playing [code golf](https://en.wikipedia.org/wiki/Code_golf). If a proof is too long, the right answer is usually **not** to maximally compress it; rather, one should identify semantically meaningful steps that can be factored out and documented as local  "helper" lemmas. Many small steps are good for readability.
-3. Make use of the structured sub-proofs feature (i.e., indentation with `{` and `}`, or bulleted sub-proofs with `-`, `+`, `*`) to structure code.  Please use the bullets in the order `-`, `+`, `*` so that Proof General indents them correctly. You may keep going with `--`, `++`, and `**`. 
+3. Make use of the structured sub-proofs feature (i.e., indentation with `{` and `}`, or bulleted sub-proofs with `-`, `+`, `*`) to structure code.  Please use the bullets in the order `-`, `+`, `*` so that Proof General indents them correctly. You may keep going with `--`, `++`, and `**`.
 4. Make proofs "step-able." This means preferring `.` over `;` (within reason). This makes it easier for novices to learn from existing proofs.
 
 
@@ -113,16 +130,17 @@ Note: We employ an automatic proof-length checker that runs as part of continuou
 Generally try to make proofs as robust to (minor) changes in definitions as possible. Longterm maintenance is a major concern.
 
 1. Make use of the `by` tactical to stop the proof script early in case of any changes in assumptions.
-2. General principle: **Rewrite with equalities, do not unfold definitions.**   
+2. General principle: **Rewrite with equalities, do not unfold definitions.**
 Avoid unfolding definitions in anything but “basic facts” files. Main proofs should not unfold low-level definitions, processor models, etc. Rather, they should rely exclusively on basic facts so that we can change representations without breaking high-level proofs.
 3. In particular, for case analysis, prefer basic facts that express all possible cases as a disjunction. Do not destruct the actual definitions directly.
-    - Aside: Sometimes, it is more convenient to use a specific inductive type rather than a disjunction. See for instance `PeanoNat.Nat.compare_spec` in the Coq standard library or Section 4.2.1 of the [Mathcomp book](https://math-comp.github.io/mcb/book.pdf) for more details. However, we generally prefer disjunctions for readability whenever possible and reasonable. 
-4. Do not explicitly reference proof terms in type classes (because they might change with the representation). Instead, introduce lemmas that restate the proof term in a general, abstract way that is unlikely to change and rely on those.  
+    - Aside: Sometimes, it is more convenient to use a specific inductive type rather than a disjunction. See for instance `PeanoNat.Nat.compare_spec` in the Coq standard library or Section 4.2.1 of the [Mathcomp book](https://math-comp.github.io/mcb/book.pdf) for more details. However, we generally prefer disjunctions for readability whenever possible and reasonable.
+4. Do not explicitly reference proof terms in type classes (because they might change with the representation). Instead, introduce lemmas that restate the proof term in a general, abstract way that is unlikely to change and rely on those.
 Guideline: do not name proof terms in type classes to prevent explicit dependencies.
 
 ### Tactics
 
 - Document the tactics that you use in the [list of tactics](doc/tactics.md). For new users, it can be quite difficult to identify the right tactics to use. This list is intended to give novices a starting to point in the search for the "right" tools.
+- Prefer ssreflect style. For example, use `move` and `case` instead of `intro`, `intros`, and `destruct`.
 
 ### Forward vs backward reasoning
 Although the primary focus of Prosa is on the quality of the overall structure and the specifications, good proofs are short and readable. Since Coq tends to favor backward reasoning, try to adhere to it. Forward reasoning tends to be more verbose and to generate needlessly convoluted proof trees. To get an idea, read the following snippet:
@@ -147,7 +165,7 @@ Although the primary focus of Prosa is on the quality of the overall structure a
     A->D.
   Proof.
     intros.
-    (* hmm, I have C->D. If only I had C... *) 
+    (* hmm, I have C->D. If only I had C... *)
     have I_need_C: C.
     { (* hmm, I have B->C. If only I had B... *)
       have I_need_B: B by apply AB.
@@ -163,4 +181,3 @@ Although the primary focus of Prosa is on the quality of the overall structure a
 
 
 *To be continued… Merge requests welcome: please feel free to propose new advice and better guidelines.*
-
