@@ -187,25 +187,30 @@ Section AbstractRTAforFPwithArrivalCurves.
       busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
     Proof.
       move => j ARR TSK POS.
-      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 GGG]]]]; rt_eauto.
-      { by intros; rewrite {2}H_fixed_point leq_add //; apply total_workload_le_total_hep_rbf. }
+      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 BI]]]]; rt_eauto.
+      { intros; rewrite {2}H_fixed_point leq_add //.
+        rewrite /workload_of_higher_or_equal_priority_jobs /total_hep_rbf
+          /total_hep_request_bound_function_FP
+          /workload_of_jobs /hep_job /FP_to_JLFP.
+        move: (TSK) =>  /eqP ->.
+        by apply: sum_of_jobs_le_sum_rbf; eauto. }
       exists t1, t2; split; first by done.
       by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
     Qed.
 
     (** Next, we prove that [IBF_other] is indeed an interference bound.
 
-       Recall that in module abstract_seq_RTA hypothesis task_interference_is_bounded_by expects
-       to receive a function that maps some task t, the relative arrival time of a job j of task t,
-       and the length of the interval to the maximum amount of interference (for more details see
-       files limited.abstract_RTA.definitions and limited.abstract_RTA.abstract_seq_rta).
+    Recall that in module abstract_seq_RTA hypothesis task_interference_is_bounded_by expects
+    to receive a function that maps some task t, the relative arrival time of a job j of task t,
+    and the length of the interval to the maximum amount of interference (for more details see
+    files limited.abstract_RTA.definitions and limited.abstract_RTA.abstract_seq_rta).
 
-       However, in this module we analyze only one task -- [tsk], therefore it is “hard-coded”
-       inside the interference bound function [IBF_other]. Moreover, in case of a model with fixed
-       priorities, interference that some job j incurs from higher-or-equal priority jobs does not
-       depend on the relative arrival time of job j. Therefore, in order for the [IBF_other] signature to
-       match the required signature in module abstract_seq_RTA, we wrap the [IBF_other] function in a
-       function that accepts, but simply ignores, the task and the relative arrival time. *)
+    However, in this module we analyze only one task -- [tsk], therefore it is “hard-coded”
+    inside the interference bound function [IBF_other]. Moreover, in case of a model with fixed
+    priorities, interference that some job j incurs from higher-or-equal priority jobs does not
+    depend on the relative arrival time of job j. Therefore, in order for the [IBF_other] signature to
+    match the required signature in module abstract_seq_RTA, we wrap the [IBF_other] function in a
+    function that accepts, but simply ignores, the task and the relative arrival time. *)
     Lemma instantiated_task_interference_is_bounded:
       task_interference_is_bounded_by
         arr_seq sched tsk interference interfering_workload (fun t A R => IBF_other R).
@@ -229,16 +234,16 @@ Section AbstractRTAforFPwithArrivalCurves.
       }
       { erewrite cumulative_i_thep_eq_service_of_othep; rt_eauto;
           last by unfold quiet_time; move: BUSY => [[_ [T1 T2]] _].
-        apply leq_trans with
-            (workload_of_jobs
-               (fun jhp : Job => (FP_to_JLFP _ _) jhp j && (job_task jhp != job_task j))
-               (arrivals_between arr_seq t1 (t1 + R0))).
+        apply: leq_trans.
         { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
           by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). }
         { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
-          move: (TSK) => /eqP <-; apply total_workload_le_total_ohep_rbf; try done.
-          by move: (TSK) => /eqP ->. }
-        all: eauto 2 using arr_seq with basic_rt_facts. }
+          rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
+          set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
+          rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
+            last by move=> j'; rewrite /pred_task; move: TSK => /eqP ->.
+          erewrite (eq_big pred_task); [|by done|by move=> tsk'; eauto].
+          by apply: sum_of_jobs_le_sum_rbf; eauto. } }
     Qed.
 
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
