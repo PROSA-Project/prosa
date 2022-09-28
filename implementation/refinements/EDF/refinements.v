@@ -32,14 +32,16 @@ Section Definitions.
     && (P.2 <= R)%C.
 
   (** ... a generic version of [blocking_bound_NP], ... *)
-  Definition blocking_bound_NP_T (ts : seq task_T) (tsk : task_T) :=
-    let ts_lp := filter (fun tsk_o => @task_deadline_T T tsk < @task_deadline_T T tsk_o)%C ts in
+  Definition blocking_bound_NP_T (ts : seq task_T) (tsk : task_T) A :=
+    let blocking_relevant tsk_o := (0 < ConcreteMaxArrivals_T tsk_o 1)%C  && (0 < task_cost_T tsk_o)%C in
+    let ts_lp := filter (fun tsk_o => (blocking_relevant tsk_o)
+                                    && (@task_deadline_T T tsk + A < @task_deadline_T T tsk_o))%C ts in
     let ts_block := map (fun tsk_o => task_cost_T tsk_o - 1)%C ts_lp in
     foldr maxn_T 0%C ts_block.
 
   (** ... of [check_point_NP], ... *)
   Definition check_point_NP_T (ts : seq task_T) (tsk : task_T) (R : T) (P : T * T) : bool :=
-    (blocking_bound_NP_T ts tsk
+    (blocking_bound_NP_T ts tsk P.1
      + (task_rbf_T tsk (P.1 + 1) - (task_cost_T tsk - 1))
      + bound_on_total_hep_workload_T ts tsk P.1 (P.1 + P.2) <= P.1 + P.2)%C
     && (P.2 + (task_cost_T tsk - 1) <= R)%C.
@@ -234,37 +236,27 @@ Qed.
 
 (** Next, we prove a refinement for the [blocking_bound_NP] function. *)
 Global Instance refine_blocking_bound :
-  refines (list_R Rtask ==> Rtask ==> Rnat)%rel blocking_bound_NP blocking_bound_NP_T.
+  refines (list_R Rtask ==> Rtask ==> Rnat ==> Rnat)%rel blocking_bound_NP blocking_bound_NP_T.
 Proof.
   rewrite refinesE => ts ts' Rts tsk tsk' Rtsk.
-  unfold blocking_bound_NP, blocking_bound_NP_T.
-  replace ( \max_(tsk_o <- ts | _) _)
-    with (\max_(tsk_o <- ts|task_deadline tsk < task_deadline tsk_o ) (task_cost tsk_o - ε)).
-  { apply refinesP; eapply refine_foldr_max.
-    { by rewrite refinesE; apply Rts. }
-    { by apply refines_abstr; move => tsk1 tsk1' Rtsk1; unfold ε; tc. }
-    { apply refines_abstr; move => tsk1 tsk1' Rtsk1.
-      move: refine_task_deadline => Ra.
-      rewrite refinesE in Rtsk1; rewrite refinesE in Ra; specialize (Ra _ _ Rtsk1).
+  unfold blocking_bound_NP, blocking_bound_NP_T, blocking_relevant.
+  intros A A' RA; apply refinesP; eapply refine_foldr_max.
+  - by rewrite refinesE map_id; apply Rts.
+  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; unfold ε; tc.
+  - rewrite refinesE => tsk1 tsk1' Rtsk1.
+    apply andb_R; first apply andb_R.
+    + unfold ε.
+      apply refine_ltn; first by done.
+      by apply refinesP; rewrite /max_arrivals; refines_apply; apply refine_ConcreteMaxArrivals.
+    + by apply refine_ltn; [done | apply refinesP; refines_apply].
+    + move: refine_task_deadline => Ra.
+      rewrite refinesE in Ra; specialize (Ra _ _ Rtsk1).
       move: refine_task_deadline => Rb.
       rewrite refinesE in Rb; specialize (Rb _ _ Rtsk).
       inversion Ra; inversion Rb.
       set (a := @task_deadline_T N tsk') in *.
       set (b := @task_deadline_T N tsk1') in *.
-      have <- : (a < b) = (a < b)%C.
-      { unfold lt_op, lt_N.
-        destruct (a<b) eqn:EQ; symmetry; first by apply N.ltb_lt; apply /Rnat_ltP; rewrite EQ.
-        apply N.ltb_ge; apply negbT in EQ; rewrite -leqNgt in EQ.
-        apply /N.leb_spec0.
-        move: Rnat_leE => LE.
-        unfold leq_op, leq_N in LE.
-        by rewrite LE. }
-      subst a b.
-      rewrite refinesE.
-      by apply bool_Rxx. } }
-  { apply eq_bigl => tsk_o.
-    destruct (tsk_o == tsk) eqn:EQ =>//.
-    by move: EQ => /eqP EQ; subst; rewrite ltnn. }
+      by apply refine_ltn; [apply refinesP; refines_apply | done].    
 Qed.
 
 (** Next, we prove a refinement for the [check_point_NP] function. *)
