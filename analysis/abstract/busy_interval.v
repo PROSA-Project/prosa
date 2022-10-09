@@ -1,6 +1,7 @@
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.analysis.abstract.definitions.
+Require Export prosa.analysis.abstract.iw_auxiliary.
 
 (** * Lemmas About Abstract Busy Intervals *)
 
@@ -129,6 +130,30 @@ Section LemmasAboutAbstractBusyInterval.
   Proof.
     move: H_busy_interval => [PREFIX _].
     exact: abstract_busy_interval_prefix_job_arrival.
+  Qed.
+
+  (** Next, let us assume that the introduced processor model is
+      unit-supply. *)
+  Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
+
+  (** Under this assumption, the sum of the total service during the
+      time interval <<[t1, t1 + Δ)>> and the cumulative interference
+      during the same interval is bounded by the length of the time
+      interval. *)
+  Lemma service_and_interference_bound :
+    forall Δ,
+      t1 + Δ <= t2 ->
+      service_during sched j t1 (t1 + Δ) + cumulative_interference j t1 (t1 + Δ) <= Δ.
+  Proof.
+    move=> Δ LE; rewrite -big_split //= -{2}(sum_of_ones t1 Δ).
+    rewrite big_nat [in X in _ <= X]big_nat; apply leq_sum => t /andP[Lo Hi].
+    move: (H_work_conserving j t1 t2 t) => Workj.
+    feed_n 4 Workj => //.
+    { by move: H_busy_interval => [PREF QT]. }
+    { by apply/andP; split; lia. }
+    rewrite /cond_interference //=; move: Workj; case: interference => Workj.
+    - by rewrite addn1 ltnS; move_neq_up NE; apply Workj.
+    - by rewrite addn0; apply: H_unit_service_proc_model.
   Qed.
 
 End LemmasAboutAbstractBusyInterval.
