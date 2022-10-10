@@ -10,7 +10,7 @@ Section BasicLemmas.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   
-  (** Consider a JLFP-policy that indicates a higher-or-equal priority relation. *)             
+  (** Consider a JLFP policy that indicates a higher-or-equal priority relation. *)             
   Context `{JLFP_policy Job}.
   
   (** First, we prove that [another_hep_job] relation is anti-reflexive. *) 

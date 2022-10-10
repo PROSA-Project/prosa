@@ -1,15 +1,14 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
-
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.abstract.search_space.
-Require Export prosa.analysis.abstract.run_to_completion.
+Require Export prosa.analysis.abstract.lower_bound_on_service.
 
 (** * Abstract Response-Time Analysis *)
-(** In this module, we propose the general framework for response-time analysis (RTA)
-    of uni-processor scheduling of real-time tasks with arbitrary arrival models. *)
-(** We prove that the maximum (with respect to the set of offsets) among the solutions
-   of the response-time bound recurrence is a response time bound for [tsk]. Note that
-   in this section we do not rely on any hypotheses about job sequentiality. *)
+(** In this module, we propose the general framework for response-time
+    analysis (RTA) of uni-processor scheduling of real-time tasks with
+    arbitrary arrival models. *)
+(** We prove that the maximum (with respect to the set of offsets)
+    among the solutions of the response-time bound recurrence is a
+    response-time bound for the task under analysis. *)
 Section Abstract_RTA.
 
   (** Consider any type of tasks ... *)
@@ -20,513 +19,463 @@ Section Abstract_RTA.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context {JA : JobArrival Job}.
-  Context {JC : JobCost Job}.
-  Context `{JobPreemptable Job}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
 
-  (** Consider any kind of uni-service ideal processor state model. *)
+  (** Consider _any_ kind of processor state model. *)
   Context {PState : ProcessorState Job}.
-  Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
-  Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
 
-  (** Consider any valid arrival sequence with consistent, non-duplicate arrivals... *)
+  (** Consider any arrival and any schedule of this arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
-
-  (** ... and any schedule of this arrival sequence... *)
   Variable sched : schedule PState.
 
-  (** ... where jobs do not execute before their arrival nor after completion. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
-
   (** Assume that the job costs are no larger than the task costs. *)
-  Hypothesis H_valid_job_cost:
-    arrivals_have_valid_job_costs arr_seq.
+  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
-  (** Consider a task set ts... *)
+  (** Consider a task set [ts]... *)
   Variable ts : list Task.
 
-  (** ... and a task [tsk] of ts that is to be analyzed. *)
+  (** ... and a task [tsk] of [ts] that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Consider a valid preemption model... *)
-  Hypothesis H_valid_preemption_model:
-    valid_preemption_model arr_seq sched.
-
-  (** ...and a valid task run-to-completion threshold function. That
-     is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
-     any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
-  Hypothesis H_valid_run_to_completion_threshold:
-    valid_task_run_to_completion_threshold arr_seq tsk.
-
-  (** Let's define some local names for clarity. *)
-  Let work_conserving := work_conserving arr_seq sched.
-  Let busy_intervals_are_bounded_by := busy_intervals_are_bounded_by arr_seq sched tsk.
-  Let job_interference_is_bounded_by := job_interference_is_bounded_by arr_seq sched tsk.
-
-  (** Assume we are provided with abstract functions for interference and interfering workload. *)
-  Variable interference : Job -> instant -> bool.
-  Variable interfering_workload : Job -> instant -> duration.
+  (** Assume we are provided with abstract functions for interference
+      and interfering workload. *)
+  Context `{Interference Job}.
+  Context `{InterferingWorkload Job}.
 
   (** We assume that the scheduler is work-conserving. *)
-  Hypothesis H_work_conserving : work_conserving interference interfering_workload.
+  Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-  (** For simplicity, let's define some local names. *)
-  Let cumul_interference := cumul_interference interference.
-  Let cumul_interfering_workload := cumul_interfering_workload interfering_workload.
-  Let busy_interval := busy_interval sched interference interfering_workload.
-  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-
-  (** Let L be a constant which bounds any busy interval of task [tsk]. *)
+  (** Let [L] be a constant that bounds the length of any busy interval of task [tsk]. *)
   Variable L : duration.
-  Hypothesis H_busy_interval_exists:
-    busy_intervals_are_bounded_by interference interfering_workload L.
+  Hypothesis H_bounded_busy_interval_exists :
+    busy_intervals_are_bounded_by arr_seq sched tsk L.
 
-  (** Next, assume that interference_bound_function is a bound on
-     the interference incurred by jobs of task [tsk]. *)
-  Variable interference_bound_function : Task -> duration -> duration -> duration.
-  Hypothesis H_job_interference_is_bounded:
+  (** Note that response-time analyses are static analyses and by
+      definition have no access to dynamic information of an
+      individual execution of a system. However, oftentimes some
+      dynamic information can improve the tightness of a response-time
+      bound. For example, in case of a model with sequential tasks,
+      information about relative arrival time of a job can be used to
+      bound the maximum self-interference. *)
+
+  (** To gain access to some dynamic information for a response-time
+      recurrence, one can _assume_ that an execution of a system
+      satisfies a statically defined predicate. Then a response-time
+      bound can be calculated by considering a family of inputs to the
+      predicate that covers all the relevant dynamic scenarios.
+
+      To give a concrete example, one can (1) assume that any job [j]
+      of a task [tsk] arrives exactly [A] time units after the
+      beginning of [j]'s busy interval, (2) calculate the
+      response-time bound of [tsk] as if the assumption of step (1)
+      was satisfied, and (3) try all the possible [A]s. That results
+      in a "relative-arrival"-aware analysis. *)
+
+  (** The idea we will employ in this file is that one can use more
+      sophisticated dynamic information in a response-time recurrence.
+      In the following, we consider a case when information about (1)
+      relative arrival time of a job and (2) relative time when any
+      job of task [tsk] receives at least [task_rtc tsk] units of
+      service is used in the response-time recurrence. *)
+
+  (** Next, the response-time analysis will proceed in a sequence of
+      stages. A stage defines the set of sources of interference that
+      can postpone the execution of a job. Note that this separation
+      is mostly a design question. And for different models there might be
+      a varying number of stages with different meanings. *)
+
+  (** For our purposes, we consider two stages. *)
+
+  (** First stage: A job [j] can be (1) preempted because of the
+      presence of higher-or-equal priority workload and (2) make no
+      progress due to some other reason (spinning, lack of supply, and
+      so on). To bound all this interference we introduce an
+      interference bound function [IBF_P]. Note that [IBF_P] (1)
+      counts any job with higher-or-equal priority as interference and
+      (2) depends on the relative arrival time of a job. To bound time
+      that [j] spends in the first stage, we need to find a fixpoint
+      of equation [F : task_rtc tsk + IBF_P tsk A F ≤ F]. *)
+
+  (** To formalize the dependency of [IBF_P] on the relative arrival
+      time in Coq, we introduce a predicate that tests whether a job
+      [j] arrives exactly [A] time units after the beginning of its
+      busy interval, which is unique (if it exists). *)
+  Definition relative_arrival_time_of_job_is_A (j : Job) (A : duration) :=
+    forall (t1 t2 : instant),
+      busy_interval sched j t1 t2 ->
+      job_arrival j = t1 + A.
+
+  (** Next, consider a valid interference bound function [IBF_P] that
+      can use information about relative time arrival of a job of task
+      [tsk]. Recall that an interference bound function gives a bound on
+      the cumulative interference incurred by jobs of task [tsk]. *)
+  Variable IBF_P : Task -> (* A *) duration -> (* Δ *) duration -> duration.
+  Hypothesis H_job_interference_is_bounded_IBFP :
     job_interference_is_bounded_by
-      interference interfering_workload interference_bound_function.
+      arr_seq sched tsk IBF_P relative_arrival_time_of_job_is_A.
 
-  (** For simplicity, let's define a local name for the search space. *)
-  Let is_in_search_space A := is_in_search_space tsk L interference_bound_function A.
+  (** Second stage: Job [j] reaches its run-to-completion
+      threshold. After this point the job cannot be preempted by a
+      high-or-equal priority job (so we can forget about any
+      task-generated workload). At this stage, the only reason why the
+      job cannot make progress is due to lack of supply or similar. To
+      bound time that [j] spends in the second stage we use
+      [IBF_NP]. Note that the amount of interference may depend on the
+      relative time when job [j] receives [task_rtc tsk] units of
+      service; hence, [IBF_NP] depends on this parameter. Also, notice
+      that [IBF_NP] still bounds interference starting from the
+      beginning of the busy window, even though it can use the
+      solution of the first fixpoint equation. *)
 
-  (** Consider any value [R] that upper-bounds the solution of each
-      response-time recurrence, i.e., for any relative arrival time [A]
-      in the search space, there exists a corresponding solution [F]
-      such that [R >= F + (task_cost tsk - task_rtct tsk)]. *)
-  Variable R: nat.
-  Hypothesis H_R_is_maximum:
-    forall A,
+  (** To formalize the dependency of [IBF_NP] on the relative time
+      when job [j] receives [task_rtc tsk] units of service in Coq, we
+      introduce a predicate that tests whether a job [j] has more than
+      [task_rtc tsk] units of service at a time instant [t1 + F],
+      where [t1] is the beginning of [j]'s busy interval. The first
+      conjunct of the proposition is needed to derive a fact that by
+      time [t1 + F] job [j] does not receive any interference from
+      higher-or-equal priority jobs. *)
+  Definition relative_time_to_reach_rtct (j : Job) (F : duration) :=
+    forall (t1 t2 : instant),
+      busy_interval sched j t1 t2 ->
+      task_rtct tsk + IBF_P tsk (job_arrival j - t1) F <= F /\
+      task_rtct tsk <= service sched j (t1 + F).
+
+  (** Next, consider a valid interference bound function [IBF_NP] that
+      can use information about the relative time when any given job of task
+      [tsk] receives at least [task_rtc tsk] units of service. *)
+  Variable IBF_NP : Task -> (* F *) duration -> (* Δ *) duration -> duration.
+  Hypothesis H_job_interference_is_bounded_IBFNP:
+    job_interference_is_bounded_by
+      arr_seq sched tsk IBF_NP relative_time_to_reach_rtct.
+
+  (** In addition, we assume that [IBF_NP] indeed takes into account
+      information received in the first stage. Specifically, we assume
+      that the sum of [tsk]'s cost and [IBF_NP tsk F Δ] is never smaller
+      than [F]. This intuitively means that the second stage cannot
+      have a solution that is smaller than the solution to the first
+      stage. *)
+  Hypothesis H_IBF_NP_ge_param : forall F Δ, F <= task_cost tsk + IBF_NP tsk F Δ.
+
+
+  (** Given [IBF_P] and [IBF_NP] we construct a response-time recurrence. *)
+
+  (** For clarity, let's define a local name for the search space. *)
+  Let is_in_search_space A := is_in_search_space tsk L IBF_P A.
+
+  (** We use the following equation to bound the response-time of a
+      job of task [tsk]. Consider any value [R] that upper-bounds the
+      solution of each response-time recurrence, i.e., for any
+      relative arrival time [A] in the search space, there exists a
+      corresponding solution [F] such that [task_rtc tsk + IBF_P tsk A
+      F ≤ F] and [task_cost tsk + IBF_NP tsk F (A + R) ≤ A + R]. *)
+  Variable R : duration.
+  Hypothesis H_R_is_maximum :
+    forall (A : duration),
       is_in_search_space A ->
-      exists F,
-        A + F >= task_rtct tsk
-                + interference_bound_function tsk A (A + F) /\
-        R >= F + (task_cost tsk - task_rtct tsk).
+      exists (F : duration),
+        task_rtct tsk + IBF_P tsk A F <= F /\
+        task_cost tsk + IBF_NP tsk F (A + R) <= A + R.
 
-  (** In this section we show a detailed proof of the main theorem
-     that establishes that R is a response-time bound of task [tsk]. *)
+  (** * Proof of the Theorem *)
+  (** In the next section we show a detailed proof of the main theorem
+      that establishes that [R] is indeed a response-time bound of
+      task [tsk]. *)
   Section ProofOfTheorem.
 
-    (** Consider any job j of [tsk] with positive cost. *)
-    Variable j: Job.
-    Hypothesis H_j_arrives: arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk: job_of_task tsk j.
-    Hypothesis H_job_cost_positive: job_cost_positive j.
+    (** Consider any job [j] of [tsk] with a positive cost. Note that
+        the assumption about positive job cost is needed to apply
+        hypothesis [H_bounded_busy_interval_exists]. Later, we
+        consider the case when [job_cost j = 0] as well. This way, we
+        ensure that this assumption does not propagate further. *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+    Hypothesis H_job_of_tsk : job_of_task tsk j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
 
-    (** Assume we have a busy interval <<[t1, t2)>> of job j that is bounded by L. *)
-    Variable t1 t2: instant.
-    Hypothesis H_busy_interval: busy_interval j t1 t2.
+    (** Assume we have a busy interval <<[t1, t2)>> of job [j]. *)
+    Variable t1 t2 : instant.
+    Hypothesis H_busy_interval : busy_interval sched j t1 t2.
 
-    (** Let's define A as a relative arrival time of job j (with respect to time t1). *)
+    (** Let's define [A] as a relative arrival time of job
+        [j] (with respect to time [t1]). *)
     Let A := job_arrival j - t1.
 
-    (** In order to prove that R is a response-time bound of job j, we use hypothesis H_R_is_maximum.
-       Note that the relative arrival time (A) is not necessarily from the search space. However,
-       earlier we have proven that for any A there exists another [A_sp] from the search space that
-       shares the same IBF value. Moreover, we've also shown that there exists an [F_sp] such that
-       [F_sp] is a solution of the response time recurrence for parameter [A_sp]. Thus, despite the
-       fact that the relative arrival time may not lie in the search space, we can still use
-       the assumption H_R_is_maximum. *)
+    (** First, note that [job_arrival j] is equal to [t1 + A]. *)
+    Fact job_arrival_eq_t1_plus_A : job_arrival j = t1 + A.
+    Proof. by move: H_busy_interval => [[/andP [GT LT] _] _]; rewrite /A subnKC. Qed.
 
-    (** More formally, consider any [A_sp] and [F_sp] such that:.. *)
-    Variable A_sp F_sp : duration.
+    (** Since the length of the busy interval is bounded by [L], the
+        relative arrival time [A] of job [j] is less than [L]. *)
+    Fact relative_arrival_is_bounded : A < L.
+    Proof.
+      move: (H_job_of_tsk) => /eqP TSK.
+      edestruct H_bounded_busy_interval_exists as [t1' [t2' [_ [BOUND BUSY]]]]; rt_eauto.
+      edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
+      subst t1' t2'; clear BUSY.
+      apply leq_trans with (t2 - t1); last by rewrite leq_subLR.
+      move: (H_busy_interval)=> [[/andP [T1 T3] [_ _]] _].
+        by apply ltn_sub2r; first apply leq_ltn_trans with (job_arrival j).
+    Qed.
 
-    (** (a) [A_sp] is less than or equal to [A]... *)
-    Hypothesis H_A_gt_Asp : A_sp <= A.
+    (** In order to prove that [R] is a response-time bound of job
+        [j], we use hypothesis [H_R_is_maximum]. Note that the
+        relative arrival time [A] does not necessarily belong to the
+        search space. However, earlier (see file
+        [abstract.search_space]) we have proven that for any [A] there
+        exists another [A_sp] from the search space that shares the
+        same [IBF_P] value.
 
-    (** (b) [interference_bound_function(A, x)] is equal to
-       [interference_bound_function(A_sp, x)] for all [x] less than [L]... *)
+        Moreover, since the function [IBF_P(A, ⋅)] is equivalent to
+        the function [IBF_P(A_sp, ⋅)], a solution [F] for [task_rtc
+        tsk + IBF_P tsk A_sp F ≤ F] also is a solution for [task_rtc
+        tsk + IBF_P tsk A F ≤ F]. Thus, despite the fact that the
+        relative arrival time may not lie in the search space, we can
+        still use the assumption [H_R_is_maximum]. *)
+
+    (** More formally, consider any [A_sp] such that: *)
+    Variable A_sp : duration.
+
+    (** (a) [A_sp] is less than or equal to [A]. *)
+    Hypothesis H_Asp_le_A : A_sp <= A.
+
+    (** (b) [IBF_P A x] is equal to [IBF_P A_sp x] for all [x] less than [L]. *)
     Hypothesis H_equivalent :
-      are_equivalent_at_values_less_than
-        (interference_bound_function tsk A)
-        (interference_bound_function tsk A_sp) L.
+      are_equivalent_at_values_less_than (IBF_P tsk A) (IBF_P tsk A_sp) L.
 
-    (** (c) [A_sp] is in the search space, ... *)
+    (** (c) [A_sp] is in the search space. *)
     Hypothesis H_Asp_is_in_search_space : is_in_search_space A_sp.
 
-    (** (d) [A_sp + F_sp] is a solution of the response time recurrence... *)
-    Hypothesis H_Asp_Fsp_fixpoint :
-      A_sp + F_sp >= task_rtct tsk + interference_bound_function tsk A_sp (A_sp + F_sp).
+    (** (d) [F] such that ...  *)
+    Variable F : duration.
 
-    (** (e) and finally, [F_sp + (task_last - ε)] is no greater than R. *)
-    Hypothesis H_R_gt_Fsp : R >= F_sp + (task_cost tsk - task_rtct tsk).
+    (** ... [F] is a solution of the response-time recurrence. *)
+    Hypothesis H_F_fixpoint : task_rtct tsk + IBF_P tsk A_sp F <= F.
 
-    (** In this section, we consider the case where the solution is so large
-       that the value of [t1 + A_sp + F_sp] goes beyond the busy interval.
-       Although this case may be impossible in some scenarios, it can be
-       easily proven, since any job that completes by the end of the busy
-       interval remains completed. *)
-    Section FixpointOutsideBusyInterval.
+    (** And finally, (e) [task_cost tsk + IBF_NP tsk F (A_sp + R)] is
+        no greater than [A_sp + R]. *)
+    Hypothesis H_Asp_R_fixpoint :
+      task_cost tsk + IBF_NP tsk F (A_sp + R) <= A_sp + R.
 
-      (** By assumption, suppose that t2 is less than or equal to [t1 + A_sp + F_sp]. *)
-      Hypothesis H_big_fixpoint_solution : t2 <= t1 + (A_sp + F_sp).
+    (** ** Case 1 *)
+
+    (** First, we consider the case where the solution [F] is so large
+        that the value of [t1 + F] goes beyond the busy
+        interval. Depending on the pessimism of [IBF_P] and [IBP_NP]
+        this might be either possible or impossible. Regardless, the
+        response-time bound can be easily proven, since any job that
+        completes by the end of the busy interval remains
+        completed. *)
+    Section FixpointOutsideBusyInterval1.
+
+      (** By assumption, suppose that [t2] is less than or equal to [t1 + F]. *)
+      Hypothesis H_big_fixpoint_solution : t2 <= t1 + F.
 
       (** Then we prove that [job_arrival j + R] is no less than [t2]. *)
-      Lemma t2_le_arrival_plus_R:
+      Lemma t2_le_arrival_plus_R_1 :
         t2 <= job_arrival j + R.
       Proof.
         move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
-        apply leq_trans with (t1 + (A_sp + F_sp)); first by done.
-        apply leq_trans with (t1 + A + F_sp).
-        { by rewrite !addnA leq_add2r leq_add2l. }
-        rewrite /A subnKC; last by done.
-        rewrite leq_add2l.
-          by apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk));
-            first rewrite leq_addr.
+        apply leq_trans with (t1 + F); first by done.
+        rewrite job_arrival_eq_t1_plus_A -addnA leq_add2l.
+        rewrite -(leqRW H_Asp_le_A) -(leqRW H_Asp_R_fixpoint).
+        by apply H_IBF_NP_ge_param.
       Qed.
 
-      (** But since we know that the job is completed by the end of its busy interval,
-         we can show that job j is completed by [job arrival j + R]. *)
-      Lemma job_completed_by_arrival_plus_R_1:
+      (** But since we know that the job is completed by the end of
+          its busy interval, we can show that job [j] is completed by
+          [job arrival j + R]. *)
+      Lemma job_completed_by_arrival_plus_R_1 :
+        completed_by sched j (job_arrival j + R).
+      Proof.
+        move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
+        apply completion_monotonic with t2; rt_eauto.
+        - by apply t2_le_arrival_plus_R_1.
+        - by eapply job_completes_within_busy_interval; rt_eauto.
+      Qed.
+
+    End FixpointOutsideBusyInterval1.
+
+    (** ** Case 2 *)
+    (** Next, we consider the case where the solution of the first
+        recurrence is small ([t1 + F < t2]), but the solution of the
+        second fixpoint goes beyond the busy interval. Although this
+        case may be (also) impossible, the response-time bound can be
+        easily proven, since any job that completes by the end of the
+        busy interval remains completed. *)
+    Section FixpointOutsideBusyInterval2.
+
+      (** Assume that [t1 + F] is less than [t2], ... *)
+      Hypothesis H_small_fixpoint_solution : t1 + F < t2.
+
+      (** ... but [t1 + (A_sp + R)] is at least [t2]. *)
+      Hypothesis H_big_fixpoint_solution : t2 <= t1 + (A_sp + R).
+
+      (** Then we prove that [job_arrival j + R] is no less than [t2]. *)
+      Lemma t2_le_arrival_plus_R_2 :
+        t2 <= job_arrival j + R.
+      Proof.
+        move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
+        apply leq_trans with (t1 + (A_sp + R)); first by done.
+        by rewrite job_arrival_eq_t1_plus_A -addnA leq_add2l leq_add2r.
+      Qed.
+
+      (** But since we know that the job is completed by the end of
+          its busy interval, we can show that job [j] is completed by
+          [job arrival j + R]. *)
+      Lemma job_completed_by_arrival_plus_R_2 :
         completed_by sched j (job_arrival j + R).
       Proof.
         move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
         apply completion_monotonic with t2; try done.
-        apply t2_le_arrival_plus_R.
-        eapply job_completes_within_busy_interval; eauto 2.
+        - by apply t2_le_arrival_plus_R_2.
+        - by eapply job_completes_within_busy_interval; rt_eauto.
       Qed.
 
-    End FixpointOutsideBusyInterval.
+    End FixpointOutsideBusyInterval2.
 
-    (** In this section, we consider the complementary case where
-       [t1 + A_sp + F_sp] lies inside the busy interval. *)
-    Section FixpointInsideBusyInterval.
+    (** ** Case 3 *)
+    (** Next, we consider the case when both solutions are smaller
+        than the length of the busy interval. *)
+    Section FixpointsInsideBusyInterval.
 
-      (** So, assume that [t1 + A_sp + F_sp] is less than t2. *)
-      Hypothesis H_small_fixpoint_solution : t1 + (A_sp + F_sp) < t2.
+      (** So, assume that [t1 + F] and [t1 + (A_sp + R)] are both
+          smaller than [t2]. *)
+      Hypothesis H_small_fixpoint_solution1 : t1 + F < t2.
+      Hypothesis H_small_fixpoint_solution2 : t1 + (A_sp + R) < t2.
 
-      (** Next, let's consider two other cases: *)
-      (** CASE 1: the value of the fix-point is no less than the relative arrival time of job [j]. *)
-      Section FixpointIsNoLessThanArrival.
+      (** First note that [F] is indeed less than [L]. *)
+      Lemma relative_rtc_time_is_bounded : F < L.
+      Proof.
+        edestruct H_bounded_busy_interval_exists as [t1' [t2' [_ [BOUND BUSY]]]]; eauto 2.
+        edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
+        subst t1' t2'; clear BUSY.
+        apply leq_trans with (t2 - t1); last by rewrite leq_subLR.
+        by rewrite ltn_subRL.
+      Qed.
 
-        (** Suppose that [A_sp + F_sp] is no less than relative arrival of job [j]. *)
-        Hypothesis H_fixpoint_is_no_less_than_relative_arrival_of_j : A <= A_sp + F_sp.
+      (** Next we consider two sub-cases. *)
 
-        (** In this section, we prove that the fact that job [j] is not completed by
-           time [job_arrival j + R] leads to a contradiction. Which in turn implies
-           that the opposite is true -- job [j] completes by time [job_arrival j + R]. *)
-        Section ProofByContradiction.
+      (** *** Case 3.1 *)
+      (** The cost of job [j] is smaller than or equal to the
+          run-to-completion threshold of task [tsk]. *)
+      Section JobCostIsSmall.
 
-          (** Recall that by lemma "solution_for_A_exists" there is a solution [F]
-             of the response-time recurrence for the given relative arrival time [A]
-             (which is not necessarily from the search space). *)
+        (** We assume that [job_cost j <= task_rtc tsk]. *)
+        Hypothesis H_job_cost_is_small : job_cost j <= task_rtct tsk.
 
-          (** Thus, consider a constant [F] such that:.. *)
-          Variable F : duration.
-          (** (a) the sum of [A_sp] and [F_sp] is equal to the sum of [A] and [F]... *)
-          Hypothesis H_Asp_Fsp_eq_A_F : A_sp + F_sp = A + F.
-          (** (b) [F] is at mo1st [F_sp]... *)
-          Hypothesis H_F_le_Fsp : F <= F_sp.
-          (** (c) and [A + F] is a solution for the response-time recurrence for [A]. *)
-          Hypothesis H_A_F_fixpoint:
-            A + F >= task_rtct tsk + interference_bound_function tsk A (A + F).
-
-          (** Next, we assume that job [j] is not completed by time [job_arrival j + R]. *)
-          Hypothesis H_j_not_completed : ~~ completed_by sched j (job_arrival j + R).
-
-          (** Some additional reasoning is required since the term [task_cost tsk - task_rtct tsk]
-             does not necessarily bound the term [job_cost j - job_rtct j]. That is, a job can
-             have a small run-to-completion threshold, thereby becoming non-preemptive much earlier than guaranteed
-             according to task run-to-completion threshold, while simultaneously executing the last non-preemptive
-             segment that is longer than [task_cost tsk - task_rtct tsk] (e.g., this is possible
-             in the case of floating non-preemptive sections).
-
-             In this case we cannot directly apply lemma "j_receives_at_least_run_to_completion_threshold". Therefore
-             we introduce two temporal notions of the last non-preemptive region of job j and an execution
-             optimism. We use these notions inside this proof, so we define them only locally. *)
-
-          (** Let the last non-preemptive region of job [j] (last) be
-             the difference between the cost of the job and the [j]'s
-             run-to-completion threshold (i.e. [job_cost j - job_rtct j]).
-             We know that after j has reached its
-             run-to-completion threshold, it will additionally be
-             executed [job_last j] units of time. *)
-          Let job_last := job_cost j - job_rtct j.
-
-          (** And let execution optimism (optimism) be the difference
-             between the [tsk]'s run-to-completion threshold and the
-             [j]'s run-to-completion threshold (i.e.  [task_rtct -
-             job_rtct]).  Intuitively, optimism is how much earlier
-             job j has received its run-to-completion threshold than
-             it could at worst.  *)
-          Let optimism := task_rtct tsk - job_rtct j.
-
-          (** From lemma "j_receives_at_least_run_to_completion_threshold"
-              with parameters [progress_of_job := job_rtct j] and [delta :=
-              (A + F) - optimism)] we know that service of [j] by time
-              [t1 + (A + F) - optimism] is no less than [job_rtct
-              j]. Hence, job [j] is completed by time [t1 + (A + F) -
-              optimism + last]. *)
-          Lemma j_is_completed_by_t1_A_F_optimist_last :
-            completed_by sched j (t1 + (A + F - optimism) + job_last).
-          Proof.
-            move: H_busy_interval => [[/andP [GT LT] _] _].
-            have ESERV :=
-              @j_receives_at_least_run_to_completion_threshold
-                _ _  _  PState _ _  arr_seq sched interference interfering_workload
-                _ j _ _  t1 t2 _ (job_rtct j) _ ((A + F) - optimism).
-            specialize (ESERV JA JC).
-            feed_n 6  ESERV; eauto 2.
-            specialize (ESERV JC _).
-            feed_n 2 ESERV.
-            { eapply job_run_to_completion_threshold_le_job_cost; eauto. }
-            { rewrite -{2}(leqRW H_A_F_fixpoint).
-              rewrite /definitions.cumul_interference.
-              rewrite -[in X in _ <= X]addnBAC; last by rewrite leq_subr.
-              rewrite {2}/optimism.
-              rewrite subKn; last by apply H_valid_run_to_completion_threshold.
-              rewrite leq_add2l.
-              apply leq_trans with (cumul_interference j t1 (t1 + (A + F))).
-              { rewrite /cumul_interference /definitions.cumul_interference
-                   [in X in _ <= X](@big_cat_nat _ _ _ (t1 + (A + F - optimism))) //=.
-                all: by lia. }
-              { apply H_job_interference_is_bounded with t2; try done.
-                - by rewrite -H_Asp_Fsp_eq_A_F.
-                - apply/negP; intros CONTR.
-                  move: H_j_not_completed => /negP C; apply: C.
-                  apply completion_monotonic with (t1 + (A + F)); try done.
-                  rewrite addnA subnKC // leq_add2l.
-                  apply leq_trans with F_sp; first by done.
-                  by lia. } }
-            apply: job_completes_after_reaching_run_to_completion_threshold; rt_eauto.
-          Qed.
-
-          (** However, [t1 + (A + F) - optimism + last ≤ job_arrival j + R]!
-             To prove this fact we need a few auxiliary inequalities that are
-             needed because we use the truncated subtraction in our development.
-             So, for example [a + (b - c) = a + b - c] only if [b ≥ c]. *)
-          Section AuxiliaryInequalities.
-
-            (** Recall that we consider a busy interval of a job [j], and [j] has arrived [A] time units
-               after the beginning the busy interval. From basic properties of a busy interval it
-               follows that job [j] incurs interference at any time instant t ∈ <<[t1, t1 + A)>>.
-               Therefore [interference_bound_function(tsk, A, A + F)] is at least [A]. *)
-            Lemma relative_arrival_le_interference_bound:
-              A <= interference_bound_function tsk A (A + F).
-            Proof.
-              move: H_j_not_completed; clear H_j_not_completed; move => /negP CONTRc.
-              move: (H_busy_interval) => [[/andP [GT LT] _] _].
-              apply leq_trans with (cumul_interference j t1 (t1 + (A+F))).
-              { rewrite /cumul_interference.
-                apply leq_trans with
-                  (\sum_(t1 <= t < t1 + A) interference j t);last by
-                  rewrite /definitions.cumul_interference [in X in _ <= X](@big_cat_nat _ _ _ (t1 + A)) //=; try by lia.
-                { rewrite -{1}[A](sum_of_ones t1).
-                  rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond.
-                  rewrite leq_sum //.
-                  move => t /andP [/andP [NEQ1 NEQ2] _].
-                  rewrite lt0b.
-                  move: (H_work_conserving j t1 t2 t) => CONS.
-                  feed_n 4 CONS; try done.
-                  { apply/andP; split; first by done.
-                    by apply leq_trans with (t1 + A); [done | lia]. }
-                  move: CONS => [CONS1 _].
-                  apply/negP; intros CONTR.
-                  move: (CONS1 CONTR) => SCHED; clear CONS1 CONTR.
-                  move: NEQ2; rewrite ltnNge; move => /negP NEQ2; apply: NEQ2.
-                  rewrite /A subnKC; last by done.
-                  by apply : has_arrived_scheduled; rt_eauto. } }
-              { apply H_job_interference_is_bounded with t2; try done.
-                - by rewrite -H_Asp_Fsp_eq_A_F.
-                - apply /negP; move =>  CONTR.
-                  apply: CONTRc.
-                  by apply completion_monotonic with (t1 + (A + F)); [lia | done]. }
-            Qed.
-
-            (** As two trivial corollaries, we show that
-               [tsk]'s run-to-completion threshold is at most [F_sp]... *)
-            Corollary tsk_run_to_completion_threshold_le_Fsp :
-              task_rtct tsk <= F_sp.
-            Proof.
-              move: H_A_F_fixpoint => EQ.
-              have L1 := relative_arrival_le_interference_bound.
-              by lia.
-            Qed.
-
-            (** ... and optimism is at most [F]. *)
-            Corollary optimism_le_F :
-              optimism <= F.
-            Proof.
-              move: H_A_F_fixpoint => EQ.
-              have L1 := relative_arrival_le_interference_bound.
-              by lia.
-            Qed.
-
-          End AuxiliaryInequalities.
-
-          (** Next we show that [t1 + (A + F) - optimism + last] is at most [job_arrival j + R],
-             which is easy to see from the following sequence of inequalities:
-
-             [t1 + (A + F) - optimism + last]
-             [≤ job_arrival j + (F - optimism) + job_last]
-             [≤ job_arrival j + (F_sp - optimism) + job_last]
-             [≤ job_arrival j + F_sp + (job_last - optimism)]
-             [≤ job_arrival j + F_sp + job_cost j - task_rtct tsk]
-             [≤ job_arrival j + F_sp + task_cost tsk - task_rtct tsk]
-             [≤ job_arrival j + R]. *)
-          Lemma t1_A_F_optimist_last_le_arrival_R :
-            t1 + (A + F - optimism) + job_last <= job_arrival j + R.
-          Proof.
-            move: (H_busy_interval) => [[/andP [GT LT] _] _].
-            have L1 := tsk_run_to_completion_threshold_le_Fsp.
-            have L2 := optimism_le_F.
-            apply leq_trans with (job_arrival j + (F - optimism) + job_last).
-            { rewrite leq_add2r addnBA.
-              - by rewrite /A !addnA subnKC // addnBA.
-              - by apply leq_trans with F; last rewrite leq_addl.
-            }
-            { move: H_valid_run_to_completion_threshold => [PRT1 PRT2].
-              rewrite -addnA leq_add2l.
-              apply leq_trans with (F_sp - optimism + job_last ); first by rewrite leq_add2r leq_sub2r.
-              apply leq_trans with (F_sp + (task_cost tsk - task_rtct tsk)); last by done.
-              rewrite /optimism subnBA; last by apply PRT2.
-              rewrite -addnBAC // /job_last.
-              rewrite addnBA; last by eapply job_run_to_completion_threshold_le_job_cost; eauto 2.
-              rewrite -addnBAC; last by lia.
-              rewrite -addnBA // subnn addn0.
-              rewrite addnBA; last by apply PRT1.
-              rewrite addnBAC; last by done.
-              rewrite leq_sub2r // leq_add2l.
-              by move: H_job_of_tsk => /eqP <-; apply H_valid_job_cost.
-            }
-          Qed.
-
-          (** ... which contradicts the initial assumption about [j] is not
-             completed by time [job_arrival j + R]. *)
-          Lemma j_is_completed_earlier_contradiction : False.
-          Proof.
-            move: H_j_not_completed => /negP C; apply: C.
-            apply completion_monotonic with (t1 + ((A + F) - optimism) + job_last);
-              auto using j_is_completed_by_t1_A_F_optimist_last, t1_A_F_optimist_last_le_arrival_R.
-          Qed.
-
-        End ProofByContradiction.
-
-        (** Putting everything together, we conclude that [j] is completed by [job_arrival j + R]. *)
-        Lemma job_completed_by_arrival_plus_R_2:
-          completed_by sched j (job_arrival j + R).
+        (** Then we apply lemma [j_receives_enough_service] with
+            parameters [progress_of_job := job_cost j] and [delta :=
+            F] to obtain the fact that the service of [j] by time [t1
+            + F] is no less than [job_cost j] (that is, the job is
+            completed). *)
+        Lemma job_receives_enough_service_1 :
+          job_cost j <= service sched j (t1 + F).
         Proof.
-          move: H_busy_interval => [[/andP [GT LT] _] _].
-          have L1 := solution_for_A_exists
-                       tsk L (fun tsk A R => task_rtct tsk
-                                          + interference_bound_function tsk A R) A_sp F_sp.
-          specialize (L1 _).
-          feed_n 2 L1; try done.
-          { move: (H_busy_interval_exists j H_j_arrives H_job_of_tsk H_job_cost_positive)
-                => [t1' [t2' [BOUND BUSY]]].
-            have EQ:= busy_interval_is_unique _ _ _ _ _ _ _ _ H_busy_interval BUSY.
-            move : EQ => [EQ1 EQ2].
-            subst t1' t2'; clear BUSY.
-            by rewrite -(ltn_add2l t1); apply leq_trans with t2.
-          }
-          specialize (L1 A); feed_n 2 L1; first by apply/andP; split.
-          + by intros x LTG; apply/eqP; rewrite eqn_add2l H_equivalent.
-            move: L1 => [F [EQSUM [F2LEF1 FIX2]]].
-            apply/negP; intros CONTRc; move: CONTRc => /negP CONTRc.
-            by eapply j_is_completed_earlier_contradiction in CONTRc; eauto 2.
+          move_neq_up T; move: (T) => NC; move_neq_down T.
+          eapply j_receives_enough_service; eauto 2;
+            rewrite /definitions.cumulative_interference.
+          rewrite -{2}(leqRW H_F_fixpoint).
+          rewrite leq_add //.
+          rewrite -H_equivalent; [ | apply relative_rtc_time_is_bounded].
+          eapply H_job_interference_is_bounded_IBFP with t2; try done.
+          + by rewrite -ltnNge.
+          + move => t1' t2' BUSY.
+            edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
+            by subst t1' t2'; rewrite -job_arrival_eq_t1_plus_A.
         Qed.
 
-      End FixpointIsNoLessThanArrival.
+      End JobCostIsSmall.
 
-      (** CASE 2: the value of the fix-point is less than the relative arrival time of
-         job j (which turns out to be impossible, i.e. the solution of the response-time
-         recurrence is always equal to or greater than the relative arrival time). *)
-      Section FixpointCannotBeSmallerThanArrival.
+      (** *** Case 3.2 *)
+      (** The cost of job [j] is greater than or equal to
+          the run-to-completion threshold of task [tsk ]. *)
+      Section JobCostIsBig.
 
-        (** Assume that [A_sp + F_sp] is less than A. *)
-        Hypothesis H_fixpoint_is_less_that_relative_arrival_of_j: A_sp + F_sp < A.
+        (** We assume that [task_rtc tsk <= job_cost j]. *)
+        Hypothesis H_job_cost_is_big : task_rtct tsk <= job_cost j.
 
-        (** Note that the relative arrival time of job j is less than L. *)
-        Lemma relative_arrival_is_bounded: A < L.
+        (** We apply lemma [j_receives_enough_service] with parameters
+            [progress_of_job := task_rtc tsk] and [delta := F] to
+            obtain the fact that the service of [j] by time [t1 + F]
+            is no less than [task_rtc tsk]. *)
+        Lemma job_receives_enough_service_2 :
+          task_rtct tsk <= service sched j (t1 + F).
         Proof.
-          rewrite /A.
-          move: (H_busy_interval_exists j H_j_arrives H_job_of_tsk H_job_cost_positive) => [t1' [t2' [BOUND BUSY]]].
-          have EQ:= busy_interval_is_unique _ _ _ _ _ _ _ _ H_busy_interval BUSY. destruct EQ as [EQ1 EQ2].
-          subst t1' t2'; clear BUSY.
-          apply leq_trans with (t2 - t1); last by rewrite leq_subLR.
-          move: (H_busy_interval)=> [[/andP [T1 T3] [_ _]] _].
-          by apply ltn_sub2r; first apply leq_ltn_trans with (job_arrival j).
+          move_neq_up T; move: (T) (H_job_of_tsk) => NC /eqP TSK; move_neq_down T.
+          eapply j_receives_enough_service; rt_eauto;
+            rewrite /definitions.cumulative_interference.
+          erewrite leq_trans; last apply H_F_fixpoint; auto.
+          rewrite leq_add //.
+          rewrite -H_equivalent; [ | apply relative_rtc_time_is_bounded].
+          eapply H_job_interference_is_bounded_IBFP with t2; try done.
+          + by rewrite -ltnNge (leqRW NC).
+          + intros ? ? BUSY.
+            edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
+            subst t0 t3; clear BUSY.
+            by rewrite -job_arrival_eq_t1_plus_A.
         Qed.
 
-        (** We can use [j_receives_at_least_run_to_completion_threshold] to prove that the service
-           received by j by time [t1 + (A_sp + F_sp)] is no less than run-to-completion threshold. *)
-        Lemma service_of_job_ge_run_to_completion_threshold:
-          service sched j (t1 + (A_sp + F_sp)) >= job_rtct j.
+        (** Next, we again apply lemma [j_receives_enough_service]
+            with parameters [progress_of_job := job_cost j] and [delta
+            := A_sp + R] to obtain the fact that the service of [j] by
+            time [t1 + (A_sp + R)] is no less than [job_cost j]. *)
+        Lemma job_receives_enough_service_3 :
+          job_cost j <= service sched j (t1 + (A_sp + R)).
         Proof.
-          move: (H_busy_interval) => [[NEQ [QT1 NTQ]] QT2].
-          move: (NEQ) => /andP [GT LT].
-          move: (H_job_interference_is_bounded t1 t2 (A_sp + F_sp) j) => IB.
-          feed_n 5 IB; try done.
-          { apply/negP => COMPL.
-            apply completion_monotonic with (t' := t1 + A) in COMPL; try done; last first.
-            { by rewrite leq_add2l; apply ltnW. }
-            { rewrite /A subnKC in COMPL; last by done.
-              move: COMPL; rewrite /completed_by leqNgt; move => /negP COMPL; apply: COMPL.
-              rewrite /service -(service_during_cat _ _ _ (job_arrival j)); last by apply/andP; split.
-              rewrite (cumulative_service_before_job_arrival_zero) //; rt_eauto.
-              by rewrite add0n /service_during big_geq //.
-            }
-          }
-          rewrite -/A in IB.
-          have ALTT := relative_arrival_is_bounded.
-          simpl in IB; rewrite H_equivalent in IB; last by apply ltn_trans with A.
-          have ESERV :=
-              @j_receives_at_least_run_to_completion_threshold
-                _ _  _  PState _ _  arr_seq sched interference interfering_workload
-                _ j _ _  t1 t2 _ (job_rtct j) _ (A_sp + F_sp).
-          specialize (ESERV JA JC).
-          feed_n 6 ESERV; eauto 2.
-          specialize (ESERV JC _).
-          feed_n 2 ESERV; eauto using job_run_to_completion_threshold_le_job_cost.
-          by rewrite -{2}(leqRW H_Asp_Fsp_fixpoint) leq_add //; apply H_valid_run_to_completion_threshold.
-          Qed.
-
-        (** However, this is a contradiction. Since job [j] has not yet arrived, its service
-           is equal to [0]. However, run-to-completion threshold is always positive. *)
-        Lemma relative_arrival_time_is_no_less_than_fixpoint:
-          False.
-        Proof.
-          move: (H_busy_interval) => [[NEQ [QT1 NTQ]] QT2].
-          move: (NEQ) => /andP [GT LT].
-          have ESERV := service_of_job_ge_run_to_completion_threshold.
-          move: ESERV; rewrite leqNgt; move => /negP ESERV; apply: ESERV.
-          rewrite /service cumulative_service_before_job_arrival_zero;
-            eauto 5 using job_run_to_completion_threshold_positive; rt_eauto.
-          rewrite -[X in _ <= X](@subnKC t1) //.
-            by rewrite -/A leq_add2l ltnW.
+          move: (H_job_of_tsk) => /eqP TSK.
+          apply/negPn/negP; intros NC; move: NC => /negP NC; apply NC; move: NC => /negP NC.
+          eapply j_receives_enough_service; rt_eauto.
+          erewrite leq_trans; [ | | apply H_Asp_R_fixpoint]; auto.
+          apply leq_add; [by rewrite -TSK; apply H_valid_job_cost | ].
+          eapply H_job_interference_is_bounded_IBFNP with (t2 := t2); eauto 2.
+          intros ? ? BUSY.
+          edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
+          subst t0 t3; clear BUSY; split.
+          - by rewrite H_equivalent //; apply relative_rtc_time_is_bounded.
+          - by rewrite -(leqRW job_receives_enough_service_2).
         Qed.
 
-      End FixpointCannotBeSmallerThanArrival.
+      End JobCostIsBig.
 
-    End FixpointInsideBusyInterval.
+      (** Either way, job [j] is completed by time [job_arrival j + R]. *)
+      Lemma job_is_completed_by_arrival_plus_R :
+        completed_by sched j (job_arrival j + R).
+      Proof.
+        edestruct (leqP (job_cost j) (task_rtct tsk)) as [LE|LE].
+        - eapply completion_monotonic; [ | eapply job_receives_enough_service_1; auto].
+          apply leq_trans with (t1 + (A_sp + R));
+            [ rewrite leq_add2l; eapply leq_trans; [ | apply H_Asp_R_fixpoint]; eauto
+            | by rewrite job_arrival_eq_t1_plus_A -addnA leq_add2l leq_add2r].
+        - eapply completion_monotonic; [ | eapply job_receives_enough_service_3; auto].
+          by rewrite addnA leq_add2r job_arrival_eq_t1_plus_A leq_add2l.
+      Qed.
+
+    End FixpointsInsideBusyInterval.
 
   End ProofOfTheorem.
 
+  (** * Response-Time Bound *)
+
   (** Using the lemmas above, we prove that [R] is a response-time bound. *)
   Theorem uniprocessor_response_time_bound:
-    response_time_bounded_by tsk R.
+    task_response_time_bound arr_seq sched tsk R.
   Proof.
-    intros j ARR JOBtsk. unfold job_response_time_bound.
-    move: (posnP (@job_cost _ JC j)) => [ZERO|POS].
+    move => j ARR JOBtsk; unfold job_response_time_bound.
+    move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
     { by rewrite /completed_by ZERO. }
-    move: (H_busy_interval_exists j ARR JOBtsk POS) => [t1 [t2 [T2 BUSY]]].
-    move: (BUSY) => [[/andP [GE LT] _] QTt2].
-    have A2LTL := relative_arrival_is_bounded _ ARR JOBtsk POS _ _ BUSY.
-    set (A2 := job_arrival j - t1) in *.
-    move: (representative_exists tsk _ interference_bound_function _ A2LTL) => [A1 [ALEA2 [EQΦ INSP]]].
-    move: (H_R_is_maximum _ INSP) => [F1 [FIX1 LE1]].
-    destruct (t1 + (A1 + F1) >= t2) eqn:BIG.
-    - eapply job_completed_by_arrival_plus_R_1; eauto 2.
-    - apply negbT in BIG; rewrite -ltnNge in BIG.
-      destruct (A2 <= A1 + F1) eqn:BOUND.
-      + eapply job_completed_by_arrival_plus_R_2; eauto 2.
-      + apply negbT in BOUND; rewrite -ltnNge in BOUND.
-        exfalso; apply relative_arrival_time_is_no_less_than_fixpoint
-                   with (j := j) (t1 := t1) (t2 := t2) (A_sp := A1) (F_sp := F1); auto.
+    move: (H_bounded_busy_interval_exists  _ ARR JOBtsk POS) => [t1 [t2 [NEQ [T2 BUSY]]]].
+    move: (relative_arrival_is_bounded _ ARR JOBtsk POS _ _ BUSY) => AltL.
+    move: (representative_exists tsk _ IBF_P _ AltL) => [A__sp [ALEA2 [EQΦ INSP]]].
+    set (A := job_arrival j - t1) in *.
+    move: (H_R_is_maximum _ INSP) => [F [FIX1 FIX2]].
+    edestruct (leqP t2 (t1 + F)) as [LE1|LE1];
+      [ | edestruct (leqP t2 (t1 + (A__sp + R))) as [LE2|LE2]].
+    - by eapply job_completed_by_arrival_plus_R_1; eauto.
+    - by eapply job_completed_by_arrival_plus_R_2; eauto.
+    - by eapply job_is_completed_by_arrival_plus_R with (A_sp := A__sp); eauto 2.
   Qed.
 
 End Abstract_RTA.

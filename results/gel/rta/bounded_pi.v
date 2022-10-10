@@ -1,7 +1,7 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop ssrZ.
 
 Require Import prosa.model.readiness.basic.
-Require Import prosa.analysis.abstract.ideal_jlfp_rta.
+Require Import prosa.analysis.abstract.ideal.iw_instantiation.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
 Require Import prosa.model.schedule.priority_driven.
@@ -83,16 +83,16 @@ Section AbstractRTAforGELwithArrivalCurves.
     priority_inversion_is_bounded_by arr_seq sched tsk priority_inversion_bound.
 
   (** ** B. Encoding the Scheduling Policy and Preemption Model *)
-  (** Next, we encode the scheduling policy and preemption model
-      using the functions [interference] and [interfering_workload].
-      To this end, we simply reuse the general definitions of interference
-      and interfering workload that apply to any JLFP policy, as defined in
-      the module [ideal_jlfp_rta]. *)
-  Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference arr_seq sched j t.
+  (** Next, we encode the scheduling policy and preemption model using
+      the functions [interference] and [interfering_workload]. To this
+      end, we simply reuse the general definitions of interference and
+      interfering workload that apply to any JLFP policy, as defined
+      in the module [analysis.abstract.ideal.iw_instantiation]. *)
+  #[local] Instance ideal_jlfp_interference : Interference Job :=
+    ideal_jlfp_interference arr_seq sched.
 
-  Let interfering_workload (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interfering_workload arr_seq sched j t.
+  #[local] Instance ideal_jlfp_interfering_workload : InterferingWorkload Job :=
+    ideal_jlfp_interfering_workload arr_seq sched.
 
   (** ** C. Abstract Work Conservation *)
   (** Let us recall the abstract and classic notations of work conservation. *)
@@ -150,8 +150,7 @@ Section AbstractRTAforGELwithArrivalCurves.
 
       (** Assume the busy interval of [j] is given by <<[t1,t2)>>. *)
       Variable t1 t2 : duration.
-      Hypothesis H_busy_interval :
-        definitions.busy_interval sched interference interfering_workload j t1 t2.
+      Hypothesis H_busy_interval : definitions.busy_interval sched j t1 t2.
 
       (** Assume the relative arrival time of [j] is given by [A]. *)
       Let A := job_arrival j - t1.
@@ -224,8 +223,7 @@ Section AbstractRTAforGELwithArrivalCurves.
           eapply leq_trans; first by eapply total_workload_shorten_range; eauto 2; lia.
           rewrite /GEL_from.
           case (interval tsko A >=? 0)%Z eqn: EQ1.
-          + have -> : (Z.to_nat (Z.of_nat t1 + interval tsko A)) = t1 + Z.to_nat (interval tsko A)
-                                                                         by lia.
+          + have -> : (Z.to_nat (Z.of_nat t1 + interval tsko A)) = t1 + Z.to_nat (interval tsko A) by lia.
             by eapply workload_le_rbf; rt_eauto.
           + rewrite arrivals_between_geq /workload_of_jobs.
             rewrite big_nil.
@@ -239,27 +237,28 @@ Section AbstractRTAforGELwithArrivalCurves.
     (** Finally, we prove that [IBF_other] bounds the interference incurred by [tsk]. *)
     Corollary instantiated_task_interference_is_bounded:
       task_interference_is_bounded_by
-        arr_seq sched tsk interference interfering_workload (fun tsk A R => IBF_other A R).
+        arr_seq sched tsk (fun tsk A R => IBF_other A R).
     Proof.
       move => j R2 t1 t2 ARR TSK N NCOMPL BUSY.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
         by rewrite /completed_by /completed_by ZERO.
       - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
-        rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ tsk j); rt_eauto.
-        + rewrite /I leq_add //.
-          eapply cumulative_priority_inversion_is_bounded; rt_eauto.
-          eapply leq_trans. eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
-          eapply leq_trans. apply service_of_jobs_le_workload; rt_eauto.
-          eapply leq_trans. eapply reorder_summation; eauto 2 => j' IN.
-          by apply H_all_jobs_from_taskset; eapply in_arrivals_implies_arrived; exact IN.
+        rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ _ j); rt_eauto; first last.
+        { by eapply arrived_between_implies_in_arrivals; rt_eauto. }
+        { by eapply GEL_implies_sequential_tasks; rt_auto. } 
+        rewrite /I leq_add //.
+        + eapply cumulative_priority_inversion_is_bounded; rt_eauto.
+        + eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
+          eapply leq_trans; first by apply service_of_jobs_le_workload; rt_eauto.
           eapply leq_trans.
-          move : TSK => /eqP TSK; rewrite TSK.
-          eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
-          by apply /eqP.
-          by done.
-        + by eapply GEL_implies_sequential_tasks; rt_auto.
-        + by eapply arrived_between_implies_in_arrivals; rt_eauto.
+          * eapply reorder_summation; eauto 2 => j' IN.
+            by apply H_all_jobs_from_taskset; eapply in_arrivals_implies_arrived; exact IN.
+          * eapply leq_trans.
+            -- move : TSK => /eqP TSK; rewrite TSK.
+               eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
+               by apply /eqP.
+            -- by done.
     Qed.
 
   (** ** F. Defining the Search Space *)
@@ -408,19 +407,16 @@ Section AbstractRTAforGELwithArrivalCurves.
     move => js ARRs TSKs.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
-    ( try ( eapply uniprocessor_response_time_bound_seq with
-          (interference0 := interference) (interfering_workload0 := interfering_workload)
+    (try ( eapply uniprocessor_response_time_bound_seq with
           (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L) ) ||
         eapply uniprocessor_response_time_bound_seq with
-      (interference := interference) (interfering_workload := interfering_workload)
       (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
-    - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
+    - eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
       * eapply GEL_implies_sequential_tasks; rt_eauto.
     - by eapply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
     - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_task_interference_is_bounded.
     - by eapply correct_search_space; eauto 2.
   Qed.
-
 
 End AbstractRTAforGELwithArrivalCurves.

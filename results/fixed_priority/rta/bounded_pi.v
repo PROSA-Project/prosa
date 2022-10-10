@@ -1,5 +1,5 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.abstract.ideal_jlfp_rta.
+Require Export prosa.analysis.abstract.ideal.iw_instantiation.
 Require Export prosa.analysis.facts.busy_interval.busy_interval.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
@@ -55,8 +55,22 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** ... and assume that the schedule is valid.  *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-  (** Note that we differentiate between abstract and
-     classical notions of work conserving schedule. *)
+  (** ** Instantiation of Interference *)
+  (** We say that job [j] incurs interference at time [t] iff it
+      cannot execute due to a higher-or-equal-priority job being
+      scheduled, or if it incurs a priority inversion. *)
+  #[local] Instance ideal_jlfp_interference : Interference Job :=
+    ideal_jlfp_interference arr_seq sched.
+
+  (** ** Instantiation of Interfering Workload *)
+  (** The interfering workload, in turn, is defined as the sum of the
+      priority inversion function and interfering workload of jobs
+      with higher or equal priority. *)
+  #[local] Instance ideal_jlfp_interfering_workload : InterferingWorkload Job :=
+    ideal_jlfp_interfering_workload arr_seq sched.
+
+  (** Note that we differentiate between abstract and classical
+      notions of work conserving schedule. *)
   Let work_conserving_ab := definitions.work_conserving arr_seq sched.
   Let work_conserving_cl := work_conserving.work_conserving arr_seq sched.
 
@@ -124,7 +138,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   Let total_ohep_rbf :=
     total_ohep_request_bound_function_FP ts tsk.
 
-  (** Assume that there exists a constant priority_inversion_bound
+  (** Assume that there exists a constant [priority_inversion_bound]
       that bounds the length of any priority inversion experienced by
       any job of [tsk].  Since we analyze only task [tsk], we ignore
       the lengths of priority inversions incurred by any other
@@ -160,19 +174,6 @@ Section AbstractRTAforFPwithArrivalCurves.
                 + total_ohep_rbf (A + F) /\
         R >= F + (task_cost tsk - task_rtct tsk).
 
-  (** Instantiation of Interference *)
-  (** We say that job j incurs interference at time t iff it cannot execute due to
-     a higher-or-equal-priority job being scheduled, or if it incurs a priority inversion. *)
-  Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference arr_seq sched j t.
-
-  (** Instantiation of Interfering Workload *)
-  (** The interfering workload, in turn, is defined as the sum of the
-      priority inversion function and interfering workload of jobs
-      with higher or equal priority. *)
-  Let interfering_workload (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interfering_workload arr_seq sched j t.
-
   (** Finally, we define the interference bound function
       ([IBF_other]). [IBF_other] bounds the interference if tasks are
       sequential. Since tasks are sequential, we exclude interference
@@ -186,14 +187,16 @@ Section AbstractRTAforFPwithArrivalCurves.
       the abstract theorem are satisfied. *)
   Section FillingOutHypothesesOfAbstractRTATheorem.
 
-    (** Recall that L is assumed to be a fixed point of the busy interval recurrence. Thanks to
-       this fact, we can prove that every busy interval (according to the concrete definition)
-       is bounded. In addition, we know that the conventional concept of busy interval and the
-       one obtained from the abstract definition (with the interference and interfering
-       workload) coincide. Thus, it follows that any busy interval (in the abstract sense)
-       is bounded. *)
-    Lemma instantiated_busy_intervals_are_bounded:
-      busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
+    (** Recall that [L] is assumed to be a fixed point of the busy
+        interval recurrence. Thanks to this fact, we can prove that
+        every busy interval (according to the concrete definition) is
+        bounded. In addition, we know that the conventional concept of
+        busy interval and the one obtained from the abstract
+        definition (with the interference and interfering workload)
+        coincide. Thus, it follows that any busy interval (in the
+        abstract sense) is bounded. *)
+    Lemma instantiated_busy_intervals_are_bounded :
+      busy_intervals_are_bounded_by arr_seq sched tsk L.
     Proof.
       move => j ARR TSK POS.
       edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 BI]]]]; rt_eauto.
@@ -203,36 +206,39 @@ Section AbstractRTAforFPwithArrivalCurves.
           /workload_of_jobs /hep_job /FP_to_JLFP.
         move: (TSK) =>  /eqP ->.
         by apply: sum_of_jobs_le_sum_rbf; eauto. }
-      exists t1, t2; split; first by done.
-      by eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
+      exists t1, t2; split; first by done. split; first by done.
+      eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
     Qed.
 
-    (** Next, we prove that [IBF_other] is indeed an interference bound.
+    (** Next, we prove that [IBF_other] is indeed an interference
+        bound.
 
-    Recall that in module abstract_seq_RTA hypothesis task_interference_is_bounded_by expects
-    to receive a function that maps some task t, the relative arrival time of a job j of task t,
-    and the length of the interval to the maximum amount of interference (for more details see
-    files limited.abstract_RTA.definitions and limited.abstract_RTA.abstract_seq_rta).
+        Recall that in module abstract_seq_RTA hypothesis
+        [task_interference_is_bounded_by] expects to receive a
+        function that maps some task [tsk], the relative arrival time of
+        a job [j] of task [tsk], and the length of the interval to the
+        maximum amount of interference.
 
-    However, in this module we analyze only one task -- [tsk], therefore it is “hard-coded”
-    inside the interference bound function [IBF_other]. Moreover, in case of a model with fixed
-    priorities, interference that some job j incurs from higher-or-equal priority jobs does not
-    depend on the relative arrival time of job j. Therefore, in order for the [IBF_other] signature to
-    match the required signature in module abstract_seq_RTA, we wrap the [IBF_other] function in a
-    function that accepts, but simply ignores, the task and the relative arrival time. *)
-    Lemma instantiated_task_interference_is_bounded:
-      task_interference_is_bounded_by
-        arr_seq sched tsk interference interfering_workload (fun t A R => IBF_other R).
+        However, in this module we analyze only one task -- [tsk],
+        therefore it is “hard-coded” inside the interference bound
+        function [IBF_other]. Moreover, in case of a model with fixed
+        priorities, interference that some job [j] incurs from
+        higher-or-equal priority jobs does not depend on the relative
+        arrival time of job [j]. Therefore, in order for the
+        [IBF_other] signature to match the required signature in
+        module [abstract_seq_RTA], we wrap the [IBF_other] function in
+        a function that accepts, but simply ignores, the task and the
+        relative arrival time. *)
+    Lemma instantiated_task_interference_is_bounded :
+      task_interference_is_bounded_by arr_seq sched tsk (fun t A R => IBF_other R).
     Proof.
       intros ? ? ? ? ARR TSK ? NCOMPL BUSY; simpl.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
       eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
-      rewrite /interference; erewrite cumulative_task_interference_split; rt_eauto; last first.
-      { move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _].
-        by eapply arrived_between_implies_in_arrivals; rt_eauto. }
-      unfold IBF_other, interference.
-      rewrite leq_add; try done.
+      rewrite /ideal_jlfp_interference; erewrite cumulative_task_interference_split; rt_eauto; last first.
+      { by move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _]; eapply arrived_between_implies_in_arrivals; rt_eauto. }
+      rewrite /IBF_other leq_add; try done.
       { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + R0)); first by done.
         apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2); last first.
         { by apply H_priority_inversion_is_bounded; rt_eauto; move: BUSY => [PREF QT2]. }

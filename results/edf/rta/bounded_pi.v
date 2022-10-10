@@ -5,7 +5,7 @@ Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
-Require Import prosa.analysis.abstract.ideal_jlfp_rta.
+Require Import prosa.analysis.abstract.ideal.iw_instantiation.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
 Require Import prosa.analysis.facts.busy_interval.ideal.inequalities.
@@ -70,8 +70,28 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched EDF.
 
-  (** Note that we differentiate between abstract and
-     classical notions of work conserving schedule. *)
+  (** To use the theorem [uniprocessor_response_time_bound_seq] from
+      the Abstract RTA module, we need to specify functions of
+      interference, interfering workload, and [IBF_other]. Next, we
+      define interference and interfering workload; we return to
+      [IBF_other] later. *)
+  
+  (** ** Instantiation of Interference *)
+  (** We say that job [j] incurs interference at time [t] iff it
+      cannot execute due to a higher-or-equal-priority job being
+      scheduled, or if it incurs a priority inversion. *)
+  #[local] Instance ideal_jlfp_interference : Interference Job :=
+    ideal_jlfp_interference arr_seq sched.
+
+  (** ** Instantiation of Interfering Workload *)
+  (** The interfering workload, in turn, is defined as the sum of the
+      priority inversion function and interfering workload of jobs
+      with higher or equal priority. *)
+  #[local] Instance ideal_jlfp_interfering_workload : InterferingWorkload Job :=
+    ideal_jlfp_interfering_workload arr_seq sched.
+        
+  (** Note that we differentiate between abstract and classical
+      notions of work-conserving schedule. *)
   Let work_conserving_ab := definitions.work_conserving arr_seq sched.
   Let work_conserving_cl := work_conserving.work_conserving arr_seq sched.
 
@@ -91,7 +111,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound
+      any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival bound
       of [tsk], and (2) it is a monotonic function that equals 0 for
       the empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
@@ -114,7 +134,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
   (** We introduce [rbf] as an abbreviation of the task request bound
       function, which is defined as [task_cost(T) × max_arrivals(T,Δ)]
-      for some task T. *)
+      for some task [T]. *)
   Let rbf := task_request_bound_function.
 
   (** Next, we introduce [task_rbf] as an abbreviation of the task
@@ -157,7 +177,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       ε)]. *)
   Definition task_rbf_changes_at (A : duration) := task_rbf A != task_rbf (A + ε).
 
-  (** Second, we ask whether there exists a task [tsko] from ts such
+  (** Second, we ask whether there exists a task [tsko] from [ts] such
       that [tsko ≠ tsk] and [rbf(tsko, A + D tsk - D tsko) ≠ rbf(tsko,
       A + ε + D tsk - D tsko)]. Note that we use a slightly uncommon
       notation [has (λ tsko ⇒ P tskₒ) ts], which can be interpreted as
@@ -196,21 +216,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
                 + bound_on_total_hep_workload  A (A + F) /\
         R >= F + (task_cost tsk - task_rtct tsk).
 
-  (** To use the theorem uniprocessor_response_time_bound_seq from the Abstract RTA module,
-     we need to specify functions of interference, interfering workload and [IBF_other].  *)
-
-  (** Instantiation of Interference *)
-  (** We say that job j incurs interference at time t iff it cannot execute due to
-     a higher-or-equal-priority job being scheduled, or if it incurs a priority inversion. *)
-  Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference arr_seq sched j t.
-
-  (** Instantiation of Interfering Workload *)
-  (** The interfering workload, in turn, is defined as the sum of the priority inversion
-     function and interfering workload of jobs with higher or equal priority. *)
-  Let interfering_workload (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interfering_workload arr_seq sched j t.
-
   
   (** Finally, we define the interference bound function
       ([IBF_other]). [IBF_other] bounds the interference if tasks are
@@ -238,8 +243,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
         (** Consider any busy interval <<[t1, t2)>> of job [j]. *)
         Variable t1 t2 : duration.
-        Hypothesis H_busy_interval :
-          definitions.busy_interval sched interference interfering_workload j t1 t2.
+        Hypothesis H_busy_interval : definitions.busy_interval sched j t1 t2.
 
         (** Let's define A as a relative arrival time of job j (with respect to time t1). *)
         Let A := job_arrival j - t1.
@@ -251,7 +255,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         (** ... and the set of all arrivals between [t1] and [t1 + Δ]. *)
         Let jobs := arrivals_between arr_seq t1 (t1 + Δ).
 
-        (** We define a predicate [EDF_from tsk].Predicate [EDF_from
+        (** We define a predicate [EDF_from tsk]. Predicate [EDF_from
             tsk] holds true for any job [jo] of task [tsk] such that
             [job_deadline jo <= job_deadline j]. *)
         Let EDF_from (tsk : Task) := fun (jo : Job) => EDF jo j && (job_task jo == tsk).
@@ -273,7 +277,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
               interval [t1, t1 + A + ε + D tsk - D tsk_o].  The
               intuition behind this inequality is that jobs which
               arrive after time instant [t1 + A + ε + D tsk - D tsk_o]
-              has smaller priority than job [j] due to the term [D tsk
+              have lower priority than job [j] due to the term [D tsk
               - D tsk_o]. *)
           Lemma total_workload_shorten_range:
             workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + Δ))
@@ -294,7 +298,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
         End ShortenRange.
 
-        (** Using the above lemma, we prove that total workload of
+        (** Using the above lemma, we prove that the total workload of the
             tasks is at most [bound_on_total_hep_workload(A, Δ)]. *)
         Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload :
           \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (EDF_from tsk_o) jobs
@@ -310,13 +314,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
       End HepWorkloadBound.
 
-      Corollary instantiated_task_interference_is_bounded:
-        task_interference_is_bounded_by
-          arr_seq sched tsk interference interfering_workload (fun tsk A R => IBF_other A R).
       (** Recall that in module abstract_seq_RTA hypothesis
           [task_interference_is_bounded_by] expects to receive a
-          function that maps some task t, the relative arrival time of
-          a job j of task t, and the length of the interval to the
+          function that maps some task [t], the relative arrival time of
+          a job [j] of task [t], and the length of the interval to the
           maximum amount of interference.
 
           However, in this module we analyze only one task -- [tsk],
@@ -325,6 +326,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
           [IBF_other] signature to match the required signature in
           module abstract_seq_RTA, we wrap the [IBF_other] function in
           a function that accepts, but simply ignores the task. *)
+      Corollary instantiated_task_interference_is_bounded :
+        task_interference_is_bounded_by arr_seq sched tsk (fun tsk A R => IBF_other A R).
       Proof.
         rewrite /task_interference_is_bounded_by.
         move => j R2 t1 t2 ARR TSK N NCOMPL BUSY.
@@ -332,26 +335,24 @@ Section AbstractRTAforEDFwithArrivalCurves.
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
           by rewrite /completed_by /completed_by ZERO.
         - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
-          rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ tsk j); rt_eauto;
-            last first.
+          rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ _ j); rt_eauto; last first. 
           + by eapply arrived_between_implies_in_arrivals; rt_eauto.
           + by eapply EDF_implies_sequential_tasks; rt_eauto.
-            rewrite /I leq_add //; first by eapply cumulative_priority_inversion_is_bounded; rt_eauto.
-            eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
-            eapply leq_trans; first by eapply service_of_jobs_le_workload; rt_eauto.
-            eapply leq_trans.
-            * eapply reorder_summation; rt_eauto.
+          + rewrite /I leq_add //.
+            * eapply cumulative_priority_inversion_is_bounded; rt_eauto.
+            * eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
+              eapply leq_trans; first by eapply service_of_jobs_le_workload; rt_eauto.
+              eapply leq_trans.
+              eapply reorder_summation; rt_eauto.
               move => j' IN.
-              apply H_all_jobs_from_taskset.
-              eapply in_arrivals_implies_arrived.
-              by exact IN.
-            *  move : TSK => /eqP TSK.
-               rewrite TSK.
-               move : TSK => /eqP TSK.
-               by eapply leq_trans;
-               first by eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; rt_eauto.
+              apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
+              move : TSK => /eqP TSK.
+              rewrite TSK.
+              eapply leq_trans; first eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; rt_eauto.
+              by apply /eqP.
+              Unshelve.
+              all : try by rt_eauto.
       Qed.
-
 
     End TaskInterferenceIsBoundedByIBF_other.
 
@@ -364,10 +365,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
       Hypothesis H_job_of_tsk : job_of_task tsk j.
       Hypothesis H_job_cost_positive : job_cost_positive j.
 
-      (** Given any job j of task [tsk] that arrives exactly A units
+      (** Given any job [j] of task [tsk] that arrives exactly [A] units
           after the beginning of the busy interval, the bound of the
-          total interference incurred by j within an interval of
-          length Δ is equal to [task_rbf (A + ε) - task_cost tsk +
+          total interference incurred by [j] within an interval of
+          length [Δ] is equal to [task_rbf (A + ε) - task_cost tsk +
           IBF_other(A, Δ)]. *)
       Let total_interference_bound tsk (A Δ : duration) :=
         task_rbf (A + ε) - task_cost tsk + IBF_other A Δ.
@@ -430,7 +431,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
 
   (** ** Final Theorem *)
   (** Based on the properties established above, we apply the abstract
-      analysis framework to infer that R is a response-time bound for
+      analysis framework to infer that [R] is a response-time bound for
       [tsk]. *)
   Theorem uniprocessor_response_time_bound_edf:
     task_response_time_bound arr_seq sched tsk R.
@@ -438,18 +439,16 @@ Section AbstractRTAforEDFwithArrivalCurves.
     move => js ARRs TSKs.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
-    ( try ( eapply uniprocessor_response_time_bound_seq with
-        (interference0 := interference) (interfering_workload0 := interfering_workload)
-        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L) ) ||
     eapply uniprocessor_response_time_bound_seq with
-        (interference := interference) (interfering_workload := interfering_workload)
-        (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
+      (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)
+      || eapply uniprocessor_response_time_bound_seq with
+      (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L); rt_eauto.
     - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
-      * eapply EDF_implies_sequential_tasks; rt_eauto.
-    - by eapply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
+      + by eapply EDF_implies_sequential_tasks; rt_eauto.
+    - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
     - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_task_interference_is_bounded.
-    - by eapply correct_search_space; eauto 2.
+    - by eapply correct_search_space; rt_eauto.
   Qed.
 
 End AbstractRTAforEDFwithArrivalCurves.

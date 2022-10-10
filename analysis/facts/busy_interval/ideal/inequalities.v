@@ -1,4 +1,4 @@
-Require Export analysis.abstract.ideal_jlfp_rta.
+Require Export analysis.abstract.ideal.iw_instantiation.
 
 (** In this file, we prove some inequalities that always
     hold inside the busy interval of a job. Throughout this file we
@@ -36,25 +36,24 @@ Section BusyIntervalInequalities.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_of_task tsk j.
   Hypothesis H_job_cost_positive: job_cost_positive j.
-
+  
   (** Consider the ideal JLFP definitions of interference and
       interfering workload. *)
-  Let interference (j : Job) (t : instant) :=
-        ideal_jlfp_rta.interference arr_seq sched j t.
+  #[local] Instance ideal_jlfp_interference : Interference Job :=
+    ideal_jlfp_interference arr_seq sched.
 
-  Let interfering_workload (j : Job) (t : instant) :=
-        ideal_jlfp_rta.interfering_workload arr_seq sched j t.
+  #[local] Instance ideal_jlfp_interfering_workload : InterferingWorkload Job :=
+    ideal_jlfp_interfering_workload arr_seq sched.
 
   (** Consider the busy interval for j is given by <<[t1,t2)>>. *)
   Variable t1 t2 : duration.
-  Hypothesis H_busy_interval :
-    definitions.busy_interval sched interference interfering_workload j t1 t2.
+  Hypothesis H_busy_interval : definitions.busy_interval sched j t1 t2.
 
   (** Let us denote the relative arrival time by [A]. *)
   Let A := job_arrival j - t1.
 
   (** Consider any arbitrary time [Δ] inside the busy interval. *)
-  Variable  Δ: duration.
+  Variable  Δ : duration.
   Hypothesis H_Δ_in_busy : t1 + Δ < t2.
 
   (** First, we prove that if the priority inversion is bounded then,
@@ -63,16 +62,15 @@ Section BusyIntervalInequalities.
 
     (** Consider the priority inversion in any given interval
         is bounded by a constant. *)
-    Variable priority_inversion_bound: duration -> duration.
-    Hypothesis H_priority_inversion_is_bounded:
-      priority_inversion_is_bounded_by
-        arr_seq sched tsk priority_inversion_bound.
+    Variable priority_inversion_bound : duration -> duration.
+    Hypothesis H_priority_inversion_is_bounded :
+      priority_inversion_is_bounded_by arr_seq sched tsk priority_inversion_bound.
 
     (** Then, the cumulative priority inversion in any interval
         is also bounded. *)
     Lemma cumulative_priority_inversion_is_bounded:
-      cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ)  <=
-        priority_inversion_bound (job_arrival j - t1).
+      cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ)
+      <= priority_inversion_bound (job_arrival j - t1).
     Proof.
       apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2).
       - rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1  + Δ)) //=; try by lia.
@@ -91,15 +89,13 @@ Section BusyIntervalInequalities.
       jobs of other tasks in an interval is bounded by the total service
       received by the higher priority jobs of those tasks. *)
   Lemma cumulative_interference_is_bounded_by_total_service:
-    cumulative_interference_from_hep_jobs_from_other_tasks sched j t1 (t1 + Δ)
+    cumulative_another_task_hep_job_interference arr_seq sched j t1 (t1 + Δ)
     <= service_of_jobs sched (fun jo => another_task_hep_job jo j) jobs t1 (t1 + Δ).
   Proof.
     move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
-    erewrite cumulative_i_thep_eq_service_of_othep;
-      rt_eauto.
+    erewrite cumulative_i_thep_eq_service_of_othep; rt_eauto.
     - move: (H_job_of_tsk) => /eqP TSK.
-      by rewrite /another_task_hep_job /jobs /service_of_jobs.
-    - by rewrite instantiated_quiet_time_equivalent_quiet_time; rt_eauto.
+      by rewrite instantiated_quiet_time_equivalent_quiet_time; rt_eauto.
   Qed.
 
   Section WorkloadRBF.

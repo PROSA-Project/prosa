@@ -3,7 +3,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.fifo.
 Require Import prosa.analysis.facts.priority.fifo.
-Require Import prosa.analysis.abstract.ideal_jlfp_rta.
+Require Import prosa.analysis.abstract.ideal.iw_instantiation.
 Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.facts.busy_interval.ideal.inequalities.
 Require Import prosa.analysis.facts.model.task_cost.
@@ -125,21 +125,22 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   (** ** B. Encoding the Scheduling Policy and Preemption Model *)
 
-  (** With the system model in place, the next step is to encode the scheduling
-      policy and preemption model such that aRTA becomes applicable. To this
-      end, we encode the semantics of the scheduling policy and preemption model
-      using two functions, by convention called [interference] and
-      [interfering_workload]. The paper explains the idea behind these two
-      functions and how they interact in much more detail. At the code level,
-      we fortunately can simply reuse the existing general definitions of
-      _interference_ and _interfering workload_ that apply to any job-level
-      fixed-priority (JLFP) policy (as provided in the module
-      [ideal_jlfp_rta]). *)
-  Let interference (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interference arr_seq sched j t.
+  (** With the system model in place, the next step is to encode the
+      scheduling policy and preemption model such that aRTA becomes
+      applicable. To this end, we encode the semantics of the
+      scheduling policy and preemption model using two functions, by
+      convention called [interference] and [interfering_workload]. The
+      paper explains the idea behind these two functions and how they
+      interact in much more detail. At the code level, we fortunately
+      can simply reuse the existing general definitions of
+      _interference_ and _interfering workload_ that apply to any
+      job-level fixed-priority (JLFP) policy (as provided in the
+      module [analysis.abstract.ideal.iw_instantiation]). *)
+  #[local] Instance ideal_jlfp_interference : Interference Job :=
+    ideal_jlfp_interference arr_seq sched.
 
-  Let interfering_workload (j : Job) (t : instant) :=
-    ideal_jlfp_rta.interfering_workload arr_seq sched j t.
+  #[local] Instance ideal_jlfp_interfering_workload : InterferingWorkload Job :=
+    ideal_jlfp_interfering_workload arr_seq sched.
 
   (** Please refer to the general definitions (by clicking on the links above)
       to see how they correspond to the definitions provided in Listing 3 of the
@@ -169,7 +170,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       lemma immediately allows us to conclude that the schedule is
       work-conserving in the abstract sense with respect to [interference] and
       [interfering_workload]. *)
-  Fact abstractly_work_conserving : work_conserving_ab interference interfering_workload.
+  Fact abstractly_work_conserving : work_conserving_ab.
   Proof. by apply: instantiated_i_and_w_are_coherent_with_schedule; rt_eauto. Qed.
 
   (** The preceding fact [abstractly_work_conserving] corresponds to Lemma 1 in
@@ -195,7 +196,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       length (or, interchangeably, busy-interval length) as understood by
       aRTA. *)
   Let busy_windows_are_bounded_by L :=
-    busy_intervals_are_bounded_by arr_seq sched tsk interference interfering_workload L.
+    busy_intervals_are_bounded_by arr_seq sched tsk L.
 
   (** We observe that the length of any (abstract) busy window in [sched] is
       indeed bounded by [L]. Again, the proof is trivial because we can reuse a
@@ -220,8 +221,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       actually relevant. We therefore define [IBF] as the sum, across all
       tasks, of the per-task request-bound functions (RBFs) in the interval [A +
       ε] minus the WCET of the task under analysis [tsk]. *)
-  Let IBF tsk (A Δ : duration) := (\sum_(tsko <- ts) task_request_bound_function tsko (A + ε))
-                                  - task_cost tsk.
+  Let IBF tsk (A Δ : duration) :=
+        (\sum_(tsko <- ts) task_request_bound_function tsko (A + ε)) - task_cost tsk.
 
   (** As discussed in the paper, our proof obligation now is to show that the
       stated [IBF] is indeed correct. To this end, we first establish two
@@ -252,7 +253,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     (** Assume the busy interval of the job [j] is given by <<[t1,t2)>>. *)
     Variable t1 t2 : duration.
     Hypothesis H_busy_interval :
-      definitions.busy_interval sched interference interfering_workload j t1 t2.
+      definitions.busy_interval sched j t1 t2.
 
     (** Consider any sub-interval <<[t1, t1 + Δ)>> of the busy interval of [j]. *)
     Variable Δ : duration.
@@ -290,7 +291,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     (** Consider the (abstract) busy window of [j] and denote it as  <<[t1, t2)>>. *)
     Variable t1 t2 : instant.
     Hypothesis H_busy_window :
-      definitions.busy_interval sched interference interfering_workload j t1 t2.
+      definitions.busy_interval sched j t1 t2.
 
     (** Consider any arbitrary sub-interval <<[t1, Δ)>> within the busy window
         of [j]. *)
@@ -300,7 +301,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     (** The cumulative interference from higher- and equal-priority jobs during
         <<[t1, Δ)>> is bounded as follows. *)
     Lemma bound_on_hep_workload :
-      \sum_(t1 <= t < t1 + Δ) is_interference_from_another_hep_job sched j t <=
+      cumulative_another_hep_job_interference arr_seq sched j t1 (t1 + Δ) <=
         \sum_(tsko <- ts) task_request_bound_function tsko (job_arrival j - t1 + ε) - task_cost tsk.
     Proof.
       move: H_busy_window => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
@@ -341,22 +342,27 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   (** *** Correctness of [IBF]  *)
 
-  (** Combining the bound on interference due to lower-priority jobs (priority
-      inversion, i.e., [no_priority_inversion]) and the interference due to
-      higher- or equal-priority jobs ([bound_on_hep_workload]), we can prove
-      that [IBF] indeed bounds the total interference. *)
+  (** Combining the bound on interference due to lower-priority jobs
+      (priority inversion, i.e., [no_priority_inversion]) and the
+      interference due to higher- or equal-priority jobs
+      ([bound_on_hep_workload]), we can prove that [IBF] indeed bounds
+      the total interference.
+
+      Notice that, unlike the aRTA framework published at ECRTS'20,
+      generalized aRTA supports custom parameters for [IBF]. Hence, we
+      have to specify that the first argument of [IBF] represents the
+      relative arrival time of a job under analysis by passing a
+      proposition [relative_arrival_time_of_job_is_A]. *) 
   Lemma IBF_correct :
-    job_interference_is_bounded_by arr_seq sched tsk interference interfering_workload  IBF.
+    job_interference_is_bounded_by arr_seq sched tsk IBF (relative_arrival_time_of_job_is_A sched).
   Proof.
-    move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL.
-    rewrite /cumul_interference cumulative_interference_split; rt_eauto.
-    rewrite /IBF /cumulative_priority_inversion.
+    move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL A Pred.
+    rewrite cumulative_interference_split; rt_eauto.
     have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
     move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
-    have CPIB := no_priority_inversion j ARRj _ JPOS t1 t2.
-    rewrite /cumulative_priority_inversion in CPIB;
-      rewrite /ideal_jlfp_rta.cumulative_priority_inversion CPIB //= add0n.
-    by apply: bound_on_hep_workload; rt_eauto.
+    rewrite (no_priority_inversion j ARRj _ JPOS _ t2) //= add0n.
+    have ->: A = job_arrival j - t1 by erewrite Pred with (t1 := t1); [lia | apply BUSY].
+    by rewrite /IBF; eapply bound_on_hep_workload; rt_eauto.
   Qed.
 
   (** The preceding lemma [IBF_correct] corresponds to Lemma 3 in the paper. To
@@ -505,7 +511,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     move => js ARRs TSKs.
     rewrite /job_response_time_bound /completed_by.
     case: (posnP (@job_cost _ _ js)) => [ -> |POS]; first by done.
-    eapply uniprocessor_response_time_bound; rt_eauto.
+    eapply uniprocessor_response_time_bound_ideal; rt_eauto.
     - exact: abstractly_work_conserving.
     - exact: busy_windows_are_bounded.
     - exact: IBF_correct.
