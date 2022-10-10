@@ -1,7 +1,5 @@
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.job_properties.
-Require Export prosa.analysis.definitions.priority_inversion.
-Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.analysis.facts.model.service_of_jobs.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 
@@ -57,7 +55,7 @@ Section ExistsBusyIntervalJLFP.
   Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
   Hypothesis H_job_task : job_of_task tsk j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
-  
+    
   (** Recall the list of jobs that arrive in any interval. *)
   Let quiet_time t1 := quiet_time arr_seq sched j t1.
   Let quiet_time_dec t1 := quiet_time_dec arr_seq sched j t1.
@@ -65,8 +63,8 @@ Section ExistsBusyIntervalJLFP.
   Let busy_interval t1 t2 := busy_interval arr_seq sched j t1 t2.
   Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by_constant arr_seq sched j K.
   
-  (** We begin by proving a basic lemma about busy intervals. *)
-  Section BasicLemma.
+  (** We begin by proving a few basic lemmas about busy intervals. *)
+  Section BasicLemmas.
 
     (** Assume that the priority relation is reflexive. *)
     Hypothesis H_priority_is_reflexive : reflexive_priorities.
@@ -85,7 +83,7 @@ Section ExistsBusyIntervalJLFP.
       apply (REFL 0).
     Qed.
 
-  End BasicLemma.
+  End BasicLemmas.
   
   (** In this section, we prove that during a busy interval there
       always exists a pending job. *)
@@ -616,30 +614,30 @@ Section ExistsBusyIntervalJLFP.
         infer the existence of a busy interval. *) 
     Section BusyIntervalFromWorkloadBound.
 
-      (** Let priority_inversion_bound be a constant that bounds the length of a priority inversion. *)
-      Variable priority_inversion_bound: duration.
-      Hypothesis H_priority_inversion_is_bounded:
+      (** Let [priority_inversion_bound] be a constant that bounds the
+          length of a priority inversion. *)
+      Variable priority_inversion_bound : duration.
+      Hypothesis H_priority_inversion_is_bounded :
         is_priority_inversion_bounded_by priority_inversion_bound.
 
       (** Assume that for some positive delta, the sum of requested workload at
           time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
-      Variable delta: duration.
-      Hypothesis H_delta_positive: delta > 0.
-      Hypothesis H_workload_is_bounded:
+      Variable delta : duration.
+      Hypothesis H_delta_positive : delta > 0.
+      Hypothesis H_workload_is_bounded :
         forall t, priority_inversion_bound + hp_workload t (t + delta) <= delta.
 
-      (** Next, we assume that job [j] has positive cost, from which we
-          can infer that there is a time in which [j] is pending. *)
-      Hypothesis H_positive_cost: job_cost j > 0.
-
-      (** Therefore there must exists a busy interval <<[t1, t2)>> that
-          contains the arrival time of [j]. *)
+      (** Next, we assume that job j has positive cost, from which we
+          can infer that there is a time in which j is pending. *)
+      Hypothesis H_positive_cost : job_cost j > 0.
+      
+      (** Therefore there must exists a busy interval [t1, t2) that contains the arrival time of j. *)
       Corollary exists_busy_interval:
-        exists t1 t2, 
+        exists t1 t2,
           t1 <= job_arrival j < t2 /\
           t2 <= t1 + delta /\
           busy_interval t1 t2.
-      Proof. 
+      Proof.
         have PREFIX := exists_busy_interval_prefix.
         move: (H_workload_is_bounded) => WORK.
         feed (PREFIX (job_arrival j)).
@@ -699,7 +697,7 @@ Section ExistsBusyIntervalJLFP.
       Qed.
 
     End ResponseTimeBoundFromBusyInterval.
-
+    
   End BoundingBusyInterval.
   
 End ExistsBusyIntervalJLFP.

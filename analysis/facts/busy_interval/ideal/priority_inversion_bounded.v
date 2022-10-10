@@ -1,9 +1,9 @@
 Require Export prosa.model.task.preemption.parameters.
-Require Export prosa.analysis.facts.busy_interval.ideal.hep_job_scheduled.
 Require Export prosa.analysis.facts.model.preemption.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
+Require Export prosa.analysis.facts.busy_interval.ideal.hep_job_scheduled.
 
 (** * Priority inversion is bounded *)
 (** In this file, we prove that any priority inversion that occurs in
@@ -59,13 +59,13 @@ Section PriorityInversionIsBounded.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... and the schedule respects the scheduling policy at every preemption point. *)
-  Hypothesis H_respects_policy:
+  Hypothesis H_respects_policy :
     respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** Finally, we introduce the notion of the maximal length of
-       (potential) priority inversion at a time instant [t], which is
-       defined as the maximum length of nonpreemptive segments among
-       all jobs that arrived so far. *)
+      (potential) priority inversion at a time instant [t], which is
+      defined as the maximum length of nonpreemptive segments among
+      all jobs that arrived so far. *)
   Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
     \max_(j_lp <- arrivals_before arr_seq t | (~~ hep_job j_lp j) && (job_cost j_lp > 0))
      (job_max_nonpreemptive_segment j_lp - ε).
@@ -155,7 +155,7 @@ Section PriorityInversionIsBounded.
         distance to a preemption time from the beginning of the busy
         interval. *)
     Variable K : duration.
-    Hypothesis H_preemption_time_exists:
+    Hypothesis H_preemption_time_exists :
       exists pr_t, preemption_time sched pr_t /\ t1 <= pr_t <= t1 + K.
 
     (** Then we prove that the processor is always busy with a job
@@ -378,26 +378,26 @@ Section PriorityInversionIsBounded.
               t1 <= t' < t1 + fpt ->
               scheduled_at sched jlp t'.
           Proof.
-             move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
-             move: (H_jlp_is_scheduled) => ARRs; apply H_jobs_come_from_arrival_sequence in ARRs.
+            move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
+            move: (H_jlp_is_scheduled) => ARRs; apply H_jobs_come_from_arrival_sequence in ARRs.
             move => t' /andP [GE LT].
-              have Fact: exists Δ, t' = t1 + Δ.
-              { by exists (t' - t1); apply/eqP; rewrite eq_sym; apply/eqP; rewrite subnKC. }
-              move: Fact => [Δ EQ]; subst t'.
-              have NPPJ := @no_intermediate_preemption_point (@service _ _ sched jlp (t1 + Δ)).
-              apply proj1 in CORR; specialize (CORR jlp ARRs).
-              move: CORR => [_ [_ [T _] ]].
-              apply T; apply: NPPJ; apply/andP; split.
-              { by apply service_monotonic; rewrite leq_addr. }
-              rewrite /service  -(service_during_cat _ _ _ t1).
-              { rewrite ltn_add2l; rewrite ltn_add2l in LT.
-                apply leq_ltn_trans with Δ; last by done.
-                rewrite -{2}(sum_of_ones t1 Δ).
-                rewrite leq_sum //; intros t _.
-                apply service_at_most_one.
-                  by apply ideal_proc_model_provides_unit_service.
-              }
-              { by apply/andP; split; [done | rewrite leq_addr]. }
+            have Fact: exists Δ, t' = t1 + Δ.
+            { by exists (t' - t1); apply/eqP; rewrite eq_sym; apply/eqP; rewrite subnKC. }
+            move: Fact => [Δ EQ]; subst t'.
+            have NPPJ := @no_intermediate_preemption_point (@service _ _ sched jlp (t1 + Δ)).
+            apply proj1 in CORR; specialize (CORR jlp ARRs).
+            move: CORR => [_ [_ [T _] ]].
+            apply T; apply: NPPJ; apply/andP; split.
+            { by apply service_monotonic; rewrite leq_addr. }
+            rewrite /service  -(service_during_cat _ _ _ t1).
+            { rewrite ltn_add2l; rewrite ltn_add2l in LT.
+              apply leq_ltn_trans with Δ; last by done.
+              rewrite -{2}(sum_of_ones t1 Δ).
+              rewrite leq_sum //; intros t _.
+              apply service_at_most_one.
+              by apply ideal_proc_model_provides_unit_service.
+            }
+            { by apply/andP; split; [done | rewrite leq_addr]. }
           Qed.
 
           (** Thus, job [jlp] reaches its preemption point at time instant [t1 + fpt],

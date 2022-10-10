@@ -1,4 +1,3 @@
-Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
@@ -103,24 +102,24 @@ Section PIIdealProcessorModelLemmas.
 
   (** Assume that [j'] has lower priority than job [j], then
       we prove that [j] incurs priority inversion. *)
-    Lemma sched_lp_implies_priority_inversion :
-      ~~ hep_job j' j ->
-      priority_inversion_dec arr_seq sched j t.
-    Proof.
-      intros LP.
-      apply/andP; split.
-      - apply/negP; intros SCHED.
-        have HF := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched SCHED; subst j'.
-        move: (LP) => /negP HH; apply: HH.
-        specialize (H_priority_is_reflexive 0).
-        unfold hep_job_at, JLFP_to_JLDP in *.
-        by erewrite H_priority_is_reflexive; eauto 2.
-      - apply/hasP.
-        exists j'.
-        + apply arrived_between_implies_in_arrivals; eauto 2.
-          apply/andP; split; try done.
-          by rewrite ltnS; apply H_jobs_must_arrive_to_execute.
-        + by apply/andP; split.
-    Qed.
+  Lemma sched_lp_implies_priority_inversion :
+    ~~ hep_job j' j ->
+    priority_inversion_dec arr_seq sched j t.
+  Proof.
+    intros LP.
+    apply/andP; split.
+    - apply/negP; intros SCHED.
+      have HF := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched SCHED; subst j'.
+      move: (LP) => /negP HH; apply: HH.
+      specialize (H_priority_is_reflexive 0).
+      unfold hep_job_at, JLFP_to_JLDP in *.
+      by erewrite H_priority_is_reflexive; eauto 2.
+    - apply/hasP.
+      exists j'.
+      + apply arrived_between_implies_in_arrivals; eauto 2.
+        apply/andP; split; try done.
+        by rewrite ltnS; apply H_jobs_must_arrive_to_execute.
+      + by apply/andP; split.
+  Qed.
 
 End PIIdealProcessorModelLemmas.
