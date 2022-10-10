@@ -1,13 +1,11 @@
 Require Import prosa.model.readiness.basic.
 Require Export prosa.model.task.sequentiality.
-Require Export prosa.model.schedule.nonpreemptive.
 Require Export prosa.model.priority.fifo.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
-Require Export prosa.analysis.abstract.ideal_jlfp_rta.
 
 (** In this section, we prove some fundamental properties of the FIFO policy. *)
 Section BasicLemmas.
