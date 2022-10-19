@@ -177,13 +177,13 @@ Section DerivedPriorityRleations.
   (** First, we introduce a relation that defines whether job [j1] has
       a higher-than-or-equal-priority than job [j2] and [j1] is not
       equal to [j2]. *)
-  Definition another_hep_job : JLFP_policy Job :=
+  Definition another_hep_job :=
     fun j1 j2 => hep_job j1 j2 && (j1 != j2).
 
   (** Next, we introduce a relation that defines whether a job [j1]
       has a higher-or-equal-priority than job [j2] and the task of
       [j1] is not equal to task of [j2]. *)
-  Definition another_task_hep_job : JLFP_policy Job :=
+  Definition another_task_hep_job :=
     fun j1 j2 => hep_job j1 j2 && (job_task j1 != job_task j2).
 
 End DerivedPriorityRleations.
