@@ -63,13 +63,13 @@ Section PriorityInversion.
     Lemma priority_inversion_P :
       forall t, reflect (priority_inversion t) (priority_inversion_dec t).
     Proof.
-      intros t; apply /introP.
+      move => t; apply /introP.
       - move=> /andP [SCHED /hasP [jlp ARR PRIO]].
         by split => //; (exists jlp).
       - rewrite negb_and /priority_inversion; move=> /orP NPRIO.
         destruct NPRIO as [NSCHED | NHAS].
         + rewrite Bool.negb_involutive in NSCHED.
-          by rewrite NSCHED; intros [F _].
+          by rewrite NSCHED; move => [F _].
         + move => [NSCHED [jlp /andP[SCHED_jlp NHEP]]].
           move: NHAS => /hasPn NJOBS.
           specialize (NJOBS jlp).
@@ -86,7 +86,7 @@ Section PriorityInversion.
     Corollary priority_inversion_negP :
       forall t, reflect (~ priority_inversion t) (~~ priority_inversion_dec t).
     Proof.
-      intros t; apply /introP.
+      move=> t; apply /introP.
       - by move => /priority_inversion_P DEC.
       - by move=> /negPn /priority_inversion_P; auto.
     Qed.
