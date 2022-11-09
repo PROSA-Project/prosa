@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-ALE="alectryon"
+ALE="python3 ./scripts/alectryon_custom_driver.py"
 OUT="./html-alectryon"
 
 mkdir -p "$OUT"
