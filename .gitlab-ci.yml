@@ -77,7 +77,7 @@ compile-and-doc:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic
+    - ./create_makefile.sh
     - make -j ${NJOBS}
     - !reference [.make-html, script]
   artifacts:
@@ -95,45 +95,13 @@ compile-and-doc-and-validate:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic
+    - ./create_makefile.sh
     - make -j ${NJOBS}
     - !reference [.make-html, script]
-    - make validate 2>&1 | tee validation-results.txt
-    - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
-  artifacts:
-    name: "prosa-spec-$CI_COMMIT_REF_NAME"
-    paths:
-      - "with-proofs/"
-      - "without-proofs/"
-      - "pretty/"
-    expire_in: 1 week
-
-# Check that proof irrelevance shows up only due to refinements.
-compile-and-validate:
-  stage: build
-  extends:
-    - .not_in_wip_branches
-    - .preferred-stable-version
-  script:
-    - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic --without-refinements
-    - make -j ${NJOBS}    
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh validation-results.txt
-
-classic-compile-and-doc-and-validate:
-  stage: build
-  extends:
-    - .preferred-stable-version
-    - .not_in_wip_branches
-  script:
-    - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --only-classic
-    - make -j ${NJOBS}
-    - !reference [.make-html, script]
-    - make validate
   artifacts:
-    name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
+    name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
       - "with-proofs/"
       - "without-proofs/"
@@ -146,42 +114,3 @@ proof-length:
   script:
     - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
 
-spell-check:
-  extends:  
-    - .not_in_wip_branches  
-  stage: build
-  image: bbbrandenburg/aspell-ci
-  script:
-    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
-
-# mathcomp-dev with stable Coq
-#coq-8.15:
-#  extends:
-#    - .build-dev
-#    - .not_in_wip_branches    
-#  # it's ok to fail with an unreleased version of ssreflect
-#  allow_failure: true
-
-# mathcomp-dev with coq-dev
-#coq-dev:
-#  extends:
-#    - .build-dev
-#    - .not_in_wip_branches    
-#  # it's ok to fail with an unreleased version of ssreflect and Coq
-#  allow_failure: true
-
-proof-state:
-  extends:
-   - .not_in_wip_branches  
-  stage: build
-  image: bbbrandenburg/alectryon-ci:1.14.0-coq-8.15.0
-  script:
-    - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
-    - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic
-    - make -j ${NJOBS} alectryon
-  artifacts:
-    name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
-    paths:
-      - "html-alectryon/"
-    expire_in: 1 week
