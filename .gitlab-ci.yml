@@ -77,7 +77,7 @@ compile-and-doc:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic
+    - ./create_makefile.sh
     - make -j ${NJOBS}
     - !reference [.make-html, script]
   artifacts:
@@ -95,7 +95,7 @@ compile-and-doc-and-validate:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic
+    - ./create_makefile.sh
     - make -j ${NJOBS}
     - !reference [.make-html, script]
     - make validate 2>&1 | tee validation-results.txt
@@ -116,29 +116,10 @@ compile-and-validate:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic --without-refinements
+    - ./create_makefile.sh --without-refinements
     - make -j ${NJOBS}    
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh validation-results.txt
-
-classic-compile-and-doc-and-validate:
-  stage: build
-  extends:
-    - .preferred-stable-version
-    - .not_in_wip_branches
-  script:
-    - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --only-classic
-    - make -j ${NJOBS}
-    - !reference [.make-html, script]
-    - make validate
-  artifacts:
-    name: "prosa-classic-spec-$CI_COMMIT_REF_NAME"
-    paths:
-      - "with-proofs/"
-      - "without-proofs/"
-      - "pretty/"
-    expire_in: 1 week
 
 proof-length:
   stage: build
@@ -152,7 +133,7 @@ spell-check:
   stage: build
   image: bbbrandenburg/aspell-ci
   script:
-    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
+    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v'`
 
 # mathcomp-dev with stable Coq
 #coq-8.15:
@@ -178,7 +159,7 @@ proof-state:
   script:
     - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-classic
+    - ./create_makefile.sh
     - make -j ${NJOBS} alectryon
   artifacts:
     name: "prosa-proof-state-$CI_COMMIT_REF_NAME"

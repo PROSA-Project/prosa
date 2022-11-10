@@ -56,7 +56,7 @@
 +	$(HIDE)find . -depth -iname '.DS_Store' ! -path './.git/*' -delete
 +
 +spell::
-+	./scripts/flag-typos-in-comments.sh `find .  -iname '*.v' ! -path './classic/*'`
++	./scripts/flag-typos-in-comments.sh `find .  -iname '*.v'`
  
  # Compilation rules ###########################################################
  

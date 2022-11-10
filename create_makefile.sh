@@ -6,16 +6,9 @@ FIND_OPTS=( . -name '*.v' ! -name '*#*' ! -path './.git/*' ! -path './with-proof
 while ! [ -z "$1" ]
 do
     case "$1" in
-        --without-classic)
-            FIND_OPTS+=( ! -path './classic/*' )
-            ;;
         --without-refinements)
             FIND_OPTS+=( ! -path './implementation/refinements/*' )
             ;;            
-        --only-classic)
-            FIND_OPTS+=( ! -path './analysis/*' ! -path './behavior/*' ! -path './model/*' \
-                         ! -path './implementation/*' ! -path './results/*')
-            ;;
         *)
             echo "Unrecognized option: $1"
             exit 1

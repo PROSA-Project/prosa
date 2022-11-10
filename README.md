@@ -1,8 +1,12 @@
 # Prosa: Formally Proven Schedulability Analysis
 
-This repository contains the main Coq specification & proof development of the [Prosa open-source project](https://prosa.mpi-sws.org), which was launched in 2016. As of 2018, Prosa is primarily being developed in the context of the [RT-Proofs research project](https://rt-proofs.inria.fr/) (kindly funded jointly by ANR and DFG, projects ANR-17-CE25-0016 and DFG-391919384, respectively).
+This repository contains the main Coq specification & proof development of the [Prosa open-source project](https://prosa.mpi-sws.org), which was launched in 2016. 
+
+From 2018–201, Prosa was furter developed in the context of the [RT-Proofs research project](https://rt-proofs.inria.fr/) (funded jointly by ANR and DFG, projects ANR-17-CE25-0016 and DFG-391919384, respectively). 
 
 <center><img alt="RT-Proofs logo" src="http://prosa.mpi-sws.org/figures/rt-proofs-logo.png" width="300px"></center>
+
+Prosa continues to be maintained and developed by the MPI-SWS Real-Time Systems group and contributors. Patches and merge requests are very welcome! 
 
 ## Documentation
 
@@ -14,23 +18,26 @@ Up-to-date documentation for all branches of the main Prosa repository is availa
 
 Please see the [list of publications](https://prosa.mpi-sws.org/publications.html) on the Prosa project's homepage. 
 
+### Classic Prosa
+
+All results published prior to 2020 used the "classic" version of Prosa as first presented at ECRTS'16. Classic Prosa has been superseded by this development and is no longer being maintained. Refer to [the `classic-prosa` branch](https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/classic-prosa) to find this original version of Prosa. 
+
+
 ## Directory and Module Structure
 
-The directory and module structure is organized as follows. First, the main parts, of which there are currently four.
+The directory and module structure is organized as follows. First, the main parts, of which there are currently six.
 
-- [behavior/](behavior/): The `behavior` namespace collects basic definitions and properties of system behavior (i.e., it defines Prosa's **trace-based semantics**). There are *no* proofs here. This module is mandatory: *all* results in Prosa rely on the basic trace-based semantics defined in this module. 
-- [model/](model/): The `model` namespace collects all definitions and basic properties of various **system models** (e.g., sporadic tasks, arrival curves, various scheduling policies, etc.). There are only few proofs here. This module contains multiple, mutually exclusive alternatives (e.g., periodic vs. sporadic tasks, uni- vs. multiprocessor models, constrained vs. arbitrary deadlines, etc.), and higher-level results are expected "pick and choose" whatever definitions and assumptions are appropriate.
-- [analysis/](analysis/): The `analysis` namespace collects all definitions and proof libraries needed to establish **system properties** (e.g., schedulability, response time, etc.). This includes a substantial library of *basic facts* that follow directly from the trace-based semantics or specific modelling assumptions. Virtually all intermediate steps and low-level proofs will be found here.
-- [results/](results/): The `results` namespace contains all **high-level analysis results**. 
+- [behavior](behavior/): The `behavior` namespace collects basic definitions and properties of system behavior (i.e., it defines Prosa's **trace-based semantics**). There are *no* proofs here. This module is mandatory: *all* results in Prosa rely on the basic trace-based semantics defined in this module. 
+- [model](model/): The `model` namespace collects all definitions and basic properties of various **system models** (e.g., sporadic tasks, arrival curves, various scheduling policies, etc.). There are only few proofs here. This module contains multiple, mutually exclusive alternatives (e.g., periodic vs. sporadic tasks, uni- vs. multiprocessor models, constrained vs. arbitrary deadlines, etc.), and higher-level results are expected "pick and choose" whatever definitions and assumptions are appropriate. These models are *axiomatic* in the sense that they are collections of hypotheses and not necessarily backed by concrete implementations (but see below).
+- [analysis](analysis/): The `analysis` namespace collects all definitions and proof libraries needed to establish **system properties** (e.g., schedulability, response time, etc.). This includes a substantial library of *basic facts* that follow directly from the trace-based semantics or specific modelling assumptions. Virtually all intermediate steps and low-level proofs will be found here.
+- [results](results/): The `results` namespace contains all **high-level analysis results**. 
+- [implementation](implementation/): This module collects concrete implementations of some of the axiomatic models and scheduling policies to which the results apply. These are used to instantiate  (i.e., apply) high-level results in an assumption-free environment for concrete job and task types, which establishes the absence of contradictions in the axiomatic models refined by the implementations.
+- [implementation.refinements](implementation/refinements/): The refinements needed by [POET](https://drops.dagstuhl.de/opus/volltexte/2022/16336/) to compute with large numbers, based on [CoqEAL](https://github.com/coq-community/CoqEAL).
 
-
-In future work, there will also (again) be an `implementation` or `examples` namespace in which important high-level results are instantiated (i.e., applied) in an assumption-free environment for concrete job and task types to establish the absence of any contradiction in assumptions.
 
 Furthermore, there are a couple of additional folders and namespaces.
 
-- [classic/](classic/): This module contains the "classic" version of Prosa as first presented at ECRTS'16.  
-All results published prior to 2020 build on this "classic" version of Prosa.
-- [util/](util/): A collection of miscellaneous "helper" lemmas and tactics. Used throughout the rest of Prosa.
+- [util](util/): A collection of miscellaneous "helper" lemmas and tactics. Used throughout the rest of Prosa.
 - [scripts/](scripts/): Scripts and supporting resources required for continuous integration and documentation generation.
 
 ## Installation
@@ -111,16 +118,10 @@ First, create an appropriate `Makefile`.
 ./create_makefile.sh
 ```
 
-Alternatively, to avoid compiling the older "classic" Prosa, specify the `--without-classic` option. This can speed up compilation considerably and is a good idea during development.  (It's also possible to *only* compile the "classic" Prosa by specifying the `--only-classic` option, but this is rarely needed.)
+To avoid compiling the POET-related refinements (which require CoqEAL to be installed and inject a dependency on the *proof irrelevance* axiom), specify the switch `--without-refinements`. For example:
 
 ```bash
-./create_makefile.sh --without-classic
-```
-
-To avoid compiling the POET-related refinements (which require CoqEAL to be installed and inject a dependency on the *proof irrelevance* axiom), specify the switch `--without-refinements`. For example, to skip both "classic" Prosa and the refinements library, use the following command:
-
-```bash
-./create_makefile.sh --without-classic --without-refinements
+./create_makefile.sh --without-refinements
 ```
 
 Second, compile the library.

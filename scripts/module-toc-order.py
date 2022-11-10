@@ -20,7 +20,6 @@ MODULE_ORDER = [
     'model',
     'results',
     'analysis',
-    'classic',
     'util',
 ]
 
