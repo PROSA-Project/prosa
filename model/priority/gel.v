@@ -1,7 +1,7 @@
 Require Export prosa.model.priority.classes.
 Require Export BinInt.
 
-From mathcomp Require Import ssrZ.
+From mathcomp.zify Require Import ssrZ.
 
 (** * GEL Priority Policy  *)
 
