@@ -8,14 +8,13 @@ bug-reports: "https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/issues"
 license: "BSD-2-Clause"
 
 build: [
-  ["./create_makefile.sh" "--without-refinements"]
+  ["./create_makefile.sh" "--only-refinements"]
   [make "-j%{jobs}%"]
 ]
 install: [make "install"]
 depends: [
-  "coq" {((>= "8.13" & < "8.17~") | = "dev")}
-  "coq-mathcomp-ssreflect" {((>= "1.12" & < "1.16~") | = "dev")}
-  "coq-mathcomp-zify" {>= "1.2.0"}
+  "coq-prosa" { = version }
+  "coq-coqeal" {>= "1.1.0"}
 ]
 
 tags: [

@@ -27,6 +27,8 @@ stages:
     - opam remove -y coq-mathcomp-character
     - opam pin add -n -y -k path coq-prosa .
     - opam install -y -v -j ${NJOBS} coq-prosa
+    - opam pin add -n -y -k path coq-prosa-refinements .
+    - opam install -y -v -j ${NJOBS} coq-prosa-refinements
 
 .preferred-stable-version:
     image: mathcomp/mathcomp:1.15.0-coq-8.16
