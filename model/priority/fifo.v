@@ -19,15 +19,15 @@ Section Properties.
 
   (** FIFO is reflexive. *)
   Lemma FIFO_is_reflexive : reflexive_priorities.
-  Proof.  by intros t j; unfold hep_job_at, JLFP_to_JLDP, hep_job, FIFO. Qed.
+  Proof. by move=> t j; apply: leqnn. Qed.
 
   (** FIFO is transitive. *)
   Lemma FIFO_is_transitive : transitive_priorities.
-  Proof. by intros t y x z; apply leq_trans. Qed.
+  Proof. by move=> t y x z; apply: leq_trans. Qed.
 
   (** FIFO is total. *)
   Lemma FIFO_is_total : total_priorities.
-  Proof. by move=> t j1 j2; apply leq_total. Qed.
+  Proof. by move=> t j1 j2; apply: leq_total. Qed.
 
 End Properties.
 

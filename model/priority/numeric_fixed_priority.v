@@ -52,7 +52,7 @@ Section PropertiesNFPA.
 
   (** The resulting priority policy is total. *)
   Lemma NFPA_is_total : total_priorities.
-  Proof. by move=> t j1 j2; apply leq_total. Qed.
+  Proof. by move=> t j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPA.
 
@@ -90,7 +90,7 @@ Section PropertiesNFPD.
 
   (** The resulting priority policy is total. *)
   Lemma NFPD_is_total : total_priorities.
-  Proof. by move=> t j1 j2; apply leq_total. Qed.
+  Proof. by move=> t j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPD.
 

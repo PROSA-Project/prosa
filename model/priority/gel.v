@@ -59,15 +59,15 @@ Section PropertiesOfGEL.
 
   (** GEL is reflexive. *)
   Fact GEL_is_reflexive : reflexive_priorities.
-  Proof. by move=> t j; apply Z.leb_refl. Qed.
+  Proof. by move=> t j; apply: Z.leb_refl. Qed.
 
   (** GEL is transitive. *)
   Fact GEL_is_transitive : transitive_priorities.
-  Proof. by move=> t y x z; apply Zbool.Zle_bool_trans. Qed.
+  Proof. by move=> t y x z; apply: Zbool.Zle_bool_trans. Qed.
 
   (** GEL is total. *)
   Fact GEL_is_total : total_priorities.
-  Proof. by move=> t j1 j2; apply ZInstances.leZ_total. Qed.
+  Proof. by move=> t j1 j2; apply: ZInstances.leZ_total. Qed.
 
 End PropertiesOfGEL.
 
