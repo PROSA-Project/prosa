@@ -1,5 +1,5 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop ssrZ.
-
+From mathcomp Require Import eqtype ssrnat seq path fintype bigop.
+Require Import prosa.util.int.
 Require Import prosa.model.readiness.basic.
 Require Import prosa.analysis.abstract.ideal.iw_instantiation.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
@@ -119,7 +119,7 @@ Section AbstractRTAforGELwithArrivalCurves.
 
   (** Consider the following parametrized interval. *)
   Let interval (tsk_o : Task) (A : instant):=
-    (Z.of_nat(A + ε) + task_priority_point tsk - task_priority_point tsk_o)%Z.
+    ((A + ε)%:R + task_priority_point tsk - task_priority_point tsk_o)%R.
 
 
   (** We define the bound on the total higher-or-equal-priority (HEP) workload
@@ -127,8 +127,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       the task set [ts] (excluding [tsk]) over the minimum of [Δ] and [interval]. *)
   Let bound_on_total_hep_workload (A Δ : duration) :=
         \sum_(tsk_o <- ts | tsk_o != tsk)
-          task_request_bound_function tsk_o (minn (Z.to_nat (interval tsk_o A)) Δ).
-
+          task_request_bound_function tsk_o (minn `|Num.max 0%R (interval tsk_o A)| Δ).
   (** Finally, [IBF_other] for an interval [R] is defined as the sum of
       [bound_on_total_hep_workload] in [R] and [priority_inversion_bound]. *)
   Let IBF_other (A R : duration) := priority_inversion_bound A + bound_on_total_hep_workload A R.
@@ -176,7 +175,7 @@ Section AbstractRTAforGELwithArrivalCurves.
         Hypothesis H_neq: tsk_o != tsk.
 
         (** If [Δ] is greater than [interval] for [tsk_o] and [A], ... *)
-        Hypothesis H_Δ_ge: Z.to_nat (interval tsk_o A) <= Δ.
+        Hypothesis H_Δ_ge: (interval tsk_o A <= Δ%:R)%R.
 
         (** ... then the workload of jobs satisfying the predicate [GEL_from]
             in the interval <<[t1,t1 + Δ)>> is equal to the workload in
@@ -188,9 +187,9 @@ Section AbstractRTAforGELwithArrivalCurves.
             (arrivals_between arr_seq t1 (t1 + Δ))
           <= workload_of_jobs (GEL_from tsk_o)
               (arrivals_between arr_seq t1
-                 (Z.to_nat (Z.of_nat t1 + interval tsk_o A))).
+                 `|Num.max 0%R (t1%:R + interval tsk_o A)%R|).
         Proof.
-          have BOUNDED: Z.to_nat (Z.of_nat t1 + (interval tsk_o A)) <= t1 + Δ by lia.
+          have BOUNDED: `|Num.max 0%R (t1%:R + interval tsk_o A)%R| <= t1 + Δ by lia.
           rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'; rt_eauto.
           rewrite /GEL_from.
           case: (eqVneq (job_task j') tsk_o) => TSK';
@@ -200,8 +199,8 @@ Section AbstractRTAforGELwithArrivalCurves.
           move: (hep_job_arrives_before _ j' HEP) => EARLIEST.
           move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
           move: ARR'; rewrite /interval /ε => LATEST.
-          have LATEST': (Z.of_nat (t1 + A + 1) + task_priority_point tsk -
-                           task_priority_point tsk_o <= Z.of_nat (job_arrival j') )%Z
+          have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk -
+                           task_priority_point tsk_o <= (job_arrival j')%:R)%R
                           by lia.
           by move: LATEST'; rewrite -TSK -TSK' => LATEST'; lia.
         Qed.
@@ -216,20 +215,15 @@ Section AbstractRTAforGELwithArrivalCurves.
       Proof.
         move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
         apply leq_sum_seq => tsko INtsko NEQT.
-        case ( Δ <= Z.to_nat (interval tsko A)) eqn: EQ.
-        - rewrite /minn //= ifF; try by lia.
-          by apply (workload_le_rbf arr_seq ts); try by done.
-        - rewrite /minn ifT; try by lia.
-          eapply leq_trans; first by eapply total_workload_shorten_range; eauto 2; lia.
-          rewrite /GEL_from.
-          case (interval tsko A >=? 0)%Z eqn: EQ1.
-          + have -> : (Z.to_nat (Z.of_nat t1 + interval tsko A)) = t1 + Z.to_nat (interval tsko A) by lia.
-            by eapply workload_le_rbf; rt_eauto.
-          + rewrite arrivals_between_geq /workload_of_jobs.
-            rewrite big_nil.
-            have -> : Z.to_nat (interval tsko A) = 0 by lia.
-            rewrite task_rbf_0_zero; rt_eauto.
-            by lia.
+        have [EQ|EQ] := leqP Δ `|Num.max 0%R (interval tsko A)|.
+        { exact: (workload_le_rbf arr_seq ts). }
+        apply: (leq_trans (total_workload_shorten_range _ _ _ _)) => //; [lia|].
+        rewrite /GEL_from.
+        have [EQ1|EQ1] := lerP 0%R (interval tsko A).
+        - have -> : `|Num.max 0%R (t1%:R + interval tsko A)%R|
+            = t1 + `|interval tsko A| by lia.
+          by apply: workload_le_rbf; rt_eauto.
+        - rewrite arrivals_between_geq /workload_of_jobs ?big_nil//; lia.
       Qed.
 
     End HepWorkloadBound.
@@ -325,22 +319,19 @@ Section AbstractRTAforGELwithArrivalCurves.
         apply: (@leq_trans (job_cost j)) => //.
         move: (H_job_of_tsk) => /eqP <-.
         by apply: (H_valid_job_cost _ H_j_arrives). }
-      { apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
-        exfalso; apply INSP2.
-        rewrite /total_interference_bound subnK // RBF.
-        apply /eqP; rewrite eqn_add2l /IBF_other PI eqn_add2l.
-        rewrite /bound_on_total_hep_workload.
-        apply /eqP; rewrite big_seq_cond [RHS]big_seq_cond.
-        apply eq_big => // tsk_i /andP [TS OTHER].
-        move: WL; rewrite /bound_on_total_hep_workload_changes_at => /hasPn WL.
-        move: {WL} (WL tsk_i TS) =>  /nandP [/negPn/eqP EQ|/negPn/eqP WL];
-                                    first by move: OTHER; rewrite EQ => /neqP.
-        case: (ltngtP (Z.to_nat (interval tsk_i A)) x) => [ltn_x|gtn_x|eq_x];
-                                                         rewrite /minn;
-                                                         first by rewrite ifT // WL.
-        - rewrite ifF // WL.
-          by lia.
-        - by case: (Z.to_nat (interval tsk_i (A - ε)) < x)%nat; [rewrite WL| rewrite eq_x]. }
+      apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
+      exfalso; apply INSP2.
+      rewrite /total_interference_bound subnK // RBF.
+      apply /eqP; rewrite eqn_add2l /IBF_other PI eqn_add2l.
+      rewrite /bound_on_total_hep_workload.
+      apply /eqP; rewrite big_seq_cond [RHS]big_seq_cond.
+      apply eq_big => // tsk_i /andP [TS OTHER].
+      move: WL; rewrite /bound_on_total_hep_workload_changes_at => /hasPn WL.
+      move: {WL} (WL tsk_i TS) =>  /nandP [/negPn/eqP EQ|/negPn/eqP WL].
+      { by move: OTHER; rewrite EQ => /neqP. }
+      have [leq_x|gtn_x] := leqP `|Num.max 0%R (interval tsk_i A)| x.
+      - by rewrite WL (minn_idPl leq_x).
+      - by rewrite WL (minn_idPr (ltnW gtn_x)).
     Qed.
 
   End ConcreteSearchSpace.

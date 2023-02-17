@@ -1,3 +1,4 @@
+Require Import prosa.util.int.
 Require Import prosa.model.priority.gel.
 Require Import prosa.model.processor.ideal.
 Require Import prosa.model.schedule.priority_driven.
@@ -22,9 +23,9 @@ Section GELBasicFacts.
 
     (** The arrival time of [j'] is bounded as follows. *)
     Lemma hep_job_arrives_before :
-      (Z.of_nat (job_arrival j') <=
-         Z.of_nat (job_arrival j) +
-           task_priority_point (job_task j) - task_priority_point (job_task j'))%Z.
+      ((job_arrival j')%:R <=
+         (job_arrival j)%:R +
+           task_priority_point (job_task j) - task_priority_point (job_task j'))%R.
     Proof.
       by move : H_j'_hep; rewrite /hep_job /GEL /job_priority_point; lia.
     Qed.
@@ -36,12 +37,9 @@ Section GELBasicFacts.
         the function [Z.of_nat] is used to convert natural numbers
         to integers. *)
     Corollary hep_job_arrives_after_zero :
-      (0 <= Z.of_nat (job_arrival j) +
-             task_priority_point (job_task j) - task_priority_point (job_task j'))%Z.
-    Proof.
-      apply: (@Z.le_trans _ (Z.of_nat (job_arrival j'))); first by lia.
-      by apply: hep_job_arrives_before.
-    Qed.
+      (0 <= (job_arrival j)%:R +
+             task_priority_point (job_task j) - task_priority_point (job_task j'))%R.
+    Proof. exact: le_trans hep_job_arrives_before. Qed.
 
   End HEPJobArrival.
 
