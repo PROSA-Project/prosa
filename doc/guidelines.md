@@ -75,6 +75,23 @@ Lemma foo_lower_bound : foo + 1 >= 4.
 - We tend to not use a lot of custom syntax/notation. Heavy use of custom syntax reduces readability because readers are forced to remember all local syntax definitions.
 - We rely heavily on ssreflect notation.
 
+### Implicit Arguments
+
+Implicit arguments are a convenient feature to avoid typing things
+that can be guessed by the system. However, we should be careful not
+to overuse them. Although perfectly crafting implicit arguments can be
+a subtle art, we can first follow the simple rule that the main thing
+a definition or lemma applies to should be kept explicit.
+
+Technically, implicit arguments are often set with curly braces
+``{my_implicit_arg : nat}`` instead of parentheses
+``(my_explicit_arg : nat)``. When in doubt, go for explicit
+arguments.
+
+A brief explanation of implicit arguments can be found when discussing
+``cons`` in Section 1.3.1 of the
+[Mathcomp book](https://math-comp.github.io/mcb/book.pdf).
+
 ## Structuring Specifications
 
 - Split specifications into succinct, logically self-contained files/modules.
