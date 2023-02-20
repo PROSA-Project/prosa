@@ -154,10 +154,9 @@ Compilation then proceeds as follows
 Stepping through this Tutorial
 ------------------------------
 
-This tutorial is actually a Coq file that can be downloaded at
-`<https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/blob/tutorial/doc/tutorial.v>`_
-(TODO update URL once merged)
-so one can step through it with Coq and thus replay the examples
+This tutorial is actually a Coq file that can be found in the `doc/tutorial.v`
+file of Prosa's sources (as downloaded by the git command just above).
+So one can step through it with Coq and thus replay the examples
 and experiment with them while reading the tutorial.
 Once Coq is installed, it is then advisable to download this file and step
 through it in your editor/IDE (essential keyboard shortcuts are C-c C-n,
