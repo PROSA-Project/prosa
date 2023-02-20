@@ -35,9 +35,9 @@ Section Service.
 
   (** In the following, consider jobs that have a cost, a deadline, and an
       arbitrary arrival time. *)
-  Context `{JobCost Job}.
-  Context `{JobDeadline Job}.
-  Context `{JobArrival Job}.
+  Context {jc : JobCost Job}.
+  Context {jd : JobDeadline Job}.
+  Context {ja : JobArrival Job}.
 
   (** We say that job [j] has completed by time [t] if it received all required
       service in the interval from [0] until (but not including) [t]. *)

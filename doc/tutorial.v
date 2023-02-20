@@ -433,7 +433,7 @@ Section ValidArrivalSequence.
 
   (** Assume that job arrival times are known. *)
   Context {Job : JobType}.
-  Context `{JobArrival Job}.
+  Context {ja : JobArrival Job}.
 
   (** Consider any job arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
@@ -463,7 +463,7 @@ Section ArrivalTimeProperties.
 
   (** Assume that job arrival times are known. *)
   Context {Job : JobType}.
-  Context `{JobArrival Job}.
+  Context {ja : JobArrival Job}.
 
   (** Let j be any job. *)
   Variable j : Job.
@@ -490,7 +490,7 @@ Section ArrivalSequencePrefix.
 
   (** Assume that job arrival times are known. *)
   Context {Job : JobType}.
-  Context `{JobArrival Job}.
+  Context {ja : JobArrival Job}.
 
   (** Consider any job arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
@@ -592,9 +592,9 @@ as well as the notion of completion of a job
 |*)
   (** In the following, consider jobs that have a cost, a deadline,
       and an arbitrary arrival time. *)
-  Context `{JobCost Job}.
-  Context `{JobDeadline Job}.
-  Context `{JobArrival Job}.
+  Context {jc : JobCost Job}.
+  Context {jd : JobDeadline Job}.
+  Context {ja : JobArrival Job}.
 
   (** We say that job [j] has completed by time [t] if it received all
       required service in the interval from [0] until
