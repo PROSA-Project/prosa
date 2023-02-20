@@ -317,8 +317,6 @@ Class JobArrival (Job : JobType) := job_arrival : Job -> instant.
 Class JobDeadline (Job : JobType) := job_deadline : Job -> instant.
 
 (*|
-TODO : very short explanation about Class and typeclasses
-
 From the above listing we can see that job is an entity with several parameters:
 
 1. `job_arrival` is the time instant when the job arrived to the system,
@@ -326,6 +324,17 @@ From the above listing we can see that job is an entity with several parameters:
    (a computation time in the context of uniprocessors), also called the job
    execution time,
 3. `job_deadline` is a deadline of a job.
+
+.. note::
+
+   The `Class` syntax is a Coq mechanism to declare
+   `typeclasses <https://coq.inria.fr/distrib/current/refman/addendum/type-classes.html>`_.
+   Without entering into too much details, it enables to define generic
+   definitions (like the `job_cost` function of type `Job -> Work` above)
+   for which we could later provide or assume specific `Instance` s
+   (for a given `JobType` for instance).
+   The system will then automatically instantiate the generic definitions
+   with the instances lying around.
 |*)
 
 (*|
