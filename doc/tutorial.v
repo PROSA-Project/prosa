@@ -382,6 +382,8 @@ they refer to.
 Print arrival_sequence.  (* .unfold *)
 (*|
 Note that `Job` is now a parameter of `arrival_sequence`.
+This `Section` mechanism is extensively used in Prosa to share
+common variables between multiple definitions.
 |*)
 
 (*|
