@@ -200,10 +200,6 @@ The code of the Prosa library is split in a few main directories:
 * `util/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/util>`_
   contains generic mathematical results useful in the remaining
   of the library.
-* `classic/ <https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/tree/master/classic>`_
-  contains an old version of the library. Some results are
-  not yet ported to the new version and remains available there.
-  This part is outside the scope fo the current document.
 
 Note that the following description
 and code listings correspond to the current version of Prosa publicly
