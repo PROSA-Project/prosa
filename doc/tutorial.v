@@ -351,7 +351,7 @@ only serves a documentation purpose) in which one can
 add variables
 |*)
   (** Given any job type with decidable equality, ... *)
-  Variable Job: JobType.
+  Variable Job : JobType.
 (*|
 which can be used in further definitions in the section
 |*)
@@ -390,8 +390,8 @@ are available
 Section JobProperties.
 
   (** Consider any job arrival sequence. *)
-  Context {Job: JobType}.
-  Variable arr_seq: arrival_sequence Job.
+  Context {Job : JobType}.
+  Variable arr_seq : arrival_sequence Job.
 
   (** First, we define the sequence of jobs arriving at time t. *)
   Definition arrivals_at (t : instant) := arr_seq t.
@@ -417,11 +417,11 @@ with such a function. This is expressed by the following definitions:
 Section ValidArrivalSequence.
 
   (** Assume that job arrival times are known. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
 
   (** Consider any job arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** We say that arrival times are consistent if any job that arrives
       in the sequence has the corresponding arrival time. *)
@@ -447,11 +447,11 @@ about individual jobs.
 Section ArrivalTimeProperties.
 
   (** Assume that job arrival times are known. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
 
   (** Let j be any job. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (** We say that job j has arrived at time t iff it arrives
       at some time t_0 with t_0 <= t. *)
@@ -474,11 +474,11 @@ jobs arriving in some time interval.
 Section ArrivalSequencePrefix.
 
   (** Assume that job arrival times are known. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
 
   (** Consider any job arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** By concatenation, we construct the list of jobs that arrived
       in the interval <<[t1, t2)>>. *)
@@ -954,10 +954,10 @@ Section Monotonicity.
   Context {Job : JobType} {PState : ProcessorState Job}.
 
   (** Consider any given schedule... *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** ...and a given job that is to be scheduled. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (** We observe that the amount of service received
       is monotonic by definition. *)
