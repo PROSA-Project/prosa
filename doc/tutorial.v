@@ -412,11 +412,20 @@ Section JobProperties.
 
 End JobProperties.
 (*|
-TODO short explanation on Context and implicit arguments
+.. note::
+
+   `Context` is a synonym of `Variable` enabling the curly brace syntax
+   `{Job : JobType}` to declare `Job` as an *implicit* argument.
+   Indeed, since `arr_seq` is of type `arrival_sequence Job`,
+   giving a value to `arr_seq` is enough to know `Job`. After closing
+   this section, the implicit arguments mechanism will then save some typing
+   by making the three arguments function `arrives_at` appear as a function
+   of three arguments (`arr_seq`, `j` and `t`, the first argument `Job` being
+   automatically inferred from `arr_seq`).
 |*)
 
 (*|
-We've seen above that a function `JobArrival` can map any job to its arrival
+We've seen above that a function `job_arrival` can map any job to its arrival
 time, we thus need a way to state that an arrival sequence is consistent
 with such a function. This is expressed by the following definitions:
 |*)
