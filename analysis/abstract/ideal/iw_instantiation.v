@@ -84,8 +84,8 @@ Section JLFPInstantiation.
   Definition another_hep_job_interference_dec (j : Job) (t : instant) :=
     has (fun jhp => another_hep_job jhp j && receives_service_at sched jhp t) (arrivals_up_to arr_seq t).
 
-  (** Notice that the computational and propositional definitions are
-      equivalent; ... *)
+  (** Note that the computational and propositional definitions are
+      equivalent. *)
   Lemma another_hep_job_interference_P :
     forall j t,
       reflect (another_hep_job_interference j t) (another_hep_job_interference_dec j t).
@@ -669,98 +669,69 @@ Section JLFPInstantiation.
       Hypothesis H_quiet_time : busy_interval.quiet_time arr_seq sched j t1.
 
       (** Then for job [j], the (abstract) instantiated function of
-          interference is equal to the total service of jobs with
-          higher or equal priority. *)
+          interference is equal to the total service of any subset of jobs
+          with higher or equal priority. *)
+      Lemma cumulative_pred_eq_service (P : pred Job) :
+        (forall j', P j' -> hep_job j' j) ->
+          \sum_(t1 <= t' < t)
+            has (fun j' => P j' && receives_service_at sched j' t')
+                (arrivals_up_to arr_seq t')
+          = service_of_jobs sched P (arrivals_between arr_seq t1 t) t1 t.
+      Proof.
+        move=> Phep; clear H_job_of_tsk.
+        rewrite [RHS]exchange_big /=; apply: eq_big_nat => x /andP[t1lex xltt].
+        rewrite /another_hep_job_interference_dec.
+        ideal_proc_model_sched_case_analysis_eq sched x jo => [|{EqSched_jo}].
+        { rewrite (@eq_has _ _ pred0) ?has_pred0 ?big1 // => [j' _ | j'].
+          + exact: ideal_not_idle_implies_sched.
+          + rewrite /receives_service_at ideal_not_idle_implies_sched //.
+            by rewrite andbF. }
+        have arr_jo : arrives_in arr_seq jo.
+        { exact: H_jobs_come_from_arrival_sequence Sched_jo. }
+        have arr_jo_x : job_arrival jo <= x.
+        { exact: H_jobs_must_arrive_to_execute Sched_jo. }
+        have [jo_hep_j|PRIO] := boolP (P jo).
+        - transitivity true.
+          { congr nat_of_bool; apply/hasP; exists jo.
+            - by apply: arrived_between_implies_in_arrivals; rt_eauto.
+            - rewrite jo_hep_j /receives_service_at service_at_is_scheduled_at.
+              by rewrite Sched_jo. }
+          apply/esym/eqP; rewrite eqn_leq; apply/andP; split.
+          + by apply: service_of_jobs_le_1; rt_eauto.
+          + rewrite sum_nat_gt0; apply/hasP; exists jo; last first.
+            { by rewrite service_at_is_scheduled_at Sched_jo. }
+            rewrite mem_filter jo_hep_j /=.
+            apply: arrived_between_implies_in_arrivals; rt_eauto.
+            apply/negPn; rewrite negb_and -ltnNge -leqNgt.
+            apply/negP => /orP[arr_jo_t1|]; last by lia.
+            move: Sched_jo; apply/negP.
+            apply: completed_implies_not_scheduled => //.
+            apply: completion_monotonic t1lex _.
+            by apply: H_quiet_time => //; apply: Phep jo_hep_j.
+        - rewrite (@eq_in_has _ _ pred0) ?has_pred0 ?big1// => [j' AHEP|j' IN].
+          + apply/eqP; rewrite service_at_is_scheduled_at eqb0; apply/negP.
+            move=> SCHED; move: AHEP PRIO; suff -> : jo = j' by move=> ->.
+            by apply: ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
+          + apply/eqP; rewrite eqbF_neg negb_and orbC -implyNb negbK.
+            apply/implyP.
+            rewrite /receives_service_at service_at_is_scheduled_at lt0b.
+            move=> SCHED; suff <- : jo = j' by [].
+            by apply: ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
+      Qed.
+
+      (** The above is in particular true for the jobs other
+          than [j] with higher or equal priority... *)
       Lemma  cumulative_i_ohep_eq_service_of_ohep :
         cumulative_another_hep_job_interference j t1 t
         = service_of_another_hep_jobs j t1 t.
-      Proof.
-        clear H_job_of_tsk; rewrite /service_of_another_hep_jobs /service_of_jobs.
-        rewrite /cumulative_another_hep_job_interference /another_hep_job_interference_dec.
-        rewrite exchange_big //= big_nat_cond [in X in _ = X]big_nat_cond.
-        apply eq_bigr => x /andP [/andP [Ge Le] _].
-        ideal_proc_model_sched_case_analysis_eq sched x jo.
-        { erewrite eq_in_has; [erewrite has_pred0; symmetry| ].
-          { by apply big1 => j' _; rewrite ideal_not_idle_implies_sched. }
-          { by move => j' _; apply Bool.andb_false_intro2; rewrite /receives_service_at ideal_not_idle_implies_sched. }
-        }
-        { have ARRIN: arrives_in arr_seq jo by apply H_jobs_come_from_arrival_sequence with x.
-          clear EqSched_jo; destruct (another_hep_job jo j) eqn:PRIO.
-          { replace (has _ _) with true; symmetry; last first.
-            { apply/hasP; exists jo.
-              - apply arrived_between_implies_in_arrivals => //; rt_eauto.
-                by apply/andP; split; last (rewrite ltnS //; apply H_jobs_must_arrive_to_execute).
-              - by rewrite PRIO //= /receives_service_at service_at_is_scheduled_at Sched_jo.
-            }
-            { apply/eqP; rewrite eqn_leq; apply/andP; split; rt_eauto.
-              - eapply service_of_jobs_le_1; rt_eauto.
-              - rewrite sum_nat_gt0; apply/hasP; exists jo; last by rewrite service_at_is_scheduled_at Sched_jo.
-                rewrite mem_filter PRIO //=; apply arrived_between_implies_in_arrivals => //; rt_eauto.
-                apply/negPn; rewrite negb_and -ltnNge -leqNgt; apply /negP => /orP [LT|GE]; first last.
-                + by apply H_jobs_must_arrive_to_execute in Sched_jo; unfold has_arrived in *; lia.
-                + move: Sched_jo; rewrite -[scheduled_at _ _ _]Bool.negb_involutive => /negP SCH; apply: SCH.
-                  eapply completed_implies_not_scheduled => //; apply completion_monotonic with t1 => //; apply H_quiet_time => //.
-                  by move: PRIO => /andP [PRIO _].
-            }
-          }
-          { erewrite eq_in_has; [erewrite has_pred0; symmetry| ].
-            - apply big1 => j' AHEP; apply/eqP; rewrite service_at_is_scheduled_at //= eqb0; apply/negP => SCHED.
-              enough (EQ : jo = j'); first by subst; rewrite AHEP in PRIO.
-              by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
-            - move=> j' IN => //=; apply/eqP.
-              rewrite eqbF_neg negb_and Bool.orb_comm -implyNb Bool.negb_involutive; apply/implyP => SCHED.
-              rewrite /receives_service_at service_at_is_scheduled_at lt0b in SCHED.
-              enough (EQ : jo = j'); first by subst; rewrite PRIO.
-              by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
-          }
-        }
-      Qed.
+      Proof. by apply: cumulative_pred_eq_service => ? /andP[]. Qed.
 
-      (** The same applies to the alternative definition of interference. *)
+      (** ...and for jobs from other tasks than [j] with higher
+          or equal priority. *)
       Lemma cumulative_i_thep_eq_service_of_othep :
         cumulative_another_task_hep_job_interference j t1 t
         = service_of_another_task_hep_job j t1 t.
-      Proof.
-        rewrite /service_of_another_task_hep_job /service_of_jobs.
-        rewrite /cumulative_another_task_hep_job_interference /another_task_hep_job_interference_dec.
-        rewrite exchange_big //= big_nat_cond [in X in _ = X]big_nat_cond.
-        apply eq_bigr => x /andP [/andP [Ge Le] _].
-        ideal_proc_model_sched_case_analysis_eq sched x jo.
-        { erewrite eq_in_has; [erewrite has_pred0; symmetry| ].
-          { by apply big1 => j' _; rewrite ideal_not_idle_implies_sched. }
-          { by move => j' _; apply Bool.andb_false_intro2; rewrite /receives_service_at ideal_not_idle_implies_sched. }
-        }
-        { have ARRIN: arrives_in arr_seq jo by apply H_jobs_come_from_arrival_sequence with x.
-          clear EqSched_jo; destruct (another_task_hep_job jo j) eqn:PRIO.
-          { replace (has _ _) with true; symmetry; last first.
-            { apply/hasP; exists jo.
-              - apply arrived_between_implies_in_arrivals => //; rt_eauto.
-                by apply/andP; split; last (rewrite ltnS //; apply H_jobs_must_arrive_to_execute).
-              - by rewrite PRIO //= /receives_service_at service_at_is_scheduled_at Sched_jo.
-            }
-            { apply/eqP; rewrite eqn_leq; apply/andP; split; rt_eauto.
-              - eapply service_of_jobs_le_1; rt_eauto.
-              - rewrite sum_nat_gt0; apply/hasP; exists jo; last by rewrite service_at_is_scheduled_at Sched_jo.
-                rewrite mem_filter PRIO //=; apply arrived_between_implies_in_arrivals => //; rt_eauto.
-                apply/negPn; rewrite negb_and -ltnNge -leqNgt; apply /negP => /orP [LT|GE]; first last.
-                + by apply H_jobs_must_arrive_to_execute in Sched_jo; unfold has_arrived in *; lia.
-                + move: Sched_jo; rewrite -[scheduled_at _ _ _]Bool.negb_involutive => /negP SCH; apply: SCH.
-                  eapply completed_implies_not_scheduled => //; apply completion_monotonic with t1 => //; apply H_quiet_time => //.
-                  by move: PRIO => /andP [PRIO _].
-            }
-          }
-          { erewrite eq_in_has; [erewrite has_pred0; symmetry| ].
-            - apply big1 => j' AHEP; apply/eqP; rewrite service_at_is_scheduled_at //= eqb0; apply/negP => SCHED.
-              enough (EQ : jo = j'); first by subst; rewrite AHEP in PRIO.
-              by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
-            - move => j' IN => //=; apply/eqP.
-              rewrite eqbF_neg negb_and Bool.orb_comm -implyNb Bool.negb_involutive; apply/implyP => SCHED.
-              rewrite /receives_service_at service_at_is_scheduled_at lt0b in SCHED.
-              enough (EQ : jo = j'); first by subst; rewrite PRIO.
-              by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
-          }
-        }
-      Qed.
+      Proof. by apply: cumulative_pred_eq_service => ? /andP[]. Qed.
 
     End InstantiatedServiceEquivalences.
 
