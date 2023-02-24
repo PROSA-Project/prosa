@@ -98,17 +98,6 @@ Section JLFPInstantiation.
       by apply/andP; split.
   Qed.
 
-  (** ... for convenience, we prove that their negated counterparts
-      are equivalent as well. *)
-  Lemma another_hep_job_interference_negP :
-    forall j t,
-      reflect (~ another_hep_job_interference j t) (~~ another_hep_job_interference_dec j t).
-  Proof.
-    move => j t; apply/introP.
-    - by move => /negP NDEC NPROP; apply: NDEC; apply/another_hep_job_interference_P.
-    - move => /negPn/another_hep_job_interference_P; auto.
-  Qed.
-
   (** Similarly, we say that job [j] is incurring interference from a
       job with higher-or-equal priority of another task at time [t]
       if there exists a job [jhp] (of a different task) with
@@ -991,7 +980,7 @@ Section JLFPInstantiation.
           by eapply not_quiet_implies_not_idle; rt_eauto.
         }
         { move: HYP1 => /priority_inversion_negP PINV; feed_n 3 PINV; rt_auto.
-          move: HYP2 => /another_hep_job_interference_negP INT.
+          have /another_hep_job_interference_P INT := HYP2.
           eapply iffLRn in INT; last apply interference_ahep_equiv_ahep; rt_eauto.
           move: INT => /negP. rewrite negb_and => /orP [NHEP | EQ].
           - rewrite/receives_service_at; move_neq_up ZS; move: ZS; rewrite leqn0 => /eqP ZS.
