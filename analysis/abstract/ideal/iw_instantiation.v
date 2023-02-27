@@ -46,9 +46,9 @@ Section JLFPInstantiation.
   (** Consider a JLFP-policy that indicates a higher-or-equal priority
       relation, and assume that this relation is reflexive and
       transitive. *)
-  Context `{JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities.
-  Hypothesis H_priority_is_transitive : transitive_priorities.
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_priorities JLFP.
 
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
@@ -60,7 +60,7 @@ Section JLFPInstantiation.
   (** We also assume that the policy respects sequential tasks,
       meaning that later-arrived jobs of a task don't have higher
       priority than earlier-arrived jobs of the same task. *)
-  Hypothesis H_JLFP_respects_sequential_tasks : policy_respects_sequential_tasks.
+  Hypothesis H_JLFP_respects_sequential_tasks : policy_respects_sequential_tasks JLFP.
 
   (** * Interference and Interfering Workload *)
   (** In the following, we introduce definitions of interference,
@@ -954,7 +954,7 @@ Section JLFPInstantiation.
     Hypothesis H_work_conserving : work_conserving_cl.
 
     (** Assume the scheduling policy under consideration is reflexive. *)
-    Hypothesis policy_reflexive : reflexive_priorities.
+    Hypothesis policy_reflexive : reflexive_priorities JLFP.
 
     (** In this section, we prove the correctness of interference
         inside the busy interval, i.e., we prove that if interference
@@ -1029,7 +1029,7 @@ Section JLFPInstantiation.
     (** Next, in order to prove that these definitions of [I] and [IW]
         are consistent with sequential tasks, we need to assume that
         the policy under consideration respects sequential tasks. *)
-    Hypothesis H_policy_respects_sequential_tasks : policy_respects_sequential_tasks.
+    Hypothesis H_policy_respects_sequential_tasks : policy_respects_sequential_tasks JLFP.
 
     (** We prove that these definitions of [I] and [IW] are consistent
         with sequential tasks. *)

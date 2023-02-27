@@ -140,7 +140,7 @@ Section BasicLemmas.
     Qed.
 
     (** We also note that the [FIFO] policy respects sequential tasks. *)
-    Fact fifo_respects_sequential_tasks : policy_respects_sequential_tasks.
+    Fact fifo_respects_sequential_tasks : policy_respects_sequential_tasks (FIFO Job).
     Proof. by move => j1 j2 SAME ARRLE; rewrite /hep_job /FIFO. Qed.
 
   End SequentialTasks.

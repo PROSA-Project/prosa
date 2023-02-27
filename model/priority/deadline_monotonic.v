@@ -22,15 +22,15 @@ Section Properties.
   Context `{JobTask Job Task}.
 
   (** DM is reflexive. *)
-  Lemma DM_is_reflexive : reflexive_priorities.
+  Lemma DM_is_reflexive : reflexive_priorities (FP_to_JLFP (DM Task)).
   Proof. by move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /DM. Qed.
 
   (** DM is transitive. *)
-  Lemma DM_is_transitive : transitive_priorities.
+  Lemma DM_is_transitive : transitive_priorities (FP_to_JLFP (DM Task)).
   Proof. by move=> t y x z; apply: leq_trans. Qed.
 
   (** DM is total. *)
-  Lemma DM_is_total : total_priorities.
+  Lemma DM_is_total : total_priorities (FP_to_JLFP (DM Task)).
  Proof. by move=> t j1 j2; apply: leq_total. Qed.
 
 End Properties.

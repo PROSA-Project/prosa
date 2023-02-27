@@ -54,6 +54,6 @@ Section Priority.
      
   (** [FP].  *)
   Definition respects_FP_policy_at_preemption_point (policy: FP_policy Task) :=
-    respects_JLDP_policy_at_preemption_point (FP_to_JLFP Job Task ).
+    respects_JLDP_policy_at_preemption_point (FP_to_JLFP policy).
 
 End Priority.

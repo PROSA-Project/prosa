@@ -30,8 +30,8 @@ Section PriorityInversionIsBounded.
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_priorities.
-  Hypothesis H_priority_is_transitive: transitive_priorities.
+  Hypothesis H_priority_is_reflexive: reflexive_priorities JLFP.
+  Hypothesis H_priority_is_transitive: transitive_priorities JLFP.
 
   (** In addition, we assume the existence of a function mapping a
       task to its maximal non-preemptive segment ... *)

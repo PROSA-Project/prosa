@@ -76,8 +76,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** ... and that it respects a reflexive and transitive fixed-priority
           scheduling policy [FP]. *)
   Context {FP : FP_policy Task}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities.
-  Hypothesis H_priority_is_transitive : transitive_priorities.
+  Hypothesis H_priority_is_reflexive : reflexive_priorities (FP_to_JLFP FP).
+  Hypothesis H_priority_is_transitive : transitive_priorities (FP_to_JLFP FP).
   Hypothesis H_respects_policy :
     respects_FP_policy_at_preemption_point arr_seq sched FP.
 

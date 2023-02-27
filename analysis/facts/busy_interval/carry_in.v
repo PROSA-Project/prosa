@@ -41,7 +41,7 @@ Section ExistsNoCarryIn.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume a given JLFP policy. *)
-  Context `{JLFP_policy Job}.
+  Context {JLFP : JLFP_policy Job}.
   
   (** For simplicity, let's define some local names. *)
   Let job_pending_at := pending sched.
@@ -121,8 +121,8 @@ Section ExistsNoCarryIn.
   Qed.
   
   (** Let the priority relation be reflexive. *)
-  Hypothesis H_priority_is_reflexive: reflexive_priorities.
-  
+  Hypothesis H_priority_is_reflexive: reflexive_priorities JLFP.
+
   (** Recall the notion of workload of all jobs released in a given interval <<[t1, t2)>>... *)
   Let total_workload t1 t2 :=
     workload_of_jobs predT (arrivals_between t1 t2).

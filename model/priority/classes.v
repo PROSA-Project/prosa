@@ -41,14 +41,15 @@ Class JLDP_policy (Job: JobType) := hep_job_at : instant -> rel Job.
 (** First, any FP policy can be interpreted as an JLFP policy by comparing jobs
     according to the priorities of their respective tasks. *)
 #[global]
-Instance FP_to_JLFP (Job: JobType) (Task: TaskType)
-         `{JobTask Job Task} `{FP_policy Task} : JLFP_policy Job :=
+Instance FP_to_JLFP {Job : JobType} {Task : TaskType} {tasks : JobTask Job Task}
+    (FP : FP_policy Task) : JLFP_policy Job :=
   fun j1 j2 => hep_task (job_task j1) (job_task j2).
 
 (** Second, any JLFP policy implies a JLDP policy that simply ignores the time
     parameter. *)
 #[global]
-Instance JLFP_to_JLDP (Job: JobType) `{JLFP_policy Job} : JLDP_policy Job :=
+Instance JLFP_to_JLDP {Job : JobType}
+    (JLFP : JLFP_policy Job) : JLDP_policy Job :=
   fun _ j1 j2 => hep_job j1 j2.
 
 (** We add coercions to enable automatic conversion from [JLFP] to [JLDP]... *)
@@ -80,7 +81,7 @@ Section Priorities.
   Section JLDP.
 
     (** Consider any JLDP policy. *)
-    Context `{JLDP_policy Job}.
+    Context (JLDP : JLDP_policy Job).
 
     (** We define what it means for a JLDP policy to be reflexive, transitive,
         and total. Note that these definitions, although phrased in terms of a
@@ -105,7 +106,7 @@ Section Priorities.
   Section JLFP.
 
     (** Consider any JLFP policy. *)
-    Context `{JLFP_policy Job}.
+    Context (JLFP : JLFP_policy Job).
 
     (** Recall that jobs of a sequential task are necessarily executed in the
         order that they arrive.
@@ -130,11 +131,11 @@ Section Priorities.
 
   End JLFP.
 
-  (** Finally, we we define and observe two properties of FP policies. *)
+  (** Finally, we define FP policies. *)
   Section FP.
 
     (** Consider any FP policy. *)
-    Context `{FP_policy Task}.
+    Context (FP : FP_policy Task).
 
     (** To express the common assumption that task priorities are unique, we
         define whether the given FP policy is antisymmetric over a task set
@@ -142,19 +143,28 @@ Section Priorities.
     Definition antisymmetric_over_taskset (ts : seq Task) :=
       antisymmetric_over_list hep_task ts.
 
+  End FP.
+
+  (** And we observe properties of FP policies. *)
+  Section FPRemarks.
+
+    (** Consider any FP policy. *)
+    Context {FP : FP_policy Task}.
+
     (** Further, we observe that any [FP_policy] respects the sequential tasks
         hypothesis, meaning that later-arrived jobs of a task don't have higher
         priority than earlier-arrived jobs of the same task (assuming that task
         priorities are reflexive). *)
     Remark respects_sequential_tasks :
-      reflexive_priorities -> policy_respects_sequential_tasks.
+      reflexive_priorities (FP_to_JLFP FP) ->
+      policy_respects_sequential_tasks (FP_to_JLFP FP).
     Proof.
       move => REFL j1 j2 /eqP EQ LT.
       rewrite /hep_job /FP_to_JLFP EQ.
         by eapply (REFL 0).
     Qed.
 
-  End FP.
+  End FPRemarks.
 
 End Priorities.
 

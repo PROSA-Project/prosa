@@ -36,8 +36,8 @@ Section SequentialTasksReadiness.
   
   (** Consider an FP policy that indicates a reflexive 
       higher-or-equal priority relation. *) 
-  Context `{FP_policy Task}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities.
+  Context {FP : FP_policy Task}.
+  Hypothesis H_priority_is_reflexive : reflexive_priorities (FP_to_JLFP FP).
 
   (** First, we show that the sequential readiness model is non-clairvoyant. *) 
   Fact sequential_readiness_nonclairvoyance :

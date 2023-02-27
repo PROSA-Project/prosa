@@ -20,7 +20,7 @@ Section PropertiesOfEDF.
 
   (** EDF respects sequential tasks hypothesis. *)
   Lemma EDF_respects_sequential_tasks:
-    policy_respects_sequential_tasks.
+    policy_respects_sequential_tasks (EDF Job).
   Proof.
     move => j1 j2 /eqP TSK ARR.
     rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline TSK.

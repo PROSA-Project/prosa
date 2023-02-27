@@ -39,11 +39,11 @@ Section PropertiesNFPA.
   Context `{JobTask Job Task}.
 
   (** The resulting priority policy is reflexive. *)
-  Lemma NFPA_is_reflexive : reflexive_priorities.
+  Lemma NFPA_is_reflexive : reflexive_priorities (FP_to_JLFP (NumericFPAscending Task)).
   Proof.  by move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPAscending. Qed.
 
   (** The resulting priority policy is transitive. *)
-  Lemma NFPA_is_transitive : transitive_priorities.
+  Lemma NFPA_is_transitive : transitive_priorities (FP_to_JLFP (NumericFPAscending Task)).
   Proof.
     move=> t y x z.
     rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPAscending.
@@ -51,7 +51,7 @@ Section PropertiesNFPA.
   Qed.
 
   (** The resulting priority policy is total. *)
-  Lemma NFPA_is_total : total_priorities.
+  Lemma NFPA_is_total : total_priorities (FP_to_JLFP (NumericFPAscending Task)).
   Proof. by move=> t j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPA.
@@ -77,11 +77,11 @@ Section PropertiesNFPD.
   Context `{JobTask Job Task}.
 
   (** The resulting priority policy is reflexive. *)
-  Lemma NFPD_is_reflexive : reflexive_priorities.
-  Proof.  by  move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending. Qed.
+  Lemma NFPD_is_reflexive : reflexive_priorities (FP_to_JLFP (NumericFPDescending Task)).
+  Proof. by  move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending. Qed.
 
   (** The resulting priority policy is transitive. *)
-  Lemma NFPD_is_transitive : transitive_priorities.
+  Lemma NFPD_is_transitive : transitive_priorities (FP_to_JLFP (NumericFPDescending Task)).
   Proof.
     move=> t y x z.
     rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending.
@@ -89,7 +89,7 @@ Section PropertiesNFPD.
   Qed.
 
   (** The resulting priority policy is total. *)
-  Lemma NFPD_is_total : total_priorities.
+  Lemma NFPD_is_total : total_priorities (FP_to_JLFP (NumericFPDescending Task)).
   Proof. by move=> t j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPD.

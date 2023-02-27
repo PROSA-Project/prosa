@@ -34,8 +34,8 @@ Section PIIdealProcessorModelLemmas.
 
   (** Consider a JLFP-policy that indicates a higher-or-equal priority relation,
      and assume that this relation is reflexive. *)
-  Context `{JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities.
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
 
   (** Let [tsk] be any task to be analyzed. *)
   Variable tsk : Task.

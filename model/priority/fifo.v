@@ -18,15 +18,15 @@ Section Properties.
   Context `{JobArrival Job}.
 
   (** FIFO is reflexive. *)
-  Lemma FIFO_is_reflexive : reflexive_priorities.
+  Lemma FIFO_is_reflexive : reflexive_priorities (FIFO Job).
   Proof. by move=> t j; apply: leqnn. Qed.
 
   (** FIFO is transitive. *)
-  Lemma FIFO_is_transitive : transitive_priorities.
+  Lemma FIFO_is_transitive : transitive_priorities (FIFO Job).
   Proof. by move=> t y x z; apply: leq_trans. Qed.
 
   (** FIFO is total. *)
-  Lemma FIFO_is_total : total_priorities.
+  Lemma FIFO_is_total : total_priorities (FIFO Job).
   Proof. by move=> t j1 j2; apply: leq_total. Qed.
 
 End Properties.

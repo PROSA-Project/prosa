@@ -392,8 +392,8 @@ Section DegenerateTotalRBFs.
   Qed.
 
   (** Second, given a fixed-priority policy with reflexive priorities, ... *)
-  Context `{FP_policy Task}.
-  Hypothesis H_reflexive : reflexive_priorities.
+  Context {FP : FP_policy Task}.
+  Hypothesis H_reflexive : reflexive_priorities (FP_to_JLFP FP).
 
   (** ... if the total RBF of all equal- and higher-priority tasks is zero, then
       the reference task's response-time bound is also trivially zero. *)

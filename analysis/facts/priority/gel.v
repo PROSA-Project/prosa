@@ -47,7 +47,7 @@ Section GELBasicFacts.
 
   (** Next, we prove that the GEL policy respects sequential tasks. *)
   Lemma GEL_respects_sequential_tasks:
-    policy_respects_sequential_tasks.
+    policy_respects_sequential_tasks (GEL Job Task).
   Proof.
     move =>  j1 j2 /eqP TSK ARR.
     rewrite /hep_job /GEL /job_priority_point TSK.

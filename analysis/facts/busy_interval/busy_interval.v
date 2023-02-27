@@ -37,7 +37,7 @@ Section ExistsBusyIntervalJLFP.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume a given JLFP policy. *)
-  Context `{JLFP_policy Job}.
+  Context {JLFP : JLFP_policy Job}.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
   Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
@@ -67,7 +67,7 @@ Section ExistsBusyIntervalJLFP.
   Section BasicLemmas.
 
     (** Assume that the priority relation is reflexive. *)
-    Hypothesis H_priority_is_reflexive : reflexive_priorities.
+    Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
 
     (** Consider any busy interval <<[t1, t2)>> of job [j]. *)
     Variable t1 t2 : instant.
@@ -135,8 +135,8 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
     (** ... and the priority relation is reflexive and transitive. *)
-    Hypothesis H_priority_is_reflexive : reflexive_priorities.
-    Hypothesis H_priority_is_transitive : transitive_priorities.
+    Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
+    Hypothesis H_priority_is_transitive : transitive_priorities JLFP.
 
     (** Consider any busy interval prefix <<[t1, t2)>>. *)
     Variable t1 t2 : instant.
@@ -347,8 +347,8 @@ Section ExistsBusyIntervalJLFP.
       arrival_sequence_uniq arr_seq.
 
     (** ... and the priority relation is reflexive and transitive. *)
-    Hypothesis H_priority_is_reflexive: reflexive_priorities.
-    Hypothesis H_priority_is_transitive: transitive_priorities.
+    Hypothesis H_priority_is_reflexive: reflexive_priorities JLFP.
+    Hypothesis H_priority_is_transitive: transitive_priorities JLFP.
 
     (** Next, we recall the notion of workload of all jobs released in
         a given interval <<[t1, t2)>> that have higher-or-equal
