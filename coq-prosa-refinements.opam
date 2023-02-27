@@ -8,8 +8,7 @@ bug-reports: "https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/issues"
 license: "BSD-2-Clause"
 
 build: [
-  ["./create_makefile.sh" "--only-refinements"]
-  [make "-j%{jobs}%"]
+  [make "-j%{jobs}%" "refinements"]
 ]
 install: [make "install"]
 depends: [

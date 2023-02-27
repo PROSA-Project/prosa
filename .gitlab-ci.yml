@@ -79,8 +79,7 @@ compile-and-doc:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh
-    - make -j ${NJOBS}
+    - make -j ${NJOBS} all
     - !reference [.make-html, script]
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
@@ -97,8 +96,7 @@ compile-and-doc-and-validate:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh
-    - make -j ${NJOBS}
+    - make -j ${NJOBS} all
     - !reference [.make-html, script]
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
@@ -118,7 +116,6 @@ compile-and-validate:
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh --without-refinements
     - make -j ${NJOBS}    
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh validation-results.txt
@@ -161,7 +158,7 @@ proof-state:
   script:
     - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
     - !reference [.install-dependencies, script]
-    - ./create_makefile.sh
+    - make -j ${NJOBS} all
     - make -j ${NJOBS} alectryon
   artifacts:
     name: "prosa-proof-state-$CI_COMMIT_REF_NAME"

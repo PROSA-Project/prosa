@@ -24,7 +24,7 @@ OBSERVED="/tmp/observed-validation-output"
 EXPECTED="/tmp/expected-validation-output"
 
 # strip the list of files and COQDEP output
-grep -v 'COQDEP VFILES' "$RESULTS" | grep -v '"coqchk" -silent' > "$OBSERVED"
+grep -v 'COQDEP VFILES' "$RESULTS" | grep -v 'make' | grep -v '"coqchk" -silent' > "$OBSERVED"
 
 if [ -z "$ACCEPT_PI" ]
 then
@@ -71,7 +71,7 @@ then
 
     # strip the list of files, COQDEP output, and 
     # filter bogus ltac: axioms (see Coq issue 13324)
-    grep -v 'COQDEP VFILES' "$RESULTS" | grep -v '"coqchk" -silent' | grep -v "ltac_gen_subproof" > "$OBSERVED"
+    grep -v 'COQDEP VFILES' "$RESULTS" | grep -v 'make' | grep -v '"coqchk" -silent' | grep -v "ltac_gen_subproof" > "$OBSERVED"
     # the list of axioms should now be an empty list
     if ! diff --brief  "$EXPECTED" "$OBSERVED" > /dev/null
     then

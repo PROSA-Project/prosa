@@ -6,7 +6,7 @@
 *.html
 /html
 *.aux
-Makefile*
+Makefile.coq*
 *.crashcoqide
 *.v#
 *.cache

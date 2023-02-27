@@ -8,7 +8,6 @@ bug-reports: "https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/issues"
 license: "BSD-2-Clause"
 
 build: [
-  ["./create_makefile.sh" "--without-refinements"]
   [make "-j%{jobs}%"]
 ]
 install: [make "install"]

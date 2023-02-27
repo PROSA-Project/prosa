@@ -1,5 +1,5 @@
---- Makefile.orig	2021-10-04 11:15:22.592822933 +0200
-+++ Makefile	2021-10-04 11:17:18.684584261 +0200
+--- Makefile.coq.orig	2021-10-04 11:15:22.592822933 +0200
++++ Makefile.coq	2021-10-04 11:17:18.684584261 +0200
 @@ -15,6 +15,11 @@
  SELF := $(lastword $(MAKEFILE_LIST))
  PARENT := $(firstword $(MAKEFILE_LIST))
@@ -42,21 +42,3 @@
  # FIXME: not quite right, since the output name is different
  gallinahtml: GAL=-g
  gallinahtml: html
-@@ -646,6 +658,17 @@
- 	$(HIDE)rm -f $(CMOFILES:%.cmo=%.cmx)
- .PHONY: archclean
- 
-+vacuum:: cleanall
-+	$(SHOW)'VACUUMING *.vo *.glob .*.aux <empty directories>'
-+	$(HIDE)find . -depth \( -iname '*.vo' -or  -iname '*.glob' -or -iname '.*.aux' \)  ! -path './.git/*' -delete
-+	$(HIDE)find . -depth -type d -empty ! -path './.git/*' -delete
-+
-+macos-clean::
-+	$(SHOW)'CLEAN .DS_Store'
-+	$(HIDE)find . -depth -iname '.DS_Store' ! -path './.git/*' -delete
-+
-+spell::
-+	./scripts/flag-typos-in-comments.sh `find .  -iname '*.v'`
- 
- # Compilation rules ###########################################################
- 

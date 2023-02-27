@@ -110,21 +110,7 @@ Prosa always tracks the latest stable versions of Coq and ssreflect. We do not m
 
 #### Compiling Prosa
 
-Assuming all dependencies are available (either via OPAM or compiled from source, see the [Prosa setup instructions](http://prosa.mpi-sws.org/setup-instructions.html)), compiling Prosa consists of only two steps.
-
-First, create an appropriate `Makefile`.
-
-```bash
-./create_makefile.sh
-```
-
-To avoid compiling the POET-related refinements (which require CoqEAL to be installed and inject a dependency on the *proof irrelevance* axiom), specify the switch `--without-refinements`. For example:
-
-```bash
-./create_makefile.sh --without-refinements
-```
-
-Second, compile the library.
+Assuming all dependencies are available (either via OPAM or compiled from source, see the [Prosa setup instructions](http://prosa.mpi-sws.org/setup-instructions.html)), compiling Prosa can be done by just typing:
 
 ```bash
 make -j
@@ -132,9 +118,27 @@ make -j
 
 Depending on how powerful your machine is, this will take a few minutes.
 
+The library can then be installed with:
+
+```bash
+make install
+```
+
+To compile the POET-related refinements (which require CoqEAL to be installed and inject a dependency on the *proof irrelevance* axiom), first install the main Prosa library with the two commands above, then type:
+
+```bash
+make refinements
+```
+
+The newly compiled files can then be installed with:
+
+```bash
+make install
+```
+
 ## Generating HTML Documentation
 
-The Coqdoc documentation (as shown on the [webpage](http://prosa.mpi-sws.org/documentation.html)) can be easily generated with the provided `Makefile`:
+Once the has been library compiled, the Coqdoc documentation (as shown on the [webpage](http://prosa.mpi-sws.org/documentation.html)) can be easily generated with:
 
 - `make htmlpretty -j`  --- pretty documentation based on CoqdocJS (can hide/show proofs),
 - `make gallinahtml -j` --- just the specification, without proofs,
