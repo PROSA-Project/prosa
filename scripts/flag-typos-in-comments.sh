@@ -10,7 +10,7 @@ do
 
 	#Here, sed is used to remove verbatim text (enclosed in <<>>)
 	for WORD in $(scripts/extract-comments.py "$SRC" \
-		| sed 's/<<.*>>//g' \
+		| sed -e 's/<<.*>>//g' -e 's/`.*`//g' \
 		| aspell --add-extra-dicts=$KNOWN_EXCEPTIONS -l en  list \
 		| sort \
 		| uniq)

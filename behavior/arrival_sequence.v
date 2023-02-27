@@ -47,8 +47,8 @@ Section ValidArrivalSequence.
 
   (** Assume that job arrival times are known. *)
   Context {Job: JobType}.
-  Context `{JobArrival Job}.
-  
+  Context {ja : JobArrival Job}.
+
   (** Consider any job arrival sequence. *)
   Variable arr_seq: arrival_sequence Job.
 
@@ -75,11 +75,11 @@ End ValidArrivalSequence.
 Section ArrivalTimeProperties.
 
   (** Assume that job arrival times are known. *)
-  Context {Job: JobType}.
-  Context `{JobArrival Job}.
+  Context {Job : JobType}.
+  Context {ja : JobArrival Job}.
 
   (** Let j be any job. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (** We say that job j has arrived at time t iff it arrives at some time t_0
      with t_0 <= t. *)
@@ -102,11 +102,11 @@ End ArrivalTimeProperties.
 Section ArrivalSequencePrefix.
 
   (** Assume that job arrival times are known. *)
-  Context {Job: JobType}.
-  Context `{JobArrival Job}.
+  Context {Job : JobType}.
+  Context {ja : JobArrival Job}.
 
   (** Consider any job arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** By concatenation, we construct the list of jobs that arrived in the
      interval <<[t1, t2)>>. *)
