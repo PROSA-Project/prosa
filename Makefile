@@ -18,6 +18,10 @@ refinements: refinementsCoqProject
 	$(MAKE) $(COQ_MAKEFILE)
 	$(MAKE) -f $(COQ_MAKEFILE)
 
+mangle-names: mangle-namesCoqProject
+	$(MAKE) $(COQ_MAKEFILE)
+	$(MAKE) -f $(COQ_MAKEFILE)
+
 commonCoqProject:
 	@$(RM) -f $(COQ_PROJ)
 	@echo "# Automatically created by make, do not edit" > $(COQ_PROJ)
@@ -44,6 +48,14 @@ refinementsCoqProject: commonCoqProject
 	@echo "" >> $(COQ_PROJ)
 	@find $(FIND_OPTS) \
 	  -path './implementation/refinements/*' \
+	  -print | scripts/module-toc-order.py >> $(COQ_PROJ)
+
+mangle-namesCoqProject: commonCoqProject
+	@echo "-arg \"-mangle-names __\"" >> $(COQ_PROJ)
+	@echo "" >> $(COQ_PROJ)
+	@echo "-R . prosa" >> $(COQ_PROJ)
+	@echo "" >> $(COQ_PROJ)
+	@find $(FIND_OPTS) \
 	  -print | scripts/module-toc-order.py >> $(COQ_PROJ)
 
 $(COQ_MAKEFILE): $(COQ_PROJ) scripts/Makefile.coq.patch
@@ -89,8 +101,9 @@ help:
 	@echo "'make vacumm' to clean .vo .glob .aux files and empty dirs"
 	@echo "'make macos-clean' to clean macos' .DS_Store dirs"
 	@echo "'make distclean' to remove all generated files"
+	@echo "'make mangle-names' to compile with mangle-names option"
 
-.PHONY: all prosa refinements
+.PHONY: all prosa refinements mangle-names mangle-namesCoqProject
 .PHONY: commonCoqProject allCoqProject prosaCoqProject refinementsCoqProject
 .PHONY: install html gallinahtml htmlpretty clean cleanall validate alectryon
 .PHONY: vacuum macos-clean spell distclean help
