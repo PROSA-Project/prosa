@@ -43,7 +43,7 @@ Section PIGenericProcessorModelLemma.
         cumulative_priority_inversion arr_seq sched j t1 t_mid
         + cumulative_priority_inversion arr_seq sched j t_mid t2.
   Proof.
-    intros * LE1 LE2.
+    intros t_mid t1 t2 LE1 LE2.
     rewrite /cumulative_priority_inversion -big_cat //=.
     replace (index_iota t1 t_mid ++ index_iota t_mid t2) with (index_iota t1 t2); first by reflexivity.
     interval_to_duration t1 t_mid δ1.

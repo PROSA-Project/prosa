@@ -45,7 +45,7 @@ Section ValidArrivalCurvePrefixFacts.
     intros st IN; unfold get_time_steps_of_task in *.
     move: (H_valid_task_set) => VAL; specialize (VAL _ H_tsk_in_ts).
     unfold valid_arrivals in VAL; unfold get_arrival_curve_prefix in *.
-    destruct (task_arrival tsk).
+    destruct (task_arrival tsk) as [a|a|a].
     { by unfold inter_arrival_to_prefix, time_steps_of in *; simpl in IN;
         move: IN; rewrite mem_seq1 => /eqP EQ; subst. }
     { by unfold inter_arrival_to_prefix, time_steps_of in *; simpl in IN;
@@ -70,7 +70,7 @@ Section ValidArrivalCurvePrefixFacts.
     forall A offs,
       A \in repeat_steps_with_offset tsk offs -> A > 0.
   Proof.
-    intros * IN.
+    intros A offs IN.
     move: IN  => /flatten_mapP [o INo IN].
     move: IN => /mapP [st IN EQ]; subst A.
     rewrite addn_gt0; apply/orP; left.

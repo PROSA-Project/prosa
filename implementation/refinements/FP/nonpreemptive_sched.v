@@ -77,7 +77,7 @@ Section Schedule.
     set chp:= choose_highest_prio_job; set sut:= schedule_up_to.
     replace (_ (_ (_ _ _) _ t) j t.+1) with (service sched j t.+1); last first.
     { rewrite /uni_schedule /pmc_uni_schedule /generic_schedule /service
-              /service_during /service_at; apply eq_big_nat; intros.
+              /service_during /service_at; apply eq_big_nat => i H.
       replace (_ (_ _ _) _ t i) with (sut (allocation_at arr_seq chp) None i i) => //.
       by apply schedule_up_to_prefix_inclusion. }
     move=> SC SZ; apply /andP.
@@ -103,7 +103,7 @@ Section Schedule.
     nonpreemptive_schedule (uni_schedule arr_seq).
   Proof.
     rewrite /nonpreemptive_schedule.
-    induction t'; first by move=> t'; have->: t = 0 by lia.
+    move=> j t; elim=> [|t' IHt']; first by move=> t'; have->: t = 0 by lia.
     move=> LEQ SCHED NCOMP.
     destruct (ltngtP t t'.+1) as [LT | _ | EQ] => //; last by rewrite -EQ.
     feed_n 3 IHt'=> //.

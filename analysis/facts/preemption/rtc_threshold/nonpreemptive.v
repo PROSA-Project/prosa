@@ -41,10 +41,10 @@ Section TaskRTCThresholdFullyNonPreemptive.
       job_cost j = 0 -> 
       job_rtct j = 0.
   Proof.
-    intros.
+    move=> j cj0.
     apply/eqP; rewrite eqn_leq; apply/andP; split; last by done.
     unfold job_rtct.
-      by rewrite H3; compute.
+      by rewrite cj0; compute.
   Qed.
   
   (** ... and ε otherwise. *)
@@ -54,7 +54,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
       arrives_in arr_seq j ->
       job_rtct j = ε.
   Proof.
-    intros ? ARRj POSj; unfold ε in *.
+    move=> j ARRj POSj; unfold ε in *.
     unfold job_rtct.
     rewrite job_last_nps_is_job_cost.
       by rewrite subKn.

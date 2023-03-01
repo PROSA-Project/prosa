@@ -249,7 +249,7 @@ Section RunToCompletionThreshold.
       ~~ completed_by sched j t' ->
       scheduled_at sched j t'.
   Proof.
-    intros ? ? LE TH COM.
+    move=> t t' LE TH COM.
     apply H_valid_preemption_model; first by done.
     apply job_cannot_be_preempted_within_last_segment; apply/andP; split.
     - by apply leq_trans with (service sched j t); last apply service_monotonic.

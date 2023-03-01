@@ -10,7 +10,7 @@ Section ExtraLemmas.
   Lemma leq_bigmax_cond_seq :
     forall {X : eqType} (F : X -> nat) (P : pred X) (xs : seq X) (x : X),
       x \in xs -> P x -> F x <= \max_(i <- xs | P i) F i.
-  Proof. by intros * IN Px; rewrite (big_rem x) //= Px leq_maxl. Qed.
+  Proof. by move=> X F P xs x IN Px; rewrite (big_rem x) //= Px leq_maxl. Qed.
 
   (** Next, we show that the fact [max { F i | ∀ i ∈ xs, P i} <= m] for
       some [m] is equivalent to the fact that [∀ x ∈ xs, P x -> F x <= m]. *)
@@ -36,7 +36,7 @@ Section ExtraLemmas.
       (forall x, x \in xs -> P x -> F1 x <= F2 x) ->
       \max_(x <- xs | P x) F1 x <= \max_(x <- xs | P x) F2 x.
   Proof.
-    intros * ALL; apply /bigmax_leq_seqP; intros * IN Px.
+    move=> X F1 F2 P xs ALL; apply /bigmax_leq_seqP => x IN Px.
     specialize (ALL x); feed_n 2 ALL; try done.
     rewrite (big_rem x) //=; rewrite Px.
     by apply leq_trans with (F2 x); [ | rewrite leq_maxl].
@@ -50,9 +50,9 @@ Section ExtraLemmas.
       \max_(i < n) i < n.
   Proof.
     intros [ | n] POS; first by rewrite ltn0 in POS.
-    clear POS; induction n; first by rewrite big_ord_recr /= big_ord0 maxn0.
-    rewrite big_ord_recr /=.
-    by rewrite /maxn IHn.
+    clear POS.
+    elim: n => [|n IHn]; first by rewrite big_ord_recr /= big_ord0 maxn0.
+    by rewrite big_ord_recr /= /maxn IHn.
   Qed.
 
   (** We state the next lemma in terms of _ordinals_.  Given a natural
@@ -66,10 +66,10 @@ Section ExtraLemmas.
     \max_(i < n | P i) i < n.
   Proof.
     intros n P i0 Pi.
-    destruct n; first by destruct i0 as [i0 P0]; move: (P0) => P0'; rewrite ltn0 in P0'.
+    destruct n as [|n]; first by destruct i0 as [i0 P0]; move: (P0) => P0'; rewrite ltn0 in P0'.
     rewrite big_mkcond.
     apply leq_ltn_trans with (n := \max_(i < n.+1) i).
-    - apply/bigmax_leqP; ins.
+    - apply/bigmax_leqP => i _.
       destruct (P i); last by done.
       by apply leq_bigmax_cond.
     - by apply bigmax_ord_ltn_identity.
@@ -83,12 +83,12 @@ Section ExtraLemmas.
       P i0 ->
       P (\max_(i < n | P i) i).
   Proof.
-    intros * Pi0.
-    induction n.
+    intros n P i0 Pi0.
+    elim: n i0 Pi0 => [|n IHn] i0 Pi0.
     { by destruct i0 as [i0 P0]; move: (P0) => P1; rewrite ltn0 in P1. }
     { rewrite big_mkcond big_ord_recr /=.
       destruct (P n) eqn:Pn.
-      { destruct n; first by rewrite big_ord0 maxn0.
+      { destruct n as [|n]; first by rewrite big_ord0 maxn0.
         unfold maxn at 1.
         destruct (\max_(i < n.+1) (match P (@nat_of_ord (S n) i) return nat with
                                    | true => @nat_of_ord (S n) i

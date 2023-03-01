@@ -49,7 +49,7 @@ Section ReadinessOfSelfSuspendingJobs.
                              && ~~ completed_by sched j t
   }.
   Next Obligation.
-    move: H2 => /andP [PASSED UNFINISHED].
+    move=> sched j t /andP[PASSED UNFINISHED].
     rewrite /pending. apply /andP. split => //.
     move: PASSED. rewrite /suspension_has_passed /has_arrived => /andP [ARR _].
     by apply: leq_trans ARR; rewrite leq_addr.

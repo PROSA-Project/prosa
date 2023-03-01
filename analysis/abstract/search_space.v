@@ -86,7 +86,7 @@ Section AbstractRTAReduction.
                                            (interference_bound_function tsk A_sp) B /\
         is_in_search_space A_sp.
     Proof.
-      induction A as [|n].
+      induction A as [|n IHn].
       - exists 0; repeat split.
           by rewrite /is_in_search_space; left.
       - have ALT:

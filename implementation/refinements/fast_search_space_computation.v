@@ -58,14 +58,13 @@ Section FastSearchSpaceComputation.
         - destruct get_time_steps_of_task; rewrite //= -index_mem in IN.
           by rewrite /last0; simpl (last 0 _); rewrite index_last. }
       { exfalso. (* h is at least the last step *)
-        destruct get_time_steps_of_task eqn:TS => //.
+        destruct get_time_steps_of_task as [|d l] eqn:TS => //.
         have IN: last0 (d::l) \in d::l by rewrite /last0 //=; apply mem_last.
         unfold large_horizon, get_time_steps_of_task in *.
         rewrite EQ in TS; rewrite TS in LARGEh.
         apply LARGEh in IN.
         by rewrite /get_horizon_of_task EQ in LT1; lia. }
     Qed.
-
 
     (** Next, we show that for each offset [A] in the search space for fixed-priority
         tasks, either (1) [A+ε] is zero or a multiple of the horizon, offset by
@@ -128,7 +127,7 @@ Section FastSearchSpaceComputation.
         A \in search_space_arrival_curve_prefix_FP tsk L.
     Proof.
       move: (has_valid_arrival_curve_prefix_tsk ts H_valid_task_set tsk H_tsk_in_ts) => [evec [EMAX VALID]].
-      intros * LT DIV; rewrite /search_space_arrival_curve_prefix_FP.
+      intros A LT DIV; rewrite /search_space_arrival_curve_prefix_FP.
       destruct VALID as [POSh [LARGEh [NOINF [BUR SORT]]]].
       replace A with (A + ε - ε); last by lia.
       rewrite subn1; apply map_f.
@@ -156,7 +155,7 @@ Section FastSearchSpaceComputation.
         A + ε = i * get_horizon_of_task tsk + t ->
         A \in search_space_arrival_curve_prefix_FP tsk L.
     Proof.
-      move: (H_valid_task_set) => VALID; intros * LT IN EQ; rewrite /search_space_arrival_curve_prefix_FP.
+      move: (H_valid_task_set) => VALID; intros i t A LT IN EQ; rewrite /search_space_arrival_curve_prefix_FP.
       replace A with (A + ε - ε); last by lia.
       rewrite subn1; apply map_f.
       set (h := get_horizon_of_task tsk) in *.
@@ -187,7 +186,7 @@ Section FastSearchSpaceComputation.
         have -> : vec (A %% h) = vec h.
         { rewrite /vec /value_at.
           have -> : ((step_at evec (A %% h)) = (step_at evec h)) => //.
-          rewrite (pred_Sn A) -addn1 modn_pred; [|repeat destruct h=> //|lia].
+          rewrite (pred_Sn A) -addn1 modn_pred; [|repeat destruct h as [|h]=> //|lia].
           rewrite /step_at DIV.
           have -> : [seq step <- steps_of evec | step.1 <= h] = steps_of evec.
           { apply /all_filterP /allP => [step IN]; apply ltnW; subst h.
@@ -199,7 +198,8 @@ Section FastSearchSpaceComputation.
           move: LTH; rewrite /get_horizon_of_task EMAX => VALID.
           specialize (VALID step.1).
           feed VALID; first by rewrite /get_time_steps_of_task EMAX; apply (map_f fst).
-          by destruct (horizon_of evec). }
+          by destruct (horizon_of evec).
+        }
         rewrite -mulSnr {1}(pred_Sn A) divn_pred -(addn1 A) DIV subn1 prednK //=.
         move: DIV => /dvdnP [k EQk]; rewrite EQk.
         by destruct k;[rewrite /ε in EQk; lia | rewrite mulnK]. }

@@ -69,9 +69,8 @@ Section SporadicArrivals.
     move: SIZE_CASE => [Z|[ONE|GTONE]].
     - apply size0nil in Z.
       by rewrite Z in J_IN_FILTER.
-    - repeat (destruct seq; try by done).
-      rewrite mem_seq1 in J_IN_FILTER; move : J_IN_FILTER => /eqP J1_S.
-      by rewrite J1_S.
+    - case: seq ONE J_IN_FILTER => [//| s [|//]] J_ONE.
+      by rewrite mem_seq1 => /eqP ->.
     - exfalso.
       apply size_task_arrivals_at_leq_one.
       exists j1.

@@ -265,7 +265,7 @@ Section TaskArrivals.
       t >= job_arrival j ->
       nth j_def (task_arrivals_up_to arr_seq tsk t) n = j.
   Proof.
-    intros * ARR TSK IND T_G.
+    move=> n j_def j t ARR TSK IND T_G.
     rewrite -IND.
     have EQ_IND : index j (task_arrivals_up_to_job_arrival arr_seq j) = index j (task_arrivals_up_to arr_seq tsk t).
     { have CAT : exists xs, task_arrivals_up_to_job_arrival arr_seq j ++ xs = task_arrivals_up_to arr_seq tsk t.

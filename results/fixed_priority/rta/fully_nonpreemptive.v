@@ -18,7 +18,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task}.
+  Context {tc : TaskCost Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -136,7 +136,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Theorem uniprocessor_response_time_bound_fully_nonpreemptive_fp:
     response_time_bounded_by tsk R.
   Proof.
-    move: (posnP (@task_cost _ H tsk)) => [ZERO|POS].
+    move: (posnP (@task_cost _ tc tsk)) => [ZERO|POS].
     { intros j ARR TSK.
       have ZEROj: job_cost j = 0.
       { move: (H_valid_job_cost j ARR) => NEQ.

@@ -95,7 +95,7 @@ Section PeriodicLemmas.
                (starting_instant_of_corresponding_hyperperiod ts j2) (job_task j1)) = job_task j1.
   Proof.
     clear H_task_in_ts H_valid_period.
-    intros *.
+    move=> j1 j2.
     set ARRIVALS := (task_arrivals_between arr_seq (job_task j1) (starting_instant_of_hyperperiod ts (job_arrival j2))
           (starting_instant_of_hyperperiod ts (job_arrival j2) + HP)).
     set IND := (job_index_in_hyperperiod ts arr_seq j1 (starting_instant_of_hyperperiod ts (job_arrival j1)) (job_task j1)).
@@ -132,7 +132,7 @@ Section PeriodicLemmas.
       size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk) =
       size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
   Proof.
-    intros * N1_LT.
+    move=> n1 n2 N1_LT.
     have -> : n2 * HP + O_max = n1 * HP + O_max + (n2 - n1) * HP.
     { by rewrite -[in LHS](subnKC N1_LT) mulnDl addnAC. }
     destruct (hyperperiod_int_mult_of_any_task ts tsk H_task_in_ts) as [k HYP]; rewrite !/HP.
@@ -152,7 +152,7 @@ Section PeriodicLemmas.
       size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk) =
       size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
   Proof.
-    intros *.
+    move=> n1 n2.
     case : (boolP (n1 == n2)) => [/eqP EQ | NEQ]; first by rewrite EQ.
     move : NEQ; rewrite neq_ltn; move => /orP [LT | LT].
     + by apply eq_size_hyp_lt => //; lia.

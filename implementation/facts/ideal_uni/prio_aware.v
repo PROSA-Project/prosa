@@ -127,7 +127,7 @@ Section PrioAwareUniprocessorScheduler.
         have ->: backlogged (uni_schedule arr_seq) j1 t = backlogged (prefix t) j1 t.
         { apply backlogged_prefix_invariance' with (h := t) => //.
           rewrite /identical_prefix /uni_schedule /prefix => t' LT.
-          induction t => //.
+          elim: t PREEMPT SCHED_j2 NOT_SCHED_j1 LT => [//|t IHt] PREEMPT SCHED_j2 NOT_SCHED_j1 LT.
           rewrite /pmc_uni_schedule/generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
           rewrite /prefix scheduled_at_def.
           induction t => //.
@@ -141,4 +141,3 @@ Section PrioAwareUniprocessorScheduler.
   End Priority.
 
 End PrioAwareUniprocessorScheduler.
-

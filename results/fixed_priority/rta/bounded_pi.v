@@ -200,7 +200,8 @@ Section AbstractRTAforFPwithArrivalCurves.
     Proof.
       move => j ARR TSK POS.
       edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 BI]]]]; rt_eauto.
-      { intros; rewrite {2}H_fixed_point leq_add //.
+      {
+        intros; rewrite {2}H_fixed_point leq_add //.
         rewrite /workload_of_higher_or_equal_priority_jobs /total_hep_rbf
           /total_hep_request_bound_function_FP
           /workload_of_jobs /hep_job /FP_to_JLFP.
@@ -232,7 +233,7 @@ Section AbstractRTAforFPwithArrivalCurves.
     Lemma instantiated_task_interference_is_bounded :
       task_interference_is_bounded_by arr_seq sched tsk (fun t A R => IBF_other R).
     Proof.
-      intros ? ? ? ? ARR TSK ? NCOMPL BUSY; simpl.
+      intros j R0 t1 t2 ARR TSK ? NCOMPL BUSY; simpl.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
       eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.

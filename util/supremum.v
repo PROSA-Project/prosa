@@ -48,7 +48,7 @@ Section SelectSupremum.
     elim: s IN; first by done.
     move=> a l _ _.
     rewrite supremum_unfold.
-    destruct (supremum l); rewrite /choose_superior //.
+    destruct (supremum l) as [s|]; rewrite /choose_superior //.
     by destruct (R a s).
   Qed.
 
@@ -59,7 +59,7 @@ Section SelectSupremum.
     elim: s; first by done.
     move => a l IH.
     rewrite supremum_unfold /choose_superior.
-    by destruct (supremum l); try destruct (R a s).
+    by destruct (supremum l) as [s|]; try destruct (R a s).
   Qed.
 
   (** Next, we observe that the value found by [supremum] comes indeed from the
@@ -73,12 +73,12 @@ Section SelectSupremum.
     elim => // a l IN_TAIL IN.
     rewrite in_cons; apply /orP.
     move: IN; rewrite supremum_unfold.
-    destruct (supremum l); rewrite /choose_superior.
+    destruct (supremum l) as [s|]; rewrite /choose_superior.
     { elim: (R a s) => EQ.
       - left; apply /eqP.
         by injection EQ.
       - right; by apply IN_TAIL. }
-    { left. apply /eqP.
+    { move=> IN; left. apply /eqP.
       by injection IN. }
   Qed.
 
@@ -112,7 +112,7 @@ Section SelectSupremum.
     { rewrite in_cons => /orP [/eqP EQy | INy]; last first.
       - have R_by: R b y
           by apply IH => //; apply supremum_in.
-        apply H_R_transitive  with (y := b) => //.
+        apply: H_R_transitive R_by.
         destruct (R s1 b) eqn:R_s1b;
           by injection SOME_z => <-.
       - move: IN_z_s; rewrite in_cons => /orP [/eqP EQz | INz];

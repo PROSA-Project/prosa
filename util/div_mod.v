@@ -12,7 +12,7 @@ Section DivMod.
       t1 %/ h = t2 %/ h -> 
       t1 %% h <= t2 %% h.
   Proof.
-    intros * LT EQ.
+    move=> t1 t2 h LT EQ.
     destruct (posnP h) as [Z | POSh].
     { by subst; rewrite !modn0. }
     { have EX: exists k, t1 + k = t2.
@@ -33,7 +33,7 @@ Section DivMod.
       x %/ y < (x + 1) %/ y -> 
       y %| (x + 1).
   Proof.
-    intros ? ? LT.
+    move=> x y LT.
     destruct (posnP y) as [Z | POS]; first by subst y.
     move: LT; rewrite divnD // -addn1 -addnA leq_add2l addn_gt0 => /orP [ONE | LE].
     { by destruct y as [ | []]. }
@@ -123,7 +123,7 @@ Section DivFloorCeil.
     rewrite ltn_divRL //.
     apply: (leq_trans _ LEQ).
     move: (leq_trunc_div m d) => LEQm.
-    destruct (ltngtP (m %/ d * d) m) => //.
+    destruct (ltngtP (m %/ d * d) m) as [| |e] => //.
     move: e => /eqP EQ; rewrite -dvdn_eq in EQ.
     by rewrite EQ in Mm.
   Qed.
@@ -135,7 +135,7 @@ Section DivFloorCeil.
       T > 0 -> Δ >= T ->
       div_ceil (Δ - T) T < div_ceil Δ T.
   Proof.
-    intros * POS LE. rewrite /div_ceil.
+    move=> Δ T POS LE. rewrite /div_ceil.
     have lkc: (Δ - T) %/ T < Δ %/ T.
     { rewrite divnBr; last by auto.
       rewrite divnn POS.
@@ -194,7 +194,7 @@ Section DivFloorCeil.
       b > 0 ->
       a < a %/ b * b + b.
   Proof.
-    intros * POS.
+    move=> a b POS.
     specialize (divn_eq a b) => DIV.
     rewrite [in X in X < _]DIV.
     rewrite ltn_add2l.
@@ -209,7 +209,7 @@ Section DivFloorCeil.
       c > b ->
       (a + c - b) %% c = if a %% c >= b then (a %% c - b) else (a %% c + c - b).
   Proof.
-    intros * BC.
+    move=> a b c BC.
     have POS : c > 0 by lia.
     have G : a %% c < c by apply ltn_pmod.
     case (b <= a %% c) eqn:CASE; rewrite -addnBA; auto; rewrite -modnDml.

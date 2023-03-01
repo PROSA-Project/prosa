@@ -12,7 +12,7 @@ Section Definitions.
   Context `{!zero_of T, !one_of T, !sub_of T, !add_of T, !mul_of T,
             !div_of T, !mod_of T, !eq_of T, !leq_of T, !lt_of T}.
   Context `{!eq_of (seq T)}.
-  Context `{!eq_of (@task_T T)}.
+  Context {eq_of2 : eq_of (@task_T T)}.
 
   (** We define a generic version of total request-bound function of
       higher-or-equal priority task, ... *)
@@ -125,11 +125,11 @@ Global Instance refine_search_space_emax_EDF :
             (search_space_emax_EDF (map taskT_to_task ts) (taskT_to_task tsk))
             (search_space_emax_EDF_N ts tsk).
 Proof.
-  intros ? ?.
+  move=> ts tsk.
   unfold search_space_emax_EDF, search_space_emax_EDF_N.
   rewrite refinesE => L L' RL; apply refinesP.
   have F: forall xs f, \cat_(x <- xs) f x = flatten (map f xs).
-  { clear; induction xs as [ | x xs]; intros.
+  { clear=> T T0; elim=> [|x xs IHxs] f.
     - by rewrite big_nil.
     - by rewrite big_cons //= IHxs. }
   rewrite F; clear F.
@@ -166,7 +166,7 @@ Global Instance refine_total_rbf' :
             (total_request_bound_function (map taskT_to_task ts))
             (total_rbf_T ts) | 0.
 Proof.
-  intros; rewrite refinesE; intros δ δ' Rδ.
+  move=> ts; rewrite refinesE => δ δ' Rδ.
   move: refine_task_set' => RTS.
   rewrite refinesE in RTS.
   specialize (RTS ts ts (unifyxx _)); simpl in RTS.

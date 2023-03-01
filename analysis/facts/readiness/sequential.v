@@ -43,11 +43,11 @@ Section SequentialTasksReadiness.
   Fact sequential_readiness_nonclairvoyance :
     nonclairvoyant_readiness sequential_readiness.
   Proof.
-    intros sched1 sched2 ? ? ID ? LE; rewrite //=.
+    intros sched1 sched2 j h ID t LE; rewrite //=.
     erewrite identical_prefix_pending; eauto 2.
     destruct (boolP (pending sched2 j t)) as [_ | _] => //=.
     destruct (boolP (prior_jobs_complete arr_seq sched2 j t)) as [ALL | NOT_ALL]; apply/eqP.
-    - rewrite eqb_id; apply/allP; intros ? IN.
+    - rewrite eqb_id; apply/allP; intros x IN.
       move: ALL => /allP ALL; specialize (ALL x IN).
       by erewrite identical_prefix_completed_by; eauto 2.
     - move: NOT_ALL => /allPn [x IN NCOMP].
@@ -81,7 +81,7 @@ Section SequentialTasksReadiness.
     intros j.
     have EX: exists k, job_arrival j <= k by (exists (job_arrival j)).
     destruct EX as [k LE]; move: j LE.
-    induction k; intros ? ? ? ARR PEND.
+    elim: k => [|k IHk] j LE t ARR PEND.
     { destruct (boolP (job_ready sched j t)) as [READY | NREADY].
       { by exists j; repeat split; eauto using (H_priority_is_reflexive 0). }
       { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [jhp IN NCOMP].

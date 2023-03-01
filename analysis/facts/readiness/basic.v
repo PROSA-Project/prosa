@@ -62,7 +62,7 @@ Section LiuAndLaylandReadiness.
   Fact basic_readiness_is_work_bearing_readiness :
     work_bearing_readiness arr_seq sched.
   Proof.
-    intros ? ? ARR PEND.
+    intros j ? ARR PEND.
     exists j; repeat split => //.
     by eapply (H_priority_is_reflexive 0).
   Qed.

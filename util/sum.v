@@ -242,17 +242,14 @@ Section SumsOverRanges.
       \sum_(t <= x < t + Δ) f x < Δ ->
       exists x, t <= x < t + Δ /\ f x = 0.
   Proof.
-    induction Δ; intros; first by rewrite ltn0 in H.
-    destruct (f (t + Δ)) eqn: EQ.
+    move=> f t; elim=> [|Δ IHΔ] H; first by rewrite ltn0 in H.
+    destruct (f (t + Δ)) as [|n] eqn: EQ.
     { exists (t + Δ); split; last by done.
       by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS]. }
     { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS; move => H.
-      feed IHΔ.
+      have {}/IHΔ [z [/andP[LE GE] ZERO]] : \sum_(t <= t' < t + Δ) f t' < Δ.
       { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
-      move: IHΔ => [z [/andP [LE GE] ZERO]].
-      exists z; split; last by done.
-      apply/andP; split; first by done.
-      by rewrite ltnS ltnW. }
+      by exists z; split=> //; rewrite LE/= ltnS ltnW. }
   Qed.
 
   (** Next, we prove that the summing over the difference of two functions is
@@ -292,10 +289,10 @@ Section SumOfTwoIntervals.
   Lemma big_sum_eq_in_eq_sized_intervals:
     \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
   Proof.
-    induction d; first by rewrite !addn0 !big_geq.
+    elim: d equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.
     rewrite !addnS !big_nat_recr => //; try by lia.
-    rewrite IHn //=; last by move=> g G_LTl; apply (equal_before_d g); lia.
-    by rewrite equal_before_d.
+    rewrite IHn //=; last by move=> g G_LTl; apply (eq g); lia.
+    by rewrite eq.
   Qed.
 
 End SumOfTwoIntervals.

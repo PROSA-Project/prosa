@@ -78,7 +78,7 @@ Section ExistsNoCarryIn.
       is_idle sched t ->
       no_carry_in t.
   Proof.
-    intros ? IDLE j ARR HA.
+    move=> t IDLE j ARR HA.
     apply/negPn/negP; intros NCOMP.
     have PEND : job_pending_at j t.
     { apply/andP; split.
@@ -102,7 +102,7 @@ Section ExistsNoCarryIn.
       is_idle sched t ->
       no_carry_in t.+1.
   Proof.
-    intros ? IDLE j ARR HA.
+    move=> t IDLE j ARR HA.
     apply/negPn/negP; intros NCOMP.
     have PEND : job_pending_at j t.
     { apply/andP; split.
@@ -208,7 +208,7 @@ Section ExistsNoCarryIn.
           intros s ARR BEF.
           by apply idle_instant_implies_no_carry_in_at_t.
       Qed.
-             
+
       (** In the second case, the total service within the time
           interval <<[t, t + Δ)>> is equal to [Δ]. On the other hand,
           we know that the total workload is lower-bounded by the
@@ -257,7 +257,7 @@ Section ExistsNoCarryIn.
     Lemma processor_is_not_too_busy :
       forall t, exists δ, δ < Δ /\ no_carry_in (t + δ).
     Proof.
-      induction t.
+      elim=> [|t IHt].
       { by exists 0; split; [ | rewrite addn0; apply no_carry_in_at_the_beginning]. }
       { move: IHt => [δ [LE FQT]].
         move: (posnP δ) => [Z|POS]; last first.
@@ -272,7 +272,7 @@ Section ExistsNoCarryIn.
         - by apply low_total_service_implies_existence_of_time_with_no_carry_in. 
       }
     Qed.
-         
+
   End ProcessorIsNotTooBusy.
   
   (** Consider an arbitrary job [j] with positive cost. *)

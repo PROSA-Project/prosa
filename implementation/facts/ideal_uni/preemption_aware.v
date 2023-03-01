@@ -173,7 +173,7 @@ Section NPUniprocessorScheduler.
       rewrite scheduled_at_def /schedule /uni_schedule /pmc_uni_schedule
               /allocation_at /generic_schedule schedule_up_to_def //= in SCHED.
       destruct (prev_job_nonpreemptive _) eqn:PREV.
-      { destruct t => //; rewrite //= in SCHED, PREV.
+      { destruct t as [|t] => //; rewrite //= in SCHED, PREV.
         destruct (schedule_up_to) => //.
         move: PREV => /andP [READY _].
         move: SCHED=> /eqP SCHED.

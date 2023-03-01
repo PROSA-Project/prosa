@@ -274,13 +274,14 @@ Section MakeEDFWorkConservationLemmas.
       conservation. *)
   Lemma mea_maintains_work_conservation :
     work_conserving arr_seq sched -> work_conserving arr_seq sched'.
-  Proof. rewrite /sched'/make_edf_at => WC_sched. destruct (sched t_edf) eqn:E => //.
-         apply fsc_swap_maintains_work_conservation => //.
-         -  by rewrite scheduled_at_def; apply /eqP => //.
-         - apply (scheduled_at_implies_later_deadline sched) => //.
-           + rewrite /all_deadlines_met in  (H_no_deadline_misses).
-             now apply (H_no_deadline_misses s t_edf); rewrite scheduled_at_def; apply /eqP.
-           + by rewrite scheduled_at_def; apply/eqP => //.
+  Proof.
+    rewrite /sched'/make_edf_at => WC_sched. destruct (sched t_edf) as [s|] eqn:E => //.
+    apply fsc_swap_maintains_work_conservation => //.
+    - by rewrite scheduled_at_def; apply /eqP => //.
+    - apply (scheduled_at_implies_later_deadline sched) => //.
+      + rewrite /all_deadlines_met in (H_no_deadline_misses).
+        now apply (H_no_deadline_misses s t_edf); rewrite scheduled_at_def; apply /eqP.
+      + by rewrite scheduled_at_def; apply/eqP => //.
   Qed.
 
 End MakeEDFWorkConservationLemmas.

@@ -64,11 +64,7 @@ Section Schedule.
       scheduled_on := multiproc_scheduled_on;
       service_on := multiproc_service_on
     |}.
-  Next Obligation.
-    move: j s r H.
-    move=> j mps cpu.
-    by apply: service_in_implies_scheduled_in.
-  Qed.
+  Next Obligation. by move=> ? ? ?; apply: service_in_implies_scheduled_in. Qed.
 
   (** From the instance [multiproc_state], we get the function [service_in].
       The service received by a given job [j] in a given multiprocessor state

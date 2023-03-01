@@ -54,10 +54,5 @@ Section State.
       scheduled_on := spin_scheduled_on;
       service_on   := spin_service_on
     |}.
-  Next Obligation.
-    move: r H.
-    case: s=>//= j' _.
-    rewrite /nat_of_bool.
-    by case: ifP.
-  Qed.
+  Next Obligation. by move=> j [] //= j' _ /negbTE ->. Qed.
 End State.

@@ -113,7 +113,7 @@ Section PriorityInversionIsBounded.
           scheduled_at sched j_hp t.
     Proof.
       move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
-      ideal_proc_model_sched_case_analysis_eq sched t jhp.
+      have [Idle|[jhp Sched_jhp]] := ideal_proc_model_sched_case_analysis sched t.
       { by eapply instant_t_is_not_idle in Idle; rt_eauto;
         [ | apply/andP; split; first apply leq_trans with tp]. }
       exists jhp.
@@ -407,10 +407,10 @@ Section PriorityInversionIsBounded.
           Proof.
             rewrite /preemption_time.
             move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
-            ideal_proc_model_sched_case_analysis_eq sched (t1 + fpt) s'; try done.
-            clear EqSched_s'; move: (Sched_s'); rewrite scheduled_at_def;
-              move => /eqP EqSched_s'; rewrite EqSched_s'.
-            destruct (jlp == s') eqn: EQ.
+            have [Idle|[s' Sched_s']] := ideal_proc_model_sched_case_analysis sched (t1 + fpt).
+            { by rewrite (eqP Idle). }
+            move: (Sched_s'); rewrite scheduled_at_def => /eqP EqSched_s'.
+            rewrite EqSched_s'; destruct (jlp == s') eqn: EQ.
             - move: EQ => /eqP EQ; subst s'.
               rewrite /service -(service_during_cat _ _ _ t1); last first.
               { by apply/andP; split; last rewrite leq_addr. }

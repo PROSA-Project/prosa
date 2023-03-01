@@ -81,7 +81,7 @@ Section Schedule.
     replace (_ (_ (_ _ _) _ t) j _) with (service sched j t.+1); last first.
     { rewrite /uni_schedule /pmc_uni_schedule /generic_schedule /service
               /service_during /service_at.
-      apply eq_big_nat; intros.
+      apply eq_big_nat => i H.
       replace (_ (_ _ _) _ t i) with (schedule_up_to (allocation_at arr_seq chp) None i i) => //.
       by apply schedule_up_to_prefix_inclusion. }
     move=> SERV_COST SERV_ZERO; apply /andP.
@@ -102,7 +102,7 @@ Section Schedule.
     nonpreemptive_schedule (uni_schedule arr_seq).
   Proof.
     rewrite /nonpreemptive_schedule.
-    induction t'; first by move=> t'; have->: t = 0 by lia.
+    move=> j t; elim=> [|t' IHt']; first by move=> t'; have->: t = 0 by lia.
     move=> LEQ SCHED NCOMP.
     destruct (ltngtP t t'.+1) as [LT | _ | EQ] => //; last by rewrite -EQ.
     feed_n 3 IHt'=> //.

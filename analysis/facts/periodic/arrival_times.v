@@ -34,7 +34,7 @@ Section PeriodicArrivalTimes.
       job_index arr_seq j = n ->
       job_arrival j = task_offset tsk + n * task_period tsk.
   Proof.
-    induction n.
+    elim=> [|n IHn].
     { intros j ARR TSK_IN ZINDEX.
       rewrite mul0n addn0.
       exact: first_job_arrival ZINDEX.
@@ -56,7 +56,7 @@ Section PeriodicArrivalTimes.
       job_task j = tsk ->
       exists n, job_arrival j = task_offset tsk + n * task_period tsk.
   Proof.
-    intros * ARR TSK.
+    move=> j ARR TSK.
     exists (job_index arr_seq j).
     specialize (periodic_arrival_times (job_index arr_seq j) j) => J_ARR.
     by feed_n 3 J_ARR => //.
@@ -72,11 +72,11 @@ Section PeriodicArrivalTimes.
       job_index arr_seq j = n.
   Proof.
     have F : task_period tsk > 0 by auto.
-    induction n.
-    + intros * ARR_J TSK ARR.
+    elim=> [|n IHn].
+    + move=> j ARR_J TSK ARR.
       destruct (PeanoNat.Nat.zero_or_succ (job_index arr_seq j)) as [Z | [m SUCC]] => //.
       by apply periodic_arrival_times in SUCC => //; lia.
-    + intros * ARR_J TSK ARR.
+    + move=> j ARR_J TSK ARR.
       specialize (H_task_respects_periodic_model j); feed_n 3 H_task_respects_periodic_model => //.
       { rewrite lt0n; apply /eqP; intro EQ.
         apply (first_job_arrival _ H_valid_arrival_sequence tsk) in EQ => //.

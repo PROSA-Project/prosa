@@ -39,10 +39,10 @@ Section FullyPreemptiveModel.
       job_cost j = 0 -> 
       job_max_nonpreemptive_segment j = 0.
   Proof.
-    intros.
+    move=> j H1.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points. 
-      by rewrite H1; compute.
+    by rewrite H1.
   Qed.
 
   (** ... or ε when [job_cost j > 0]. *)  

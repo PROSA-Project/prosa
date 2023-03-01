@@ -15,7 +15,7 @@ Section Definitions.
   Context `{!zero_of T, !one_of T, !sub_of T, !add_of T, !mul_of T,
             !div_of T, !mod_of T, !eq_of T, !leq_of T, !lt_of T}.
   Context `{!eq_of (seq T)}.
-  Context `{!eq_of (@task_T T)}.
+  Context {eq_of2 : eq_of (@task_T T)}.
 
   (** We define a generic version of higher-or-equal priority task, ... *)
   Definition hep_task_T tsk_o tsk := (task_priority_T tsk <= @task_priority_T T tsk_o)%C.
@@ -139,7 +139,7 @@ Global Instance refine_total_hep_rbf' :
             (total_hep_rbf (map taskT_to_task ts) (taskT_to_task tsk))
             (total_hep_rbf_T ts tsk) | 0.
 Proof.
-  intros; rewrite refinesE; intros δ δ' Rδ.
+  move=> ts tsk; rewrite refinesE => δ δ' Rδ.
   move: refine_task_set' => RTS.
   rewrite refinesE in RTS.
   specialize (RTS ts ts (unifyxx _)); simpl in RTS.

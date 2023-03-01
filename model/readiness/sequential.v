@@ -30,8 +30,8 @@ Section SequentialTasksReadiness.
   #[local,program] Instance sequential_ready_instance : JobReady Job PState :=
   {
     job_ready sched j t := pending sched j t &&
-                             prior_jobs_complete arr_seq sched j t
+                             prior_jobs_complete arr_seq sched j t;
   }.
-  Next Obligation. by move: H2 => /andP[]. Qed.
+  Next Obligation. by move=> sched j t /andP[]. Qed.
 
 End SequentialTasksReadiness.

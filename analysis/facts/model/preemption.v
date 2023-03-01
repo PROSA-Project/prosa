@@ -99,7 +99,7 @@ Section PreemptionFacts.
     move :  (H_sched_valid) =>  [COME_ARR READY].
     have MIN := ex_minnP EX. 
     move: MIN => [mpt /andP [/andP [LT1 SCHEDsmpt] /allP ALL] MIN]; clear EX.
-    destruct mpt.
+    destruct mpt as [|mpt].
     - exists 0; repeat split.
       + by apply/andP; split => //; apply MATE.
       +  eapply (zero_is_pt arr_seq); eauto 2.
@@ -114,7 +114,7 @@ Section PreemptionFacts.
         move: GE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LT].
         - by subst t'. 
         - by apply ALL; rewrite mem_index_iota; apply/andP; split. 
-      }         
+      }
       have PP: preemption_time sched mpt.+1 by eapply (first_moment_is_pt arr_seq)  with (j := s); eauto 2.
       exists mpt.+1; repeat split; try done.
       + apply/andP; split; last by done.

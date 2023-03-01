@@ -114,8 +114,8 @@ Section ScheduleClass.
     forall (sched : schedule (ideal.processor_state Job)) (t : instant),
       is_idle sched t \/ exists j, scheduled_at sched j t.
   Proof.
-    intros.
-    unfold is_idle; simpl; destruct (sched t) eqn:EQ.
+    move=> sched t.
+    unfold is_idle; simpl; destruct (sched t) as [s|] eqn:EQ.
     - by right; exists s; auto; rewrite scheduled_at_def EQ.
     - by left; auto.
   Qed.
@@ -223,7 +223,7 @@ Section IncrementalService.
   Proof.
     move=> j t1 t2 k SERV.
     have LE: t1 < t2 by move: (service_during_ge _ _ _ _ SERV).
-    induction k; first by apply positive_service_during in SERV.
+    elim: k SERV => [|k IHk] SERV; first by apply positive_service_during in SERV.
     feed IHk; first by apply ltn_trans with k.+1.
     move: IHk => [t [/andP [NEQ1 NEQ2] [SCHEDt SERVk]]].
     have SERVk1: service_during sched j t1 t.+1 = k.+1.

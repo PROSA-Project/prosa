@@ -52,7 +52,7 @@ Section IdealModelLemmas.
       service_of_jobs sched predT (arrivals_between arr_seq 0 t2) t1 t2 < t2 - t1 ->
       exists t, t1 <= t < t2 /\ is_idle sched t.
   Proof.
-    intros ? ? SERV.
+    move=> t1 t2 SERV.
     destruct (t1 <= t2) eqn:LE; last first.
     { move: LE => /negP/negP; rewrite -ltnNge.
       move => LT; apply ltnW in LT; rewrite -subn_eq0 in LT.
@@ -68,7 +68,7 @@ Section IdealModelLemmas.
     exists x; split; first by apply/andP; split.
     apply/negPn; apply/negP; intros NIDLE.
     unfold is_idle in NIDLE.
-    destruct(sched x) eqn:SCHED; last by done.
+    destruct(sched x) as [s|] eqn:SCHED; last by done.
     move: SCHED => /eqP SCHED; clear NIDLE; rewrite -scheduled_at_def/= in SCHED.
     move: L => /eqP; rewrite sum_nat_eq0_nat filter_predT; move => /allP L.
     specialize (L s); feed L. 

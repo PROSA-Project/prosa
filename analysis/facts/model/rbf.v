@@ -288,8 +288,7 @@ Section RequestBoundFunctions.
       t > 0 ->
       task_cost tsk <= total_request_bound_function ts t.
   Proof.
-    move => t GE.
-    destruct t; first by done.
+    case=> [//|t] GE.
     eapply leq_trans; first by apply task_rbf_1_ge_task_cost; rt_eauto.
     rewrite /total_request_bound_function.
     erewrite big_rem; last by exact H_tsk_in_ts.

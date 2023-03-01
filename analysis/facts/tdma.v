@@ -44,11 +44,10 @@ Section TDMAFacts.
     Proof.
       rewrite /task_slot_offset /TDMA_cycle big_mkcond.
       apply leq_ltn_trans with (n:=\sum_(prev_task <- ts )if prev_task!=task then task_time_slot prev_task else 0).
-      - apply leq_sum. intros* T. case (slot_order i task);auto.
+      - apply leq_sum => i T. case (slot_order i task);auto.
       - rewrite -big_mkcond (bigD1_seq task)?set_uniq//=.
-        rewrite -subn_gt0 -addnBA. rewrite subnn addn0 //.
+        rewrite -subn_gt0 -addnBA // subnn addn0 //.
         exact: time_slot_positive.
-        easy.
     Qed.
 
     (** For a task, the sum of its slot offset and its time slot is
@@ -61,7 +60,7 @@ Section TDMAFacts.
       rewrite big_mkcond.
       replace (\sum_(i <- ts | i != task) task_time_slot i)
         with (\sum_(i <- ts ) if i != task then task_time_slot i else 0).
-      apply leq_sum. intros*T. case (slot_order i task);auto.
+      apply leq_sum => i T; case (slot_order i task);auto.
         by rewrite -big_mkcond. apply (set_uniq ts).
     Qed.
   End TimeSlotFacts.
@@ -98,11 +97,11 @@ Section TDMAFacts.
                                           task_slot_offset ts tsk2 >=
                                           task_slot_offset ts tsk1 + task_time_slot tsk1 .
     Proof.
-      intros* IN1 IN2 ORDER NEQ.
+      move=> tsk1 tsk2 IN1 IN2 ORDER NEQ.
       rewrite /task_slot_offset big_mkcond addnC/=.
       replace (\sum_(tsk <- ts | slot_order tsk tsk2 && (tsk != tsk2)) task_time_slot tsk)
         with (task_time_slot tsk1 + \sum_(tsk <- ts )if slot_order tsk tsk2 && (tsk != tsk1) && (tsk!=tsk2) then task_time_slot tsk else O).
-      rewrite leq_add2l. apply leq_sum_seq. intros* IN T.
+      rewrite leq_add2l. apply leq_sum_seq => i IN T.
       case (slot_order i tsk1)eqn:SI2;auto. case (i==tsk1)eqn:IT2;auto;simpl.
       case (i==tsk2)eqn:IT1;simpl;auto.
       - by move/eqP in IT1;rewrite IT1 in SI2;apply slot_order_antisymmetric in ORDER;auto;apply ORDER in SI2;move/eqP in NEQ.
@@ -111,7 +110,7 @@ Section TDMAFacts.
         move/eqP /eqP in ORDER. move/eqP in NEQ. rewrite ORDER //=. apply /eqP.
         have TS2: (tsk1 != tsk2) = true . apply /eqP;auto. rewrite TS2.
         rewrite eqn_add2l. rewrite big_mkcond. apply/eqP. apply eq_bigr;auto.
-        intros* T. case(i!=tsk1);case (slot_order i tsk2);case (i!=tsk2) ;auto.
+        move=> i T. case(i!=tsk1);case (slot_order i tsk2);case (i!=tsk2) ;auto.
     Qed.
 
     (** Then, we proved that no two tasks share the same time slot at any time. *)
@@ -123,7 +122,7 @@ Section TDMAFacts.
         task_in_time_slot ts tsk2 t ->
         tsk1 = tsk2.
     Proof.
-      intros * IN1 SLOT1 IN2 SLOT2.
+      intros tsk1 tsk2 t IN1 SLOT1 IN2 SLOT2.
       rewrite /task_in_time_slot.
       set cycle := TDMA_cycle ts.
       set O1 := task_slot_offset ts tsk1.

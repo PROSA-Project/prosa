@@ -467,8 +467,9 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       Proof.
         move=> t before_horizon.
         rewrite /sched1 /sched2.
-        induction h2; first by move: (leq_trans before_horizon H_horizon_order).
-        move: H_horizon_order. rewrite leq_eqVlt => /orP [/eqP ->|LT]; first by done.
+        elim: h2 H_horizon_order => [|i IHi] horizon_order.
+          by move: (leq_trans before_horizon horizon_order).
+        move: horizon_order. rewrite leq_eqVlt => /orP [/eqP ->|LT]; first by done.
         move: LT. rewrite ltnS => H_horizon_order_lt.
         rewrite [RHS]/wc_transform_prefix /prefix_map -/prefix_map IHi //.
         rewrite {1}/make_wc_at.
@@ -478,7 +479,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         rewrite //.
         apply swap_candidate_is_in_future.
       Qed.
-    
+
     End PrefixInclusion.
 
     (** Next, we show that repeating the point-wise transformation up to a given horizon
@@ -515,7 +516,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         rewrite /servp /wc_transform_prefix.
         clear serv servp.
         apply prefix_map_property_invariance; last by done.
-        intros. apply leq_trans with (service sched0 j t)=> //.
+        move=> sched0 ? ?. apply leq_trans with (service sched0 j t)=> //.
         by intros; apply mwa_service_bound.
       Qed.
 

@@ -20,7 +20,7 @@ Section JLFPInstantiation.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task}.
+  Context {tc : TaskCost Task}.
 
   (** ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -572,7 +572,8 @@ Section JLFPInstantiation.
       move=> j t1 R upp ARRin TSK ARR NCOMPL; rewrite /cumul_task_interference.
       rewrite -big_split //= big_seq_cond [in X in _ = X]big_seq_cond; apply eq_bigr; move => t /andP [IN _].
       have BinFact: forall (a b c : bool), (a -> (~~ b && c) || (b && ~~c)) -> (b \/ c -> a) -> nat_of_bool a = nat_of_bool b + nat_of_bool c.
-      { by clear; move => [] [] []; try compute; firstorder; inversion H; inversion H0. }
+      { by clear; move=> [] [] [] //=; do ?[by move=> /(_ erefl)]; move=> _;
+           do ?[by move=> /(_ (or_introl erefl))]; move=> /(_ (or_intror erefl)). }
       apply: BinFact;
         [move=> /task_interference_received_before_P [TNSCHED [jo [INT TIN]]]
         | move=> [/priority_inversion_P PRIO | /another_task_hep_job_interference_P [jo [INjo [ATHEP RSERV]]]]].
@@ -638,7 +639,7 @@ Section JLFPInstantiation.
         }
         { unfold other_hep_jobs_interfering_workload, workload_of_jobs.
           interval_to_duration t1 t2 k.
-          induction k.
+          elim: k => [|k IHk].
           - rewrite !addn0.
             rewrite big_geq; last by done.
             rewrite /arrivals_between /arrival_sequence.arrivals_between big_geq; last by done.
@@ -681,7 +682,7 @@ Section JLFPInstantiation.
         move=> Phep; clear H_job_of_tsk.
         rewrite [RHS]exchange_big /=; apply: eq_big_nat => x /andP[t1lex xltt].
         rewrite /another_hep_job_interference_dec.
-        ideal_proc_model_sched_case_analysis_eq sched x jo => [|{EqSched_jo}].
+        have [Idle|[jo Sched_jo]] := ideal_proc_model_sched_case_analysis sched x.
         { rewrite (@eq_has _ _ pred0) ?has_pred0 ?big1 // => [j' _ | j'].
           + exact: ideal_not_idle_implies_sched.
           + rewrite /receives_service_at ideal_not_idle_implies_sched //.
@@ -945,7 +946,7 @@ Section JLFPInstantiation.
         move => /negP HYP; move : HYP.
         rewrite negb_or /another_hep_job_interference.
         move => /andP [HYP1 HYP2].
-        ideal_proc_model_sched_case_analysis_eq sched t jo.
+        have [Idle|[jo Sched_jo]] := ideal_proc_model_sched_case_analysis sched t.
         { exfalso; clear HYP1 HYP2.
           eapply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix in H_busy_interval_prefix; rt_eauto.
           by eapply not_quiet_implies_not_idle; rt_eauto.

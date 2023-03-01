@@ -86,7 +86,7 @@ Section JobArrivalSeparation.
       move: j1 j2 H_j1_of_task H_j2_of_task H_index_difference_k H_job_arrival_lt H_j2_from_arr_seq H_j1_from_arr_seq;
         clear H_index_difference_k H_job_arrival_lt H_j2_from_arr_seq H_j1_from_arr_seq H_j1_of_task H_j2_of_task j1 j2.
       move: k => s.
-      induction s.
+      elim: s => [|s IHs].
       { intros j1 j2 TSKj1 TSKj2 STEP LT ARRj1 ARRj2; exfalso.
         specialize (earlier_arrival_implies_lower_index arr_seq H_valid_arrival_sequence j1 j2) => LT_IND.
         feed_n 4 LT_IND => //; first by rewrite TSKj2.
@@ -95,7 +95,7 @@ Section JobArrivalSeparation.
       { intros j1 j2 TSKj1 TSKj2 STEP LT ARRj2 ARRj1.
         specialize (exists_jobs_before_j
                       arr_seq H_valid_arrival_sequence j2 ARRj2 (job_index arr_seq j2 - s)) => BEFORE.
-        destruct s.
+        destruct s as [|s].
         - exists 1; repeat split.
           by rewrite (consecutive_job_separation j1) //; lia.
         - feed BEFORE; first by lia.

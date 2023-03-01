@@ -43,12 +43,11 @@ Section BigCatNatLemmas.
           x \in f i /\ m <= i < n.
     Proof.
       intros x m n IN.
-      induction n; first by rewrite big_geq // in IN.
+      elim: n IN => [|n IHn] IN; first by rewrite big_geq // in IN.
       destruct (leqP m n); last by rewrite big_geq ?in_nil // ltnW in IN.
       rewrite big_nat_recr // /= mem_cat in IN.
       move: IN => /orP [HEAD | TAIL].
-      - apply IHn in HEAD; destruct HEAD; exists x0.
-        move: H => [H /andP [H0 H1]].
+      - move: (IHn HEAD) => [x0 [H /andP[H0 H1]]]; exists x0.
         split; first by done.
         by apply/andP; split; last by apply ltnW.
       - exists n; split; first by done.
@@ -94,7 +93,7 @@ Section BigCatNatLemmas.
       case (leqP n1 n2) => [LE | GT]; last by rewrite big_geq // ltnW.
       rewrite -[n2](addKn n1).
       rewrite -addnBA //; set delta := n2 - n1.
-      induction delta; first by rewrite addn0 big_geq.
+      elim: delta => [|delta IHdelta]; first by rewrite addn0 big_geq.
       rewrite addnS big_nat_recr /=; last by apply leq_addr.
       rewrite cat_uniq; apply/andP; split; first by apply IHdelta.
       apply /andP; split; last by apply H_uniq_seq.
@@ -155,11 +154,11 @@ Section BigCatNatLemmas.
     forall {X : Type} (F : nat -> seq X) (P : X -> bool) (t1 t2 : nat),
       [seq x <- \cat_(t1 <= t < t2) F t | P x] = \cat_(t1 <= t < t2)[seq x <- F t | P x].
   Proof.
-    intros.
+    move=> X F P t1 t2.
     specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
     + have EX: exists Δ, t2 = t1 + Δ by simpl; exists (t2 - t1); lia.
       move: EX => [Δ EQ]; subst t2.
-      induction Δ.
+      elim: Δ T1_LT => [|Δ IHΔ] T1_LT.
       { by rewrite addn0 !big_geq => //. }
       { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
         rewrite filter_cat IHΔ => //.
@@ -174,11 +173,11 @@ Section BigCatNatLemmas.
       \sum_(t1 <= t < t2) size (F t) =
       size (\cat_(t1 <= t < t2) F t).
   Proof.
-    intros.
+    move=> X F t1 t2.
     specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
     - have EX: exists Δ, t2 = t1 + Δ by simpl; exists (t2 - t1); lia.
       move: EX => [Δ EQ]; subst t2.
-      induction Δ.
+      elim: Δ T1_LT => [|Δ IHΔ] T1_LT.
       { by rewrite addn0 !big_geq => //. }
       { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
         by rewrite size_cat IHΔ => //; lia. }         
@@ -208,7 +207,7 @@ Section BigCatLemmas.
       y \in \cat_(x <- s) f x.
   Proof.
     move=> x y s INs INfx.
-    induction s; first by done.
+    elim: s INs => [//|z s IHs] INs.
     rewrite big_cons mem_cat.
     move:INs; rewrite in_cons => /orP[/eqP HEAD | CONS].
     - by rewrite -HEAD; apply /orP; left.
@@ -222,8 +221,7 @@ Section BigCatLemmas.
       y \in \cat_(x <- s) f x ->
       exists x, x \in s /\ y \in f x.
   Proof.
-    induction s; first by rewrite big_nil.
-    move=> y.
+    elim=> [|a s IHs] y; first by rewrite big_nil.
     rewrite big_cons mem_cat => /orP[HEAD | CONS].
     - exists a.
       by split => //; apply mem_head.
@@ -240,7 +238,7 @@ Section BigCatLemmas.
       \cat_(xs <- xss) [seq x <- f xs | P x] .
   Proof.
     move=> xss P.
-    induction xss.
+    elim: xss => [|a xss IHxss].
     - by rewrite !big_nil.
     - by rewrite !big_cons filter_cat IHxss.
   Qed.
@@ -264,7 +262,7 @@ Section BigCatLemmas.
         uniq xs ->
         uniq (\cat_(x <- xs) (f x)).
     Proof.
-      induction xs; first by rewrite big_nil.
+      elim=> [|a xs IHxs]; first by rewrite big_nil.
       rewrite cons_uniq => /andP [NINxs UNIQ].
       rewrite big_cons cat_uniq.
       apply /andP; split; first by apply H_uniq_f.
@@ -315,7 +313,7 @@ Section BigCatLemmas.
         \cat_(x <- xs) [seq x' <- f x | g x' == y] = f y. 
     Proof.
       move=> y xs IN UNI.
-      induction xs as [ | x' xs]; first by done.
+      elim: xs IN UNI => [//|x' xs IHxs] IN UNI.
       move: IN; rewrite in_cons => /orP [/eqP EQ| IN].
       { subst; rewrite !big_cons.
         have -> :  [seq x <- f x' | g x == x'] = f x'.
@@ -363,7 +361,7 @@ Section BigCatNestedCount.
       count P (\cat_(x <- xs) \cat_(y <- ys) F x y) =
       count P (\cat_(y <- ys) \cat_(x <- xs) F x y). 
   Proof.
-    induction xs as [|x0 seqX IHxs]; induction ys as [|y0 seqY IHys]; intros.
+    elim=> [|x0 seqX IHxs]; elim=> [|y0 seqY IHys].
     { by rewrite !big_nil. }
     { by rewrite big_cons count_cat -IHys !big_nil. } 
     { by rewrite big_cons count_cat IHxs !big_nil. } 
@@ -375,5 +373,3 @@ Section BigCatNestedCount.
   Qed.
 
 End BigCatNestedCount.
-
-

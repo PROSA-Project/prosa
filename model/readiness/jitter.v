@@ -40,7 +40,7 @@ Section ReadinessOfJitteryJobs.
     job_ready sched j t := is_released j t && ~~ completed_by sched j t
   }.
   Next Obligation.
-    move: H2 => /andP [REL UNFINISHED].
+    move=> sched j t /andP[REL UNFINISHED].
     rewrite /pending. apply /andP. split => //.
     move: REL. rewrite /is_released /has_arrived.
     by apply: leq_trans; rewrite leq_addr.

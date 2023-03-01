@@ -36,7 +36,9 @@ Section State.
           given state [s] iff [s] is [Some j]. *)
       service_on j s (_ : unit) := if s == Some j then 1 else 0;
     |}.
-  Next Obligation. by rewrite /nat_of_bool; case: ifP H => // ? /negP[]. Qed.
+  Next Obligation.
+    by move=> j s ?; rewrite /nat_of_bool; case: ifP => // ? /negP[].
+  Qed.
 
 End State.
 

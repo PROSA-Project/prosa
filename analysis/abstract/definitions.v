@@ -133,7 +133,7 @@ Section AbstractRTADefinitions.
         busy_interval j t1' t2' ->
         t1 = t1' /\ t2 = t2'.
     Proof.
-      intros ? ? ? ? ? BUSY BUSY'.
+      move=> j t1 t2 t1' t2' BUSY BUSY'.
       have EQ: t1 = t1'.
       { apply/eqP.
         apply/negPn/negP; intros CONTR.

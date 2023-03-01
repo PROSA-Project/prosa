@@ -20,7 +20,7 @@ Section Abstract_RTA.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+  Context {jc : JobCost Job}.
 
   (** Consider _any_ kind of processor state model. *)
   Context {PState : ProcessorState Job}.
@@ -412,7 +412,7 @@ Section Abstract_RTA.
           rewrite -H_equivalent; [ | apply relative_rtc_time_is_bounded].
           eapply H_job_interference_is_bounded_IBFP with t2; try done.
           + by rewrite -ltnNge (leqRW NC).
-          + intros ? ? BUSY.
+          + intros t0 t3 BUSY.
             edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
             subst t0 t3; clear BUSY.
             by rewrite -job_arrival_eq_t1_plus_A.
@@ -431,7 +431,7 @@ Section Abstract_RTA.
           erewrite leq_trans; [ | | apply H_Asp_R_fixpoint]; auto.
           apply leq_add; [by rewrite -TSK; apply H_valid_job_cost | ].
           eapply H_job_interference_is_bounded_IBFNP with (t2 := t2); eauto 2.
-          intros ? ? BUSY.
+          intros t0 t3 BUSY.
           edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
           subst t0 t3; clear BUSY; split.
           - by rewrite H_equivalent //; apply relative_rtc_time_is_bounded.
@@ -464,7 +464,7 @@ Section Abstract_RTA.
     task_response_time_bound arr_seq sched tsk R.
   Proof.
     move => j ARR JOBtsk; unfold job_response_time_bound.
-    move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
+    move: (posnP (@job_cost _ jc j)) => [ZERO|POS].
     { by rewrite /completed_by ZERO. }
     move: (H_bounded_busy_interval_exists  _ ARR JOBtsk POS) => [t1 [t2 [NEQ [T2 BUSY]]]].
     move: (relative_arrival_is_bounded _ ARR JOBtsk POS _ _ BUSY) => AltL.

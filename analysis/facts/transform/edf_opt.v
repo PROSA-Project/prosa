@@ -689,7 +689,7 @@ Section EDFPrefixInclusion.
       identical_prefix (edf_transform_prefix sched h1) (edf_transform_prefix sched h2) h1.
   Proof.
     move=> h1 h2 LE_h1_h2. rewrite /identical_prefix => t LT_t_h1.
-    induction h2; first by move: (leq_trans LT_t_h1 LE_h1_h2).
+    elim: h2 LE_h1_h2 => [|h2 IHh2] LE_h1_h2; first by move: (leq_trans LT_t_h1 LE_h1_h2).
     move: LE_h1_h2. rewrite leq_eqVlt => /orP [/eqP ->|LT]; first by done.
     move: LT. rewrite ltnS => LE_h1_h2.
     rewrite [RHS]/edf_transform_prefix /prefix_map -/prefix_map IHh2 //.

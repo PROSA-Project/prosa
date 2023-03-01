@@ -26,7 +26,7 @@ Section Sequential_Abstract_RTA.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
-  Context `{JobCost Job}.
+  Context {jc : JobCost Job}.
   Context `{JobPreemptable Job}.
 
   (** Consider any valid arrival sequence with consistent, non-duplicate arrivals...*)
@@ -272,7 +272,7 @@ Section Sequential_Abstract_RTA.
         completed_by sched j2 t1.
       Proof.
         move => JA; move: (H_j2_from_tsk) => /eqP TSK2eq.
-        move: (posnP (@job_cost _ H3 j2)) => [ZERO|POS].
+        move: (posnP (@job_cost _ jc j2)) => [ZERO|POS].
         { by rewrite /completed_by /service.completed_by ZERO. }
         move: (H_interference_and_workload_consistent_with_sequential_tasks
                  j1 t1 t2 H_j1_arrives H_j1_from_tsk H_j1_cost_positive H_busy_interval) => SWEQ.
@@ -745,7 +745,7 @@ Section Sequential_Abstract_RTA.
       apply ideal_proc_model_provides_unit_service.
       { clear ARR TSK H_R_is_maximum_seq R j.
         move => t1 t2 R j ARR TSK BUSY NEQ COMPL.
-        move: (posnP (@job_cost _ H3 j)) => [ZERO|POS].
+        move: (posnP (@job_cost _ jc j)) => [ZERO|POS].
         { exfalso; move: COMPL => /negP COMPL; apply: COMPL.
           by rewrite /service.completed_by /completed_by ZERO.
         }

@@ -65,7 +65,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     { apply/negPn/negP; rewrite -eqn0Ngt; intros CONTR; move: CONTR => /eqP CONTR.
       move: (END _ H_tsk_in_ts) => EQ.
       move: EQ; rewrite /last0 -nth_last nth_default; last by rewrite CONTR.
-        by intros; move: (H_positive_cost); rewrite EQ ltnn. 
+      by move=> EQ; move: (H_positive_cost); rewrite EQ ltnn. 
     } 
     have EQ: 2 = size [::0; task_cost tsk]; first by done. 
     rewrite EQ; clear EQ.
@@ -93,14 +93,14 @@ Section TaskRTCThresholdLimitedPreemptions.
         by rewrite -(leq_add2r 1) !addn1 prednK //.
     }
   Qed.
-    
+
   (** Then, we prove that [task_rtct] function
       defines a valid task's run to completion threshold. *)   
   Lemma limited_valid_task_run_to_completion_threshold:
     valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
     split; first by rewrite /task_rtc_bounded_by_cost leq_subr.
-    intros ? ARR__j TSK__j. move: (H_valid_fixed_preemption_points_model) => [LJ LT].
+    intros j ARR__j TSK__j. move: (H_valid_fixed_preemption_points_model) => [LJ LT].
     move: (LJ) (LT) => [ZERO__job [COST__job SORT__job]] [ZERO__task [COST__task [SORT__task [T4 [T5 T6]]]]].
     rewrite /job_rtct /task_rtct /limited_preemptions_rtc_threshold
             /job_last_nonpreemptive_segment /task_last_nonpr_segment /lengths_of_segments.
@@ -139,6 +139,6 @@ Section TaskRTCThresholdLimitedPreemptions.
     - by rewrite TSK__j; eapply number_of_preemption_points_in_task_at_least_two.  
     - by apply SORT__task; rewrite TSK__j.
   Qed.
-  
+
 End TaskRTCThresholdLimitedPreemptions.
 Global Hint Resolve limited_valid_task_run_to_completion_threshold : basic_rt_facts.

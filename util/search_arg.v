@@ -48,7 +48,7 @@ Section ArgSearch.
     forall a b,
       search_arg a b = None <-> forall x, a <= x < b -> ~~ P (f x).
   Proof.
-    split.
+    move=> a b; split.
     { (* if *)
       elim: b => [ _ | b' HYP]; first by move=> _ /andP [_ FALSE] //.
       rewrite /search_arg  -/search_arg.
@@ -95,7 +95,7 @@ Section ArgSearch.
       exists y, search_arg a b = Some y.
   Proof.
     move=> a b H_exists.
-    destruct (search_arg a b) eqn:SEARCH; first by exists n.
+    destruct (search_arg a b) as [n|] eqn:SEARCH; first by exists n.
     move: SEARCH. rewrite search_arg_none => NOT_exists.
     exfalso.
     move: H_exists => [x [RANGE Pfx]].
@@ -214,7 +214,7 @@ Section ExMinn.
       P (ex_minn ex) ->
       exists n, P n /\ pred n /\ (forall n', pred n' -> n <= n').
   Proof.
-    intros.
+    move=> P pred ex.
     exists (ex_minn ex); repeat split; auto.
     all: have MIN := ex_minnP ex; move: MIN => [n Pn MIN]; auto.
   Qed.
@@ -226,8 +226,8 @@ Section ExMinn.
     forall (P : nat -> bool) (exP : exists n, P n) (c : nat),
       P c -> 
       ex_minn exP <= c.
-  Proof. 
-    intros ? ? ? EX.
+  Proof.
+    move=> P exP c EX.
     rewrite leqNgt; apply/negP; intros GT.
     pattern (ex_minn (P:=P) exP) in GT;
       apply prop_on_ex_minn in GT; move: GT => [n [LT [Pn MIN]]].

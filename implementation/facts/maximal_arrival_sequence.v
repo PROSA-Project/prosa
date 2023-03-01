@@ -178,7 +178,7 @@ Section MaximalArrivalSequence.
         nth 0 (maximal_arrival_prefix tsk h1) t = nth 0 (maximal_arrival_prefix tsk h2) t.
     Proof.
       move=> t h1 h2 /andP[LEQh1 LEQh2].
-      induction h2; [by have -> : h1 = 0; lia |].
+      elim: h2 LEQh2 => [|h2 IHh2] LEQh2; [by have -> : h1 = 0; lia |].
       rewrite leq_eqVlt in LEQh2.
       move: LEQh2 => /orP [/eqP EQ | LT]; first by rewrite EQ.
       feed IHh2; first by lia.
@@ -212,7 +212,7 @@ Section MaximalArrivalSequence.
     Proof.
       move=> t Δ LEQ.
       move: (H_valid_arrival_curve tsk H_tsk_in_ts) => [ZERO MONO].
-      destruct t.
+      destruct t as [|t].
       { rewrite unlock //= subn0.
         rewrite /max_arrivals_at /maximal_arrival_prefix /extend_arrival_prefix
                 /next_max_arrival //= /suffix_sum subn0 unlock subn0.
@@ -245,12 +245,12 @@ Section MaximalArrivalSequence.
     replace t1 with (t-Δ); last by lia.
     have LEQd: Δ <= t by lia.
     generalize Δ LEQd; clear LEQ Δ LEQd.
-    induction t; move => Δ LEQ.
+    elim: t => [|t IHt] Δ LEQ.
     { rewrite sub0n.
       rewrite number_of_task_arrivals_eq //.
       by vm_compute; rewrite unlock. }
     { rewrite number_of_task_arrivals_eq //.
-      destruct Δ; first by rewrite /index_iota subnn; vm_compute; rewrite unlock.
+      destruct Δ as [|Δ]; first by rewrite /index_iota subnn; vm_compute; rewrite unlock.
       rewrite subSS.
       specialize (IHt Δ).
       feed IHt; first by lia.
@@ -263,4 +263,3 @@ Section MaximalArrivalSequence.
   Qed.
 
 End MaximalArrivalSequence.
-

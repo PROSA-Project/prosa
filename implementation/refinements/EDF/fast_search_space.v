@@ -109,7 +109,7 @@ Section FastSearchSpaceComputationSubset.
     set (S := repeat_steps_with_offset _ _) in *.
     replace (shift_points_neg _ _) with S; first by done.
     symmetry; unfold shift_points_neg, shift_points_pos.
-    induction S; first by done.
+    elim: S => [//|a S IHS].
     rewrite //= leq_addr //= IHS.
     by replace ( _ + _ - _) with a; last lia.
   Qed.
@@ -119,7 +119,7 @@ Section FastSearchSpaceComputationSubset.
   Lemma search_space_subset_EDF :
     forall A, A \in correct_search_space ts tsk L -> A \in search_space_emax_EDF ts tsk L.
   Proof.
-    intros *; unfold correct_search_space, is_in_search_space.
+    move=> A; unfold correct_search_space, is_in_search_space.
     rewrite mem_filter => /andP [/andP [LT /orP [CH|CH]] IN]; unfold search_space_emax_EDF.
     { move: (H_tsk_in_ts) => INTS.
       apply in_cat in INTS; destruct INTS as [ts_l [ts_r EQ]].

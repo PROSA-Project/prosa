@@ -35,7 +35,7 @@ Section ExecutionOrder.
       scheduled_at sched j1 t ->
       job_arrival j1 <= job_arrival j2.
   Proof.
-    intros ? ? t ARR1 ARR2 TSK NCOMPL SCHED.
+    move=> j1 j2 t ARR1 ARR2 TSK NCOMPL SCHED.
     rewrite /same_task eq_sym in TSK.
     have SEQ := H_sequential_tasks j2 j1 t ARR2 ARR1 TSK.
     rewrite leqNgt; apply/negP; intros ARR.

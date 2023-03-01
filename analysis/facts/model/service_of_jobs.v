@@ -18,7 +18,7 @@ Section GenericModelLemmas.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
+  Context {ja : JobArrival Job}.
   Context `{JobCost Job}.
 
   (** Consider any kind of processor state model, ... *)
@@ -63,7 +63,7 @@ Section GenericModelLemmas.
       move => x /andP [/andP [GEi LTi] _].
       rewrite big_seq_cond big1 //.
       move => j /andP [ARR Ps].
-      apply service_before_job_arrival_zero with H0; auto.
+      apply service_before_job_arrival_zero with ja; auto.
       eapply in_arrivals_implies_arrived_between in ARR; eauto 2.
       by move: ARR => /andP [N1 N2]; apply leq_trans with t.
     Qed.
@@ -177,7 +177,7 @@ Section GenericModelLemmas.
         service_of_jobs_at sched P jobs t = 0.
     Proof.
       intros ? ALL.
-      induction jobs.
+      elim: jobs ALL => [|a l IHl] ALL.
       - by rewrite /service_of_jobs_at big_nil.
       - feed IHl.
         { by intros j' IN; apply ALL; rewrite in_cons; apply/orP; right. }
@@ -190,7 +190,6 @@ Section GenericModelLemmas.
         by apply not_scheduled_implies_no_service.
     Qed.
 
-    
 End GenericModelLemmas.
 
 (** In this section, we prove some properties about service
@@ -267,7 +266,7 @@ Section UnitServiceModelLemmas.
       apply in_arrivals_implies_arrived_between in ARR; last by done.
       move: ARR => /andP [T1 T2].
       have F1: forall a b, (a < b) || (a >= b).
-      { by intros; destruct (a < b) eqn:EQU; apply/orP;
+      { by move=> a b; destruct (a < b) eqn:EQU; apply/orP;
           [by left |right]; apply negbT in EQU; rewrite leqNgt. }
       move: (F1 t_compl t1) => /orP [LT | GT].
       - rewrite /service_of_jobs /service_during in EQ.
@@ -384,9 +383,9 @@ Section UnitServiceUniProcessorModelLemmas.
       intros t.
       eapply leq_trans.
       { by apply leq_sum_seq_pred with (P2 := predT); intros. }
-      simpl; induction jobs as [ | j js].
+      simpl; elim: jobs H_no_duplicate_jobs => [|j js IHjs] uniq_js.
       - by rewrite big_nil.
-      - feed IHjs; first by move: H_no_duplicate_jobs; rewrite cons_uniq => /andP [_ U].
+      - feed IHjs; first by move: uniq_js; rewrite cons_uniq => /andP [_ U].
         rewrite big_cons.
         destruct (service_is_zero_or_one H_unit_service_proc_model  sched j t) as [Z | O].
         + by rewrite Z (leqRW IHjs).
@@ -399,16 +398,16 @@ Section UnitServiceUniProcessorModelLemmas.
             first apply service_at_implies_scheduled_at.
           apply/negP; intros SCHED.
           specialize (H_uniprocessor_model _ _ _ _ POS SCHED); subst j'.
-          by move: H_no_duplicate_jobs; rewrite cons_uniq => /andP [/negP NIN _].
+          by move: uniq_js; rewrite cons_uniq => /andP [/negP NIN _].
     Qed.
-    
+
     (** Next, we prove that the service received by those jobs is no larger 
         than their workload. *)
     Corollary service_of_jobs_le_length_of_interval:
       forall (t : instant) (Δ : duration),
         service_of_jobs sched P jobs t (t + Δ) <= Δ.
     Proof.
-      intros.
+      move=> t Δ.
       have EQ: \sum_(t <= x < t + Δ) 1 = Δ.
       { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t]addn0 subnDl subn0. }
       rewrite -{2}EQ {EQ}.
@@ -423,7 +422,7 @@ Section UnitServiceUniProcessorModelLemmas.
       forall (t1 t2 : instant),
         service_of_jobs sched P jobs t1 t2 <= t2 - t1.
     Proof.
-      intros.
+      move=> t1 t2.
       have <-: \sum_(t1 <= x < t2) 1 = t2 - t1.
       { by rewrite big_const_nat iter_addn mul1n addn0. } 
       rewrite /service_of_jobs exchange_big //=.

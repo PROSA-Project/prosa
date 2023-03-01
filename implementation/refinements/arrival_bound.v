@@ -208,7 +208,7 @@ Section Refinements.
     destruct evec as [h st].
     apply prod_R_pair_R.
     - by compute.
-    - simpl; clear h; induction st.
+    - simpl; clear h; elim: st => [|a st IHst].
       + apply list_R_nil_R.
       + simpl; apply list_R_cons_R; last by done.
         destruct a; unfold tb2tn, tmap; simpl.
@@ -221,7 +221,7 @@ Section Refinements.
       refines ( list_R (prod_R Rnat Rnat) )%rel xs xs' ->
       refines ( bool_R )%rel (sorted ltn_steps xs) (sorted ltn_steps_T xs').
   Proof.
-    induction xs as [ | x xs]; intros * Rxs.
+    elim=> [|x xs IHxs] xs' Rxs.
     { destruct xs' as [ | x' xs']; first by tc.
       by rewrite refinesE in Rxs; inversion Rxs. }
     { destruct xs' as [ | x' xs']; first by rewrite refinesE in Rxs; inversion Rxs.
@@ -240,7 +240,7 @@ Section Refinements.
       refines ( list_R (prod_R Rnat Rnat) )%rel xs xs' ->
       refines ( bool_R )%rel (sorted leq_steps xs) (sorted leq_steps_T xs').
   Proof.
-    induction xs as [ | x xs]; intros * Rxs.
+    elim=> [|x xs IHxs] xs' Rxs.
     { destruct xs' as [ | x' xs']; first by tc.
       by rewrite refinesE in Rxs; inversion Rxs. }
     { destruct xs' as [ | x' xs']; first by rewrite refinesE in Rxs; inversion Rxs.
@@ -267,9 +267,8 @@ Section Refinements.
     apply RL; clear RL.
     - by apply refinesP; refines_apply.
     - apply filter_R.
-      + intros [n1 n2] [n1' n2'] Rnn.
-        inversion Rnn; subst; clear Rnn X0; rename X into Rn1.
-        by rewrite //=; apply refinesP; refines_apply.
+      + move=> _ _ [n1 n1' Rn1 _ _ _] /=.
+        by apply: refinesP; apply: refines_apply.
       + unfold steps_of, steps_of_T.
         by apply refinesP; refines_apply.
   Qed.
@@ -280,11 +279,8 @@ Section Refinements.
   Proof.
     rewrite refinesE => evec evec' Revec.
     destruct evec as [h st], evec' as [h' st'].
-    inversion Revec; subst; rename X into Rh; rename X0 into Rst.
-    rewrite /time_steps_of /time_steps_of_T //=.
-    apply refinesP; eapply refine_map.
-    - by rewrite refinesE; apply Rst.
-    - by apply refines_fst_R.
+    case: Revec => n1 n1' Rn1 n2 n2' Rn2.
+    by apply: refinesP; apply: refines_apply.
   Qed.
 
   (** Next, we prove the refinement for the [extrapolated_arrival_curve] function. *)
@@ -302,20 +298,17 @@ Section Refinements.
   Proof.
     rewrite refinesE => arrival_curve_prefix arrival_curve_prefix' Rarrival_curve_prefix.
     destruct arrival_curve_prefix as [h steps], arrival_curve_prefix' as [h' steps'].
-    inversion_clear Rarrival_curve_prefix; rename X into Rh, X0 into Rsteps.
-    unfold Rtask_ab, fun_hrel, task_abT_to_task_ab, ACPrefixT_to_ACPrefix.
-    simpl.
+    case: Rarrival_curve_prefix => {}h {}h' Rh {}steps {}steps' Rsteps.
+    rewrite /Rtask_ab /fun_hrel /task_abT_to_task_ab /ACPrefixT_to_ACPrefix /=.
     have ->: nat_of_bin h' = h by rewrite -Rh.
     have ->: m_tb2tn steps' = steps; last by done.
-    clear h h' Rh; move: steps' Rsteps; induction steps; intros.
+    clear h h' Rh; elim: steps steps' Rsteps => [|a steps IHsteps] steps' Rsteps.
     - by destruct steps'; [done | inversion Rsteps].
-    - destruct steps'; first by inversion Rsteps.
-      inversion_clear Rsteps; rename X into Rh, X0 into Rsteps.
-      apply/eqP; rewrite //= eqseq_cons; apply/andP; split.
-      + destruct a, p; unfold tb2tn, tmap; simpl; apply/eqP.
-        apply prod_RE in Rh.
-        by compute in Rh; destruct Rh; subst.
-      + by apply/eqP; apply: IHsteps.
+    - destruct steps' as [|p steps']; first by inversion Rsteps.
+      inversion_clear Rsteps as [|? ? Rap ? ? Rstep].
+      rewrite /m_tb2tn/= /tb2tn/tmap/=.
+      congr cons; first by case: Rap => _ {}a <- _ b <-.
+      exact: IHsteps.
   Qed.
 
   (** Next, we define some useful equality functions to guide the typeclass engine. *)
@@ -348,12 +341,12 @@ Section Refinements.
       have -> : ((h1, evec1) == (h2, evec2))%C = ((h1 == h2) && (evec1 == evec2))%C by constructor.
       apply andb_R.
       apply refinesP; refines_apply.
-      clear h1 h2; move: evec2; induction evec1 as [| h1 evec1]; first by intros [].
-      simpl; intros [ | h2 evec2]; first by done.
+      clear h1 h2; move: evec2; elim: evec1 => [[] //|h1 evec1 IHevec1].
+      case=> [//|h2 evec2].
       rewrite //= !eqseq_cons.
       apply andb_R; last by apply IHevec1.
-      destruct h1, h2; simpl.
-      rewrite /tb2tn /tmap; simpl.
+      move: h1 h2 => [n n0] [n1 n2].
+      rewrite /tb2tn /tmap /=.
       replace ((n, n0) == (n1, n2)) with ((n == n1) && (n0 == n2)) by constructor.
       replace ((nat_of_bin n, nat_of_bin n0) == (nat_of_bin n1, nat_of_bin n2)) with
           ((nat_of_bin n == nat_of_bin n1) && (nat_of_bin n0 == nat_of_bin n2)) by constructor.

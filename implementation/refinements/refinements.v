@@ -172,7 +172,7 @@ Lemma posBinNatNotZero:
   forall p, ~ (nat_of_bin (N.pos p)) = O.
 Proof.
   rewrite -[0]bin_of_natK.
-  intros ? EQ.
+  intros p EQ.
   have BJ := @Bijective _ _ nat_of_bin bin_of_nat.
   feed_n 2 BJ.
   { by intros ?; rewrite bin_of_natE; apply nat_of_binK. }
@@ -204,7 +204,7 @@ Lemma refine_ltn :
     Rnat b b' ->
     bool_R (a < b) (a' < b')%C.
 Proof.
-  intros * Ra Rb.
+  move=> a a' b b' Ra Rb.
   replace (@lt_op N lt_N a' b') with (@leq_op N leq_N (1 + a')%N b');
     first by apply refinesP; refines_apply.
   unfold leq_op, leq_N, lt_op, lt_N.
@@ -319,24 +319,19 @@ Global Instance refine_last :
   forall {A B : Type} (rA : A -> B -> Type),
     refines (rA ==> list_R rA ==> rA)%rel last last.
 Proof.
-  intros *; rewrite refinesE => d d' Rd xs xs' Rxs.
-  move: d d' Rd xs' Rxs; induction xs; intros.
+  move=> A B rA; rewrite refinesE => d d' Rd xs xs' Rxs.
+  elim: xs d d' Rd xs' Rxs => [|a xs IHxs] d d' Rd xs' Rxs.
   - by destruct xs'; last inversion Rxs.
-  - destruct xs'; first by inversion Rxs.
-    inversion Rxs; subst; clear Rxs; rename X1 into Rab, X4 into Rxs.
-    by simpl; apply IHxs.
+  - case: xs' Rxs => [|b xs'] Rxs; first by inversion Rxs.
+    exact: last_R.
 Qed.
 
 (** Next, we prove a refinement for the [size] function. *)
 Global Instance refine_size A C (rAC : A -> C -> Type) :
   refines (list_R rAC ==> Rnat)%rel size size_T.
 Proof.
-  rewrite refinesE => h.
-  induction h; intros h' Rh; first by destruct h'; last inversion Rh.
-  destruct h'; first by inversion Rh.
-  inversion_clear Rh.
-  apply IHh in X4; clear IHh; simpl.
-  by have H := Rnat_S; rewrite refinesE in H; specialize (H _ _ X4).
+  apply: refines_abstr => s s'; rewrite !refinesE.
+  by elim=> [//|a a' Ra {}s {}s' Rs IHs] /=; apply: refinesP.
 Qed.
 
 (** Next, we prove a refinement for the [iota] function when applied
@@ -346,9 +341,9 @@ Lemma iotaTsuccN :
     iota_T a (N.succ (Pos.pred_N p)) = a :: iota_T (succN a) (Pos.pred_N p).
 Proof.
   move=> a p.
-  destruct (N.succ (Pos.pred_N p)) eqn:EQ; first by move: (N.neq_succ_0 (Pos.pred_N p)).
+  destruct (N.succ (Pos.pred_N p)) as [|p0] eqn:EQ; first by move: (N.neq_succ_0 (Pos.pred_N p)).
   move: (posBinNatNotZero p0) => /eqP EQn0.
-  destruct (nat_of_bin (N.pos p0)) eqn:EQn; first by done.
+  destruct (nat_of_bin (N.pos p0)) as [|n] eqn:EQn; first by done.
   have -> : n = Pos.pred_N p; last by rewrite //= /succN /add_N /add_op N.add_comm.
   apply /eqP.
   rewrite -eqSS -EQn -EQ -addn1.
@@ -360,7 +355,7 @@ Qed.
 Global Instance refine_iota :
   refines (Rnat ==> Rnat ==> list_R Rnat)%rel iota iota_T.
 Proof.
-  rewrite refinesE => a a' Ra b; move: a a' Ra; induction b; intros a a' Ra b' Rb.
+  rewrite refinesE => a a' Ra b; move: a a' Ra; elim: b => [|b IHb] a a' Ra b' Rb.
   { destruct b'; first  by rewrite //=; apply list_R_nil_R.
     by compute in Rb; apply posBinNatNotZero in Rb. }
   { destruct b'; first  by compute in Rb; destruct b.
@@ -403,7 +398,7 @@ Global Instance refine_abstract :
   forall xs,
     refines (list_R Rnat)%rel (map nat_of_bin xs) xs | 0.
 Proof.
-  induction xs; first by rewrite refinesE; simpl; apply list_R_nil_R.
+  elim=> [|a xs IHxs]; first by rewrite refinesE; simpl; apply list_R_nil_R.
   rewrite //= refinesE; rewrite refinesE in IHxs.
   by apply list_R_cons_R; last by done.
 Qed.
@@ -418,7 +413,7 @@ Qed.
 Lemma refine_foldr_lemma :
   refines ((Rnat ==> Rnat ==> Rnat) ==> Rnat ==> list_R Rnat ==> Rnat)%rel foldr foldr.
 Proof.
-  rewrite refinesE => f f' Rf d d' Rd xs; induction xs as [ | x xs]; intros xs' Rxs.
+  rewrite refinesE => f f' Rf d d' Rd; elim=> [|x xs IHxs] xs' Rxs.
   { by destruct xs' as [ | x' xs']; [ done | inversion Rxs ]. }
   { destruct xs' as [ | x' xs']; first by inversion Rxs.
     inversion Rxs; subst.
@@ -442,7 +437,7 @@ Section GenericLists.
       refines ( rT ==> bool_R )%rel R R' ->
       refines Rnat (\sum_(x <- xs | R x) F x) (foldr +%C 0%C [seq F' x' | x' <- xs' & R' x']).
   Proof.
-    intros * Rxs Rf Rr.
+    move=> R R' F F' rT Rxs Rf Rr.
     have ->: \sum_(x <- xs | R x) F x = foldr addn 0 [seq F x | x <- xs & R x].
     { by rewrite foldrE big_map big_filter. }
     refines_apply.
@@ -461,7 +456,7 @@ Section GenericLists.
       refines ( rT ==> Rnat )%rel F F' ->
       refines Rnat (\sum_(x <- xs) F x) (foldr +%C 0%C [seq F' x' | x' <- xs']).
   Proof.
-    intros * Rxs Rf.
+    move=> F F' rT Rxs Rf.
     have ->: \sum_(x <- xs) F x = foldr addn 0 [seq F x | x <- xs] by rewrite foldrE big_map.
     refines_apply.
     by apply refine_foldr_lemma.
@@ -479,7 +474,7 @@ Section GenericLists.
       refines ( rT ==> bool_R )%rel R R' ->
       refines Rnat (\max_(x <- xs | R x) F x) (foldr maxn_T 0%C [seq F' x' | x' <- xs' & R' x']).
   Proof.
-    intros * Rxs Rf Rr.
+    move=> R R' F F' rT Rxs Rf Rr.
     have ->: \max_(x <- xs | R x) F x = foldr maxn 0 [seq F x | x <- xs & R x]
                                          by rewrite foldrE big_map big_filter.
     refines_apply.

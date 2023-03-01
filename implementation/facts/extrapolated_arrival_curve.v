@@ -61,14 +61,16 @@ Section ArrivalCurvePrefixSortedLeq.
         all (leq_steps (t__d1, v__d1)) steps ->
         all (leq_steps (t__d2, v__d2)) steps ->
         snd (last (t__d1, v__d1) [seq step <- steps | fst step <= t1]) <= snd (last (t__d2, v__d2) [seq step <- steps | fst step <= t2]).
-    { induction steps as [ | [t__c v__c] steps]; first by done.
+    { have steps_sorted := H_sorted_leq; clear H_sorted_leq.
+      elim: steps steps_sorted => [//|[t__c v__c] steps IHsteps] steps_sorted.
       simpl; intros *; move => LEv /andP [LTN1 /allP ALL1] /andP [LTN2 /allP ALL2].
-      move: (H_sorted_leq); rewrite //= (@path_sorted_inE _ predT leq_steps); first last.
+      move: (steps_sorted); rewrite //= (@path_sorted_inE _ predT leq_steps); first last.
       { by apply/allP. }
       { by intros ? ? ? _ _ _; apply leq_steps_is_transitive. }
       move => /andP [ALL SORT].
       destruct (leqP (fst (t__c, v__c)) t1) as [R1 | R1], (leqP (fst (t__c, v__c)) t2) as [R2 | R2]; simpl in *.
-      { rewrite R1 R2 //=; apply IHsteps; try done. }
+      {
+        rewrite R1 R2 //=; apply IHsteps; try done. }
       { by lia. }
       { rewrite ltnNge -eqbF_neg in R1; move: R1 => /eqP ->; rewrite R2 //=; apply IHsteps; try done.
         - by move: LTN1; rewrite /leq_steps => /andP //= [_ LEc].
@@ -94,13 +96,13 @@ Section ArrivalCurvePrefixSortedLeq.
       value_at ac_prefix t < value_at ac_prefix (t + ε) ->
       exists v, (t + ε, v) \in steps_of ac_prefix.
   Proof.
-    intros ? LT.
+    move=> t LT.
     unfold value_at, step_at in LT.
     destruct ac_prefix as [h2 steps]; simpl in LT.
     rewrite [in X in _ < X](sorted_split _ _ fst t) in LT.
     { rewrite [in X in _ ++ X](eq_filter (a2 := fun x => fst x == t + ε)) in LT; last first.
       { by intros [a b]; simpl; rewrite -addn1 /ε eqn_leq. }
-      { destruct ([seq x <- steps | fst x == t + ε]) eqn:LST.
+      { destruct ([seq x <- steps | fst x == t + ε]) as [|p l] eqn:LST.
         { rewrite LST in LT.
           rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT; last first.
           { clear; intros [a b]; simpl.
@@ -118,7 +120,7 @@ Section ArrivalCurvePrefixSortedLeq.
       }
     }
     { move: (H_sorted_leq); clear H_sorted_leq; rewrite /sorted_leq_steps //= => SORT; clear H_no_inf_arrivals.
-      induction steps; [by done | simpl in *].
+      elim: steps SORT => [//|a steps IHsteps] /= SORT.
       move: SORT; rewrite path_sortedE; auto using leq_steps_is_transitive; move => /andP [LE SORT].
       apply IHsteps in SORT.
       rewrite path_sortedE; last by intros ? ? ? LE1 LE2; lia.
@@ -146,7 +148,7 @@ Section ArrivalCurvePrefixSortedLtn.
   Lemma sorted_ltn_steps_imply_sorted_leq_steps_steps :
     sorted_leq_steps ac_prefix.
   Proof.
-    destruct ac_prefix; unfold sorted_leq_steps, sorted_ltn_steps in *; simpl in *.
+    destruct ac_prefix as [d l]; unfold sorted_leq_steps, sorted_ltn_steps in *; simpl in *.
     clear H_no_inf_arrivals d.
     destruct l; simpl in *; first by done.
     eapply sub_path; last by apply H_sorted_ltn.
@@ -181,7 +183,7 @@ Section ArrivalCurvePrefixSortedLtn.
     intros * IN; destruct ac_prefix as [h steps].
     unfold step_at; simpl in *.
     apply in_cat in IN; move: IN => [steps__l [steps__r EQ]]; subst steps.
-    apply sorted_cat in H_sorted_ltn; destruct H_sorted_ltn; clear H_sorted_ltn; last by apply ltn_steps_is_transitive.
+    apply sorted_cat in H_sorted_ltn; destruct H_sorted_ltn as [H H0]; clear H_sorted_ltn; last by apply ltn_steps_is_transitive.
     rewrite filter_cat last_cat (nonnil_last _ _ (0,0)); last by rewrite //= leqnn.
     move: H0; rewrite //= path_sortedE; auto using ltn_steps_is_transitive; rewrite //= leqnn => /andP [ALL SORT].
     simpl; replace (filter _ _ ) with (@nil (nat * nat)); first by done.
@@ -265,7 +267,7 @@ Section ExtrapolatedArrivalCurve.
         s1 <= s2 ->
         m * s1 + x < m * s2 + y ->
         s1 < s2 \/ s1 = s2 /\ x < y.
-    {  clear; intros * LEs LT.
+    {  clear; intros s1 s2 m x y LEs LT.
        move: LEs; rewrite leq_eqVlt => /orP [/eqP EQ | LTs].
        { by subst s2; rename s1 into s; right; split; [ done | lia]. }
        { by left. }

@@ -33,10 +33,9 @@ Section TaskArrivalsSize.
       (forall n, t <> task_offset tsk + n * task_period tsk) ->
       task_arrivals_at arr_seq tsk t = [::].
   Proof.
-    intros * T.
+    move=> t T.
     have EMPT_OR_EXISTS : forall xs, xs = [::] \/ exists a, a \in xs.
-    { intros *.
-      induction xs; first by left.
+    { move=> t0; elim=> [|a xs IHxs]; first by left.
       right; exists a.
       by apply mem_head.
     }
@@ -115,7 +114,7 @@ Section TaskArrivalsSize.
         job_arrival j = task_offset tsk + n * task_period tsk /\
         job_index arr_seq j = n.
     Proof.
-      intros *.
+      move=> n.
       destruct (H_infinite_jobs tsk n) as [j [ARR [TSK IND]]].
       exists j; repeat split => //.
       exact: (periodic_arrival_times arr_seq).
@@ -161,7 +160,7 @@ Section TaskArrivalsSize.
         let r := (task_offset tsk + n.+1 * task_period tsk) in
         size (task_arrivals_up_to arr_seq tsk l) = n + 1.
     Proof.
-      induction n.
+      elim=> [|n IHn].
       intros l r; rewrite /l mul0n add0n addn0.
       by apply size_task_arrivals_up_to_offset.
       intros l r.

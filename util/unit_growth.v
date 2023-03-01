@@ -41,7 +41,7 @@ Section Lemmas.
         { by apply/andP; split; last by rewrite addnBA // addKn. }
         by rewrite subnKC in DELTA.
       }
-      induction delta.
+      elim=> [|delta IHdelta].
       { rewrite addn0; move => /andP [GE0 LT0].
         by apply (leq_ltn_trans GE0) in LT0; rewrite ltnn in LT0.
       }

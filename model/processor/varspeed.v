@@ -51,10 +51,6 @@ Section State.
       scheduled_on := varspeed_scheduled_on;
       service_on   := varspeed_service_on
     |}.
-  Next Obligation.
-    move: r H.
-    case: s=>//= j' v _.
-    by case: ifP.
-  Qed.
+  Next Obligation. by move=> j [] //= j' v _; case: ifP. Qed.
 
 End State.

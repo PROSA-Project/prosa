@@ -41,7 +41,7 @@ Section FullyNonPreemptiveModel.
   Lemma valid_fully_nonpreemptive_model:
     valid_preemption_model arr_seq sched.
   Proof.
-    intros j; split; [by apply/orP; left | split; [by apply/orP; right | split]].
+    move=> j _; split; [by apply/orP; left | split; [by apply/orP; right | split]].
     - move => t; rewrite /job_preemptable /fully_nonpreemptive_job_model Bool.negb_orb -lt0n; move => /andP [POS NCOMPL].
       move: (incremental_service_during _ _ _ _ _ POS) => [ft [/andP [_ LT] [SCHED SERV]]].
       apply H_nonpreemptive_sched with ft.
@@ -75,7 +75,7 @@ Section FullyNonPreemptiveModel.
   Lemma job_max_nps_is_job_cost:
     forall j, job_max_nonpreemptive_segment j = job_cost j.
   Proof.
-    intros.
+    move=> j.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points /job_preemptable /fully_nonpreemptive_job_model.
     case: (posnP (job_cost j)) => [ZERO|POS].
@@ -84,9 +84,9 @@ Section FullyNonPreemptiveModel.
     { clear; simpl; intros.
       apply/eqP; rewrite eqseq_cons; apply/andP; split; first by done.
       have ->:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
-      { clear; intros.
+      { clear; move=> t xs P1 P2 H.
         apply eq_in_filter.
-        intros ? IN. specialize (H _ IN).
+        move=> x IN. specialize (H _ IN).
           by destruct (P1 x), (P2 x).
       }
       rewrite filter_pred1_uniq; first by done.
@@ -98,12 +98,12 @@ Section FullyNonPreemptiveModel.
     by rewrite /distances; simpl; rewrite subn0 /max0; simpl; rewrite max0n.
       by done.
   Qed.
-  
+
   (** ... and [job_last_nonpreemptive_segment j] is equal to [job_cost j]. *)
   Lemma job_last_nps_is_job_cost:
     forall j, job_last_nonpreemptive_segment j = job_cost j.
   Proof.
-    intros.
+    move=> j.
     rewrite /job_last_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points /job_preemptable /fully_nonpreemptive_job_model.
     case: (posnP (job_cost j)) => [ZERO|POS].
@@ -112,9 +112,9 @@ Section FullyNonPreemptiveModel.
     { clear; simpl; intros.
       apply/eqP; rewrite eqseq_cons; apply/andP; split; first by done.
       have ->:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
-      { clear; intros.
+      { clear; move=> t xs P1 P2 H.
         apply eq_in_filter.
-        intros ? IN. specialize (H _ IN).
+        move=> x IN. specialize (H _ IN).
           by destruct (P1 x), (P2 x).
       }
       rewrite filter_pred1_uniq; first by done.
@@ -126,7 +126,7 @@ Section FullyNonPreemptiveModel.
       by rewrite /distances; simpl; rewrite subn0 /last0; simpl. 
       by done.
   Qed.
-  
+
 End FullyNonPreemptiveModel.
 Global Hint Resolve valid_fully_nonpreemptive_model : basic_rt_facts.
 
@@ -170,4 +170,4 @@ Section NoPreemptionsEquivalence.
     }
     Qed.
 
-End NoPreemptionsEquivalence. 
+End NoPreemptionsEquivalence.

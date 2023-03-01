@@ -9,7 +9,7 @@ Definition lcml (xs : seq nat) : nat := foldr lcmn 1 xs.
 Lemma int_divides_lcm_in_seq: 
   forall (x : nat) (xs : seq nat), x %| lcml (x :: xs).
 Proof.
-  induction xs. 
+  move=> x xs; induction xs.
   - by apply dvdn_lcml.
   - rewrite /lcml -cat1s foldr_cat /foldr.
     by apply dvdn_lcml.
@@ -20,7 +20,7 @@ Lemma lcm_seq_divides_lcm_super:
   forall (x : nat) (xs : seq nat), 
   lcml xs %| lcml (x :: xs).
 Proof.
-  induction xs; first by auto.
+  move=> x xs; induction xs; first by auto.
   rewrite /lcml -cat1s foldr_cat /foldr.
   by apply dvdn_lcmr.
 Qed.
@@ -48,8 +48,7 @@ Lemma all_pos_implies_lcml_pos:
     (forall x, x \in xs -> x > 0) ->
     lcml xs > 0.
 Proof.
-  intros * POS.
-  induction xs; first by easy.
+  elim=> [//|x xs IHxs] POS.
   rewrite /lcml -cat1s //= lcmn_gt0.
   apply/andP; split => //.
   - by apply POS; rewrite in_cons eq_refl.
