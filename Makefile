@@ -81,7 +81,8 @@ macos-clean:
 	@find . -depth -iname '.DS_Store' ! -path './.git/*' -delete
 
 spell:
-	./scripts/flag-typos-in-comments.sh `find .  -iname '*.v'`
+	./scripts/flag-typos-in-comments.sh `find . -iname '*.v'`
+	./scripts/flag-typos-in-Markdown.sh `find . -iname '*.md'`
 
 distclean: cleanall
 	$(RM) $(COQ_PROJ)

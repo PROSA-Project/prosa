@@ -130,9 +130,9 @@ spell-check:
   extends:  
     - .not_in_wip_branches  
   stage: build
-  image: bbbrandenburg/aspell-ci
+  image: bbbrandenburg/aspell-ci:2023-03
   script:
-    - scripts/flag-typos-in-comments.sh `find .  -iname '*.v'`
+    - make spell
 
 # mathcomp-dev with stable Coq
 #coq-8.15:
