@@ -2,6 +2,12 @@ personal_ws-1.1 en 0
 Prosa
 Prosa's
 Coq
+OCaml
+OPAM
+CoqEAL
+CoqdocJS
+CoqIDE
+Micromega
 ssreflect's
 ssreflect
 typeclass
@@ -26,6 +32,10 @@ nonpreemptive
 preemptive
 preemptable
 preemptions
+MPI
+SWS
+ANR
+DFG
 EDF
 FP
 DM
@@ -44,6 +54,7 @@ BCET
 BCETs
 Layland
 Liu
+linearize
 sequentiality
 equalities
 extremum
@@ -51,6 +62,7 @@ supremum
 runtime
 bursty
 TODO
+WIP
 mathcomp
 hyperperiod
 hyperperiods
@@ -72,6 +84,8 @@ ad
 hoc
 mailinglist
 Gonthier
+Viktor
+Vafeiadis
 setoid
 Leontyev
 et
