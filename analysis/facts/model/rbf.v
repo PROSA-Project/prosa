@@ -392,7 +392,7 @@ Section DegenerateTotalRBFs.
 
   (** Second, given a fixed-priority policy with reflexive priorities, ... *)
   Context {FP : FP_policy Task}.
-  Hypothesis H_reflexive : reflexive_priorities (FP_to_JLFP FP).
+  Hypothesis H_reflexive : reflexive_task_priorities FP.
 
   (** ... if the total RBF of all equal- and higher-priority tasks is zero, then
       the reference task's response-time bound is also trivially zero. *)
@@ -407,9 +407,6 @@ Section DegenerateTotalRBFs.
     apply /eqP.
     move: ZERO => /eqP; rewrite sum_nat_eq0_nat => /allP; apply.
     rewrite mem_filter; apply /andP; split => //.
-    move: (H_reflexive 0 j).
-    rewrite /hep_job_at/JLFP_to_JLDP/hep_job/FP_to_JLFP.
-    by move: TASK; rewrite /job_of_task => /eqP ->.
   Qed.
 
   (** Thus we we can prove any response-time bound from such a pathological

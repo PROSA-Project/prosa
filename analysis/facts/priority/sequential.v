@@ -19,7 +19,7 @@ Section SequentialJLFP.
   (** Consider a JLFP-policy that indicates a higher-or-equal priority
       relation, and assume that this relation is transitive. *)             
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_transitive : transitive_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).

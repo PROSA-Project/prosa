@@ -39,20 +39,19 @@ Section PropertiesNFPA.
   Context `{JobTask Job Task}.
 
   (** The resulting priority policy is reflexive. *)
-  Lemma NFPA_is_reflexive : reflexive_priorities (FP_to_JLFP (NumericFPAscending Task)).
+  Lemma NFPA_is_reflexive : reflexive_task_priorities (NumericFPAscending Task).
   Proof.  by move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPAscending. Qed.
 
   (** The resulting priority policy is transitive. *)
-  Lemma NFPA_is_transitive : transitive_priorities (FP_to_JLFP (NumericFPAscending Task)).
+  Lemma NFPA_is_transitive : transitive_task_priorities (NumericFPAscending Task).
   Proof.
-    move=> t y x z.
-    rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPAscending.
-    by move=> PRIO_yx PRIO_zy; apply leq_trans with (n := task_priority (job_task y)).
+    move=> y x z.
+    by rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPAscending => PRIO_yx PRIO_xy; lia.
   Qed.
 
   (** The resulting priority policy is total. *)
-  Lemma NFPA_is_total : total_priorities (FP_to_JLFP (NumericFPAscending Task)).
-  Proof. by move=> t j1 j2; apply: leq_total. Qed.
+  Lemma NFPA_is_total : total_task_priorities (NumericFPAscending Task).
+  Proof. by move=> j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPA.
 
@@ -77,20 +76,19 @@ Section PropertiesNFPD.
   Context `{JobTask Job Task}.
 
   (** The resulting priority policy is reflexive. *)
-  Lemma NFPD_is_reflexive : reflexive_priorities (FP_to_JLFP (NumericFPDescending Task)).
+  Lemma NFPD_is_reflexive : reflexive_task_priorities (NumericFPDescending Task).
   Proof. by  move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending. Qed.
 
   (** The resulting priority policy is transitive. *)
-  Lemma NFPD_is_transitive : transitive_priorities (FP_to_JLFP (NumericFPDescending Task)).
+  Lemma NFPD_is_transitive : transitive_task_priorities (NumericFPDescending Task).
   Proof.
-    move=> t y x z.
-    rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending.
-    by move=> PRIO_yx PRIO_zy; apply leq_trans with (n := task_priority (job_task y)).
+    move=> y x z.
+    by rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending => PRIO_yx PRIO_xy; lia.
   Qed.
 
   (** The resulting priority policy is total. *)
-  Lemma NFPD_is_total : total_priorities (FP_to_JLFP (NumericFPDescending Task)).
-  Proof. by move=> t j1 j2; apply: leq_total. Qed.
+  Lemma NFPD_is_total : total_task_priorities (NumericFPDescending Task).
+  Proof. by move=> j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPD.
 

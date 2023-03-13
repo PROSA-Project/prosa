@@ -121,7 +121,7 @@ Section ExistsNoCarryIn.
   Qed.
   
   (** Let the priority relation be reflexive. *)
-  Hypothesis H_priority_is_reflexive: reflexive_priorities JLFP.
+  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
 
   (** Recall the notion of workload of all jobs released in a given interval <<[t1, t2)>>... *)
   Let total_workload t1 t2 :=

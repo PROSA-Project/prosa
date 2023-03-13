@@ -67,7 +67,7 @@ Section ExistsBusyIntervalJLFP.
   Section BasicLemmas.
 
     (** Assume that the priority relation is reflexive. *)
-    Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
+    Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
     (** Consider any busy interval <<[t1, t2)>> of job [j]. *)
     Variable t1 t2 : instant.
@@ -80,7 +80,6 @@ Section ExistsBusyIntervalJLFP.
       rename H_priority_is_reflexive into REFL, H_busy_interval into BUSY.
       move: BUSY => [[_ [_ [_ /andP [_ ARR]]]] QUIET].
       apply QUIET; try done.
-      apply (REFL 0).
     Qed.
 
   End BasicLemmas.
@@ -135,8 +134,8 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
     (** ... and the priority relation is reflexive and transitive. *)
-    Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
-    Hypothesis H_priority_is_transitive : transitive_priorities JLFP.
+    Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+    Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
     (** Consider any busy interval prefix <<[t1, t2)>>. *)
     Variable t1 t2 : instant.
@@ -184,7 +183,6 @@ Section ExistsBusyIntervalJLFP.
         exists j; repeat split; try done.
         + move: REL; rewrite ltnS -eqn_leq eq_sym; move => /eqP REL.
             by rewrite -REL; eapply job_pending_at_arrival; eauto 2.
-        + by apply (H_priority_is_reflexive 0).
       - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
       - have EX: exists hp__seq: seq Job,
         forall j__hp, j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ job_pending_at j__hp t /\ hep_job j__hp j.
@@ -347,8 +345,8 @@ Section ExistsBusyIntervalJLFP.
       arrival_sequence_uniq arr_seq.
 
     (** ... and the priority relation is reflexive and transitive. *)
-    Hypothesis H_priority_is_reflexive: reflexive_priorities JLFP.
-    Hypothesis H_priority_is_transitive: transitive_priorities JLFP.
+    Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
+    Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
 
     (** Next, we recall the notion of workload of all jobs released in
         a given interval <<[t1, t2)>> that have higher-or-equal
@@ -395,7 +393,7 @@ Section ExistsBusyIntervalJLFP.
             { apply/andP; split; last by move: PEND => /andP [ARR _].
               move_neq_up BEFORE.
               move: PEND => /andP [_ NOTCOMP].
-              feed (QUIET j H_from_arrival_sequence); first by apply (H_priority_is_reflexive 0).
+              feed (QUIET j H_from_arrival_sequence); first by apply H_priority_is_reflexive.
               specialize (QUIET BEFORE).
               apply completion_monotonic with (t' := t_busy) in QUIET; first by rewrite QUIET in NOTCOMP.
                 by apply bigmax_ltn_ord with (i0 := t).
@@ -488,7 +486,7 @@ Section ExistsBusyIntervalJLFP.
                   + apply/negP; intros SCHED'.
                     have EQ: j = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto 2.
                     subst; move: PRIO1 => /negP PRIO1; apply: PRIO1.
-                    by specialize (H_priority_is_reflexive 0 j').
+                    apply H_priority_is_reflexive.
                   + apply/hasP; exists j'.
                     * apply arrived_between_implies_in_arrivals; eauto 2.
                       apply H_jobs_must_arrive_to_execute in SCHED.

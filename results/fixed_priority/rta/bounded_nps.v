@@ -34,8 +34,8 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       relation, and assume that the relation is reflexive and
       transitive. *)
   Context {FP : FP_policy Task}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities (FP_to_JLFP FP).
-  Hypothesis H_priority_is_transitive : transitive_priorities (FP_to_JLFP FP).
+  Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
+  Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.

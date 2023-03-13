@@ -22,16 +22,16 @@ Section PropertiesOfEDF.
   Variable arr_seq : arrival_sequence Job.
 
   (** EDF is reflexive. *)
-  Lemma EDF_is_reflexive : reflexive_priorities (EDF Job).
-  Proof. by move=> t j; apply:leqnn. Qed.
+  Lemma EDF_is_reflexive : reflexive_job_priorities (EDF Job).
+  Proof. by move=> j; apply:leqnn. Qed.
 
   (** EDF is transitive. *)
-  Lemma EDF_is_transitive : transitive_priorities (EDF Job).
-  Proof. by move=> t y x z; apply: leq_trans. Qed.
+  Lemma EDF_is_transitive : transitive_job_priorities (EDF Job).
+  Proof. by move=> y x z; apply: leq_trans. Qed.
 
   (** EDF is total. *)
-  Lemma EDF_is_total : total_priorities (EDF Job).
-  Proof. by move=> t j1 j2; apply: leq_total. Qed.
+  Lemma EDF_is_total : total_job_priorities (EDF Job).
+  Proof. by move=> j1 j2; apply: leq_total. Qed.
 
 End PropertiesOfEDF.
 

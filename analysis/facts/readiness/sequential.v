@@ -37,7 +37,7 @@ Section SequentialTasksReadiness.
   (** Consider an FP policy that indicates a reflexive 
       higher-or-equal priority relation. *) 
   Context {FP : FP_policy Task}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities (FP_to_JLFP FP).
+  Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
 
   (** First, we show that the sequential readiness model is non-clairvoyant. *) 
   Fact sequential_readiness_nonclairvoyance :
@@ -83,7 +83,7 @@ Section SequentialTasksReadiness.
     destruct EX as [k LE]; move: j LE.
     elim: k => [|k IHk] j LE t ARR PEND.
     { destruct (boolP (job_ready sched j t)) as [READY | NREADY].
-      { by exists j; repeat split; eauto using (H_priority_is_reflexive 0). }
+      { by exists j; repeat split; eauto using H_priority_is_reflexive. }
       { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [jhp IN NCOMP].
         apply arrives_in_task_arrivals_before_implies_arrives_before in IN; last by done.
         by exfalso; move: LE; rewrite leqn0 => /eqP EQ; rewrite EQ in IN.
@@ -91,7 +91,7 @@ Section SequentialTasksReadiness.
     }
     { move: LE; rewrite leq_eqVlt ltnS => /orP [/eqP EQ | LE]; last by apply IHk.
       destruct (boolP (job_ready sched j t)) as [READY | NREADY].
-      { by exists j; repeat split; eauto using (H_priority_is_reflexive 0). }
+      { by exists j; repeat split; eauto using H_priority_is_reflexive. }
       { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [j' IN NCOMP].
         have LE' : job_arrival j' <= k.
         { by apply arrives_in_task_arrivals_before_implies_arrives_before in IN; rewrite // -ltnS -EQ. }

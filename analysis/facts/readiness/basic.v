@@ -53,7 +53,7 @@ Section LiuAndLaylandReadiness.
   (** Consider a JLFP policy that indicates a reflexive
       higher-or-equal priority relation. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
   (** We show that the basic readiness model is a work-bearing
       readiness model. That is, at any time instant [t], if a job [j]
@@ -64,7 +64,6 @@ Section LiuAndLaylandReadiness.
   Proof.
     intros j ? ARR PEND.
     exists j; repeat split => //.
-    by eapply (H_priority_is_reflexive 0).
   Qed.
 
 End LiuAndLaylandReadiness.

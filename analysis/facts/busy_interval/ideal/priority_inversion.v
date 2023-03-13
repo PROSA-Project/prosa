@@ -35,7 +35,7 @@ Section PIIdealProcessorModelLemmas.
   (** Consider a JLFP-policy that indicates a higher-or-equal priority relation,
      and assume that this relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
   (** Let [tsk] be any task to be analyzed. *)
   Variable tsk : Task.
@@ -75,8 +75,7 @@ Section PIIdealProcessorModelLemmas.
     rewrite /priority_inversion_dec.
     destruct (scheduled_at _ j _) eqn:SCHED2; rewrite //=.
     { have EQ: j = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
-      subst j'; symmetry; apply/eqP; rewrite eqbF_neg Bool.negb_involutive.
-      by apply (H_priority_is_reflexive 0).
+      by subst j'; symmetry; apply/eqP; rewrite eqbF_neg Bool.negb_involutive.
     }
     { destruct (hep_job) eqn:HEP; rewrite //=.
       - apply/eqP; rewrite eqbF_neg; apply/hasPn; intros l IN.
@@ -111,7 +110,6 @@ Section PIIdealProcessorModelLemmas.
     - apply/negP; intros SCHED.
       have HF := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched SCHED; subst j'.
       move: (LP) => /negP HH; apply: HH.
-      specialize (H_priority_is_reflexive 0).
       unfold hep_job_at, JLFP_to_JLDP in *.
       by erewrite H_priority_is_reflexive; eauto 2.
     - apply/hasP.

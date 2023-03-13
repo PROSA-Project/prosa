@@ -58,16 +58,16 @@ Section PropertiesOfGEL.
   Context {Job : JobType} `{JobArrival Job} `{JobTask Job Task}.
 
   (** GEL is reflexive. *)
-  Fact GEL_is_reflexive : reflexive_priorities (GEL Job Task).
-  Proof. by move=> t j; apply: Z.leb_refl. Qed.
+  Fact GEL_is_reflexive : reflexive_job_priorities (GEL Job Task).
+  Proof. by move=> ?; apply: Z.leb_refl. Qed.
 
   (** GEL is transitive. *)
-  Fact GEL_is_transitive : transitive_priorities (GEL Job Task).
-  Proof. by move=> t y x z; apply: Zbool.Zle_bool_trans. Qed.
+  Fact GEL_is_transitive : transitive_job_priorities (GEL Job Task).
+  Proof. by move=> y x z; apply: Zbool.Zle_bool_trans. Qed.
 
   (** GEL is total. *)
-  Fact GEL_is_total : total_priorities (GEL Job Task).
-  Proof. by move=> t j1 j2; apply: ZInstances.leZ_total. Qed.
+  Fact GEL_is_total : total_job_priorities (GEL Job Task).
+  Proof. by move=> j1 j2; apply: ZInstances.leZ_total. Qed.
 
 End PropertiesOfGEL.
 

@@ -47,8 +47,8 @@ Section JLFPInstantiation.
       relation, and assume that this relation is reflexive and
       transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
@@ -545,7 +545,7 @@ Section JLFPInstantiation.
         + split; last by (exists jt; apply/andP; split).
           apply/negP => SCHEDj; move: OH11.
           rewrite (ideal_proc_model_is_a_uniprocessor_model _ _ _ _ SCHEDj SCHED).
-          by move => /negP E; apply: E; eapply H_priority_is_reflexive with (t := 0).
+          by move => /negP E; apply: E; eapply H_priority_is_reflexive.
         + exfalso; apply: TNSCHED.
           move: SCHED; rewrite /task_scheduled_at scheduled_at_def => /eqP ->.
           by move: OH22; rewrite Bool.negb_involutive => /eqP ->.
@@ -775,9 +775,7 @@ Section JLFPInstantiation.
         { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
         move=> t QT; split; last first.
         { rewrite negb_and Bool.negb_involutive; apply/orP.
-          case ARR: (arrived_before j t); [right | left]; [apply QT | ]; eauto.
-          by apply H_priority_is_reflexive with (t := 0).
-        }
+          case ARR: (arrived_before j t); [right | left]; [apply QT | ]; eauto. }
         { erewrite cumulative_interference_split, cumulative_interfering_workload_split; apply/eqP; rewrite eqn_add2l.
           rewrite cumulative_i_ohep_eq_service_of_ohep; rt_eauto; first last.
           { by move => ? _ _ ; unfold arrived_before; lia. }
@@ -823,7 +821,7 @@ Section JLFPInstantiation.
             replace (~~ (j__copy != j)) with (j__copy == j); last by case: (j__copy == j).
             rewrite eq_sym; destruct (j == j__copy) eqn:EQ; last by rewrite Bool.andb_false_r.
             move: EQ => /eqP EQ; rewrite Bool.andb_true_r; apply/eqP; rewrite eqb_id; subst.
-            by eapply (H_priority_is_reflexive 0). }
+            by eapply H_priority_is_reflexive. }
           erewrite service_of_jobs_equiv_pred with (P2 := eq_op j); last by done.
           erewrite workload_of_jobs_equiv_pred with (P' := eq_op j); last by done.
           move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split => /eqP; rewrite eqn_add2l => /eqP EQ.
@@ -915,7 +913,7 @@ Section JLFPInstantiation.
     Hypothesis H_work_conserving : work_conserving_cl.
 
     (** Assume the scheduling policy under consideration is reflexive. *)
-    Hypothesis policy_reflexive : reflexive_priorities JLFP.
+    Hypothesis policy_reflexive : reflexive_job_priorities JLFP.
 
     (** In this section, we prove the correctness of interference
         inside the busy interval, i.e., we prove that if interference

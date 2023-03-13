@@ -26,8 +26,8 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_priorities JLFP.
-  Hypothesis H_priority_is_transitive: transitive_priorities JLFP.
+  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
 
   (** In addition, we assume the existence of a function mapping a job
       and its progress to a boolean value saying whether this job is
@@ -104,7 +104,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       - by move: NCOMP'; apply contra, completion_monotonic.
     }
     apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' HEP']]].
-    have HEP : hep_job j' j by apply (H_priority_is_transitive t j_hp).
+    have HEP : hep_job j' j by apply (H_priority_is_transitive j_hp).
     clear HEP' NCOMP' BEF HP ARR j_hp.
     have BACK: backlogged sched j' t.
     { apply/andP; split; first by done.
@@ -112,7 +112,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
       by subst; apply: NOTHP.
     }
-    apply NOTHP, (H_priority_is_transitive t j'); last by eapply HEP.
+    apply NOTHP, (H_priority_is_transitive j'); last by eapply HEP.
     by eapply H_respects_policy; eauto .
   Qed.
 
@@ -138,7 +138,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       have PEND: pending sched j t2.-1
         by rewrite -ARR; apply job_pending_at_arrival => //; rt_eauto.
       apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [PENDhp HEPhp]]].
-      eapply NOTHP, (H_priority_is_transitive 0); last by apply HEPhp.
+      eapply NOTHP, H_priority_is_transitive; last by apply HEPhp.
       apply (H_respects_policy _ _ t2.-1); auto.
       apply/andP; split; first by done.
       apply/negP; intros SCHED.
@@ -154,7 +154,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
         - by move: NOTCOMP'; apply contra, completion_monotonic.
       }
       apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' HEP']]].
-      have HEP : hep_job j' j by apply (H_priority_is_transitive t j_hp').
+      have HEP : hep_job j' j by apply (H_priority_is_transitive j_hp').
       clear ARR HP IN HEP' NOTCOMP' j_hp'.
       have BACK: backlogged sched j' t.
       { apply/andP; split; first by done.
@@ -162,7 +162,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
         move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
         by subst; apply: NOTHP.
       }
-      apply NOTHP, (H_priority_is_transitive t j'); last by eapply HEP.
+      apply NOTHP, (H_priority_is_transitive j'); last by eapply HEP.
       by eapply H_respects_policy; eauto .
     }
   Qed.
