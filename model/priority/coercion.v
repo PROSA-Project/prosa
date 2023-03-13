@@ -9,17 +9,20 @@ Require Export prosa.model.priority.definitions.
     scope. *)
 
 (** First, any FP policy can be interpreted as an JLFP policy by comparing jobs
-    according to the priorities of their respective tasks. *)
+    according to the priorities of their respective tasks.
+    The priority is lowered to 10 in order to avoid conflict with other instances
+    of JLFP policies which take FP policies as argument.*)
 #[global]
 Instance FP_to_JLFP {Job : JobType} {Task : TaskType} {tasks : JobTask Job Task}
-    (FP : FP_policy Task) : JLFP_policy Job :=
+    (FP : FP_policy Task) : JLFP_policy Job | 10 :=
   fun j1 j2 => hep_task (job_task j1) (job_task j2).
 
 (** Second, any JLFP policy implies a JLDP policy that simply ignores the time
-    parameter. *)
+    parameter. Analogously, priority is lowered to 10 in order to avoid conflict
+    with other instances of JLDP policies which take JLFP policies as argument.*)
 #[global]
 Instance JLFP_to_JLDP {Job : JobType}
-    (JLFP : JLFP_policy Job) : JLDP_policy Job :=
+    (JLFP : JLFP_policy Job) : JLDP_policy Job | 10 :=
   fun _ j1 j2 => hep_job j1 j2.
 
 (** We add coercions to enable automatic conversion from [JLFP] to [JLDP]... *)
