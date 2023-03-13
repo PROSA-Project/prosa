@@ -35,6 +35,123 @@ Section BasicLemmas.
 
 End BasicLemmas.
 
+(** In the following section, we establish properties of [hp_task] and [ep_task ]auxiliary
+    priority relations defined for FP policies. They are useful in proving properties of the
+    ELF scheduling policy. *)
+Section FPRelationsProperties.
+
+  (** Consider any type of tasks and an FP policy that indicates a higher-or-equal
+      priority relation on the tasks.*)
+  Context {Task : TaskType} {FP_policy : FP_policy Task}.
+
+  (** First, we prove some trivial lemmas about the [hep_task] and [ep_task]
+      relations. *)
+  Section BasicProperties.
+
+    (** If a task [tsk1] has higher priority than task [tsk2], then task [tsk1] has
+        higher-or-equal priority than task [tsk2]. *)
+    Lemma hp_hep_task :
+      forall tsk1 tsk2,
+        hp_task tsk1 tsk2 ->
+        hep_task tsk1 tsk2.
+    Proof. by move=> ? ? /andP[]. Qed.
+
+    (** If a task [tsk1] has equal priority as task [tsk2], then task [tsk1] has
+        higher-or-equal priority than task [tsk2]. *)
+    Lemma ep_hep_task :
+      forall tsk1 tsk2,
+        ep_task tsk1 tsk2 ->
+        hep_task tsk1 tsk2.
+    Proof. by move=> ? ? /andP[]. Qed.
+
+    (** Task [tsk1] having equal priority as task [tsk2] is equivalent to task [tsk2]
+        having equal priority as task [tsk1]. *)
+    Lemma ep_task_sym :
+      forall tsk1 tsk2,
+        ep_task tsk1 tsk2 = ep_task tsk2 tsk1.
+    Proof. by move=> x y; rewrite /ep_task andbC. Qed.
+
+  End BasicProperties.
+
+  (** In the following section, we establish a useful property about the equal
+      priority relation, which follows when the FP policy is reflexive.  *)
+  Section ReflexiveProperties.
+
+    (** Assuming that the FP policy is reflexive ... *)
+    Hypothesis H_reflexive : reflexive hep_task.
+
+    (** ... it follows that the equal priority relation is reflexive. *)
+    Lemma eq_reflexive : reflexive ep_task.
+    Proof. by move=> ?; apply /andP; split. Qed.
+
+  End ReflexiveProperties.
+
+  (** Now we establish useful properties about the higher priority relation,
+      which follow when the FP policy is transitive.  *)
+  Section TransitiveProperties.
+
+    (** Assuming that the FP policy is transitive ... *)
+    Hypothesis H_transitive : transitive hep_task.
+
+    (** ... it follows that the higher priority relation is also transitive.  *)
+    Lemma hp_trans : transitive hp_task.
+    Proof.
+      move=> y x z /andP[hepxy Nhepyx] /andP[hepyz Nhepyz]; apply/andP; split.
+      { exact: H_transitive hepyz. }
+      { by apply: contraNN Nhepyx; exact: H_transitive. }
+    Qed.
+
+    (** If task [tsk1] has higher priority than task [tsk2], and task [tsk2] has
+        higher-or-equal priority than task [tsk3], then task [tsk1] has higher priority
+        than task [tsk3]. *)
+    Lemma hp_hep_trans :
+      forall tsk1 tsk2 tsk3,
+        hp_task tsk1 tsk2 ->
+        hep_task tsk2 tsk3 ->
+        hp_task tsk1 tsk3.
+    Proof.
+      move=> x y z /andP[hepxy Nhepyx] hepyz; apply/andP; split.
+      { exact: H_transitive hepyz. }
+      { by apply: contraNN Nhepyx; exact: H_transitive. }
+    Qed.
+
+    (** If task [tsk1] has higher-or-equal priority than task [tsk2], and task [tsk2]
+        has strictly higher priority than task [tsk3], then task [tsk1]
+        has higher priority than task [tsk3]. *)
+    Lemma hep_hp_trans :
+      forall tsk1 tsk2 tsk3,
+        hep_task tsk1 tsk2 ->
+        hp_task tsk2 tsk3 ->
+        hp_task tsk1 tsk3.
+    Proof.
+      move=> x y z hepxy /andP[hepyz Nhepzy]; apply/andP; split.
+      { exact: H_transitive hepyz. }
+      { apply: contraNN Nhepzy => hepzy; exact: H_transitive hepxy. }
+    Qed.
+
+  End TransitiveProperties.
+
+  (** Finally, we establish a useful property about the higher priority relation,
+      which follows when the FP policy is total.  *)
+  Section TotalProperties.
+
+    (** We assume that the FP policy is total. *)
+    Hypothesis H_total : total hep_task.
+
+    (** If a task [tsk1] does not have higher-or-equal priority than task [tsk2], then
+        task [tsk2] has higher priority than task [tsk1].  *)
+    Lemma not_hep_hp_task : forall tsk1 tsk2, ~~hep_task tsk1 tsk2 = hp_task tsk2 tsk1.
+    Proof.
+      move=> x y; apply /idP/idP => [| /andP[//]].
+      move=> Nhepxy; apply /andP; split=> [|//].
+      have /orP[h | //] := H_total x y.
+      by exfalso; move/negP: Nhepxy.
+    Qed.
+
+  End TotalProperties.
+
+End FPRelationsProperties.
+
 (** In the following section, we show that FP policies respect the sequential
     tasks hypothesis. It means that later-arrived jobs of a task don't have
     higher priority than earlier-arrived jobs of the same task (assuming that

@@ -146,8 +146,8 @@ End Priorities.
 (** ** Derived Priority Relations *)
 
 (** In the following section, we derive two auxiliary priority
-    relations. *)
-Section DerivedPriorityRelations.
+    relations for JLFP policies. *)
+Section JLFPDerivedPriorityRelations.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -160,7 +160,7 @@ Section DerivedPriorityRelations.
   Context `{JLFP_policy Job}.
 
   (** First, we introduce a relation that defines whether job [j1] has
-      a higher-than-or-equal-priority than job [j2] and [j1] is not
+      a higher-than-or-equal priority than job [j2] and [j1] is not
       equal to [j2]. *)
   Definition another_hep_job j1 j2 := hep_job j1 j2 && (j1 != j2).
 
@@ -170,4 +170,26 @@ Section DerivedPriorityRelations.
   Definition another_task_hep_job j1 j2 :=
     hep_job j1 j2 && (job_task j1 != job_task j2).
 
-End DerivedPriorityRelations.
+End JLFPDerivedPriorityRelations.
+
+(** In the following section, we derive two more auxiliary priority relations
+    for FP policies to incorporate the notions of higher and equal priority of tasks. *)
+Section FPDerivedPriorityRelations.
+
+  (** Consider any type of tasks and an FP policy that indicates a higher-or-equal
+      priority relation on the tasks. *)
+  Context {Task : TaskType} {FP_policy : FP_policy Task}.
+
+  (** First, we introduce a relation that defines whether task [tsk1] has higher
+      priority than task [tsk2] ,i.e., [tsk1] has higher-or-equal priority than
+      [tsk2] but [tsk2] does not have higher-or-equal priority than [tsk1].*)
+  Definition hp_task (tsk1 tsk2 : Task) :=
+    hep_task tsk1 tsk2 && ~~ hep_task tsk2 tsk1.
+
+  (** Next, we introduce a relation that defines whether task [tsk1] has equal
+      priority as task [tsk2] ,i.e., [tsk1] has higher-or-equal priority than [tsk2]
+      and [tsk2] has higher-or-equal priority than [tsk1]. *)
+  Definition ep_task (tsk1 tsk2 : Task) :=
+    hep_task tsk1 tsk2 && hep_task tsk2 tsk1.
+
+End FPDerivedPriorityRelations.
