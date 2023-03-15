@@ -48,6 +48,10 @@ Section FPRelationsProperties.
       relations. *)
   Section BasicProperties.
 
+    (* [hp_task] is irreflexive. *)
+    Lemma hp_task_irrefl : irreflexive hp_task.
+    Proof. by move=> tsk; rewrite /hp_task; case: hep_task. Qed.
+
     (** If a task [tsk1] has higher priority than task [tsk2], then task [tsk1] has
         higher-or-equal priority than task [tsk2]. *)
     Lemma hp_hep_task :
@@ -70,6 +74,14 @@ Section FPRelationsProperties.
       forall tsk1 tsk2,
         ep_task tsk1 tsk2 = ep_task tsk2 tsk1.
     Proof. by move=> x y; rewrite /ep_task andbC. Qed.
+
+    (** If a task [tsk1] has higher-or-equal priority than a task
+        [tsk2], then [tsk1] either has strictly higher priority than
+        [tsk2] or the two have equal priority. *)
+    Lemma hep_hp_ep_task :
+      forall tsk1 tsk2,
+        hep_task tsk1 tsk2 = hp_task tsk1 tsk2 || ep_task tsk1 tsk2.
+    Proof. by move=> ? ?; rewrite /hp_task /ep_task -andb_orr orNb andbT. Qed.
 
   End BasicProperties.
 
@@ -140,7 +152,8 @@ Section FPRelationsProperties.
 
     (** If a task [tsk1] does not have higher-or-equal priority than task [tsk2], then
         task [tsk2] has higher priority than task [tsk1].  *)
-    Lemma not_hep_hp_task : forall tsk1 tsk2, ~~hep_task tsk1 tsk2 = hp_task tsk2 tsk1.
+    Lemma not_hep_hp_task :
+      forall tsk1 tsk2, ~~ hep_task tsk1 tsk2 = hp_task tsk2 tsk1.
     Proof.
       move=> x y; apply /idP/idP => [| /andP[//]].
       move=> Nhepxy; apply /andP; split=> [|//].

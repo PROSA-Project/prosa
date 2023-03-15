@@ -21,6 +21,35 @@ Section Definitions.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
+  (** Definitions of interference for FP policies. *)
+  Section FPDefinitions.
+    Context {FP : FP_policy Task}.
+
+    (** We first define interference from higher priority tasks. *)
+    Definition hp_task_interference (j : Job) (t : instant) :=
+      has (fun jhp => hp_task (job_task jhp) (job_task j)
+                      && receives_service_at sched jhp t)
+        (arrivals_up_to arr_seq t).
+
+    Context {JLFP : JLFP_policy Job}.
+
+    (** Then, to define interference from equal priority tasks, we first
+        define higher priority jobs from an equal priority task... *)
+    Definition ep_task_hep_job j1 j2 :=
+      hep_job j1 j2 && ep_task (job_task j1) (job_task j2).
+
+    (** ...and such jobs that are not the same. *)
+    Definition other_ep_task_hep_job j1 j2 :=
+      ep_task_hep_job j1 j2 && (job_task j1 != job_task j2).
+
+    (** This enables us to define interference from equal priority tasks. *)
+    Definition other_ep_task_hep_job_interference (j : Job) (t : instant) :=
+      has (fun jhp => other_ep_task_hep_job jhp j
+                      && receives_service_at sched jhp t)
+        (arrivals_up_to arr_seq t).
+
+  End FPDefinitions.
+
   (** Definitions of interference for JLFP policies. *)
   Section JLFPDefinitions.
 
