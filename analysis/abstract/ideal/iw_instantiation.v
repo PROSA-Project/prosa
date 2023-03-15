@@ -88,7 +88,7 @@ Section JLFPInstantiation.
     {
       interference (j : Job) (t : instant) :=
         priority_inversion_dec arr_seq sched j t
-        || another_hep_job_interference_dec arr_seq sched j t
+        || another_hep_job_interference arr_seq sched j t
     }.
 
   (** ** Instantiation of Interfering Workload *)
@@ -159,8 +159,8 @@ Section JLFPInstantiation.
       Lemma idle_implies_no_hep_job_interference :
         forall j, ~ another_hep_job_interference arr_seq sched j t.
       Proof.
-        move => j [j' [ _ [ _ SERV]]].
-        by rewrite /receives_service_at ideal_not_idle_implies_sched in SERV.
+        move=> j /hasP[j' _ /andP[_]].
+        by rewrite /receives_service_at ideal_not_idle_implies_sched.
       Qed.
 
       (** ... there is no interference from higher-or-equal priority
@@ -168,8 +168,8 @@ Section JLFPInstantiation.
       Lemma idle_implies_no_hep_task_interference :
         forall j, ~ another_task_hep_job_interference arr_seq sched j t.
       Proof.
-        move => j [j' [ _ [ _ SERV]]].
-        by rewrite /receives_service_at ideal_not_idle_implies_sched in SERV.
+        move=> j /hasP[j' _ /andP[]].
+        by rewrite /receives_service_at ideal_not_idle_implies_sched.
       Qed.
 
       (** ... there is no interference, ... *)
@@ -179,10 +179,8 @@ Section JLFPInstantiation.
         move => j.
         rewrite /interference /ideal_jlfp_interference => /orP [PI | HEPI].
         - move : PI; move => /priority_inversion_P PI; (feed_n 3 PI; rt_auto).
-          move: PI => [_ [j' /andP [SCHED _]]].
-          by apply ideal_sched_implies_not_idle in SCHED.
-        - move: HEPI => /another_hep_job_interference_P HEPI.
-          by apply idle_implies_no_hep_job_interference in HEPI.
+          by move: PI => [_ [? /andP[/ideal_sched_implies_not_idle]]].
+        - exact: idle_implies_no_hep_job_interference HEPI.
       Qed.
 
       (** ... as well as no interference for [tsk]. Recall that the
@@ -224,17 +222,17 @@ Section JLFPInstantiation.
             interference from another higher-or-equal priority job is
             equivalent to the relation [another_hep_job]. *)
         Lemma interference_ahep_equiv_ahep :
-          another_hep_job_interference arr_seq sched j t <-> another_hep_job j' j.
+          another_hep_job_interference arr_seq sched j t = another_hep_job j' j.
         Proof.
-          split; [move => [jhp [IN [AHEP PSERV]]] | move => AHEP].
+          apply/idP/idP => [/hasP[jhp IN /andP[AHEP PSERV]] | AHEP].
           - apply service_at_implies_scheduled_at in PSERV.
             by have -> := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_sched PSERV.
-          - exists j'; repeat split.
+          - apply/hasP; exists j'; repeat split.
             + apply arrived_between_implies_in_arrivals; rt_eauto.
               apply/andP; split; first by done.
               by apply H_jobs_must_arrive_to_execute in H_sched; rewrite ltnS.
-            + by done.
-            + by rewrite /receives_service_at service_at_is_scheduled_at H_sched.
+            + rewrite AHEP /=.
+              by rewrite /receives_service_at service_at_is_scheduled_at H_sched.
         Qed.
 
       End SomeJobIsScheduled.
@@ -250,7 +248,7 @@ Section JLFPInstantiation.
         Lemma interference_ahep_job_eq_false :
           ~ another_hep_job_interference arr_seq sched j t.
         Proof.
-          move => [jhp [IN [AHEP PSERV]]].
+          move=> /hasP[jhp IN /andP[AHEP PSERV]].
           apply service_at_implies_scheduled_at in PSERV.
           have EQ := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j_sched PSERV; subst jhp.
           by apply another_hep_job_antireflexive in AHEP.
@@ -273,7 +271,7 @@ Section JLFPInstantiation.
         Lemma interference_athep_eq_false :
           ~ another_task_hep_job_interference arr_seq sched j t.
         Proof.
-          move => [jhp [IN [AHEP PSERV]]].
+          move=> /hasP[jhp IN /andP[AHEP PSERV]].
           apply service_at_implies_scheduled_at in PSERV.
           have EQ := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched PSERV; subst jhp.
           by eapply another_task_hep_job_taskwise_antireflexive in AHEP; rt_eauto.
@@ -307,19 +305,19 @@ Section JLFPInstantiation.
             interference from another task iff [j'] has
             higher-or-equal priority than [j]. *)
         Lemma sched_at_implies_interference_athep_eq_hep :
-          another_task_hep_job_interference arr_seq sched j t <-> hep_job j' j.
+          another_task_hep_job_interference arr_seq sched j t = hep_job j' j.
         Proof.
-          split; [move=> [j'' [IN [/andP [AHEP FF] RSERV]]] | move => HEP].
+          apply/idP/idP => [/hasP[j'' IN /andP[/andP[AHEP FF] RSERV]] | HEP].
           - apply service_at_implies_scheduled_at in RSERV.
             by have EQ := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched RSERV; subst j''.
-          - exists j'; repeat split.
+          - apply/hasP; exists j'; repeat split.
             + apply arrived_between_implies_in_arrivals; rt_eauto.
               apply/andP; split; first by done.
               by apply H_jobs_must_arrive_to_execute in H_j'_sched; rewrite ltnS.
-            + apply/andP; split; first by done.
-              apply/negP => /eqP EQ.
-              by move: (H_j'_not_tsk) => /negP T; apply: T; rewrite /job_of_task EQ.
-            + by rewrite /receives_service_at service_at_is_scheduled_at H_j'_sched.
+            + apply/andP; split; [apply/andP; split=> [//|]|].
+              * apply/negP => /eqP EQ.
+                by move: (H_j'_not_tsk) => /negP T; apply: T; rewrite /job_of_task EQ.
+              * by rewrite /receives_service_at service_at_is_scheduled_at H_j'_sched.
         Qed.
 
         (** Hence, if we assume that [j'] has higher-or-equal priority, ... *)
@@ -330,7 +328,7 @@ Section JLFPInstantiation.
         Lemma sched_athep_implies_interference_athep :
           another_task_hep_job_interference arr_seq sched j t.
         Proof.
-          by apply sched_at_implies_interference_athep_eq_hep.
+          by rewrite sched_at_implies_interference_athep_eq_hep.
         Qed.
 
         (** Moreover, in this case, task [tsk] also incurs interference. *)
@@ -343,8 +341,7 @@ Section JLFPInstantiation.
           split.
           - by move: (H_j'_sched); rewrite /task_scheduled_at scheduled_at_def => /eqP ->; apply/negP.
           - exists j; split.
-            + apply/orP; right.
-              apply/another_hep_job_interference_P; exists j'; repeat split.
+            + apply/orP; right; apply/hasP; exists j'; [|apply/andP; split].
               * apply arrived_between_implies_in_arrivals; rt_eauto.
                 apply/andP; split; first by done.
                 by apply H_jobs_must_arrive_to_execute in H_j'_sched; rewrite ltnS.
@@ -371,8 +368,7 @@ Section JLFPInstantiation.
         Lemma sched_alp_implies_interference_ahep_false :
           ~ another_hep_job_interference arr_seq sched j t.
         Proof.
-          move=> [jlp [IN [AHEP RSERV]]].
-          apply service_at_implies_scheduled_at in RSERV.
+          move/hasP => [jlp IN /andP[AHEP /service_at_implies_scheduled_at RSERV]].
           have EQ := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched RSERV; subst j'.
           by move: (H_j'_lp) AHEP => LP /andP [HEP A]; rewrite HEP in LP.
         Qed.
@@ -393,7 +389,7 @@ Section JLFPInstantiation.
       rewrite /cumulative_interference /interference => j t1 t2; rewrite -big_split //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split; rewrite leq_sum; try done.
       { move => t _; unfold ideal_jlfp_interference.
-        by destruct (priority_inversion_dec _ _ _ _), (another_hep_job_interference_dec arr_seq sched j t).
+        by destruct (priority_inversion_dec _ _ _ _), (another_hep_job_interference arr_seq sched j t).
       }
       { move => t _; rewrite /ideal_jlfp_interference.
         destruct (ideal_proc_model_sched_case_analysis sched t) as [IDLE | [s SCHED]].
@@ -402,8 +398,7 @@ Section JLFPInstantiation.
           + by erewrite sched_hep_implies_no_priority_inversion; rt_eauto; rewrite add0n.
           + erewrite !sched_lp_implies_priority_inversion; rt_eauto; last by rewrite PRIO.
             rewrite orTb.
-            destruct (another_hep_job_interference_dec arr_seq sched j t) eqn:IAHEP; [exfalso | by done].
-            move: IAHEP => /another_hep_job_interference_P IAHEP.
+            destruct (another_hep_job_interference arr_seq sched j t) eqn:IAHEP; [exfalso | by done].
             eapply sched_alp_implies_interference_ahep_false; rt_eauto.
             by rewrite PRIO.
       }
@@ -437,22 +432,22 @@ Section JLFPInstantiation.
         ~ task_scheduled_at sched tsk t ->
         forall jo,
           interference jo t ->
-          (~~ priority_inversion_dec arr_seq sched j t && another_task_hep_job_interference_dec arr_seq sched j t)
-          || (priority_inversion_dec arr_seq sched j t && ~~ another_task_hep_job_interference_dec arr_seq sched j t).
+          (~~ priority_inversion_dec arr_seq sched j t && another_task_hep_job_interference arr_seq sched j t)
+          || (priority_inversion_dec arr_seq sched j t && ~~ another_task_hep_job_interference arr_seq sched j t).
     Proof.
       move => j t TSK TNSCHED jo INT.
       destruct priority_inversion_dec eqn:PI; simpl.
       - move: PI => /priority_inversion_negP PI; feed_n 3 PI; rt_eauto.
-        apply/negP; move => /another_task_hep_job_interference_P [jhp [IN__jhp [/andP [ATHEP__hp BB] RS__jhp]]].
+        apply/hasP => -[jhp IN__jhp /andP[/andP[ATHEP__hp BB] RS__jhp]].
         apply: PI; move => [_ [jlp /andP [SCHED__jlp LEP__jlp]]].
         enough (EQ: jlp = jhp); first by (subst; rewrite ATHEP__hp in LEP__jlp).
         eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto; move: RS__jhp.
         by rewrite /receives_service_at service_at_is_scheduled_at lt0b.
-      - destruct another_task_hep_job_interference_dec eqn:IATHEP; try done; exfalso.
+      - destruct another_task_hep_job_interference eqn:IATHEP; try done; exfalso.
         have L1: interference jo t -> exists jt, scheduled_at sched jt t.
         { clear PI IATHEP; move => /orP [/priority_inversion_P PI| ].
           { by feed_n 3 PI; rt_auto; move: PI => [NSCHED [jt /andP [SCHED _]]]; exists jt. }
-          { move => /another_hep_job_interference_P [jt [_ [_ RSERV]]].
+          { move=> /hasP[jt _ /andP[_ RSERV]].
             by exists jt; move: RSERV; rewrite /receives_service_at service_at_is_scheduled_at lt0b. }
         }
         apply L1 in INT; destruct INT as [jt SCHED]; clear L1.
@@ -495,10 +490,10 @@ Section JLFPInstantiation.
       rewrite -big_split //= big_seq_cond [in X in _ = X]big_seq_cond; apply eq_bigr; move => t /andP [IN _].
       have BinFact: forall (a b c : bool), (a -> (~~ b && c) || (b && ~~c)) -> (b \/ c -> a) -> nat_of_bool a = nat_of_bool b + nat_of_bool c.
       { by clear; move=> [] [] [] //=; do ?[by move=> /(_ erefl)]; move=> _;
-           do ?[by move=> /(_ (or_introl erefl))]; move=> /(_ (or_intror erefl)). }
-      apply: BinFact;
-        [move=> /task_interference_received_before_P [TNSCHED [jo [INT TIN]]]
-        | move=> [/priority_inversion_P PRIO | /another_task_hep_job_interference_P [jo [INjo [ATHEP RSERV]]]]].
+          do ?[by move=> /(_ (or_introl erefl))]; move=> /(_ (or_intror erefl)). }
+      apply: BinFact =>
+        [ /task_interference_received_before_P [TNSCHED [jo [INT TIN]]]
+        | [/priority_inversion_P PRIO | /hasP[jo INjo /andP[ATHEP RSERV]]]].
       { by eapply priority_inversion_xor_atask_hep_job_interference; rt_eauto. }
       { feed_n 3 PRIO; rt_auto; move: PRIO => [NSCHED [j' /andP [SCHED NHEP]]].
         apply/task_interference_received_before_P; split.
@@ -526,8 +521,8 @@ Section JLFPInstantiation.
           by rewrite eq_sym.
         }
         exists j; split.
-        - apply/orP; right; apply/another_hep_job_interference_P.
-          exists jo; split; first (by done); split; last by done.
+        - apply/orP; right; apply/hasP.
+          exists jo; [by [] | apply/andP; split=> [|//]].
           move: ATHEP => /andP [A B]; apply/andP; split; first by done.
           by apply/negP; move => /eqP EQ; subst jo; rewrite eq_refl in B.
         - by rewrite mem_filter; apply/andP; split. }
@@ -603,7 +598,7 @@ Section JLFPInstantiation.
       Proof.
         move=> Phep; clear H_job_of_tsk.
         rewrite [RHS]exchange_big /=; apply: eq_big_nat => x /andP[t1lex xltt].
-        rewrite /another_hep_job_interference_dec.
+        rewrite /another_hep_job_interference.
         have [Idle|[jo Sched_jo]] := ideal_proc_model_sched_case_analysis sched x.
         { rewrite (@eq_has _ _ pred0) ?has_pred0 ?big1 // => [j' _ | j'].
           + exact: ideal_not_idle_implies_sched.
@@ -697,7 +692,7 @@ Section JLFPInstantiation.
         { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
         move=> t QT; split; last first.
         { rewrite negb_and Bool.negb_involutive; apply/orP.
-          case ARR: (arrived_before j t); [right | left]; [apply QT | ]; eauto. }
+          by case ARR: (arrived_before j t); [right | left]; [apply QT | ]. }
         { erewrite cumulative_interference_split, cumulative_interfering_workload_split; apply/eqP; rewrite eqn_add2l.
           rewrite cumulative_i_ohep_eq_service_of_ohep; rt_eauto; first last.
           { by move => ? _ _ ; unfold arrived_before; lia. }
@@ -742,8 +737,7 @@ Section JLFPInstantiation.
           { move => j__copy IN.
             replace (~~ (j__copy != j)) with (j__copy == j); last by case: (j__copy == j).
             rewrite eq_sym; destruct (j == j__copy) eqn:EQ; last by rewrite Bool.andb_false_r.
-            move: EQ => /eqP EQ; rewrite Bool.andb_true_r; apply/eqP; rewrite eqb_id; subst.
-            by eapply H_priority_is_reflexive. }
+            by move: EQ => /eqP EQ; rewrite Bool.andb_true_r; apply/eqP; rewrite eqb_id; subst. }
           erewrite service_of_jobs_equiv_pred with (P2 := eq_op j); last by done.
           erewrite workload_of_jobs_equiv_pred with (P' := eq_op j); last by done.
           move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split => /eqP; rewrite eqn_add2l => /eqP EQ.
@@ -872,9 +866,10 @@ Section JLFPInstantiation.
           by eapply not_quiet_implies_not_idle; rt_eauto.
         }
         { move: HYP1 => /priority_inversion_negP PINV; feed_n 3 PINV; rt_auto.
-          have /another_hep_job_interference_P INT := HYP2.
-          eapply iffLRn in INT; last apply interference_ahep_equiv_ahep; rt_eauto.
-          move: INT => /negP. rewrite negb_and => /orP [NHEP | EQ].
+          have: ~~ another_hep_job jo j.
+          { apply: contraNN HYP2.
+            by rewrite -(interference_ahep_equiv_ahep _ t). }
+          rewrite negb_and => /orP [NHEP | EQ].
           - rewrite/receives_service_at; move_neq_up ZS; move: ZS; rewrite leqn0 => /eqP ZS.
             apply no_service_not_scheduled in ZS; rt_auto; apply: PINV.
             by split; rt_auto; exists jo; apply/andP; split; rt_eauto.
@@ -887,7 +882,7 @@ Section JLFPInstantiation.
       Lemma scheduled_implies_no_interference :
         receives_service_at sched j t -> ~ interference j t.
       Proof.
-        move => RSERV /orP [PINV|/another_hep_job_interference_P INT].
+        move=> RSERV /orP[PINV | INT].
         - rewrite (sched_hep_implies_no_priority_inversion _ _ _ _ j) in PINV; rt_eauto.
           by rewrite /receives_service_at service_at_is_scheduled_at lt0b in RSERV.
         - rewrite /receives_service_at service_at_is_scheduled_at lt0b in RSERV.
@@ -980,9 +975,7 @@ End JLFPInstantiation.
     definition opaque. This way, we ensure that the system will treat
     each of these definitions as a single entity. *)
 Global Opaque another_hep_job_interference
-       another_hep_job_interference_dec
        another_task_hep_job_interference
-       another_task_hep_job_interference_dec
        ideal_jlfp_interference
        ideal_jlfp_interfering_workload
        cumulative_another_hep_job_interference

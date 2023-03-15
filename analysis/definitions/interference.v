@@ -33,58 +33,17 @@ Section Definitions.
         job [jhp] (different from [j]) with a higher-or-equal priority
         that executes at time [t]. *)
     Definition another_hep_job_interference (j : Job) (t : instant) :=
-      exists jhp,
-        (jhp \in arrivals_up_to arr_seq t)
-        /\ another_hep_job jhp j
-        /\ receives_service_at sched jhp t.
-
-    (** In order to use the above definition in aRTA, we need to define
-        its computational version. *)
-    Definition another_hep_job_interference_dec (j : Job) (t : instant) :=
-      has (fun jhp => another_hep_job jhp j && receives_service_at sched jhp t) (arrivals_up_to arr_seq t).
-
-    (** Note that the computational and propositional definitions are
-        equivalent. *)
-    Lemma another_hep_job_interference_P :
-      forall j t,
-        reflect (another_hep_job_interference j t) (another_hep_job_interference_dec j t).
-    Proof.
-      move => j t; apply/introP.
-      - by move => /hasP [jhp ARR /andP [HEP SCHED]]; (exists jhp; split).
-      - move => /negP T1; move => [jhp [ARR [HEP SCHED]]].
-        apply: T1; apply/hasP.
-        exists jhp; first by done.
-        by apply/andP; split.
-    Qed.
+      has (fun jhp => another_hep_job jhp j && receives_service_at sched jhp t)
+        (arrivals_up_to arr_seq t).
 
     (** Similarly, we say that job [j] is incurring interference from a
         job with higher-or-equal priority of another task at time [t]
         if there exists a job [jhp] (of a different task) with
         higher-or-equal priority that executes at time [t]. *)
     Definition another_task_hep_job_interference (j : Job) (t : instant) :=
-      exists jhp,
-        (jhp \in arrivals_up_to arr_seq t)
-        /\ another_task_hep_job jhp j
-        /\ receives_service_at sched jhp t.
-
-    (** In order to use the above definition in aRTA, we need to define
-        its computational version. *)
-    Definition another_task_hep_job_interference_dec (j : Job) (t : instant) :=
-      has (fun jhp => another_task_hep_job jhp j && receives_service_at sched jhp t) (arrivals_up_to arr_seq t).
-
-    (** We also show that the computational and propositional
-        definitions are equivalent. *)
-    Lemma another_task_hep_job_interference_P :
-      forall j t,
-        reflect (another_task_hep_job_interference j t) (another_task_hep_job_interference_dec j t).
-    Proof.
-      move => j t; apply/introP.
-      - by move => /hasP [jhp ARR /andP [HEP SCHED]]; (exists jhp; split).
-      - move => /negP T1; move => [jhp [ARR [HEP SCHED]]].
-        apply: T1; apply/hasP.
-        exists jhp; first by done.
-        by apply/andP; split.
-    Qed.
+      has (fun jhp => another_task_hep_job jhp j
+                      && receives_service_at sched jhp t)
+        (arrivals_up_to arr_seq t).
 
     (** Now, we define the notion of cumulative interfering workload,
         called [other_hep_jobs_interfering_workload], that says how many
@@ -98,12 +57,12 @@ Section Definitions.
 
     (** (a) cumulative interference from other jobs with higher-or-equal priority ... *)
     Definition cumulative_another_hep_job_interference (j : Job) (t1 t2 : instant) :=
-      \sum_(t1 <= t < t2) another_hep_job_interference_dec j t.
+      \sum_(t1 <= t < t2) another_hep_job_interference j t.
 
     (** ... (b) and cumulative interference from jobs with higher or
         equal priority from other tasks, ... *)
     Definition cumulative_another_task_hep_job_interference (j : Job) (t1 t2 : instant) :=
-      \sum_(t1 <= t < t2) another_task_hep_job_interference_dec j t.
+      \sum_(t1 <= t < t2) another_task_hep_job_interference j t.
 
     (** ... and (c) cumulative workload from jobs with higher or equal priority. *)
     Definition cumulative_other_hep_jobs_interfering_workload (j : Job) (t1 t2 : instant) :=
