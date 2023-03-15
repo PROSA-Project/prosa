@@ -161,6 +161,11 @@ Section FPRelationsProperties.
       by exfalso; move/negP: Nhepxy.
     Qed.
 
+    (** The converse also holds. *)
+    Lemma not_hp_hep_task :
+      forall tsk1 tsk2, ~~ hp_task tsk1 tsk2 = hep_task tsk2 tsk1.
+    Proof. by move=> x y; rewrite -not_hep_hp_task negbK. Qed.
+
   End TotalProperties.
 
 End FPRelationsProperties.
