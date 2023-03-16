@@ -89,14 +89,14 @@ compile-and-doc:
       - "pretty/"
     expire_in: 1 week
 
-compile-and-doc-and-mangle-names-and-validate:
+compile-and-doc-and-validate:
   stage: build
   extends:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
     - !reference [.install-dependencies, script]
-    - make -j ${NJOBS} mangle-names
+    - make -j ${NJOBS} all
     - !reference [.make-html, script]
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
@@ -107,6 +107,15 @@ compile-and-doc-and-mangle-names-and-validate:
       - "without-proofs/"
       - "pretty/"
     expire_in: 1 week
+
+mangle-names:
+  stage: build
+  extends:
+    - .not_in_wip_branches
+    - .preferred-stable-version
+  script:
+    - !reference [.install-dependencies, script]
+    - make -j ${NJOBS} mangle-names
 
 # Check that proof irrelevance shows up only due to refinements.
 compile-and-validate:
