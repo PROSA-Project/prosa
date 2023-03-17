@@ -431,7 +431,6 @@ Section EDFSwap.
       move=> AT_t2.
       rewrite -service_invariant_implies_deadline_met; first by exact H_deadline_met.
       apply service_after_swap_invariant => //.
-      try ( by apply scheduled_at_implies_later_deadline with (sched0 := sched) => // ) ||
       by apply scheduled_at_implies_later_deadline with (sched := sched) => //.
     Qed.
 

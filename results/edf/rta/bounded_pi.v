@@ -444,7 +444,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       || eapply uniprocessor_response_time_bound_seq with
       (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L); rt_eauto.
     - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
-      + by eapply EDF_implies_sequential_tasks; rt_eauto.
+    - by eapply EDF_implies_sequential_tasks; rt_eauto.
     - by apply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
     - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
     - by apply instantiated_task_interference_is_bounded.
