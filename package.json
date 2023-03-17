@@ -22,7 +22,7 @@
 		"doc": "make html -j"
 	},
 	"dependencies": {
-		"@opam/coq": ">=8.13 <8.16",
+		"@opam/coq": ">=8.16 <8.18",
 		"@opam/ocamlfind": "1.8.1",
 		"coq-mathcomp": ">=1.16 <1.17",
 		"coq-mathcomp-zify": "*"
@@ -59,7 +59,7 @@
 			"source": "github:math-comp/mczify#63a5a1557758fec39782eaacca80befd17ac0ed2",
 			"override": {
 				"dependencies": {
-					"@opam/coq": ">=8.13",
+					"@opam/coq": ">=8.16",
 					"coq-mathcomp": "*"
 				},
 				"buildsInSource": true,

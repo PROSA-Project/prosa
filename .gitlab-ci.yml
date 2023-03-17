@@ -57,17 +57,12 @@ stages:
 
 ###################### The Jobs ######################
 
-1.16.0-coq-8.14:
+1.16.0-coq-8.16:
   extends:
     - .build
     - .not_in_wip_branches
 
-1.16.0-coq-8.15:
-  extends:
-    - .build
-    - .not_in_wip_branches
-
-1.16.0-coq-8.15:
+1.16.0-coq-8.17:
   extends:
     - .build
     - .not_in_wip_branches
@@ -144,7 +139,7 @@ spell-check:
     - make spell
 
 # mathcomp-dev with stable Coq
-#coq-8.15:
+#coq-8.17:
 #  extends:
 #    - .build-dev
 #    - .not_in_wip_branches    
@@ -163,9 +158,9 @@ proof-state:
   extends:
    - .not_in_wip_branches  
   stage: build
-  image: bbbrandenburg/alectryon-ci:1.16.0-coq-8.15.0
+  image: bbbrandenburg/alectryon-ci:1.16.0-coq-8.16
   script:
-    - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
+    - eval $(opam env)
     - !reference [.install-dependencies, script]
     - make -j ${NJOBS} all
     - make -j ${NJOBS} alectryon
