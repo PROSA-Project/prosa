@@ -24,7 +24,7 @@
 	"dependencies": {
 		"@opam/coq": ">=8.13 <8.16",
 		"@opam/ocamlfind": "1.8.1",
-		"coq-mathcomp": ">=1.12 <1.15",
+		"coq-mathcomp": ">=1.16 <1.17",
 		"coq-mathcomp-zify": "*"
 	},
 	"devDependencies": {},

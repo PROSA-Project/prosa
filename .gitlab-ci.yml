@@ -31,7 +31,7 @@ stages:
     - opam install -y -v -j ${NJOBS} coq-prosa-refinements
 
 .preferred-stable-version:
-    image: mathcomp/mathcomp:1.15.0-coq-8.16
+    image: mathcomp/mathcomp:1.16.0-coq-8.16
 
 .build:
   image: mathcomp/mathcomp:${CI_JOB_NAME}
@@ -57,17 +57,17 @@ stages:
 
 ###################### The Jobs ######################
 
-1.13.0-coq-8.14:
+1.16.0-coq-8.14:
   extends:
     - .build
     - .not_in_wip_branches
 
-1.14.0-coq-8.15:
+1.16.0-coq-8.15:
   extends:
     - .build
     - .not_in_wip_branches
 
-1.15.0-coq-8.15:
+1.16.0-coq-8.15:
   extends:
     - .build
     - .not_in_wip_branches
@@ -163,7 +163,7 @@ proof-state:
   extends:
    - .not_in_wip_branches  
   stage: build
-  image: bbbrandenburg/alectryon-ci:1.14.0-coq-8.15.0
+  image: bbbrandenburg/alectryon-ci:1.16.0-coq-8.15.0
   script:
     - eval $(opam env "--switch=${COMPILER_EDGE}" --set-switch)
     - !reference [.install-dependencies, script]
