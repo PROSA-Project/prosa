@@ -1,7 +1,7 @@
 Require Export prosa.model.task.sequentiality.
 
 Section ExecutionOrder.
-  
+
   (** Consider any type of job associated with any type of tasks... *)
   Context {Job: JobType}.
   Context {Task: TaskType}.
@@ -14,13 +14,18 @@ Section ExecutionOrder.
   (** ... and any kind of processor state model. *)
   Context {PState: ProcessorState Job}.
 
+  (** Trivially, [same_task] is symmetric. *)
+  Remark same_task_sym :
+    forall j1 j2,
+      same_task j1 j2 = same_task j2 j1.
+  Proof. by move=> j1 j2; rewrite /same_task eq_sym. Qed.
 
-  (** Consider any arrival sequence ... *) 
+  (** Consider any arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
-  
+
   (** ... and any schedule of this arrival sequence ... *)
-  Variable sched : schedule PState.  
-  
+  Variable sched : schedule PState.
+
   (** ... in which the sequential tasks hypothesis holds. *)
   Hypothesis H_sequential_tasks: sequential_tasks arr_seq sched.
 
@@ -28,7 +33,7 @@ Section ExecutionOrder.
       executes a job with the earliest arrival time. *)
   Corollary scheduler_executes_job_with_earliest_arrival:
     forall j1 j2 t,
-      arrives_in arr_seq j1 -> 
+      arrives_in arr_seq j1 ->
       arrives_in arr_seq j2 ->
       same_task j1 j2 ->
       ~~ completed_by sched j2 t ->
@@ -36,11 +41,27 @@ Section ExecutionOrder.
       job_arrival j1 <= job_arrival j2.
   Proof.
     move=> j1 j2 t ARR1 ARR2 TSK NCOMPL SCHED.
-    rewrite /same_task eq_sym in TSK.
+    have {}TSK := eqbLR (same_task_sym _ _) TSK.
     have SEQ := H_sequential_tasks j2 j1 t ARR2 ARR1 TSK.
-    rewrite leqNgt; apply/negP; intros ARR.
-    move: NCOMPL => /negP NCOMPL; apply: NCOMPL.
-    by apply SEQ.
+    rewrite leqNgt; apply/negP => ARR.
+    exact/(negP NCOMPL)/SEQ.
+  Qed.
+
+  (** Likewise, if we see an earlier-arrived incomplete job [j1] while another
+      job [j2] is scheduled, then [j1] and [j2] must stem from different
+      tasks. *)
+  Corollary sequential_tasks_different_tasks :
+    forall j1 j2 t,
+      arrives_in arr_seq j1 ->
+      arrives_in arr_seq j2 ->
+      job_arrival j1 < job_arrival j2 ->
+      ~~ completed_by sched j1 t ->
+      scheduled_at sched j2 t ->
+      ~~ same_task j1 j2.
+  Proof.
+    move=> j1 j2 t IN1 IN2 LT_ARR INCOMP SCHED.
+    apply: contraL INCOMP => SAME.
+    by apply/negPn/H_sequential_tasks; eauto.
   Qed.
 
 End ExecutionOrder.
