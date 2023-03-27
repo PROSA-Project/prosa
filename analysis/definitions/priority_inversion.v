@@ -7,7 +7,6 @@ Section PriorityInversion.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
