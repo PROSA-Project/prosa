@@ -44,11 +44,14 @@ Section Equivalence.
   (** ...consider a given valid job arrival sequence ... *)
   Variable arr_seq: arrival_sequence Job.
   Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (** ...and a corresponding schedule. *)
+  (** ...and a corresponding ideal uniprocessor schedule. *)
   Variable sched : schedule (ideal.processor_state Job).
 
-  (** Suppose jobs don't execute after their completion, ... *)
+  (** Suppose jobs don't execute before their arrival nor after their
+      completion, ... *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
 
   (** ...all jobs come from the arrival sequence [arr_seq], ...*)
@@ -87,7 +90,7 @@ Section Equivalence.
     move /neqP => NEQ.
     exploit (H_priority_driven j j_hp t) => //.
     { by apply (H_from_arr_seq _ _ SCHED'). }
-    { by rewrite /preemption_time; destruct (sched t). }
+    { by rewrite /preemption_time scheduled_job_at_def //; destruct (sched t). }
     { apply /andP; split => //.
       - apply /andP; split => //.
         apply (incompletion_monotonic _ j _ _ LEQ).

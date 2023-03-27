@@ -1,5 +1,6 @@
 Require Export prosa.implementation.definitions.generic_scheduler.
 
+Require Export prosa.model.processor.ideal.
 Require Export prosa.model.preemption.parameter.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.analysis.facts.readiness.backlogged.

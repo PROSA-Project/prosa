@@ -17,12 +17,15 @@ Section BasicLemmas.
   (** Consider any type of jobs with arrival times and execution costs. *)
   Context `{Job : JobType} {Arrival : JobArrival Job} {Cost : JobCost Job}.
 
-  (** Consider any arrival sequence of such jobs ... *)
+  (** Consider any valid arrival sequence of such jobs ... *)
   Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and the resulting ideal uniprocessor schedule. We assume that the
-      schedule is valid and work-conserving. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... and the resulting uniprocessor schedule. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_uniproc : uniprocessor_model PState.
+  Variable sched : schedule PState.
+  (** We assume that the schedule is valid and work-conserving. *)
   Hypothesis H_schedule_is_valid : valid_schedule sched arr_seq.
   Hypothesis H_work_conservation : work_conserving arr_seq sched.
 
@@ -117,8 +120,7 @@ Section BasicLemmas.
   Proof.
     move => j' t SCHED j_hp ARRjhp HEP.
     have EARLIER: job_arrival j_hp < job_arrival j' by rewrite -ltnNge in HEP.
-    eapply (early_hep_job_is_scheduled arr_seq _ sched _ _ _ _ j_hp j' _ _ _ t).
-    Unshelve. all : rt_eauto.
+    apply: early_hep_job_is_scheduled; rt_eauto.
     move=> t'; apply /andP; split => //.
     by apply ltnW.
   Qed.
@@ -156,32 +158,26 @@ Section BasicLemmas.
     forall j t,
       ~~ preempted_at sched j t.
   Proof.
-    move => j t.
-    apply /negP.
-    intros CONTR.
-    move: CONTR => /andP [/andP [SCHED1 NCOMPL] SCHED2].
-    move : H_schedule_is_valid => [COME MUST].
-    move: (ideal_proc_model_sched_case_analysis sched t) => [IDLE |[s INTER]].
-    { specialize (H_work_conservation j t).
-      destruct H_work_conservation as [j_other SCHEDj_other]; first by eapply (COME j t.-1 SCHED1).
-      - do 2 (apply /andP; split; last by done).
-        eapply scheduled_implies_pending in SCHED1; try rt_eauto.
-        move : SCHED1 => /andP [HAS COMPL].
-        by apply leq_trans with t.-1; [exact HAS| lia].
-      - move: SCHEDj_other IDLE.
-        rewrite scheduled_at_def => /eqP SCHED /eqP IDLE.
-        by rewrite IDLE in SCHED. }
-    { specialize (H_no_superfluous_preemptions t j s).
-      have HEP : ~~ hep_job j s.
-      {
-        apply H_no_superfluous_preemptions; last by done.
-        by repeat (apply /andP ; split; try by done).
-      }
-      rewrite /hep_job /fifo.FIFO -ltnNge in HEP.
-      eapply (early_hep_job_is_scheduled arr_seq ) in SCHED1; try rt_eauto.
-      - apply scheduled_implies_not_completed in INTER; rt_eauto.
-        by eapply (incompletion_monotonic sched s t.-1 t) in INTER; [move: INTER => /negP|lia].
+    move => j t; apply /negP => /andP [/andP [SCHED1 NCOMPL] SCHED2].
+    case SJA: (scheduled_job_at arr_seq sched t) => [j'|].
+    { move: SJA; rewrite scheduled_job_at_iff //; rt_eauto => SCHED'.
+      have: ~~ hep_job j j'.
+      { apply: H_no_superfluous_preemptions; last exact: SCHED'.
+        by repeat (apply /andP ; split). }
+      rewrite /hep_job /fifo.FIFO -ltnNge => EARLIER.
+      eapply (early_hep_job_is_scheduled arr_seq ) in SCHED1;  rt_eauto.
+      - apply scheduled_implies_not_completed in SCHED'; rt_eauto.
+        by eapply (incompletion_monotonic sched j' t.-1 t) in SCHED'; [move: SCHED' => /negP|lia].
       - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=]. }
+    { move: SJA; rewrite scheduled_job_at_none; rt_eauto => NSCHED.
+      have [j' SCHED']: exists j', scheduled_at sched j' t.
+      { apply: (H_work_conservation j t); rt_eauto.
+        apply/andP; split => //.
+        rewrite /job_ready/basic_ready_instance/pending.
+        apply/andP; split => //.
+        have: has_arrived j t.-1; last by rewrite /has_arrived; lia.
+        apply: has_arrived_scheduled; rt_eauto. }
+      by move: (NSCHED  j') => /negP. }
   Qed.
 
   (** It immediately follows that FIFO schedules are

@@ -23,6 +23,7 @@ Section Optimality.
   (** ... and any valid arrival sequence of such jobs. *)
   Variable arr_seq: arrival_sequence Job.
   Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
@@ -116,8 +117,9 @@ Section Optimality.
   Proof.
     move /EDF_WC_optimality => [edf_sched [[ARR READY] [DL_MET [WC EDF]]]].
     exists edf_sched.
-    apply (EDF_schedule_equiv arr_seq _) in EDF => //.
-    now apply (completed_jobs_are_not_ready edf_sched READY).
+    apply  (EDF_schedule_equiv arr_seq) in EDF => //;
+      first by apply: jobs_must_arrive_to_be_ready.
+    by apply (completed_jobs_are_not_ready edf_sched READY).
   Qed.
 
 End Optimality.

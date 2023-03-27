@@ -137,10 +137,11 @@ Section NoPreemptionsEquivalence.
   Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
-  
-  (** Consider an ideal uniprocessor schedule. *)
-  Variable sched : schedule (ideal.processor_state Job).
-  
+
+  (** Consider any type of schedule. *)
+  Context {PState : ProcessorState Job}.
+  Variable sched : schedule PState.
+
   (** We prove that no preemptions in a schedule is equivalent to a non-preemptive schedule. *)
   Lemma no_preemptions_equiv_nonpreemptive :
     (forall j t, ~~preempted_at sched j t) <-> nonpreemptive_schedule sched.

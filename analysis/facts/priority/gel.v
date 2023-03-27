@@ -1,6 +1,5 @@
 Require Import prosa.util.int.
 Require Import prosa.model.priority.gel.
-Require Import prosa.model.processor.ideal.
 Require Import prosa.model.schedule.priority_driven.
 Require Import prosa.model.task.sequentiality.
 Require Import prosa.analysis.facts.priority.sequential.
@@ -59,12 +58,18 @@ Section GELBasicFacts.
     (** Consider any arrival sequence. *)
     Variable arr_seq : arrival_sequence Job.
 
-    (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
-    Variable sched : schedule (ideal.processor_state Job).
+    (** Allow for any uniprocessor model. *)
+    Context {PState : ProcessorState Job}.
+    Hypothesis H_uniproc : uniprocessor_model PState.
+
+    (** Next, consider any schedule of the arrival sequence, ... *)
+    Variable sched : schedule PState.
 
     Context `{JobArrival Job} `{JobCost Job}.
+    Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
+
     (** ... allow for any work-bearing notion of job readiness, ... *)
-    Context `{@JobReady Job (ideal.processor_state Job) _ _}.
+    Context `{@JobReady Job PState _ _}.
     Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
     (** ... and assume that the schedule is valid. *)
@@ -92,7 +97,7 @@ Section GELBasicFacts.
       sequential_tasks arr_seq sched.
     Proof.
       move => j1 j2 t ARR1 ARR2 /eqP SAME LT.
-      eapply early_hep_job_is_scheduled => //; rt_eauto => t'.
+      apply: early_hep_job_is_scheduled; rt_eauto => t'.
       rewrite /hep_job_at  /JLFP_to_JLDP /hep_job /GEL /job_priority_point SAME.
       by lia.
     Qed.

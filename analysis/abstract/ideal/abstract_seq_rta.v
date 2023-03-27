@@ -125,12 +125,12 @@ Section Sequential_Abstract_RTA.
         as [upper_bound] one can use the end of the corresponding busy
         interval. *)
     Definition task_interference_received_before (tsk : Task) (t__up : instant) (t : instant) :=
-      ~ task_scheduled_at sched tsk t /\
+      ~ task_scheduled_at arr_seq sched tsk t /\
       exists j, interference j t /\ j \in task_arrivals_before arr_seq tsk t__up.
 
     (** We also define a decidable counterpart of this definition... *) 
     Definition task_interference_received_before_dec (tsk : Task) (t__up : instant) (t : instant) :=
-      (~~ task_scheduled_at sched tsk t)
+      (~~ task_scheduled_at arr_seq sched tsk t)
       && has (fun j => interference j t) (task_arrivals_before arr_seq tsk t__up).
 
     (** ... and prove that the propositional and decidable definitions
@@ -384,7 +384,8 @@ Section Sequential_Abstract_RTA.
               rewrite !H_idle/= addn0 add0n.
               case INT: (interference j t); last by done.
               rewrite /= lt0b /task_interference_received_before_dec; apply/andP; split.
-              { by rewrite /task_scheduled_at H_idle. }
+              { rewrite /task_scheduled_at scheduled_job_at_def; rt_eauto.
+                by rewrite H_idle. }
               apply/hasP; exists j; last by done.
               by rewrite mem_filter; apply/andP; split; rt_eauto.
             Qed.
@@ -414,6 +415,7 @@ Section Sequential_Abstract_RTA.
                       /service_of_jobs.service_of_jobs_at scheduled_at_def/=.
               have ARRs: arrives_in arr_seq j';
                 first by apply H_jobs_come_from_arrival_sequence with t; rewrite scheduled_at_def; apply/eqP.
+              rewrite scheduled_job_at_def; rt_eauto.
               rewrite H_sched H_not_job_of_tsk; simpl.
               have ->: Some j' == Some j = false; last rewrite addn0.
               { apply/negP => /eqP CONTR; inversion CONTR; subst j'.
@@ -513,6 +515,7 @@ Section Sequential_Abstract_RTA.
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def.
               move: (H_job_of_tsk) => /eqP TSK.
+              rewrite scheduled_job_at_def; rt_eauto.
               rewrite H_sched TSK !eq_refl //= addn0; simpl.
               move: (H_work_conserving j _ _ t H_j_arrives  H_job_cost_positive (fst H_busy_interval)) => WORK.
               feed WORK.

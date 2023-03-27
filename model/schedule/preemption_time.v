@@ -1,5 +1,5 @@
+Require Export prosa.model.schedule.scheduled.
 Require Export prosa.model.preemption.parameter.
-Require prosa.model.processor.ideal.
 
 (** * Preemption Times *)
 
@@ -23,15 +23,21 @@ Section PreemptionTime.
   (** ... any preemption model, ... *)
   Context `{JobPreemptable Job}.
 
-  (** ... and any ideal uniprocessor schedule of such jobs. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... any arrival sequence, ... *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** ... any processor model, ... *)
+  Context {PState : ProcessorState Job}.
+
+  (** ... and any schedule. *)
+  Variable sched : schedule PState.
 
   (** We say that a time [t] is a preemption time iff the job that is currently
       scheduled at [t], if any, can be preempted according to the predicate
       [job_preemptable] (which encodes the preemption model). An idle instant
       is always a preemption time. *)
   Definition preemption_time (t : instant) :=
-    if sched t is Some j then
+    if (scheduled_job_at arr_seq sched t) is Some j then
       job_preemptable j (service sched j t)
     else true.
 

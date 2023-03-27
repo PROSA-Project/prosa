@@ -22,14 +22,11 @@ Section GeneralityOfGEL.
   (** Consider any type of tasks with relative priority points... *)
   Context  {Task : TaskType} `{PriorityPoint Task}.
 
-  (** ... and jobs of these tasks. *)
+  (** ... jobs of these tasks, and ... *)
   Context  {Job : JobType} `{JobTask Job Task}.
 
-  (** Conceptually, the results in this module should hold for any processor
-      model. However, due to legacy limitations related to priority-policy
-      compliance that yet need to be fixed, we currently can state the
-      generality of GEL only for ideal uniprocessor schedules. *)
-  Let PState := ideal.processor_state Job.
+  (** ... any processor model. *)
+  Context {PState : ProcessorState Job}.
 
   (** Suppose the jobs have arrival times, costs, and any preemption model. *)
   Context {Arrival : JobArrival Job} {Cost : JobCost Job} `{JobPreemptable Job}.

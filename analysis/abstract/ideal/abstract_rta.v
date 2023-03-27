@@ -1,5 +1,6 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 
+Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.abstract.search_space.
 Require Export prosa.analysis.abstract.abstract_rta.

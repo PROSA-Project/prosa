@@ -1,7 +1,7 @@
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
 Require Import prosa.model.task.preemption.parameters.
-     
+
 (** In this section, we prove a few properties about EDF policy. *)
 Section PropertiesOfEDF.
 
@@ -38,9 +38,9 @@ Require Export prosa.model.task.sequentiality.
 Require Export prosa.analysis.facts.busy_interval.priority_inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 
-(** In this section, we prove that EDF priority policy 
-    implies that tasks are sequential. *)
-Section SequentialEDF.  
+(** In this section, we prove that the EDF priority policy implies that tasks
+    are executed sequentially. *)
+Section SequentialEDF.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -48,30 +48,35 @@ Section SequentialEDF.
   Context `{TaskDeadline Task}.
 
   (** ... with a bound on the maximum non-preemptive segment length.
-      The bound is needed to ensure that, at any instant, it always 
-      exists a subsequent preemption time in which the scheduler can, 
+      The bound is needed to ensure that, at any instant, it always
+      exists a subsequent preemption time in which the scheduler can,
       if needed, switch to another higher-priority job. *)
   Context `{TaskMaxNonpreemptiveSegment Task}.
-  
+
   (** Further, consider any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{Arrival : JobArrival Job}.
   Context `{Cost : JobCost Job}.
 
-  (** Consider any arrival sequence. *)
+  (** Allow for any uniprocessor model. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_uniproc : uniprocessor_model PState.
+
+  (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
-  Variable sched : schedule (ideal.processor_state Job).
-  
+  Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
+
+  (** Next, consider any schedule of this arrival sequence, ... *)
+  Variable sched : schedule PState.
+
   (** ... allow for any work-bearing notion of job readiness, ... *)
-  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
+  Context `{@JobReady Job PState Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** ... and assume that the schedule is valid. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  
+
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)
   Context `{JobPreemptable Job}.

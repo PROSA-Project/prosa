@@ -62,7 +62,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** Consider an arbitrary preemption time t ∈ <<[t1,t2)>>. *)
   Variable t : instant.
   Hypothesis H_t_in_busy_interval : t1 <= t < t2.
-  Hypothesis H_t_preemption_time : preemption_time sched t.
+  Hypothesis H_t_preemption_time : preemption_time arr_seq sched t.
 
   (** First note since [t] lies inside the busy interval,
       the processor cannot be idle at time [t]. *)

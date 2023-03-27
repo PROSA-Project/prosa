@@ -18,9 +18,9 @@ Section Schedule.
   Definition Task := [eqType of concrete_task].
   Definition Job := [eqType of concrete_job].
 
-  (** Consider any arrival sequence with consistent arrivals, ... *)
+  (** Consider any valid arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
+  Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
   (** ... assume sequential readiness, ... *)
   Instance sequential_ready_instance : JobReady Job (ideal.processor_state Job) :=

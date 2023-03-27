@@ -14,16 +14,16 @@ Section PrioAwareUniprocessorScheduler.
   Let PState := ideal.processor_state Job.
   Let idle_state : PState := None.
 
-  (** Suppose we are given a consistent arrival sequence of such jobs, ... *)
+  (** Suppose we are given a valid arrival sequence of such jobs, ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrival_times: consistent_arrival_times arr_seq.
+  Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
   (** ... a non-clairvoyant readiness model, ... *)
   Context {RM : JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_nonclairvoyant_job_readiness: nonclairvoyant_readiness RM.
 
   (** ... a preemption model, ... *)
-  Context `{JobPreemptable Job}.      
+  Context `{JobPreemptable Job}.
 
   (** ... and reflexive, total, and transitive JLDP priority policy. *)
   Context {JLDP : JLDP_policy Job}.
@@ -35,7 +35,7 @@ Section PrioAwareUniprocessorScheduler.
       priority-aware ideal uniprocessor scheduler... *)
   Let schedule := uni_schedule arr_seq.
 
-  (** ...and assume that the preemption model is consistent with the 
+  (** ...and assume that the preemption model is consistent with the
       readiness model. *)
   Hypothesis H_valid_preemption_behavior:
     valid_nonpreemptive_readiness RM schedule.
@@ -81,7 +81,7 @@ Section PrioAwareUniprocessorScheduler.
     Qed.
 
   End PreemptionCompliance.
-  
+
   (** Now we proceed to the main property of the priority-aware scheduler: in
       the following section we establish that [uni_schedule arr_seq] is
       compliant with the given priority policy whenever jobs are
@@ -100,18 +100,19 @@ Section PrioAwareUniprocessorScheduler.
     Lemma scheduled_job_is_supremum:
       forall j t,
         scheduled_at schedule j t ->
-        preemption_time schedule t ->
+        preemption_time arr_seq schedule t ->
         supremum (hep_job_at t) (jobs_backlogged_at arr_seq (prefix t) t) = Some j.
     Proof.
       move=> j t SCHED PREEMPT.
       have NOT_NP: ~~ prev_job_nonpreemptive (prefix t) t.
-      { apply contraL with (b := preemption_time (uni_schedule arr_seq) t) => //.
-        now apply np_consistent. }
+      { apply /(contraL _ PREEMPT)/np_consistent; rt_eauto.
+        rewrite /choose_highest_prio_job => t' s j'.
+        by apply: supremum_in. }
       move: SCHED.
       rewrite scheduled_at_def => /eqP.
       rewrite {1}/schedule/uni_schedule/pmc_uni_schedule/generic_schedule schedule_up_to_def /allocation_at -/(prefix t).
       rewrite ifF //.
-      now apply negbTE.
+      by apply negbTE.
     Qed.
 
     (** From the preceding facts, we conclude that [uni_schedule arr_seq]
@@ -131,11 +132,11 @@ Section PrioAwareUniprocessorScheduler.
           rewrite /pmc_uni_schedule/generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
           rewrite /prefix scheduled_at_def.
           induction t => //.
-          now rewrite schedule_up_to_empty. }
+          by rewrite schedule_up_to_empty. }
         move=> BACK_j1.
         move: (scheduled_job_is_supremum j2 t SCHED_j2 PREEMPT) => SUPREMUM.
         apply supremum_spec with (s := jobs_backlogged_at arr_seq (prefix t) t) => //.
-        now apply mem_backlogged_jobs. }
+        by apply mem_backlogged_jobs; rt_auto. }
     Qed.
 
   End Priority.

@@ -20,9 +20,9 @@ Section NPUniprocessorScheduler.
   Let PState := ideal.processor_state Job.
   Let idle_state : PState := None.
 
-  (** Suppose we are given a consistent arrival sequence of such jobs, ... *)
+  (** Suppose we are given a valid arrival sequence of such jobs, ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrival_times: consistent_arrival_times arr_seq.
+  Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
   (** ... a non-clairvoyant readiness model, ... *)
   Context {RM: JobReady Job (ideal.processor_state Job)}.
@@ -97,8 +97,8 @@ Section NPUniprocessorScheduler.
       move=> j t ARRIVES BACKLOGGED.
       move: (@ideal_proc_model_sched_case_analysis Job schedule t) => [IDLE|SCHED]; last by exact.
       exfalso.
-      have NON_EMPTY: j \in jobs_backlogged_at arr_seq schedule t by apply mem_backlogged_jobs => //.
-      clear BACKLOGGED.
+      have NON_EMPTY: j \in jobs_backlogged_at arr_seq schedule t
+        by apply mem_backlogged_jobs => //; rt_auto.
       move: (idle_schedule_no_backlogged_jobs t IDLE) => EMPTY.
       by rewrite EMPTY in NON_EMPTY.
     Qed.
@@ -110,25 +110,25 @@ Section NPUniprocessorScheduler.
       sequence and only ready jobs are scheduled. *)
   Section Validity.
 
-    (** First, any reasonable job selection policy will not create jobs "out 
+    (** First, any reasonable job selection policy will not create jobs "out
         of thin air," i.e., if a job is selected, it was among those given
         to choose from. *)
     Hypothesis H_chooses_from_set: forall t s j, choose_job t s = Some j -> j \in s.
-    
-    (** Second, for the schedule to be valid, we require the notion of readiness 
+
+    (** Second, for the schedule to be valid, we require the notion of readiness
         to be consistent with the preemption model: a non-preemptive job remains
         ready until (at least) the end of its current non-preemptive section. *)
     Hypothesis H_valid_preemption_behavior: valid_nonpreemptive_readiness RM schedule.
-    
+
     (** Finally, we assume the readiness model to be non-clairvoyant. *)
     Hypothesis H_nonclairvoyant_readiness: nonclairvoyant_readiness RM.
-    
+
     (** For notational convenience, recall the definition of a prefix of the
         schedule based on which the next decision is made. *)
     Let sched_prefix t :=
       if t is t'.+1 then schedule_up_to policy None t' else empty_schedule idle_state.
 
-    (** We begin by showing that any job in the schedule must come from the arrival 
+    (** We begin by showing that any job in the schedule must come from the arrival
         sequence used to generate it. *)
     Lemma np_schedule_jobs_from_arrival_sequence:
       jobs_come_from_arrival_sequence schedule arr_seq.
@@ -145,7 +145,7 @@ Section NPUniprocessorScheduler.
           by apply backlogged_job_arrives_in.
     Qed.
 
-    (** Next, we show that any job selected by the job selection policy must 
+    (** Next, we show that any job selected by the job selection policy must
         be ready. *)
     Theorem chosen_job_is_ready:
       forall j t,
@@ -219,13 +219,16 @@ Section NPUniprocessorScheduler.
         now rewrite (schedule_up_to_prefix_inclusion _  _ t t').
         rewrite //=.
         by move=> /andP [? ?]. }
-    Qed. 
+    Qed.
 
   End Validity.
 
   (** Next, we observe that the resulting schedule is consistent with the
       definition of "preemption times". *)
   Section PreemptionTimes.
+
+    (** Again, we require that the job-selection policy is reasonable. *)
+    Hypothesis H_chooses_from_set: forall t s j, choose_job t s = Some j -> j \in s.
 
     (** For notational convenience, recall the definition of a prefix of the
         schedule based on which the next decision is made. *)
@@ -251,10 +254,14 @@ Section NPUniprocessorScheduler.
     Lemma np_consistent:
       forall t,
         prev_job_nonpreemptive (prefix t) t ->
-        ~~ preemption_time schedule t.
+        ~~ preemption_time arr_seq schedule t.
     Proof.
-      elim => [|t _]; first by rewrite /prev_job_nonpreemptive.
-      rewrite /schedule /pmc_uni_schedule /generic_schedule /preemption_time
+      move=> t.
+      rewrite /preemption_time scheduled_job_at_def; rt_eauto; last first.
+      - by apply /jobs_must_arrive_to_be_ready/jobs_must_be_ready.
+      - by apply np_schedule_jobs_from_arrival_sequence.
+      elim: t => [|t _]; first by rewrite /prev_job_nonpreemptive.
+      rewrite /schedule /pmc_uni_schedule /generic_schedule
               schedule_up_to_def /prefix /allocation_at => NP.
       rewrite ifT // -pred_Sn.
       move: NP; rewrite /prev_job_nonpreemptive.
@@ -263,7 +270,7 @@ Section NPUniprocessorScheduler.
                 service (schedule_up_to policy idle_state t) j t.+1) => //.
       rewrite /service.
       apply equal_prefix_implies_same_service_during => t' /andP [_ BOUND].
-      rewrite (schedule_up_to_prefix_inclusion _ _ t' t) //. 
+      rewrite (schedule_up_to_prefix_inclusion _ _ t' t) //.
       by move=> /andP [? ?].
     Qed.
 
@@ -280,8 +287,8 @@ Section NPUniprocessorScheduler.
       forall j,
         arrives_in arr_seq j ->
         job_cannot_become_nonpreemptive_before_execution j.
-    
-    (** Second, for the schedule to be valid, we require the notion of readiness 
+
+    (** Second, for the schedule to be valid, we require the notion of readiness
         to be consistent with the preemption model: a non-preemptive job remains
         ready until (at least) the end of its current non-preemptive section. *)
     Hypothesis H_valid_preemption_behavior: valid_nonpreemptive_readiness RM schedule.

@@ -157,8 +157,8 @@ Section ScheduleClass.
       jobs_come_from_arrival_sequence sched arr_seq.
     Hypothesis H_jobs_must_arrive_to_execute :
       jobs_must_arrive_to_execute sched.
-    Hypothesis H_arrival_times_are_consistent :
-      consistent_arrival_times arr_seq.
+    Hypothesis H_arrival_times_are_valid :
+      valid_arrival_sequence arr_seq.
 
     (** The generic notion [scheduled_job_at] coincides with our notion of ideal
         processor state. This observation allows cutting out the generic notion
@@ -168,7 +168,7 @@ Section ScheduleClass.
         scheduled_job_at arr_seq sched t = sched t.
     Proof.
       move=> t.
-      case: (scheduled_at_dec arr_seq sched _ _ _ t) => //[[j SCHED]|NS].
+      case: (scheduled_at_dec arr_seq _ sched _ _ t) => //[[j SCHED]|NS].
       { move: (SCHED); rewrite scheduled_at_def => /eqP ->.
         by rewrite scheduled_job_at_iff
            ; auto using ideal_proc_model_is_a_uniprocessor_model. }
