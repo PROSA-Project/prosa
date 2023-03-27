@@ -1,6 +1,7 @@
 Require Export prosa.util.all.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.facts.behavior.service.
+Require Export prosa.analysis.facts.model.scheduled.
 Require Import prosa.model.processor.ideal.
 
 (** Note: we do not re-export the basic definitions to avoid littering the global
@@ -136,7 +137,50 @@ Section ScheduleClass.
     is_idle sched t ->
     service_at sched j t = 0.
   Proof. by rewrite service_at_is_scheduled_at scheduled_at_def => /eqP ->. Qed.
-  
+
+  (** In the following, we relate the ideal uniprocessor state to the generic
+       definition [job_scheduled_at]. Specifically, the two notions are
+       equivalent. To show this, require an arrival sequence in context. *)
+  Section RelationToGenericScheduledJob.
+
+    (** Consider any arrival sequence ... *)
+    Variable arr_seq : arrival_sequence Job.
+    Context `{JobArrival Job}.
+
+    (** ... and any ideal uni-processor schedule of this arrival sequence. *)
+    Variable sched : schedule (ideal.processor_state Job).
+
+  (** Suppose all jobs come from the arrival sequence and do not execute before
+      their arrival time (which must be consistent with the arrival
+      sequence). *)
+    Hypothesis H_jobs_come_from_arrival_sequence :
+      jobs_come_from_arrival_sequence sched arr_seq.
+    Hypothesis H_jobs_must_arrive_to_execute :
+      jobs_must_arrive_to_execute sched.
+    Hypothesis H_arrival_times_are_consistent :
+      consistent_arrival_times arr_seq.
+
+    (** The generic notion [scheduled_job_at] coincides with our notion of ideal
+        processor state. This observation allows cutting out the generic notion
+        in proofs specific to ideal uniprocessor schedules. *)
+    Lemma scheduled_job_at_def :
+      forall t,
+        scheduled_job_at arr_seq sched t = sched t.
+    Proof.
+      move=> t.
+      case: (scheduled_at_dec arr_seq sched _ _ _ t) => //[[j SCHED]|NS].
+      { move: (SCHED); rewrite scheduled_at_def => /eqP ->.
+        by rewrite scheduled_job_at_iff
+           ; auto using ideal_proc_model_is_a_uniprocessor_model. }
+      { move: (NS); rewrite -scheduled_job_at_none; eauto => NONE.
+        case SCHED: (sched t) => [j|]; last by rewrite NONE.
+        exfalso.
+        move: SCHED => /eqP; rewrite -scheduled_at_def.
+        by move: (NS j) => /negP. }
+    Qed.
+
+  End RelationToGenericScheduledJob.
+
 End ScheduleClass.
 
 (** * Incremental Service in Ideal Schedule *)
