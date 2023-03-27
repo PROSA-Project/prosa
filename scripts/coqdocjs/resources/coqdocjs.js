@@ -3,7 +3,7 @@ var coqdocjs = coqdocjs || {};
 
 function replace(s){
   var m;
-  if (m = s.match(/^(.+)'/)) {
+  if (m = s.match(/^(.+)'$/)) {
     return replace(m[1])+"'";
   } else if (m = s.match(/^([A-Za-z]+)_?(\d+)$/)) {
     return replace(m[1])+m[2].replace(/\d/g, function(d){
