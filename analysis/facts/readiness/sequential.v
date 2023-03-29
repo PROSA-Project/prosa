@@ -9,7 +9,7 @@ Require Export prosa.analysis.facts.model.task_arrivals.
 Require Export prosa.model.readiness.sequential.
 
 (** In this section, we show some useful properties of the sequential
-    task readiness model. *) 
+    task readiness model. *)
 Section SequentialTasksReadiness.
 
   (** Consider any type of job associated with any type of tasks ... *)
@@ -18,30 +18,36 @@ Section SequentialTasksReadiness.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
-  
+
   (** ... and any kind of processor state. *)
   Context {PState : ProcessorState Job}.
-  
+
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  
+
   (** Recall that we assume sequential tasks. *)
-  #[local] Instance sequential_readiness : JobReady Job PState :=
+  #[local] Instance sequential_readiness_instance : JobReady Job PState :=
     sequential_ready_instance arr_seq.
-  
+
+  (** First, we observe that the sequential readiness model indeed lives up to
+      its name. *)
+  Fact sequential_readiness_is_sequential :
+    sequential_readiness sequential_readiness_instance arr_seq.
+  Proof. by move=> sched j t; rewrite /job_ready //= => /andP [_ PRIO_COMP]. Qed.
+
   (** Consider any valid schedule of [arr_seq]. *)
   Variable sched : schedule PState.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
-  
-  (** Consider an FP policy that indicates a reflexive 
-      higher-or-equal priority relation. *) 
+
+  (** Consider an FP policy that indicates a reflexive
+      higher-or-equal priority relation. *)
   Context {FP : FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
 
-  (** First, we show that the sequential readiness model is non-clairvoyant. *) 
+  (** We show that the sequential readiness model is non-clairvoyant. *)
   Fact sequential_readiness_nonclairvoyance :
-    nonclairvoyant_readiness sequential_readiness.
+    nonclairvoyant_readiness sequential_readiness_instance.
   Proof.
     intros sched1 sched2 j h ID t LE; rewrite //=.
     erewrite identical_prefix_pending; eauto 2.

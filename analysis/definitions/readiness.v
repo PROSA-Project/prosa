@@ -2,12 +2,13 @@ Require Export prosa.behavior.ready.
 Require Export prosa.analysis.definitions.schedule_prefix.
 Require Export prosa.model.preemption.parameter.
 Require Export prosa.model.priority.classes.
+Require Export prosa.model.task.sequentiality.
 
 (** * Properties of Readiness Models *)
 
 (** In this file, we define commonsense properties of readiness models. *)
 Section ReadinessModelProperties.
-  
+
   (** For any type of jobs with costs and arrival times ... *)
   Context {Job : JobType} `{JobCost Job} `{JobArrival Job}.
 
@@ -32,7 +33,7 @@ Section ReadinessModelProperties.
       forall t,
         t <= h ->
         job_ready sched j t = job_ready sched' j t.
-  
+
   (** Next, we relate the readiness model to the preemption model. *)
   Context `{JobPreemptable Job}.
 
@@ -44,5 +45,18 @@ Section ReadinessModelProperties.
   Definition valid_nonpreemptive_readiness sched :=
      forall j t,
         ~~ job_preemptable j (service sched j t) -> job_ready sched j t.
-  
+
+  (** For the next definition, consider the tasks from which the jobs stem. *)
+  Context {Task : TaskType}.
+  Context `{JobTask Job Task}.
+
+  (** We say a readiness model is sequential iff only a task's earliest
+      incomplete job is ready, meaning that later jobs can be executed only
+      after all earlier jobs have been completed. *)
+  Definition sequential_readiness (arr_seq : arrival_sequence Job) :=
+    forall sched j t,
+      job_ready sched j t -> prior_jobs_complete arr_seq sched j t.
+
 End ReadinessModelProperties.
+
+
