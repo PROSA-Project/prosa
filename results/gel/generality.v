@@ -6,7 +6,6 @@ Require Export prosa.model.priority.fifo.
 Require Export prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.facts.priority.classes.
-Require Export prosa.analysis.facts.readiness.sequential.
 Require Export prosa.analysis.facts.model.sequential.
 
 
@@ -28,8 +27,10 @@ Section GeneralityOfGEL.
   (** ... any processor model. *)
   Context {PState : ProcessorState Job}.
 
-  (** Suppose the jobs have arrival times, costs, and any preemption model. *)
-  Context {Arrival : JobArrival Job} {Cost : JobCost Job} `{JobPreemptable Job}.
+  (** Suppose the jobs have arrival times and costs, and allow for any preemption
+      and readiness models. *)
+  Context {Arrival : JobArrival Job} {Cost : JobCost Job}
+    `{JobPreemptable Job} {JR: @JobReady Job PState Cost Arrival}.
 
   (** ** GEL Generalizes EDF *)
 
@@ -38,9 +39,8 @@ Section GeneralityOfGEL.
 
   Section GELGeneralizesEDF.
 
-    (** Suppose the tasks have relative deadlines and allow for any readiness
-        model. *)
-    Context `{TaskDeadline Task} `{@JobReady Job PState Cost Arrival}.
+    (** Suppose the tasks have relative deadlines. *)
+    Context `{TaskDeadline Task}.
 
     (** If each task's priority point is set to its relative deadline ... *)
     Hypothesis H_priority_point :
@@ -69,9 +69,6 @@ Section GeneralityOfGEL.
 
   (** GEL similarly generalizes FIFO in a trivial manner. *)
   Section GELGeneralizesFIFO.
-
-    (** We again allow for an arbitrary readiness model. *)
-    Context `{@JobReady Job PState Cost Arrival}.
 
     (** If each task's priority point is set to zero ... *)
     Hypothesis H_priority_point :
@@ -115,10 +112,10 @@ Section GeneralityOfGEL.
     Variable arr_seq : arrival_sequence Job.
     Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-   (** In the following, we assume sequential readiness: a later-arriving job of
-       a task is ready only if all prior jobs are complete. *)
-    #[local] Instance sequential_readiness : (@JobReady _ PState _ _) :=
-      sequential_ready_instance arr_seq.
+   (** In the following, we assume a sequential readiness model: a
+       later-arriving job of a task is ready only if all prior jobs are
+       complete. *)
+    Hypothesis H_sequential : sequential_readiness JR arr_seq.
 
     (** For ease of reference, we refer to the difference between the relative
         priority points of two given tasks as [pp_delta]. *)
@@ -231,7 +228,7 @@ Section GeneralityOfGEL.
       <-> respects_FP_policy_at_preemption_point arr_seq sched fp.
     Proof.
       have SEQ: sequential_tasks arr_seq sched
-        by eapply sequential_readiness_implies_sequential_tasks; rt_auto.
+        by eapply sequential_tasks_from_readiness; rt_auto.
       split=> RESPECTED j' j t ARR PT BL SCHED; last first.
       { have [SAME|DIFF] := boolP (same_task j' j).
         {
