@@ -84,27 +84,39 @@ spell:
 	./scripts/flag-typos-in-comments.sh `find . -iname '*.v'`
 	./scripts/flag-typos-in-Markdown.sh `find . -iname '*.md'`
 
+proof-length:
+	./scripts/proofloc.py --check `find . -iname '*.v'`
+
 distclean: cleanall
 	$(RM) $(COQ_PROJ)
 
 help:
 	@echo "You can run:"
+	@echo
 	@echo "'make' or 'make prosa' to build Prosa main development"
 	@echo "'make refinements' to build the refinement part only"
 	@echo "    (requires the main development to be installed)"
 	@echo "'make all' to build everything"
+	@echo
 	@echo "'make install' to install previously compiled files"
+	@echo "'make validate' to check and verify all proofs"
+	@echo
 	@echo "'make htmlpretty' to build the documentation based on CoqdocJS"
 	@echo "    (can hide/show proofs)"
 	@echo "'make gallinahtml' to build the documentation without proofs"
 	@echo "'make html' to build the documentation with all proofs"
+	@echo
 	@echo "'make clean' to remove generated files"
 	@echo "'make vacumm' to clean .vo .glob .aux files and empty dirs"
 	@echo "'make macos-clean' to clean macos' .DS_Store dirs"
 	@echo "'make distclean' to remove all generated files"
-	@echo "'make mangle-names' to compile with mangle-names option"
+	@echo
+	@echo "'make mangle-names' to compile with mangle-names option"	
+	@echo "'make spell' to run a spell checker on comments and Markdown files"
+	@echo "'make proof-length' to flag too-long proofs"
+	@echo
 
 .PHONY: all prosa refinements mangle-names mangle-namesCoqProject
 .PHONY: commonCoqProject allCoqProject prosaCoqProject refinementsCoqProject
 .PHONY: install html gallinahtml htmlpretty clean cleanall validate alectryon
-.PHONY: vacuum macos-clean spell distclean help
+.PHONY: vacuum macos-clean spell proof-length distclean help

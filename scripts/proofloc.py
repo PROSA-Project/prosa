@@ -123,8 +123,12 @@ def check_proof_lengths(opts, all_proofs):
             new_long_proofs = True
         else:
             known_long_proofs = known_long_proofs + 1
-    print("Checked %d proofs in %d files, while skipping %d known long proofs."
-            % (len(all_proofs), len(opts.input_files), known_long_proofs))
+    if known_long_proofs:
+        print("Checked %d proofs in %d files, while skipping %d known long proofs."
+                % (len(all_proofs), len(opts.input_files), known_long_proofs))
+    else:
+        print("Checked %d proofs in %d files."
+                % (len(all_proofs), len(opts.input_files)))
     return new_long_proofs
 
 def rank_proofs(opts, all_proofs):

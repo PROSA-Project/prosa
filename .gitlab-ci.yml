@@ -126,9 +126,9 @@ compile-and-validate:
 
 proof-length:
   stage: build
-  image: python:3-alpine
+  image: python:3
   script:
-    - scripts/proofloc.py --check --long-proofs scripts/known-long-proofs.json `find . -iname *.v`
+    - make proof-length
 
 spell-check:
   extends:  
