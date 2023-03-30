@@ -318,7 +318,7 @@ Section SumOverPartitions.
   Variable ys : seq Y.
 
   (** We assume that any item in [xs] has its corresponding partition in the sequence of partitions [ys]. *)
-  Hypothesis H_no_partition_missing : forall x, x \in xs -> x_to_y x \in ys.
+  Hypothesis H_no_partition_missing : forall x, x \in xs -> P x -> x_to_y x \in ys.
 
   (** Consider the sum of [f x] over all [x] in a given partition [y]. *)
   Let sum_of_partition y := \sum_(x <- xs | P x && (x_to_y x == y)) f x.
@@ -332,16 +332,17 @@ Section SumOverPartitions.
     rewrite /sum_of_partition.
     induction xs as [| x' xs' LE_TAIL]; first by rewrite big_nil.
     have P_HOLDS: forall i j, true -> P j && (x_to_y j== i) -> P j by move=> ??? /andP [P_HOLDS _].
-    have IN_ys: forall x : X, x \in xs' -> x_to_y x \in ys.
-    { by move=> ??; apply H_no_partition_missing => //; rewrite in_cons; apply /orP; right. }
+    have IN_ys: forall x : X, x \in xs' -> P x -> x_to_y x \in ys
+      by move=> ??; apply H_no_partition_missing => //;  rewrite in_cons; apply /orP; right.
     move: LE_TAIL; rewrite (exchange_big_dep P) => //= LE_TAIL.
     rewrite (exchange_big_dep P) //= !big_cons.
-    case: (P x') => //=; last by apply LE_TAIL.
+    case PX: (P x') => //=; last by apply LE_TAIL.
     apply leq_add => //; last by apply LE_TAIL.
     rewrite big_const_seq iter_addn_0.
     apply leq_pmulr; rewrite -has_count.
     apply /hasP; eapply ex_intro2 => //.
-    by apply H_no_partition_missing, mem_head.
+    apply H_no_partition_missing => //.
+    exact: mem_head.
   Qed.
 
   (** Consider a partition [y']. *)
@@ -387,7 +388,7 @@ Section SumOverPartitions.
       { by move: H_xs_unique; rewrite cons_uniq => /andP [??]. }
       rewrite (exchange_big_dep P) //=; last by move=> ??? /andP[??].
       rewrite !big_cons.
-      destruct (P x'); last by rewrite LE_TAIL (exchange_big_dep P) //=;  move=> ??? /andP[??].
+      case PX: (P x'); last by rewrite LE_TAIL (exchange_big_dep P) //=;  move=> ??? /andP[??].
       have -> : \sum_(i <- ys | true && ( x_to_y x' == i)) f x' = f x'.
       { rewrite //= -big_filter.
         have -> : [seq i <- ys | x_to_y x' == i] = [:: x_to_y x']; last by rewrite unlock //= addn0.
@@ -397,7 +398,9 @@ Section SumOverPartitions.
           feed LE_TAILy; first by move: H_ys_unique; rewrite cons_uniq => /andP [??].
           by rewrite //=  LE_TAILy //= eq_sym. }
         apply filter_pred1_uniq => //.
-        by apply H_no_partition_missing; rewrite in_cons; apply /orP; left. }
+        apply H_no_partition_missing => //.
+        by rewrite in_cons; apply /orP; left.
+      }
       apply /eqP; rewrite eqn_add2l; apply /eqP.
       by rewrite LE_TAIL (exchange_big_dep P) //=;  move=> ??? /andP[??].
     Qed.

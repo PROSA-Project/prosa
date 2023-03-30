@@ -246,7 +246,7 @@ Section AbstractRTAforGELwithArrivalCurves.
         + eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
           eapply leq_trans; first by apply service_of_jobs_le_workload; rt_eauto.
           eapply leq_trans.
-          * eapply reorder_summation; eauto 2 => j' IN.
+          * eapply reorder_summation; eauto 2 => j' IN _.
             by apply H_all_jobs_from_taskset; eapply in_arrivals_implies_arrived; exact IN.
           * eapply leq_trans.
             -- move : TSK => /eqP TSK; rewrite TSK.

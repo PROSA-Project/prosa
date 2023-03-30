@@ -344,7 +344,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
               eapply leq_trans; first by eapply service_of_jobs_le_workload; rt_eauto.
               eapply leq_trans.
               eapply reorder_summation; rt_eauto.
-              move => j' IN.
+              move => j' IN _.
               apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
               move : TSK => /eqP TSK.
               rewrite TSK.

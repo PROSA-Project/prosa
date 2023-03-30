@@ -321,7 +321,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
           last by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
         rewrite addnBA.
         + rewrite leq_sub2r //; eapply leq_trans.
-          * apply sum_over_partitions_le => j' inJOBS.
+          * apply sum_over_partitions_le => j' inJOBS => _.
             by apply H_all_jobs_from_taskset, (in_arrivals_implies_arrived _ _ _ _ inJOBS).
           * rewrite (big_rem tsk) //= addnC leq_add //; last by rewrite subnKC.
             rewrite big_seq_cond [in X in _ <= X]big_seq_cond big_mkcond [in X in _ <= X]big_mkcond //=.
