@@ -3,8 +3,6 @@ Require Export prosa.model.task.concept.
 Require Export prosa.util.seqset.
 Require Export prosa.util.rel.
 
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require prosa.model.processor.ideal.
 
 (** * TDMA Scheduling *)
 
@@ -113,14 +111,15 @@ Section TDMASchedule.
 
   Context {Task : TaskType} {Job : JobType}.
 
+  Context {PState : ProcessorState Job}.
   Context {ja : JobArrival Job} {jc : JobCost Job}.
-  Context {jr : JobReady Job (ideal.processor_state Job)} `{JobTask Job Task}.
+  Context {jr : @JobReady Job PState jc ja} `{JobTask Job Task}.
 
   (** Consider any job arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** ..., any uniprocessor ideal schedule ... *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ..., any schedule ... *)
+  Variable sched : schedule PState.
 
   (** ... and any sporadic task set. *)
   Variable ts: {set Task}.
