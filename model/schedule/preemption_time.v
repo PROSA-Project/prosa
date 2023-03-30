@@ -1,19 +1,15 @@
 Require Export prosa.model.schedule.scheduled.
 Require Export prosa.model.preemption.parameter.
 
-(** * Preemption Times *)
+(** * Preemption Times on a Uniprocessor *)
 
 (** The preemption framework defines a generic predicate [job_preemptable] as
     the interface to various preemption models. Crucially, [job_preemptable]
     does not depend on the current schedule or the current time, but only on
     the job's progress, i.e., it indicates the presence or absence of a
     preemption _point_ in the job's execution. In this section, we define the
-    notion of a preemption _time_ in an ideal uniprocessor schedule base on the
-    progress of the currently scheduled job.
-
-    NB: For legacy reasons, the following definition are currently specific to
-    ideal uniprocessor schedules. Lifting this assumption is future work
-    (https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/issues/76). *)
+    notion of a preemption _time_ in a uniprocessor schedule based on the
+    progress of the currently scheduled job. *)
 
 Section PreemptionTime.
 

@@ -1,16 +1,19 @@
 Require Export prosa.model.priority.classes.
 Require Export prosa.model.schedule.preemption_time.
 
-(** * Priority-Driven Schedules *)
+(** * Priority-Driven Uniprocessor Schedules *)
 
-(** We now define what it means for a schedule to respect a priority in the
-    presence of jobs with non-preemptive segments.  We only specify a
-    definition for JLDP policies since JLFP and FP policies can be used with
-    this definition through the canonical conversions (see
-    model.priority.classes).
+(** We now define what it means for a uniprocessor schedule to respect a
+    priority in the presence of jobs with non-preemptive segments. The main
+    definition is stated for JLDP policies.  For JLFP and FP policies, we
+    provide thin wrappers on top of the JLDP definition because JLFP and FP
+    policies can be used with this definition through the canonical conversions
+    (see [model.priority.coercion]).
 
-    NB: For legacy reasons, the below definition is currently specific to ideal
-        uniprocessor schedules. Removal of this limitation is future work. *)
+    NB: This definition is useful only for uniprocessor models (but not
+        necessarily ideal ones). A similar, more general definition could be
+        stated for multiprocessor models, but this remains future work at this
+        point. *)
 
 Section Priority.
 
@@ -34,7 +37,7 @@ Section Priority.
   (** Given any job arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** ...and an ideal uniprocessor schedule of these jobs, *)
+  (** ...and any schedule of these jobs, *)
   Variable sched : schedule PState.
 
   (** we say that a priority policy is respected by the schedule iff,
