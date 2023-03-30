@@ -1,23 +1,19 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
+Require Export prosa.model.schedule.scheduled.
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.model.service_of_jobs.
 Require Export prosa.analysis.facts.behavior.completion.
+Require Export prosa.analysis.facts.model.scheduled.
 
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.
-Require Export prosa.analysis.facts.model.ideal.schedule.
 
-(** * Service Received by Sets of Jobs in Ideal Uni-Processor Schedules *)
+(** * Service Received by Sets of Jobs in Uniprocessor Ideal-Progress Schedules *)
 
 (** In this file, we establish a fact about the service received by _sets_ of
-    jobs under ideal uni-processor schedule and the presence of idle times.  The
-    lemma is currently specific to ideal uniprocessors only because of the lack
-    of a general notion of idle time, which should be added in the near
-    future. Conceptually, the fact holds for any [ideal_progress_proc_model].
-    Once a general notion of idle time has been defined, this file should be
-    generalized.  *)
+    jobs in the presence of idle times on a uniprocessor under the
+    ideal-progress assumption (i.e., that a scheduled job necessarily receives
+    nonzero service).  *)
 Section IdealModelLemmas.
 
   (** Consider any type of tasks ... *)
@@ -31,13 +27,18 @@ Section IdealModelLemmas.
 
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
+  (** Allow for any uniprocessor model that ensures ideal progress. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
+  Hypothesis H_uniproc : uniprocessor_model PState.
 
   (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
+  Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
-    
+
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
@@ -50,7 +51,7 @@ Section IdealModelLemmas.
   Lemma low_service_implies_existence_of_idle_time :
     forall t1 t2,
       service_of_jobs sched predT (arrivals_between arr_seq 0 t2) t1 t2 < t2 - t1 ->
-      exists t, t1 <= t < t2 /\ ideal_is_idle sched t.
+      exists t, t1 <= t < t2 /\ is_idle arr_seq sched t.
   Proof.
     move=> t1 t2 SERV.
     destruct (t1 <= t2) eqn:LE; last first.
@@ -66,19 +67,14 @@ Section IdealModelLemmas.
     apply sum_le_summation_range in SERV.
     move: SERV => [x [/andP [GEx LEx] L]].
     exists x; split; first by apply/andP; split.
-    apply/negPn; apply/negP; intros NIDLE.
-    unfold ideal_is_idle in NIDLE.
-    destruct(sched x) as [s|] eqn:SCHED; last by done.
-    move: SCHED => /eqP SCHED; clear NIDLE; rewrite -scheduled_at_def/= in SCHED.
-    move: L => /eqP; rewrite sum_nat_eq0_nat filter_predT; move => /allP L.
-    specialize (L s); feed L. 
-    { unfold arrivals_between.
-      eapply arrived_between_implies_in_arrivals; eauto 2.
-      by apply H_jobs_must_arrive_to_execute in SCHED; apply leq_ltn_trans with x.
-    } 
-    move: SCHED L => /=.
-    rewrite scheduled_at_def service_at_def => /eqP-> /eqP.
-    by rewrite eqxx.
+    apply/negPn/negP; rewrite is_nonidle_iff //= => [[j SCHED]].
+    move: L => /eqP; rewrite sum_nat_eq0_nat filter_predT => /allP L.
+    have /eqP:  service_at sched j x == 0.
+    { apply/L/arrived_between_implies_in_arrivals; rt_eauto.
+      rewrite /arrived_between; apply/andP; split => //.
+      have: job_arrival j <= x by apply: H_jobs_must_arrive_to_execute.
+      by lia. }
+    by rewrite -no_service_not_scheduled // => /negP.
   Qed.
 
 End IdealModelLemmas.
