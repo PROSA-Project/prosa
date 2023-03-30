@@ -32,6 +32,25 @@ Section WorkloadFacts.
     by rewrite andbF.
   Qed.
 
+  (** The workload of a set of jobs can be equivalently rewritten as sum over
+      their tasks. *)
+  Lemma workload_of_jobs_partitioned_by_tasks :
+    forall {P : pred Job} (Q : pred Task) {js : seq Job} (ts : seq Task),
+      {in js, forall j, (job_task j) \in ts} ->
+      {in js, forall j, P j -> Q (job_task j)} ->
+      uniq js ->
+      uniq ts ->
+      let P_and_job_of tsk_o j := P j && (job_task j == tsk_o) in
+      workload_of_jobs P js
+      = \sum_(tsk_o <- ts | Q tsk_o ) workload_of_jobs (P_and_job_of tsk_o) js.
+  Proof.
+    move=> P Q js ts IN_ts PQ UJ UT //=.
+    rewrite -big_filter {1}/workload_of_jobs //.
+    apply: sum_over_partitions_eq => // [j IN Px|]; last exact: filter_uniq.
+    rewrite mem_filter; apply/andP; split; last by apply: IN_ts.
+    by apply: PQ.
+  Qed.
+
   (** Next, consider any job arrival sequence consistent with the arrival times
       of the jobs. *)
   Variable arr_seq : arrival_sequence Job.
