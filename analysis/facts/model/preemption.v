@@ -80,10 +80,8 @@ Section PreemptionFacts.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
+  (** Next, consider any valid schedule of this arrival sequence. *)
   Variable sched : schedule PState.
-
-  (** ...and, assume that the schedule is valid. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In addition, we assume the existence of a function mapping jobs to their preemption points ... *)

@@ -1,6 +1,6 @@
 Require Export prosa.model.task.concept.
 Require Export prosa.analysis.definitions.task_schedule.
-Require Export prosa.analysis.facts.model.ideal.schedule.
+Require Export prosa.analysis.facts.model.scheduled.
 
 (** In this file we provide basic properties related to schedule of a task. *)
 Section TaskSchedule.

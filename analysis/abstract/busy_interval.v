@@ -7,7 +7,7 @@ Require Export prosa.analysis.abstract.definitions.
 (** In this file we prove a few basic lemmas about the notion of
     an abstract busy interval. *)
 Section LemmasAboutAbstractBusyInterval.
-    
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -16,41 +16,41 @@ Section LemmasAboutAbstractBusyInterval.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
-  Context `{JobCost Job}.    
+  Context `{JobCost Job}.
 
   (** Consider any kind of processor state model. *)
   Context {PState : ProcessorState Job}.
-  
+
   (** Assume we are provided with abstract functions for interference
       and interfering workload. *)
   Context `{Interference Job}.
   Context `{InterferingWorkload Job}.
-  
+
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
-  
+
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
-  
-  (** Next, consider any work-conserving ideal uni-processor schedule
-      of this arrival sequence ... *)
+
+  (** Next, consider any work-conserving schedule of this arrival sequence
+      ... *)
   Variable sched : schedule PState.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... where jobs do not execute before their arrival. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  
+
   (** Consider an arbitrary job [j] with positive cost. Notice that a
       positive-cost assumption is required to ensure that one cannot
-      construct a busy interval without any workload inside of it. *) 
+      construct a busy interval without any workload inside of it. *)
   Variable j : Job.
   Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
-  
+
   (** Consider a busy interval <<[t1, t2)>> of job [j]. *)
   Variable t1 t2 : instant.
   Hypothesis H_busy_interval : busy_interval sched j t1 t2.
-  
+
   (** First, we prove that job [j] completes by the end of the busy
       interval. Note that the busy interval contains the execution of
       job [j]; in addition, time instant [t2] is a quiet time. Thus by
@@ -86,9 +86,9 @@ Section LemmasAboutAbstractBusyInterval.
         [ | by apply/andP; split; lia].
       by rewrite cumulative_service_before_job_arrival_zero; eauto 2.
     - rewrite service_during_geq; last by lia.
-      by rewrite /service cumulative_service_before_job_arrival_zero; auto; lia.  
+      by rewrite /service cumulative_service_before_job_arrival_zero; auto; lia.
   Qed.
-  
+
   (** Since the job cannot arrive before the busy interval starts and
       completes by the end of the busy interval, it receives at least
       [job_cost j] units of service within the interval. *)
