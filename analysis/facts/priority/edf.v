@@ -35,7 +35,7 @@ Global Hint Resolve EDF_respects_sequential_tasks : basic_rt_facts.
 
 
 Require Export prosa.model.task.sequentiality.
-Require Export prosa.analysis.facts.busy_interval.priority_inversion.
+Require Export prosa.analysis.facts.priority.inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 
 (** In this section, we prove that the EDF priority policy implies that tasks

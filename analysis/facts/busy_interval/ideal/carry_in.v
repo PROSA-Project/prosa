@@ -1,4 +1,5 @@
 Require Export prosa.analysis.facts.busy_interval.carry_in.
+Require Export prosa.analysis.facts.busy_interval.ideal.busy_interval.
 
 (** The following lemma conceptually belongs in
     [prosa.analysis.facts.busy_interval.carry_in], but still has dependencies

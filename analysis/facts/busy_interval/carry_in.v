@@ -1,8 +1,8 @@
 Require Export prosa.analysis.facts.model.workload.
-Require Export prosa.analysis.definitions.carry_in.
-Require Export prosa.analysis.facts.busy_interval.busy_interval.
 Require Export prosa.analysis.facts.model.ideal.service_of_jobs.
-
+Require Export prosa.analysis.facts.busy_interval.quiet_time.
+Require Export prosa.analysis.definitions.work_bearing_readiness.
+Require Export prosa.model.schedule.work_conserving.
 
 (** * Existence of No Carry-In Instant *)
 
@@ -59,14 +59,6 @@ Section ExistsNoCarryIn.
 
   (** ... and assume that the schedule is work-conserving. *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-
-  (** The fact that there is no carry-in at time instant [t] trivially
-      implies that [t] is a quiet time. *)
-  Lemma no_carry_in_implies_quiet_time :
-    forall j t,
-      no_carry_in t ->
-      quiet_time j t.
-  Proof. by move=> j t + j_hp ARR HP BEF; apply. Qed.
 
   (** Conversely, the presence of a pending job implies that the processor isn't
       idle due to work-conservation. *)
@@ -230,8 +222,7 @@ Section ExistsNoCarryIn.
             - eapply in_arrivals_implies_arrived_between in A; eauto 2.
           }
           apply/eqP; rewrite eqn_leq; apply/andP; split;
-            last by apply service_of_jobs_le_workload;
-            auto using ideal_proc_model_provides_unit_service.
+            last by apply service_of_jobs_le_workload.
           rewrite /total_workload (workload_of_jobs_cat arr_seq t); last first.
           apply/andP; split; [by done | by rewrite leq_addr].
           rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t); try done; first last.

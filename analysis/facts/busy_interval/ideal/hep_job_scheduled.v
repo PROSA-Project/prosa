@@ -1,5 +1,5 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.busy_interval.busy_interval.
+Require Export prosa.analysis.facts.busy_interval.ideal.busy_interval.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
