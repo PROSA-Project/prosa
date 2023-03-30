@@ -2,7 +2,7 @@ Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 Require Export prosa.analysis.definitions.interference.
-Require Export prosa.analysis.facts.busy_interval.carry_in.
+Require Export prosa.analysis.facts.busy_interval.ideal.carry_in.
 Require Export prosa.analysis.abstract.iw_auxiliary.
 Require Export prosa.analysis.facts.priority.classes.
 

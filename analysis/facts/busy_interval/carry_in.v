@@ -1,10 +1,8 @@
 Require Export prosa.analysis.facts.model.workload.
 Require Export prosa.analysis.definitions.carry_in.
 Require Export prosa.analysis.facts.busy_interval.busy_interval.
-
-(** Throughout this file, we assume ideal uniprocessor schedules. *)
-Require Import prosa.model.processor.ideal.
 Require Export prosa.analysis.facts.model.ideal.service_of_jobs.
+
 
 (** * Existence of No Carry-In Instant *)
 
@@ -27,12 +25,17 @@ Section ExistsNoCarryIn.
   Context {Arrival: JobArrival Job}.
   Context {Cost : JobCost Job}.
 
-  (** Consider any arrival sequence with consistent arrivals. *)
+  (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
-  Variable H_valid_arr_seq : valid_arrival_sequence arr_seq.
+  Hypothesis H_valid_arr_seq : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** Allow for any uniprocessor model that ensures ideal progress. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
+  Hypothesis H_uniproc : uniprocessor_model PState.
+
+  (** Next, consider any schedule of the arrival sequence ... *)
+  Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
 
@@ -50,16 +53,12 @@ Section ExistsNoCarryIn.
   Let no_carry_in := no_carry_in arr_seq sched.
   Let quiet_time := quiet_time arr_seq sched.
 
-  (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
+  (** Further, allow for any work-bearing notion of job readiness ... *)
+  Context `{@JobReady Job PState Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
-  (** Assume that the schedule is work-conserving, ... *)
+  (** ... and assume that the schedule is work-conserving. *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-
-  (** ... and there are no duplicate job arrivals. *)
-  Hypothesis H_arrival_sequence_is_a_set:
-    arrival_sequence_uniq arr_seq.
 
   (** The fact that there is no carry-in at time instant [t] trivially
       implies that [t] is a quiet time. *)
@@ -67,63 +66,56 @@ Section ExistsNoCarryIn.
     forall j t,
       no_carry_in t ->
       quiet_time j t.
-  Proof.
-    by intros j t FQT j_hp ARR HP BEF; apply FQT.
-  Qed.
+  Proof. by move=> j t + j_hp ARR HP BEF; apply. Qed.
 
+  (** Conversely, the presence of a pending job implies that the processor isn't
+      idle due to work-conservation. *)
+  Lemma pending_job_implies_not_idle :
+    forall j t,
+      arrives_in arr_seq j ->
+      pending sched j t ->
+      ~ is_idle arr_seq sched t.
+  Proof.
+    move=> j t ARR PEND IDLE.
+    apply H_job_ready in PEND => //; move: PEND => [jhp [ARRhp [READYhp _]]].
+    move: IDLE; rewrite is_idle_iff => /eqP; rewrite scheduled_job_at_none; rt_eauto => IDLE.
+    have [j_other SCHED]:  exists j_other : Job, scheduled_at sched j_other t
+      by apply: H_work_conserving; rt_eauto; apply/andP; split => //.
+    by move: (IDLE j_other) => /negP.
+  Qed.
 
   (** We show that an idle time implies no carry in at this time instant. *)
   Lemma idle_instant_implies_no_carry_in_at_t :
     forall t,
-      ideal_is_idle sched t ->
+      is_idle arr_seq sched t ->
       no_carry_in t.
   Proof.
     move=> t IDLE j ARR HA.
-    apply/negPn/negP; intros NCOMP.
-    have PEND : job_pending_at j t.
-    { apply/andP; split.
-      - by rewrite /has_arrived ltnW.
-      - by move: NCOMP; apply contra, completion_monotonic.
-    }
-    apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [READYhp _]]].
-    move: IDLE => /eqP IDLE.
-    move: (H_work_conserving _ t ARRhp) => NIDLE.
-    feed NIDLE.
-    { apply/andP; split; first by done.
-      by rewrite scheduled_at_def IDLE.
-    }
-    move: NIDLE => [j' SCHED].
-    by rewrite scheduled_at_def IDLE in SCHED.
+    apply/negPn/negP =>  NCOMP.
+    have PEND : job_pending_at j t by apply/andP; split; rt_eauto; rewrite /has_arrived ltnW.
+    by apply: (pending_job_implies_not_idle j t).
   Qed.
 
   (** Moreover, an idle time implies no carry in at the next time instant. *)
   Lemma idle_instant_implies_no_carry_in_at_t_pl_1 :
     forall t,
-      ideal_is_idle sched t ->
+      is_idle arr_seq sched t ->
       no_carry_in t.+1.
   Proof.
     move=> t IDLE j ARR HA.
     apply/negPn/negP; intros NCOMP.
     have PEND : job_pending_at j t.
-    { apply/andP; split.
-      - by rewrite /has_arrived.
-      - by move: NCOMP; apply contra, completion_monotonic.
-    }
-    apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [READYhp _]]].
-    move: IDLE => /eqP IDLE.
-    move: (H_work_conserving _ t ARRhp) => NIDLE.
-    feed NIDLE.
-    { apply/andP; split; first by done.
-      by rewrite scheduled_at_def IDLE.
-    }
-    move: NIDLE => [j' SCHED].
-    by rewrite scheduled_at_def IDLE in SCHED.
+    { apply/andP; split; rt_eauto; rewrite /has_arrived.
+      apply/contra; last exact NCOMP.
+      by apply/completion_monotonic. }
+    by apply: (pending_job_implies_not_idle j t).
   Qed.
 
   (** Let the priority relation be reflexive. *)
   Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
 
-  (** Recall the notion of workload of all jobs released in a given interval <<[t1, t2)>>... *)
+  (** Recall the notion of workload of all jobs released in a given interval
+      <<[t1, t2)>>... *)
   Let total_workload t1 t2 :=
     workload_of_jobs predT (arrivals_between t1 t2).
 
@@ -138,6 +130,10 @@ Section ExistsNoCarryIn.
   Variable Δ : duration.
   Hypothesis H_delta_positive : Δ > 0.
   Hypothesis H_workload_is_bounded : forall t, total_workload t (t + Δ) <= Δ.
+
+  (** In the following, we also require the processor to be a unit-speed
+      processor. *)
+  Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
 
   (** Next we prove that, since for any time instant [t] there is a
       point where the total workload is upper-bounded by the supply,
@@ -165,8 +161,9 @@ Section ExistsNoCarryIn.
       (** ...such that the processor has no carry-in at time [t]. *)
       Hypothesis H_no_carry_in : no_carry_in t.
 
-      (** First, recall that the total service is bounded by the total workload. Therefore
-             the total service of jobs in the interval <<[t, t + Δ)>> is bounded by [Δ]. *)
+      (** First, recall that the total service is bounded by the total
+          workload. Therefore the total service of jobs in the interval <<[t, t
+          + Δ)>> is bounded by [Δ]. *)
       Lemma total_service_is_bounded_by_Δ :
         total_service t (t + Δ) <= Δ.
       Proof.
@@ -191,7 +188,6 @@ Section ExistsNoCarryIn.
         rewrite -{3}[Δ]addn0 -{2}(subnn t) addnBA // [Δ + t]addnC in LT.
         eapply low_service_implies_existence_of_idle_time in LT; rt_eauto.
         move: LT => [t_idle [/andP [LEt GTe] IDLE]].
-        rewrite is_idle_def in IDLE; rt_eauto.
         move: LEt; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
         { exists 0; split => //.
           rewrite addn0; subst t_idle => s ARR BEF.
@@ -252,7 +248,8 @@ Section ExistsNoCarryIn.
 
     End ProcessorIsNotTooBusyInduction.
 
-    (** Finally, we show that any interval of length [Δ] contains a time instant with no carry-in. *)
+    (** Finally, we show that any interval of length [Δ] contains a time instant
+        with no carry-in. *)
     Lemma processor_is_not_too_busy :
       forall t, exists δ, δ < Δ /\ no_carry_in (t + δ).
     Proof.
@@ -274,53 +271,5 @@ Section ExistsNoCarryIn.
 
   End ProcessorIsNotTooBusy.
 
-  (** Consider an arbitrary job [j] with positive cost. *)
-  Variable j : Job.
-  Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
-  Hypothesis H_job_cost_positive : job_cost_positive j.
-
-  (** We show that there must exist a busy interval <<[t1, t2)>> that
-      contains the arrival time of [j]. *)
-  Corollary exists_busy_interval_from_total_workload_bound :
-    exists t1 t2,
-      t1 <= job_arrival j < t2 /\
-      t2 <= t1 + Δ /\
-      busy_interval arr_seq sched j t1 t2.
-  Proof.
-    rename H_from_arrival_sequence into ARR, H_job_cost_positive into POS.
-    have CONSIST: consistent_arrival_times arr_seq by rt_eauto.
-    edestruct (exists_busy_interval_prefix
-                 arr_seq CONSIST
-                 sched j ARR H_priority_is_reflexive (job_arrival j))
-      as [t1 [PREFIX GE]]; first by apply job_pending_at_arrival.
-    move: GE => /andP [GE1 _].
-    exists t1; move: (processor_is_not_too_busy t1.+1) => [δ [LE QT]].
-    apply no_carry_in_implies_quiet_time with (j := j) in QT.
-    have EX: exists t2, ((t1 < t2 <= t1.+1 + δ) && quiet_time_dec arr_seq sched j t2).
-    { exists (t1.+1 + δ); apply/andP; split.
-      - by apply/andP; split; first rewrite addSn ltnS leq_addr.
-      - by apply/quiet_time_P. }
-    move: (ex_minnP EX) => [t2 /andP [/andP [GTt2 LEt2] QUIET] MIN]; clear EX.
-    have NEQ: t1 <= job_arrival j < t2.
-    { apply/andP; split; first by done.
-      rewrite ltnNge; apply/negP; intros CONTR.
-      move: (PREFIX) => [_ [_ [NQT _]]].
-      move: (NQT t2); clear NQT; move  => NQT.
-      feed NQT; first by (apply/andP; split; [|rewrite ltnS]).
-      by apply: NQT; apply/quiet_time_P.
-    }
-    exists t2; split; last split; first by done.
-    { apply leq_trans with (t1.+1 + δ); [by done | by rewrite addSn ltn_add2l]. }
-    { move: PREFIX => [_ [QTt1 [NQT _]]]; repeat split; try done.
-      - move => t /andP [GEt LTt] QTt.
-        feed (MIN t).
-        { apply/andP; split.
-          + by apply/andP; split; last (apply leq_trans with t2; [apply ltnW | ]).
-          + by apply/quiet_time_P.
-        }
-        by move: LTt; rewrite ltnNge; move => /negP LTt; apply: LTt.
-      - by apply/quiet_time_P.
-    }
-  Qed.
 
 End ExistsNoCarryIn.
