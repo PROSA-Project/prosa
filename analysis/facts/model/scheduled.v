@@ -103,6 +103,27 @@ Section ScheduledJobs.
       by case: (scheduled_jobs_at arr_seq sched t).
     Qed.
 
+    (** For convenience, we state a similar observation also for the [is_idle]
+        wrapper, both for the idle case ... *)
+    Corollary is_idle_iff :
+      forall t,
+        is_idle arr_seq sched t = (scheduled_job_at arr_seq sched t == None).
+    Proof.
+      move=> t; rewrite /is_idle/scheduled_job_at.
+      by case: (scheduled_jobs_at _ _ _).
+    Qed.
+
+    (** ... and the non-idle case. *)
+    Corollary is_nonidle_iff :
+      forall t,
+        ~~ is_idle arr_seq sched t <-> exists j, scheduled_at sched j t.
+    Proof.
+      move=> t. rewrite is_idle_iff.
+      split => [|[j]]; last by rewrite -scheduled_job_at_iff => ->.
+      case SJA: (scheduled_job_at _ _ _) => [j|//] _.
+      by exists j; rewrite -scheduled_job_at_iff.
+    Qed.
+
   End Uniprocessors.
 
   (** ** Case Analysis: a Scheduled Job Exists or no Job is Scheduled*)

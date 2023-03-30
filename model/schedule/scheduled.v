@@ -31,4 +31,8 @@ Section ScheduledJobs.
       that reduces the sequence of scheduled jobs to an [option Job]. *)
   Definition scheduled_job_at t := ohead (scheduled_jobs_at t).
 
+  (** We also provide a convenience wrapper to express the absence of scheduled
+      jobs. *)
+  Definition is_idle t := scheduled_jobs_at t == [::].
+
 End ScheduledJobs.

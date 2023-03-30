@@ -179,6 +179,17 @@ Section ScheduleClass.
         by move: (NS j) => /negP. }
     Qed.
 
+    (** Similarly, the generic and specific notions of idle instants
+        coincide, too. *)
+    Lemma is_idle_def :
+      forall t,
+        is_idle arr_seq sched t = ideal_is_idle sched t.
+    Proof.
+      move=> t.
+      rewrite /is_idle/ideal_is_idle -scheduled_job_at_def /scheduled_job_at.
+      by case: (scheduled_jobs_at _ _ _).
+    Qed.
+
   End RelationToGenericScheduledJob.
 
 End ScheduleClass.
