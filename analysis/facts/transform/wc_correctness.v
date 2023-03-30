@@ -238,7 +238,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       Section MakeWCAtFindsReadyJobs_CaseResultFound.
 
         (** Assuming that the processor is idle at time t... *)
-        Hypothesis H_sched_t_idle: is_idle sched t.
+        Hypothesis H_sched_t_idle: ideal_is_idle sched t.
         
         (** ...let [t_swap] be a time instant found by the search procedure. *)
         Variable t_swap: instant.

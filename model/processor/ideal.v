@@ -56,6 +56,6 @@ Section IsIdle.
   Variable sched : schedule ((*ideal*)processor_state Job).
 
   (** We say that the processor is idle at time [t] iff there is no job being scheduled. *)
-  Definition is_idle (t : instant) := sched t == None.
+  Definition ideal_is_idle (t : instant) := sched t == None.
 
 End IsIdle.

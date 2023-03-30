@@ -75,7 +75,7 @@ Section ExistsNoCarryIn.
   (** We show that an idle time implies no carry in at this time instant. *)
   Lemma idle_instant_implies_no_carry_in_at_t :
     forall t,
-      is_idle sched t ->
+      ideal_is_idle sched t ->
       no_carry_in t.
   Proof.
     move=> t IDLE j ARR HA.
@@ -99,7 +99,7 @@ Section ExistsNoCarryIn.
   (** Moreover, an idle time implies no carry in at the next time instant. *)
   Lemma idle_instant_implies_no_carry_in_at_t_pl_1 :
     forall t,
-      is_idle sched t ->
+      ideal_is_idle sched t ->
       no_carry_in t.+1.
   Proof.
     move=> t IDLE j ARR HA.

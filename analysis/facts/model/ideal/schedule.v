@@ -113,10 +113,10 @@ Section ScheduleClass.
       the state of an ideal schedule. *)
   Lemma ideal_proc_model_sched_case_analysis:
     forall (sched : schedule (ideal.processor_state Job)) (t : instant),
-      is_idle sched t \/ exists j, scheduled_at sched j t.
+      ideal_is_idle sched t \/ exists j, scheduled_at sched j t.
   Proof.
     move=> sched t.
-    unfold is_idle; simpl; destruct (sched t) as [s|] eqn:EQ.
+    unfold ideal_is_idle; simpl; destruct (sched t) as [s|] eqn:EQ.
     - by right; exists s; auto; rewrite scheduled_at_def EQ.
     - by left; auto.
   Qed.
@@ -125,7 +125,7 @@ Section ScheduleClass.
       then the scheduler is not idle at [t]. *) 
   Lemma ideal_sched_implies_not_idle sched (j : Job) t :
     scheduled_at sched j t ->
-    ~ is_idle sched t.
+    ~ ideal_is_idle sched t.
   Proof.
     rewrite scheduled_at_def => /eqP SCHED /eqP IDLE.
     by rewrite IDLE in SCHED; inversion SCHED.
@@ -134,7 +134,7 @@ Section ScheduleClass.
   (** On a similar note, if a scheduler is idle at a time instant [t],
       then no job can receive service at [t]. *)
   Lemma ideal_not_idle_implies_sched sched (j : Job) t :
-    is_idle sched t ->
+    ideal_is_idle sched t ->
     service_at sched j t = 0.
   Proof. by rewrite service_at_is_scheduled_at scheduled_at_def => /eqP ->. Qed.
 

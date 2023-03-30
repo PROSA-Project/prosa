@@ -70,11 +70,11 @@ Section NPUniprocessorScheduler.
         a time [t] only if there are no backlogged jobs. *)
     Lemma idle_schedule_no_backlogged_jobs:
       forall t,
-        is_idle schedule t ->
+        ideal_is_idle schedule t ->
         jobs_backlogged_at arr_seq schedule t = [::].
     Proof.
       move=> t.
-      rewrite /is_idle /schedule /pmc_uni_schedule /generic_schedule => /eqP.
+      rewrite /ideal_is_idle /schedule /pmc_uni_schedule /generic_schedule => /eqP.
       move=> NONE. move: (NONE).
       rewrite schedule_up_to_def => IDLE.
       apply allocation_at_idle in IDLE.

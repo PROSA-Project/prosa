@@ -145,7 +145,7 @@ Section ExistsBusyIntervalJLFP.
         then the next time instant [t+1] will be a quiet time. *)
     Lemma idle_time_implies_quiet_time_at_the_next_time_instant:
       forall (t : instant),
-        is_idle sched t ->
+        ideal_is_idle sched t ->
         quiet_time t.+1.
     Proof.
       intros t IDLE jhp ARR HP AB.
@@ -219,7 +219,7 @@ Section ExistsBusyIntervalJLFP.
     Lemma not_quiet_implies_not_idle:
       forall t,
         t1 <= t < t2 ->
-        ~ is_idle sched t.
+        ~ ideal_is_idle sched t.
     Proof.
       intros t NEQ IDLE.
       move: (pending_hp_job_exists _ NEQ) => [jhp [ARR [PEND HP]]].

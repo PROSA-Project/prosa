@@ -289,7 +289,7 @@ Section PriorityInversionIsBounded.
       Section Case1.
 
         (** Assume that the schedule is idle at time [t1]. *)
-        Hypothesis H_is_idle : is_idle sched t1.
+        Hypothesis H_ideal_is_idle : ideal_is_idle sched t1.
 
         (** Then time instant [t1] is a preemption time. *)
         Lemma preemption_time_exists_case1:
@@ -301,7 +301,7 @@ Section PriorityInversionIsBounded.
           move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
           move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]].
           exists t1; split.
-          - by rewrite /preemption_time scheduled_job_at_def; rt_eauto; move: H_is_idle => /eqP ->.
+          - by rewrite /preemption_time scheduled_job_at_def; rt_eauto; move: H_ideal_is_idle => /eqP ->.
           - by apply/andP; split; last rewrite leq_addr.
         Qed.
 

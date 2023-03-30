@@ -52,7 +52,7 @@ Section PIIdealProcessorModelLemmas.
   (** We prove that if the processor is idle at time [t], then there
       is no priority inversion. *)
   Lemma idle_implies_no_priority_inversion :
-    is_idle sched t ->
+    ideal_is_idle sched t ->
     priority_inversion_dec arr_seq sched j t = false.
   Proof.
     unfold priority_inversion_dec; intros IDLE.

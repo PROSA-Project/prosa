@@ -67,7 +67,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** First note since [t] lies inside the busy interval,
       the processor cannot be idle at time [t]. *)
   Lemma instant_t_is_not_idle:
-    ~ is_idle sched t.
+    ~ ideal_is_idle sched t.
   Proof.
     by move => IDLE; exfalso; apply: not_quiet_implies_not_idle; rt_eauto.
   Qed.

@@ -150,7 +150,7 @@ Section JLFPInstantiation.
       Variable t : instant.
 
       (** ... and assume that the schedule is idle at [t]. *)
-      Hypothesis H_idle : is_idle sched t.
+      Hypothesis H_idle : ideal_is_idle sched t.
 
       (** We prove that in this case: ... *)
 
