@@ -11,7 +11,7 @@ Require Export prosa.analysis.definitions.schedule_prefix.
 (** To begin with, we provide some simple but handy rewriting rules for
       [service] and [service_during]. *)
 Section Composition.
-  
+
   (** Consider any job type and any processor state. *)
   Context {Job: JobType}.
   Context {PState: ProcessorState Job}.
@@ -31,6 +31,18 @@ Section Composition.
     forall t1 t2,
       t1 >= t2 -> service_during sched j t1 t2 = 0.
   Proof. by move=> ? ? ?; rewrite /service_during big_geq. Qed.
+
+  (** Conversely, if a job receives some service in some interval, then the
+      interval is not empty. *)
+  Corollary service_during_ge :
+    forall t1 t2 k,
+      service_during sched j t1 t2 > k ->
+      t1 < t2.
+  Proof.
+    move=> t1 t2 k GT.
+    apply: (contraPltn _ GT) => LEQ.
+    by move: (service_during_geq _ _ LEQ) => ->.
+  Qed.
 
   (** Equally trivially, no job has received service prior to time zero. *)
   Corollary service0:
@@ -159,25 +171,46 @@ Section UnitService.
 
   Section ServiceIsUnitGrowthFunction.
 
-    (** We show that the service received by any job [j] is a unit growth function. *)
-    Lemma service_is_unit_growth_function :
-      unit_growth_function (service sched j).
+    (** We show that the service received by any job [j] during any interval is
+        a unit growth function... *)
+    Lemma service_during_is_unit_growth_function :
+      forall t0,
+        unit_growth_function (service_during sched j t0).
     Proof.
-      move=> t; rewrite addn1 -service_last_plus_before leq_add2l.
+      move=> t0 t1.
+      have [LEQ|LT]:= leqP t0 t1; last by rewrite service_during_geq; lia.
+      rewrite addn1 -service_during_last_plus_before // leq_add2l.
       exact: service_at_most_one.
     Qed.
 
-    (** Next, consider any time [t]... *)
-    Variable t : instant.
+    (** ... and restate the same observation in terms of [service]. *)
+    Corollary  service_is_unit_growth_function :
+      unit_growth_function (service sched j).
+    Proof. by apply: service_during_is_unit_growth_function. Qed.
 
-    (** ...and let [s] be any value less than the service received
-       by job [j] by time [t]. *)
+    (** It follows that [service_during] does not skip over any values. *)
+    Corollary exists_intermediate_service_during :
+      forall t0 t1 t2 s,
+        t0 <= t1 <= t2 ->
+        service_during sched j t0 t1 <= s < service_during sched j t0 t2 ->
+      exists t,
+        t1 <= t < t2 /\
+        service_during sched j t0 t = s.
+    Proof.
+      move=> t0 t1 t2 s /andP [t0t1 t1t2] SERV.
+      apply: exists_intermediate_point => //.
+      exact: service_during_is_unit_growth_function.
+    Qed.
+
+    (** To restate this observation in terms of [service], let [s] be any value
+       less than the service received by job [j] by time [t]. *)
+    Variable t : instant.
     Variable s : duration.
     Hypothesis H_less_than_s: s < service sched j t.
 
-    (** Then, we show that there exists an earlier time [t'] where job
-       [j] had [s] units of service. *)
-    Corollary exists_intermediate_service:
+    (** There necessarily exists an earlier time [t'] where job [j] had [s]
+       units of service. *)
+    Corollary exists_intermediate_service :
       exists t',
         t' < t /\
         service sched j t' = s.
@@ -253,7 +286,7 @@ Section RelationToScheduled.
 
   (** Thus, if the cumulative amount of service changes, then it must be
      scheduled, too. *)
-  Lemma service_delta_implies_scheduled:
+  Lemma service_delta_implies_scheduled :
     forall t,
       service sched j t < service sched j t.+1 -> scheduled_at sched j t.
   Proof.
@@ -263,7 +296,7 @@ Section RelationToScheduled.
 
   (** We observe that a job receives cumulative service during some interval iff
      it receives services at some specific time in the interval. *)
-  Lemma service_during_service_at:
+  Lemma service_during_service_at :
     forall t1 t2,
       service_during sched j t1 t2 > 0
       <->
@@ -281,7 +314,7 @@ Section RelationToScheduled.
 
   (** Thus, any job that receives some service during an interval must be
       scheduled at some point during the interval... *)
-  Corollary cumulative_service_implies_scheduled:
+  Corollary cumulative_service_implies_scheduled :
     forall t1 t2,
       service_during sched j t1 t2 > 0 ->
       exists t,
@@ -301,8 +334,47 @@ Section RelationToScheduled.
     by move=> t /cumulative_service_implies_scheduled[t' ?]; exists t'.
   Qed.
 
-  (** If we can assume that a scheduled job always receives service,
-      we can further prove the converse. *)
+  (** We can further strengthen [service_during_service_at] to yield the
+      earliest point in time at which a job receives service in an interval... *)
+  Corollary service_during_service_at_earliest :
+    forall t1 t2,
+      service_during sched j t1 t2 > 0 ->
+      exists t,
+        t1 <= t < t2
+        /\ service_at sched j t > 0
+        /\ service_during sched j t1 t = 0.
+  Proof.
+    move=> t1 t2.
+    rewrite service_during_service_at => [[t [IN SAT]]].
+    set P := fun t' => (service_at sched j t' > 0) && (t1 <= t' < t2).
+    have WITNESS: exists t', P t' by exists t; apply/andP.
+    have [t' /andP [SCHED' IN'] LEAST] := ex_minnP WITNESS.
+    exists t'; repeat (split => //).
+    apply/eqP/contraT.
+    rewrite -lt0n service_during_service_at => [[t'' [IN'' SAT'']]].
+    have: t' <= t''; last by lia.
+    apply/LEAST/andP; split => //.
+    by lia.
+  Qed.
+
+  (** ... and make a similar observation about the same point in time
+      w.r.t. [scheduled_at]. *)
+  Corollary service_during_scheduled_at_earliest :
+    forall t1 t2,
+      service_during sched j t1 t2 > 0 ->
+      exists t,
+        t1 <= t < t2
+        /\ scheduled_at sched j t
+        /\ service_during sched j t1 t = 0.
+  Proof.
+    move=> t1 t2 SERVICED.
+    have [t [IN [SAT NONE]]] := service_during_service_at_earliest t1 t2 SERVICED.
+    exists t; repeat (split => //).
+    exact: service_at_implies_scheduled_at.
+  Qed.
+
+  (** If we can assume that a scheduled job always receives service, then we can
+      further relate above observations to [scheduled_at]. *)
   Section GuaranteedService.
 
     (** Assume [j] always receives some positive service. *)
@@ -336,7 +408,7 @@ Section RelationToScheduled.
         it does not receive any service in that interval *)
     Lemma not_scheduled_during_implies_zero_service:
       forall t1 t2,
-        (forall t, t1 <= t < t2 -> ~~ scheduled_at sched j t) -> 
+        (forall t, t1 <= t < t2 -> ~~ scheduled_at sched j t) ->
         service_during sched j t1 t2 = 0.
     Proof.
       move=> t1 t2; rewrite big_nat_eq0 => + t titv => /(_ t titv).
@@ -510,8 +582,81 @@ Section RelationToScheduled.
 
 End RelationToScheduled.
 
+(** * Incremental Service in Unit-Service Schedules  *)
+(** In unit-service schedules, any job gains at most one unit of service at any
+    time. Hence, no job "skips" an service values, which we note with the lemma
+    [incremental_service_during] below. *)
+Section IncrementalService.
+
+  (** Consider any job type, ... *)
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** ... any arrival sequence, ... *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** ... and any unit-service schedule of this arrival sequence. *)
+  Context {PState : ProcessorState Job}.
+  Variable sched : schedule PState.
+  Hypothesis H_unit_service: unit_service_proc_model PState.
+
+  (** We prove that if in some time interval <<[t1,t2)>> a job [j] receives [k]
+      units of service, then there exists a time instant <<t ∈ [t1,t2)>> such
+      that [j] is scheduled at time [t] and service of job [j] within interval
+      <<[t1,t)>> is equal to [k]. *)
+  Lemma incremental_service_during:
+    forall j t1 t2 k,
+      service_during sched j t1 t2 > k ->
+      exists t, t1 <= t < t2 /\ scheduled_at sched j t /\ service_during sched j t1 t = k.
+  Proof.
+    move=> j t1 t2 k SERV.
+    have LE: t1 < t2 by move: (service_during_ge _ _ _ _ _ SERV).
+    case: k SERV => [|k] SERV; first by apply service_during_scheduled_at_earliest in SERV.
+    set P := fun t' => service_during sched j t1 t' >= k.+1.
+    have: exists t' : nat, t1 < t' <= t2 /\ (forall x : nat, t1 <= x < t' -> ~~ P x) /\ P t'.
+    { apply: (exists_first_intermediate_point P t1 t2); first by lia.
+      - by rewrite /P service_during_geq //.
+      - by rewrite /P;  lia. }
+    rewrite /P; move=> [t' [IN' [LIMIT Pt']]]; clear P.
+    set P'' := fun t'' => (t' <= t'' < t2) && (service_at sched j t'' > 0).
+    have WITNESS: exists t'', P'' t''.
+    { have: 0 < service_during sched j t' t2;
+        last by rewrite service_during_service_at => [[t'' [IN'' SERVICED]]]
+                ; exists t''; apply/andP; split.
+      move: SERV; rewrite -(service_during_cat _ _ t1 t'.-1 t2); last by lia. move=> SERV.
+      have SERV2: service_during sched j t1 t'.-1 <= k
+        by rewrite leqNgt; apply (LIMIT t'.-1); lia.
+      have: service_during sched j t'.-1 t2 >= 2 by lia.
+      rewrite -service_during_first_plus_later; last by lia.
+      move: (IN') => /andP [LE' _]; rewrite (ltn_predK LE').
+      by case: (service_is_zero_or_one _ sched j t'.-1) =>  [//|->|->]; try lia. }
+    have [t''' /andP [IN''' SCHED'''] MIN] := ex_minnP WITNESS.
+    exists t'''; repeat split; [by lia|by apply: service_at_implies_scheduled_at|].
+    have ->:  service_during sched j t1 t''' = service_during sched j t1 t'.
+    { rewrite -(service_during_cat _ _ t1 t' t'''); last by lia.
+      have [Z|POS] := leqP (service_during sched j t' t''') 0; first by lia.
+      exfalso.
+      move: POS; rewrite service_during_service_at => [[x [xIN xSERV]]].
+      have xP'': P'' x by apply/andP;split; [by lia| by[]].
+      by move: (MIN x xP''); lia. }
+    move: Pt'; rewrite leq_eqVlt => /orP [/eqP -> //|XL].
+    exfalso. move: XL.
+    have ->: service_during sched j t1 t' = service_during sched j t1 t'.-1.+1
+      by move: (IN') => /andP [LE' _]; rewrite (ltn_predK LE').
+    rewrite -service_during_last_plus_before; last by lia. move=> ABOVE.
+    have BELOW: service_during sched j t1 t'.-1 <= k
+      by rewrite leqNgt; apply (LIMIT t'.-1); lia.
+    have: service_at sched j t'.-1 > 1 by lia.
+    have: service_at sched j t'.-1 <= 1 by apply/service_at_most_one.
+    by lia.
+  Qed.
+
+End IncrementalService.
+
+
 Section ServiceInTwoSchedules.
-  
+
   (** Consider any job type and any processor model. *)
   Context {Job: JobType}.
   Context {PState: ProcessorState Job}.
