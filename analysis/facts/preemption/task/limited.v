@@ -17,38 +17,38 @@ Section LimitedPreemptionsModel.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
-  
+
   (** We assume that jobs are preemptable only at specific points during their
       execution, ... *)
   Context `{JobPreemptionPoints Job}.
   Context `{TaskPreemptionPoints Task}.
   (** ... i.e., we assume limited-preemptive jobs. *)
   #[local] Existing Instance limited_preemptive_job_model.
-  
+
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
-  
-  (** Next, consider any ideal uni-processor preemption-aware schedule
-      of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
+
+  (** Next, consider any preemption-aware schedule of this arrival sequence... *)
+  Context {PState : ProcessorState Job}.
+  Variable sched : schedule PState.
   Hypothesis H_schedule_respects_preemption_model:
-    schedule_respects_preemption_model arr_seq sched.  
-    
+    schedule_respects_preemption_model arr_seq sched.
+
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
-  (** Consider an arbitrary task set ts. *)     
+  (** Consider an arbitrary task set ts. *)
   Variable ts : list Task.
 
   (** Next, we assume that preemption points are defined by the model
-      with fixed preemption points. *)    
+      with fixed preemption points. *)
   Hypothesis H_valid_fixed_preemption_points_model:
     valid_fixed_preemption_points_model arr_seq ts.
 
   (** Then we prove that functions [job_preemptable and
       task_preemption_points] define a model with bounded non-preemptive
-      regions. *)       
+      regions. *)
   Lemma fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions:
     model_with_bounded_nonpreemptive_segments arr_seq .
   Proof.
@@ -67,8 +67,8 @@ Section LimitedPreemptionsModel.
       + rewrite /job_respects_max_nonpreemptive_segment
                 /job_max_nonpreemptive_segment /lengths_of_segments; erewrite job_parameters_max_np_to_job_limited; eauto.
           by apply max_of_dominating_seq; intros; apply A5.
-      + exists progr; split; first apply/andP; first split; rewrite ?leq_addr; by done. 
-      + move: NotIN => /eqP; rewrite eqbF_neg; move => NotIN. 
+      + exists progr; split; first apply/andP; first split; rewrite ?leq_addr; by done.
+      + move: NotIN => /eqP; rewrite eqbF_neg; move => NotIN.
         edestruct (work_belongs_to_some_nonpreemptive_segment arr_seq) as [x [SIZE2 N]]; eauto 2. move: N => /andP [N1 N2].
         set ptl := nth 0 (job_preemptive_points j) x.
         set ptr := nth 0 (job_preemptive_points j) x.+1.
@@ -76,27 +76,27 @@ Section LimitedPreemptionsModel.
         * by unfold job_preemptable, limited_preemptive_job_model; apply mem_nth.
         * apply/andP; split; first by apply ltnW.
           apply leq_trans with (ptl + (job_max_nonpreemptive_segment j - ε) + 1); first last.
-          -- rewrite addn1 ltn_add2r; apply N1. 
+          -- rewrite addn1 ltn_add2r; apply N1.
           -- unfold job_max_nonpreemptive_segment.
              rewrite -addnA -leq_subLR -(leq_add2r 1).
-             rewrite [in X in _ <= X]addnC -leq_subLR.                
-             rewrite !subn1 !addn1 prednK. 
+             rewrite [in X in _ <= X]addnC -leq_subLR.
+             rewrite !subn1 !addn1 prednK.
              { rewrite -[_.+1.-1]pred_Sn. rewrite /lengths_of_segments.
                erewrite job_parameters_max_np_to_job_limited; eauto.
                  by apply distance_between_neighboring_elements_le_max_distance_in_seq. }
              { rewrite /lengths_of_segments; erewrite job_parameters_max_np_to_job_limited; eauto.
                apply max_distance_in_nontrivial_seq_is_positive; first by eauto 2.
-               exists 0, (job_cost j); repeat split. 
-               - by eapply zero_in_preemption_points; eauto. 
-               - by eapply job_cost_in_nonpreemptive_points; eauto. 
-               - by apply/eqP; rewrite eq_sym -lt0n; apply POS. 
-             } 
+               exists 0, (job_cost j); repeat split.
+               - by eapply zero_in_preemption_points; eauto.
+               - by eapply job_cost_in_nonpreemptive_points; eauto.
+               - by apply/eqP; rewrite eq_sym -lt0n; apply POS.
+             }
   Qed.
-  
+
   (** Which together with lemma [valid_fixed_preemption_points_model]
       gives us the fact that functions [job_preemptable and
       task_preemption_points] defines a valid preemption model with
-      bounded non-preemptive regions. *) 
+      bounded non-preemptive regions. *)
   Corollary fixed_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions:
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
   Proof.
@@ -104,8 +104,8 @@ Section LimitedPreemptionsModel.
     - by apply valid_fixed_preemption_points_model_lemma; destruct H_valid_fixed_preemption_points_model.
     - by apply fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions.
   Qed.
-  
-End LimitedPreemptionsModel. 
+
+End LimitedPreemptionsModel.
 
 (** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)
 Global Hint Resolve

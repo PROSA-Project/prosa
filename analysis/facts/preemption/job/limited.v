@@ -2,7 +2,6 @@ Require Export prosa.model.schedule.limited_preemptive.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.analysis.facts.model.sequential.
-Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.model.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)
@@ -30,12 +29,13 @@ Section ModelWithLimitedPreemptions.
 
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
-  
-  (** Next, consider any limited ideal uni-processor schedule of this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
+
+  (** Next, consider any limited-preemptive schedule of this arrival sequence ... *)
+  Context {PState : ProcessorState Job}.
+  Variable sched : schedule PState.
   Hypothesis H_schedule_respects_preemption_model:
     schedule_respects_preemption_model arr_seq sched.
-  
+
   (** ...where jobs do not execute after their completion. *)
   Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
 
@@ -43,7 +43,7 @@ Section ModelWithLimitedPreemptions.
       job-level model with limited preemptions. *)
   Hypothesis H_valid_limited_preemptions_job_model:
     valid_limited_preemptions_job_model arr_seq.
-  
+
   (** First, we prove a few auxiliary lemmas. *)
   Section AuxiliaryLemmas.
 
@@ -53,8 +53,8 @@ Section ModelWithLimitedPreemptions.
 
     (** Recall that 0 is a preemption point. *)
     Remark zero_in_preemption_points: 0 \in job_preemptive_points j.
-    Proof. by apply H_valid_limited_preemptions_job_model. Qed.                
-    
+    Proof. by apply H_valid_limited_preemptions_job_model. Qed.
+
     (** Using the fact that [job_preemptive_points] is a
         non-decreasing sequence, we prove that the first element of
         [job_preemptive_points] is 0. *)
@@ -64,7 +64,7 @@ Section ModelWithLimitedPreemptions.
       destruct H_valid_limited_preemptions_job_model as [_ [_ C]]; specialize (C j H_j_arrives).
         by apply nondec_seq_zero_first.
     Qed.
-    
+
     (** We prove that the list of preemption points is not empty. *)
     Lemma list_of_preemption_point_is_not_empty:
       0 < size (job_preemptive_points j).
@@ -96,15 +96,15 @@ Section ModelWithLimitedPreemptions.
       2 <= size (job_preemptive_points j).
     Proof.
       intros POS.
-      move: H_valid_limited_preemptions_job_model => [BEG [END _]]. 
-      have EQ: 2 = size [::0; job_cost j]; first by done. 
+      move: H_valid_limited_preemptions_job_model => [BEG [END _]].
+      have EQ: 2 = size [::0; job_cost j]; first by done.
       rewrite EQ; clear EQ.
       apply subseq_leq_size.
       rewrite !cons_uniq.
       { apply/andP; split.
         rewrite in_cons negb_or; apply/andP; split; last by done.
         rewrite neq_ltn; apply/orP; left; eauto 2.
-        apply/andP; split; by done. } 
+        apply/andP; split; by done. }
       intros t EQ; move: EQ; rewrite !in_cons.
       move => /orP [/eqP EQ| /orP [/eqP EQ|EQ]]; last by done.
       - by rewrite EQ; apply zero_in_preemption_points.
@@ -115,7 +115,7 @@ Section ModelWithLimitedPreemptions.
         [preemption.util] file) holds for [job_preemption_point j]. *)
     Lemma antidensity_of_preemption_points:
       forall (ρ : work),
-        ρ <= job_cost j -> 
+        ρ <= job_cost j ->
         ~~ (ρ \in job_preemptive_points j) ->
         first0 (job_preemptive_points j) <= ρ < last0 (job_preemptive_points j).
     Proof.
@@ -127,7 +127,7 @@ Section ModelWithLimitedPreemptions.
         rewrite ltn_neqAle; apply/andP; split; last by done.
         apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
         rewrite CONTR in NotIN.
-        move: NotIN => /negP NIN; apply: NIN. 
+        move: NotIN => /negP NIN; apply: NIN.
           by apply job_cost_in_nonpreemptive_points.
     Qed.
 
@@ -157,7 +157,7 @@ Section ModelWithLimitedPreemptions.
       move: NotIN => /negP CONTR; apply: CONTR.
       rewrite -EQ; clear EQ.
       rewrite mem_nth //.
-        by apply ltnW. 
+        by apply ltnW.
     Qed.
 
     (** Recall that the module [prosa.model.preemption.parameters] also defines
@@ -191,34 +191,27 @@ Section ModelWithLimitedPreemptions.
       intros; rewrite distances_iota_filtered; eauto 2.
       rewrite max0_rem0 //.
       rewrite -A2 //.
-        by intros; apply last_is_max_in_nondecreasing_seq; eauto 2.      
+        by intros; apply last_is_max_in_nondecreasing_seq; eauto 2.
     Qed.
-    
+
   End AuxiliaryLemmas.
 
   (** We prove that the [fixed_preemption_point_model] function
-      defines a valid preemption model. *)                 
+      defines a valid preemption model. *)
   Lemma valid_fixed_preemption_points_model_lemma:
     valid_preemption_model arr_seq sched.
-  Proof. 
-    intros j ARR; repeat split. 
+  Proof.
+    intros j ARR; repeat split.
     { by apply zero_in_preemption_points. }
     { by apply job_cost_in_nonpreemptive_points. }
     { by move => t NPP; apply H_schedule_respects_preemption_model. }
-    { intros t NSCHED SCHED. 
-      have SERV: service sched j t = service sched j t.+1.
-      { rewrite -[service sched j t]addn0 /service /service_during; apply/eqP. 
-        rewrite big_nat_recr //=.
-        rewrite eqn_add2l eq_sym.
-        rewrite scheduled_at_def in NSCHED.
-          by rewrite service_at_def eqb0. }
-      rewrite -[job_preemptable _ _]Bool.negb_involutive.
-      apply/negP; intros CONTR.
-      move: NSCHED => /negP NSCHED; apply: NSCHED.
-      apply H_schedule_respects_preemption_model; first by done.
-        by rewrite SERV.
-    }            
+    { intros t NSCHED SCHED.
+      have ->: service sched j t.+1 = service sched j t
+        by rewrite -service_last_plus_before not_scheduled_implies_no_service // addn0.
+      apply: contraT => NP.
+      have: scheduled_at sched j t by apply: H_schedule_respects_preemption_model.
+      by move: NSCHED => /negP. }
   Qed.
-  
+
 End ModelWithLimitedPreemptions.
 Global Hint Resolve valid_fixed_preemption_points_model_lemma : basic_rt_facts.

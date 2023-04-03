@@ -1,5 +1,4 @@
 Require Export prosa.analysis.facts.behavior.all.
-Require Export prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.model.schedule.nonpreemptive.
 Require Export prosa.model.preemption.fully_nonpreemptive.
@@ -22,52 +21,45 @@ Section FullyNonPreemptiveModel.
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-   
-  (** Next, consider any non-preemptive ideal uniprocessor schedule of
-      this arrival sequence ... *)
-  Variable sched : schedule (ideal.processor_state Job).
+
+  (** Next, consider any non-preemptive unit-service schedule of the arrival sequence ... *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_unit_service: unit_service_proc_model PState.
+  Variable sched : schedule PState.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched. 
-  
-  (** For simplicity, let's define some local names. *)
-  Let job_pending := pending sched.
-  Let job_completed_by := completed_by sched.
-  Let job_scheduled_at := scheduled_at sched.
-  
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
+
+
   (** Then, we prove that fully_nonpreemptive_model is a valid preemption model. *)
   Lemma valid_fully_nonpreemptive_model:
     valid_preemption_model arr_seq sched.
   Proof.
     move=> j _; split; [by apply/orP; left | split; [by apply/orP; right | split]].
     - move => t; rewrite /job_preemptable /fully_nonpreemptive_job_model Bool.negb_orb -lt0n; move => /andP [POS NCOMPL].
-      move: (incremental_service_during _ _ _ _ _ POS) => [ft [/andP [_ LT] [SCHED SERV]]].
+      move: (incremental_service_during _ H_unit_service _ _ _ _ POS) => [ft [/andP [_ LT] [SCHED SERV]]].
       apply H_nonpreemptive_sched with ft.
-      + by apply ltnW. 
-      + by done. 
+      + by apply ltnW.
+      + by done.
       + rewrite /completed_by -ltnNge.
         move: NCOMPL; rewrite neq_ltn; move => /orP [LE|GE]; [by done | exfalso].
         move: GE; rewrite ltnNge; move => /negP GE; apply: GE.
         apply completion.service_at_most_cost; rt_eauto.
     - intros t NSCHED SCHED.
       rewrite /job_preemptable /fully_nonpreemptive_job_model.
-      apply/orP; left. 
-      apply/negP; intros CONTR; move: CONTR => /negP; rewrite -lt0n; intros POS. 
-      move: (incremental_service_during _ _ _ _ _ POS) => [ft [/andP [_ LT] [SCHEDn SERV]]].
+      apply/orP; left.
+      apply/negP; intros CONTR; move: CONTR => /negP; rewrite -lt0n; intros POS.
+      move: (incremental_service_during _ H_unit_service _ _ _ _ POS) => [ft [/andP [_ LT] [SCHEDn SERV]]].
       move: NSCHED => /negP NSCHED; apply: NSCHED.
       apply H_nonpreemptive_sched with ft.
       + by rewrite -ltnS.
-      + by done. 
+      + by done.
       + rewrite /completed_by -ltnNge.
-        apply leq_ltn_trans with (service sched j t.+1).  
-        * by rewrite /service /service_during big_nat_recr //= leq_addr. 
-        * rewrite -addn1; apply leq_trans with (service sched j t.+2). 
-          have <-: (service_at sched j t.+1) = 1.
-          { by apply/eqP; rewrite service_at_def eqb1 -scheduled_at_def. }
-            by rewrite -big_nat_recr //=.
-            by apply completion.service_at_most_cost; rt_eauto.
+        apply leq_ltn_trans with (service sched j t.+1).
+        * by rewrite /service /service_during big_nat_recr //= leq_addr.
+        * by apply H_completed_jobs_dont_execute.
   Qed.
 
   (** We also prove that under the fully non-preemptive model
@@ -90,11 +82,11 @@ Section FullyNonPreemptiveModel.
           by destruct (P1 x), (P2 x).
       }
       rewrite filter_pred1_uniq; first by done.
-      - by apply iota_uniq. 
+      - by apply iota_uniq.
       - by rewrite mem_iota; apply/andP; split; [done | rewrite add1n].
       - intros x; rewrite mem_iota; move => /andP [POS _].
           by rewrite -lt0n.
-    } 
+    }
     by rewrite /distances; simpl; rewrite subn0 /max0; simpl; rewrite max0n.
       by done.
   Qed.
@@ -118,12 +110,12 @@ Section FullyNonPreemptiveModel.
           by destruct (P1 x), (P2 x).
       }
       rewrite filter_pred1_uniq; first by done.
-      - by apply iota_uniq. 
+      - by apply iota_uniq.
       - by rewrite mem_iota; apply/andP; split; [done | rewrite add1n].
       - intros x; rewrite mem_iota; move => /andP [POS _].
           by rewrite -lt0n.
-    } 
-      by rewrite /distances; simpl; rewrite subn0 /last0; simpl. 
+    }
+      by rewrite /distances; simpl; rewrite subn0 /last0; simpl.
       by done.
   Qed.
 
