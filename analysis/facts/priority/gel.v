@@ -1,7 +1,7 @@
 Require Import prosa.util.int.
 Require Import prosa.model.priority.gel.
 Require Import prosa.model.schedule.priority_driven.
-Require Import prosa.model.task.sequentiality.
+Require Import prosa.analysis.facts.model.sequential.
 Require Import prosa.analysis.facts.priority.sequential.
 
 (** In this file we state and prove some basic facts
@@ -10,7 +10,7 @@ Section GELBasicFacts.
 
   (** Consider any type of tasks and jobs. *)
   Context `{Task : TaskType} {Job : JobType} `{JobTask Job Task} `{PriorityPoint Task}.
-  Context `{JobArrival Job}.
+  Context {AR : JobArrival Job}.
 
   Section HEPJobArrival.
     (** Consider a job [j]... *)
@@ -32,9 +32,7 @@ Section GELBasicFacts.
     (** Using the above lemma, we prove that for any
         higher-or-equal priority job [j'], the term
         [job_arrival j +  task_priority_point (job_task j) -
-        task_priority_point (job_task j')] is positive. Note that
-        the function [Z.of_nat] is used to convert natural numbers
-        to integers. *)
+        task_priority_point (job_task j')] is positive.  *)
     Corollary hep_job_arrives_after_zero :
       (0 <= (job_arrival j)%:R +
              task_priority_point (job_task j) - task_priority_point (job_task j'))%R.
@@ -42,14 +40,22 @@ Section GELBasicFacts.
 
   End HEPJobArrival.
 
+  (** If we are looking at two jobs of the same task, then [hep_job] is a
+      statement about their respective arrival times. *)
+  Fact hep_job_arrival_gel :
+    forall j j',
+      same_task j j' ->
+      (hep_job j j')= (job_arrival j <= job_arrival j').
+  Proof.
+    move=> j j' /eqP SAME.
+    rewrite /hep_job/GEL/job_priority_point SAME.
+    by case CMP: (job_arrival _ <= job_arrival _); lia.
+  Qed.
+
   (** Next, we prove that the GEL policy respects sequential tasks. *)
   Lemma GEL_respects_sequential_tasks:
     policy_respects_sequential_tasks (GEL Job Task).
-  Proof.
-    move =>  j1 j2 /eqP TSK ARR.
-    rewrite /hep_job /GEL /job_priority_point TSK.
-    by lia.
-  Qed.
+  Proof. by move =>  j1 j2 TSK ARR; rewrite hep_job_arrival_gel. Qed.
 
   (** In this section, we prove that in a schedule following
       the GEL policy, tasks are always sequential. *)
@@ -65,11 +71,11 @@ Section GELBasicFacts.
     (** Next, consider any schedule of the arrival sequence, ... *)
     Variable sched : schedule PState.
 
-    Context `{JobArrival Job} `{JobCost Job}.
+    Context `{JobCost Job}.
     Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
     (** ... allow for any work-bearing notion of job readiness, ... *)
-    Context `{@JobReady Job PState _ _}.
+    Context `{@JobReady Job PState _ AR}.
     Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
     (** ... and assume that the schedule is valid. *)
@@ -96,10 +102,11 @@ Section GELBasicFacts.
     Lemma GEL_implies_sequential_tasks:
       sequential_tasks arr_seq sched.
     Proof.
-      move => j1 j2 t ARR1 ARR2 /eqP SAME LT.
+      move => j1 j2 t ARR1 ARR2 SAME LT.
       apply: early_hep_job_is_scheduled; rt_eauto => t'.
-      rewrite /hep_job_at  /JLFP_to_JLDP /hep_job /GEL /job_priority_point SAME.
-      by lia.
+      rewrite /hep_job_at  /JLFP_to_JLDP !hep_job_arrival_gel //.
+      - by lia.
+      - by rewrite same_task_sym.
     Qed.
 
   End SequentialTasks.
