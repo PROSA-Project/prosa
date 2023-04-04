@@ -112,11 +112,6 @@ Section GeneralityOfGEL.
     Variable arr_seq : arrival_sequence Job.
     Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-   (** In the following, we assume a sequential readiness model: a
-       later-arriving job of a task is ready only if all prior jobs are
-       complete. *)
-    Hypothesis H_sequential : sequential_readiness JR arr_seq.
-
     (** For ease of reference, we refer to the difference between the relative
         priority points of two given tasks as [pp_delta]. *)
     Definition pp_delta tsk tsk' :=
@@ -203,8 +198,8 @@ Section GeneralityOfGEL.
         hp_task (job_task j) (job_task j') ->
         (pp_delta (job_task j) (job_task j') >= 0)%R.
 
-    (** To state the third and final assumption, we require an arbitrary, valid
-        schedule to be given. *)
+    (** To state the third and fourth assumptions, we require an arbitrary,
+        valid schedule to be given. *)
     Variable sched : schedule PState.
     Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
@@ -221,14 +216,15 @@ Section GeneralityOfGEL.
         hp_task (job_task j) (job_task j') ->
         job_response_time_bound sched j' `|pp_delta (job_task j) (job_task j')|.
 
-    (** Under the three conditions stated above, GEL generalizes the given FP
+    (** Fourth, we require that tasks execute sequentially. *)
+    Hypothesis H_sequential : sequential_tasks arr_seq sched.
+
+    (** Under the four conditions stated above, GEL generalizes the given FP
         policy. *)
     Theorem gel_conditionally_generalizes_fp :
       respects_JLFP_policy_at_preemption_point arr_seq sched (GEL Job Task)
       <-> respects_FP_policy_at_preemption_point arr_seq sched fp.
     Proof.
-      have SEQ: sequential_tasks arr_seq sched
-        by eapply sequential_tasks_from_readiness; rt_auto.
       split=> RESPECTED j' j t ARR PT BL SCHED; last first.
       { have [SAME|DIFF] := boolP (same_task j' j).
         {
