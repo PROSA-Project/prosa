@@ -231,25 +231,54 @@ Section Theory.
 End Theory.
 
 
+(** * Task Declaration Notation *)
 
-(** For convenience, we define a simple notation to declare concrete tasks using
-    numbers represented in binary, adopted in POET's certificates. *)
+(** For convenience, we define a simple notation for declaring concrete tasks
+    using numbers represented in binary, which is used in POET's certificates to
+    improve readability. *)
 Require Export NArith.
 
-Notation "{| 'id:' c1 'cost:' c2 'deadline:' c3 'arrival:' c4 'priority:' c5 }" := {|
-  task_id_T := c1;
-  task_cost_T := c2;
-  task_deadline_T := c3;
-  task_arrival_T := c4;
-  task_priority_T := c5 |} (at level 6,
-                            right associativity,
-                            only parsing ).
+(** We declare a notation to declare a task instance of type [Task_T]. *)
+Notation "'[' 'TASK' 'id:' c1 'cost:' c2 'deadline:' c3 'arrival:' c4 'priority:' c5 ']'" :=
+  {| task_id_T := c1
+  ;  task_cost_T := c2
+  ;  task_deadline_T := c3
+  ;  task_arrival_T := c4
+  ;  task_priority_T := c5
+  |} (at level 6, right associativity, only parsing).
 
-Notation "{| 'id:' c1 'cost:' c2 'deadline:' c3 'arrival:' c4 }" := {|
-  task_id_T := c1;
-  task_cost_T := c2;
-  task_deadline_T := c3;
-  task_arrival_T := c4;
-  task_priority_T := 0%N |} (at level 6,
-                             right associativity,
-                             only parsing ).
+(** As a special case, we declare a variant of the above notation that does not
+    require specifying a priority (which is meaningless in EDF certificates). *)
+Notation "'[' 'TASK' 'id:' c1 'cost:' c2 'deadline:' c3 'arrival:' c4 ']'" :=
+  [TASK id: c1 cost: c2 deadline: c3 arrival: c4 priority: 0%N]
+    (at level 6, right associativity, only parsing).
+
+(** In the following, we further provide specialized versions of the two cases
+    above for periodic and sporadic tasks. *)
+
+(** (1) A shorthand notation for periodic tasks with numeric priorities. *)
+Notation "'[' 'PERIODIC-TASK' 'id:' c1 'cost:' c2 'deadline:' c3 'period:' c4 'priority:' c5 ']'"
+  := [TASK id: c1 cost: c2 deadline: c3 arrival: Periodic_T c4 priority: c5 ]
+       (at level 6, right associativity, only parsing).
+
+(** (2) shorthand notation for periodic tasks without numeric priorities. *)
+Notation "'[' 'PERIODIC-TASK' 'id:' c1 'cost:' c2 'deadline:' c3 'period:' c4 ']'"
+  := [PERIODIC-TASK id: c1 cost: c2 deadline: c3 period: c4 priority: 0%N]
+       (at level 6, right associativity, only parsing).
+
+(** (3) A shorthand notation for simple sporadic tasks with numeric priorities
+        described only by a minimum inter-arrival separation. *)
+Notation "'[' 'SPORADIC-TASK' 'id:' c1 'cost:' c2 'deadline:' c3 'separation:' c4 'priority:' c5 ']'"
+  := [TASK id: c1 cost: c2 deadline: c3 arrival: Sporadic_T c4 priority: c5]
+     (at level 6, right associativity, only parsing).
+
+(** (4) A shorthand notation for simple sporadic tasks without numeric priorities
+        described only by a minimum inter-arrival separation. *)
+Notation "'[' 'SPORADIC-TASK' 'id:' c1 'cost:' c2 'deadline:' c3 'separation:' c4 ']'"
+  := [SPORADIC-TASK id: c1 cost: c2 deadline: c3 separation: c4 priority: 0%N]
+       (at level 6, right associativity, only parsing).
+
+(** Finally, we provide a simplified notation for specifying arrival curves. *)
+Notation "'[' 'CURVE' 'horizon:' c1 'steps:' c2 ']'"
+  := (ArrivalPrefix_T (c1, c2))
+    (at level 6, right associativity, only parsing).
