@@ -23,18 +23,16 @@ stages:
 .build-common:
   stage: build
   script:
-    - opam update -y
-    - opam remove -y coq-mathcomp-character
     - opam pin add -n -y -k path coq-prosa .
     - opam install -y -v -j ${NJOBS} coq-prosa
     - opam pin add -n -y -k path coq-prosa-refinements .
     - opam install -y -v -j ${NJOBS} coq-prosa-refinements
 
 .preferred-stable-version:
-    image: mathcomp/mathcomp:1.16.0-coq-8.16
+    image: bbbrandenburg/mathcomp-for-prosa:1.16.0-coq-8.16
 
 .build:
-  image: mathcomp/mathcomp:${CI_JOB_NAME}
+  image: bbbrandenburg/mathcomp-for-prosa:${CI_JOB_NAME}
   extends: .build-common
 
 .build-and-test-POET:
@@ -52,18 +50,9 @@ stages:
         echo "==================";
         echo "Testing $WORKLOAD:";
         mkdir -p $CERT;
-        time ./poet -v -o $CERT -j ${NJOBS} -s $WORKLOAD | tee -a $CERT/output.txt;
+        time ./poet -v -o $CERT -j ${NJOBS} -s $WORKLOAD;
       done;
       
-
-.build-dev:
-  image: mathcomp/mathcomp-dev:${CI_JOB_NAME}
-  extends: .build-common
-
-.install-dependencies:
-  script:
-   - opam update
-   - opam install -y -v -j ${NJOBS} coq-mathcomp-zify coq-coqeal
 
 .make-html:
   script:
@@ -81,15 +70,15 @@ stages:
     - .build
     - .not_in_wip_branches
 
-1.16.0-coq-8.17:
-  extends:
-    - .build
-    - .not_in_wip_branches
+# 1.16.0-coq-8.17:
+#   extends:
+#     - .build
+#     - .not_in_wip_branches
 
 POET:
-  image: bbbrandenburg/mathcomp-with-pip:1.16.0-coq-8.16
   extends:
     - .build-and-test-POET
+    - .preferred-stable-version
     - .not_in_wip_branches
 
 compile-and-doc:
@@ -98,7 +87,6 @@ compile-and-doc:
     - .only_in_wip_branches
     - .preferred-stable-version
   script:
-    - !reference [.install-dependencies, script]
     - make -j ${NJOBS} all
     - !reference [.make-html, script]
   artifacts:
@@ -115,7 +103,6 @@ compile-and-doc-and-validate:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - !reference [.install-dependencies, script]
     - make -j ${NJOBS} all
     - !reference [.make-html, script]
     - make validate 2>&1 | tee validation-results.txt
@@ -134,7 +121,6 @@ mangle-names:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - !reference [.install-dependencies, script]
     - make -j ${NJOBS} mangle-names
 
 # Check that proof irrelevance shows up only due to refinements.
@@ -144,7 +130,6 @@ compile-and-validate:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - !reference [.install-dependencies, script]
     - make -j ${NJOBS}
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh validation-results.txt
@@ -186,7 +171,6 @@ proof-state:
   image: bbbrandenburg/alectryon-ci:1.16.0-coq-8.16
   script:
     - eval $(opam env)
-    - !reference [.install-dependencies, script]
     - make -j ${NJOBS} all
     - make -j ${NJOBS} alectryon
   artifacts:
