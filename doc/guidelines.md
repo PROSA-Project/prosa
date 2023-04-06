@@ -16,11 +16,7 @@ This project targets Coq *non*-experts. Accordingly, great emphasis is placed on
 - Use many, mostly short sections. Sections are a great way to structure code and to guide the reader; they serve the reader by establishing a local scope that is easier to remember.
 - Keep definitions and proofs in separate sections, and ideally in different files. This makes the definitions short, and more clearly separates the computation of the actual analysis results from their validity arguments.
 - Make extensive use of the `Hypothesis` feature. Hypotheses are very readable and are accessible even to non-Coq users, especially when paired with self-explanatory names.
-- Consider renaming general concepts with `let` bindings to introduce local names that are more meaningful. In many cases, this is also useful to bind necessary context to local names. For example:
-```
-    Let no_deadline_is_missed :=
-      task_misses_no_deadline sched tsk.
-```
+- Consider renaming general concepts with `let` bindings to introduce local names that are more meaningful. 
 - Interleave running commentary *as if you were writing a paper* with the actual definitions and lemmas. This helps greatly with making the spec more accessible to everyone. See [`results.fifo.rta`](../results/fifo/rta.v) for a nice example  of this style.
 - When commenting, be careful not to leave any misspelled words: Prosa's CI system includes a spell-checker that will flag potential errors.
 - When comments have to contain variable names or mathematical notation, use square brackets (e.g. `[job_cost j]`). You can nest square brackets _only if they are balanced_: `[[t1,t2)]` will not work. In this case, use `<<[t1,t2)>>`.
@@ -134,7 +130,6 @@ Note: We employ an automatic proof-length checker that runs as part of continuou
 3. Make use of the structured sub-proofs feature (i.e., indentation with `{` and `}`, or bulleted sub-proofs with `-`, `+`, `*`) to structure code.  Please use the bullets in the order `-`, `+`, `*` so that Proof General indents them correctly. You may keep going with `--`, `++`, and `**`.
 4. Make proofs "step-able." This means preferring `.` over `;` (within reason). This makes it easier for novices to learn from existing proofs.
 
-
 ### Maintainability
 
 Generally try to make proofs as robust to (minor) changes in definitions as possible. Long-term maintenance is a major concern.
@@ -149,58 +144,105 @@ Guideline: do not name proof terms in type classes to prevent explicit dependenc
 
 ### Auto-Generated Names
 
-Some tactics, like ``intros.`` (without arguments) can introduce
-hypotheses with automatically generated names (typically ``H``,
-``H0``, ``H1``, ``H2``). The use of such tactic should be avoided as
-they make the proofs less robust (any change can easily shift the
-naming). Note that ssreflect offers ``move=> ?`` that can be used when
-naming is not needed, while still being robust, because it ensures the
-automatically named hypotheses cannot be explicitly mentioned in the
-proof script. The fact that no automatically generated name is
-explicitly referred to is checked in the CI with the ```-mangle-names``
-option of Coq.
+Some tactics, like `intros.` (without arguments) can introduce hypotheses with automatically generated names (typically `H`, `H0`, `H1`, `H2`). The use of such tactic should be avoided as they make the proofs less robust (any change can easily shift the naming). Note that ssreflect offers `move=> ?` that can be used when naming is not needed, while still being robust, because it ensures the automatically named hypotheses cannot be explicitly mentioned in the proof script. The fact that no automatically generated name is explicitly referred to is checked in the CI with the `-mangle-names` option of Coq.
 
-### Tactics
 
-- Document the tactics that you use in the [list of tactics](doc/tactics.md). For new users, it can be quite difficult to identify the right tactics to use. This list is intended to give novices a starting to point in the search for the "right" tools.
-- Prefer ssreflect style. For example, use `move` and `case` instead of `intro`, `intros`, and `destruct`.
+### Choice of Tactics
+
+In new code, prefer *ssreflect* style:
+
+| Instead of… | use…  |
+|:--|:--|
+| `intro` or `intros` | `move` |
+| `apply`| `apply:` |
+| `eapply`| `apply:` |
+| `apply FOO; apply BAR`| `apply/FOO/BAR` |
+| `apply FOO; intro a b c` | `apply: FOO => a b c` |
+| `…; simpl` | `… => /` |
+| `…; try done` | `… => //` |
+| `…; simpl; try done` | `… => //=` |
+| `destruct` | `case:` |
+| `destruct … eqn:FOO` | `case FOO: …` |
+| `destruct … as [FOO｜BAR] ` | `have [FOO｜BAR] := …` |
+| `edestruct FOO` | placeholder `_`, as in `(FOO _)` |
+| `specialize (H_Foo x)` | `move: (H_Foo x)` |
+| `induction n` | `elim: n` |
+
+*The above list is incomplete. Please expand it as you come across missing examples.*
+
+If you have trouble getting the ssreflect tactics to work, **ask for help** instead of reverting to non-ssreflect tactics.
+
+**Note**: it can be effective to ask conversational AI tools such as `ChatGPT` for examples, usage instructions, and explanations. Try prompts such as: "In the context of Coq with the ssreflect library, please explain how one performs case analysis in idiomatic ssreflect style."
+
+Document non-standard tactics that you use in the [list of tactics](doc/tactics.md). For new users, it can be quite difficult to identify the right tactics to use. This list is intended to give novices a starting to point in the search for the "right" tools.
 
 ### Forward vs backward reasoning
 Although the primary focus of Prosa is on the quality of the overall structure and the specifications, good proofs are short and readable. Since Coq tends to favor backward reasoning, try to adhere to it. Forward reasoning tends to be more verbose and to generate needlessly convoluted proof trees. To get an idea, read the following snippet:
-```
-(* Let's say A->B->C->D *)
+
+```coq
+(** Let's say we have piecewise [A->B->C->D]. *)
   Variable A B C D : Prop.
   Hypothesis AB : A->B.
   Hypothesis BC : B->C.
   Hypothesis CD : C->D.
 
-  (* And we want to prove A->D *)
-  Lemma AD_backward:
-    A->D.
+  (** And we want to prove [A->D] *)
+  Lemma AD_backward :
+    A -> D.
   Proof.
-    intros.
-    apply CD.
-    apply BC.
-    now apply AB.
+    move=> ?.
+    apply: CD.
+    apply: BC.
+    by apply: AB.
   Qed.
 
-  Lemma AD_forward:
-    A->D.
+  (** In fact, ssreflect allows us to express this even more succinctly *)
+  Lemma AD_backward' :
+    A -> D.
   Proof.
-    intros.
+    move=> ?.
+    by apply/CD/BC/AB.
+  Qed.
+
+  (** In contrast, the proof looks much more convoluted in forward style. *)
+  Lemma AD_forward :
+    A -> D.
+  Proof.
+    move=> ?.
     (* hmm, I have C->D. If only I had C... *)
     have I_need_C: C.
     { (* hmm, I have B->C. If only I had B... *)
-      have I_need_B: B by apply AB.
+      have I_need_B: B by apply: AB.
       feed BC.
-      apply I_need_B.
-      now apply BC.
+      apply: I_need_B.
+      by apply: BC.
     }
     feed CD.
-    apply I_need_C.
-    now apply CD.
+    apply: I_need_C.
+    by apply: CD.
   Qed.
-  ```
+```
+
+
+### Misc. Hints and Tips
+
+- Instead of writing `exists x, P x /\ Q x`, prefer `exists2 x, P x & Q x` ([see documentation](https://gitlab.mpi-sws.org/RT-PROOFS/rt-proofs/-/merge_requests/276#note_89874)). The latter saves a destruct making the intro patterns less cluttered in the proofs (i.e., one would write `=> [x Px Qx]` instead of having to write `=> [x [Px Qx]]`).
+
+- Similarly, using the notation `[/\ A, B, C & D]` can be preferable to just `A /\ B /\ C /\ D` for the same reason. Analogous notations exist for `\/`, `&&`, and `||`. See [`Coq.ssr.ssrbool`](https://coq.inria.fr/distrib/V8.16.1/stdlib//Coq.ssr.ssrbool.html#and3) for further details.
+
+- Avoid using lemmas from `Bool` (e.g., like `Bool.andb_orb_distrib_l`). There are more idiomatic ways of accomplishing the same things with ssreflect tactics and lemmas. To find these, look for lemmas about `andb` and `orb` in `ssr.ssrbool` with the command `Search andb orb in ssr.ssrbool`.
+
+- Here are a couple of nice ways of doing common case analyses:
+    * `have [LEQ|LT] := leqP n m.` — either `n <= m` or `n > m`.
+    * `have [n_LT_m|m_LT_n|n_EQ_m] := ltngtP n m.` — either `n < m`, `m < n`, or `n = m`.
+    * `have [SAME|DIFF] := boolP (same_task j j').` — are `j` and `j'` jobs of the same task?
+    * `have [SAME|DIFF] := (eqVneq  (job_task j) tsk_o)` — are the task of job `j` and task `tsk_o` the same?
+
+- It can be initially difficult to find lemmas applicable to `int` (in)equalities (e.g., when working with the GEL or ELF policies). The key is to note that `int` is just a particular instance of `ringType` or `numDomainType` and generic lemmas for these algebraic structures do apply (a lot of them are in [`ssralg`](https://math-comp.github.io/htmldoc/mathcomp.algebra.ssralg.html) or [`ssrnum`](https://math-comp.github.io/htmldoc/mathcomp.algebra.ssrnum.html)). To find applicable lemmas with `Search`, make sure to specify the appropriate notation scope `%R`. For example, `Search (_ + _)%R.` will find lemmas about addition that are applicable to `int`. As another example, `Search +%R -%R "K".` will find relevant cancellation lemmas (which by ssreflect convention include the letter "K" in their names). 
+
+- Note that `%:R` is *not* a scope delimiter; rather, it's the injection from `nat` to a `ringType` (e.g., typically the integers in our context). For example, `Search (_%:R + _%:R)%R.` will find lemmas about the addition two injected `nat` elements in ring scope.
+
+- If `apply: (FOO a b c)` doesn't given useful feedback, try `Check (FOO a b c)` to help with debugging the root cause.
 
 
 *To be continued… Merge requests welcome: please feel free to propose new advice and better guidelines.*
