@@ -540,4 +540,46 @@ Section PriorityInversionIsBounded.
 
   End PreemptionTimeExists.
 
+  (** In this section we prove that if a preemption point [ppt] exists in a job's busy window,
+      it suffers no priority inversion after [ppt]. Equivalently the [cumulative_priority_inversion]
+      of the job in the busy window [t1,t2] is bounded by the [cumulative_priority_inversion]
+      of the job in the time window [t1,[ppt]). *)
+  Section NoPriorityInversionAfterPreemptionPoint.
+
+    (** Consider the preemption point [ppt]. *)
+    Variable ppt: instant.
+    Hypothesis H_preemption_point : preemption_time arr_seq sched ppt.
+    Hypothesis H_after_t1 : t1 <= ppt.
+
+    (** We establish the aforementioned result by showing that [j] cannot suffer
+        priority inversion after the preemption time [ppt]. *)
+    Lemma priority_inversion_occurs_only_till_preemption_point:
+      cumulative_priority_inversion arr_seq sched j t1 t2 <=
+      cumulative_priority_inversion arr_seq sched j t1 ppt.
+    Proof.
+      have [LEQ|LT_t1t2] := leqP t1 t2;
+        last by rewrite /cumulative_priority_inversion big_geq //; exact: ltnW.
+      have [LEQ_t2ppt|LT] := leqP t2 ppt;
+        first by rewrite (cumulative_priority_inversion_cat _ _ _ t2 t1 ppt) //
+                 ; exact: leq_addr.
+      move: (H_busy_interval_prefix) => [_ [_ [_ /andP [T _]]]].
+      rewrite /cumulative_priority_inversion (@big_cat_nat _ _ _ ppt) //=;
+        last by lia.
+      rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
+      rewrite big_nat_cond big1 //; move => t /andP[/andP[GEt LEt] _].
+      have [j_hp [ARRB [HP SCHEDHP]]]:
+        exists j_hp : Job, arrived_between j_hp t1 t.+1
+                           /\ hep_job j_hp j
+                           /\ scheduled_at sched j_hp t.
+      { apply: not_quiet_implies_exists_scheduled_hp_job (ppt-t1) _ (t) _; rt_eauto.
+        by exists ppt; split; [done | rewrite subnKC //; apply /andP;split].
+        by rewrite subnKC //; apply/andP; split. }
+      apply /eqP; rewrite eqb0; apply/negP; move => /priority_inversion_P INV.
+      feed_n 3 INV; rt_eauto; last move: INV => [_ [j_lp /andP[SCHED PRIO]]].
+      enough (EQ : j_lp = j_hp); first by subst; rewrite HP in PRIO.
+      by apply: (ideal_proc_model_is_a_uniprocessor_model j_lp j_hp sched t); rt_eauto.
+    Qed.
+
+  End NoPriorityInversionAfterPreemptionPoint.
+
 End PriorityInversionIsBounded.
