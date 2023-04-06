@@ -32,6 +32,24 @@ Section WorkloadFacts.
     by rewrite andbF.
   Qed.
 
+  (** We establish that if the predicate [P1] implies the predicate [P2],
+      then the cumulative workload of jobs that respect [P1] is bounded
+      by the cumulative workload of jobs that respect [P2]. *)
+  Lemma workload_of_jobs_weaken :
+    forall (P1 P2 : pred Job) (jobs : seq Job),
+      (forall j, P1 j -> P2 j) ->
+      workload_of_jobs P1 jobs <= workload_of_jobs P2 jobs.
+  Proof.
+    move => P1 P2 jobs IMPLIES; rewrite /workload_of_jobs.
+    apply: leq_sum_seq_pred => j' _.
+    by apply: IMPLIES.
+  Qed.
+
+  (** The cumulative workload of jobs from an empty sequence is always zero. *)
+  Lemma workload_of_jobs0 :
+    forall (P : pred Job), workload_of_jobs P [::] = 0.
+  Proof. by move => ?; rewrite /workload_of_jobs big_nil. Qed.
+
   (** The workload of a set of jobs can be equivalently rewritten as sum over
       their tasks. *)
   Lemma workload_of_jobs_partitioned_by_tasks :
