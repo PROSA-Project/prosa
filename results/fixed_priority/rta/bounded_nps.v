@@ -2,6 +2,7 @@ Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded.
+Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded_jlfp.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)
@@ -124,73 +125,40 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
        bounded by the maximum length of a non-preemptive section of a task with
        lower-priority task (i.e., the blocking term). *)
     Lemma priority_inversion_is_bounded_by_blocking:
-      forall j t,
+      forall j t1 t2,
         arrives_in arr_seq j ->
         job_of_task tsk j ->
-        max_length_of_priority_inversion j t <= blocking_bound.
+        busy_interval_prefix arr_seq sched j t1 t2 ->
+        max_length_of_priority_inversion j t1 <= blocking_bound .
     Proof.
-      intros j t ARR TSK; move: TSK => /eqP TSK.
+      move=> j t1 t2 ARR TSK BUSY; move: TSK => /eqP TSK.
       rewrite /max_length_of_priority_inversion /blocking_bound /max_length_of_priority_inversion.
-      apply: (@leq_trans (\max_(j_lp <- arrivals_before arr_seq t | ~~ hep_job j_lp j)
-                            (job_max_nonpreemptive_segment j_lp - ε)));
-        first by apply: bigmax_subset => j' IN /andP [not_hep _].
-      apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t
-                | ~~ hep_task (job_task j_lp) tsk)
+      apply: leq_trans;
+        first by apply: priority_inversion_is_bounded_by_max_np_segment; rt_eauto.
+      apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t1
+                | (~~ hep_task (job_task j_lp) tsk) && (0 < job_cost j_lp))
                             (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
       { rewrite /hep_job /FP_to_JLFP TSK.
-        apply leq_big_max => j' JINB NOTHEP.
-        rewrite leq_sub2r //.
-        apply H_valid_model_with_bounded_nonpreemptive_segments.
-        by eapply in_arrivals_implies_arrived; eauto 2. }
-      { apply /bigmax_leq_seqP => j' JINB NOTHEP.
+        apply: leq_big_max => j' JINB NOTHEP.
+        rewrite leq_sub2r //. }
+      { apply /bigmax_leq_seqP => j' JINB /andP[NOTHEP POS].
         apply leq_bigmax_cond_seq with
             (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
           last by done.
-        apply H_all_jobs_from_taskset.
+        apply: H_all_jobs_from_taskset.
         by apply: in_arrivals_implies_arrived (JINB). }
     Qed.
 
-    (** Using the above lemma, we prove that the priority inversion of the task is bounded by blocking_bound. *)
+    (** Using the above lemma, we prove that the priority inversion of the task
+        is bounded by the blocking_bound. *)
     Lemma priority_inversion_is_bounded:
       priority_inversion_is_bounded_by_constant
         arr_seq sched tsk blocking_bound.
     Proof.
-      intros j ARR TSK POS t1 t2 PREF.
-      case NEQ: (t2 - t1 <= blocking_bound).
-      { apply leq_trans with (t2 - t1); last by done.
-        rewrite /cumulative_priority_inversion -[X in _ <= X]addn0
-                -[t2 - t1]mul1n -iter_addn -big_const_nat leq_sum //.
-        by intros t _; case: (priority_inversion_dec _ _ _).
-      }
-      move: NEQ => /negP /negP; rewrite -ltnNge; move => BOUND.
-      edestruct (@preemption_time_exists) as [ppt [PPT NEQ]]; rt_eauto.
-      move: NEQ => /andP [GE LE].
-      apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt);
-        last apply leq_trans with (ppt - t1); first last.
-      - rewrite leq_subLR.
-        apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
-        by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
-        rewrite /cumulative_priority_inversion -[X in _ <= X]addn0
-                -[ppt - t1]mul1n -iter_addn -big_const_nat leq_sum //.
-        by intros t _; case: (priority_inversion_dec _ _ _).
-      - rewrite /cumulative_priority_inversion.
-        rewrite (@big_cat_nat _ _ _ ppt) //=; last first.
-        { rewrite ltn_subRL in BOUND.
-          apply leq_trans with (t1 + blocking_bound); last by apply ltnW.
-          apply leq_trans with (t1 + max_length_of_priority_inversion j t1); first by done.
-          by rewrite leq_add2l; eapply priority_inversion_is_bounded_by_blocking; eauto 2.
-        }
-        rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
-        rewrite big_nat_cond big1 // => t /andP [/andP [GEt LTt] _ ].
-        apply/eqP; rewrite eqb0; apply/negP => /priority_inversion_P PI; feed_n 3 PI; rt_eauto.
-        move: PI => [NSCHED [j__lp /andP [SCHED HEP]]].
-        edestruct (@not_quiet_implies_exists_scheduled_hp_job)
-          with (K := ppt - t1) (t1 := t1) (t2 := t2) (t := t)
-          as [j_hp [ARRB [HP SCHEDHP]]]; rt_eauto.
-        { by exists ppt; split; [done | rewrite subnKC //; apply/andP]. }
-        { by rewrite subnKC //; apply/andP; split. }
-        enough (EQef : j__lp = j_hp); first by subst; rewrite HP in HEP.
-        by eapply ideal_proc_model_is_a_uniprocessor_model; rt_eauto.
+      have PIB: priority_inversion_is_bounded_by arr_seq sched tsk (fun=> blocking_bound).
+      apply: priority_inversion_is_bounded; rt_eauto.
+      apply: priority_inversion_is_bounded_by_blocking.
+      by apply PIB.
     Qed.
 
   End PriorityInversionIsBounded.
