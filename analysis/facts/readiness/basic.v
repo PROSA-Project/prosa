@@ -1,10 +1,10 @@
-Require Import prosa.model.readiness.basic.
+Require Export prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.definitions.readiness.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 
 Section LiuAndLaylandReadiness.
-  
+
   (** We assume the basic (i.e., Liu & Layland)
       readiness model under which any pending job is ready. *)
   #[local] Existing Instance basic_ready_instance.
@@ -33,7 +33,7 @@ Section LiuAndLaylandReadiness.
   (** ... and any schedule of these jobs. *)
   Variable sched : schedule PState.
 
-  (** In the basic Liu & Layland model, a schedule satisfies that only ready 
+  (** In the basic Liu & Layland model, a schedule satisfies that only ready
       jobs execute as long as jobs must arrive to execute and completed jobs
       don't execute, which we note with the following theorem. *)
   Lemma basic_readiness_compliance :

@@ -25,7 +25,7 @@ Section Definitions.
   Section FPDefinitions.
     Context {FP : FP_policy Task}.
 
-    (** We first define interference from higher priority tasks. *)
+    (** We first define interference from higher-priority tasks. *)
     Definition hp_task_interference (j : Job) (t : instant) :=
       has (fun jhp => hp_task (job_task jhp) (job_task j)
                       && receives_service_at sched jhp t)
@@ -33,20 +33,37 @@ Section Definitions.
 
     Context {JLFP : JLFP_policy Job}.
 
-    (** Then, to define interference from equal priority tasks, we first
-        define higher priority jobs from an equal priority task... *)
+    (** Then, to define interference from equal-priority tasks, we first
+        define higher-or-equal-priority jobs from an equal-priority task... *)
     Definition ep_task_hep_job j1 j2 :=
       hep_job j1 j2 && ep_task (job_task j1) (job_task j2).
 
-    (** ...and such jobs that are not the same. *)
+    (** ... and higher-or-equal-priority-jobs of equal-priority tasks that
+        do not stem from the same task. *)
     Definition other_ep_task_hep_job j1 j2 :=
       ep_task_hep_job j1 j2 && (job_task j1 != job_task j2).
 
-    (** This enables us to define interference from equal priority tasks. *)
-    Definition other_ep_task_hep_job_interference (j : Job) (t : instant) :=
-      has (fun jhp => other_ep_task_hep_job jhp j
-                      && receives_service_at sched jhp t)
-        (arrivals_up_to arr_seq t).
+    (** This enables us to define interference from equal-priority tasks. *)
+    Definition hep_job_from_other_ep_task_interference (j : Job) (t : instant) :=
+      has (fun jhp => other_ep_task_hep_job jhp j && receives_service_at sched jhp t) (arrivals_up_to arr_seq t).
+
+    (** Similarly, to define interference from strictly higher-priority tasks, we first
+        define higher-or-equal-priority jobs from a strictly higher-priority task, which... *)
+    Definition hp_task_hep_job :=
+      fun j1 j2 => hep_job j1 j2 && (hp_task (job_task j1) (job_task j2)).
+
+    (** ... enables us to define interference from strictly higher-priority tasks. *)
+    Definition hep_job_from_hp_task_interference (j : Job) (t : instant) :=
+      has (fun jhp => hp_task_hep_job jhp j && receives_service_at sched jhp t) (arrivals_up_to arr_seq t).
+
+    (** Using the above definitions, we define the cumulative interference incurred in the interval
+        <<[t1, t2)>> from (1) higher-or-equal-priority jobs from strictly higher-priority tasks... *)
+    Definition cumulative_interference_from_hep_jobs_from_hp_tasks (j : Job) (t1 t2 : instant) :=
+      \sum_(t1 <= t < t2) hep_job_from_hp_task_interference j t.
+
+    (** ... and (2) higher-or-equal-priority jobs from equal-priority tasks. *)
+    Definition cumulative_interference_from_hep_jobs_from_other_ep_tasks (j : Job) (t1 t2 : instant) :=
+      \sum_(t1 <= t < t2) hep_job_from_other_ep_task_interference j t.
 
   End FPDefinitions.
 

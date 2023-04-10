@@ -32,11 +32,15 @@ Section ELF.
   Context {Job : JobType} `{JobArrival Job} `{JobTask Job Task} .
   (** We parameterize the ELF priority policy based on a fixed-priority policy.
       Job [j1] is assigned a higher priority than job [j2] if either the task
-      associated with [j1] has a strictly higher priority than the task associated
-      with [j2], or if their tasks have equal priorities and the relative priority
-      point of [j1] is less than or equal to the relative priority point of [j2],
-      similar to the GEL policy. *)
-  #[export] Instance ELF (fp : FP_policy Task) : JLFP_policy Job :=
+      associated with [j1] has a strictly higher priority than the task
+      associated with [j2], or if their tasks have equal priorities and the
+      relative priority point of [j1] is less than or equal to the relative
+      priority point of [j2], similar to the GEL policy.
+
+      NB: The <<| 0>> at the end of the next line is a priority hint for
+          type-class resolution, meaning this type class should be picked with
+          highest priority in ambiguous contexts. *)
+  #[export] Instance ELF (fp : FP_policy Task) : JLFP_policy Job | 0:=
   {
       hep_job (j1 j2 : Job) :=
         (** Recall the notion of a higher-priority job under the GEL policy as

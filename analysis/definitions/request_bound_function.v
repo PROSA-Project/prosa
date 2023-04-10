@@ -56,10 +56,10 @@ Section TaskWorkloadBoundedByArrivalCurves.
     (** Let delta be the length of the interval of interest. *)
     Variable delta : duration.
 
-    (** Recall the definition of higher-or-equal-priority task and the per-task
-        workload bound for FP scheduling. *)
+    (** Recall the definition of higher-or-equal-priority task for FP scheduling. *)
     Let is_hep_task tsk_other := hep_task tsk_other tsk.
     Let is_other_hep_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk).
+    Let is_hp_task tsk_other := hp_task tsk_other tsk.
 
     (** Using the sum of individual workload bounds, we define the following
         bound for the total workload of tasks in any interval of length
@@ -74,10 +74,16 @@ Section TaskWorkloadBoundedByArrivalCurves.
       \sum_(tsk_other <- ts | is_hep_task tsk_other)
        task_request_bound_function tsk_other delta.
 
-    (** We also define a bound for the total workload of higher-or-equal
-        priority tasks other than [tsk] in any interval of length delta. *)
+    (** We also define a bound for the total workload of higher-or-equal-priority
+        tasks other than [tsk] in any interval of length [delta]. *)
     Definition total_ohep_request_bound_function_FP :=
       \sum_(tsk_other <- ts | is_other_hep_task tsk_other)
+        task_request_bound_function tsk_other delta.
+
+    (** Finally, we define a bound for the total workload of higher-priority
+        tasks in any interval of length delta. *)
+    Definition total_hp_request_bound_function_FP :=
+      \sum_(tsk_other <- ts | is_hp_task tsk_other)
        task_request_bound_function tsk_other delta.
 
   End AllTasks.
