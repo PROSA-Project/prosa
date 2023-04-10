@@ -36,7 +36,7 @@ Section BusyIntervalInequalities.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_of_task tsk j.
   Hypothesis H_job_cost_positive: job_cost_positive j.
-  
+
   (** Consider the ideal JLFP definitions of interference and
       interfering workload. *)
   #[local] Instance ideal_jlfp_interference : Interference Job :=
@@ -54,7 +54,7 @@ Section BusyIntervalInequalities.
 
   (** Consider any arbitrary time [Δ] inside the busy interval. *)
   Variable  Δ : duration.
-  Hypothesis H_Δ_in_busy : t1 + Δ < t2.
+  Hypothesis H_Δ_in_busy : t1 + Δ <= t2.
 
   (** First, we prove that if the priority inversion is bounded then,
       the cumulative priority inversion is also bounded. *)
