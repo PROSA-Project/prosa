@@ -307,9 +307,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
           move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
           apply leq_sum_seq => tsko INtsko NEQT.
           edestruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; [ | apply ltnW in NEQ].
-          - apply (workload_le_rbf arr_seq ts); try by done.
+          - by apply: (workload_le_rbf' arr_seq tsko); rt_eauto.
           - eapply leq_trans; first by eapply total_workload_shorten_range; eauto 2.
-             eapply workload_le_rbf; rt_eauto.
+            by apply workload_le_rbf'; rt_eauto.
         Qed.
 
       End HepWorkloadBound.

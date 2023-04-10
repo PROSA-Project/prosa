@@ -1,8 +1,10 @@
 Require Import prosa.model.priority.elf.
 Require Export prosa.analysis.facts.priority.classes.
+Require Export prosa.analysis.definitions.priority.classes.
 
   (** In this section, we note three basic properties of the ELF policy: the
-      priority relation is reflexive, transitive, and total.  *)
+      priority relation is reflexive, transitive, and total. We also show
+      that the ELF policy is JLFP-FP compatible. *)
 Section PropertiesOfELF.
 
   (** Consider any type of tasks with relative priority points...*)
@@ -46,7 +48,18 @@ Section PropertiesOfELF.
     { by apply /orP; left; rewrite -not_hep_hp_task. }
     { apply /orP; right. move: NNhepyx => /negbNE -> /=.
       move: Njpxy; unfold hep_job, GEL; lia. }}
-    Qed.
+  Qed.
+
+  (** The ELF policy is [JLFP_FP_compatible]. *)
+  Lemma ELF_is_JLFP_FP_compatible :
+    JLFP_FP_compatible (ELF FP) FP.
+  Proof.
+    split; move => j1 j2.
+    - rewrite /hep_job /ELF.
+      by move => /orP [/andP [HPTASK1 HPTASK2] | /andP [HEPTASK HEPJOB]].
+    - move => HP_TASK.
+      by apply /orP; left.
+  Qed.
 
 End PropertiesOfELF.
 

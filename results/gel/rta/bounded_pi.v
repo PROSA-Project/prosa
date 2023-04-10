@@ -215,14 +215,14 @@ Section AbstractRTAforGELwithArrivalCurves.
       Proof.
         move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
         apply leq_sum_seq => tsko INtsko NEQT.
-        have [EQ|EQ] := leqP Δ `|Num.max 0%R (interval tsko A)|.
-        { exact: (workload_le_rbf arr_seq ts). }
+        have [EQ|EQ] := leqP Δ `|Num.max 0%R (interval tsko A)|;
+         first by apply: (workload_le_rbf' arr_seq tsko); rt_eauto.
         apply: (leq_trans (total_workload_shorten_range _ _ _ _)) => //; [lia|].
         rewrite /GEL_from.
         have [EQ1|EQ1] := lerP 0%R (interval tsko A).
         - have -> : `|Num.max 0%R (t1%:R + interval tsko A)%R|
             = t1 + `|interval tsko A| by lia.
-          by apply: workload_le_rbf; rt_eauto.
+          by apply: workload_le_rbf'; rt_eauto.
         - rewrite arrivals_between_geq /workload_of_jobs ?big_nil//; lia.
       Qed.
 

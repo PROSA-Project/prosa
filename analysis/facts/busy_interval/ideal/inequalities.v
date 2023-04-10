@@ -98,42 +98,4 @@ Section BusyIntervalInequalities.
       by rewrite instantiated_quiet_time_equivalent_quiet_time; rt_eauto.
   Qed.
 
-  Section WorkloadRBF.
-
-    (** Consider a valid arrival curve that is followed by the task set [ts]. *)
-    Context `{TaskCost Task} `{MaxArrivals Task}.
-    Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
-    Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
-
-    (** Suppose all arrivals have WCET-compliant job costs. *)
-    Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
-
-    (** Consider a task [tsk_o] that is not equal to [tsk]. *)
-    Variable tsk_o : Task.
-    Hypothesis H_tsko_in_ts: tsk_o \in ts.
-    Hypothesis H_neq: tsk_o != tsk.
-
-    (** We prove that the workload of higher priority jobs of a task [tsk] in
-        any interval is bound by the request bound function of the task in that interval. *)
-    Lemma workload_le_rbf:
-      workload_of_jobs (fun jo => hep_job jo j && (job_task jo == tsk_o)) jobs <=
-        task_request_bound_function tsk_o Δ.
-    Proof.
-      apply leq_trans with (task_cost tsk_o * number_of_task_arrivals arr_seq tsk_o t1 (t1 + Δ)).
-      { apply leq_trans with (\sum_(j0 <- arrivals_between arr_seq t1 (t1 + Δ) | job_task j0 == tsk_o)
-                                job_cost j0).
-        { rewrite /workload_of_jobs big_mkcond [X in _ <= X]big_mkcond //= leq_sum // => s _.
-          by case (job_task s == tsk); case (hep_job s j).
-        }
-        { rewrite /number_of_task_arrivals /task.arrivals.number_of_task_arrivals
-                  -sum1_size big_distrr /= big_filter muln1.
-          apply leq_sum_seq; move => jo IN0 /eqP EQ.
-          by rewrite -EQ; apply H_valid_job_cost; apply in_arrivals_implies_arrived in IN0. } }
-      { rewrite leq_mul2l; apply/orP; right.
-        rewrite -{2}[Δ](addKn t1).
-        apply H_is_arrival_curve; auto using leq_addr. }
-    Qed.
-
-  End WorkloadRBF.
-
 End BusyIntervalInequalities.

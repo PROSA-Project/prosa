@@ -1,5 +1,6 @@
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.analysis.facts.behavior.arrivals.
+Require Export prosa.analysis.definitions.request_bound_function.
 
 (** * Lemmas about Workload of Sets of Jobs *)
 (** In this file, we establish basic facts about the workload of sets of jobs. *)
@@ -73,6 +74,56 @@ Section WorkloadFacts.
       of the jobs. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_consistent : consistent_arrival_times arr_seq.
+
+  (** In this section, we bound the workload of jobs of a particular task by the task's [RBF]. *)
+  Section WorkloadRBF.
+
+    (** Consider an arbitrary task. *)
+    Variable tsk : Task.
+
+    (** Consider a valid arrival curve that is respected by the task [tsk]. *)
+    Context `{MaxArrivals Task}.
+    Hypothesis H_task_repsects_max_arrivals : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
+
+    (** Suppose all arrivals have WCET-compliant job costs. *)
+    Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
+
+    (** Consider an instant [t1] and a duration [Δ]. *)
+    Variable t1 : instant.
+    Variable Δ : duration.
+
+    (** We prove that the workload of jobs of a task [tsk] in any interval is
+        bound by the request bound function of the task in that interval. *)
+    Lemma workload_le_rbf :
+      workload_of_jobs (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + Δ))
+      <= task_request_bound_function tsk Δ.
+    Proof.
+      apply: (@leq_trans (task_cost tsk * number_of_task_arrivals arr_seq tsk t1 (t1 + Δ))).
+      { rewrite /workload_of_jobs /number_of_task_arrivals/task_arrivals_between/job_of_task.
+        apply: sum_majorant_constant => j IN TSK.
+        have: valid_job_cost j; last by rewrite /valid_job_cost; move: TSK => /eqP ->.
+        by apply/H_valid_job_cost/in_arrivals_implies_arrived; rt_eauto. }
+      { rewrite leq_mul2l; apply/orP; right.
+        rewrite -{2}[Δ](addKn t1).
+        by apply H_task_repsects_max_arrivals; lia. }
+    Qed.
+
+    (** For convenience, we combine the preceding bound with
+        [workload_of_jobs_weaken], as the two are often used together. *)
+    Corollary workload_le_rbf' :
+      forall P,
+        workload_of_jobs (fun j => (P j) && (job_task j == tsk))
+          (arrivals_between arr_seq t1 (t1 + Δ))
+        <= task_request_bound_function tsk Δ.
+    Proof.
+      move=> P.
+      have LEQ: forall ar, workload_of_jobs (fun j : Job => P j && (job_task j == tsk)) ar
+                      <= workload_of_jobs (job_of_task tsk) ar
+        by move=> ar; apply: workload_of_jobs_weaken => j /andP [_ +].
+      by apply/(leq_trans (LEQ _))/workload_le_rbf.
+    Qed.
+
+  End WorkloadRBF.
 
   (** If at some point in time [t] the predicate [P] by which we select jobs
       from the set of arrivals in an interval <<[t1, t2)>> becomes certainly

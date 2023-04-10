@@ -1,19 +1,20 @@
 Require Export prosa.model.priority.classes.
+Require Export prosa.analysis.definitions.priority.classes.
 
 (** In this section, we prove some basic properties about priority relations. *)
 Section BasicLemmas.
-  
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  
+
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  
-  (** Consider a JLFP policy that indicates a higher-or-equal priority relation. *)             
+
+  (** Consider a JLFP policy that indicates a higher-or-equal priority relation. *)
   Context `{JLFP_policy Job}.
-  
-  (** First, we prove that [another_hep_job] relation is anti-reflexive. *) 
+
+  (** First, we prove that [another_hep_job] relation is anti-reflexive. *)
   Lemma another_hep_job_antireflexive :
     forall j, ~ another_hep_job j j.
   Proof.
@@ -22,7 +23,7 @@ Section BasicLemmas.
 
   (** We show that [another_task_hep_job] is "task-wise"
       anti-reflexive; that is, given two jobs [j] and [j'] from the
-      same task, [another_task_hep_job j' j] is false. *) 
+      same task, [another_task_hep_job j' j] is false. *)
   Lemma another_task_hep_job_taskwise_antireflexive :
     forall tsk j j',
       job_of_task tsk j ->
@@ -48,7 +49,7 @@ Section FPRelationsProperties.
       relations. *)
   Section BasicProperties.
 
-    (* [hp_task] is irreflexive. *)
+    (** [hp_task] is irreflexive. *)
     Lemma hp_task_irrefl : irreflexive hp_task.
     Proof. by move=> tsk; rewrite /hp_task; case: hep_task. Qed.
 
@@ -200,6 +201,32 @@ Section FPRemarks.
   Qed.
 
 End FPRemarks.
+
+Section JLFPFP.
+   (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+
+  (** Consider any pair of JLFP and FP policies. *)
+  Context (JLFP : JLFP_policy Job) (FP : FP_policy Task).
+
+  (** If a policy is [JLFP_FP_compatible], then a job [j1] has 
+      lower priority than a job [j2] if the task of [j1] has 
+      lower priority than the task of [j2]. *)
+  Lemma not_hep_task_implies_not_hep_job: forall j1 j2,
+      JLFP_FP_compatible JLFP FP ->
+      ~~ hep_task (job_task j1) (job_task j2) ->
+      ~~ hep_job j1 j2.
+  Proof.
+    move =>  j1 j2 [NOTHEP HP] NOTHEPTSK.
+    specialize (NOTHEP j1 j2).
+    by apply contra in NOTHEP.
+  Qed.
+
+End JLFPFP.
 
 (** We add the above observation into the "Hint Database" basic_rt_facts, so Coq
     will be able to apply it automatically. *)

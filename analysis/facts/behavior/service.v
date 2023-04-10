@@ -2,6 +2,7 @@ Require Export prosa.util.all.
 Require Export prosa.behavior.all.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.definitions.schedule_prefix.
+Require Export prosa.model.task.concept.
 
 (** * Service *)
 
@@ -710,3 +711,36 @@ Section ServiceInTwoSchedules.
   Proof. move=> ? ? ?; exact: equal_prefix_implies_same_service_during. Qed.
 
 End ServiceInTwoSchedules.
+
+(** In this section we prove a lemma on the service received by a job
+    in a uniprocessor schedule. *)
+Section UniProcessor.
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+
+  (** Allow for any uniprocessor model. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_uniproc : uniprocessor_model PState.
+
+  (** Next, consider any schedule of this arrival sequence. *)
+  Variable sched : schedule PState.
+
+  (** We prove that if two jobs [j1] and [j2] receive service at the
+      same instant then [j1] is equal to [j2]. *)
+  Lemma recv_service_impl_same_job :
+    forall j1 j2 t,
+      receives_service_at sched j1 t ->
+      receives_service_at sched j2 t ->
+      j1 = j2.
+  Proof.
+    move => j1 j2 t SERV1 SERV2.
+    apply service_at_implies_scheduled_at in SERV1.
+    apply service_at_implies_scheduled_at in SERV2.
+    by apply (H_uniproc j1 j2 sched t).
+  Qed.
+
+End UniProcessor.
