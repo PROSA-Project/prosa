@@ -44,13 +44,13 @@ Section SporadicArrivals.
     move => [j [SIZE_G [PERIODIC VALID_TMIA]]].
     specialize (exists_two (task_arrivals_at_job_arrival arr_seq j)) => EXISTS_TWO.
     move : H_valid_arrival_sequence => [CONSISTENT UNIQ].
-    destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by done | by apply filter_uniq | ].
+    destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by [] | by apply filter_uniq | ].
     rewrite mem_filter in A_IN; rewrite mem_filter in B_IN.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].
     move: (ARRA); move: (ARRB); rewrite /arrivals_at => A_IN B_IN.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
-    have EQ_ARR_A : (job_arrival a = job_arrival j) by rt_eauto.
-    have EQ_ARR_B : (job_arrival b = job_arrival j) by rt_eauto.
+    have EQ_ARR_A : (job_arrival a = job_arrival j) by [].
+    have EQ_ARR_B : (job_arrival b = job_arrival j) by [].
     try ( apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j) in NEQ => // ) ||
     apply uneq_job_uneq_arr with (arr_seq := arr_seq) (tsk := job_task j) in NEQ => //.
     by rewrite EQ_ARR_A EQ_ARR_B in NEQ.
@@ -63,7 +63,7 @@ Section SporadicArrivals.
     task_arrivals_at_job_arrival arr_seq j1 = [::j1].
   Proof.
     set (task_arrivals_at_job_arrival arr_seq j1) as seq in *.
-    have J_IN_FILTER : (j1 \in seq) by apply arrives_in_task_arrivals_at; rt_auto.
+    have J_IN_FILTER : (j1 \in seq) by apply arrives_in_task_arrivals_at.
     have SIZE_CASE : size seq = 0 \/ size seq = 1 \/ size seq > 1
       by intros; now destruct (size seq) as [ | [ | ]]; try auto.
     move: SIZE_CASE => [Z|[ONE|GTONE]].

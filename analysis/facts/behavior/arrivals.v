@@ -2,6 +2,8 @@ Require Export prosa.behavior.all.
 Require Export prosa.util.all.
 Require Export prosa.model.task.arrivals.
 
+
+
 (** * Arrival Sequence *)
 
 (** First, we relate the stronger to the weaker arrival predicates. *)
@@ -515,9 +517,8 @@ Section ScheduledImpliesArrives.
   Proof.
     move=> t' LTtt'.
     apply: arrived_between_implies_in_arrivals => //.
-    - by apply: arrives_in_jobs_come_from_arrival_sequence.
-    - apply: leq_ltn_trans LTtt'.
-      by apply: arrived_between_jobs_must_arrive_to_execute.
+    apply: leq_ltn_trans LTtt'.
+    by apply: arrived_between_jobs_must_arrive_to_execute.
   Qed.
 
 End ScheduledImpliesArrives.

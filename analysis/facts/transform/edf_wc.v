@@ -152,12 +152,12 @@ Section NonIdleSwapWorkConservationLemmas.
       { rewrite /work_conserving in WC_sched. apply (WC_sched j2).
         - by unfold jobs_come_from_arrival_sequence in H_from_arr_seq; apply (H_from_arr_seq _ t2) => //.
         - rewrite/backlogged/job_ready/basic_ready_instance/pending/completed_by.
-          apply /andP; split; first (apply /andP; split) => //; last by done.
+          apply /andP; split=> [|//]; apply /andP; split=> //.
           + by rewrite /has_arrived; apply (leq_trans H_arrival_j2); apply ltnW.
           + rewrite -ltnNge. apply (leq_ltn_trans) with (service sched j2 t2).
-            * by apply service_monotonic.
-            * by apply H_completed_jobs_dont_execute. }
-      exists j_other. now rewrite  (swap_job_scheduled_other_times) //; (apply /neqP; eauto).
+            * exact: service_monotonic.
+            * exact: H_completed_jobs_dont_execute. }
+      by exists j_other; rewrite swap_job_scheduled_other_times//; apply /neqP.
   Qed.
 
 End NonIdleSwapWorkConservationLemmas.

@@ -1,6 +1,7 @@
 Require Export prosa.model.schedule.scheduled.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.facts.behavior.arrivals.
+Require Export prosa.util.tactics.
 
 (** * Correctness of the Scheduled Job(s) *)
 
@@ -41,7 +42,7 @@ Section ScheduledJobs.
       j \in scheduled_jobs_at arr_seq sched t = scheduled_at sched j t.
   Proof.
     move=> j t; rewrite mem_filter; apply: andb_idr => SCHED.
-    by apply: arrivals_before_scheduled_at; rt_eauto.
+    exact: arrivals_before_scheduled_at.
   Qed.
 
   (** Conversely, if no jobs are in the sequence, then no job is scheduled. *)
@@ -75,7 +76,7 @@ Section ScheduledJobs.
         size (scheduled_jobs_at arr_seq sched t) <= 1.
     Proof.
       move=> t; set sja := scheduled_jobs_at _ _ _; rewrite leqNgt.
-      have uniq_sja : uniq sja by apply/filter_uniq/arrivals_uniq; rt_eauto.
+      have uniq_sja : uniq sja by apply/filter_uniq/arrivals_uniq.
       apply/negP => /exists_two/(_ uniq_sja)[j1 [j2 [j1j2 [j1sja j2sja]]]].
       by apply/j1j2/(H_uni j1 j2 sched t); rewrite  -scheduled_jobs_at_iff.
     Qed.
@@ -144,6 +145,3 @@ Section ScheduledJobs.
   Qed.
 
 End ScheduledJobs.
-
-
-

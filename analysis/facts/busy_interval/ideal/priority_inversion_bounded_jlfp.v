@@ -108,7 +108,7 @@ Section PriorityInversionIsBounded.
     move: (PREF) => [_ [_ [_ /andP [T _]]]].
     move: H_valid_schedule => [COARR MBR].
     have [NEQ|NEQ] := boolP ((t2-t1) <= blocking_bound (job_arrival j - t1)).
-    { apply leq_trans with (t2 -t1); last by done.
+    { apply leq_trans with (t2 -t1) => [|//].
       rewrite /cumulative_priority_inversion.
       rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat.
       by rewrite leq_sum //; move=> t _; destruct (priority_inversion_dec). }
@@ -116,14 +116,14 @@ Section PriorityInversionIsBounded.
                                       preemption_time arr_seq sched ppt /\
                                       t1 <= ppt <=
                                       t1 + max_length_of_priority_inversion arr_seq j t1.
-    by apply /preemption_time_exists; rt_eauto.
+    by apply /preemption_time_exists.
     apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt);
       last apply leq_trans with (ppt - t1).
     apply: priority_inversion_occurs_only_till_preemption_point =>//.
     { rewrite /cumulative_priority_inversion -[X in _ <= X]addn0 -[ppt - t1]mul1n
               -iter_addn -big_const_nat.
       by rewrite leq_sum //; move=> t _; case: priority_inversion_dec. }
-    { rewrite leq_subLR; apply leq_trans with (t1 + max_length_of_priority_inversion arr_seq j t1);first by done.
+    { rewrite leq_subLR; apply leq_trans with (t1 + max_length_of_priority_inversion arr_seq j t1) => [//|].
       by rewrite leq_add2l; apply: (H_priority_inversion_is_bounded_by_blocking j t1 t2). }
     Qed.
 

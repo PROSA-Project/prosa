@@ -50,7 +50,7 @@ Section BasicLemmas.
   Proof.
     move => j t ARRIVES /andP [ARRIVED /negP NCOMPL] [NSCHED [jlp /andP [SCHED PRIO]]].
     move: PRIO; rewrite /hep_job /FIFO -ltnNge => LT.
-    apply: NCOMPL; eapply early_hep_job_is_scheduled; rt_eauto.
+    apply: NCOMPL; apply: early_hep_job_is_scheduled => //.
     by intros t'; apply/andP; split; unfold hep_job_at, JLFP_to_JLDP, hep_job, FIFO; lia.
   Qed.
 
@@ -83,25 +83,24 @@ Section BasicLemmas.
     Proof.
       move=> j ARRIN TASK POS t1 t2 BUSY.
       rewrite /priority_inversion.cumulative_priority_inversion.
-      have -> : \sum_(t1 <= t < t2) priority_inversion_dec arr_seq sched j t = 0;
-        last by done.
+      have -> // : \sum_(t1 <= t < t2) priority_inversion_dec arr_seq sched j t = 0.
       rewrite big_nat_eq0 => t /andP[T1 T2].
       apply /eqP; rewrite eqb0.
       apply /negP => /priority_inversion_P INV.
-      feed_n 3 INV; rt_eauto.
+      feed_n 3 INV => //.
       move: INV => [NSCHED [j__lp /andP [SCHED LP]]].
       move: LP; rewrite /hep_job /FIFO -ltnNge => LT.
       have COMPL: completed_by sched j t.
-      { apply: early_hep_job_is_scheduled; rt_eauto.
+      { apply: early_hep_job_is_scheduled => //.
         move=> t'; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FIFO -ltnNge.
         by apply/andP; split; first apply ltnW. }
       move : BUSY => [LE [QT [NQT /andP[ARR1 ARR2]]]].
       move: T1; rewrite leq_eqVlt => /orP [/eqP EQ | GT].
-      { subst t; apply completed_implies_scheduled_before in COMPL; rt_eauto.
+      { subst t; apply completed_implies_scheduled_before in COMPL => //.
         by case: COMPL => [t' [/andP [ARR3 LT__temp] SCHED__temp]]; lia. }
       { apply: NQT; first (apply/andP; split; [exact GT | lia]).
         intros ? ARR HEP ARRB; rewrite /hep_job /FIFO in HEP.
-        eapply early_hep_job_is_scheduled; rt_eauto; first by lia.
+        eapply early_hep_job_is_scheduled => //; first lia.
         by move => t'; apply/andP; split; rewrite /hep_job_at /FIFO /JLFP_to_JLDP /hep_job //=; lia. }
     Qed.
 
@@ -120,7 +119,7 @@ Section BasicLemmas.
   Proof.
     move => j' t SCHED j_hp ARRjhp HEP.
     have EARLIER: job_arrival j_hp < job_arrival j' by rewrite -ltnNge in HEP.
-    apply: early_hep_job_is_scheduled; rt_eauto.
+    apply: early_hep_job_is_scheduled => //.
     move=> t'; apply /andP; split => //.
     by apply ltnW.
   Qed.
@@ -137,7 +136,7 @@ Section BasicLemmas.
     Lemma tasks_execute_sequentially : sequential_tasks arr_seq sched.
     Proof.
       move => j1 j2 t ARRj1 ARRj2 SAME_TASKx LT => //.
-      eapply (early_hep_job_is_scheduled); try rt_eauto.
+      apply: (early_hep_job_is_scheduled) => //.
       by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=].
     Qed.
 
@@ -160,23 +159,23 @@ Section BasicLemmas.
   Proof.
     move => j t; apply /negP => /andP [/andP [SCHED1 NCOMPL] SCHED2].
     case SJA: (scheduled_job_at arr_seq sched t) => [j'|].
-    { move: SJA; rewrite scheduled_job_at_iff //; rt_eauto => SCHED'.
+    { move: SJA; rewrite scheduled_job_at_iff // => SCHED'.
       have: ~~ hep_job j j'.
       { apply: H_no_superfluous_preemptions; last exact: SCHED'.
         by repeat (apply /andP ; split). }
       rewrite /hep_job /fifo.FIFO -ltnNge => EARLIER.
-      eapply (early_hep_job_is_scheduled arr_seq ) in SCHED1;  rt_eauto.
-      - apply scheduled_implies_not_completed in SCHED'; rt_eauto.
+      eapply (early_hep_job_is_scheduled arr_seq) with (JLFP:=FIFO Job) in SCHED1 => //.
+      - apply scheduled_implies_not_completed in SCHED' => //.
         by eapply (incompletion_monotonic sched j' t.-1 t) in SCHED'; [move: SCHED' => /negP|lia].
       - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=]. }
-    { move: SJA; rewrite scheduled_job_at_none; rt_eauto => NSCHED.
+    { move: SJA; rewrite scheduled_job_at_none => // NSCHED.
       have [j' SCHED']: exists j', scheduled_at sched j' t.
-      { apply: (H_work_conservation j t); rt_eauto.
+      { apply: (H_work_conservation j t) => //.
         apply/andP; split => //.
         rewrite /job_ready/basic_ready_instance/pending.
         apply/andP; split => //.
         have: has_arrived j t.-1; last by rewrite /has_arrived; lia.
-        apply: has_arrived_scheduled; rt_eauto. }
+        exact: has_arrived_scheduled. }
       by move: (NSCHED  j') => /negP. }
   Qed.
 

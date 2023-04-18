@@ -82,7 +82,7 @@ Section PIIdealProcessorModelLemmas.
         destruct (scheduled_at _ l _) eqn:SCHED3; rewrite //=.
         have EQ: l = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
         by subst j'; rewrite HEP.
-      - apply/hasP; exists j'.  rt_eauto.
+      - apply/hasP; exists j' => [//|].
         by rewrite H_j'_sched HEP.
     }
   Qed.
@@ -115,9 +115,8 @@ Section PIIdealProcessorModelLemmas.
     - apply/hasP.
       exists j'.
       + apply arrived_between_implies_in_arrivals; eauto 2.
-        apply/andP; split; try done.
-        by rewrite ltnS; apply H_jobs_must_arrive_to_execute.
-      + by apply/andP; split.
+        exact/andP.
+      + exact/andP.
   Qed.
 
 End PIIdealProcessorModelLemmas.

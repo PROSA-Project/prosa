@@ -1,5 +1,5 @@
-From mathcomp Require Export ssrbool.
 Require Export prosa.behavior.all.
+Require Export prosa.util.all.
 
 (** * Task Type *)
 
@@ -173,5 +173,3 @@ Section SameTask.
   Definition job_of_task (tsk : Task) (j : Job) := job_task j == tsk.
 
 End SameTask.
-
-

@@ -3,6 +3,7 @@ Require Export prosa.analysis.facts.busy_interval.ideal.busy_interval.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
+Require Export prosa.util.tactics.
 
 (** * Processor Executes HEP jobs at Preemption Point *)
 
@@ -69,7 +70,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Lemma instant_t_is_not_idle:
     ~ ideal_is_idle sched t.
   Proof.
-    by move => IDLE; exfalso; apply: not_quiet_implies_not_idle; rt_eauto.
+  by move => IDLE; exfalso; apply: not_quiet_implies_not_idle.
   Qed.
 
   (** Next we consider two cases:
@@ -107,7 +108,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
     have HEP : hep_job j' j by apply (H_priority_is_transitive j_hp).
     clear HEP' NCOMP' BEF HP ARR j_hp.
     have BACK: backlogged sched j' t.
-    { apply/andP; split; first by done.
+    { apply/andP; split=> [//|].
       apply/negP; intro SCHED'.
       move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
       by subst; apply: NOTHP.
@@ -131,16 +132,16 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
     { subst t t1; clear LEt SL.
       have ARR : job_arrival j = t2.-1.
       { apply/eqP; rewrite eq_sym eqn_leq.
-        destruct t2; first by done.
+        destruct t2 => [//|].
         rewrite ltnS -pred_Sn in INBI.
-        now rewrite -pred_Sn.
+        by rewrite -pred_Sn.
       }
-      have PEND: pending sched j t2.-1
-        by rewrite -ARR; apply job_pending_at_arrival => //; rt_eauto.
+      have PEND: pending sched j t2.-1.
+        by rewrite -ARR; apply job_pending_at_arrival.
       apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [PENDhp HEPhp]]].
       eapply NOTHP, H_priority_is_transitive; last by apply HEPhp.
       apply (H_respects_policy _ _ t2.-1); auto.
-      apply/andP; split; first by done.
+      apply/andP; split=> [//|].
       apply/negP; intros SCHED.
       move: (ideal_proc_model_is_a_uniprocessor_model _ _ sched _ SCHED Sched_jlp) => EQ.
       by subst; apply: NOTHP.
@@ -157,7 +158,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       have HEP : hep_job j' j by apply (H_priority_is_transitive j_hp').
       clear ARR HP IN HEP' NOTCOMP' j_hp'.
       have BACK: backlogged sched j' t.
-      { apply/andP; split; first by done.
+      { apply/andP; split=> [//|].
         apply/negP; intro SCHED'.
         move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
         by subst; apply: NOTHP.
@@ -195,13 +196,13 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
     move: (H_t_in_busy_interval) => /andP [GEt LEt].
     have HP := scheduled_at_preemption_time_implies_higher_or_equal_priority _ Sched_jhp.
     move: (Sched_jhp) => PENDING.
-    eapply scheduled_implies_pending in PENDING; rt_eauto.
+    eapply scheduled_implies_pending in PENDING => //.
     apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
     apply contraT; rewrite -ltnNge; intro LT; exfalso.
     feed (QUIET jhp); first by eapply CONS, Sched_jhp.
     specialize (QUIET HP LT).
     have COMP: completed_by sched jhp t by apply: completion_monotonic QUIET.
-    apply completed_implies_not_scheduled in COMP; rt_eauto.
+    apply completed_implies_not_scheduled in COMP => //.
     by move: COMP => /negP COMP; apply COMP.
   Qed.
 
@@ -220,9 +221,9 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
     { by exfalso; apply instant_t_is_not_idle. }
     exists jhp.
     repeat split.
-    - by apply scheduled_at_preemption_time_implies_arrived_between_within_busy_interval.
-    - by apply scheduled_at_preemption_time_implies_higher_or_equal_priority.
-    - by done.
+    - exact: scheduled_at_preemption_time_implies_arrived_between_within_busy_interval.
+    - exact: scheduled_at_preemption_time_implies_higher_or_equal_priority.
+    - by [].
   Qed.
 
 End ProcessorBusyWithHEPJobAtPreemptionPoints.

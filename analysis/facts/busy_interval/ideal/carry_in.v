@@ -68,42 +68,40 @@ Section BusyWindowExistence.
       busy_interval arr_seq sched j t1 t2.
   Proof.
     rename H_from_arrival_sequence into ARR, H_job_cost_positive into POS.
-    have CONSIST: consistent_arrival_times arr_seq by rt_eauto.
+    have CONSIST: consistent_arrival_times arr_seq by [].
     edestruct (exists_busy_interval_prefix
                  arr_seq CONSIST
                  sched j ARR H_priority_is_reflexive (job_arrival j))
       as [t1 [PREFIX GE]]; first by apply job_pending_at_arrival.
     move: GE => /andP [GE1 _].
     exists t1.
-    have [δ [LE QT]]:  exists δ : nat, δ < Δ /\ no_carry_in arr_seq sched (t1.+1 + δ)
-      by apply: processor_is_not_too_busy; rt_eauto.
+    have [δ [LE QT]]:  exists δ : nat, δ < Δ /\ no_carry_in arr_seq sched (t1.+1 + δ).
+      exact: processor_is_not_too_busy.
     eapply no_carry_in_implies_quiet_time with (j := j) in QT.
     have EX: exists t2, ((t1 < t2 <= t1.+1 + δ) && quiet_time_dec arr_seq sched j t2).
     { exists (t1.+1 + δ); apply/andP; split.
       - by apply/andP; split; first rewrite addSn ltnS leq_addr.
-      - by apply/quiet_time_P; rt_eauto. }
+      - exact/quiet_time_P. }
     move: (ex_minnP EX) => [t2 /andP [/andP [GTt2 LEt2] QUIET] MIN]; clear EX.
     have NEQ: t1 <= job_arrival j < t2.
-    { apply/andP; split; first by done.
+    { apply/andP; split=> [//|].
       rewrite ltnNge; apply/negP; intros CONTR.
       move: (PREFIX) => [_ [_ [NQT _]]].
       move: (NQT t2); clear NQT; move  => NQT.
       feed NQT; first by (apply/andP; split; [|rewrite ltnS]).
       by apply: NQT; apply/quiet_time_P.
     }
-    exists t2; split; last split; first by done.
-    { apply leq_trans with (t1.+1 + δ); [by done | by rewrite addSn ltn_add2l]. }
-    { move: PREFIX => [_ [QTt1 [NQT _]]]; repeat split; try done.
-      - move => t /andP [GEt LTt] QTt.
-        feed (MIN t).
-        { apply/andP; split.
-          + by apply/andP; split; last (apply leq_trans with t2; [apply ltnW | ]).
-          + by apply/quiet_time_P.
-        }
+    exists t2; split=> [//|]; split.
+    { by apply leq_trans with (t1.+1 + δ); [|rewrite addSn ltn_add2l]. }
+    { move: PREFIX => [_ [QTt1 [NQT _]]]; repeat split=> //; last first.
+        exact/quiet_time_P.
+      move => t /andP [GEt LTt] QTt.
+      feed (MIN t); last first.
         by move: LTt; rewrite ltnNge; move => /negP LTt; apply: LTt.
-      - by apply/quiet_time_P.
+      apply/andP; split.
+      + by apply/andP; split; last (apply leq_trans with t2; [apply ltnW | ]).
+      + exact/quiet_time_P.
     }
   Qed.
-
 
 End BusyWindowExistence.

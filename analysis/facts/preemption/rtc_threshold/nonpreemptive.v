@@ -43,9 +43,8 @@ Section TaskRTCThresholdFullyNonPreemptive.
       job_rtct j = 0.
   Proof.
     move=> j cj0.
-    apply/eqP; rewrite eqn_leq; apply/andP; split; last by done.
-    unfold job_rtct.
-      by rewrite cj0; compute.
+    apply/eqP; rewrite eqn_leq; apply/andP; split=> [|//].
+    by rewrite /job_rtct cj0; compute.
   Qed.
 
   (** ... and ε otherwise. *)

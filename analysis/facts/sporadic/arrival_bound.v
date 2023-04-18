@@ -57,7 +57,7 @@ Section SporadicArrivalBound.
       case ARR : (task_arrivals_between arr_seq tsk t1 t2) => [|j' js'] -> // LIM JOB.
       elim: i LIM j JOB => [LIM j JOB|i IH LIM j JOB].
       { rewrite muln0 addn0.
-        apply: job_arrival_between_ge; rt_eauto.
+        apply: job_arrival_between_ge => //.
         apply: (task_arrivals_between_subset _ tsk _ t2).
         by rewrite JOB ARR; apply mem_nth. }
       { rewrite mulnSr addnA.
@@ -73,7 +73,7 @@ Section SporadicArrivalBound.
         apply: H_sporadic_model => //=.
         { rewrite JOB /prev_j  => /eqP.
           rewrite nth_uniq; try lia; rewrite -ARR.
-          by apply: task_arrivals_between_uniq;rt_eauto. }
+          by apply: task_arrivals_between_uniq. }
         { by apply/in_arrivals_implies_arrived/(task_arrivals_between_subset _ tsk t1 t2). }
         { by apply/in_arrivals_implies_arrived/(task_arrivals_between_subset _ tsk t1 t2). }
         { apply: in_task_arrivals_between_implies_job_of_task.
@@ -82,7 +82,7 @@ Section SporadicArrivalBound.
           exact: IN_j. }
         { rewrite /prev_j JOB.
           have SORTED : sorted by_arrival_times (j' :: js')
-            by rewrite -ARR; apply task_arrivals_between_sorted; rt_eauto.
+            by rewrite -ARR; apply task_arrivals_between_sorted.
           eapply (sorted_leq_nth _ _ _ SORTED); try lia.
           - rewrite unfold_in simpl_predE; lia.
           - rewrite unfold_in simpl_predE; lia. } }
@@ -109,15 +109,15 @@ Section SporadicArrivalBound.
     (* Now that we can use [nth], let's proceed with the actual proof. *)
     set j_last := (nth j (task_arrivals_between arr_seq tsk t1 t2) n.-1).
     have LAST : job_arrival j_last  < t2.
-    { apply: job_arrival_between_lt; rt_eauto.
+    { apply: job_arrival_between_lt => //.
       apply: task_arrivals_between_subset.
       apply mem_nth.
       by move: H_num_arrivals; rewrite /number_of_task_arrivals => ->; lia. }
     have DIST :  t1 + task_min_inter_arrival_time tsk * n.-1 <= job_arrival j_last.
     { apply: arrival_of_nth_job; auto;
         first by rewrite [number_of_task_arrivals arr_seq tsk t1 _]H_num_arrivals; lia.
-      by rewrite /j_last //=. }
-    by lia.
+      by []. }
+    lia.
   Qed.
 
   (** Based on the above lemma, it is easy to see that

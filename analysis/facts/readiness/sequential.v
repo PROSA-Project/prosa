@@ -70,10 +70,9 @@ Section SequentialTasksReadiness.
     intros j1 j2 t ARR1 ARR2 SAME LT SCHED.
     destruct (boolP (job_ready sched j2 t)) as [READY | NREADY].
     - move: READY => /andP [PEND /allP ALL]; apply: ALL.
-      rewrite mem_filter; apply/andP; split; first by done.
-      by apply arrived_between_implies_in_arrivals => //.
-    - exfalso; apply/(negP NREADY)/job_scheduled_implies_ready => //.
-      exact: (valid_schedule_jobs_must_be_ready_to_execute sched arr_seq).
+      rewrite mem_filter; apply/andP; split=> [//|].
+      exact: arrived_between_implies_in_arrivals.
+    - by exfalso; apply/(negP NREADY)/job_scheduled_implies_ready.
   Qed.
 
   (** Finally, we show that the sequential readiness model is a
@@ -91,7 +90,7 @@ Section SequentialTasksReadiness.
     { destruct (boolP (job_ready sched j t)) as [READY | NREADY].
       { by exists j; repeat split; eauto using H_priority_is_reflexive. }
       { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [jhp IN NCOMP].
-        apply arrives_in_task_arrivals_before_implies_arrives_before in IN; last by done.
+        apply arrives_in_task_arrivals_before_implies_arrives_before in IN => [|//].
         by exfalso; move: LE; rewrite leqn0 => /eqP EQ; rewrite EQ in IN.
       }
     }
@@ -104,7 +103,7 @@ Section SequentialTasksReadiness.
         have ARR' : arrives_in arr_seq j'.
         { by eapply arrives_in_task_arrivals_implies_arrived; eauto 2. }
         have PEND' : pending sched j' t.
-        { apply/andP; split; last by done.
+        { apply/andP; split=> [|//].
           move: PEND => /andP [LE _].
           by unfold has_arrived in *; lia.
         }

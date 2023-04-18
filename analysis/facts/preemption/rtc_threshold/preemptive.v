@@ -37,7 +37,7 @@ Section TaskRTCThresholdFullyPreemptiveModel.
     intros; split.
     - by rewrite /task_rtc_bounded_by_cost.
     - intros j ARR TSK.
-      apply leq_trans with (job_cost j); rt_eauto.
+      apply leq_trans with (job_cost j) => //.
       by move: TSK => /eqP <-; apply H_valid_job_cost.
   Qed.
     

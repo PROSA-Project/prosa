@@ -3,6 +3,7 @@ Require Export prosa.analysis.facts.model.ideal.service_of_jobs.
 Require Export prosa.analysis.facts.busy_interval.quiet_time.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.util.tactics.
 
 (** * Existence of No Carry-In Instant *)
 
@@ -70,9 +71,9 @@ Section ExistsNoCarryIn.
   Proof.
     move=> j t ARR PEND IDLE.
     apply H_job_ready in PEND => //; move: PEND => [jhp [ARRhp [READYhp _]]].
-    move: IDLE; rewrite is_idle_iff => /eqP; rewrite scheduled_job_at_none; rt_eauto => IDLE.
-    have [j_other SCHED]:  exists j_other : Job, scheduled_at sched j_other t
-      by apply: H_work_conserving; rt_eauto; apply/andP; split => //.
+    move: IDLE; rewrite is_idle_iff => /eqP; rewrite scheduled_job_at_none => // IDLE.
+    have [j_other SCHED]:  exists j_other : Job, scheduled_at sched j_other t.
+      by apply: H_work_conserving ARRhp _; apply/andP.
     by move: (IDLE j_other) => /negP.
   Qed.
 
@@ -84,7 +85,7 @@ Section ExistsNoCarryIn.
   Proof.
     move=> t IDLE j ARR HA.
     apply/negPn/negP =>  NCOMP.
-    have PEND : job_pending_at j t by apply/andP; split; rt_eauto; rewrite /has_arrived ltnW.
+    have PEND : job_pending_at j t by apply/andP; split; rewrite // /has_arrived ltnW.
     by apply: (pending_job_implies_not_idle j t).
   Qed.
 
@@ -97,7 +98,7 @@ Section ExistsNoCarryIn.
     move=> t IDLE j ARR HA.
     apply/negPn/negP; intros NCOMP.
     have PEND : job_pending_at j t.
-    { apply/andP; split; rt_eauto; rewrite /has_arrived.
+    { apply/andP; split; rewrite // /has_arrived.
       apply/contra; last exact NCOMP.
       by apply/completion_monotonic. }
     by apply: (pending_job_implies_not_idle j t).
@@ -161,8 +162,8 @@ Section ExistsNoCarryIn.
       Proof.
         unfold total_service.
         rewrite -{3}[Δ]addn0 -{2}(subnn t) addnBA // [in X in _ <= X]addnC.
-        apply service_of_jobs_le_length_of_interval'; rt_auto.
-        by eapply arrivals_uniq; rt_eauto.
+        apply service_of_jobs_le_length_of_interval' => //.
+        exact: arrivals_uniq.
       Qed.
 
       (** Next we consider two cases:
@@ -178,13 +179,12 @@ Section ExistsNoCarryIn.
       Proof.
         unfold total_service; intros LT.
         rewrite -{3}[Δ]addn0 -{2}(subnn t) addnBA // [Δ + t]addnC in LT.
-        eapply low_service_implies_existence_of_idle_time in LT; rt_eauto.
+        eapply low_service_implies_existence_of_idle_time in LT => //.
         move: LT => [t_idle [/andP [LEt GTe] IDLE]].
         move: LEt; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
         { exists 0; split => //.
           rewrite addn0; subst t_idle => s ARR BEF.
-          apply idle_instant_implies_no_carry_in_at_t_pl_1 in IDLE => //.
-          by apply IDLE. }
+          by apply idle_instant_implies_no_carry_in_at_t_pl_1 in IDLE. }
         have EX: exists γ, t_idle = t + γ.
         { by exists (t_idle - t); rewrite subnKC // ltnW. }
         move: EX => [γ EQ]; subst t_idle; rewrite ltn_add2l in GTe.
@@ -193,7 +193,7 @@ Section ExistsNoCarryIn.
         - apply leq_trans with γ. by rewrite prednK. by rewrite ltnW.
         - rewrite -subn1 -addn1 -addnA subnKC //.
           intros s ARR BEF.
-          apply idle_instant_implies_no_carry_in_at_t; rt_eauto.
+          exact: idle_instant_implies_no_carry_in_at_t.
       Qed.
 
       (** In the second case, the total service within the time
@@ -210,13 +210,13 @@ Section ExistsNoCarryIn.
         unfold total_service; intros EQserv.
         move: (H_workload_is_bounded t); move => WORK.
         have EQ: total_workload 0 (t + Δ) = service_of_jobs sched predT (arrivals_between 0 (t + Δ)) 0 (t + Δ).
-        { have CONSIST: consistent_arrival_times arr_seq by rt_eauto.
+        { have CONSIST: consistent_arrival_times arr_seq by [].
           have COMPL := all_jobs_have_completed_impl_workload_eq_service
                           _ arr_seq CONSIST sched
                           H_jobs_must_arrive_to_execute
                           H_completed_jobs_dont_execute
                           predT 0 t t.
-          feed_n 2 COMPL; rt_auto.
+          feed_n 2 COMPL => //.
           { intros j A B; apply H_no_carry_in.
             - eapply in_arrivals_implies_arrived; eauto 2.
             - eapply in_arrivals_implies_arrived_between in A; eauto 2.
@@ -224,17 +224,17 @@ Section ExistsNoCarryIn.
           apply/eqP; rewrite eqn_leq; apply/andP; split;
             last by apply service_of_jobs_le_workload.
           rewrite /total_workload (workload_of_jobs_cat arr_seq t); last first.
-          apply/andP; split; [by done | by rewrite leq_addr].
-          rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t); try done; first last.
-          { by apply/andP; split; [by done | by rewrite leq_addr]. }
+            by apply/andP; split; [|rewrite leq_addr].
+          rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t)//; first last.
+          { by apply/andP; split; [|rewrite leq_addr]. }
           rewrite COMPL -addnA leq_add2l.
           rewrite -service_of_jobs_cat_arrival_interval; last first.
-          apply/andP; split; [by done| by rewrite leq_addr].
+            by apply/andP; split; [|rewrite leq_addr].
           rewrite EQserv.
           by apply H_workload_is_bounded.
         }
         intros s ARR BEF.
-        by eapply workload_eq_service_impl_all_jobs_have_completed; rt_eauto.
+        exact: workload_eq_service_impl_all_jobs_have_completed.
       Qed.
 
     End ProcessorIsNotTooBusyInduction.

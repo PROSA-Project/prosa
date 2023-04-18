@@ -30,7 +30,7 @@ Section SwappedFacts.
   Proof.
     rewrite /sched' => <- t.
     rewrite /swapped /replace_at.
-    case: (boolP (t1 == t)); last by done.
+    case: (boolP (t1 == t)) => [|//].
     by move /eqP ->.
   Qed.
 
@@ -227,9 +227,8 @@ Section SwappedFacts.
   Proof.
     move => t le_tt1 j.
     rewrite /service.
-    rewrite -!service_at_other_times_invariant //; left; first by done.
-    apply leq_trans with (n := t1) => //;
-      by apply ltnW.
+    rewrite -!service_at_other_times_invariant //; left=> //.
+    by apply leq_trans with (n := t1) => //; apply: ltnW.
   Qed.
 
   (** Likewise, we observe that, *after* t2, the swapped schedule again does not
@@ -243,8 +242,8 @@ Section SwappedFacts.
     move => t t2t j.
     move: H_well_ordered. rewrite leq_eqVlt => /orP [/eqP EQ|t1_lt_t2];
       first by apply trivial_swap_service_invariant.
-    have TIME: 0 <= t1 < t
-      by apply /andP; split; try apply ltn_trans with (n := t2); done.
+    have TIME: 0 <= t1 < t.
+      by apply /andP; split; try apply ltn_trans with (n := t2).
     rewrite /service !service_in_replaced// /service_at// /replace_at //.
     rewrite ifT// ifT// ifF;
       last by apply ltn_eqF; exact.

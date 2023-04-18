@@ -146,12 +146,11 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       move: TSK => /eqP TSK; move: POSt; rewrite /valid_job_cost TSK ZERO leqn0; move => /eqP Z.
       by rewrite /job_response_time_bound /completed_by Z.
     }
-    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L).
-    all: rt_eauto.
-    rewrite subKn; first by done.
+    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L) => //.
+    rewrite subKn//.
     rewrite /task_last_nonpr_segment  -(leq_add2r 1) subn1 !addn1 prednK; last first.
     - rewrite /last0 -nth_last.
-      apply HYP3; try by done.
+      apply HYP3 => //.
       rewrite -(ltn_add2r 1) !addn1 prednK //.
       move: (number_of_preemption_points_in_task_at_least_two
                _ _ H_valid_model_with_fixed_preemption_points _ H_tsk_in_ts POSt) => Fact2.
@@ -159,9 +158,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       by rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2.
     - apply leq_trans with (task_max_nonpreemptive_segment tsk).
       + by apply last_of_seq_le_max_of_seq.
-      + rewrite -END; last by done.
-        apply ltnW; rewrite ltnS; try done.
-        by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
+      + rewrite -END// ltnW// ltnS//.
+        exact: max_distance_in_seq_le_last_element_of_seq.
   Qed.
 
 End RTAforFixedPreemptionPointsModelwithArrivalCurves.

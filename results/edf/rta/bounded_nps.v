@@ -8,6 +8,7 @@ Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded.
 Require Import prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded_jlfp.
 Require Export prosa.results.edf.rta.bounded_pi.
+Require Export prosa.util.tactics.
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
@@ -234,14 +235,14 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Proof.
       move=> j t1 t2 ARR TSK BUSY; rewrite /max_length_of_priority_inversion /blocking_bound.
       move: BUSY => [TT [QT [_ LE]]]; move: LE => /andP [GE LT].
-      apply: leq_trans;
-        first by apply: priority_inversion_is_bounded_by_max_np_segment; rt_eauto.
+      apply: leq_trans.
+        exact: priority_inversion_is_bounded_by_max_np_segment.
       apply /bigmax_leq_seqP => j' JINB NOTHEP.
       have ARR': arrives_in arr_seq j'
         by apply: in_arrivals_implies_arrived; exact: JINB.
       apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
         first by apply H_all_jobs_from_taskset.
-      apply in_arrivals_implies_arrived_between in JINB; last by rt_eauto.
+      apply in_arrivals_implies_arrived_between in JINB => [|//].
       move: JINB; move => /andP [_ TJ'].
       repeat (apply/andP; split); last first.
       { rewrite /EDF -ltnNge in NOTHEP.
@@ -292,8 +293,8 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Theorem uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments:
       response_time_bounded_by tsk R.
     Proof.
-      eapply uniprocessor_response_time_bound_edf; rt_eauto.
-      { apply: priority_inversion_is_bounded; rt_eauto.
+      apply: uniprocessor_response_time_bound_edf; eauto 4 with basic_rt_facts.
+      { apply: priority_inversion_is_bounded => //.
         apply: priority_inversion_is_bounded_by_blocking. }
       - move=> A BPI_SP.
         by apply H_R_is_maximum, search_space_inclusion.

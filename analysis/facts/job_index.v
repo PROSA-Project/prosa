@@ -49,10 +49,10 @@ Section JobIndexLemmas.
       move : ARR_LT => [xs ARR_CAT].
       apply eq_ind_in_seq with (xs := task_arrivals_up_to_job_arrival arr_seq j2) => //.
       - by rewrite -/(job_index _ _) -IND -ARR_CAT index_cat ifT;
-          try apply arrives_in_task_arrivals_up_to; rt_eauto.
+          try apply arrives_in_task_arrivals_up_to.
       - rewrite -ARR_CAT mem_cat; apply /orP.
-        by left; apply arrives_in_task_arrivals_up_to; rt_eauto.
-      - by apply arrives_in_task_arrivals_up_to; rt_eauto.
+        by left; apply arrives_in_task_arrivals_up_to.
+      - by apply arrives_in_task_arrivals_up_to.
     Qed.
 
     (** And similarly if [j1] arrives after [j2], we show that
@@ -66,10 +66,10 @@ Section JobIndexLemmas.
       move: LT => [xs ARR_CAT].
       apply (eq_ind_in_seq _ _ (task_arrivals_up_to_job_arrival arr_seq j1)) => //.
       - by rewrite -/(job_index _ _) IND -ARR_CAT index_cat ifT;
-          try apply arrives_in_task_arrivals_up_to; rt_eauto.
-      - by apply arrives_in_task_arrivals_up_to; rt_eauto.
+          try apply arrives_in_task_arrivals_up_to.
+      - by apply arrives_in_task_arrivals_up_to.
       - rewrite -ARR_CAT mem_cat; apply /orP.
-        by left; apply arrives_in_task_arrivals_up_to => //; rt_eauto.
+        by left; apply arrives_in_task_arrivals_up_to.
     Qed.
 
     (** And finally we show that irrespective of the relation between the arrival
@@ -110,8 +110,8 @@ Section JobIndexLemmas.
     apply Bool.not_true_is_false; intro T.
     move : T; rewrite mem_filter => /andP [/eqP SM_TSK JB_IN_ARR].
     apply mem_bigcat_nat_exists in JB_IN_ARR; move : JB_IN_ARR => [ind [JB_IN IND_INTR]].
-    have ARR : job_arrival j1 =  ind by rt_eauto.
-    by lia.
+    have ARR : job_arrival j1 =  ind by [].
+    lia.
   Qed.
 
   (** Given jobs [j1] and [j2] in [arrivals_between_P arr_seq P t1 t2], the fact that
@@ -129,8 +129,8 @@ Section JobIndexLemmas.
     rewrite mem_filter; apply /andP; split => //.
     apply mem_bigcat_nat_exists in J2ARR; move : J2ARR => [i [J2_IN INEQ]].
     apply mem_bigcat_nat with (j := i) => //.
-    apply job_arrival_at in J2_IN; rt_eauto.
-    by lia.
+    apply job_arrival_at in J2_IN => //.
+    lia.
   Qed.
 
   (** We show that jobs in the sequence [arrivals_between_P] are ordered by their arrival times, i.e.,
@@ -145,14 +145,14 @@ Section JobIndexLemmas.
   Proof.
     intros * IN1 IN2 LE.
     move_neq_up LT; move_neq_down LE.
-    rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between_P in IN1; rt_eauto.
+    rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between_P in IN1 => //.
     rewrite !index_cat ifT; last by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     rewrite ifF.
     - eapply leq_trans; [ | by erewrite leq_addr].
       rewrite index_mem.
       by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     - apply Bool.not_true_is_false; intro T.
-      by apply job_arrival_between_P in T; try lia; rt_eauto.
+      by apply job_arrival_between_P in T; try lia.
   Qed.
 
   (** We observe that index of job [j1] is same in the
@@ -163,11 +163,11 @@ Section JobIndexLemmas.
     index j1 (task_arrivals_up_to_job_arrival arr_seq j1) = index j1 (task_arrivals_up_to_job_arrival arr_seq j2).
   Proof.
     rewrite leq_eqVlt => /orP [/eqP LT|LT]; first by rewrite /task_arrivals_up_to_job_arrival LT H_same_task.
-    have CONSISTENT : consistent_arrival_times arr_seq by rt_eauto.
+    have CONSISTENT : consistent_arrival_times arr_seq by [].
     specialize (arrival_lt_implies_strict_prefix arr_seq CONSISTENT (job_task j1) j1 j2) => SUB.
     feed_n 5 SUB => //; move: SUB => [xs2 [NEMPT2 CAT2]].
     rewrite -CAT2 index_cat ifT //=.
-    by apply arrives_in_task_arrivals_up_to => //.
+    by apply arrives_in_task_arrivals_up_to.
   Qed.
 
   (** We show that the [job_index] of a job [j1] is strictly less than
@@ -175,8 +175,7 @@ Section JobIndexLemmas.
   Lemma index_job_lt_size_task_arrivals_up_to_job:
     job_index arr_seq j1 < size (task_arrivals_up_to_job_arrival arr_seq j1).
   Proof.
-    rewrite /job_index index_mem.
-    by apply arrives_in_task_arrivals_up_to; rt_eauto.
+    by rewrite /job_index index_mem; apply: arrives_in_task_arrivals_up_to.
   Qed.
 
   (** Finally, we show that a lower job index implies an earlier arrival time. *)
@@ -187,14 +186,14 @@ Section JobIndexLemmas.
     intros IND_LT.
     rewrite /job_index in IND_LT.
     move_neq_up ARR_GT; move_neq_down IND_LT.
-    rewrite job_index_same_in_task_arrivals /task_arrivals_up_to_job_arrival; try by lia.
-    rewrite -> task_arrivals_cat with (t_m := job_arrival j1); try by lia.
-    rewrite -H_same_task !index_cat ifT; try by apply arrives_in_task_arrivals_up_to; rt_eauto.
+    rewrite job_index_same_in_task_arrivals /task_arrivals_up_to_job_arrival; try lia.
+    rewrite -> task_arrivals_cat with (t_m := job_arrival j1); try lia.
+    rewrite -H_same_task !index_cat ifT; try by apply arrives_in_task_arrivals_up_to => //.
     rewrite ifF.
     - by eapply leq_trans;
         [apply index_job_lt_size_task_arrivals_up_to_job | rewrite leq_addr].
     - apply Bool.not_true_is_false; intro T.
-      by apply job_arrival_between_P in T; try lia; rt_eauto.
+      by apply job_arrival_between_P in T; try lia.
   Qed.
 
   (** We show that if job [j1] arrives earlier than job [j2]
@@ -213,7 +212,7 @@ Section JobIndexLemmas.
   Lemma job_index_minus_one_lt_size_task_arrivals_up_to:
     job_index arr_seq j1 - 1 < size (task_arrivals_up_to_job_arrival arr_seq j1).
   Proof.
-    apply leq_ltn_trans with (n := job_index arr_seq j1); try by lia.
+    apply leq_ltn_trans with (n := job_index arr_seq j1); try lia.
     by apply index_job_lt_size_task_arrivals_up_to_job.
   Qed.
 
@@ -224,8 +223,8 @@ Section JobIndexLemmas.
   Proof.
     rewrite lt0n; apply /eqP; intro Z.
     apply size0nil in Z.
-    have J_IN : (j1 \in task_arrivals_up_to_job_arrival arr_seq j1)
-      by apply arrives_in_task_arrivals_up_to => //; rt_eauto.
+    have J_IN : (j1 \in task_arrivals_up_to_job_arrival arr_seq j1).
+      by apply arrives_in_task_arrivals_up_to.
     by rewrite Z in J_IN.
   Qed.
 
@@ -268,8 +267,8 @@ Section PreviousJob.
   Lemma prev_job_index:
     index (prev_job arr_seq j) (task_arrivals_up_to_job_arrival arr_seq j) = job_index arr_seq j - 1.
   Proof.
-    apply index_uniq; last by apply uniq_task_arrivals; rt_eauto.
-    apply leq_ltn_trans with (n := job_index arr_seq j); try by lia.
+    apply index_uniq; last by exact: uniq_task_arrivals.
+    apply leq_ltn_trans with (n := job_index arr_seq j); try lia.
     by apply index_job_lt_size_task_arrivals_up_to_job.
   Qed.
 
@@ -288,7 +287,7 @@ Section PreviousJob.
   Proof.
     rewrite /prev_job -index_mem index_uniq;
       try by apply job_index_minus_one_lt_size_task_arrivals_up_to.
-    by apply uniq_task_arrivals; rt_eauto.
+    by apply uniq_task_arrivals.
   Qed.
 
   (** We observe that for any job [j] the arrival time of [prev_job j] is
@@ -301,7 +300,7 @@ Section PreviousJob.
     apply mem_bigcat_nat_exists in PREV_IN; move : PREV_IN => [i [PREV_IN INEQ]].
     move : H_valid_arrival_sequence => [CONSISTENT UNIQ].
     apply CONSISTENT in PREV_IN; rewrite -PREV_IN in INEQ.
-    by lia.
+    lia.
   Qed.
 
   (** We show that for any job [j] the job index of [prev_job j] is one less
@@ -312,10 +311,10 @@ Section PreviousJob.
   Proof.
     intros NZ_IND.
     rewrite -prev_job_index.
-    apply job_index_same_in_task_arrivals => //; rt_eauto.
-    - by apply prev_job_arr.
-    - by apply prev_job_task.
-    - by apply prev_job_arr_lte.
+    apply: job_index_same_in_task_arrivals => //.
+    - exact: prev_job_arr.
+    - exact: prev_job_task.
+    - exact: prev_job_arr_lte.
   Qed.
 
   (** We also show that for any job [j] there are no task arrivals
@@ -330,16 +329,16 @@ Section PreviousJob.
     - rewrite EQ.
       apply/eqP/negPn/negP; rewrite -has_filter => /hasP [j' IN /eqP TASK].
       apply mem_bigcat_nat_exists in IN; move : IN => [i [J'_IN ARR_INEQ]].
-      by lia.
+      lia.
     - apply/eqP/negPn/negP; rewrite -has_filter => /hasP [j3 IN /eqP TASK].
       apply mem_bigcat_nat_exists in IN; move : IN => [i [J3_IN ARR_INEQ]].
       have J3_ARR : (arrives_in arr_seq j3) by apply in_arrseq_implies_arrives with (t := i).
-      apply job_arrival_at in J3_IN; rt_eauto; rewrite -J3_IN in ARR_INEQ.
+      apply job_arrival_at in J3_IN => //; rewrite -J3_IN in ARR_INEQ.
       move : ARR_INEQ => /andP [PJ_L_J3 J3_L_J].
       apply (earlier_arrival_implies_lower_index arr_seq H_valid_arrival_sequence _ _) in PJ_L_J3 => //; try by
           rewrite prev_job_task.
       + apply (earlier_arrival_implies_lower_index arr_seq H_valid_arrival_sequence _ _) in J3_L_J => //.
-        by rewrite prev_job_index_j in PJ_L_J3; try by lia.
+        by rewrite prev_job_index_j in PJ_L_J3; try lia.
       + by apply prev_job_arr.
   Qed.
 
@@ -365,16 +364,15 @@ Section PreviousJob.
     apply mem_bigcat_nat_exists in JK_IN; move : JK_IN => [i [JK_IN I_INEQ]].
     have JK_ARR : (arrives_in arr_seq jk) by apply in_arrseq_implies_arrives with (t := i) => //.
     have INDJK : (index jk (task_arrivals_up_to_job_arrival arr_seq j) = k).
-    { apply index_uniq => //.
-      by apply uniq_task_arrivals => //; rt_eauto. }
+    { by apply: index_uniq => //; apply: uniq_task_arrivals. }
     repeat split => //.
     { rewrite -> diff_jobs_iff_diff_indices => //; eauto.
       rewrite /job_index; rewrite [in X in _ <> X] (job_index_same_in_task_arrivals _ _ jk j) => //.
-      - rewrite index_uniq -/(job_index arr_seq j)=> //; last by apply uniq_task_arrivals; rt_eauto.
-        by lia.
-      - by apply job_arrival_at in JK_IN; rt_eauto; rewrite -JK_IN in I_INEQ. }
+      - rewrite index_uniq -/(job_index arr_seq j)=> //; last by apply uniq_task_arrivals.
+        lia.
+      - by apply job_arrival_at in JK_IN => //; rewrite -JK_IN in I_INEQ. }
     { rewrite /job_index; rewrite [in X in X = _] (job_index_same_in_task_arrivals _ _ jk j) => //.
-      by apply job_arrival_at in JK_IN; rt_eauto; rewrite -JK_IN in I_INEQ. }
+      by apply job_arrival_at in JK_IN => //; rewrite -JK_IN in I_INEQ. }
   Qed.
 
 End PreviousJob.

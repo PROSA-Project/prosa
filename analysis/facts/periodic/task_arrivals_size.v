@@ -63,19 +63,19 @@ Section TaskArrivalsSize.
     destruct (size (task_arrivals_at arr_seq tsk t)); now left.
     specialize (exists_two (task_arrivals_at arr_seq tsk t)) => EXISTS_TWO.
     move : H_valid_arrival_sequence => [CONSISTENT UNIQ].
-    destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by done | by apply filter_uniq | ].
+    destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by [] | by apply filter_uniq | ].
     rewrite mem_filter in A_IN; rewrite mem_filter in B_IN.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].
     move: (ARRA); move: (ARRB); rewrite /arrivals_at => A_IN B_IN.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
-    have SPO : respects_sporadic_task_model arr_seq tsk; try by rt_auto.
-    have EQ_ARR_A : (job_arrival a = t) by rt_eauto.
-    have EQ_ARR_B : (job_arrival b = t) by rt_eauto.
-    specialize (SPO a b); feed_n 6 SPO => //; try by lia.
+    have SPO : respects_sporadic_task_model arr_seq tsk => [//|].
+    have EQ_ARR_A : (job_arrival a = t) by [].
+    have EQ_ARR_B : (job_arrival b = t) by [].
+    specialize (SPO a b); feed_n 6 SPO => //; first lia.
     rewrite EQ_ARR_A EQ_ARR_B in SPO.
     rewrite /task_min_inter_arrival_time /periodic_as_sporadic in SPO.
-    have POS : task_period tsk > 0 by auto.
-    by lia.
+    have POS : task_period tsk > 0 by [].
+    lia.
   Qed.
 
   (** We show that the size of task arrivals (strictly) between two consecutive arrival
@@ -129,8 +129,7 @@ Section TaskArrivalsSize.
       intros n l; rewrite /l.
       move : (jobs_exists_later n) => [j' [ARR [TSK [ARRIVAL IND]]]].
       apply (only_j_in_task_arrivals_at_j
-               arr_seq H_valid_arrival_sequence tsk) in ARR => //;
-        last by rt_auto.
+               arr_seq H_valid_arrival_sequence tsk) in ARR => //.
       rewrite /task_arrivals_at_job_arrival TSK in ARR.
       by rewrite -ARRIVAL ARR.
     Qed.

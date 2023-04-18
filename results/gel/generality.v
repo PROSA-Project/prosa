@@ -231,36 +231,35 @@ Section GeneralityOfGEL.
           have [LT_ARR|] := ltnP (job_arrival j') (job_arrival j).
           { exfalso.
             have DIFF: ~ same_task j' j; last by contradiction.
-            apply/negP/sequential_tasks_different_tasks; rt_eauto.
+            apply/negP/sequential_tasks_different_tasks => //.
             exact: backlogged_implies_incomplete. }
           { rewrite /hep_job_at/GEL/JLFP_to_JLDP/hep_job/job_priority_point.
             by move: SAME; rewrite /same_task => /eqP ->; lia. } }
         { have HFP: hp_task (job_task j) (job_task j').
-          { apply: H_unique_fixed_priorities; rt_eauto;
-              first by rewrite same_task_sym.
+          { apply: H_unique_fixed_priorities => //.
+              by rewrite same_task_sym.
             move: (RESPECTED j' j t ARR PT BL SCHED).
             by rewrite /hep_job_at/FP_to_JLFP/JLFP_to_JLDP/hep_job. }
-          by apply: (backlogged_job_has_lower_gel_prio _ _ sched t); rt_eauto.
+          exact: (backlogged_job_has_lower_gel_prio _ _ sched t).
         } }
       { rewrite /hep_job_at/FP_to_JLFP/JLFP_to_JLDP/hep_job.
         case: (boolP (same_task j' j)); first by rewrite /same_task => /eqP ->.
         move=> DIFF; apply: contraT; rewrite not_hep_hp_task // => HFP.
-        have FIN: completed_by sched j (job_arrival j + `|pp_delta (job_task j') (job_task j)|)
-          by apply: H_hp_delta_rtb; rt_eauto.
+        have FIN: completed_by sched j (job_arrival j + `|pp_delta (job_task j') (job_task j)|).
+          exact: H_hp_delta_rtb.
         move: (RESPECTED j' j t ARR PT BL SCHED).
         rewrite /hep_job_at/GEL/JLFP_to_JLDP/hep_job/job_priority_point => PRIO.
-        have POS: (pp_delta (job_task j') (job_task j) >= 0)%R
-                    by apply: H_hp_delta_pos; rt_eauto.
+        have POS: (pp_delta (job_task j') (job_task j) >= 0)%R.
+          exact: H_hp_delta_pos.
         have: completed_by sched j t; last first.
         { have: ~ completed_by sched j t => [|//].
-          by apply/negP/scheduled_implies_not_completed; rt_eauto. }
+          by apply/negP/scheduled_implies_not_completed. }
         { apply: completion_monotonic; last exact: FIN.
           move: POS; rewrite /pp_delta.
           have: job_arrival j' <= t; last lia.
-          by rewrite -/(has_arrived j' t); rt_eauto. } }
+          by rewrite -/(has_arrived j' t). } }
     Qed.
 
   End GELConditionallyGeneralizesFP.
 
 End GeneralityOfGEL.
-

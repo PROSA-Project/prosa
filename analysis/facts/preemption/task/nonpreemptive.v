@@ -56,9 +56,9 @@ Section FullyNonPreemptiveModel.
     move => progr /andP [_ GE].
     move: (F (progr)) => [EQ | GT].
     { exists progr; split.
-        - by apply/andP; split; [done | rewrite leq_addr].
+        - by apply/andP; split; [|rewrite leq_addr].
         - rewrite /job_preemptable /fully_nonpreemptive_job_model.
-            by apply/orP; left; rewrite EQ.
+          by apply/orP; left; rewrite EQ.
     }
     { exists (maxn progr (job_cost j)).
       have POS: 0 < job_cost j by apply leq_trans with progr.

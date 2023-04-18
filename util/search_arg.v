@@ -76,8 +76,7 @@ Section ArgSearch.
       {
         apply IND => x /andP [a_le_x x_lt_n].
         apply: (NOT_SAT x).
-        apply /andP; split => //.
-        by rewrite ltnS; apply ltnW.
+        by apply /andP; split.
       }
       case: (boolP (a < b'.+1)) => [a_lt_b | //].
       apply ifF.
@@ -135,12 +134,10 @@ Section ArgSearch.
     - elim: (R (f n) (f q)) => //= x_is;
         first by injection x_is => <-; apply /andP; split.
       move: (IND x_is) => /andP [a_le_x x_lt_n].
-      apply /andP; split => //.
-      by rewrite ltnS ltnW.
+      by apply /andP; split.
     - move => x_is.
       move: (IND x_is) => /andP [a_le_x x_lt_n].
-      apply /andP; split => //.
-      by rewrite ltnS ltnW.
+      by apply /andP; split.
     - move => x_is.
       by injection x_is => <-; apply /andP; split.
   Qed.

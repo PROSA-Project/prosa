@@ -68,30 +68,29 @@ Section TaskRTCThresholdLimitedPreemptions.
       move: EQ; rewrite /last0 -nth_last nth_default; last by rewrite CONTR.
       by move=> EQ; move: (H_positive_cost); rewrite EQ ltnn.
     }
-    have EQ: 2 = size [::0; task_cost tsk]; first by done.
+    have EQ: 2 = size [::0; task_cost tsk] by [].
     rewrite EQ; clear EQ.
     apply subseq_leq_size.
     rewrite !cons_uniq.
-    { apply/andP; split.
-      rewrite in_cons negb_or; apply/andP; split; last by done.
-      rewrite neq_ltn; apply/orP; left; eauto 2.
-      apply/andP; split; by done. }
+    { apply/andP; split=> [|//].
+      rewrite in_cons negb_or; apply/andP; split=> [|//].
+      by rewrite neq_ltn; apply/orP; left. }
     intros t EQ; move: EQ; rewrite !in_cons.
-    move => /orP [/eqP EQ| /orP [/eqP EQ|EQ]]; last by done.
+    move => /orP[/eqP EQ | /orP[/eqP EQ|//]].
     { rewrite EQ; clear EQ.
       move: (BEG _ H_tsk_in_ts) => EQ.
       rewrite -EQ; clear EQ.
       rewrite /first0 -nth0.
       apply/(nthP 0).
-      exists 0; by done.
+      by exists 0.
     }
     { rewrite EQ; clear EQ.
       move: (END _ H_tsk_in_ts) => EQ.
       rewrite -EQ; clear EQ.
       rewrite /last0 -nth_last.
       apply/(nthP 0).
-      exists ((size (task_preemption_points tsk)).-1); last by done.
-        by rewrite -(leq_add2r 1) !addn1 prednK //.
+      exists ((size (task_preemption_points tsk)).-1) => [|//].
+      by rewrite -(leq_add2r 1) !addn1 prednK.
     }
   Qed.
 
@@ -126,14 +125,14 @@ Section TaskRTCThresholdLimitedPreemptions.
     }
     rewrite subnBA // subnBA // -addnBAC // -addnBAC // !addn1 ltnS.
     erewrite job_parameters_last_np_to_job_limited; eauto 2.
-    rewrite distances_positive_undup //; last by apply SORT__job.
+    rewrite distances_positive_undup//.
     have -> : job_cost j = last0 (undup (job_preemptive_points j)) by rewrite last0_undup; [rewrite -COST__job | apply SORT__job].
     rewrite last_seq_minus_last_distance_seq; last by apply nondecreasing_sequence_undup, SORT__job.
     apply leq_trans with( nth 0 (job_preemptive_points j) ((size (job_preemptive_points j)).-2)); first by apply undup_nth_le; eauto 2.
     have -> : task_cost tsk = last0 (task_preemption_points tsk) by rewrite COST__task.
     rewrite last_seq_minus_last_distance_seq; last by apply SORT__task.
     move: TSK__j => /eqP TSK__j; rewrite -TSK__j.
-    rewrite T4; last by done.
+    rewrite T4//.
     apply domination_of_distances_implies_domination_of_seq; try eauto 2.
     - erewrite zero_is_first_element; eauto.
     - eapply number_of_preemption_points_at_least_two; eauto 2.

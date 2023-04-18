@@ -69,8 +69,7 @@ Section Schedule.
     unfold job_ready, basic_ready_instance, basic.basic_ready_instance in *.
     set chp:= choose_highest_prio_job.
     have SERV_ZERO: 0 < service sched j t.+1.
-    { apply scheduled_implies_nonzero_service => //; last by simpl; exists t; split.
-      by apply ideal_proc_model_ensures_ideal_progress. }
+    { exact: scheduled_implies_nonzero_service. }
     have SERV_COST: service sched j t.+1 < job_cost j by apply less_service_than_cost_is_incomplete.
     move: SCHED NCOMP.
     rewrite !scheduled_at_def /sched /uni_schedule
@@ -104,7 +103,7 @@ Section Schedule.
     rewrite /nonpreemptive_schedule.
     move=> j t; elim=> [|t' IHt']; first by move=> t'; have->: t = 0 by lia.
     move=> LEQ SCHED NCOMP.
-    destruct (ltngtP t t'.+1) as [LT | _ | EQ] => //; last by rewrite -EQ.
+    destruct (ltngtP t t'.+1) as [LT | _ | EQ] => //.
     feed_n 3 IHt'=> //.
     { specialize (completion_monotonic sched j t' t'.+1) => MONO.
       feed MONO; first by lia.

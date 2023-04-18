@@ -212,7 +212,7 @@ Section Abstract_RTA.
     Fact relative_arrival_is_bounded : A < L.
     Proof.
       move: (H_job_of_tsk) => /eqP TSK.
-      edestruct H_bounded_busy_interval_exists as [t1' [t2' [_ [BOUND BUSY]]]]; rt_eauto.
+      edestruct H_bounded_busy_interval_exists as [t1' [t2' [_ [BOUND BUSY]]]] => //.
       edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
       subst t1' t2'; clear BUSY.
       apply leq_trans with (t2 - t1); last by rewrite leq_subLR.
@@ -278,7 +278,7 @@ Section Abstract_RTA.
         t2 <= job_arrival j + R.
       Proof.
         move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
-        apply leq_trans with (t1 + F); first by done.
+        apply leq_trans with (t1 + F) => [//|].
         rewrite job_arrival_eq_t1_plus_A -addnA leq_add2l.
         rewrite -(leqRW H_Asp_le_A) -(leqRW H_Asp_R_fixpoint).
         by apply H_IBF_NP_ge_param.
@@ -291,9 +291,9 @@ Section Abstract_RTA.
         completed_by sched j (job_arrival j + R).
       Proof.
         move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
-        apply completion_monotonic with t2; rt_eauto.
-        - by apply t2_le_arrival_plus_R_1.
-        - by eapply job_completes_within_busy_interval; rt_eauto.
+        apply completion_monotonic with t2 => //.
+        - exact: t2_le_arrival_plus_R_1.
+        - exact: job_completes_within_busy_interval.
       Qed.
 
     End FixpointOutsideBusyInterval1.
@@ -318,7 +318,7 @@ Section Abstract_RTA.
         t2 <= job_arrival j + R.
       Proof.
         move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
-        apply leq_trans with (t1 + (A_sp + R)); first by done.
+        apply leq_trans with (t1 + (A_sp + R)) => [//|].
         by rewrite job_arrival_eq_t1_plus_A -addnA leq_add2l leq_add2r.
       Qed.
 
@@ -329,9 +329,9 @@ Section Abstract_RTA.
         completed_by sched j (job_arrival j + R).
       Proof.
         move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
-        apply completion_monotonic with t2; try done.
-        - by apply t2_le_arrival_plus_R_2.
-        - by eapply job_completes_within_busy_interval; rt_eauto.
+        apply completion_monotonic with t2.
+        - exact: t2_le_arrival_plus_R_2.
+        - exact: job_completes_within_busy_interval.
       Qed.
 
     End FixpointOutsideBusyInterval2.
@@ -380,7 +380,7 @@ Section Abstract_RTA.
           rewrite -{2}(leqRW H_F_fixpoint).
           rewrite leq_add //.
           rewrite -H_equivalent; [ | apply relative_rtc_time_is_bounded].
-          eapply H_job_interference_is_bounded_IBFP with t2; try done.
+          eapply H_job_interference_is_bounded_IBFP with t2 => //.
           + by rewrite -ltnNge.
           + move => t1' t2' BUSY.
             edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
@@ -405,12 +405,12 @@ Section Abstract_RTA.
           task_rtct tsk <= service sched j (t1 + F).
         Proof.
           move_neq_up T; move: (T) (H_job_of_tsk) => NC /eqP TSK; move_neq_down T.
-          eapply j_receives_enough_service; rt_eauto;
-            rewrite /definitions.cumulative_interference.
+          eapply j_receives_enough_service => //.
+          rewrite /definitions.cumulative_interference.
           erewrite leq_trans; last apply H_F_fixpoint; auto.
           rewrite leq_add //.
           rewrite -H_equivalent; [ | apply relative_rtc_time_is_bounded].
-          eapply H_job_interference_is_bounded_IBFP with t2; try done.
+          eapply H_job_interference_is_bounded_IBFP with t2 => //.
           + by rewrite -ltnNge (leqRW NC).
           + intros t0 t3 BUSY.
             edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
@@ -427,7 +427,7 @@ Section Abstract_RTA.
         Proof.
           move: (H_job_of_tsk) => /eqP TSK.
           apply/negPn/negP; intros NC; move: NC => /negP NC; apply NC; move: NC => /negP NC.
-          eapply j_receives_enough_service; rt_eauto.
+          apply: j_receives_enough_service => //.
           erewrite leq_trans; [ | | apply H_Asp_R_fixpoint]; auto.
           apply leq_add; [by rewrite -TSK; apply H_valid_job_cost | ].
           eapply H_job_interference_is_bounded_IBFNP with (t2 := t2); eauto 2.

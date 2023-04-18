@@ -80,8 +80,7 @@ Section PeriodicTasksAsSporadicTasks.
   Proof.
     intros ts VALID_PERIODS H_PERIODIC tsk TSK_IN.
     specialize (H_PERIODIC tsk TSK_IN).
-    apply periodic_task_respects_sporadic_task_model => //.
-    by apply VALID_PERIODS.
+    exact: periodic_task_respects_sporadic_task_model.
   Qed.
 
 End PeriodicTasksAsSporadicTasks.

@@ -139,8 +139,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Proof.
     move: (H_valid_task_model_with_floating_nonpreemptive_regions) => [LIMJ JMLETM].
     move: (LIMJ) => [BEG [END _]].
-    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L).
-    all: rt_eauto.
+    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L) => //.
     rewrite subnn.
     intros A SP.
     apply H_R_is_maximum in SP.

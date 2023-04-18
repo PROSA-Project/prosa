@@ -1,6 +1,7 @@
 Require Export prosa.analysis.definitions.hyperperiod.
 Require Export prosa.analysis.facts.periodic.task_arrivals_size.
 Require Export prosa.util.div_mod.
+Require Export prosa.util.tactics.
 
 (** In this file we prove some simple properties of hyperperiods of periodic tasks. *)
 Section Hyperperiod.
@@ -119,7 +120,7 @@ Section PeriodicLemmas.
     rewrite mem_filter in JB_IN_HP.
     move : JB_IN_HP => /andP [/eqP TSK JB_IN]; apply mem_bigcat_nat_exists in JB_IN.
     destruct JB_IN as [i [JB_IN INEQ]].
-    apply job_arrival_at in JB_IN; rt_auto.
+    apply job_arrival_at in JB_IN => //.
     by rewrite JB_IN.
   Qed.
 
@@ -141,7 +142,7 @@ Section PeriodicLemmas.
     erewrite big_sum_eq_in_eq_sized_intervals => //; intros g G_LT.
     have OFF_G : task_offset tsk <= O_max by apply max_offset_g.
     have FG : forall v b n, v + b + n = v + n + b by intros *; lia.
-    erewrite eq_size_of_task_arrivals_seperated_by_period => //; rt_eauto; last by lia.
+    erewrite eq_size_of_task_arrivals_seperated_by_period => //; last lia.
     by rewrite FG.
   Qed.
 
@@ -185,24 +186,23 @@ Section PeriodicLemmas.
     move : (J_IN) => J_ARR; apply all_jobs_arrive_within_hyperperiod in J_IN.
     rewrite /jobs_in_hp /jobs_in_hyperperiod /task_arrivals_up_to /task_arrivals_between mem_filter in J_ARR.
     move : J_ARR =>  /andP [/eqP TSK' NTH_IN].
-    apply job_in_task_arrivals_between => //;
-                                           first by apply in_arrivals_implies_arrived in NTH_IN; rt_eauto.
-    eapply  in_arrivals_implies_arrived; first by exact NTH_IN.
+    apply job_in_task_arrivals_between => //.
+      by apply in_arrivals_implies_arrived in NTH_IN.
     apply mem_bigcat_nat_exists in NTH_IN.
     apply /andP; split => //.
     rewrite ltnS.
     apply leq_trans with (n := (job_arrival j2 - O_max) %/ HP * HP + O_max + HP); first by lia.
     rewrite leq_add2r.
     have O_M : (job_arrival j2 - O_max) %/ HP * HP <= job_arrival j2 - O_max by apply leq_trunc_div.
-    have ARR_G : job_arrival j2 >= O_max by auto.
-    by lia.
+    have ARR_G : job_arrival j2 >= O_max by [].
+    lia.
   Qed.
 
   (** We show that job [j1] arrives in its own hyperperiod. *)
   Lemma job_in_own_hp:
     j1 \in jobs_in_hyperperiod ts arr_seq ((job_arrival j1 - O_max) %/ HP * HP + O_max) tsk.
   Proof.
-    apply job_in_task_arrivals_between => //; rt_eauto.
+    apply job_in_task_arrivals_between => //.
     apply /andP; split.
     + rewrite addnC -leq_subRL => //.
       by apply leq_trunc_div.

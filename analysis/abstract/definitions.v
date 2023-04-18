@@ -140,15 +140,15 @@ Section AbstractRTADefinitions.
         move: BUSY => [[IN [QT1 NQ]] _].
         move: BUSY' => [[IN' [QT1' NQ']] _].
         move: CONTR; rewrite neq_ltn; move => /orP [LT|GT].
-        { apply NQ with t1'; try done; clear NQ.
-          apply/andP; split; first by done.
+        { apply NQ with t1' => //; clear NQ.
+          apply/andP; split=> [//|].
           move: IN IN' => /andP [_ T1] /andP [T2 _].
             by apply leq_ltn_trans with (job_arrival j).
         }
-        { apply NQ' with t1; try done; clear NQ'.
-          apply/andP; split; first by done.
+        { apply NQ' with t1 => [|//]; clear NQ'.
+          apply/andP; split=> [//|].
           move: IN IN' => /andP [T1 _] /andP [_ T2].
-            by apply leq_ltn_trans with (job_arrival j).
+          by apply leq_ltn_trans with (job_arrival j).
         }
       }
       subst t1'.
@@ -158,13 +158,13 @@ Section AbstractRTADefinitions.
         move: BUSY => [[IN [_ NQ]] QT2].
         move: BUSY' => [[IN' [_ NQ']] QT2'].
         move: CONTR; rewrite neq_ltn; move => /orP [LT|GT].
-        { apply NQ' with t2; try done; clear NQ'.
-          apply/andP; split; last by done.
+        { apply NQ' with t2 => //; clear NQ'.
+          apply/andP; split=> [|//].
           move: IN IN' => /andP [_ T1] /andP [T2 _].
           by apply leq_ltn_trans with (job_arrival j).
         }
-        { apply NQ with t2'; try done; clear NQ.
-          apply/andP; split; last by done.
+        { apply NQ with t2' => //; clear NQ.
+          apply/andP; split=> [|//].
           move: IN IN' => /andP [T1 _] /andP [_ T2].
           by apply leq_ltn_trans with (job_arrival j).
         }

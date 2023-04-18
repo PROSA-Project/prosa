@@ -48,8 +48,7 @@ Section FixpointSearch.
     rewrite /find_fixpoint_from.
     case: (eqVneq (f s') s') => [F [] <- // | _].
     rewrite -/find_fixpoint_from.
-    case: (f s' <= h) => //.
-    by apply: IH.
+    by case: (f s' <= h).
   Qed.
 
   (** Using the above fact, we observe that the result of [find_fixpoint] is a
@@ -168,7 +167,6 @@ Section FixpointSearch.
       { rewrite -/find_fixpoint_from => FFP x /andP[SX XH].
         case: (leqP (f s) x) => FSX.
         { apply: (IH (f s)) => //.
-          - by apply H_f_mono => //.
           - by lia.
           - by apply /andP; split. }
         { apply: (no_fixpoint_skipped s) => //.

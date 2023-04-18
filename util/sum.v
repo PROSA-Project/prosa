@@ -291,8 +291,7 @@ Section SumOfTwoIntervals.
   Proof.
     elim: d equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.
     rewrite !addnS !big_nat_recr => //; try by lia.
-    rewrite IHn //=; last by move=> g G_LTl; apply (eq g); lia.
-    by rewrite eq.
+    by rewrite IHn.
   Qed.
 
 End SumOfTwoIntervals.
@@ -336,8 +335,8 @@ Section SumOverPartitions.
       by move=> ??; apply H_no_partition_missing => //;  rewrite in_cons; apply /orP; right.
     move: LE_TAIL; rewrite (exchange_big_dep P) => //= LE_TAIL.
     rewrite (exchange_big_dep P) //= !big_cons.
-    case PX: (P x') => //=; last by apply LE_TAIL.
-    apply leq_add => //; last by apply LE_TAIL.
+    case PX: (P x') => //=.
+    apply leq_add => //.
     rewrite big_const_seq iter_addn_0.
     apply leq_pmulr; rewrite -has_count.
     apply /hasP; eapply ex_intro2 => //.
@@ -357,8 +356,7 @@ Section SumOverPartitions.
     - rewrite  big_seq_cond [X in _ <= X]big_seq_cond.
       apply leq_sum => x' /andP [ARRo /andP [Px' NEQ]].
       rewrite (big_rem (x_to_y x')) //=.
-      rewrite Px' eq_refl NEQ andTb andTb leq_addr //.
-      by apply H_no_partition_missing.
+      by rewrite Px' eq_refl NEQ andTb andTb leq_addr.
     - move => y_of_x' x' /negP NEQ /andP [EQ1 /eqP EQ2].
       rewrite EQ1 Bool.andb_true_l; apply/negP; intros CONTR.
       apply: NEQ; clear EQ1.

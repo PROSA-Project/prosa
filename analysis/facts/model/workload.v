@@ -102,7 +102,7 @@ Section WorkloadFacts.
       { rewrite /workload_of_jobs /number_of_task_arrivals/task_arrivals_between/job_of_task.
         apply: sum_majorant_constant => j IN TSK.
         have: valid_job_cost j; last by rewrite /valid_job_cost; move: TSK => /eqP ->.
-        by apply/H_valid_job_cost/in_arrivals_implies_arrived; rt_eauto. }
+        exact/H_valid_job_cost/in_arrivals_implies_arrived. }
       { rewrite leq_mul2l; apply/orP; right.
         rewrite -{2}[Δ](addKn t1).
         by apply H_task_repsects_max_arrivals; lia. }
@@ -183,7 +183,7 @@ Section WorkloadFacts.
     rewrite [in LHS]big_seq_cond [in RHS]big_seq_cond.
     apply eq_bigl => j'.
     rewrite Bool.andb_true_r.
-    destruct (j' \in rem (T:=Job) j jobs) eqn:INjobs; last by done.
+    destruct (j' \in rem (T:=Job) j jobs) eqn:INjobs => [|//].
     apply /negP => /eqP EQUAL.
     by rewrite EQUAL mem_rem_uniqF in INjobs.
   Qed.
@@ -214,9 +214,9 @@ Section WorkloadFacts.
       clear H_jobs_uniq H_j_in_jobs H_t1_le_t2.
       rewrite /workload_of_jobs big_seq_cond.
       rewrite -[in X in X <= _]big_filter -[in X in _ <= X]big_filter.
-      apply leq_sum_sub_uniq; first by apply filter_uniq, arrivals_uniq; rt_eauto.
+      apply leq_sum_sub_uniq; first by apply filter_uniq, arrivals_uniq.
       move => j'; rewrite mem_filter => [/andP [/andP [A /andP [C D]] _]].
-      rewrite mem_filter; apply/andP; split; first by done.
+      rewrite mem_filter; apply/andP; split=> [//|].
       apply job_in_arrivals_between; eauto.
       - by eapply in_arrivals_implies_arrived; eauto 2.
       - apply in_arrivals_implies_arrived_between in A; auto; move: A => /andP [A E].

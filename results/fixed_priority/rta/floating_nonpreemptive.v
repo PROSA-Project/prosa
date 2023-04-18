@@ -141,10 +141,9 @@ Section RTAforFloatingModelwithArrivalCurves.
   Proof.
     move: (H_valid_task_model_with_floating_nonpreemptive_regions) => [LIMJ JMLETM].
     move: (LIMJ) => [BEG [END _]].
-    eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments.
-    all: rt_eauto.
-    - by apply sequential_readiness_implies_work_bearing_readiness; rt_eauto.
-    - by apply sequential_readiness_implies_sequential_tasks; rt_eauto.
+    eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with (L:=L) => //.
+    - exact: sequential_readiness_implies_work_bearing_readiness.
+    - exact: sequential_readiness_implies_sequential_tasks.
     - intros A SP.
       rewrite subnn subn0.
       destruct (H_R_is_maximum _ SP) as [F [EQ LE]].

@@ -101,8 +101,7 @@ Section JobArrivalSeparation.
         - feed BEFORE; first by lia.
           move : BEFORE => [nj [NEQNJ [TSKNJ [ARRNJ INDNJ]]]]; rewrite TSKj2 in TSKNJ.
           specialize (IHs nj j2); feed_n 6 IHs => //; first by lia.
-          { by apply (lower_index_implies_earlier_arrival _ H_valid_arrival_sequence tsk);
-              rt_eauto; lia.
+          { by apply (lower_index_implies_earlier_arrival _ H_valid_arrival_sequence tsk) => //; lia.
           }
           move : IHs => [n [NZN ARRJ'NJ]].
           move: (H_periodic_model nj) => PERIODIC; feed_n 3 PERIODIC => //; first by lia.
@@ -139,16 +138,16 @@ Section JobArrivalSeparation.
       n > 0 /\
       job_arrival j2 = job_arrival j1 + n * task_period tsk.
   Proof.
-    apply job_arrival_separation_when_index_diff_is_k with (k := (job_index arr_seq j2 - job_index arr_seq j1)); try done.
+    apply job_arrival_separation_when_index_diff_is_k with (k := (job_index arr_seq j2 - job_index arr_seq j1)) => //.
     - apply subnKC.
       move_neq_up IND.
-      eapply lower_index_implies_earlier_arrival in IND; rt_eauto.
+      eapply lower_index_implies_earlier_arrival in IND => //.
       by move_neq_down IND.
     - case: (boolP (job_index arr_seq j1 == job_index arr_seq j2)) => [/eqP EQ_IND|NEQ_IND].
       + by apply equal_index_implies_equal_jobs in EQ_IND => //; rewrite H_j1_of_task.
       + move: NEQ_IND; rewrite neq_ltn => /orP [LT|LT].
-        * by eapply (lower_index_implies_earlier_arrival) in LT; rt_eauto.
-        * eapply (lower_index_implies_earlier_arrival) in LT; rt_eauto.
+        * by eapply (lower_index_implies_earlier_arrival) in LT.
+        * eapply (lower_index_implies_earlier_arrival) in LT => //.
           by move_neq_down LT.
   Qed.
 

@@ -59,8 +59,7 @@ Section RunToCompletionThreshold.
       unfold job_preemption_points, range.
       destruct (H_valid_preemption_model j) as [A1 [A2 [A3 A4]]]; auto.
       unfold job_cannot_become_nonpreemptive_before_execution in *.
-      rewrite index_iota_lt_step; last by done.
-        by simpl; rewrite A1 in_cons eq_refl.
+      by rewrite index_iota_lt_step//= A1 in_cons eq_refl.
     Qed.
     
     (** ... and [job_cost] are in preemption points. *)
@@ -84,15 +83,15 @@ Section RunToCompletionThreshold.
       2 <= size (job_preemption_points j).
     Proof.
       intros POS.
-      replace 2 with (size [::0; job_cost j]); last by done.
+      replace 2 with (size [::0; job_cost j]) => [|//].
       apply subseq_leq_size.
       - apply/andP; split. rewrite !in_cons Bool.negb_orb.
-        + apply/andP; split. by rewrite neq_ltn POS. by done.
-        + apply/andP; split; by done. 
+        + by apply/andP; split; [rewrite neq_ltn POS|].
+        + by [].
       - intros ρ; rewrite !in_cons; move => /orP [/eqP EQ| /orP [/eqP Cost | C]].
         + by subst; apply zero_in_preemption_points.
         + by subst; apply job_cost_in_preemption_points.
-        + by done.
+        + by [].
     Qed.
 
     (** Next we show that the sequence of preemption points is a non-decreasing sequence. *)
@@ -132,15 +131,14 @@ Section RunToCompletionThreshold.
       }
       apply iota_is_increasing_sequence; apply/andP; split. 
       - rewrite -(leq_add2r 2) !addn2.
-        rewrite prednK; first by done. 
+        rewrite prednK//.
         rewrite -(leq_add2r 1) !addn1.
         rewrite prednK.
         + by apply size_of_preemption_points.
         + by rewrite ltnW //; apply size_of_preemption_points.
       - rewrite -(leq_add2r 1) !addn1.
         unfold job_preemption_points, range.
-        rewrite prednK ?ltnS; first by done. 
-          by rewrite ltnW //; apply size_of_preemption_points.
+        by rewrite prednK ?ltnS// ltnW// size_of_preemption_points.
     Qed.
 
     (** Max nonpreemptive segment of a positive-cost job has positive length. *)
@@ -226,16 +224,16 @@ Section RunToCompletionThreshold.
     have EQ := antidensity_of_nondecreasing_seq.
     specialize (EQ (job_preemption_points j) ρ (size (job_preemption_points j)).-2 ).
     feed_n 2 EQ; first by apply preemption_points_nondecreasing.
-    { apply/andP; split; first by done.
+    { apply/andP; split=> [//|].
       rewrite prednK; first by rewrite -last0_nth.
       rewrite -(leq_add2r 1) !addn1 prednK.
-      - by apply size_of_preemption_points.
+      - exact: size_of_preemption_points.
       - by eapply leq_trans; last apply size_of_preemption_points.
     }
     move: EQ => /negP EQ; apply: EQ.
-    apply conversion_preserves_equivalence; try done.
+    apply conversion_preserves_equivalence => //.
     eapply leq_trans; first by apply ltnW; exact LT.
-      by rewrite job_cost_is_last_element_of_preemption_points.
+    by rewrite job_cost_is_last_element_of_preemption_points.
   Qed.
   
   (** In order to get a consistent schedule, the scheduler should respect 
@@ -250,7 +248,7 @@ Section RunToCompletionThreshold.
       scheduled_at sched j t'.
   Proof.
     move=> t t' LE TH COM.
-    apply H_valid_preemption_model; first by done.
+    apply H_valid_preemption_model => [//|].
     apply job_cannot_be_preempted_within_last_segment; apply/andP; split.
     - by apply leq_trans with (service sched j t); last apply service_monotonic.
     - by rewrite ltnNge.

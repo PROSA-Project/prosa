@@ -190,18 +190,16 @@ Section AbstractRTAforGELwithArrivalCurves.
                  `|Num.max 0%R (t1%:R + interval tsk_o A)%R|).
         Proof.
           have BOUNDED: `|Num.max 0%R (t1%:R + interval tsk_o A)%R| <= t1 + Δ by lia.
-          rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'; rt_eauto.
+          rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
           rewrite /GEL_from.
-          case: (eqVneq (job_task j') tsk_o) => TSK';
-                                               last by rewrite andbF.
+          case: (eqVneq (job_task j') tsk_o) => TSK'; last by rewrite andbF.
           rewrite andbT; apply: contraT  => /negPn HEP.
           move: (hep_job_arrives_after_zero _ j' HEP) => GT0.
           move: (hep_job_arrives_before _ j' HEP) => EARLIEST.
           move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
           move: ARR'; rewrite /interval /ε => LATEST.
           have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk -
-                           task_priority_point tsk_o <= (job_arrival j')%:R)%R
-                          by lia.
+                      task_priority_point tsk_o <= (job_arrival j')%:R)%R by lia.
           by move: LATEST'; rewrite -TSK -TSK' => LATEST'; lia.
         Qed.
 
@@ -215,14 +213,14 @@ Section AbstractRTAforGELwithArrivalCurves.
       Proof.
         move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
         apply leq_sum_seq => tsko INtsko NEQT.
-        have [EQ|EQ] := leqP Δ `|Num.max 0%R (interval tsko A)|;
-         first by apply: (workload_le_rbf' arr_seq tsko); rt_eauto.
+        have [EQ|EQ] := leqP Δ `|Num.max 0%R (interval tsko A)|.
+          exact: (workload_le_rbf' arr_seq tsko).
         apply: (leq_trans (total_workload_shorten_range _ _ _ _)) => //; [lia|].
         rewrite /GEL_from.
         have [EQ1|EQ1] := lerP 0%R (interval tsko A).
         - have -> : `|Num.max 0%R (t1%:R + interval tsko A)%R|
             = t1 + `|interval tsko A| by lia.
-          by apply: workload_le_rbf'; rt_eauto.
+          exact: workload_le_rbf'.
         - rewrite arrivals_between_geq /workload_of_jobs ?big_nil//; lia.
       Qed.
 
@@ -238,21 +236,19 @@ Section AbstractRTAforGELwithArrivalCurves.
       - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
         by rewrite /completed_by /completed_by ZERO.
       - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
-        rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ _ j); rt_eauto; first last.
-        { by eapply arrived_between_implies_in_arrivals; rt_eauto. }
-        { by eapply GEL_implies_sequential_tasks; rt_auto. } 
+        rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ _ j)//; first last.
+        { exact: arrived_between_implies_in_arrivals. }
+        { exact: GEL_implies_sequential_tasks. }
         rewrite /I leq_add //.
-        + eapply cumulative_priority_inversion_is_bounded; rt_eauto.
-        + eapply leq_trans; first by eapply cumulative_interference_is_bounded_by_total_service; rt_eauto.
-          eapply leq_trans; first by apply service_of_jobs_le_workload; rt_eauto.
+        + exact: cumulative_priority_inversion_is_bounded.
+        + eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
+          eapply leq_trans; first exact: service_of_jobs_le_workload.
           eapply leq_trans.
           * eapply reorder_summation; eauto 2 => j' IN _.
             by apply H_all_jobs_from_taskset; eapply in_arrivals_implies_arrived; exact IN.
-          * eapply leq_trans.
-            -- move : TSK => /eqP TSK; rewrite TSK.
-               eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
-               by apply /eqP.
-            -- by done.
+          * move : TSK => /eqP TSK; rewrite TSK.
+            eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
+            by apply /eqP.
     Qed.
 
   (** ** F. Defining the Search Space *)
@@ -314,8 +310,7 @@ Section AbstractRTAforGELwithArrivalCurves.
         rewrite /task_rbf_changes_at task_rbf_0_zero //; eauto 2.
         apply contraT => /negPn /eqP ZERO.
         rewrite -(ltnn 0) {2}ZERO add0n.
-        apply: (@leq_trans (task_cost tsk));
-          last by apply: task_rbf_1_ge_task_cost; rt_eauto.
+        apply: (@leq_trans (task_cost tsk)); [|exact: task_rbf_1_ge_task_cost].
         apply: (@leq_trans (job_cost j)) => //.
         move: (H_job_of_tsk) => /eqP <-.
         by apply: (H_valid_job_cost _ H_j_arrives). }
@@ -377,16 +372,13 @@ Section AbstractRTAforGELwithArrivalCurves.
     Proof.
       move => A IN.
       edestruct H_R_is_maximum as [F [FIX NEQ]].
-      eapply A_is_in_concrete_search_space; rt_eauto.
-      exists F; split; last by done.
+      eapply A_is_in_concrete_search_space => //.
+      exists F; split=> [|//].
       rewrite -{2}(leqRW FIX).
       by rewrite addnA [_ + priority_inversion_bound A]addnC -!addnA.
     Qed.
 
   End ResponseTimeReccurence.
-
-
-
 
   (** ** H. Soundness of the Response-Time Bound *)
 
@@ -398,16 +390,14 @@ Section AbstractRTAforGELwithArrivalCurves.
     move => js ARRs TSKs.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
-    (try ( eapply uniprocessor_response_time_bound_seq with
-          (task_interference_bound_function := fun tsk A R => IBF_other A R) (L0 := L) ) ||
-        eapply uniprocessor_response_time_bound_seq with
-      (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L)); rt_eauto.
-    - eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
-      * eapply GEL_implies_sequential_tasks; rt_eauto.
-    - by eapply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
-    - by eapply instantiated_busy_intervals_are_bounded; rt_eauto.
-    - by apply instantiated_task_interference_is_bounded.
-    - by eapply correct_search_space; eauto 2.
+    eapply uniprocessor_response_time_bound_seq with
+      (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L) => //.
+    - eapply instantiated_i_and_w_are_coherent_with_schedule => //.
+      exact: GEL_implies_sequential_tasks.
+    - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
+    - exact: instantiated_busy_intervals_are_bounded.
+    - exact: instantiated_task_interference_is_bounded.
+    - exact: correct_search_space.
   Qed.
 
 End AbstractRTAforGELwithArrivalCurves.

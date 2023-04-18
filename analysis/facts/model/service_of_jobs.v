@@ -182,7 +182,7 @@ Section GenericModelLemmas.
       - feed IHl.
         { by intros j' IN; apply ALL; rewrite in_cons; apply/orP; right. }
         rewrite /service_of_jobs_at big_cons; rewrite /service_of_jobs_at in IHl.
-        destruct (P a) eqn: Pa; last by done.
+        destruct (P a) eqn: Pa => [|//].
         rewrite IHl addn0.
         specialize (ALL a); feed ALL.
         { by rewrite in_cons; apply/orP; left. }
@@ -263,7 +263,7 @@ Section UnitServiceModelLemmas.
       all_jobs_completed_by t_compl.
     Proof.
       unfold jobs; intros EQ j ARR Pj; move: (ARR) => ARR2.
-      apply in_arrivals_implies_arrived_between in ARR; last by done.
+      apply in_arrivals_implies_arrived_between in ARR => [|//].
       move: ARR => /andP [T1 T2].
       have F1: forall a b, (a < b) || (a >= b).
       { by move=> a b; destruct (a < b) eqn:EQU; apply/orP;
@@ -302,11 +302,11 @@ Section UnitServiceModelLemmas.
       destruct (t_compl <= t1) eqn:EQ.
       - unfold service_of_jobs. unfold service_during.
         rewrite exchange_big //=.
-        rewrite big_geq; last by done.
+        rewrite big_geq => [|//].
         rewrite /workload_of_jobs big1_seq //.
         move => j /andP [Pj ARR].
         specialize (COMPL _ ARR Pj).
-        rewrite <- F with (j := j) (t := t_compl); try done.
+        rewrite <- F with (j := j) (t := t_compl) => //.
         apply/eqP; rewrite eqn_leq; apply/andP; split.
         + by apply COMPL.
         + by apply service_at_most_cost.

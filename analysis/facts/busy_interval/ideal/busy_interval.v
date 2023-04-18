@@ -79,7 +79,7 @@ Section ExistsBusyIntervalJLFP.
     Proof.
       rename H_priority_is_reflexive into REFL, H_busy_interval into BUSY.
       move: BUSY => [[_ [_ [_ /andP [_ ARR]]]] QUIET].
-      apply QUIET; try done.
+      exact: QUIET.
     Qed.
 
   End BasicLemmas.
@@ -108,7 +108,7 @@ Section ExistsBusyIntervalJLFP.
                     (arrivals_between arr_seq t1 t2)) eqn:COMP.
       { move: COMP => /hasP [j_hp ARR /andP [NOTCOMP HP]].
         move: (ARR) => INarr.
-        apply in_arrivals_implies_arrived_between in ARR; last by done.
+        apply in_arrivals_implies_arrived_between in ARR => [|//].
         apply in_arrivals_implies_arrived in INarr.
         by exists j_hp; repeat split; last by apply/negP.
       }
@@ -151,13 +151,13 @@ Section ExistsBusyIntervalJLFP.
       intros t IDLE jhp ARR HP AB.
       apply negbNE; apply/negP; intros NCOMP.
       have PEND : job_pending_at jhp t.
-      { apply/andP; split; first by done.
+      { apply/andP; split=> [//|].
         by move: NCOMP; apply contra, completion_monotonic.
       }
       apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' _]]].
       move:(H_work_conserving j' t) => WC.
-      feed_n 2 WC; first by done.
-      { apply/andP; split; first by done.
+      feed_n 2 WC => [//||].
+      { apply/andP; split=> [//|].
         by move: IDLE => /eqP IDLE; rewrite /scheduled_at scheduled_in_def IDLE.
       }
       move: IDLE WC => /eqP IDLE [jo SCHED].
@@ -180,7 +180,7 @@ Section ExistsBusyIntervalJLFP.
       - subst t2; rewrite ltnS in LT.
         have EQ: t1 = t by apply/eqP; rewrite eqn_leq; apply/andP; split.
         subst t1; clear GE LT.
-        exists j; repeat split; try done.
+        exists j; repeat split=> //.
         + move: REL; rewrite ltnS -eqn_leq eq_sym; move => /eqP REL.
             by rewrite -REL; eapply job_pending_at_arrival; eauto 2.
       - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
@@ -191,8 +191,8 @@ Section ExistsBusyIntervalJLFP.
           - move: T; rewrite mem_filter; move => /andP [/andP [PEN HP] IN].
             repeat split; eauto using in_arrivals_implies_arrived.
           - move: T => [ARR [PEN HP]].
-            rewrite mem_filter; apply/andP; split; first (apply/andP; split); try done.
-            eapply arrived_between_implies_in_arrivals; try done.
+            rewrite mem_filter; apply/andP; split; first (apply/andP; split=> //).
+            apply: arrived_between_implies_in_arrivals => //.
             by apply/andP; split; last rewrite ltnS; move: PEN => /andP [T _].
         } move: EX => [hp__seq SE]; case FL: (hp__seq) => [ | jhp jhps].
         + subst hp__seq; exfalso.
@@ -201,16 +201,16 @@ Section ExistsBusyIntervalJLFP.
             apply NQT with t1.+1; first by apply/andP; split.
             intros jhp ARR HP ARRB; apply negbNE; apply/negP; intros NCOMP.
             move: (SE jhp) => [_ SE2].
-            rewrite in_nil in SE2; feed SE2; [clear SE2 | by done].
-            repeat split; try done; first apply/andP; split; try done.
+            rewrite in_nil in SE2; feed SE2=> [|//]; clear SE2.
+            repeat split=> //; first apply/andP; split=> //.
             apply/negP; intros COMLP.
             move: NCOMP => /negP NCOMP; apply: NCOMP.
             by apply completion_monotonic with t1.
           * apply NQT with t; first by apply/andP; split.
             intros jhp ARR HP ARRB; apply negbNE; apply/negP; intros NCOMP.
             move: (SE jhp) => [_ SE2].
-            rewrite in_nil in SE2; feed SE2; [clear SE2 | by done].
-              by repeat split; auto; apply/andP; split; first apply ltnW.
+            rewrite in_nil in SE2; feed SE2 => [|//]; clear SE2.
+            by repeat split; auto; apply/andP; split; first apply ltnW.
         + move: (SE jhp)=> [SE1 _]; subst; clear SE.
           by exists jhp; apply SE1; rewrite in_cons; apply/orP; left.
     Qed.
@@ -225,11 +225,11 @@ Section ExistsBusyIntervalJLFP.
       move: (pending_hp_job_exists _ NEQ) => [jhp [ARR [PEND HP]]].
       apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' _]]].
       feed (H_work_conserving _ t ARR').
-      apply/andP; split; first by done.
-      move: IDLE => /eqP IDLE; rewrite scheduled_at_def IDLE; by done.
+        apply/andP; split=> [//|].
+        by move: IDLE => /eqP IDLE; rewrite scheduled_at_def IDLE.
       move: (H_work_conserving) => [jo SCHED].
       move: IDLE SCHED => /eqP IDLE SCHED.
-        by rewrite scheduled_at_def IDLE in SCHED.
+      by rewrite scheduled_at_def IDLE in SCHED.
     Qed.
 
   End ProcessorAlwaysBusy.
@@ -270,7 +270,7 @@ Section ExistsBusyIntervalJLFP.
       rewrite /service_received_by_hep_jobs_released_during
               /service_of_higher_or_equal_priority_jobs /service_of_jobs.
       rewrite [in X in _ = X](arrivals_between_cat _ _ t1);
-        [ | | rewrite leq_addr]; try done.
+        [ | by [] | rewrite leq_addr//].
       rewrite big_cat //=.
       rewrite -{1}[\sum_(j <- arrivals_between arr_seq _ (t1 + Δ) | _)
                     service_during sched j t1 (t1 + Δ)]add0n.
@@ -282,10 +282,10 @@ Section ExistsBusyIntervalJLFP.
       apply/eqP.
       rewrite service_at_def eqb0 -scheduled_at_def.
       apply (completed_implies_not_scheduled _ _ H_completed_jobs_dont_execute).
-      apply completion_monotonic with t1; [ move: NEQ => /andP [T1 _] | ]; try done.
-      apply H_quiet_time; try done.
-      - by eapply in_arrivals_implies_arrived; eauto 2.
-      - by eapply in_arrivals_implies_arrived_before; eauto 2.
+      apply completion_monotonic with t1; first by move: NEQ => /andP[].
+      apply H_quiet_time => //.
+      - exact: in_arrivals_implies_arrived.
+      - exact: in_arrivals_implies_arrived_before.
     Qed.
 
     (** Next we prove that the total service within a "non-quiet"
@@ -320,9 +320,8 @@ Section ExistsBusyIntervalJLFP.
             move: H_work_conserving => [j_other SCHEDother].
             by rewrite scheduled_at_def (eqP Idle) in SCHEDother. } }
         { exists jo.
-          - apply arrived_between_implies_in_arrivals; try done.
-            apply H_jobs_come_from_arrival_sequence with t'; try done.
-            apply/andP; split; first by done.
+          - apply arrived_between_implies_in_arrivals => //.
+            apply/andP; split=> [//|].
             apply H_jobs_must_arrive_to_execute in Sched_jo.
             by apply leq_ltn_trans with t'.
           - by rewrite service_at_def lt0b -scheduled_at_def.
@@ -398,7 +397,7 @@ Section ExistsBusyIntervalJLFP.
               apply completion_monotonic with (t' := t_busy) in QUIET; first by rewrite QUIET in NOTCOMP.
                 by apply bigmax_ltn_ord with (i0 := t).
             }
-            repeat split; try done.
+            repeat split=> //.
             + by apply bigmax_ltn_ord with (i0 := t).
             + move => t0 /andP [GTlast LTbusy] QUIET0.
               have PRED0: quiet_time_dec t0.
@@ -414,8 +413,8 @@ Section ExistsBusyIntervalJLFP.
              intros QUIET; apply ALL; simpl.
              apply/allP; intros j_hp ARR; apply/implyP; intros HP.
              apply QUIET; eauto 2 using in_arrivals_implies_arrived, in_arrivals_implies_arrived_before.
-             apply/andP; split; first by done.
-               by move: PEND => /andP [ARR _].
+             apply/andP; split=> [//|].
+             by move: PEND => /andP[].
         Qed.
 
       End LowerBound.
@@ -476,7 +475,7 @@ Section ExistsBusyIntervalJLFP.
               { apply leq_trans with 0; [rewrite leqn0; apply/eqP | by apply leq0n].
                 by apply big1; intros; apply ideal_not_idle_implies_sched. }
               { destruct (hep_job j' j) eqn:PRIO1.
-                - rewrite service_of_jobs_nsched_or_unsat; first by done.
+                - rewrite service_of_jobs_nsched_or_unsat//.
                   intros j'' IN; apply/andP; intros [NHEP SCHED''].
                   have EQ: j'' = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto 2.
                   by subst j''; rewrite PRIO1 in NHEP.
@@ -491,12 +490,12 @@ Section ExistsBusyIntervalJLFP.
                     * apply arrived_between_implies_in_arrivals; eauto 2.
                       apply H_jobs_must_arrive_to_execute in SCHED.
                       by unfold has_arrived, arrived_between in *; lia.
-                    * by apply/andP; split; [done | rewrite PRIO1]. } }
+                    * by apply/andP; split; [ | rewrite PRIO1]. } }
             { rewrite leq_add2r.
               destruct (t1 + delta <= t_busy.+1) eqn:NEQ; [ | apply negbT in NEQ; rewrite -ltnNge in NEQ].
               - apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t_busy.+1); last eauto 2.
                 by rewrite [in X in _ <= X](cumulative_priority_inversion_cat _ _ _ (t1 + delta)) //= leq_addr.
-              -  apply H_priority_inversion_is_bounded; repeat split; try done.
+              -  apply H_priority_inversion_is_bounded; repeat split=> //.
                  + by rewrite -addn1 leq_add2l.
                  + by move => t' /andP [LT GT]; apply H_no_quiet_time; apply/andP; split; last rewrite ltnW.
                  + by move: EXj => /andP [T1 T2]; apply/andP; split; last apply ltn_trans with (t_busy.+1). }
@@ -527,17 +526,15 @@ Section ExistsBusyIntervalJLFP.
             { by eapply arrived_between_implies_in_arrivals; eauto 1; apply/andP; split. }
             have UNIQ: uniq l by eapply arrivals_uniq; eauto 1.
             rewrite big_mkcond [\sum_(_ <- _ | _ _ _)_]big_mkcond //=.
-            rewrite (bigD1_seq j0); [simpl | by done | by done].
-            rewrite (bigD1_seq j0); [simpl | by done | by done].
-            rewrite /hep HP0.
+            rewrite (bigD1_seq j0)//= (bigD1_seq j0)//= /hep HP0.
             rewrite -add1n addnA [1 + _]addnC addn1.
             apply leq_add; last first.
             { apply leq_sum; intros j1 NEQ.
-              destruct (hep_job j1 j); last by done.
-                by apply cumulative_service_le_job_cost, ideal_proc_model_provides_unit_service.
+              destruct (hep_job j1 j) => [|//].
+              by apply cumulative_service_le_job_cost, ideal_proc_model_provides_unit_service.
             }
-            rewrite ignore_service_before_arrival; rewrite //; [| by apply ltnW].
-            rewrite -(ignore_service_before_arrival _ _ _ 0)//; [|exact: ltnW].
+            rewrite ignore_service_before_arrival//.
+            rewrite -(ignore_service_before_arrival _ _ _ 0)//.
             by rewrite ltnNge; apply/negP.
           Qed.
 
@@ -567,10 +564,10 @@ Section ExistsBusyIntervalJLFP.
           destruct ([exists t2:'I_(t1 + delta).+1, (t2 > t1) && quiet_time_dec t2]) eqn:EX.
           - have EX': exists (t2 : instant), ((t1 < t2 <= t1 + delta) && quiet_time_dec t2).
             { move: EX => /existsP [t2 /andP [LE QUIET]].
-              exists t2; apply/andP; split; last by done.
-                by apply/andP; split; last (rewrite -ltnS; apply ltn_ord). }
+              exists t2; apply/andP; split=> [|//].
+              by apply/andP; split; last (rewrite -ltnS; apply ltn_ord). }
             move: (ex_minnP EX') => [t2 /andP [/andP [GT LE] QUIET] MIN]; clear EX EX'.
-            exists t2; split; [ | split; [repeat split | ]]; try done.
+            exists t2; split; [ | split; [repeat split | ]] => //.
             + move => t /andP [GT1 LT2] BUG.
               feed (MIN t); first (apply/andP; split).
               * by apply/andP; split; last by apply leq_trans with (n := t2); eauto using ltnW.
@@ -578,7 +575,7 @@ Section ExistsBusyIntervalJLFP.
                 apply BUG; eauto 2 using in_arrivals_implies_arrived, ARR, in_arrivals_implies_arrived_before.
                   by apply leq_ltn_trans with (p := t2) in MIN; first by rewrite ltnn in MIN.
             + move: NEQ => /andP [IN1 IN2].
-              apply/andP; split; first by done.
+              apply/andP; split=> [//|].
               apply leq_ltn_trans with t_busy; eauto 2.
               rewrite ltnNge; apply/negP; intros CONTR.
               apply NQ with t2.
@@ -649,11 +646,11 @@ Section ExistsBusyIntervalJLFP.
         have BOUNDED := busy_interval_is_bounded
                           (job_arrival j) _ t1  PREFIX priority_inversion_bound _ delta
                           H_delta_positive.
-        feed_n 3 BOUNDED; try done.
+        feed_n 3 BOUNDED => //.
         { by apply job_pending_at_arrival. }
         move: BOUNDED => [t2 [GE2 BUSY]].
         exists t1, t2; split.
-        { apply/andP; split; first by done.
+        { apply/andP; split=> [//|].
           apply contraT; rewrite -leqNgt; intro BUG.
           move: BUSY PREFIX => [[LE12 _] QUIET] [_ [_ [NOTQUIET _]]].
           feed (NOTQUIET t2); first by apply/andP; split.
@@ -687,11 +684,11 @@ Section ExistsBusyIntervalJLFP.
         have BUSY := exists_busy_interval priority_inversion_bound _ delta.
         move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         { by rewrite /job_completed_by /completed_by ZERO. }
-        feed_n 4 BUSY; try by done.
+        feed_n 4 BUSY => //.
         move: BUSY => [t1 [t2 [/andP [GE1 LT2] [GE2 BUSY]]]].
-        apply completion_monotonic with (t := t2); try (by done);
-          first by apply leq_trans with (n := t1 + delta); [| by rewrite leq_add2r].
-        apply job_completes_within_busy_interval with (t1 := t1); try by done.
+        apply completion_monotonic with (t := t2) => //.
+          by apply leq_trans with (n := t1 + delta); [| rewrite leq_add2r].
+        by apply job_completes_within_busy_interval with (t1 := t1).
       Qed.
 
     End ResponseTimeBoundFromBusyInterval.

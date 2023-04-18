@@ -171,7 +171,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       work-conserving in the abstract sense with respect to [interference] and
       [interfering_workload]. *)
   Fact abstractly_work_conserving : work_conserving_ab.
-  Proof. by apply: instantiated_i_and_w_are_coherent_with_schedule; rt_eauto. Qed.
+  Proof. exact: instantiated_i_and_w_are_coherent_with_schedule. Qed.
 
   (** The preceding fact [abstractly_work_conserving] corresponds to Lemma 1 in
       the paper. To see the correspondence, refer to the definition of
@@ -204,7 +204,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       case, due to the choice to reuse the existing JLFP definitions of
       [interference] and [interfering_workload]. *)
   Fact busy_windows_are_bounded : busy_windows_are_bounded_by L.
-  Proof. by apply: instantiated_busy_intervals_are_bounded; rt_eauto. Qed.
+  Proof. exact: instantiated_busy_intervals_are_bounded. Qed.
 
   (** The preceding fact [busy_windows_are_bounded] correspond to Lemma 2 in the
       paper. To clearly see the correspondence, refer to the definition of
@@ -268,10 +268,10 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       pose zf : nat -> nat := (fun=> 0).
       have: cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ) <= zf (job_arrival j - t1);
         last by apply.
-      apply: cumulative_priority_inversion_is_bounded; rt_eauto.
+      apply: cumulative_priority_inversion_is_bounded => //.
       have -> : priority_inversion_is_bounded_by arr_seq sched tsk zf
-               = priority_inversion_is_bounded_by_constant arr_seq sched tsk 0;
-        by try apply: FIFO_implies_no_pi; rt_eauto.
+               = priority_inversion_is_bounded_by_constant arr_seq sched tsk 0 by [].
+      exact: FIFO_implies_no_pi.
     Qed.
 
   End AbsenceOfPriorityInversion.
@@ -305,17 +305,17 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         \sum_(tsko <- ts) task_request_bound_function tsko (job_arrival j - t1 + ε) - task_cost tsk.
     Proof.
       move: H_busy_window => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
-      rewrite (cumulative_i_ohep_eq_service_of_ohep arr_seq); rt_eauto;
-        last by rewrite instantiated_quiet_time_equivalent_quiet_time; rt_eauto.
-      eapply leq_trans; first by apply service_of_jobs_le_workload; rt_eauto.
-      rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)); rt_eauto.
-      rewrite (workload_minus_job_cost j); rt_eauto;
-        last by rewrite /ε; apply job_in_arrivals_between; rt_auto; lia.
+      rewrite (cumulative_i_ohep_eq_service_of_ohep arr_seq) => //;
+        last by rewrite instantiated_quiet_time_equivalent_quiet_time.
+      eapply leq_trans; first exact: service_of_jobs_le_workload.
+      rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)) => //.
+      rewrite (workload_minus_job_cost j)//;
+        last by rewrite /ε; apply job_in_arrivals_between => //; lia.
       rewrite /workload_of_jobs /IBF (big_rem tsk) //=
         (addnC (task_request_bound_function tsk (job_arrival j - t1 + ε))).
       rewrite -addnBA; last first.
       - apply leq_trans with (task_request_bound_function tsk ε);
-          first by apply : (task_rbf_1_ge_task_cost arr_seq); rt_eauto.
+          first exact: (task_rbf_1_ge_task_cost arr_seq).
         by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia].
       - eapply leq_trans;
           last by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
@@ -334,7 +334,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         + move : H_job_of_task => TSKj.
           rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=;
             first by rewrite TSKj; apply leq_addr.
-          apply job_in_arrivals_between => //; rt_eauto.
+          apply job_in_arrivals_between => //.
           by apply /andP; split; [| rewrite subnKC; [rewrite addn1 |]].
     Qed.
 
@@ -357,12 +357,12 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     job_interference_is_bounded_by arr_seq sched tsk IBF (relative_arrival_time_of_job_is_A sched).
   Proof.
     move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL A Pred.
-    rewrite cumulative_interference_split; rt_eauto.
+    rewrite cumulative_interference_split//.
     have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
     move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
     rewrite (no_priority_inversion j ARRj _ JPOS _ t2) //= add0n.
     have ->: A = job_arrival j - t1 by erewrite Pred with (t1 := t1); [lia | apply BUSY].
-    by rewrite /IBF; eapply bound_on_hep_workload; rt_eauto.
+    exact: bound_on_hep_workload.
   Qed.
 
   (** The preceding lemma [IBF_correct] corresponds to Lemma 3 in the paper. To
@@ -408,20 +408,20 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     Proof.
       move: H_in_abstract => [INSP | [/andP [POSA LTL] [x [LTx INSP2]]]].
       { subst A.
-        apply/andP; split; [by done |].
-        apply /hasP. exists tsk; first by done.
+        apply/andP; split=> [//|].
+        apply /hasP. exists tsk => [//|].
         rewrite neq_ltn;apply/orP; left.
         erewrite task_rbf_0_zero; eauto 2.
         rewrite add0n ; apply leq_trans with (task_cost tsk).
         - by eapply leq_trans; eauto 2.
-        - by eapply task_rbf_1_ge_task_cost; rt_eauto. }
-      { apply /andP; split; first by done.
+        - exact: task_rbf_1_ge_task_cost. }
+      { apply /andP; split=> [//|].
         apply /hasPn.
         move => EQ2. unfold IBF in INSP2.
-        rewrite subnK in INSP2; try by done.
+        rewrite subnK in INSP2 => //.
         apply INSP2; clear INSP2.
-        have -> : \sum_(tsko <- ts) task_request_bound_function tsko A =
-                   \sum_(tsko <- ts)  task_request_bound_function tsko (A + ε); last by done.
+        have ->// : \sum_(tsko <- ts) task_request_bound_function tsko A =
+                   \sum_(tsko <- ts)  task_request_bound_function tsko (A + ε).
         apply eq_big_seq => //= task IN.
         by move: (EQ2 task IN) => /negPn /eqP. }
     Qed.
@@ -474,20 +474,20 @@ Section AbstractRTAforFIFOwithArrivalCurves.
             F + (task_cost tsk - task_rtct tsk) <= R.
     Proof.
       move => A IN.
-      eapply search_space_refinement in IN; rt_eauto.
+      eapply search_space_refinement in IN => //.
       move: (H_R_max _ IN) => [F [FIX NEQ]].
       have R_GE_TC: task_cost tsk <= R.
       { move : (H_R_max 0) => SEARCH; feed SEARCH;
-          first by eapply search_space_refinement; rt_eauto; left.
+          first by eapply search_space_refinement => //; left.
         move: SEARCH => [F' [LE1 LE2]].
         rewrite !add0n in LE1.
         rewrite -(leqRW LE2) -(leqRW LE1).
-        by eapply (task_cost_le_sum_rbf arr_seq); rt_eauto. }
+        exact: (task_cost_le_sum_rbf arr_seq). }
       exists (R - (task_cost tsk - task_rtct tsk)); split.
       - rewrite /IBF.
         rewrite (leqRW FIX) addnC -subnA; first last.
         + rewrite -(leqRW FIX).
-          apply : (task_cost_le_sum_rbf _ _ _ ); rt_eauto.
+          apply: (task_cost_le_sum_rbf _ _ _ ) => //.
           by rewrite addn1.
         + by move : H_valid_run_to_completion_threshold => [TASKvalid JOBvalid].
         + rewrite addnBA; first by rewrite leq_sub2r // leq_add2l.
@@ -511,7 +511,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     move => js ARRs TSKs.
     rewrite /job_response_time_bound /completed_by.
     case: (posnP (@job_cost _ _ js)) => [ -> |POS]; first by done.
-    eapply uniprocessor_response_time_bound_ideal; rt_eauto.
+    eapply uniprocessor_response_time_bound_ideal => //.
     - exact: abstractly_work_conserving.
     - exact: busy_windows_are_bounded.
     - exact: IBF_correct.

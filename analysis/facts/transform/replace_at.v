@@ -39,7 +39,7 @@ Section ReplaceAtFacts.
   Proof.
     move => t DIFF.
     rewrite /sched' /replace_at.
-    case (t' == t) eqn:TT; last by done.
+    case (t' == t) eqn:TT => [|//].
     by move/eqP in TT; rewrite TT in DIFF; contradiction.
   Qed.
 

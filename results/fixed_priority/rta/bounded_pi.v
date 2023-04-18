@@ -199,16 +199,15 @@ Section AbstractRTAforFPwithArrivalCurves.
       busy_intervals_are_bounded_by arr_seq sched tsk L.
     Proof.
       move => j ARR TSK POS.
-      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 BI]]]]; rt_eauto.
-      {
-        intros; rewrite {2}H_fixed_point leq_add //.
-        rewrite /workload_of_higher_or_equal_priority_jobs /total_hep_rbf
-          /total_hep_request_bound_function_FP
-          /workload_of_jobs /hep_job /FP_to_JLFP.
-        move: (TSK) =>  /eqP ->.
-        by apply: sum_of_jobs_le_sum_rbf; eauto. }
-      exists t1, t2; split; first by done. split; first by done.
-      eapply instantiated_busy_interval_equivalent_busy_interval; rt_eauto.
+      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 BI]]]] => //; last first.
+      { exists t1, t2; split=> [//|]; split=> [//|].
+        by eapply instantiated_busy_interval_equivalent_busy_interval. }
+      intros; rewrite {2}H_fixed_point leq_add //.
+      rewrite /workload_of_higher_or_equal_priority_jobs /total_hep_rbf
+        /total_hep_request_bound_function_FP
+        /workload_of_jobs /hep_job /FP_to_JLFP.
+      move: (TSK) =>  /eqP ->.
+      exact: sum_of_jobs_le_sum_rbf.
     Qed.
 
     (** Next, we prove that [IBF_other] is indeed an interference
@@ -236,20 +235,19 @@ Section AbstractRTAforFPwithArrivalCurves.
       intros j R0 t1 t2 ARR TSK ? NCOMPL BUSY; simpl.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
-      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY; rt_eauto.
-      rewrite /ideal_jlfp_interference; erewrite cumulative_task_interference_split; rt_eauto; last first.
-      { by move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _]; eapply arrived_between_implies_in_arrivals; rt_eauto. }
-      rewrite /IBF_other leq_add; try done.
+      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY => //.
+      rewrite /ideal_jlfp_interference; erewrite cumulative_task_interference_split => //; last first.
+      { by move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _]; eapply arrived_between_implies_in_arrivals. }
+      rewrite /IBF_other leq_add//.
       { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + R0)); first by done.
         apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2); last first.
-        { by apply H_priority_inversion_is_bounded; rt_eauto; move: BUSY => [PREF QT2]. }
+        { by apply: H_priority_inversion_is_bounded => //; move: BUSY => [PREF QT2]. }
         rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + R0)) //=.
         - by rewrite leq_addr.
         - by rewrite leq_addr.
-        - by rewrite ltnW.
       }
-      { erewrite cumulative_i_thep_eq_service_of_othep; rt_eauto;
-          last by unfold quiet_time; move: BUSY => [[_ [T1 T2]] _].
+      { erewrite cumulative_i_thep_eq_service_of_othep => //; last first.
+          by unfold quiet_time; move: BUSY => [[_ [T1 T2]] _].
         apply: leq_trans.
         { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
           by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). }
@@ -297,13 +295,12 @@ Section AbstractRTAforFPwithArrivalCurves.
           rewrite {1}/task_rbf; erewrite task_rbf_0_zero; eauto 2; try done.
           rewrite add0n /task_rbf; apply leq_trans with (task_cost tsk).
           + by apply leq_trans with (job_cost j); eauto 2; move: (H_job_of_tsk) => /eqP <-; eauto 2.
-          + by eapply task_rbf_1_ge_task_cost; rt_eauto.
+          + exact: task_rbf_1_ge_task_cost.
         - apply/andP; split; first by done.
           apply/negP; intros EQ; move: EQ => /eqP EQ.
           apply INSP2.
           unfold total_interference_bound in *.
-          rewrite subn1 addn1 prednK; last by done.
-            by rewrite -EQ.
+          by rewrite subn1 addn1 prednK //.
       Qed.
 
       (** Then, there exists a solution for the response-time
@@ -336,12 +333,12 @@ Section AbstractRTAforFPwithArrivalCurves.
     intros js ARRs TSKs.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
-    eapply uniprocessor_response_time_bound_seq; rt_eauto.
-    - by eapply instantiated_i_and_w_are_coherent_with_schedule; rt_eauto.
-    - by eapply instantiated_interference_and_workload_consistent_with_sequential_tasks; rt_eauto.
-    - by apply instantiated_busy_intervals_are_bounded.
-    - by apply instantiated_task_interference_is_bounded.
-    - by eapply correct_search_space; eauto 2.
+    eapply uniprocessor_response_time_bound_seq => //.
+    - exact: instantiated_i_and_w_are_coherent_with_schedule.
+    - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
+    - exact: instantiated_busy_intervals_are_bounded.
+    - exact: instantiated_task_interference_is_bounded.
+    - exact: correct_search_space.
   Qed.
 
 End AbstractRTAforFPwithArrivalCurves.

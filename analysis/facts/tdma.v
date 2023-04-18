@@ -46,8 +46,7 @@ Section TDMAFacts.
       apply leq_ltn_trans with (n:=\sum_(prev_task <- ts )if prev_task!=task then task_time_slot prev_task else 0).
       - apply leq_sum => i T. case (slot_order i task);auto.
       - rewrite -big_mkcond (bigD1_seq task)?set_uniq//=.
-        rewrite -subn_gt0 -addnBA // subnn addn0 //.
-        exact: time_slot_positive.
+        by rewrite -subn_gt0 -addnBA // subnn addn0.
     Qed.
 
     (** For a task, the sum of its slot offset and its time slot is

@@ -67,7 +67,7 @@ Section LimitedPreemptionsModel.
       + rewrite /job_respects_max_nonpreemptive_segment
                 /job_max_nonpreemptive_segment /lengths_of_segments; erewrite job_parameters_max_np_to_job_limited; eauto.
           by apply max_of_dominating_seq; intros; apply A5.
-      + exists progr; split; first apply/andP; first split; rewrite ?leq_addr; by done.
+      + by exists progr; split; first apply/andP; first split; rewrite ?leq_addr.
       + move: NotIN => /eqP; rewrite eqbF_neg; move => NotIN.
         edestruct (work_belongs_to_some_nonpreemptive_segment arr_seq) as [x [SIZE2 N]]; eauto 2. move: N => /andP [N1 N2].
         set ptl := nth 0 (job_preemptive_points j) x.

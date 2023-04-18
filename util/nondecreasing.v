@@ -152,14 +152,13 @@ Section NondecreasingSequence.
         nondecreasing_sequence xs ->
         nondecreasing_sequence (x :: xs).
     Proof.
-      intros x xs MIN ND [ |n1] [ | n2]; try done.
-      - move => /andP [_ S] //=.
-        apply leq_trans with (xs [| 0 |]).
-        + apply MIN; apply mem_nth.
-          simpl in *; rewrite ltnS in S.
-          by apply leq_ltn_trans with n2.
-        + apply ND; apply/andP; split; auto.
-      - by rewrite //= !ltnS; apply ND.
+      move=> x xs MIN ND [ |n1] [ | n2] //.
+      move=> /andP [_ S] //=.
+      apply leq_trans with (xs [| 0 |]).
+      - apply MIN; apply mem_nth.
+        simpl in *; rewrite ltnS in S.
+        by apply leq_ltn_trans with n2.
+      - by apply ND; apply/andP; split.
     Qed.
 
     (** We prove that if [x::xs] is a non-decreasing sequence,
@@ -703,9 +702,7 @@ Section NondecreasingSequence.
           move: IN; rewrite leq_eqVlt; move => /orP [/eqP KK|KK].
           move: EQ; rewrite /last0 -nth_last -{1}KK -[_.+2.-1]pred_Sn; move => /eqP; by done.
           apply/andP; split; first rewrite -(ltn_add2r 1) !addn1 prednK //.
-          + by apply ltn_trans with idx.+2.
-          + by apply ltnW.
-          + by rewrite prednK //; apply ltn_trans with idx.+2.
+          by rewrite prednK //; apply ltn_trans with idx.+2.
       }
       { destruct (first0 xs == xs [|idx|]) eqn:EQ.
         - by rewrite leq_eqVlt; apply/orP; left.
@@ -832,17 +829,16 @@ Section NondecreasingSequence.
         }
         destruct xs as [ | x3 xs], ys as [ | y3 ys]; try by done. 
         { by destruct n as [ |n]; [ | destruct n]. }
-        destruct n; first by done. 
-        simpl; apply IHlen; try done. 
-        - by apply/eqP; rewrite -(eqn_add2r 1) !addn1; apply/eqP.
+        destruct n => //.
+        simpl; apply: IHlen => //.
         - move => m1 m2 /andP [B1 B2].
           apply (STRxs m1.+1 m2.+1); apply/andP; split.
           + by rewrite ltnS.
-          + by rewrite -(ltn_add2r 1) !addn1 in B2. 
+          + by rewrite -(ltn_add2r 1) !addn1 in B2.
         - move => m1 m2 /andP [B1 B2].
           apply (STRys m1.+1 m2.+1); apply/andP; split.
           + by rewrite ltnS.
-          + by rewrite -(ltn_add2r 1) !addn1 in B2. 
+          + by rewrite -(ltn_add2r 1) !addn1 in B2.
         - by move=> n0; specialize (LE n0.+1); simpl in LE.
       }
     Qed.

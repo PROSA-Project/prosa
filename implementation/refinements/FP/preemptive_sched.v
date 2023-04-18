@@ -44,7 +44,7 @@ Section Schedule.
   Lemma respects_policy_at_preemption_point :
     respects_FP_policy_at_preemption_point arr_seq sched (NumericFPAscending Task).
   Proof.
-    apply schedule_respects_policy => //; rt_eauto.
+    apply schedule_respects_policy => //.
     by apply sequential_readiness_nonclairvoyance.
   Qed.
 

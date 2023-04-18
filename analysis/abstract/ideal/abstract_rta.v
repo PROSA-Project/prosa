@@ -131,31 +131,32 @@ Section AbstractRTAIdeal.
     destruct (leqP t2 (t1 + F)) as [NEQ1|NEQ1]; last destruct (leqP F Δ) as [NEQ2|NEQ2].
     { rewrite -leq_subLR in NEQ1.
       rewrite -(leqRW NEQ1) (leqRW RTC) (leqRW (service_at_most_cost _ _ _ _ _)) //
-              (leqRW (service_within_busy_interval_ge_job_cost  _ _ _ _ _ _ _)); rt_eauto.
+              (leqRW (service_within_busy_interval_ge_job_cost  _ _ _ _ _ _ _)) //.
       rewrite (leqRW (cumulative_interference_sub _ t1 _ t1 t2 _ _ )); try lia.
       have LLL : (t1 < t2) = true by apply leq_ltn_trans with (t1 + Δ); lia.
       interval_to_duration t1 t2 k.
       eapply leq_trans.
       - by rewrite addnC; (eapply service_and_interference_bounded with (t := t1) (t3 := t1+k)
-                        || eapply service_and_interference_bounded with (t := t1) (t2 := t1+k)); rt_eauto.
+                        || eapply service_and_interference_bounded with (t := t1) (t2 := t1+k)).
       - lia.
     }
     { have NoInterference: cumulative_interference j (t1 + F) (t1 + Δ) = 0.
       { rewrite /cumulative_interference /definitions.cumulative_interference big_nat.
         apply big1; move => t /andP [GE__t LT__t].
-        apply/eqP; rewrite eqb0; apply/negP; eapply H_work_conserving; rt_eauto.
+        apply/eqP; rewrite eqb0; apply/negP; eapply H_work_conserving => //.
         { by apply/andP; split; lia. }
-        eapply H_ideal_progress_proc_model, job_nonpreemptive_after_run_to_completion_threshold; rt_eauto.
+        apply: H_ideal_progress_proc_model.
+        apply: job_nonpreemptive_after_run_to_completion_threshold GE__t _ _ => //.
         - by rewrite -(leqRW RTC); apply H_valid_run_to_completion_threshold.
         - by move: NCOM; apply contra; apply completion_monotonic; lia.
       }
       rewrite (leqRW RTC); erewrite cumulative_interference_cat with (t := t1 + F); last by lia.
-      rewrite NoInterference addn0; erewrite no_service_before_busy_interval; rt_eauto.
-      by rewrite addnC; eapply service_and_interference_bounded; rt_eauto.
+      rewrite NoInterference addn0; erewrite no_service_before_busy_interval => //.
+      by rewrite addnC; apply: service_and_interference_bounded.
     }
     { rewrite (leqRW RTC) (leqRW (cumulative_interference_sub _ t1 _ t1 (t1 + F) _ _ )); try lia.
-      erewrite no_service_before_busy_interval; rt_eauto.
-      by rewrite addnC; eapply service_and_interference_bounded; rt_eauto.
+      erewrite no_service_before_busy_interval => //.
+      by rewrite addnC; eapply service_and_interference_bounded.
     }
   Qed.
 
@@ -181,7 +182,7 @@ Section AbstractRTAIdeal.
     task_response_time_bound arr_seq sched tsk R.
   Proof.
     try (eapply uniprocessor_response_time_bound with (IBF_NP := fun tsk F Δ => F - task_rtct tsk)
-         || eapply uniprocessor_response_time_bound with (IBF_NP0 := fun tsk F Δ => F - task_rtct tsk)); rt_eauto.
+         || eapply uniprocessor_response_time_bound with (IBF_NP0 := fun tsk F Δ => F - task_rtct tsk)) => //.
     { by apply nonpreemptive_interference_is_bounded. }
     { move => F _.
       destruct (leqP F (task_rtct tsk)) as [NEQ|NEQ].
@@ -191,7 +192,7 @@ Section AbstractRTAIdeal.
     }
     { move => A SP; specialize (H_R_is_maximum_ideal A SP).
       destruct H_R_is_maximum_ideal as [F [EQ1 EQ2]].
-      exists (A + F); split; first by done.
+      exists (A + F); split=> [//|].
       eapply leq_trans; [ | by erewrite leq_add2l; apply EQ2].
       by rewrite addnBCA; [lia | apply H_valid_run_to_completion_threshold | lia].
     }

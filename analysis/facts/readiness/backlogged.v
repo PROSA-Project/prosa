@@ -92,8 +92,7 @@ Section NonClairvoyance.
     move=> t j IN_PREFIX.
     rewrite /backlogged.
     rewrite (H_nonclairvoyant_job_readiness sched sched' j h) //.
-    rewrite /scheduled_at H_shared_prefix //.
-    now apply ltnW.
+    by rewrite /scheduled_at H_shared_prefix.
   Qed.
 
   (** As a corollary, if we further know that j is not scheduled at time [h],

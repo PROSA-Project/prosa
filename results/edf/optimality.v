@@ -117,9 +117,8 @@ Section Optimality.
   Proof.
     move /EDF_WC_optimality => [edf_sched [[ARR READY] [DL_MET [WC EDF]]]].
     exists edf_sched.
-    apply  (EDF_schedule_equiv arr_seq) in EDF => //;
-      first by apply: jobs_must_arrive_to_be_ready.
-    by apply (completed_jobs_are_not_ready edf_sched READY).
+    apply  (EDF_schedule_equiv arr_seq) in EDF => //.
+    exact: (completed_jobs_are_not_ready edf_sched READY).
   Qed.
 
 End Optimality.

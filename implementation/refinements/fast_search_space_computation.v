@@ -137,7 +137,7 @@ Section FastSearchSpaceComputation.
       exists (k * h).
       { rewrite mulnC; apply map_f.
         rewrite mem_iota; apply/andP; split; first by apply leq0n.
-        rewrite add0n ltnS leq_divRL //; first by lia.
+        rewrite add0n ltnS leq_divRL //.
         rewrite /specified_bursts in BUR.
         by rewrite /h /get_horizon_of_task EMAX. }
       { rewrite /time_steps_with_offset addnC.

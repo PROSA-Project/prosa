@@ -42,9 +42,8 @@ Section FullyPreemptiveModel.
     - case: (posnP (job_cost j)) => [ZERO|POS].
       + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_0. 
       + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_ε. 
-    - intros t; exists t; split.
-      + by apply/andP; split; [ done | rewrite leq_addr]. 
-      + by done.
+    - intros t; exists t; split=> [|//].
+      by apply/andP; split; [|rewrite leq_addr].
   Qed.
 
   (** Which together with lemma [valid_fully_preemptive_model] gives

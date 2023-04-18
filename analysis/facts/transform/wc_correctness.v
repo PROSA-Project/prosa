@@ -7,6 +7,7 @@ Require Export prosa.analysis.transform.wc_trans.
 Require Export prosa.analysis.facts.transform.swaps.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.list.
+Require Export prosa.util.tactics.
 
 (** * Correctness of the work-conservation transformation *)
 (** This file contains the main argument of the work-conservation proof,
@@ -71,9 +72,9 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       t1 <= fsc.
     Proof.
       rewrite /fsc /find_swap_candidate.
-      destruct search_arg as [n|] eqn:search_result; last by done.
+      destruct search_arg as [n|] eqn:search_result => [|//].
       apply search_arg_in_range in search_result.
-        by move:search_result => /andP [LEQ LMAX].
+      by move:search_result => /andP [LEQ LMAX].
     Qed.
 
     (** Also, we show that the search will not yield jobs that arrive later than the 
@@ -134,10 +135,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       apply /andP; split; first by apply swap_jobs_must_arrive_to_execute.
       rewrite /completed_by; rewrite -ltnNge.
       apply swapped_completed_jobs_dont_execute => //.
-      - by apply swap_candidate_is_in_future.
-      - by apply ideal_proc_model_provides_unit_service.
-      - by apply ideal_proc_model_ensures_ideal_progress.
-      - by eapply completed_jobs_are_not_ready.
+      - exact: swap_candidate_is_in_future.
+      - exact: completed_jobs_are_not_ready.
     Qed.
 
   End JobsMustBeReadyFindSwapCandidate.
@@ -251,14 +250,13 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         Proof.
           apply search_arg_pred in search_result_found.
           move:search_result_found; rewrite /relevant_pstate.
-          destruct (sched t_swap) as [j_swap|] eqn:SCHED; last by done.
+          destruct (sched t_swap) as [j_swap|] eqn:SCHED => [|//].
           move=>ARR. rewrite /swapped /replace_at.
           destruct (t_swap == t) eqn:SAME_SWAP.
           + move:SAME_SWAP => /eqP SAME_SWAP; subst t_swap.
             move:H_sched_t_idle => /eqP SCHED_NONE.
-              by rewrite SCHED_NONE in SCHED; discriminate.
-          + exists j_swap.
-              by rewrite eq_refl; apply SCHED.
+            by rewrite SCHED_NONE in SCHED; discriminate.
+          + by exists j_swap; rewrite eq_refl; apply SCHED.
         Qed.
         
       End MakeWCAtFindsReadyJobs_CaseResultFound.
@@ -386,8 +384,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       destruct (ltnP t' t) as [tLT | tGE]. 
       { have SAME: sched' t' = sched t'.
         { rewrite /sched' /make_wc_at.
-          destruct (sched t); first by done.
-            by rewrite (swap_before_invariant sched t fsc) //. }
+          destruct (sched t) => [//|].
+          by rewrite (swap_before_invariant sched t fsc). }
         rewrite SAME.
         apply P_PREFIX; eauto.
         exists j; split; auto.
@@ -396,9 +394,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       { have EQ: t' = t.
         { by apply /eqP; rewrite eqn_leq; apply /andP; split. } 
         subst t'; clear T_MIN tGE.
-        apply mwa_finds_ready_jobs => //.
-          by exists j; split; eauto. 
-      } 
+        exact: mwa_finds_ready_jobs. }
     Qed.
 
     (** We now show that the point-wise transformation does not introduce any new job
@@ -408,8 +404,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       jobs_come_from_arrival_sequence sched' arr_seq.
     Proof.
       rewrite /sched' /make_wc_at.
-      destruct (sched t) as [j_orig|] eqn:SCHED_orig; first by done.
-      by apply swapped_jobs_come_from_arrival_sequence.
+      destruct (sched t) as [j_orig|] eqn:SCHED_orig => [//|].
+      exact: swapped_jobs_come_from_arrival_sequence.
     Qed.
 
     (** We also show that the point-wise transformation does not schedule jobs in instants
@@ -420,9 +416,9 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Proof.
       move=> READY.
       rewrite /sched' /make_wc_at.
-      destruct (sched t) as [j_orig|] eqn:SCHED_orig; first by done.
-      by apply fsc_jobs_must_be_ready_to_execute.
-    Qed.      
+      destruct (sched t) as [j_orig|] eqn:SCHED_orig => [//|].
+      exact: fsc_jobs_must_be_ready_to_execute.
+    Qed.
 
     (** Finally, we show that the point-wise transformation does not introduce deadline misses. *)
     Lemma mwa_all_deadlines_of_arrivals_met:
@@ -469,15 +465,15 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         rewrite /sched1 /sched2.
         elim: h2 H_horizon_order => [|i IHi] horizon_order.
           by move: (leq_trans before_horizon horizon_order).
-        move: horizon_order. rewrite leq_eqVlt => /orP [/eqP ->|LT]; first by done.
+        move: horizon_order; rewrite leq_eqVlt => /orP [/eqP-> // | LT].
         move: LT. rewrite ltnS => H_horizon_order_lt.
         rewrite [RHS]/wc_transform_prefix /prefix_map -/prefix_map IHi //.
         rewrite {1}/make_wc_at.
-        destruct (prefix_map sched (make_wc_at arr_seq) i i) as [j|] eqn:SCHED; first by done.   
-        rewrite -(swap_before_invariant _ i (find_swap_candidate arr_seq (wc_transform_prefix arr_seq sched i) i));
-          last by apply leq_trans with (n := h1).
-        rewrite //.
-        apply swap_candidate_is_in_future.
+        destruct (prefix_map sched (make_wc_at arr_seq) i i) as [j|] eqn:SCHED => [//|].
+        rewrite -(swap_before_invariant _ i (find_swap_candidate arr_seq (wc_transform_prefix arr_seq sched i) i)).
+        - by [].
+        - exact: swap_candidate_is_in_future.
+        - by apply leq_trans with (n := h1).
       Qed.
 
     End PrefixInclusion.
@@ -511,12 +507,11 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         { rewrite /serv /servp /service /service_during.
           apply eq_big_nat => t' /andP [_ LT_t].
           rewrite /service_at.
-          rewrite (wc_transform_prefix_inclusion t'.+1 t.+1)=> //.
-          by auto. }
+          by rewrite (wc_transform_prefix_inclusion t'.+1 t.+1). }
         rewrite /servp /wc_transform_prefix.
         clear serv servp.
-        apply prefix_map_property_invariance; last by done.
-        move=> sched0 ? ?. apply leq_trans with (service sched0 j t)=> //.
+        apply prefix_map_property_invariance => [|//].
+        move=> sched0 ? ?; apply leq_trans with (service sched0 j t)=> //.
         by intros; apply mwa_service_bound.
       Qed.
 
@@ -548,7 +543,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Proof.
       move=> FROM_ARR.
       rewrite /sched' /wc_transform_prefix.
-      apply prefix_map_property_invariance; last by done.
+      apply prefix_map_property_invariance => [|//].
       move => schedX t ARR.
       by apply mwa_jobs_come_from_arrival_sequence.
     Qed.
@@ -561,7 +556,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Proof.
       move=> READY.
       rewrite /sched' /wc_transform_prefix.
-      apply prefix_map_property_invariance; last by done.
+      apply prefix_map_property_invariance => [|//].
       move=> schedX t ARR.
       by apply mwa_jobs_must_be_ready_to_execute.
     Qed.  
@@ -606,7 +601,7 @@ Section WorkConservingTransformation.
   Proof.
     move=> j t.
     rewrite /scheduled_at -/(scheduled_at _ j t).
-    eapply (wc_prefix_jobs_come_from_arrival_sequence arr_seq sched t.+1); rt_eauto.
+    exact: (wc_prefix_jobs_come_from_arrival_sequence arr_seq sched t.+1).
   Qed.
 
   (** Similarly, jobs are only scheduled if they are ready. *)
@@ -615,8 +610,8 @@ Section WorkConservingTransformation.
   Proof.
     move=> j t.
     rewrite /scheduled_at /sched_wc /wc_transform -/(scheduled_at _ j t) => SCHED_AT.
-    have READY': job_ready (wc_transform_prefix arr_seq sched t.+1) j t
-       by apply wc_prefix_jobs_must_be_ready_to_execute => //; rt_eauto.
+    have READY': job_ready (wc_transform_prefix arr_seq sched t.+1) j t.
+      exact: wc_prefix_jobs_must_be_ready_to_execute.
     move: READY'.
     rewrite /job_ready /basic.basic_ready_instance
             /pending /completed_by /service.
@@ -663,8 +658,7 @@ Section WorkConservingTransformation.
         {  apply eq_big_nat => t' /andP [_ LT_t].
            rewrite -/(wc_transform_prefix arr_seq sched _ _).
            rewrite -/(wc_transform_prefix arr_seq sched _ _).  
-           rewrite (wc_transform_prefix_inclusion arr_seq sched t'.+1 t.+1)=> //.
-           by auto. }
+           by rewrite (wc_transform_prefix_inclusion arr_seq sched t'.+1 t.+1). }
         by rewrite EQ_SUM. }
       move: READY. by rewrite EQ. }
   Qed.

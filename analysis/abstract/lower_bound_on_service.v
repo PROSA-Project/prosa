@@ -76,9 +76,8 @@ Section LowerBoundOnService.
       rewrite /service_during /cumulative_interference /service_at.
       rewrite -big_split //= -{1}(sum_of_ones t δ) big_nat [in X in _ <= X]big_nat leq_sum // => x /andP[Lo Hi].
       move: (H_work_conserving j t1 t2 x) => Workj.
-      feed_n 4 Workj; rt_eauto.
-      { by apply/andP; split; eapply leq_trans; rt_eauto. }
-      destruct interference; first by lia.
+      feed_n 4 Workj => //; first lia.
+      destruct interference; first lia.
       by rewrite // addn0; apply Workj.
     Qed.
     
@@ -95,7 +94,7 @@ Section LowerBoundOnService.
       rewrite -{2}(sum_of_ones t δ).
       rewrite big_nat [in X in _ <= X]big_nat; apply leq_sum => x /andP[Lo Hi].
       move: (H_work_conserving j t1 t2 x) => Workj.
-      feed_n 4 Workj; try done.
+      feed_n 4 Workj => //.
       { by apply/andP; split; lia. }
       destruct interference.
       - rewrite addn1 ltnS.
@@ -130,13 +129,13 @@ Section LowerBoundOnService.
     Proof.
       destruct (leqP (t1 + δ) t2) as [NEQ|NEQ]; last first.
       { move: (job_completes_within_busy_interval _ _ _ _ H_busy_interval) => COMPL.
-        apply leq_trans with (job_cost j); first by done.
+        apply leq_trans with (job_cost j) => [//|].
         rewrite /service -(service_during_cat _ _ _ t2); last by apply/andP; split; last apply ltnW.
-        by apply leq_trans with (service_during sched j 0 t2); [done | rewrite leq_addr].
+        by apply leq_trans with (service_during sched j 0 t2); [| rewrite leq_addr].
       }
       { move: H_total_workload_is_bounded => BOUND.
         rewrite addnC in BOUND; apply leq_subRL_impl in BOUND.
-        apply leq_trans with (δ - cumulative_interference j t1 (t1 + δ)); first by done.
+        apply leq_trans with (δ - cumulative_interference j t1 (t1 + δ)) => [//|].
         apply leq_trans with (service_during sched j t1 (t1 + δ)).
         - eapply leq_trans.
           + by apply leq_sub2r, (interference_is_complement_to_schedule t1 t2);

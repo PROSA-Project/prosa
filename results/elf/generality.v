@@ -120,12 +120,12 @@ Section GeneralityOfELF.
         have [LEQ|LT] := leqP (job_arrival j') (job_arrival j);
           first by rewrite hep_job_arrival_gel.
         exfalso.
-        have COMP: completed_by sched j t
-          by apply: (H_sequential j j'); rt_eauto => //; rewrite same_task_sym.
-        move: BL. rewrite /backlogged => /andP [INCOMP _].
+        have COMP: completed_by sched j t.
+          by apply: (H_sequential j j') => //; rewrite same_task_sym.
+        move: BL; rewrite /backlogged => /andP [INCOMP _].
         apply ready_implies_incomplete in INCOMP.
         by move: INCOMP => /negP. }
-      { have /negP NEP: ~~ ep_task (job_task j') (job_task j)
+      { have /negP NEP: ~~ ep_task (job_task j') (job_task j).
           by apply: H_distinct_fixed_priorities.
         by move: HEP; rewrite hep_hp_ep_task => /orP [|]. }
     Qed.
@@ -134,6 +134,4 @@ Section GeneralityOfELF.
 
 End ELFGeneralizesGEL.
 
-
 End GeneralityOfELF.
-

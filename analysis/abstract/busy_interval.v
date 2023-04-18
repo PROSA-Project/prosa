@@ -81,12 +81,12 @@ Section LemmasAboutAbstractBusyInterval.
       + rewrite /service -[in X in _ <= X](service_during_cat _ _ _ t1);
           [ | by apply/andP; split; lia].
         by (erewrite cumulative_service_before_job_arrival_zero with (t1 := 0)
-           || erewrite cumulative_service_before_job_arrival_zero with (t3 := 0)); rt_eauto.
+           || erewrite cumulative_service_before_job_arrival_zero with (t3 := 0)).
     - rewrite /service -(service_during_cat _ _ _ t1);
         [ | by apply/andP; split; lia].
       by rewrite cumulative_service_before_job_arrival_zero; eauto 2.
     - rewrite service_during_geq; last by lia.
-      by rewrite /service cumulative_service_before_job_arrival_zero; auto; lia.
+      by rewrite /service cumulative_service_before_job_arrival_zero//; lia.
   Qed.
 
   (** Since the job cannot arrive before the busy interval starts and
@@ -97,11 +97,10 @@ Section LemmasAboutAbstractBusyInterval.
   Proof.
     move : (H_busy_interval) => [[/andP [LE1 LE2] [QT1 AQT]] QT2].
     rewrite -[service_during _ _ _ _]add0n.
-    (erewrite <-cumulative_service_before_job_arrival_zero with (t1 := 0)
-     || erewrite <-cumulative_service_before_job_arrival_zero with (t3 := 0)); rt_eauto.
+    rewrite -(cumulative_service_before_job_arrival_zero sched j _ 0 _ LE1)//.
     rewrite service_during_cat; last by apply/andP; split; lia.
     rewrite  -/(completed_by sched j t2).
-    by eapply job_completes_within_busy_interval; rt_eauto.
+    exact: job_completes_within_busy_interval.
   Qed.
 
 End LemmasAboutAbstractBusyInterval.

@@ -129,7 +129,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Theorem uniprocessor_response_time_bound_fully_preemptive_edf:
     response_time_bounded_by tsk R.
   Proof.
-    apply: uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments; rt_eauto.
+    eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L:=L) => //.
     move => A /andP [LT CHANGE].
     have BLOCK: forall A', bounded_nps.blocking_bound ts tsk A' = blocking_bound A'.
     { by move=> A'; rewrite /bounded_nps.blocking_bound /parameters.task_max_nonpreemptive_segment
@@ -142,4 +142,3 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Qed.
 
 End RTAforFullyPreemptiveEDFModelwithArrivalCurves.
-

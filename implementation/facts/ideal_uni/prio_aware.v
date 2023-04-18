@@ -105,9 +105,8 @@ Section PrioAwareUniprocessorScheduler.
     Proof.
       move=> j t SCHED PREEMPT.
       have NOT_NP: ~~ prev_job_nonpreemptive (prefix t) t.
-      { apply /(contraL _ PREEMPT)/np_consistent; rt_eauto.
-        rewrite /choose_highest_prio_job => t' s j'.
-        by apply: supremum_in. }
+      { apply /(contraL _ PREEMPT)/np_consistent => // t' s j'.
+        exact: supremum_in. }
       move: SCHED.
       rewrite scheduled_at_def => /eqP.
       rewrite {1}/schedule/uni_schedule/pmc_uni_schedule/generic_schedule schedule_up_to_def /allocation_at -/(prefix t).
@@ -136,7 +135,7 @@ Section PrioAwareUniprocessorScheduler.
         move=> BACK_j1.
         move: (scheduled_job_is_supremum j2 t SCHED_j2 PREEMPT) => SUPREMUM.
         apply supremum_spec with (s := jobs_backlogged_at arr_seq (prefix t) t) => //.
-        by apply mem_backlogged_jobs; rt_auto. }
+        exact: mem_backlogged_jobs. }
     Qed.
 
   End Priority.

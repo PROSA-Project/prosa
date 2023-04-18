@@ -78,11 +78,7 @@ Section ValidJobCostsShifted.
     specialize (corresponding_jobs_have_same_task arr_seq ts j' j) => TSK.
     rewrite -[in X in _ <= task_cost X]TSK.
     have IN : job_task j' \in ts by apply H_jobs_from_taskset.
-    apply H_arrivals_have_valid_job_costs, corresponding_job_arrives => //.
-    + now apply H_valid_offsets_in_taskset.
-    + now apply H_valid_periods_in_taskset.
-    + now apply H_periodic_taskset.
-    + now lia.
+    apply H_arrivals_have_valid_job_costs, corresponding_job_arrives => //; lia.
   Qed.
 
 End ValidJobCostsShifted.

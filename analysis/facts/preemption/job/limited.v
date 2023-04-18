@@ -83,9 +83,9 @@ Section ModelWithLimitedPreemptions.
       rewrite -EQ; clear EQ.
       rewrite /last0 -nth_last.
       apply/(nthP 0).
-      exists ((size (job_preemptive_points j)).-1); last by done.
+      exists ((size (job_preemptive_points j)).-1) => [|//].
       rewrite -(leq_add2r 1) !addn1 prednK //.
-        by apply list_of_preemption_point_is_not_empty.
+      exact: list_of_preemption_point_is_not_empty.
     Qed.
 
     (** As a corollary, we prove that the sequence of non-preemptive
@@ -97,16 +97,16 @@ Section ModelWithLimitedPreemptions.
     Proof.
       intros POS.
       move: H_valid_limited_preemptions_job_model => [BEG [END _]].
-      have EQ: 2 = size [::0; job_cost j]; first by done.
+      have EQ: 2 = size [::0; job_cost j] => [//|].
       rewrite EQ; clear EQ.
       apply subseq_leq_size.
       rewrite !cons_uniq.
       { apply/andP; split.
-        rewrite in_cons negb_or; apply/andP; split; last by done.
+        rewrite in_cons negb_or; apply/andP; split=> [|//].
         rewrite neq_ltn; apply/orP; left; eauto 2.
-        apply/andP; split; by done. }
+        by apply/andP. }
       intros t EQ; move: EQ; rewrite !in_cons.
-      move => /orP [/eqP EQ| /orP [/eqP EQ|EQ]]; last by done.
+      move => /orP [/eqP EQ| /orP [/eqP EQ|EQ]] //.
       - by rewrite EQ; apply zero_in_preemption_points.
       - by rewrite EQ; apply job_cost_in_nonpreemptive_points.
     Qed.
@@ -123,12 +123,12 @@ Section ModelWithLimitedPreemptions.
       move: H_valid_limited_preemptions_job_model => [BEG [END NDEC]].
       apply/andP; split.
       - by rewrite zero_is_first_element.
-      - rewrite END; last by done.
-        rewrite ltn_neqAle; apply/andP; split; last by done.
+      - rewrite END//.
+        rewrite ltn_neqAle; apply/andP; split=> [|//].
         apply/negP; intros CONTR; move: CONTR => /eqP CONTR.
         rewrite CONTR in NotIN.
         move: NotIN => /negP NIN; apply: NIN.
-          by apply job_cost_in_nonpreemptive_points.
+        by apply job_cost_in_nonpreemptive_points.
     Qed.
 
     (** We also prove that any work that doesn't belong to
@@ -150,14 +150,13 @@ Section ModelWithLimitedPreemptions.
       move: (belonging_to_segment_of_seq_is_total
                (job_preemptive_points j) ρ (number_of_preemption_points_at_least_two POS)
                (antidensity_of_preemption_points _ LE NotIN)) => [n [SIZE2 /andP [N1 N2]]].
-      exists n; split; first by done.
-      apply/andP; split; last by done.
-      move: N1; rewrite leq_eqVlt; move => /orP [/eqP EQ | G]; last by done.
+      exists n; split=> [//|].
+      apply/andP; split=> [|//].
+      move: N1; rewrite leq_eqVlt; move => /orP [/eqP EQ | //].
       exfalso.
       move: NotIN => /negP CONTR; apply: CONTR.
       rewrite -EQ; clear EQ.
-      rewrite mem_nth //.
-        by apply ltnW.
+      by rewrite mem_nth.
     Qed.
 
     (** Recall that the module [prosa.model.preemption.parameters] also defines

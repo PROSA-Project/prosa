@@ -42,11 +42,11 @@ Section FullyNonPreemptiveModel.
       move: (incremental_service_during _ H_unit_service _ _ _ _ POS) => [ft [/andP [_ LT] [SCHED SERV]]].
       apply H_nonpreemptive_sched with ft.
       + by apply ltnW.
-      + by done.
+      + by [].
       + rewrite /completed_by -ltnNge.
-        move: NCOMPL; rewrite neq_ltn; move => /orP [LE|GE]; [by done | exfalso].
+        move: NCOMPL; rewrite neq_ltn; move => /orP [//|GE]; exfalso.
         move: GE; rewrite ltnNge; move => /negP GE; apply: GE.
-        apply completion.service_at_most_cost; rt_eauto.
+        exact: completion.service_at_most_cost.
     - intros t NSCHED SCHED.
       rewrite /job_preemptable /fully_nonpreemptive_job_model.
       apply/orP; left.
@@ -55,7 +55,7 @@ Section FullyNonPreemptiveModel.
       move: NSCHED => /negP NSCHED; apply: NSCHED.
       apply H_nonpreemptive_sched with ft.
       + by rewrite -ltnS.
-      + by done.
+      + by [].
       + rewrite /completed_by -ltnNge.
         apply leq_ltn_trans with (service sched j t.+1).
         * by rewrite /service /service_during big_nat_recr //= leq_addr.
@@ -74,21 +74,21 @@ Section FullyNonPreemptiveModel.
     { by rewrite ZERO; compute. }
     have ->: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n].
     { clear; simpl; intros.
-      apply/eqP; rewrite eqseq_cons; apply/andP; split; first by done.
+      apply/eqP; rewrite eqseq_cons; apply/andP; split=> [//|].
       have ->:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
       { clear; move=> t xs P1 P2 H.
         apply eq_in_filter.
         move=> x IN. specialize (H _ IN).
           by destruct (P1 x), (P2 x).
       }
-      rewrite filter_pred1_uniq; first by done.
+      rewrite filter_pred1_uniq//.
       - by apply iota_uniq.
-      - by rewrite mem_iota; apply/andP; split; [done | rewrite add1n].
+      - by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
       - intros x; rewrite mem_iota; move => /andP [POS _].
-          by rewrite -lt0n.
+        by rewrite -lt0n.
     }
-    by rewrite /distances; simpl; rewrite subn0 /max0; simpl; rewrite max0n.
-      by done.
+    { by rewrite /distances/= subn0 /max0/= max0n. }
+    { by []. }
   Qed.
 
   (** ... and [job_last_nonpreemptive_segment j] is equal to [job_cost j]. *)
@@ -102,21 +102,21 @@ Section FullyNonPreemptiveModel.
     { by rewrite ZERO; compute. }
     have ->: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n].
     { clear; simpl; intros.
-      apply/eqP; rewrite eqseq_cons; apply/andP; split; first by done.
+      apply/eqP; rewrite eqseq_cons; apply/andP; split=> [//|].
       have ->:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
       { clear; move=> t xs P1 P2 H.
         apply eq_in_filter.
         move=> x IN. specialize (H _ IN).
           by destruct (P1 x), (P2 x).
       }
-      rewrite filter_pred1_uniq; first by done.
+      rewrite filter_pred1_uniq//.
       - by apply iota_uniq.
-      - by rewrite mem_iota; apply/andP; split; [done | rewrite add1n].
+      - by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
       - intros x; rewrite mem_iota; move => /andP [POS _].
-          by rewrite -lt0n.
+        by rewrite -lt0n.
     }
-      by rewrite /distances; simpl; rewrite subn0 /last0; simpl.
-      by done.
+    { by rewrite /distances/= subn0. }
+    { by []. }
   Qed.
 
 End FullyNonPreemptiveModel.

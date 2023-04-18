@@ -39,8 +39,3 @@ Generally speaking, in new code, prefer `ssreflect` tactics over standard Coq ta
 - `move_neq_down H`: moves inequality `H : t1 <= t2` (or `H : t1 < t2`) from the context into goals as `t1 > t2` (or `t1 >= t2`)
 - `move_neq_up H`: the reverse operation that moves inequality `t1 <= t2` (or `t1 < t2`) from goals into the context as `H : t1 > t2` (or `H : t1 >= t2`)
 - `interval_to_duration t1 t2 k`: any interval `[t1, t2]` can be represented as `[t1, t1 + k]` for some natural number `k`. This tactic searches for inequality `t1 <= t2` (or `t1 < t2`) in the context and replaces `t2` with `t1 + k`. Note: `k` is the name of a newly created natural number. 
-- `rt_auto`: equivalent to `auto with basic_rt_facts`
-- `rt_eauto`: equivalent to `eauto with basic_rt_facts`
-
-
-

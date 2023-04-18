@@ -71,11 +71,11 @@ Section Equivalence.
     move=> EDF j' j t ARR PREEMPTION BL SCHED.
     have suff: exists t' : nat, t <= t' < job_deadline j' /\ scheduled_at sched j' t'.
     { move=> [t' [/andP [LE _] SCHED']].
-      apply: (EDF t); [done | exact LE | exact SCHED' |].
+      apply: (EDF t); [by [] | exact: LE | exact: SCHED' |].
       by apply: (backlogged_implies_arrived sched j' t). }
-    apply; apply: incomplete_implies_scheduled_later;
-      first by apply: H_no_deadline_misses => //.
-    by apply: (backlogged_implies_incomplete sched j' t).
+    apply; apply: incomplete_implies_scheduled_later.
+      exact: H_no_deadline_misses.
+    exact: (backlogged_implies_incomplete sched j' t).
   Qed.
 
   (** Conversely, the reverse direction also holds: a schedule that satisfies
@@ -89,7 +89,6 @@ Section Equivalence.
     case (boolP (j == j_hp)); first by move /eqP => EQ; subst.
     move /neqP => NEQ.
     exploit (H_priority_driven j j_hp t) => //.
-    { by apply (H_from_arr_seq _ _ SCHED'). }
     { by rewrite /preemption_time scheduled_job_at_def //; destruct (sched t). }
     { apply /andP; split => //.
       - apply /andP; split => //.
@@ -106,8 +105,8 @@ Section Equivalence.
     EDF_schedule sched <-> respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
   Proof.
     split.
-    - by apply EDF_schedule_implies_respects_policy_at_preemption_point.
-    - by apply respects_policy_at_preemption_point_implies_EDF_schedule.
+    - exact: EDF_schedule_implies_respects_policy_at_preemption_point.
+    - exact: respects_policy_at_preemption_point_implies_EDF_schedule.
   Qed.
 
 End Equivalence.

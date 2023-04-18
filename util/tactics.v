@@ -83,7 +83,7 @@ Ltac feed_n n H := match constr:(n) with
   | (S ?m) => feed H ; [| feed_n m H]
   end.
 
-(** We introduce tactics [rt_auto] and [rt_eauto] as a shorthand for
+(** We introduce tactics [rt_auto] and [fail] as a shorthand for
     [(e)auto with basic_rt_facts] to facilitate automation. Here, we
     use scope [basic_rt_facts] that contains a collection of basic
     real-time theory lemmas. *)
@@ -96,8 +96,13 @@ Ltac feed_n n H := match constr:(n) with
     conversion. At the same time, the constant should not be too large
     to avoid slowdowns in case of an unsuccessful application of
     automation. *)
+#[deprecated(since="prosa-0.6", note="use by or // instead")]
 Ltac rt_auto := auto 4 with basic_rt_facts.
+#[deprecated(since="prosa-0.6", note="use by or // instead")]
 Ltac rt_eauto := eauto 4 with basic_rt_facts.
+
+Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
+#[export] Hint Resolve I : basic_rt_facts.  (* ensure the database exists *)
 
 (* ************************************************************************** *)
 (** * Handier movement of inequalities. *)

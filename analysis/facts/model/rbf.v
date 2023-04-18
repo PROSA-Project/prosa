@@ -3,7 +3,7 @@ Require Export prosa.analysis.facts.model.arrival_curves.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.definitions.schedulability.
-
+Require Export prosa.util.tactics.
 
 (** * Facts about Request Bound Functions (RBFs) *)
 
@@ -115,7 +115,7 @@ Section ProofWorkloadBound.
       apply (@leq_trans (\sum_(tsk' <- ts) (\sum_(j0 <- l | job_task j0 == tsk') job_cost j0))).
       { rewrite /total_workload.
         have EXCHANGE := exchange_big_dep predT.
-        rewrite EXCHANGE /=; clear EXCHANGE; last by done.
+        rewrite EXCHANGE //=; clear EXCHANGE.
         rewrite /workload_of_jobs -/l big_seq_cond [X in _ <= X]big_seq_cond.
         apply leq_sum; move => j0 /andP [IN0 HP0].
         rewrite big_mkcond (big_rem (job_task j0)) /=.
@@ -246,10 +246,10 @@ Section RequestBoundFunctions.
     move: CONTR; rewrite -addn1 -[1]add0n leq_add2r leqn0 => /eqP CONTR.
     move: ARRB; rewrite addKn CONTR leqn0 eqn0Ngt => /negP T; apply: T.
     rewrite /number_of_task_arrivals -has_predT /task_arrivals_between.
-    apply/hasP; exists j; last by done.
-    rewrite /arrivals_between addn1 big_nat_recl; last by done.
+    apply/hasP; exists j => [|//].
+    rewrite /arrivals_between addn1 big_nat_recl//.
     rewrite big_geq ?cats0 //= mem_filter.
-    apply/andP; split; first by done.
+    apply/andP; split=> [//|].
     move: H_j_arrives => [t ARR]; move: (ARR) => CONS.
     apply H_arrival_times_are_consistent in CONS.
     by rewrite CONS.
@@ -273,8 +273,8 @@ Section RequestBoundFunctions.
   (** Then, we prove that [task_rbf] at [ε] is greater than [0]. *)
   Lemma task_rbf_epsilon_gt_0 : 0 < task_rbf ε.
   Proof.
-    apply leq_trans with (task_cost tsk); first by done.
-    by eapply task_rbf_1_ge_task_cost; eauto.
+    apply leq_trans with (task_cost tsk) => [//|].
+    exact: task_rbf_1_ge_task_cost.
   Qed.
 
   (** Consider a set of tasks [ts] containing the task [tsk]. *)
@@ -289,7 +289,7 @@ Section RequestBoundFunctions.
       task_cost tsk <= total_request_bound_function ts t.
   Proof.
     case=> [//|t] GE.
-    eapply leq_trans; first by apply task_rbf_1_ge_task_cost; rt_eauto.
+    eapply leq_trans; first exact: task_rbf_1_ge_task_cost.
     rewrite /total_request_bound_function.
     erewrite big_rem; last by exact H_tsk_in_ts.
     apply leq_trans with (task_request_bound_function tsk t.+1); last by apply leq_addr.
@@ -313,10 +313,7 @@ Section TotalRBFMonotonic.
   (** We observe that the total RBF is monotonically increasing. *)
   Lemma total_rbf_monotone :
     monotone leq (total_request_bound_function ts).
-  Proof.
-    apply: sum_leq_mono => tsk IN.
-    by apply task_rbf_monotone; rt_auto.
-  Qed.
+  Proof. by apply: sum_leq_mono => tsk IN; apply: task_rbf_monotone. Qed.
 
   (** Furthermore, for any fixed-priority policy, ... *)
   Context `{FP_policy Task}.
@@ -328,7 +325,7 @@ Section TotalRBFMonotonic.
   Proof.
     move=> tsk.
     apply: sum_leq_mono => tsk' IN.
-    by apply task_rbf_monotone; rt_auto.
+    exact: task_rbf_monotone.
   Qed.
 
   (** ... as is the variant that excludes the reference task. *)
@@ -338,7 +335,7 @@ Section TotalRBFMonotonic.
   Proof.
     move=> tsk.
     apply: sum_leq_mono => tsk' IN.
-    by apply task_rbf_monotone; rt_auto.
+    exact: task_rbf_monotone.
   Qed.
 
 End TotalRBFMonotonic.
@@ -385,8 +382,8 @@ Section DegenerateTotalRBFs.
       - move: TASK. rewrite /job_of_task => /eqP ->.
         by rewrite COST. }
     { exfalso.
-      have: 0 < max_arrivals tsk ε
-        by apply: (non_pathological_max_arrivals tsk arr_seq _ j); rt_auto.
+      have: 0 < max_arrivals tsk ε.
+        by apply: (non_pathological_max_arrivals tsk arr_seq _ j).
       by rewrite NEVER. }
   Qed.
 

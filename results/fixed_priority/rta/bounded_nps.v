@@ -133,8 +133,8 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Proof.
       move=> j t1 t2 ARR TSK BUSY; move: TSK => /eqP TSK.
       rewrite /max_length_of_priority_inversion /blocking_bound /max_length_of_priority_inversion.
-      apply: leq_trans;
-        first by apply: priority_inversion_is_bounded_by_max_np_segment; rt_eauto.
+      apply: leq_trans.
+        exact: priority_inversion_is_bounded_by_max_np_segment.
       apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t1
                 | (~~ hep_task (job_task j_lp) tsk) && (0 < job_cost j_lp))
                             (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
@@ -156,9 +156,9 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         arr_seq sched tsk blocking_bound.
     Proof.
       have PIB: priority_inversion_is_bounded_by arr_seq sched tsk (fun=> blocking_bound).
-      apply: priority_inversion_is_bounded; rt_eauto.
-      apply: priority_inversion_is_bounded_by_blocking.
-      by apply PIB.
+      apply: priority_inversion_is_bounded => //.
+      - exact: priority_inversion_is_bounded_by_blocking.
+      - exact: PIB.
     Qed.
 
   End PriorityInversionIsBounded.

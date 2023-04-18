@@ -101,7 +101,7 @@ Section FromSequentialReadiness.
     sequential_tasks arr_seq sched.
   Proof.
     move=> j j' t IN IN' SAME LT_ARR SCHED'.
-    have /allP COMP: prior_jobs_complete arr_seq sched j' t by apply: H_sequential; rt_eauto.
+    have /allP COMP: prior_jobs_complete arr_seq sched j' t by apply: H_sequential.
     apply/COMP/job_in_task_arrivals_between => //.
     by move: SAME => /eqP.
   Qed.

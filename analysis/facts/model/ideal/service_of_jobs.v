@@ -70,10 +70,10 @@ Section IdealModelLemmas.
     apply/negPn/negP; rewrite is_nonidle_iff //= => [[j SCHED]].
     move: L => /eqP; rewrite sum_nat_eq0_nat filter_predT => /allP L.
     have /eqP:  service_at sched j x == 0.
-    { apply/L/arrived_between_implies_in_arrivals; rt_eauto.
+    { apply/L/arrived_between_implies_in_arrivals => //.
       rewrite /arrived_between; apply/andP; split => //.
       have: job_arrival j <= x by apply: H_jobs_must_arrive_to_execute.
-      by lia. }
+      lia. }
     by rewrite -no_service_not_scheduled // => /negP.
   Qed.
 

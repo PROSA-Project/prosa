@@ -82,7 +82,7 @@ Section BusyIntervalJLFP.
       - move => /negP DEC; intros QT; apply: DEC.
         apply/allP; intros s ARRs.
         apply/implyP; intros HPs.
-        apply QT; try done.
+        apply QT => //.
         + by apply in_arrivals_implies_arrived in ARRs.
         + by eapply in_arrivals_implies_arrived_between in ARRs; eauto 2.
     Qed.

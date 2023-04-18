@@ -100,10 +100,10 @@ Section SequentialEDF.
     sequential_tasks arr_seq sched.
   Proof.
     move => j1 j2 t ARR1 ARR2 /eqP SAME LT.
-    eapply early_hep_job_is_scheduled => //; rt_eauto => t'.
+    eapply early_hep_job_is_scheduled => // t'.
     rewrite /hep_job_at  /JLFP_to_JLDP /hep_job /EDF /job_deadline
       /absolute_deadline.job_deadline_from_task_deadline SAME.
-    by lia.
+    lia.
   Qed.
 
 End SequentialEDF.

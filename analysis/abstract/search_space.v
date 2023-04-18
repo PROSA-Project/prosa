@@ -101,24 +101,22 @@ Section AbstractRTAReduction.
         feed IHn; first by apply ltn_trans with n.+1. 
         move: IHn => [ASP [NEQ [EQ SP]]].
         move: ALT => [/allP ALT| /hasP ALT].
-        { exists ASP; repeat split; try done.
-          { by apply leq_trans with n. }
-          { intros x LT.
-            move: (ALT x) => T. feed T; first by rewrite mem_iota; apply/andP; split. 
-            move: T => /eqP T.
-              by rewrite -T EQ.
-          }
+        { exists ASP; repeat split=> //.
+          intros x LT.
+          move: (ALT x) => T.
+          feed T; first by rewrite mem_iota; apply/andP; split.
+          by move: T => /eqP<-; rewrite EQ.
         }
-        { exists n.+1; repeat split; try done.
+        { exists n.+1; repeat split=> //.
           rewrite /is_in_search_space; right.
           split; first by  apply/andP; split.
           move: ALT => [y IN N].
           exists y.
           move: IN; rewrite mem_iota add0n. move => /andP [_ LT]. 
-          split; first by done.
+          split=> [//|].
           rewrite subn1 -pred_Sn.
           intros CONTR; move: N => /negP N; apply: N.
-            by rewrite CONTR.
+          by rewrite CONTR.
         }
     Qed.
 

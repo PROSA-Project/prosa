@@ -21,7 +21,7 @@ Section TaskCost.
   (** Then, the task cost of [tsk] is also positive. *)
   Lemma job_cost_positive_implies_task_cost_positive : 0 < task_cost tsk.
   Proof.
-    apply leq_trans with (job_cost j); first by done.
+    apply leq_trans with (job_cost j) => [//|].
     by move : H_job_of_task => /eqP TSK; rewrite -TSK.
   Qed.
 

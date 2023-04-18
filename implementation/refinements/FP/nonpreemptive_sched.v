@@ -105,7 +105,7 @@ Section Schedule.
     rewrite /nonpreemptive_schedule.
     move=> j t; elim=> [|t' IHt']; first by move=> t'; have->: t = 0 by lia.
     move=> LEQ SCHED NCOMP.
-    destruct (ltngtP t t'.+1) as [LT | _ | EQ] => //; last by rewrite -EQ.
+    destruct (ltngtP t t'.+1) as [LT | _ | EQ] => //.
     feed_n 3 IHt'=> //.
     { specialize (completion_monotonic sched j t' t'.+1) => MONO.
       feed MONO; first by lia.
@@ -117,7 +117,7 @@ Section Schedule.
   Lemma respects_policy_at_preemption_point_np :
     respects_FP_policy_at_preemption_point arr_seq sched (NumericFPAscending Task).
   Proof.
-    apply schedule_respects_policy; rt_eauto.
+    apply schedule_respects_policy => //.
     by apply sequential_readiness_nonclairvoyance.
   Qed.
 

@@ -99,9 +99,7 @@ Section ScheduleClass.
 
   Lemma service_on_def (j : Job) (s : processor_state Job) c :
     service_on j s c = (s == Some j).
-  Proof.
-    done.
-  Qed.
+  Proof. by []. Qed.
 
   Lemma service_at_def sched (j : Job) t :
     service_at sched j t = (sched t == Some j).

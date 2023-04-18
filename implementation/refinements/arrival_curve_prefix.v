@@ -26,13 +26,11 @@ Section ValidArrivalCurvePrefixFacts.
     { exists (inter_arrival_to_prefix p).
       split;[|split;[|split;[|split;[|split]]]] => //=.
       move=> s.
-      rewrite /large_horizon in_cons => /orP [|] => /eqP EQs //=.
-      by subst s; rewrite //=; lia. }
+      by rewrite /large_horizon in_cons => /orP [|] /eqP. }
     { exists (inter_arrival_to_prefix m).
       split;[|split;[|split;[|split;[|split]]]] => //=.
       move=> s.
-      rewrite /large_horizon in_cons => /orP [|] => /eqP EQs //=.
-      by subst s; rewrite //=; lia.  }
+      by rewrite /large_horizon in_cons => /orP [|] /eqP. }
     { by exists evec; split => //; apply /valid_arrival_curve_prefix_P. }
   Qed.
 

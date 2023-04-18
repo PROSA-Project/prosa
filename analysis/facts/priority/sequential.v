@@ -64,7 +64,7 @@ Section SequentialJLFP.
     move=> j1 j2 ARR LE AHP t SCHED.
     apply/negPn/negP; intros NCOMPL.
     edestruct scheduling_of_any_segment_starts_with_preemption_time
-      as [pt [LET [PT ALL_SCHED]]]; rt_eauto.
+      as [pt [LET [PT ALL_SCHED]]] => //.
     move: LET => /andP [LE1 LE2].
     specialize (ALL_SCHED pt); feed ALL_SCHED; first by apply/andP; split.
     have PEND1: pending sched j1 pt.
@@ -74,7 +74,7 @@ Section SequentialJLFP.
     have [j3 [ARR3 [READY3 HEP3]]] :=  (H_job_ready _ _ ARR PEND1).
     move: (AHP pt) => /andP[HEP /negP NHEP]; eapply NHEP.
     apply: H_priority_is_transitive; last exact: HEP3.
-    apply: H_respects_policy; rt_eauto.
+    apply: H_respects_policy => //.
     apply/andP; split => //.
     apply/negP => SCHED2.
     have EQ: j2 = j3 by apply: H_uniproc; eauto.

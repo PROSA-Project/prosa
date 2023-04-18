@@ -37,23 +37,23 @@ Section AutoArrivalModelConversion.
 
   (** The tasks satisfy the sporadic validity constraint... *)
   Goal valid_taskset_inter_arrival_times ts.
-  Proof. by rt_auto. Qed.
+  Proof. by []. Qed.
 
   (** ... and arrival sequence is legal under the sporadic task
       model. *)
   Goal taskset_respects_sporadic_task_model ts arr_seq.
-  Proof. by rt_auto. Qed.
+  Proof. by []. Qed.
 
   (** ** Periodic Tasks as Arrival Curves *)
 
   (** The tasks satisfy the arrival-curve validity constraint... *)
   Goal valid_taskset_arrival_curve ts max_arrivals.
-  Proof. by rt_auto. Qed.
+  Proof. by []. Qed.
 
   (** ... and the arrival sequence is legal under the arrival-curve
       model. *)
   Goal taskset_respects_max_arrivals arr_seq ts.
-  Proof. by rt_eauto. Qed.
+  Proof. by []. Qed.
 
   (** ** Periodic Tasks as RBFs *)
 
@@ -66,11 +66,11 @@ Section AutoArrivalModelConversion.
 
   (** ... the tasks satisfy the RBF validity constraint... *)
   Goal valid_taskset_request_bound_function ts (task_max_rbf max_arrivals).
-  Proof. by rt_auto. Qed.
+  Proof. by []. Qed.
 
   (** ... and the arrival sequence is legal under the RBF model. *)
   Goal taskset_respects_max_request_bound arr_seq ts.
-  Proof. by rt_eauto. Qed.
+  Proof. by []. Qed.
 
   (** Thanks to type-class resolution, all conversions from more
       restrictive to less restrictive task model happen transparently

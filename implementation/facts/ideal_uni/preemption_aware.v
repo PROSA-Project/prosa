@@ -10,6 +10,7 @@ Require Export prosa.model.schedule.limited_preemptive.
 
 (** The following results assume ideal uniprocessor schedules. *)
 Require Import prosa.model.processor.ideal.
+Require Export prosa.util.tactics.
 
 Section NPUniprocessorScheduler.
 
@@ -97,8 +98,8 @@ Section NPUniprocessorScheduler.
       move=> j t ARRIVES BACKLOGGED.
       move: (@ideal_proc_model_sched_case_analysis Job schedule t) => [IDLE|SCHED]; last by exact.
       exfalso.
-      have NON_EMPTY: j \in jobs_backlogged_at arr_seq schedule t
-        by apply mem_backlogged_jobs => //; rt_auto.
+      have NON_EMPTY: j \in jobs_backlogged_at arr_seq schedule t.
+        exact: mem_backlogged_jobs.
       move: (idle_schedule_no_backlogged_jobs t IDLE) => EMPTY.
       by rewrite EMPTY in NON_EMPTY.
     Qed.
@@ -257,9 +258,9 @@ Section NPUniprocessorScheduler.
         ~~ preemption_time arr_seq schedule t.
     Proof.
       move=> t.
-      rewrite /preemption_time scheduled_job_at_def; rt_eauto; last first.
-      - by apply /jobs_must_arrive_to_be_ready/jobs_must_be_ready.
-      - by apply np_schedule_jobs_from_arrival_sequence.
+      rewrite /preemption_time scheduled_job_at_def//; last first.
+      - exact/jobs_must_arrive_to_be_ready/jobs_must_be_ready.
+      - exact: np_schedule_jobs_from_arrival_sequence.
       elim: t => [|t _]; first by rewrite /prev_job_nonpreemptive.
       rewrite /schedule /pmc_uni_schedule /generic_schedule
               schedule_up_to_def /prefix /allocation_at => NP.
@@ -312,8 +313,7 @@ Section NPUniprocessorScheduler.
       rewrite (identical_prefix_service _ schedule); last by apply schedule_up_to_identical_prefix.
       apply /andP; split => //.
       rewrite (H_nonclairvoyant_job_readiness _ schedule _ t'.+1) //.
-      - by apply H_valid_preemption_behavior.
-      - by apply schedule_up_to_identical_prefix.
+      exact: schedule_up_to_identical_prefix.
     Qed.
 
   End PreemptionCompliance.

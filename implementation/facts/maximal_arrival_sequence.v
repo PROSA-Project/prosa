@@ -122,11 +122,7 @@ Section MaximalArrivalSequence.
       forall t,
         size (task_arrivals_at (concrete_arrival_sequence generate_jobs_at ts) tsk t)
         = max_arrivals_at tsk t.
-    Proof.
-      move=> t.
-      rewrite task_arrivals_at_eq_generate_jobs_at //.
-      by apply H_job_generation_valid_number.
-    Qed.
+    Proof. by move=> t; rewrite task_arrivals_at_eq_generate_jobs_at. Qed.
 
     (** We then generalize the previous result to an arbitrary interval
         <<[t1,t2)>>. *)
