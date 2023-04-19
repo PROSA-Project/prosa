@@ -27,7 +27,7 @@ commonCoqProject:
 	@echo "# Automatically created by make, do not edit" > $(COQ_PROJ)
 	@echo "# (edit Makefile instead)" >> $(COQ_PROJ)
 	@echo "" >> $(COQ_PROJ)
-	@echo "-arg \"-w -notation-overriden,-parsing,-projection-no-head-constant\"" >> $(COQ_PROJ)
+	@echo "-arg \"-w -notation-overriden,-parsing,-projection-no-head-constant,-ambiguous-paths\"" >> $(COQ_PROJ)
 	@echo "" >> $(COQ_PROJ)
 
 allCoqProject: commonCoqProject
