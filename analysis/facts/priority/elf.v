@@ -127,7 +127,7 @@ Section ELFBasicFacts.
       sequential_tasks arr_seq sched.
     Proof.
       move => j1 j2 t ARR1 ARR2 SAME LT.
-      apply: early_hep_job_is_scheduled; rt_eauto => t';
+      apply: early_hep_job_is_scheduled => // t';
         first by apply ELF_is_transitive.
       rewrite /hep_job_at  /JLFP_to_JLDP !hep_job_arrival_elf //.
       - by lia.

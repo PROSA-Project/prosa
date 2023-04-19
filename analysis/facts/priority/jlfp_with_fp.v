@@ -70,7 +70,7 @@ Section WorkloadTaskSum.
         => /andP [/andP [_ EP] NEQ].
       apply/andP; split => //.
       by rewrite ep_task_sym.
-    - by apply: arrivals_uniq; rt_eauto.
+    - by apply: arrivals_uniq.
   Qed.
 
 End WorkloadTaskSum.
