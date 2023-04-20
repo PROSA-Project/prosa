@@ -235,19 +235,14 @@ Section AbstractRTAforFPwithArrivalCurves.
       intros j R0 t1 t2 ARR TSK ? NCOMPL BUSY; simpl.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
-      eapply instantiated_busy_interval_equivalent_busy_interval in BUSY => //.
-      rewrite /ideal_jlfp_interference; erewrite cumulative_task_interference_split => //; last first.
-      { by move: BUSY => [[_ [_ [_ /andP [GE LT]]]] _]; eapply arrived_between_implies_in_arrivals. }
+      rewrite /ideal_jlfp_interference; erewrite cumulative_task_interference_split => //.
       rewrite /IBF_other leq_add//.
       { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + R0)); first by done.
-        apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2); last first.
-        { by apply: H_priority_inversion_is_bounded => //; move: BUSY => [PREF QT2]. }
-        rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + R0)) //=.
-        - by rewrite leq_addr.
-        - by rewrite leq_addr.
-      }
-      { erewrite cumulative_i_thep_eq_service_of_othep => //; last first.
-          by unfold quiet_time; move: BUSY => [[_ [T1 T2]] _].
+        apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2);
+          last by apply: H_priority_inversion_is_bounded => //; eauto 6 with basic_rt_facts.
+        by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + R0)) //= leq_addr. }
+      { erewrite cumulative_i_thep_eq_service_of_othep => //;
+          last by eauto 6 with basic_rt_facts.
         apply: leq_trans.
         { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
           by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). }

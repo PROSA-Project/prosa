@@ -103,4 +103,41 @@ Section LemmasAboutAbstractBusyInterval.
     exact: job_completes_within_busy_interval.
   Qed.
 
+  (** Trivially, job [j] arrives before the end of the busy window (if arrival
+      times are consistent), which is a useful fact to observe for proof
+      automation. *)
+  Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
+  Fact abstract_busy_interval_arrivals_before :
+    j \in arrivals_before arr_seq t2.
+  Proof.
+    move: (H_busy_interval) => [[/andP [_ LT] _] _].
+    by apply: arrived_between_implies_in_arrivals.
+  Qed.
+
+  (** For the same reason, we note the trivial fact that by definition [j]
+      arrives no earlier than at time [t1]. For automation, we note this both as
+      a fact on busy-interval prefixes ... *)
+  Fact abstract_busy_interval_prefix_job_arrival :
+    forall t t',  busy_interval_prefix sched j t t' -> t <= job_arrival j.
+  Proof.
+    by move=> ? ? [/andP [GEQ _] _].
+  Qed.
+
+  (** ... and complete busy-intervals. *)
+  Fact abstract_busy_interval_job_arrival :
+    t1 <= job_arrival j.
+  Proof.
+    move: H_busy_interval => [PREFIX _].
+    exact: abstract_busy_interval_prefix_job_arrival.
+  Qed.
+
 End LemmasAboutAbstractBusyInterval.
+
+(** We add some facts into the "Hint Database" basic_rt_facts, so Coq will be
+    able to apply them automatically where needed. *)
+Global Hint Resolve
+  abstract_busy_interval_arrivals_before
+  job_completes_within_busy_interval
+  abstract_busy_interval_prefix_job_arrival
+  abstract_busy_interval_job_arrival
+  : basic_rt_facts.

@@ -232,9 +232,8 @@ Section AbstractRTAforELFwithArrivalCurves.
       rewrite /cumulative_interference_from_hep_jobs_from_other_ep_tasks
         /service_of_hp_jobs_from_other_ep_tasks
         /hep_job_from_other_ep_task_interference.
-      move: H_busy_window => [[/andP [JINBI JINBI2] [QT _]] _].
-      rewrite -instantiated_quiet_time_equivalent_quiet_time // in QT.
-      rewrite (cumulative_pred_eq_service arr_seq _ sched _ _ _ j t1) //.
+      rewrite (cumulative_pred_eq_service arr_seq _ sched _ _ _ j t1) //;
+        first by eauto 6 with basic_rt_facts.
       by move => j' /andP[/andP[HEP _] _].
     Qed.
 
@@ -254,9 +253,8 @@ Section AbstractRTAforELFwithArrivalCurves.
       rewrite /cumulative_interference_from_hep_jobs_from_hp_tasks
         /service_of_hp_jobs_from_other_hp_tasks
         /hep_job_from_hp_task_interference.
-      move: H_busy_window => [[/andP [JINBI JINBI2] [QT _]] _].
-      rewrite -instantiated_quiet_time_equivalent_quiet_time // in QT.
-      rewrite (cumulative_pred_eq_service arr_seq _ sched _ _ _ j t1) //.
+      rewrite (cumulative_pred_eq_service arr_seq _ sched _ _ _ j t1) //;
+        first by eauto 6 with basic_rt_facts.
       by move => j' /andP[HEP HP].
     Qed.
 
@@ -315,7 +313,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       cumulative_interference_from_hep_jobs_from_other_ep_tasks arr_seq sched j t1 (t1 + Δ)
         <= bound_on_total_ep_workload (job_arrival j - t1) Δ.
     Proof.
-      move: H_busy_window H_job_of_task => [[/andP [JINBI JINBI2] [QT _]] _] /eqP TSK.
+      move: H_job_of_task => /eqP TSK.
       rewrite cumulative_intf_ep_task_service_equiv /service_of_hp_jobs_from_other_ep_tasks
         /service_of_jobs.
       apply: leq_trans; first by apply: service_of_jobs_le_workload.
@@ -357,7 +355,6 @@ Section AbstractRTAforELFwithArrivalCurves.
         <= total_hp_rbf Δ.
     Proof.
       rewrite cumulative_intf_hp_task_service_equiv /total_hp_rbf.
-      move: H_busy_window => [[/andP [JINBI JINBI2] [QT _]] _].
       apply: leq_trans;
         first by apply service_of_jobs_le_workload.
       rewrite /workload_of_jobs /total_hp_request_bound_function_FP.
@@ -380,9 +377,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     have [ZERO|POS] := posnP (job_cost j).
     - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
       by rewrite /completed_by /completed_by ZERO.
-    - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
-      rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ _ j) //;
-        last by apply: arrived_between_implies_in_arrivals.
+    - rewrite (cumulative_task_interference_split _  _ _  _ _ _ _ _ _ j) //.
       rewrite /IBF_other -addnA.
       apply: leq_add;
         first by apply: cumulative_priority_inversion_is_bounded.

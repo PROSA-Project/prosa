@@ -304,13 +304,12 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       cumulative_another_hep_job_interference arr_seq sched j t1 (t1 + Δ) <=
         \sum_(tsko <- ts) task_request_bound_function tsko (job_arrival j - t1 + ε) - task_cost tsk.
     Proof.
-      move: H_busy_window => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
       rewrite (cumulative_i_ohep_eq_service_of_ohep arr_seq) => //;
-        last by rewrite instantiated_quiet_time_equivalent_quiet_time.
+        last by eauto 6 with basic_rt_facts.
       eapply leq_trans; first exact: service_of_jobs_le_workload.
       rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)) => //.
       rewrite (workload_minus_job_cost j)//;
-        last by rewrite /ε; apply job_in_arrivals_between => //; lia.
+        last by rewrite /ε; apply job_in_arrivals_between => //; apply/andP; split => //; rewrite -addn1.
       rewrite /workload_of_jobs /IBF (big_rem tsk) //=
         (addnC (task_request_bound_function tsk (job_arrival j - t1 + ε))).
       rewrite -addnBA; last first.
@@ -359,7 +358,6 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL A Pred.
     rewrite cumulative_interference_split//.
     have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
-    move: (BUSY) => [ [ /andP [LE GT] [QUIETt1 _ ] ] [QUIETt2 EQNs]].
     rewrite (no_priority_inversion j ARRj _ JPOS _ t2) //= add0n.
     have ->: A = job_arrival j - t1 by erewrite Pred with (t1 := t1); [lia | apply BUSY].
     exact: bound_on_hep_workload.

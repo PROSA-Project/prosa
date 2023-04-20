@@ -7,8 +7,10 @@ Require Export prosa.analysis.facts.model.arrival_curves.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded.
 Require Import prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded_jlfp.
+Require Export prosa.analysis.facts.busy_interval.arrival.
 Require Export prosa.results.edf.rta.bounded_pi.
 Require Export prosa.util.tactics.
+
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
@@ -234,7 +236,6 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         max_length_of_priority_inversion j t1 <= blocking_bound (job_arrival j - t1).
     Proof.
       move=> j t1 t2 ARR TSK BUSY; rewrite /max_length_of_priority_inversion /blocking_bound.
-      move: BUSY => [TT [QT [_ LE]]]; move: LE => /andP [GE LT].
       apply: leq_trans.
         exact: priority_inversion_is_bounded_by_max_np_segment.
       apply /bigmax_leq_seqP => j' JINB NOTHEP.
@@ -247,7 +248,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       repeat (apply/andP; split); last first.
       { rewrite /EDF -ltnNge in NOTHEP.
         move: TSK => /eqP <-.
-        have ARRLE: job_arrival j' < job_arrival j by apply leq_trans with t1.
+        have ARRLE: job_arrival j' < job_arrival j by apply: (@leq_trans t1).
         move: NOTHEP; rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline /D.
         by lia. }
       { move: NOTHEP => /andP [_ NZ].

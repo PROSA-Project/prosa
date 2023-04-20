@@ -304,7 +304,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
           \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (EDF_from tsk_o) jobs
           <= bound_on_total_hep_workload A Δ.
         Proof.
-          move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
           apply leq_sum_seq => tsko INtsko NEQT.
           edestruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; [ | apply ltnW in NEQ].
           - exact: (workload_le_rbf' arr_seq tsko).
@@ -334,22 +333,20 @@ Section AbstractRTAforEDFwithArrivalCurves.
         move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
           by rewrite /completed_by /completed_by ZERO.
-        - move: (BUSY) => [[/andP [JINBI JINBI2] [QT _]] _].
-          rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ _ j)//; last first. 
-          + exact: arrived_between_implies_in_arrivals.
-          + exact: EDF_implies_sequential_tasks.
-          + rewrite /I leq_add //.
-            * exact: cumulative_priority_inversion_is_bounded.
-            * eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
-              eapply leq_trans; first exact: service_of_jobs_le_workload.
-              eapply leq_trans.
-              eapply reorder_summation.
-              move => j' IN _.
-              apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
-              move : TSK => /eqP TSK.
-              rewrite TSK.
-              apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
-              by apply /eqP.
+        - rewrite (cumulative_task_interference_split _  _ _  _ _ _ _ _ _ j)//;
+            last exact: EDF_implies_sequential_tasks.
+          rewrite /I leq_add //;
+            first by exact: cumulative_priority_inversion_is_bounded.
+          eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
+          eapply leq_trans; first exact: service_of_jobs_le_workload.
+          eapply leq_trans.
+          eapply reorder_summation.
+          move => j' IN _.
+          apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
+          move : TSK => /eqP TSK.
+          rewrite TSK.
+          apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
+          by apply /eqP.
       Qed.
 
     End TaskInterferenceIsBoundedByIBF_other.

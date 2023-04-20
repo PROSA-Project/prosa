@@ -292,8 +292,7 @@ Section Abstract_RTA.
       Proof.
         move: H_busy_interval => [[/andP [GT LT] [QT1 NTQ]] QT2].
         apply completion_monotonic with t2 => //.
-        - exact: t2_le_arrival_plus_R_1.
-        - exact: job_completes_within_busy_interval.
+        exact: t2_le_arrival_plus_R_1.
       Qed.
 
     End FixpointOutsideBusyInterval1.

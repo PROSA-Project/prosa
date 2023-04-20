@@ -803,6 +803,22 @@ Section JLFPInstantiation.
         }
       Qed.
 
+      (** For the sake of proof automation, we note the frequently needed
+          special case of an abstract busy window implying the existence of a
+          classic quiet time. *)
+      Fact abstract_busy_interval_classic_quiet_time :
+        forall t1 t2,
+          busy_interval_ab j t1 t2 -> quiet_time_cl j t1.
+      Proof.
+        by move=> ? ? /instantiated_busy_interval_equivalent_busy_interval [[_ [? _]] _].
+      Qed.
+
+      (** Also for automation, we note a similar fact about classic busy-window prefixes. *)
+      Fact abstract_busy_interval_classic_busy_interval_prefix :
+        forall t1 t2,
+          busy_interval_ab j t1 t2 -> busy_interval_prefix_cl j t1 t2.
+      Proof. by move=> ? ? /instantiated_busy_interval_equivalent_busy_interval [+ _]. Qed.
+
     End BusyIntervalEquivalence.
 
   End Equivalences.
@@ -983,3 +999,11 @@ Global Opaque another_hep_job_interference
        cumulative_another_task_hep_job_interference
        cumulative_other_hep_jobs_interfering_workload
        other_hep_jobs_interfering_workload.
+
+(** We add some facts into the "Hint Database" basic_rt_facts, so Coq will be
+    able to apply them automatically where needed. *)
+Global Hint Resolve
+  abstract_busy_interval_classic_quiet_time
+  abstract_busy_interval_classic_busy_interval_prefix
+  : basic_rt_facts.
+
