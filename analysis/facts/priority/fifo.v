@@ -5,7 +5,55 @@ Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.priority_inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.readiness.basic.
+Require Export prosa.analysis.facts.busy_interval.all.
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
+
+
+(** We first make some trivial observations about the FIFO priority policy to
+    avoid having to re-reason these steps repeatedly in the subsequent
+    proofs. *)
+Section PriorityFacts.
+
+  (** Consider any type of jobs. *)
+  Context `{Job : JobType} {Arrival : JobArrival Job}.
+
+  (** Under FIFO scheduling, [hep_job] is simply a statement about arrival
+      times. *)
+  Fact hep_job_arrival_FIFO :
+    forall j j',
+      hep_job j j' = (job_arrival j <= job_arrival j').
+  Proof.
+    move=> j j'.
+    by rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FIFO.
+  Qed.
+
+  (** Similarly, [~~ hep_job] implies a strict inequality on arrival times. *)
+  Fact not_hep_job_arrival_FIFO :
+    forall j j',
+      ~~ hep_job j j' = (job_arrival j' < job_arrival j).
+  Proof. by move=> j j'; rewrite hep_job_arrival_FIFO -ltnNge. Qed.
+
+  (** Combining the above two facts, we get that, trivially, [~~ hep_job j j']
+      implies [hep_job j' j], ... *)
+  Fact not_hep_job_FIFO :
+    forall j j',
+      ~~ hep_job j j' -> hep_job j' j.
+  Proof.
+    move=> j j'; rewrite not_hep_job_arrival_FIFO hep_job_arrival_FIFO.
+    exact: ltnW.
+  Qed.
+
+  (** ... from which we can infer [always_higher_priority]. *)
+  Fact not_hep_job_always_higher_priority_FIFO :
+    forall j j',
+      ~~ hep_job j j' -> always_higher_priority j' j.
+  Proof.
+    move=> j j' NHEP.
+    rewrite always_higher_priority_jlfp; apply/andP; split => //.
+    exact: not_hep_job_FIFO.
+  Qed.
+
+End PriorityFacts.
 
 (** In this section, we prove some fundamental properties of the FIFO policy. *)
 Section BasicLemmas.
@@ -48,10 +96,27 @@ Section BasicLemmas.
       pending sched j t ->
       ~ priority_inversion sched j t.
   Proof.
-    move => j t ARRIVES /andP [ARRIVED /negP NCOMPL] [NSCHED [jlp /andP [SCHED PRIO]]].
-    move: PRIO; rewrite /hep_job /FIFO -ltnNge => LT.
-    apply: NCOMPL; apply: early_hep_job_is_scheduled => //.
-    by intros t'; apply/andP; split; unfold hep_job_at, JLFP_to_JLDP, hep_job, FIFO; lia.
+    move => j t IN /andP [ARR /negP +] [NSCHED [j' /andP [SCHED PRIO]]].
+    apply; apply: early_hep_job_is_scheduled => //.
+    - by rewrite -not_hep_job_arrival_FIFO.
+    - exact: not_hep_job_always_higher_priority_FIFO.
+  Qed.
+
+  (** We prove that in a FIFO-compliant schedule, if a job [j] is
+      scheduled, then all jobs with higher priority than [j] have been
+      completed. *)
+  Lemma scheduled_implies_higher_priority_completed :
+    forall j t,
+      scheduled_at sched j t ->
+      forall j_hp,
+        arrives_in arr_seq j_hp ->
+        ~~ hep_job j j_hp ->
+        completed_by sched j_hp t.
+  Proof.
+    move => j' t SCHED j_hp ARRjhp HEP.
+    apply: early_hep_job_is_scheduled => //.
+    - by rewrite -not_hep_job_arrival_FIFO.
+    - exact: not_hep_job_always_higher_priority_FIFO.
   Qed.
 
   (** In this section, we prove the cumulative priority inversion for any task
@@ -82,47 +147,22 @@ Section BasicLemmas.
       priority_inversion_is_bounded_by_constant arr_seq sched tsk 0.
     Proof.
       move=> j ARRIN TASK POS t1 t2 BUSY.
-      rewrite /priority_inversion.cumulative_priority_inversion.
-      have -> // : \sum_(t1 <= t < t2) priority_inversion_dec arr_seq sched j t = 0.
-      rewrite big_nat_eq0 => t /andP[T1 T2].
-      apply /eqP; rewrite eqb0.
-      apply /negP => /priority_inversion_P INV.
-      feed_n 3 INV => //.
-      move: INV => [NSCHED [j__lp /andP [SCHED LP]]].
-      move: LP; rewrite /hep_job /FIFO -ltnNge => LT.
-      have COMPL: completed_by sched j t.
-      { apply: early_hep_job_is_scheduled => //.
-        move=> t'; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FIFO -ltnNge.
-        by apply/andP; split; first apply ltnW. }
-      move : BUSY => [LE [QT [NQT /andP[ARR1 ARR2]]]].
+      rewrite leqn0; apply/eqP; rewrite big_nat_eq0 => t /andP[T1 T2].
+      apply/eqP; rewrite eqb0.
+      apply: contraT => /negPn /andP[NSCHED /hasP [j' IN /andP [SCHED NHEP]]].
       move: T1; rewrite leq_eqVlt => /orP [/eqP EQ | GT].
-      { subst t; apply completed_implies_scheduled_before in COMPL => //.
-        by case: COMPL => [t' [/andP [ARR3 LT__temp] SCHED__temp]]; lia. }
-      { apply: NQT; first (apply/andP; split; [exact GT | lia]).
-        intros ? ARR HEP ARRB; rewrite /hep_job /FIFO in HEP.
-        eapply early_hep_job_is_scheduled => //; first lia.
-        by move => t'; apply/andP; split; rewrite /hep_job_at /FIFO /JLFP_to_JLDP /hep_job //=; lia. }
+      { have /completed_implies_scheduled_before [//|//|t' [/andP [+ +] _]]:
+          completed_by sched j t by apply: (scheduled_implies_higher_priority_completed j').
+        by have: t1 <= job_arrival j by []; rewrite -EQ; lia. }
+      { exfalso; apply: busy_interval_prefix_no_quiet_time => // [|? ARR HEP ARRB];
+          first by apply/andP; split; [|exact: T2].
+        apply: (scheduled_implies_higher_priority_completed j') => //.
+        move: NHEP; rewrite !not_hep_job_arrival_FIFO.
+        by apply: leq_trans. }
     Qed.
 
   End PriorityInversionBounded.
 
-  (** We prove that in a FIFO-compliant schedule, if a job [j] is
-      scheduled, then all jobs with higher priority than [j] have been
-      completed. *)
-  Lemma scheduled_implies_higher_priority_completed :
-    forall j t,
-      scheduled_at sched j t ->
-      forall j_hp,
-        arrives_in arr_seq j_hp ->
-        ~~hep_job j j_hp ->
-        completed_by sched j_hp t.
-  Proof.
-    move => j' t SCHED j_hp ARRjhp HEP.
-    have EARLIER: job_arrival j_hp < job_arrival j' by rewrite -ltnNge in HEP.
-    apply: early_hep_job_is_scheduled => //.
-    move=> t'; apply /andP; split => //.
-    by apply ltnW.
-  Qed.
 
   (** The next lemma considers FIFO schedules in the context of tasks. *)
   Section SequentialTasks.
@@ -137,12 +177,13 @@ Section BasicLemmas.
     Proof.
       move => j1 j2 t ARRj1 ARRj2 SAME_TASKx LT => //.
       apply: (early_hep_job_is_scheduled) => //.
-      by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=].
+      apply: not_hep_job_always_higher_priority_FIFO.
+      by rewrite not_hep_job_arrival_FIFO.
     Qed.
 
     (** We also note that the [FIFO] policy respects sequential tasks. *)
     Fact fifo_respects_sequential_tasks : policy_respects_sequential_tasks (FIFO Job).
-    Proof. by move => j1 j2 SAME ARRLE; rewrite /hep_job /FIFO. Qed.
+    Proof. by move => j1 j2 SAME ARRLE; rewrite hep_job_arrival_FIFO. Qed.
 
   End SequentialTasks.
 

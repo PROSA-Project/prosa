@@ -29,4 +29,19 @@ Section Facts.
       quiet_time arr_seq sched j t.
   Proof. by move=> j t + j_hp ARR HP BEF; apply. Qed.
 
+  (** For convenience in proofs, we restate that by definition there are no
+      quiet times in a busy-interval prefix... *)
+  Fact busy_interval_prefix_no_quiet_time :
+    forall j t1 t2,
+      busy_interval_prefix arr_seq sched j t1 t2 ->
+      (forall t, t1 < t < t2 -> ~ quiet_time arr_seq sched j t).
+  Proof. by move=> j t1 t2 [_ [_ [NQT _]]]. Qed.
+
+  (** ... and hence also not in a busy interval. *)
+  Fact busy_interval_no_quiet_time :
+    forall j t1 t2,
+      busy_interval arr_seq sched j t1 t2 ->
+      (forall t, t1 < t < t2 -> ~ quiet_time arr_seq sched j t).
+  Proof. by move=> j t1 t2 [BIP _]; exact: busy_interval_prefix_no_quiet_time. Qed.
+
 End Facts.
