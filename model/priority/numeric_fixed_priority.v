@@ -40,13 +40,13 @@ Section PropertiesNFPA.
 
   (** The resulting priority policy is reflexive. *)
   Lemma NFPA_is_reflexive : reflexive_task_priorities (NumericFPAscending Task).
-  Proof.  by move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPAscending. Qed.
+  Proof.  by move=> ?; rewrite /hep_task /NumericFPAscending. Qed.
 
   (** The resulting priority policy is transitive. *)
   Lemma NFPA_is_transitive : transitive_task_priorities (NumericFPAscending Task).
   Proof.
     move=> y x z.
-    by rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPAscending => PRIO_yx PRIO_xy; lia.
+    by rewrite /hep_task /NumericFPAscending => PRIO_yx PRIO_xy; lia.
   Qed.
 
   (** The resulting priority policy is total. *)
@@ -77,13 +77,13 @@ Section PropertiesNFPD.
 
   (** The resulting priority policy is reflexive. *)
   Lemma NFPD_is_reflexive : reflexive_task_priorities (NumericFPDescending Task).
-  Proof. by  move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending. Qed.
+  Proof. by  move=> ?; rewrite /hep_task /NumericFPDescending. Qed.
 
   (** The resulting priority policy is transitive. *)
   Lemma NFPD_is_transitive : transitive_task_priorities (NumericFPDescending Task).
   Proof.
     move=> y x z.
-    by rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /NumericFPDescending => PRIO_yx PRIO_xy; lia.
+    by rewrite /hep_task /NumericFPDescending => PRIO_yx PRIO_xy; lia.
   Qed.
 
   (** The resulting priority policy is total. *)

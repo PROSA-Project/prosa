@@ -34,9 +34,7 @@ Section UnderJLFP.
     forall j j',
       always_higher_priority j j' <-> (hep_job j j' && ~~ hep_job j' j).
   Proof.
-    move=> j j'.
-    rewrite /always_higher_priority/JLFP_to_JLDP/hep_job_at //; split => //.
-    by apply; exact: 0.
+    by move=> j j'; split => [|HP t]; [apply; exact: 0 | rewrite !hep_job_at_jlfp].
   Qed.
 
 End UnderJLFP.

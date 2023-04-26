@@ -9,8 +9,26 @@ Require Import prosa.analysis.facts.priority.sequential.
 Section GELBasicFacts.
 
   (** Consider any type of tasks and jobs. *)
-  Context `{Task : TaskType} {Job : JobType} `{JobTask Job Task} `{PriorityPoint Task}.
-  Context {AR : JobArrival Job}.
+  Context `{Task : TaskType} {Job : JobType}
+    `{JobTask Job Task} `{PriorityPoint Task} {Arrival : JobArrival Job}.
+
+  (** Under GEL, [hep_job] is a statement about absolute priority points. *)
+  Fact hep_job_priority_point :
+    forall j j',
+      hep_job j j' = ((job_arrival j)%:R + task_priority_point (job_task j)
+                      <= (job_arrival j')%:R + task_priority_point (job_task j'))%R.
+  Proof. by move=> j j'; rewrite /hep_job/GEL/job_priority_point. Qed.
+
+  (** If we are looking at two jobs of the same task, then [hep_job] is a
+      statement about their respective arrival times. *)
+  Fact hep_job_arrival_gel :
+    forall j j',
+      same_task j j' ->
+      hep_job j j' = (job_arrival j <= job_arrival j').
+  Proof.
+    move=> j j' /eqP SAME.
+    by rewrite hep_job_priority_point SAME; lia.
+  Qed.
 
   Section HEPJobArrival.
     (** Consider a job [j]... *)
@@ -25,9 +43,7 @@ Section GELBasicFacts.
       ((job_arrival j')%:R <=
          (job_arrival j)%:R +
            task_priority_point (job_task j) - task_priority_point (job_task j'))%R.
-    Proof.
-      by move : H_j'_hep; rewrite /hep_job /GEL /job_priority_point; lia.
-    Qed.
+    Proof. by move : H_j'_hep; rewrite hep_job_priority_point; lia. Qed.
 
     (** Using the above lemma, we prove that for any
         higher-or-equal priority job [j'], the term
@@ -39,18 +55,6 @@ Section GELBasicFacts.
     Proof. exact: le_trans hep_job_arrives_before. Qed.
 
   End HEPJobArrival.
-
-  (** If we are looking at two jobs of the same task, then [hep_job] is a
-      statement about their respective arrival times. *)
-  Fact hep_job_arrival_gel :
-    forall j j',
-      same_task j j' ->
-      (hep_job j j')= (job_arrival j <= job_arrival j').
-  Proof.
-    move=> j j' /eqP SAME.
-    rewrite /hep_job/GEL/job_priority_point SAME.
-    by case CMP: (job_arrival _ <= job_arrival _); lia.
-  Qed.
 
   (** Next, we prove that the GEL policy respects sequential tasks. *)
   Lemma GEL_respects_sequential_tasks:
@@ -75,7 +79,7 @@ Section GELBasicFacts.
     Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
     (** ... allow for any work-bearing notion of job readiness, ... *)
-    Context `{@JobReady Job PState _ AR}.
+    Context `{@JobReady Job PState _ Arrival}.
     Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
     (** ... and assume that the schedule is valid. *)
@@ -103,9 +107,9 @@ Section GELBasicFacts.
       sequential_tasks arr_seq sched.
     Proof.
       move => j1 j2 t ARR1 ARR2 SAME LT.
-      apply: early_hep_job_is_scheduled => // t'.
-      rewrite /hep_job_at  /JLFP_to_JLDP !hep_job_arrival_gel //.
-      - lia.
+      apply: early_hep_job_is_scheduled => //.
+      rewrite always_higher_priority_jlfp !hep_job_arrival_gel //.
+      - by rewrite -ltnNge; apply/andP; split => //.
       - by rewrite same_task_sym.
     Qed.
 

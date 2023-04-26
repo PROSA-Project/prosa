@@ -23,7 +23,7 @@ Section Properties.
 
   (** DM is reflexive. *)
   Lemma DM_is_reflexive : reflexive_task_priorities (DM Task).
-  Proof. by move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /DM. Qed.
+  Proof. by move=> ?; rewrite /hep_task /DM. Qed.
 
   (** DM is transitive. *)
   Lemma DM_is_transitive : transitive_task_priorities (DM Task).

@@ -7,7 +7,8 @@ Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.priority.gel.
 
-(** In this section, we state and prove some basic facts about the ELF scheduling policy. *)
+(** In this section, we state and prove some basic facts about the ELF
+    scheduling policy. *)
 Section ELFBasicFacts.
 
   (** Consider any type of tasks with relative priority points...*)
@@ -25,6 +26,33 @@ Section ELFBasicFacts.
   Hypothesis H_total_priorities : total_task_priorities FP.
 
   (** ** Basic properties of the ELF policy *)
+
+  (** We first note that, by definition, ELF reduces to GEL for equal-priority
+      tasks. *)
+  Remark hep_job_elf_gel :
+    forall j j',
+      ep_task (job_task j) (job_task j') ->
+      (@hep_job _ (ELF FP) j j') = (@hep_job _ (GEL Job Task) j j').
+  Proof.
+    move=> j j' EP.
+    rewrite [LHS]/hep_job/ELF.
+    have -> : hep_task (job_task j) (job_task j') = true by apply: ep_hep_task.
+    have -> : hp_task (job_task j)  (job_task j') = false by apply/negbTE/ep_not_hp_task.
+    by rewrite andTb orFb.
+  Qed.
+
+  (** We then show that if we are looking at two jobs of the same task,
+      then [hep_job] is a statement about their respective arrival times. *)
+  Fact hep_job_arrival_elf :
+    forall j j',
+      same_task j j' ->
+      hep_job j j' = (job_arrival j <= job_arrival j').
+  Proof.
+    move=> j j' SAME.
+    rewrite hep_job_elf_gel.
+    - by rewrite hep_job_arrival_gel.
+    - by move: SAME => /eqP ->; exact: eq_reflexive.
+  Qed.
 
   (** ELF is reflexive. *)
   Lemma ELF_is_reflexive : reflexive_job_priorities (ELF FP).
@@ -66,27 +94,15 @@ Section ELFBasicFacts.
       by apply /orP; left.
   Qed.
 
-  (** ** ELF policy respects sequential tasks. *)
+  (** ** Sequentiality under ELF *)
 
-  (** We first show that if we are looking at two jobs of the same task,
-      then [hep_job] is a statement about their respective arrival times. *)
-  Lemma hep_job_arrival_elf :
-    forall j j',
-      same_task j j' ->
-      hep_job j j' = (job_arrival j <= job_arrival j').
-  Proof.
-    move=> j j' SAME.
-    rewrite /hep_job/ELF.
-    move: (SAME) => /eqP ->; rewrite hp_task_irrefl orFb.
-    by rewrite hep_job_arrival_gel // H_reflexive_priorities andTb.
-  Qed.
-
-  (** The above fact helps us prove that the ELF policy respects sequential tasks. *)
+  (** The ELF policy satisfies the sequential-tasks hypothesis. *)
   Lemma ELF_respects_sequential_tasks :
     policy_respects_sequential_tasks (ELF FP).
   Proof. by move => j1 j2 TSK ARR; rewrite hep_job_arrival_elf. Qed.
 
-  (** In this section, we prove that tasks always execute sequentially in a schedule following the ELF policy. *)
+  (** In this section, we prove that tasks always execute sequentially in a
+      uniprocessor schedule following the ELF policy. *)
   Section ELFImpliesSequentialTasks.
 
     (** Consider any valid arrival sequence. *)
@@ -107,30 +123,29 @@ Section ELFBasicFacts.
     (** ... and assume that the schedule is valid. *)
     Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-    (** In addition, we assume that jobs have preemption points specified by the following attribute... *)
+    (** Consider any valid preemption model. *)
     Context `{JobPreemptable Job}.
+    Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
-    (** ... and that it defines a valid preemption model. *)
-    Hypothesis H_valid_preemption_model :
-      valid_preemption_model arr_seq sched.
-
-    (** Next, we assume that the schedule respects the scheduling policy at every preemption point. *)
+    (** Assume an ELF schedule. *)
     Hypothesis H_respects_policy :
       respects_JLFP_policy_at_preemption_point arr_seq sched (ELF FP).
 
-    (** To prove sequentiality, we use the lemma [early_hep_job_is_scheduled]. Clearly, under the
-        ELF priority policy, jobs satisfy the conditions described by the lemma (i.e., given two
-        jobs [j1] and [j2] from the same task, if [j1] arrives earlier than [j2], then [j1] always
-        has a higher priority than job [j2], and hence completes before [j2]); therefore, ELF implies
-        the [sequential_tasks] property. *)
+    (** To prove sequentiality, we use the lemma
+        [early_hep_job_is_scheduled]. Clearly, under the ELF priority policy,
+        jobs satisfy the conditions described by the lemma (i.e., given two jobs
+        [j1] and [j2] from the same task, if [j1] arrives earlier than [j2],
+        then [j1] always has a higher priority than job [j2], and hence
+        completes before [j2]); therefore, ELF implies the [sequential_tasks]
+        property. *)
     Lemma ELF_implies_sequential_tasks :
       sequential_tasks arr_seq sched.
     Proof.
       move => j1 j2 t ARR1 ARR2 SAME LT.
-      apply: early_hep_job_is_scheduled => // t';
-        first by apply ELF_is_transitive.
-      rewrite /hep_job_at  /JLFP_to_JLDP !hep_job_arrival_elf //.
-      - by lia.
+      apply: early_hep_job_is_scheduled => //;
+        first exact: ELF_is_transitive.
+      rewrite always_higher_priority_jlfp !hep_job_arrival_elf //.
+      - by rewrite -ltnNge; apply/andP; split => //.
       - by rewrite same_task_sym.
     Qed.
 

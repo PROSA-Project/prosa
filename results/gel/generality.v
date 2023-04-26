@@ -7,7 +7,9 @@ Require Export prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.facts.model.sequential.
-
+Require Export prosa.analysis.facts.priority.edf.
+Require Export prosa.analysis.facts.priority.gel.
+Require Export prosa.analysis.facts.priority.fifo.
 
 (** * Generality of GEL *)
 
@@ -56,11 +58,9 @@ Section GeneralityOfGEL.
       by move=> sched arr_seq
          ; split => RESPECTED j j' t ARR PT BL SCHED
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
-         ; rewrite /hep_job/hep_job_at
-                   /GEL/job_priority_point
-                   /EDF/job_deadline/job_deadline_from_task_deadline
-                   /JLFP_to_JLDP/hep_job
-                   !H_priority_point
+         ; rewrite !hep_job_at_jlfp
+                   hep_job_task_deadline
+                   hep_job_priority_point !H_priority_point
          ; lia.
     Qed.
   End GELGeneralizesEDF.
@@ -84,11 +84,8 @@ Section GeneralityOfGEL.
       by move=> sched arr_seq
          ; split => RESPECTED j j' t ARR PT BL SCHED
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
-         ; rewrite /hep_job/hep_job_at
-                   /GEL/job_priority_point
-                   /FIFO
-                   /JLFP_to_JLDP/hep_job
-                   !H_priority_point
+         ; rewrite !hep_job_at_jlfp
+                   hep_job_priority_point !H_priority_point hep_job_arrival_FIFO
          ; lia.
     Qed.
   End GELGeneralizesFIFO.
@@ -233,24 +230,22 @@ Section GeneralityOfGEL.
             have DIFF: ~ same_task j' j; last by contradiction.
             apply/negP/sequential_tasks_different_tasks => //.
             exact: backlogged_implies_incomplete. }
-          { rewrite /hep_job_at/GEL/JLFP_to_JLDP/hep_job/job_priority_point.
-            by move: SAME; rewrite /same_task => /eqP ->; lia. } }
+          { by rewrite hep_job_at_jlfp hep_job_arrival_gel // same_task_sym. }}
         { have HFP: hp_task (job_task j) (job_task j').
           { apply: H_unique_fixed_priorities => //.
-              by rewrite same_task_sym.
-            move: (RESPECTED j' j t ARR PT BL SCHED).
-            by rewrite /hep_job_at/FP_to_JLFP/JLFP_to_JLDP/hep_job. }
+            - by rewrite same_task_sym.
+            - by move: (RESPECTED j' j t ARR PT BL SCHED); rewrite hep_job_at_fp. }
           exact: (backlogged_job_has_lower_gel_prio _ _ sched t).
         } }
-      { rewrite /hep_job_at/FP_to_JLFP/JLFP_to_JLDP/hep_job.
+      { rewrite hep_job_at_fp.
         case: (boolP (same_task j' j)); first by rewrite /same_task => /eqP ->.
         move=> DIFF; apply: contraT; rewrite not_hep_hp_task // => HFP.
-        have FIN: completed_by sched j (job_arrival j + `|pp_delta (job_task j') (job_task j)|).
-          exact: H_hp_delta_rtb.
+        have FIN: completed_by sched j (job_arrival j + `|pp_delta (job_task j') (job_task j)|);
+          first by exact: H_hp_delta_rtb.
         move: (RESPECTED j' j t ARR PT BL SCHED).
-        rewrite /hep_job_at/GEL/JLFP_to_JLDP/hep_job/job_priority_point => PRIO.
-        have POS: (pp_delta (job_task j') (job_task j) >= 0)%R.
-          exact: H_hp_delta_pos.
+        rewrite hep_job_at_jlfp hep_job_priority_point => PRIO.
+        have POS: (pp_delta (job_task j') (job_task j) >= 0)%R
+          by exact: H_hp_delta_pos.
         have: completed_by sched j t; last first.
         { have: ~ completed_by sched j t => [|//].
           by apply/negP/scheduled_implies_not_completed. }

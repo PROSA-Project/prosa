@@ -3,6 +3,7 @@ Require Export prosa.util.int.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.model.priority.elf.
 Require Export prosa.analysis.facts.priority.gel.
+Require Export prosa.analysis.facts.priority.elf.
 Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.facts.model.sequential.
 
@@ -47,17 +48,10 @@ Section GeneralityOfELF.
       respects_JLFP_policy_at_preemption_point arr_seq sched (ELF fp)
       <-> respects_JLFP_policy_at_preemption_point arr_seq sched (GEL Job Task).
   Proof.
-    move=> sched arr_seq; split => RESPECTED j j' t ARR PT BL SCHED;
-      rewrite /hep_job_at /JLFP_to_JLDP /hep_job;
-      specialize (H_FP_policy_is_same (job_task j) (job_task j')).
-    { move: (RESPECTED j j' t ARR PT BL SCHED);
-        rewrite /hep_job_at /JLFP_to_JLDP /ELF /hep_job => /orP[/andP[HEP NOTHEP]| /andP[HEP GEL'] //].
-      move: H_FP_policy_is_same; rewrite /ep_task => /andP[NOTHEP' _].
-      case: (negP NOTHEP NOTHEP'). }
-    { rewrite /ELF /hep_job; apply /orP; right.
-      move: (RESPECTED j j' t ARR PT BL SCHED); rewrite /hep_job_at /JLFP_to_JLDP /hep_job => GEL'.
-      move: H_FP_policy_is_same; rewrite /ep_task =>/andP[_ HEP].
-      by apply /andP; split. }
+    by move=> sched arr_seq
+       ; split=> RESPECTED j j' t ARR PT BL SCHED
+       ; move: (RESPECTED j j' t ARR PT BL SCHED)
+       ; rewrite !hep_job_at_jlfp hep_job_elf_gel.
   Qed.
 
   (** ** ELF Generalizes Fixed-Priority Scheduling *)
@@ -78,9 +72,9 @@ Section GeneralityOfELF.
         -> respects_FP_policy_at_preemption_point arr_seq sched fp.
     Proof.
       move=> sched arr_seq RESPECTED j j' t ARR PT BL SCHED.
-      rewrite /hep_job_at /FP_to_JLFP /JLFP_to_JLDP /hep_job.
+      rewrite hep_job_at_fp.
       by move: (RESPECTED j j' t ARR PT BL SCHED)
-         ; rewrite /hep_job_at /JLFP_to_JLDP /ELF /hep_job
+         ; rewrite hep_job_at_jlfp /hep_job
             => /orP[/andP[HEP NOTHEP] //| /andP[HEP GEL] //].
     Qed.
 
@@ -113,7 +107,7 @@ Section GeneralityOfELF.
       split; first exact: elf_is_fixed_priority.
       move=> RESPECTED j j' t ARR PT BL SCHED.
       move: (RESPECTED j j' t ARR PT BL SCHED);
-        rewrite /hep_job_at /FP_to_JLFP /JLFP_to_JLDP /hep_job => HEP.
+        rewrite hep_job_at_fp => HEP.
       rewrite /ELF; apply /orP.
       have [/eqP EQ|NEQ] := eqVneq (job_task j') (job_task j); [right|left].
       { apply/andP; split => //.

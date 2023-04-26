@@ -11,7 +11,8 @@ Section BasicLemmas.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
 
-  (** Consider a JLFP policy that indicates a higher-or-equal priority relation. *)
+  (** Consider a JLFP policy that indicates a higher-or-equal priority
+      relation. *)
   Context `{JLFP_policy Job}.
 
   (** First, we prove that [another_hep_job] relation is anti-reflexive. *)
@@ -68,6 +69,17 @@ Section FPRelationsProperties.
         ep_task tsk1 tsk2 ->
         hep_task tsk1 tsk2.
     Proof. by move=> ? ? /andP[]. Qed.
+
+    (** If a task has higher priority than another task, then the two do not
+        have equal priority. *)
+    Lemma ep_not_hp_task :
+      forall tsk1 tsk2,
+        ep_task tsk1 tsk2 ->
+        ~~ hp_task tsk1 tsk2.
+    Proof.
+      move=> ? ? /andP[_ ?].
+      by rewrite negb_and; apply/orP; right; apply/negPn.
+    Qed.
 
     (** Task [tsk1] having equal priority as task [tsk2] is equivalent to task [tsk2]
         having equal priority as task [tsk1]. *)
@@ -213,10 +225,11 @@ Section JLFPFP.
   (** Consider any pair of JLFP and FP policies. *)
   Context (JLFP : JLFP_policy Job) (FP : FP_policy Task).
 
-  (** If a policy is [JLFP_FP_compatible], then a job [j1] has 
-      lower priority than a job [j2] if the task of [j1] has 
+  (** If a policy is [JLFP_FP_compatible], then a job [j1] has
+      lower priority than a job [j2] if the task of [j1] has
       lower priority than the task of [j2]. *)
-  Lemma not_hep_task_implies_not_hep_job: forall j1 j2,
+  Lemma not_hep_task_implies_not_hep_job :
+    forall j1 j2,
       JLFP_FP_compatible JLFP FP ->
       ~~ hep_task (job_task j1) (job_task j2) ->
       ~~ hep_job j1 j2.
@@ -228,6 +241,6 @@ Section JLFPFP.
 
 End JLFPFP.
 
-(** We add the above observation into the "Hint Database" basic_rt_facts, so Coq
-    will be able to apply it automatically. *)
+(** We add a lemma into the "Hint Database" basic_rt_facts, so Coq will be able
+    to apply it automatically. *)
 Global Hint Resolve respects_sequential_tasks : basic_rt_facts.

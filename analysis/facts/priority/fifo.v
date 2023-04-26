@@ -24,7 +24,7 @@ Section PriorityFacts.
       hep_job j j' = (job_arrival j <= job_arrival j').
   Proof.
     move=> j j'.
-    by rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FIFO.
+    by rewrite /hep_job /FIFO.
   Qed.
 
   (** Similarly, [~~ hep_job] implies a strict inequality on arrival times. *)

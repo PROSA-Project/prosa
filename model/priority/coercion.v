@@ -41,6 +41,25 @@ Section PriorityRelationsConversion.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
 
+  (** To simplify later proofs, we make two trivial remarks on the
+      FP->JLFP->JLDP coercion. *)
+
+  (** First, when considering a JLFP policy, [hep_job_at] and [hep_job] are by
+      definition equivalent. *)
+  Remark hep_job_at_jlfp :
+    forall `{JLFP_policy Job} j j' t,
+      hep_job_at t j j' = hep_job j j'.
+  Proof. by move=> ? j j' t; rewrite /hep_job_at/JLFP_to_JLDP. Qed.
+
+  (** Second, when considering an FP policy, [hep_job_at] and [hep_task] are by
+      definition equivalent. *)
+  Remark hep_job_at_fp :
+    forall `{FP_policy Task} j j' t,
+      hep_job_at t j j' = hep_task (job_task j) (job_task j').
+  Proof.
+    by move=> ? j j' t; rewrite hep_job_at_jlfp/hep_job/FP_to_JLFP.
+  Qed.
+
   (** We observe that lifting an [FP_policy] to a [JLFP_policy] trivially maintains
       reflexivity,... *)
   Lemma reflexive_priorities_FP_implies_JLFP :

@@ -25,7 +25,7 @@ Section Properties.
 
   (** RM is reflexive. *)
   Lemma RM_is_reflexive : reflexive_task_priorities (RM Task).
-  Proof. by move=> ?; rewrite /hep_job_at /JLFP_to_JLDP /hep_job /FP_to_JLFP /hep_task /RM. Qed.
+  Proof. by move=> ?; rewrite /hep_task /RM. Qed.
 
   (** RM is transitive. *)
   Lemma RM_is_transitive : transitive_task_priorities (RM Task).
