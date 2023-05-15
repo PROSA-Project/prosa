@@ -581,4 +581,80 @@ Section PriorityInversionIsBounded.
 
   End NoPriorityInversionAfterPreemptionPoint.
 
+  Section SingleJob.
+
+    (** Here, we will prove that priority inversion only occurs at the start of
+        the busy window and occurs due to only one job. *)
+
+    (** Suppose job [j] incurs priority inversion at a time [t_pi] in its busy window. *)
+    Variable t_pi : instant.
+    Hypothesis H_from_t1_before_t2 : t1 <= t_pi < t2.
+    Hypothesis H_PI_occurs : priority_inversion arr_seq sched j t_pi.
+
+    (** First, we show that there is no preemption time in the interval <<[t1,
+        t_pi]>>. *)
+    Lemma no_preemption_time_before_pi :
+      forall t,
+        t1 <= t <= t_pi ->
+        ~~ preemption_time arr_seq sched t.
+    Proof.
+      move => ppt intl.
+      apply: (contraTN _ H_PI_occurs) => PT.
+      have [jhp [_ [HEP SCHED]]] :=
+        (not_quiet_implies_exists_scheduled_hp_job_after_preemption_point ppt t_pi PT ltac:(lia) ltac:(lia)).
+      by apply: no_priority_inversion_when_hep_job_scheduled.
+    Qed.
+
+    (** Next, we show that the same job will be scheduled from the start of the
+        busy interval to the priority inversion time [t_pi]. *)
+    Lemma pi_job_remains_scheduled :
+      forall jlp,
+        scheduled_at sched jlp t_pi ->
+        forall t,
+          t1 <= t <= t_pi -> scheduled_at sched jlp t.
+    Proof.
+      move=> jlp SCHED t TIME.
+      have [IDLE|BUSY] := boolP (is_idle arr_seq sched t).
+      { exfalso; apply/negP.
+        - exact: (no_preemption_time_before_pi t).
+        - apply: idle_time_is_pt => //. }
+      { move: BUSY; rewrite is_nonidle_iff // => -[j' SCHED'].
+        have [<- //|DIFF] := eqVneq j' jlp.
+        have [pt premp_ppt INTL]: exists2 pt, preemption_time arr_seq sched pt & t < pt <= t_pi.
+        { (apply: neq_scheduled_at_pt; try exact: DIFF) => //.
+          by move: TIME => /andP [_ +]. }
+        exfalso; apply/(@negP (preemption_time arr_seq sched pt)) => //.
+        apply: no_preemption_time_before_pi.
+        by clear - INTL TIME; lia. }
+    Qed.
+
+    (** Thus, priority inversion takes place from the start of the busy interval
+        to the instant [t_pi], i.e., priority inversion takes place
+        continuously. *)
+    Lemma pi_continuous :
+      forall t,
+        t1 <= t <= t_pi ->
+        priority_inversion arr_seq sched j t.
+    Proof.
+      move: (H_PI_occurs) => /andP[j_nsched_pi /hasP[jlp jlp_sched_pi nHEPj]] t INTL.
+      apply /uni_priority_inversion_P => // ; exists jlp => //.
+      apply: pi_job_remains_scheduled => //.
+      by rewrite -(scheduled_jobs_at_iff arr_seq).
+    Qed.
+
+  End SingleJob.
+
+  (** From the above lemmas, it follows that either job [j] incurs no priority
+      inversion at all or certainly at time [t1], i.e., the beginning of its
+      busy interval. *)
+  Lemma busy_interval_pi_cases :
+    cumulative_priority_inversion arr_seq sched j t1 t2 = 0
+    \/ priority_inversion arr_seq sched j t1.
+  Proof.
+    case: (posnP (cumulative_priority_inversion arr_seq sched j t1 t2)); first by left.
+    rewrite sum_nat_gt0 // => /hasP[pi].
+    rewrite mem_filter /= mem_index_iota lt0b => INTL PI_pi.
+    by right; apply: pi_continuous =>//; lia.
+  Qed.
+
 End PriorityInversionIsBounded.
