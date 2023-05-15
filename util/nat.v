@@ -32,6 +32,18 @@ Section NatLemmas.
     forall n, a + z * c <> b + n * c.
   Proof. move=> b_le_a + n => /(_ (n - z)); rewrite mulnBl; lia. Qed.
 
+  (** Next, we show that the maximum of any two natural numbers [m,n] is smaller than
+      the sum of the numbers [m + n]. *)
+  Lemma max_leq_add m n :
+    maxn m n <= m + n.
+  Proof. by rewrite geq_max ?leq_addl ?leq_addr. Qed.
+
+  (** For convenience, we observe that the [nat_of_bool] coercion can be dropped
+      when establishing equality. *)
+  Lemma nat_of_bool_eq (b1 b2 : bool) :
+    (nat_of_bool b1 == nat_of_bool b2) = (b1 == b2).
+  Proof. by case: b1; case: b2. Qed.
+
 End NatLemmas.
 
 (** In this section, we prove a lemma about intervals of natural
