@@ -106,8 +106,8 @@ Section AbstractRTADefinitions.
         now). The second condition ensures that the busy window
         captures the execution of job [j]. *)
     Definition quiet_time (j : Job) (t : instant) :=
-      cumulative_interference j 0 t = cumulative_interfering_workload j 0 t /\
-      ~~ pending_earlier_and_at sched j t.
+      (cumulative_interference j 0 t == cumulative_interfering_workload j 0 t)
+      && ~~ pending_earlier_and_at sched j t.
 
     (** Based on the definition of quiet time, we say that an interval
         <<[t1, t2)>> is a (potentially unbounded) busy-interval prefix

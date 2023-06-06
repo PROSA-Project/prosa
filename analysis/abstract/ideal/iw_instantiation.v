@@ -694,10 +694,10 @@ Section JLFPInstantiation.
         clear H_JLFP_respects_sequential_tasks.
         have zero_is_quiet_time: forall j, quiet_time_cl j 0.
         { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
-        move=> t QT; split; last first.
+        move=> t QT; apply/andP; split; last first.
         { rewrite negb_and Bool.negb_involutive; apply/orP.
           by case ARR: (arrived_before j t); [right | left]; [apply QT | ]. }
-        { erewrite cumulative_interference_split, cumulative_interfering_workload_split; apply/eqP; rewrite eqn_add2l.
+        { erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l.
           rewrite cumulative_i_ohep_eq_service_of_ohep//.
           rewrite //= cumulative_iw_hep_eq_workload_of_ohep eq_sym; apply/eqP.
           apply all_jobs_have_completed_equiv_workload_eq_service => //.
@@ -716,7 +716,7 @@ Section JLFPInstantiation.
         clear H_JLFP_respects_sequential_tasks.
         have zero_is_quiet_time: forall j, quiet_time_cl j 0.
         { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
-        move => t [T0 T1] jhp ARR HP ARB.
+        move => t /andP [T0 T1] jhp ARR HP ARB.
         eapply all_jobs_have_completed_equiv_workload_eq_service with
           (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t) => //.
         erewrite service_of_jobs_case_on_pred with (P2 := fun j' => j' != j).
@@ -732,7 +732,7 @@ Section JLFPInstantiation.
             by apply in_arrivals_implies_arrived_between in IN. }
           erewrite service_of_jobs_equiv_pred with (P2 := pred0) => [|//].
           erewrite workload_of_jobs_equiv_pred with (P' := pred0) => [|//].
-          move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split => /eqP; rewrite eqn_add2l => /eqP EQ.
+          move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l => /eqP EQ.
           rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
           by erewrite workload_of_jobs_pred0, service_of_jobs_pred0.
         }
@@ -743,7 +743,7 @@ Section JLFPInstantiation.
             by move: EQ => /eqP EQ; rewrite Bool.andb_true_r; apply/eqP; rewrite eqb_id; subst. }
           erewrite service_of_jobs_equiv_pred with (P2 := eq_op j) => [|//].
           erewrite workload_of_jobs_equiv_pred with (P' := eq_op j) => [|//].
-          move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split => /eqP; rewrite eqn_add2l => /eqP EQ.
+          move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l => /eqP EQ.
           rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
           apply/eqP; eapply all_jobs_have_completed_equiv_workload_eq_service with
             (P := eq_op j) (t1 := 0) (t2 := t) => //.

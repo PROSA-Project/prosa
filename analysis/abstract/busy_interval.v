@@ -59,9 +59,9 @@ Section LemmasAboutAbstractBusyInterval.
   Lemma job_completes_within_busy_interval :
     completed_by sched j t2.
   Proof.
-    move: (H_busy_interval) => [[/andP [_ LT] [_ _]] [_ QT2]].
-    unfold pending, has_arrived in QT2.
-    move: QT2; rewrite  /pending negb_and; move => /orP [QT2|QT2].
+    move: (H_busy_interval) => [[/andP [_ LT] _] /andP [_ QT2]].
+    unfold quiet_time, pending_earlier_and_at, pending, has_arrived in QT2.
+    move: QT2; rewrite negb_and => /orP [QT2|QT2].
     { by move: QT2 => /negP QT2; exfalso; apply QT2, ltnW. }
     by rewrite Bool.negb_involutive in QT2.
   Qed.
