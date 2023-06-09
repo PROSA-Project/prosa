@@ -28,7 +28,7 @@ Instance JLFP_to_JLDP {Job : JobType}
 (** We add coercions to enable automatic conversion from [JLFP] to [JLDP]... *)
 Coercion JLFP_to_JLDP : JLFP_policy >-> JLDP_policy.
 (** ...and from [FP] to [JLFP]. *)
-Coercion FP_to_JLFP : FP_policy >-> JLFP_policy.
+#[nonuniform] Coercion FP_to_JLFP : FP_policy >-> JLFP_policy.
 
 (** We now prove lemmas about conversions between the properties of these
     priority classes. *)
