@@ -125,32 +125,12 @@ Section Sequential_Abstract_RTA.
         as [upper_bound] one can use the end of the corresponding busy
         interval. *)
     Definition task_interference_received_before (tsk : Task) (t__up : instant) (t : instant) :=
-      ~ task_scheduled_at arr_seq sched tsk t /\
-      exists j, interference j t /\ j \in task_arrivals_before arr_seq tsk t__up.
-
-    (** We also define a decidable counterpart of this definition... *) 
-    Definition task_interference_received_before_dec (tsk : Task) (t__up : instant) (t : instant) :=
       (~~ task_scheduled_at arr_seq sched tsk t)
       && has (fun j => interference j t) (task_arrivals_before arr_seq tsk t__up).
 
-    (** ... and prove that the propositional and decidable definitions
-        are equivalent. *) 
-    Lemma task_interference_received_before_P :
-      forall tsk t__up t, reflect (task_interference_received_before tsk t__up t)
-                   (task_interference_received_before_dec tsk t__up t).
-    Proof.
-      clear task_rbf H_valid_run_to_completion_threshold H_tsk_in_ts tsk.
-      move => tsk t__up t; apply/introP => TI.
-      - move: TI => /andP [T1 /hasP [j IN INT]].
-        by split; [apply/negP | exists j].
-      - move => [NS [j [INT IN]]].
-        move: TI => /negP TI; apply: TI.
-        by apply/andP; split; [apply/negP | apply/hasP; exists j].
-    Qed.
-
     (** Next we define the cumulative task interference. *)
     Definition cumul_task_interference tsk upper_bound t1 t2 :=
-      \sum_(t1 <= t < t2) task_interference_received_before_dec tsk upper_bound t.
+      \sum_(t1 <= t < t2) task_interference_received_before tsk upper_bound t.
 
     (** We say that task interference is bounded by
         [task_interference_bound_function] ([task_IBF]) iff for any
@@ -373,7 +353,7 @@ Section Sequential_Abstract_RTA.
             Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_idle:
               interference j t + scheduled_at sched j t
               <= service_of_jobs_at (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
-                + task_interference_received_before_dec tsk t2 t.
+                + task_interference_received_before tsk t2 t.
             Proof.
               move: (H_busy_interval) => [[/andP [BUS LT] _] _].
               replace (service_of_jobs_at _ _ _) with 0; last first.
@@ -383,7 +363,7 @@ Section Sequential_Abstract_RTA.
               rewrite /service_of_jobs.service_of_jobs_at /service_at /= scheduled_at_def.
               rewrite !H_idle/= addn0 add0n.
               case INT: (interference j t) => [|//].
-              rewrite /= lt0b /task_interference_received_before_dec; apply/andP; split.
+              rewrite /= lt0b /task_interference_received_before; apply/andP; split.
               { rewrite /task_scheduled_at scheduled_job_at_def => //.
                 by rewrite H_idle. }
               apply/hasP; exists j; last by [].
@@ -407,10 +387,10 @@ Section Sequential_Abstract_RTA.
             Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_task:
               interference j t + scheduled_at sched j t <=
               service_of_jobs_at (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t +
-              task_interference_received_before_dec tsk t2 t.
+              task_interference_received_before tsk t2 t.
             Proof.
               move: (H_busy_interval) => [[/andP [BUS LT] _] _].
-              rewrite /task_interference_received_before_dec
+              rewrite /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def/=.
               have ARRs: arrives_in arr_seq j';
@@ -452,7 +432,7 @@ Section Sequential_Abstract_RTA.
             Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_job:
               interference j t + scheduled_at sched j t
               <= service_of_jobs_at (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
-                + task_interference_received_before_dec tsk t2 t.
+                + task_interference_received_before tsk t2 t.
             Proof.
               move: (H_busy_interval) => [[/andP [BUS LT] _] _].
               have ->: scheduled_at sched j t = false.
@@ -504,14 +484,14 @@ Section Sequential_Abstract_RTA.
             Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_j:
               interference j t + scheduled_at sched j t
               <= service_of_jobs_at (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
-                + task_interference_received_before_dec tsk t2 t.
+                + task_interference_received_before tsk t2 t.
             Proof.
               have j_is_in_arrivals_between: j \in arrivals_between t1 (t1 + A + ε).
               { eapply arrived_between_implies_in_arrivals => //.
                 move: (H_busy_interval) => [[/andP [GE _] [_ _]] _].
                 by apply/andP; split; last rewrite /A subnKC // addn1.
               } 
-              rewrite /task_interference_received_before_dec
+              rewrite /task_interference_received_before
                       /task_scheduled_at /task_schedule.task_scheduled_at /service_of_jobs_at
                       /service_of_jobs.service_of_jobs_at scheduled_at_def.
               move: (H_job_of_tsk) => /eqP TSK.
@@ -541,7 +521,7 @@ Section Sequential_Abstract_RTA.
           Lemma interference_plus_sched_le_serv_of_task_plus_task_interference:
             interference j t + scheduled_at sched j t
             <= service_of_jobs_at (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
-              + task_interference_received_before_dec tsk t2 t.
+              + task_interference_received_before tsk t2 t.
           Proof.
             move: (H_busy_interval) => [[/andP [BUS LT] _] _].
             case SCHEDt: (sched t) => [j1 | ];

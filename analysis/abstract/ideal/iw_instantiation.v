@@ -191,7 +191,7 @@ Section JLFPInstantiation.
       Lemma idle_implies_no_task_interference :
         forall upper_bound, ~ task_interference_received_before arr_seq sched tsk upper_bound t.
       Proof.
-        move => upp [NSCHEDT [j' [INT TSKBE]]].
+        move=> upp /andP[NSCHEDT /hasP[j' TSKBE INT]].
         by apply idle_implies_no_interference in INT.
       Qed.
 
@@ -283,7 +283,7 @@ Section JLFPInstantiation.
         Lemma task_interference_eq_false :
           forall upper_bound, ~ task_interference_received_before arr_seq sched tsk upper_bound t.
         Proof.
-          move => upp [TNSCHED [j'' [INT ARR]]].
+          move=> upp /andP[/negP TNSCHED /hasP[j'' ARR INT]].
           unfold interference, ideal_jlfp_interference in *.
           apply:TNSCHED; rewrite /task_scheduled_at scheduled_job_at_def => //.
           by move: (H_j'_sched); rewrite scheduled_at_def => /eqP->.
@@ -338,11 +338,13 @@ Section JLFPInstantiation.
             task_interference_received_before arr_seq sched tsk upper_bound t.
         Proof.
           move => upp IN.
-          split.
+          apply/andP; split.
           - move: (H_j'_sched).
             rewrite /task_scheduled_at scheduled_job_at_def => //.
-            by rewrite scheduled_at_def => /eqP ->; apply/negP.
-          - exists j; split.
+            by rewrite scheduled_at_def => /eqP->.
+          - apply/hasP; exists j.
+            + rewrite mem_filter; apply/andP; split=> [|//].
+              by rewrite H_j_tsk.
             + apply/orP; right; apply/hasP; exists j'; [|apply/andP; split].
               * apply arrived_between_implies_in_arrivals => //.
                 apply/andP; split=> [//|].
@@ -351,8 +353,6 @@ Section JLFPInstantiation.
                 apply/negP; move => /eqP EQ; subst.
                 by move: (H_j'_not_tsk); rewrite H_j_tsk.
               * by rewrite /receives_service_at service_at_is_scheduled_at lt0b.
-            + rewrite mem_filter; apply/andP; split=> [|//].
-              by rewrite H_j_tsk.
         Qed.
 
       End FromDifferentTask.
@@ -496,12 +496,12 @@ Section JLFPInstantiation.
       { by clear; move=> [] [] [] //=; do ?[by move=> /(_ erefl)]; move=> _;
           do ?[by move=> /(_ (or_introl erefl))]; move=> /(_ (or_intror erefl)). }
       apply: BinFact =>
-        [ /task_interference_received_before_P [TNSCHED [jo [INT TIN]]]
+        [ /andP[/negP TNSCHED /hasP[jo TIN INT]]
         | [/priority_inversion_P PRIO | /hasP[jo INjo /andP[ATHEP RSERV]]]].
       { exact: priority_inversion_xor_atask_hep_job_interference. }
       { feed_n 3 PRIO => //; move: PRIO => [NSCHED [j' /andP [SCHED NHEP]]].
-        apply/task_interference_received_before_P; split.
-        - move => TSCHED.
+        apply/andP; split.
+        - apply/negP => TSCHED.
           have TSKj' : job_of_task tsk j'.
           { move: TSCHED.
             rewrite /task_scheduled_at scheduled_job_at_def => //.
@@ -513,23 +513,23 @@ Section JLFPInstantiation.
           move: NCOMPL => /negP NCOMPL; apply: NCOMPL.
           apply completion_monotonic with t => //.
           by move: IN; rewrite mem_iota; clear; lia.
-        - exists j; split.
+        - apply/hasP; exists j.
+          + by rewrite mem_filter; apply/andP; split.
           + apply/orP; left; apply /priority_inversion_P => //.
-            by split; last (exists j'; apply/andP; split).
-          + by rewrite mem_filter; apply/andP; split. }
-      { apply/task_interference_received_before_P; split.
-        { move => TSCHED; move: ATHEP => /andP [_ /negP EQ]; apply: EQ.
+            by split; last (exists j'; apply/andP; split). }
+      { apply/andP; split.
+        { apply/negP => TSCHED; move: ATHEP => /andP [_ /negP EQ]; apply: EQ.
           move: TSCHED.
           rewrite /task_scheduled_at scheduled_job_at_def//.
           move: RSERV; rewrite /receives_service_at service_at_is_scheduled_at
                          lt0b scheduled_at_def => /eqP -> => /eqP ->.
           by rewrite eq_sym. }
-        exists j; split.
+        apply/hasP; exists j.
+        - by rewrite mem_filter; apply/andP; split.
         - apply/orP; right; apply/hasP.
           exists jo; [by [] | apply/andP; split=> [|//]].
           move: ATHEP => /andP [A B]; apply/andP; split=> [//|].
-          by apply/negP; move => /eqP EQ; subst jo; rewrite eq_refl in B.
-        - by rewrite mem_filter; apply/andP; split. }
+          by apply/negP; move => /eqP EQ; subst jo; rewrite eq_refl in B. }
     Qed.
 
     (** In this section, we prove that the (abstract) cumulative
