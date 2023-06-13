@@ -13,7 +13,7 @@ build: [
 install: [make "install"]
 depends: [
   "coq" {((>= "8.16" & < "8.18~") | = "dev")}
-  "coq-mathcomp-algebra" {((>= "1.16" & < "1.17~") | = "dev")}
+  "coq-mathcomp-algebra" {((>= "1.16" & < "1.18~") | = "dev")}
   "coq-mathcomp-zify" {>= "1.2.0"}
 ]
 

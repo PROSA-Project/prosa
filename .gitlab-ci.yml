@@ -29,7 +29,7 @@ stages:
     - opam install -y -v -j ${NJOBS} coq-prosa-refinements
 
 .preferred-stable-version:
-    image: bbbrandenburg/mathcomp-for-prosa:1.16.0-coq-8.16
+    image: bbbrandenburg/mathcomp-for-prosa:1.17.0-coq-8.17
 
 .build:
   image: bbbrandenburg/mathcomp-for-prosa:${CI_JOB_NAME}
@@ -71,10 +71,10 @@ stages:
     - .build
     - .not_in_wip_branches
 
-# 1.16.0-coq-8.17:
-#   extends:
-#     - .build
-#     - .not_in_wip_branches
+1.17.0-coq-8.17:
+  extends:
+    - .build
+    - .not_in_wip_branches
 
 POET:
   extends:
@@ -169,7 +169,7 @@ proof-state:
   extends:
    - .not_in_wip_branches
   stage: build
-  image: bbbrandenburg/alectryon-ci:1.16.0-coq-8.16
+  image: bbbrandenburg/alectryon-ci:1.17.0-coq-8.17
   script:
     - eval $(opam env)
     - make -j ${NJOBS} all
