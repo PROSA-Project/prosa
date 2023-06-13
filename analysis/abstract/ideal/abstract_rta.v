@@ -181,8 +181,7 @@ Section AbstractRTAIdeal.
   Theorem uniprocessor_response_time_bound_ideal :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
-    try (eapply uniprocessor_response_time_bound with (IBF_NP := fun tsk F Δ => F - task_rtct tsk)
-         || eapply uniprocessor_response_time_bound with (IBF_NP0 := fun tsk F Δ => F - task_rtct tsk)) => //.
+    eapply uniprocessor_response_time_bound with (IBF_NP := fun tsk F Δ => F - task_rtct tsk) => //.
     { by apply nonpreemptive_interference_is_bounded. }
     { move => F _.
       destruct (leqP F (task_rtct tsk)) as [NEQ|NEQ].

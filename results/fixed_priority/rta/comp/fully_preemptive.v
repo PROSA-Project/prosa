@@ -132,11 +132,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       by rewrite leqn0 => /eqP ZERO; apply: pathological_total_hep_rbf_any_bound.
     move=> GT0.
     (* Second, apply the general result. *)
-    try (eapply uniprocessor_response_time_bound_fully_preemptive_fp
-          with (L0 := L) (ts0 := ts) => //)
-        ||
-        (eapply uniprocessor_response_time_bound_fully_preemptive_fp
-          with (L := L) (ts := ts) => //).
+    eapply uniprocessor_response_time_bound_fully_preemptive_fp
+      with (L := L) (ts := ts) => //.
     { apply: ffp_finds_positive_fixpoint; eauto.
       exact: total_hep_rbf_monotone. }
     { by apply: ffp_finds_fixpoint; eauto. }

@@ -51,7 +51,6 @@ Section SporadicArrivals.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
     have EQ_ARR_A : (job_arrival a = job_arrival j) by [].
     have EQ_ARR_B : (job_arrival b = job_arrival j) by [].
-    try ( apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j) in NEQ => // ) ||
     apply uneq_job_uneq_arr with (arr_seq := arr_seq) (tsk := job_task j) in NEQ => //.
     by rewrite EQ_ARR_A EQ_ARR_B in NEQ.
   Qed.
@@ -110,7 +109,6 @@ Section SporadicArrivals.
     have PREV_ARR_LTE : job_arrival (prev_job arr_seq j1) <= job_arrival j1 by apply prev_job_arr_lte => //.
     rewrite ltn_neqAle; apply /andP.
     split => //; apply /eqP.
-    try ( apply uneq_job_uneq_arr with (arr_seq0 := arr_seq) (tsk0 := job_task j1) => //; try by rewrite H_j1_task ) ||
     apply uneq_job_uneq_arr with (arr_seq := arr_seq) (tsk := job_task j1) => //; try by rewrite H_j1_task.
     - by apply prev_job_arr.
     - by apply prev_job_task.
