@@ -23,7 +23,6 @@ Section Optimality.
   (** ... and any valid arrival sequence of such jobs. *)
   Variable arr_seq: arrival_sequence Job.
   Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
