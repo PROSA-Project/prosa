@@ -49,9 +49,17 @@ Section Schedule.
       (j : Job) (mps : multiprocessor_state) (cpu : processor num_cpus)
     := scheduled_in j (mps cpu).
 
-  (** Similarly, the service received by a given job [j] in a given
-      multiprocessor state [mps] on a given processor of ID [cpu] is exactly
-      the service given by [j] in the processor-local state [(mps cpu)]. *)
+  (** Similarly, the supply produced by a given multiprocessor state
+      [mps] on a given core [cpu] is exactly the supply provided by the
+      core-local state [(mps cpu)]. *)
+  Definition multiproc_supply_on
+      (mps : multiprocessor_state) (cpu : processor num_cpus)
+    := supply_in (mps cpu).
+
+  (** Next, the service received by a given job [j] in a given
+      multiprocessor state [mps] on a given processor of ID [cpu] is
+      exactly the service given by [j] in the processor-local state
+      [(mps cpu)]. *)
   Definition multiproc_service_on
       (j : Job) (mps : multiprocessor_state) (cpu : processor num_cpus)
     := service_in j (mps cpu).
@@ -62,8 +70,12 @@ Section Schedule.
     {|
       State := multiprocessor_state;
       scheduled_on := multiproc_scheduled_on;
+      supply_on := multiproc_supply_on;
       service_on := multiproc_service_on
     |}.
+  Next Obligation.
+    by move => ? ? ?; apply: leq_sum => c _; exact: service_on_le_supply_on.
+  Qed.
   Next Obligation. by move=> ? ? ?; apply: service_in_implies_scheduled_in. Qed.
 
   (** From the instance [multiproc_state], we get the function [service_in].
@@ -72,8 +84,6 @@ Section Schedule.
       processors of the multiprocessor. *)
   Lemma multiproc_service_in_eq : forall (j : Job) (mps : multiprocessor_state),
     service_in j mps = \sum_(cpu < num_cpus) service_in j (mps cpu).
-  Proof.
-    reflexivity.
-  Qed.
+  Proof. reflexivity. Qed.
 
 End Schedule.

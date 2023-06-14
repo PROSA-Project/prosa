@@ -35,7 +35,20 @@ Section State.
       | Progress j' => j' == j
       end.
 
-    (** In contrast, job [j] receives service only if the given state [s] is
+    (** If the processor is idle, we assume that the supply equals 1,
+        indicating that the processor is ready to perform work. If the
+        processor is in the state [Spin j], then the job does not make
+        any progress, so effectively the supply is equal to
+        0. Finally, the processor being in the state [Progress j]
+        indicates that the processor carries out 1 unit of useful work. *)
+    Definition spin_supply_on (s : processor_state) (_ : unit) : work :=
+      match s with
+      | Idle       => 1
+      | Spin j     => 0
+      | Progress j => 1
+      end.
+
+    (** A job [j] receives service only if the given state [s] is
         [Progress j]. *)
     Definition spin_service_on (s : processor_state) (_ : unit) : work :=
       match s with
@@ -50,9 +63,12 @@ Section State.
       interface for abstract processor states. *)
   Program Definition pstate_instance : ProcessorState Job :=
     {|
-      State := processor_state;
+      State        := processor_state;
       scheduled_on := spin_scheduled_on;
+      supply_on    := spin_supply_on;
       service_on   := spin_service_on
     |}.
+  Next Obligation. by move => j [] // s [] /=; case: eqP. Qed.
   Next Obligation. by move=> j [] //= j' _ /negbTE ->. Qed.
+
 End State.

@@ -32,10 +32,16 @@ Section State.
       (** We say that a given job [j] is scheduled in a
           given state [s] iff [s] is [Some j]. *)
       scheduled_on j s (_ : unit) := s == Some j;
-      (** Similarly, we say that a given job [j] receives service in a
-          given state [s] iff [s] is [Some j]. *)
+      (** Any state of an ideal processor provides exactly one unit of
+          supply. *)
+      supply_on s (_ : unit) := 1;
+      (** We say that a given job [j] receives service in a given
+          state [s] iff [s] is [Some j]. *)
       service_on j s (_ : unit) := if s == Some j then 1 else 0;
     |}.
+  Next Obligation.
+    by move=> j s ?; rewrite /nat_of_bool; case: ifP => // ? /negP[].
+  Qed.
   Next Obligation.
     by move=> j s ?; rewrite /nat_of_bool; case: ifP => // ? /negP[].
   Qed.

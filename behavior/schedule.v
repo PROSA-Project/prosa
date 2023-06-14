@@ -34,12 +34,22 @@ Class ProcessorState (Job : JobType) :=
     (** For a given processor state and core, the [scheduled_on] predicate
         checks whether a given job is running on the given core. *)
     scheduled_on : Job -> State -> Core -> bool;
-    (** For a given processor state and core, the [service_on] function determines
-        how much service a given job receives on the given core). *)
+    (** For a given processor state and core, the [supply_on] function
+        determines how much supply the core produces in the given
+        state). *)
+    supply_on : State -> Core -> work;
+    (** For a given processor state and core, the [service_on]
+        function determines how much service a given job receives on
+        the given core). *)
     service_on : Job -> State -> Core -> work;
-    (** We require [scheduled_on] and [service_on] to be consistent in
-        the sense that a job can receive service (on a given core)
-        only if it is also scheduled (on that core). *)
+    (** We require [service_on] and [supply_on] to be consistent in
+        the sense that a job cannot receive more service on a given
+        core in a given state than there is supply on the core in this
+        state. *)
+    service_on_le_supply_on :
+      forall j s r, service_on j s r <= supply_on s r;
+    (** In addition, a job can receive service (on a given core) only
+        if it is also scheduled (on that core). *)
     service_on_implies_scheduled_on :
       forall j s r, ~~ scheduled_on j s r -> service_on j s r = 0
   }.
@@ -56,8 +66,10 @@ Coercion State : ProcessorState >-> Sortclass.
     (i.e., on any core), and how much service the job receives
     anywhere (i.e., across all cores). *)
 Section ProcessorIn.
+
   (** Consider any type of jobs... *)
   Context {Job : JobType}.
+
   (** ...and any type of processor state. *)
   Context {State : ProcessorState Job}.
 
@@ -66,8 +78,14 @@ Section ProcessorIn.
   Definition scheduled_in (j : Job) (s : State) : bool :=
     [exists c : Core, scheduled_on j s c].
 
-  (** For a given processor state, the [service_in] function determines how
-      much service a given job receives in that state (across all cores). *)
+  (** For a given processor state, the [supply_in] function determines
+      how much supply the processor provides (across all cores) in the given state. *)
+  Definition supply_in (s : State) : work :=
+    \sum_(r : Core) supply_on s r.
+
+  (** For a given processor state, the [service_in] function
+      determines how much service a given job receives in that state
+      (across all cores). *)
   Definition service_in (j : Job) (s : State) : work :=
     \sum_(r : Core) service_on j s r.
 
