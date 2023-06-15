@@ -20,11 +20,12 @@ Section ProcessorModels.
   (** We say that a processor model offers ideal progress if a scheduled job
       always receives non-zero service. *)
   Definition ideal_progress_proc_model :=
-    forall j s, scheduled_in j s -> service_in j s > 0.
+    forall (j : Job) (s : PState),
+      scheduled_in j s -> service_in j s > 0.
 
   (** In a uniprocessor model, the scheduled job is always unique. *)
   Definition uniprocessor_model :=
-    forall j1 j2 s t,
+    forall (j1 j2 : Job) (s : schedule PState) (t : instant),
       scheduled_at s j1 t ->
       scheduled_at s j2 t ->
       j1 = j2.
