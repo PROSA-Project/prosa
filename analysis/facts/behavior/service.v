@@ -246,9 +246,11 @@ Section Monotonicity.
 
 End Monotonicity.
 
-(** Consider any job type and any processor model. *)
+(** In the following, we establish a collection of facts relating
+    service with predicates [scheduled_in] and [scheduled_at]. *)
 Section RelationToScheduled.
 
+  (** Consider any job type and any processor model. *)
   Context {Job: JobType}.
   Context {PState: ProcessorState Job}.
 
