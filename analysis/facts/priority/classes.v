@@ -35,6 +35,35 @@ Section BasicLemmas.
     by move: AA; rewrite TSK1 TSK2 => /negP A; apply: A.
   Qed.
 
+  (** Alternative definition of [another_task_hep_job] using
+      [another_hep_job] instead of [hep_job]. *)
+  Lemma another_task_hep_job_another_hep_job :
+    forall j1 j2,
+      another_task_hep_job j1 j2
+      = another_hep_job j1 j2 && (job_task j1 != job_task j2).
+  Proof.
+    move=> j1 j2.
+    by rewrite -andbA [X in _ && X]andb_idl//; apply: contraNN => /eqP->.
+  Qed.
+
+  (** [another_hep_job] can either come from another or the same task... *)
+  Lemma another_hep_job_split_task :
+    forall j1 j2,
+      another_hep_job j1 j2
+      = another_task_hep_job j1 j2 || another_hep_job_of_same_task j1 j2.
+  Proof.
+    move=> j1 j2.
+    by rewrite another_task_hep_job_another_hep_job -andb_orr orNb andbT.
+  Qed.
+
+  (** ...but not both. *)
+  Lemma another_hep_job_exclusive :
+    forall j1 j2,
+      ~~ (another_task_hep_job j1 j2 && another_hep_job_of_same_task j1 j2).
+  Proof.
+    by move=> j1 j2; rewrite !negb_and negbK; case: eqP; rewrite /= !orbT.
+  Qed.
+
 End BasicLemmas.
 
 (** In the following section, we establish properties of [hp_task] and [ep_task ]auxiliary
@@ -222,22 +251,24 @@ Section JLFPFP.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
 
-  (** Consider any pair of JLFP and FP policies. *)
+  (** Consider any pair of JLFP and FP policies that are compatible. *)
   Context (JLFP : JLFP_policy Job) (FP : FP_policy Task).
+  Hypothesis H_compatible : JLFP_FP_compatible JLFP FP.
 
-  (** If a policy is [JLFP_FP_compatible], then a job [j1] has
-      lower priority than a job [j2] if the task of [j1] has
-      lower priority than the task of [j2]. *)
-  Lemma not_hep_task_implies_not_hep_job :
+  (** We restate [JLFP_FP_compatible] to make it easier to discover
+      with [Search]. Here is the first part... *)
+  Lemma hep_job_implies_hep_task :
     forall j1 j2,
-      JLFP_FP_compatible JLFP FP ->
-      ~~ hep_task (job_task j1) (job_task j2) ->
-      ~~ hep_job j1 j2.
-  Proof.
-    move =>  j1 j2 [NOTHEP HP] NOTHEPTSK.
-    specialize (NOTHEP j1 j2).
-    by apply contra in NOTHEP.
-  Qed.
+      hep_job j1 j2 ->
+      hep_task (job_task j1) (job_task j2).
+  Proof. exact: H_compatible.1. Qed.
+
+  (** ...and second part. *)
+  Lemma hp_task_implies_hep_job :
+    forall j1 j2,
+      hp_task (job_task j1) (job_task j2) ->
+      hep_job j1 j2.
+  Proof. exact: H_compatible.2. Qed.
 
 End JLFPFP.
 
