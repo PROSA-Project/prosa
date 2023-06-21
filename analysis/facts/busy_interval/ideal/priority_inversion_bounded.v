@@ -571,11 +571,9 @@ Section PriorityInversionIsBounded.
                            /\ scheduled_at sched j_hp t.
       { apply: not_quiet_implies_exists_scheduled_hp_job (ppt-t1) _ (t) _.
           by exists ppt; split; [|rewrite subnKC //; apply /andP;split].
-        by rewrite subnKC //; apply/andP; split. }
-      apply /eqP; rewrite eqb0; apply/negP; move => /priority_inversion_P INV.
-      feed_n 3 INV => //; last move: INV => [_ [j_lp /andP[SCHED PRIO]]].
-      enough (EQ : j_lp = j_hp); first by subst; rewrite HP in PRIO.
-      exact: (ideal_proc_model_is_a_uniprocessor_model j_lp j_hp sched t).
+               by rewrite subnKC //; apply/andP; split. }
+      apply/eqP; rewrite eqb0.
+      exact: no_priority_inversion_when_hep_job_scheduled.
     Qed.
 
   End NoPriorityInversionAfterPreemptionPoint.

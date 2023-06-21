@@ -483,14 +483,13 @@ Section ExistsBusyIntervalJLFP.
                   eapply leq_trans; first by apply: SCH; eauto using arrivals_uniq with basic_rt_facts.
                   clear SCH; rewrite lt0b; apply/andP; split.
                   + apply/negP; intros SCHED'.
-                    have EQ: j = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto 2.
+                    have EQ : j = j'.
+                      apply: ideal_proc_model_is_a_uniprocessor_model SCHED.
+                      by rewrite -(scheduled_jobs_at_iff arr_seq).
                     subst; move: PRIO1 => /negP PRIO1; apply: PRIO1.
                     apply H_priority_is_reflexive.
-                  + apply/hasP; exists j'.
-                    * apply arrived_between_implies_in_arrivals; eauto 2.
-                      apply H_jobs_must_arrive_to_execute in SCHED.
-                      by unfold has_arrived, arrived_between in *; lia.
-                    * by apply/andP; split; [ | rewrite PRIO1]. } }
+                  + apply/hasP; exists j'; last by rewrite PRIO1.
+                    by rewrite scheduled_jobs_at_iff. } }
             { rewrite leq_add2r.
               destruct (t1 + delta <= t_busy.+1) eqn:NEQ; [ | apply negbT in NEQ; rewrite -ltnNge in NEQ].
               - apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t_busy.+1); last eauto 2.

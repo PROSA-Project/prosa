@@ -19,9 +19,9 @@ Section PIIdealProcessorModelLemmas.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider any arrival sequence with consistent arrivals. *)
+  (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
@@ -53,13 +53,11 @@ Section PIIdealProcessorModelLemmas.
       is no priority inversion. *)
   Lemma idle_implies_no_priority_inversion :
     ideal_is_idle sched t ->
-    priority_inversion_dec arr_seq sched j t = false.
+    ~~ priority_inversion arr_seq sched j t.
   Proof.
-    unfold priority_inversion_dec; intros IDLE.
-    apply/eqP; rewrite eqbF_neg negb_and Bool.negb_involutive; apply/orP; right.
-    apply/hasPn; intros s IN.
-    rewrite negb_and Bool.negb_involutive; apply/orP; left.
-    by move: IDLE => /eqP; rewrite scheduled_at_def => ->.
+    move=> IDLE.
+    apply: no_priority_inversion_when_idle => //.
+    by rewrite is_idle_def.
   Qed.
 
   (** Next, consider an additional job [j'] and assume it is scheduled
@@ -70,53 +68,21 @@ Section PIIdealProcessorModelLemmas.
   (** Then, we prove that from point of view of job [j], priority
       inversion appears iff [s] has lower priority than job [j]. *)
   Lemma priority_inversion_equiv_sched_lower_priority :
-    priority_inversion_dec arr_seq sched j t = ~~ hep_job j' j.
-  Proof.
-    rewrite /priority_inversion_dec.
-    destruct (scheduled_at _ j _) eqn:SCHED2; rewrite //=.
-    { have EQ: j = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
-      by subst j'; symmetry; apply/eqP; rewrite eqbF_neg Bool.negb_involutive.
-    }
-    { destruct (hep_job) eqn:HEP; rewrite //=.
-      - apply/eqP; rewrite eqbF_neg; apply/hasPn; intros l IN.
-        destruct (scheduled_at _ l _) eqn:SCHED3; rewrite //=.
-        have EQ: l = j' by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
-        by subst j'; rewrite HEP.
-      - apply/hasP; exists j' => [//|].
-        by rewrite H_j'_sched HEP.
-    }
-  Qed.
+    priority_inversion arr_seq sched j t = ~~ hep_job j' j.
+  Proof. exact: priority_inversion_hep_job. Qed.
 
   (** Assume that [j'] has higher-or-equal priority than job [j], then
       we prove that there is no priority inversion for job [j]. *)
   Lemma sched_hep_implies_no_priority_inversion :
     hep_job j' j ->
-    priority_inversion_dec arr_seq sched j t = false.
-  Proof.
-    intros HEP.
-    apply/negP; intros CONTR; move: CONTR => /andP [NSCHED /hasP [j'' _ /andP [SCHED PRIO]]].
-    have HF := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched SCHED; subst j'.
-    by rewrite HEP in PRIO.
-  Qed.
+    priority_inversion arr_seq sched j t = false.
+  Proof. by rewrite  priority_inversion_equiv_sched_lower_priority => ->. Qed.
 
   (** Assume that [j'] has lower priority than job [j], then
       we prove that [j] incurs priority inversion. *)
   Lemma sched_lp_implies_priority_inversion :
     ~~ hep_job j' j ->
-    priority_inversion_dec arr_seq sched j t.
-  Proof.
-    intros LP.
-    apply/andP; split.
-    - apply/negP; intros SCHED.
-      have HF := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_j'_sched SCHED; subst j'.
-      move: (LP) => /negP HH; apply: HH.
-      unfold hep_job_at, JLFP_to_JLDP in *.
-      by erewrite H_priority_is_reflexive; eauto 2.
-    - apply/hasP.
-      exists j'.
-      + apply arrived_between_implies_in_arrivals; eauto 2.
-        exact/andP.
-      + exact/andP.
-  Qed.
+    priority_inversion arr_seq sched j t.
+  Proof. by move=> NHEP; apply/uni_priority_inversion_P. Qed.
 
 End PIIdealProcessorModelLemmas.

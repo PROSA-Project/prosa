@@ -7,7 +7,7 @@ Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.busy_interval.all.
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
-
+Require Export prosa.analysis.facts.priority.inversion.
 
 (** We first make some trivial observations about the FIFO priority policy to
     avoid having to re-reason these steps repeatedly in the subsequent
@@ -94,10 +94,12 @@ Section BasicLemmas.
     forall j t,
       arrives_in arr_seq j ->
       pending sched j t ->
-      ~ priority_inversion sched j t.
+      ~~ priority_inversion arr_seq sched j t.
   Proof.
-    move => j t IN /andP [ARR /negP +] [NSCHED [j' /andP [SCHED PRIO]]].
-    apply; apply: early_hep_job_is_scheduled => //.
+    move=> j t IN /andP[ARR]; apply: contraNN => pijt.
+    have [j' + PRIO] : exists2 j', scheduled_at sched j' t & ~~ hep_job j' j.
+      exact/uni_priority_inversion_P.
+    apply: (early_hep_job_is_scheduled arr_seq) => //.
     - by rewrite -not_hep_job_arrival_FIFO.
     - exact: not_hep_job_always_higher_priority_FIFO.
   Qed.
@@ -149,7 +151,9 @@ Section BasicLemmas.
       move=> j ARRIN TASK POS t1 t2 BUSY.
       rewrite leqn0; apply/eqP; rewrite big_nat_eq0 => t /andP[T1 T2].
       apply/eqP; rewrite eqb0.
-      apply: contraT => /negPn /andP[NSCHED /hasP [j' IN /andP [SCHED NHEP]]].
+      apply: contraT => /negPn pijt.
+      have [j' SCHED NHEP] : exists2 j', scheduled_at sched j' t & ~~ hep_job j' j.
+        exact/uni_priority_inversion_P.
       move: T1; rewrite leq_eqVlt => /orP [/eqP EQ | GT].
       { have /completed_implies_scheduled_before [//|//|t' [/andP [+ +] _]]:
           completed_by sched j t by apply: (scheduled_implies_higher_priority_completed j').

@@ -76,8 +76,7 @@ Section BusyIntervalInequalities.
       - rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1  + Δ)) //=; try by lia.
         by rewrite /priority_inversion leq_addr.
       - apply: H_priority_inversion_is_bounded => //.
-        eapply instantiated_busy_interval_equivalent_busy_interval in H_busy_interval => //.
-        by move: H_busy_interval => [PREF _].
+        by move: H_busy_interval; rewrite -instantiated_busy_interval_equivalent_busy_interval // =>  -[PREF _].
     Qed.
 
   End PIBound.
@@ -93,9 +92,9 @@ Section BusyIntervalInequalities.
     <= service_of_jobs sched (fun jo => another_task_hep_job jo j) jobs t1 (t1 + Δ).
   Proof.
     move: (H_busy_interval) => [[/andP [JINBI JINBI2] [QT _]] _].
-    erewrite cumulative_i_thep_eq_service_of_othep => //.
-    - move: (H_job_of_tsk) => /eqP TSK.
-      by rewrite instantiated_quiet_time_equivalent_quiet_time.
+    rewrite cumulative_i_thep_eq_service_of_othep => //.
+    have /eqP TSK := H_job_of_tsk.
+    by rewrite instantiated_quiet_time_equivalent_quiet_time.
   Qed.
 
 End BusyIntervalInequalities.

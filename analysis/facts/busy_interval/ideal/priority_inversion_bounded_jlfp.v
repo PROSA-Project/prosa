@@ -111,7 +111,7 @@ Section PriorityInversionIsBounded.
     { apply leq_trans with (t2 -t1) => [|//].
       rewrite /cumulative_priority_inversion.
       rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat.
-      by rewrite leq_sum //; move=> t _; destruct (priority_inversion_dec). }
+      by rewrite leq_sum //; move=> t _; destruct (priority_inversion). }
     have [ppt [PPT' /andP[GE LE]]]: exists ppt : instant,
                                       preemption_time arr_seq sched ppt /\
                                       t1 <= ppt <=
@@ -122,7 +122,7 @@ Section PriorityInversionIsBounded.
     apply: priority_inversion_occurs_only_till_preemption_point =>//.
     { rewrite /cumulative_priority_inversion -[X in _ <= X]addn0 -[ppt - t1]mul1n
               -iter_addn -big_const_nat.
-      by rewrite leq_sum //; move=> t _; case: priority_inversion_dec. }
+      by rewrite leq_sum //; move=> t _; case: priority_inversion. }
     { rewrite leq_subLR; apply leq_trans with (t1 + max_length_of_priority_inversion arr_seq j t1) => [//|].
       by rewrite leq_add2l; apply: (H_priority_inversion_is_bounded_by_blocking j t1 t2). }
     Qed.
