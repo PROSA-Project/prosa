@@ -1,3 +1,4 @@
+Require Export prosa.analysis.definitions.service.
 Require Export prosa.model.aggregate.workload.
 
 (** * Interference and Interfering Workload *)
@@ -20,10 +21,6 @@ Section Definitions.
 
   (** ... and any schedule. *)
   Variable sched : schedule PState.
-
-  (** First define jobs served at a given time. *)
-  Definition served_at (t : instant) :=
-    [seq j <- arrivals_up_to arr_seq t | receives_service_at sched j t].
 
   (** Definitions of interference for FP policies. *)
   Section FPDefinitions.
@@ -49,7 +46,7 @@ Section Definitions.
 
     (** This enables us to define interference from equal-priority tasks. *)
     Definition hep_job_from_other_ep_task_interference (j : Job) (t : instant) :=
-      has (other_ep_task_hep_job^~ j) (served_at t).
+      has (other_ep_task_hep_job^~ j) (served_at arr_seq sched t).
 
     (** Similarly, to define interference from strictly higher-priority tasks, we first
         define higher-or-equal-priority jobs from a strictly higher-priority task, which... *)
@@ -58,7 +55,7 @@ Section Definitions.
 
     (** ... enables us to define interference from strictly higher-priority tasks. *)
     Definition hep_job_from_hp_task_interference (j : Job) (t : instant) :=
-      has (hp_task_hep_job^~ j) (served_at t).
+      has (hp_task_hep_job^~ j) (served_at arr_seq sched t).
 
     (** Using the above definitions, we define the cumulative interference incurred in the interval
         <<[t1, t2)>> from (1) higher-or-equal-priority jobs from strictly higher-priority tasks... *)
@@ -83,14 +80,14 @@ Section Definitions.
         job [jhp] (different from [j]) with a higher-or-equal priority
         that executes at time [t]. *)
     Definition another_hep_job_interference (j : Job) (t : instant) :=
-      has (another_hep_job^~ j) (served_at t).
+      has (another_hep_job^~ j) (served_at arr_seq sched t).
 
     (** Similarly, we say that job [j] is incurring interference from a
         job with higher-or-equal priority of another task at time [t]
         if there exists a job [jhp] (of a different task) with
         higher-or-equal priority that executes at time [t]. *)
     Definition another_task_hep_job_interference (j : Job) (t : instant) :=
-      has (another_task_hep_job^~ j) (served_at t).
+      has (another_task_hep_job^~ j) (served_at arr_seq sched t).
 
     (** Similarly, we say that job [j] is incurring interference from a
         job with higher-or-equal priority of the same task at time [t]

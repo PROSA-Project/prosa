@@ -1,4 +1,5 @@
 Require Export prosa.model.schedule.scheduled.
+Require Export prosa.analysis.definitions.service.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.facts.behavior.arrivals.
 Require Export prosa.util.tactics.
@@ -61,6 +62,30 @@ Section ScheduledJobs.
     rewrite -scheduled_jobs_at_iff NN.
     exact: mem_head.
   Qed.
+
+  (** ** The Job Scheduled on an Ideal Progress Processor *)
+
+  (** In this section, we prove a simple fact about the relation
+      between [scheduled_at] and [served_at]. *)
+  Section IdealProgress.
+
+    (** Assume a scheduled job always receives some positive service. *)
+    Hypothesis H_ideal_progress_model : ideal_progress_proc_model PState.
+
+    (** We prove that if a job [j] is scheduled at time [t], then [j]
+        is in the set of jobs that are served at time [t]. *)
+    Lemma scheduled_at_implies_in_served_at :
+      forall j t,
+        scheduled_at sched j t ->
+        j \in served_at arr_seq sched t.
+    Proof.
+      move=> j t SCHED.
+      rewrite mem_filter; apply/andP; split.
+      - by apply H_ideal_progress_model.
+      - by eapply arrivals_before_scheduled_at => //.
+    Qed.
+
+  End IdealProgress.
 
   (** ** The Job Scheduled on a Uniprocessor *)
 
