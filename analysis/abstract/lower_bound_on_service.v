@@ -73,12 +73,13 @@ Section LowerBoundOnService.
     Lemma interference_is_complement_to_schedule :
       service_during sched j t (t + δ) + cumulative_interference j t (t + δ) >= δ.
     Proof.
-      rewrite /service_during /cumulative_interference /service_at.
+      rewrite /service_during /cumulative_interference /cumul_cond_interference /service_at.
       rewrite -big_split //= -{1}(sum_of_ones t δ) big_nat [in X in _ <= X]big_nat leq_sum // => x /andP[Lo Hi].
       move: (H_work_conserving j t1 t2 x) => Workj.
-      feed_n 4 Workj => //; first lia.
-      destruct interference; first lia.
-      by rewrite // addn0; apply Workj.
+      feed_n 4 Workj => //; first by lia.
+      rewrite /cond_interference //=.
+      case INT: interference; first by lia.
+      by rewrite // addn0; apply Workj; rewrite INT.
     Qed.
     
     (** Also, note that under the unit-service processor model
@@ -96,6 +97,7 @@ Section LowerBoundOnService.
       move: (H_work_conserving j t1 t2 x) => Workj.
       feed_n 4 Workj => //.
       { by apply/andP; split; lia. }
+      rewrite /cond_interference //=.
       destruct interference.
       - rewrite addn1 ltnS.
         by move_neq_up NE; apply Workj.

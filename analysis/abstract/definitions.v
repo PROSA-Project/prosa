@@ -79,11 +79,28 @@ Section AbstractRTADefinitions.
   Context `{Interference Job}.
   Context `{InterferingWorkload Job}.
 
-  (** In order to bound the response time of a job, we must
-      consider the cumulative interference and cumulative interfering
-      workload. *)
-  Definition cumulative_interference j t1 t2 := \sum_(t1 <= t < t2) interference j t.
-  Definition cumulative_interfering_workload j t1 t2 := \sum_(t1 <= t < t2) interfering_workload j t.
+  (** In order to perform subsequent abstract Response Time Analyses
+      (RTAs), it is essential that we have the capability to bound
+      interference of a certain type (for example, interference that
+      comes from other tasks' jobs). To achieve this, we define
+      "conditional" interference as a conjunction of a predicate [P :
+      Job -> instant -> bool] encoding the property of interest and
+      [interference]. *)
+  Definition cond_interference P j t :=
+    (P j t) && (interference j t).
+
+  (** In order to bound the response time of a job, we must consider
+      (1) the cumulative conditional interference, ... *)
+  Definition cumul_cond_interference P j t1 t2 :=
+    \sum_(t1 <= t < t2) cond_interference P j t.
+
+  (**  ... (2) cumulative interference, ... *)
+  Definition cumulative_interference j t1 t2 :=
+    cumul_cond_interference (fun _ _ => true) j t1 t2.
+
+  (** ... and (3) cumulative interfering workload. *)
+  Definition cumulative_interfering_workload j t1 t2 :=
+    \sum_(t1 <= t < t2) interfering_workload j t.
 
   (** Definition of Busy Interval *)
   (** Further analysis will be based on the notion of a busy
@@ -208,61 +225,80 @@ Section AbstractRTADefinitions.
           t2 <= t1 + L /\
           busy_interval j t1 t2.
 
-
-    (** Although we have defined the notion of cumulative interference
-        of a job, it cannot be used in a (static) response-time
-        analysis because of the dynamic variability of job parameters.
-        To address this issue, we define the notion of an interference
-        bound. *)
+    (** Although we have defined the notion of cumulative
+        (conditional) interference of a job, it cannot be used in a
+        (static) response-time analysis because of the dynamic
+        variability of job parameters. To address this issue, we
+        define the notion of an interference bound. *)
 
     (** As a first step, we introduce a notion of an "interference
         bound function" [IBF]. An interference bound function is any
         function with a type [Task -> duration -> duration -> work] that
-        bounds cumulative interference of a job of a task under
-        analysis (a precise definition will be presented below).
+        bounds cumulative conditional interference of a job of a task
+        under analysis (a precise definition will be presented below).
 
         Note that the function has three parameters. The first and the
         last parameters are a task under analysis and the length of an
         interval in which the interference is supposed to be bounded,
         respectively. These are quite intuitive; so, we will not
         explain them in more detail. However, the second parameter
-        deserves more thoughtful explanation.
+        deserves more thoughtful explanation, which we provide
+        next. *)
+    Variable IBF : Task -> duration -> duration -> work.
 
-        The second parameter of [IBF] allows one to organize a case
+    (** The second parameter of [IBF] allows one to organize a case
         analysis over a set of values that are known only during the
         computation. For example, the most common parameter is the
         relative arrival time [A] of a job (of a task under
-        analysis). Strictly speaking, [A] is now known at a time of
-        computing a fixpoint; however, one can consider a set of [A]
-        that covers all the relevant cases There can be other valid
-        properties such as "a time instant when a job under analysis
-        has received enough service to become non-preemptive." *)
-    Variable IBF : Task -> duration -> duration -> work.
+        analysis). Strictly speaking, [A] is not known when computing
+        a fixpoint; however, one can consider a set of [A] that covers
+        all the relevant cases. There can be other valid properties
+        such as "a time instant when a job under analysis has received
+        enough service to become non-preemptive."
 
-    (** To make the second parameter customizable, we introduce a
-        predicate [P : Job -> instant -> Prop] that connects the second
-        parameter to its semantics. More precisely, consider an
-        expression [IBF(tsk, X, delta)], and assume that we
-        instantiated [P] as some predicate [P0]. Then, it is assumed
-        that [IBF(tsk, X, delta)] bounds interference of a job under
-        analysis [j ∈ tsk] if [P0 j X] holds. *)
-    Variable P : Job -> nat -> Prop.
+        To make the second parameter customizable, we introduce a
+        predicate [ParamSem : Job -> instant -> Prop] that is used to
+        assign meaning to the second parameter. More precisely,
+        consider an expression [IBF(tsk, X, delta)], and assume that
+        we instantiated [ParamSem] as some predicate [P]. Then, it is
+        assumed that [IBF(tsk, X, delta)] bounds (conditional)
+        interference of a job under analysis [j ∈ tsk] if [P j X]
+        holds. *)
+    Variable ParamSem : Job -> nat -> Prop.
 
-    (** Next, let us define this reasoning formally.
-        We say that the job interference is bounded by an
-        "interference bound function" [IBF] iff for any job [j] of
-        task [tsk] the cumulative interference incurred by [j] in the
-        sub-interval <<[t1, t1 + delta)>> of busy interval <<[t1,
-        t2)>> does not exceed [IBF(tsk, X, delta)], where [X] is a
-        constant that satisfies a predefined predicate [P]. *)
-    (** Note that according to the definition of an abstract work
-        conservation, interference does _not_ include execution of a
-        job under analysis itself. Therefore, an interference bound is
-        not obliged to take into account the execution of this job. *)
-    Definition job_interference_is_bounded_by :=
-      (** Consider a job [j] of task [tsk], a busy interval
-          <<[t1,t2)>> of [j], and an arbitrary interval <<[t1, t1 + Δ)
-          ⊆ [t1, t2)>>.  *)
+    (** As mentioned, [IBF] must upper-bound the cumulative
+        _conditional_ interference. This is done to make further
+        extensions of the base aRTA easier. The most general aRTA
+        assumes that an IBF bounds _all_ interference of a given job
+        [j]. However, as we refine the model under analysis, we split
+        the IBF into more and more parts. For example, assuming that
+        tasks are sequential, it is possible to split IBF into two
+        parts: (1) the part that upper-bounds the cumulative
+        interference due to self-interference and (2) the part that
+        upper-bounds the cumulative interference due to all other
+        reasons. To avoid duplication, we parameterize the definition
+        of an IBF by a predicate that encodes the type of interference
+        that must be upper-bounded. *)
+    Variable Cond : Job -> instant -> bool.
+
+    (** Next, let us define this reasoning formally. We say that the
+        conditional interference is bounded by an "interference bound
+        function" [IBF] iff for any job [j] of task [tsk] and its busy
+        interval <<[t1, t2)>> the cumulative conditional interference
+        incurred by [j] w.r.t. predicate [Cond] in the sub-interval
+        <<[t1, t1 + Δ)>> does not exceed [IBF(tsk, X, Δ)], where [X]
+        is a constant that satisfies a predefined predicate
+        [ParamSem].
+
+        In other words, for a job [j ∈ tsk], the term [IBF(tsk, X, Δ)]
+        provides an upper-bound on the cumulative conditional
+        interference (w.r.t. the predicate [Cond]) that [j] might
+        experience in an interval of length [Δ] _assuming_ that
+        [ParamSem j X] holds. *)
+    Definition cond_interference_is_bounded_by :=
+      (** Consider a job [j] of task [tsk], a busy interval <<[t1,
+          t2)>> of [j], and an arbitrary interval <<[t1, t1 + Δ) ⊆
+          [t1, t2)>>. *)
       forall t1 t2 Δ j,
         arrives_in arr_seq j ->
         job_of_task tsk j ->
@@ -276,9 +312,17 @@ Section AbstractRTADefinitions.
         ~~ completed_by sched j (t1 + Δ) ->
         (** And finally, the IBF function might depend not only on the
             length of the interval, but also on a constant [X]
-            satisfying predicate [P]. *)
-        forall X, P j X -> cumulative_interference j t1 (t1 + Δ) <= IBF tsk X Δ.
+            satisfying predicate [Param]. *)
+        forall X,
+          ParamSem j X ->
+          cumul_cond_interference Cond j t1 (t1 + Δ) <= IBF tsk X Δ.
 
   End BusyIntervalProperties.
+
+  (** As an important special case, we say that a job's interference
+      is (unconditionally) bounded by [IBF] if it is conditionally
+      bounded with [Cond := fun j t => true]. *)
+  Definition job_interference_is_bounded_by IBF Param :=
+    cond_interference_is_bounded_by IBF Param (fun _ _ => true).
 
 End AbstractRTADefinitions.

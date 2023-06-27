@@ -226,16 +226,17 @@ Section AbstractRTAforGELwithArrivalCurves.
     End HepWorkloadBound.
 
     (** Finally, we prove that [IBF_other] bounds the interference incurred by [tsk]. *)
-    Corollary instantiated_task_interference_is_bounded:
+    Corollary instantiated_task_interference_is_bounded :
       task_interference_is_bounded_by
-        arr_seq sched tsk (fun tsk A R => IBF_other A R).
+        arr_seq sched tsk (fun t A R => IBF_other A R).
     Proof.
-      move => j R2 t1 t2 ARR TSK N NCOMPL BUSY.
+      move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
+      move: (OFF _ _ BUSY) => EQA; subst A.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
         by rewrite /completed_by /completed_by ZERO.
-      - rewrite (cumulative_task_interference_split arr_seq _ sched _ _ _ _ _ _ j)//;
-          last by exact: GEL_implies_sequential_tasks.
+      - rewrite -/(cumul_task_interference _ _ _ _ _).
+        rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=; last by exact: GEL_implies_sequential_tasks.
         rewrite /I leq_add //.
         + exact: cumulative_priority_inversion_is_bounded.
         + eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
@@ -388,7 +389,7 @@ Section AbstractRTAforGELwithArrivalCurves.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
     eapply uniprocessor_response_time_bound_seq with
-      (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L) => //.
+      (task_IBF := fun tsk A R => IBF_other A R) (L := L) => //.
     - eapply instantiated_i_and_w_are_coherent_with_schedule => //.
       exact: GEL_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.

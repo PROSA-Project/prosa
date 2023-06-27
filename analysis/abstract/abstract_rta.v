@@ -105,7 +105,7 @@ Section Abstract_RTA.
   Definition relative_arrival_time_of_job_is_A (j : Job) (A : duration) :=
     forall (t1 t2 : instant),
       busy_interval sched j t1 t2 ->
-      job_arrival j = t1 + A.
+      A = job_arrival j - t1.
 
   (** Next, consider a valid interference bound function [IBF_P] that
       can use information about relative time arrival of a job of task
@@ -383,7 +383,7 @@ Section Abstract_RTA.
           + by rewrite -ltnNge.
           + move => t1' t2' BUSY.
             edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
-            by subst t1' t2'; rewrite -job_arrival_eq_t1_plus_A.
+            by subst t1' t2'; rewrite job_arrival_eq_t1_plus_A; lia.
         Qed.
 
       End JobCostIsSmall.
@@ -414,7 +414,7 @@ Section Abstract_RTA.
           + intros t0 t3 BUSY.
             edestruct busy_interval_is_unique; [exact H_busy_interval | exact BUSY| ].
             subst t0 t3; clear BUSY.
-            by rewrite -job_arrival_eq_t1_plus_A.
+            by rewrite job_arrival_eq_t1_plus_A; lia.
         Qed.
 
         (** Next, we again apply lemma [j_receives_enough_service]

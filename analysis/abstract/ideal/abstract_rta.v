@@ -131,7 +131,7 @@ Section AbstractRTAIdeal.
     { rewrite -leq_subLR in NEQ1.
       rewrite -(leqRW NEQ1) (leqRW RTC) (leqRW (service_at_most_cost _ _ _ _ _)) //
               (leqRW (service_within_busy_interval_ge_job_cost  _ _ _ _ _ _ _)) //.
-      rewrite (leqRW (cumulative_interference_sub _ t1 _ t1 t2 _ _ )); try lia.
+      rewrite (leqRW (cumulative_interference_sub _ _ t1 _ t1 t2 _ _)) //. 
       have LLL : (t1 < t2) = true by apply leq_ltn_trans with (t1 + Δ); lia.
       interval_to_duration t1 t2 k.
       eapply leq_trans.
@@ -140,7 +140,7 @@ Section AbstractRTAIdeal.
       - lia.
     }
     { have NoInterference: cumulative_interference j (t1 + F) (t1 + Δ) = 0.
-      { rewrite /cumulative_interference /definitions.cumulative_interference big_nat.
+      { rewrite /cumulative_interference /cumul_cond_interference big_nat.
         apply big1; move => t /andP [GE__t LT__t].
         apply/eqP; rewrite eqb0; apply/negP; eapply H_work_conserving => //.
         { by apply/andP; split; lia. }
@@ -150,13 +150,13 @@ Section AbstractRTAIdeal.
         - by move: NCOM; apply contra; apply completion_monotonic; lia.
       }
       rewrite (leqRW RTC); erewrite cumulative_interference_cat with (t := t1 + F); last by lia.
+      rewrite /cumulative_interference in NoInterference.
       rewrite NoInterference addn0; erewrite no_service_before_busy_interval => //.
       by rewrite addnC; apply: service_and_interference_bounded.
     }
-    { rewrite (leqRW RTC) (leqRW (cumulative_interference_sub _ t1 _ t1 (t1 + F) _ _ )); try lia.
+    { rewrite (leqRW RTC) (leqRW (cumulative_interference_sub _ _ t1 _ t1 (t1 + F) _ _ )); try lia.
       erewrite no_service_before_busy_interval => //.
-      by rewrite addnC; eapply service_and_interference_bounded.
-    }
+      by rewrite addnC; eapply service_and_interference_bounded. }
   Qed.
 
   (** For simplicity, let's define a local name for the search space. *)

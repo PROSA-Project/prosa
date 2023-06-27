@@ -373,11 +373,13 @@ Section AbstractRTAforELFwithArrivalCurves.
   Lemma instantiated_task_interference_is_bounded :
     task_interference_is_bounded_by arr_seq sched tsk IBF_other.
   Proof.
-    rewrite /task_interference_is_bounded_by => j Δ t1 t2 ARR TSK IN NCOMPL BUSY.
+    move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
+    move: (OFF _ _ BUSY) => EQA; subst A.
     have [ZERO|POS] := posnP (job_cost j).
     - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
       by rewrite /completed_by /completed_by ZERO.
-    - rewrite (cumulative_task_interference_split _  _ _  _ _ _ _ _ _ j) //.
+    - rewrite -/(cumul_task_interference _ _ _ _ _).
+      rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=.
       rewrite /IBF_other -addnA.
       apply: leq_add;
         first by apply: cumulative_priority_inversion_is_bounded.

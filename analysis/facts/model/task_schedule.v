@@ -31,20 +31,13 @@ Section TaskSchedule.
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** We show that if the processor is idle at time [t], then no task
+  (** We note that if the processor is idle at time [t], then no task
       is scheduled. *)
   Lemma idle_implies_no_task_scheduled :
     forall t,
       is_idle arr_seq sched t ->
       ~~ task_scheduled_at arr_seq sched tsk t.
-  Proof.
-    move=> t IDLE; rewrite /task_scheduled_at.
-    case EQ: (scheduled_job_at arr_seq sched t) => [j | //].
-    exfalso.
-    apply scheduled_job_at_iff in EQ => //.
-    move: IDLE => /negPn /negP => IDLE; apply: IDLE.
-    by apply is_nonidle_iff => //.
-  Qed.
+  Proof. by move=> t; rewrite is_idle_iff /task_scheduled_at => /eqP ->. Qed.
 
   (** We show that if a job is scheduled at time [t], then
       [task_scheduled_at tsk t] is equal to [job_of_task tsk j]. In

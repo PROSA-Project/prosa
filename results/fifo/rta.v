@@ -351,12 +351,13 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       generalized aRTA supports custom parameters for [IBF]. Hence, we
       have to specify that the first argument of [IBF] represents the
       relative arrival time of a job under analysis by passing a
-      proposition [relative_arrival_time_of_job_is_A]. *) 
+      proposition [relative_arrival_time_of_job_is_A]. *)
   Lemma IBF_correct :
-    job_interference_is_bounded_by arr_seq sched tsk IBF (relative_arrival_time_of_job_is_A sched).
+    job_interference_is_bounded_by
+      arr_seq sched tsk IBF (relative_arrival_time_of_job_is_A sched).
   Proof.
     move => t1 t2 Δ j ARRj TSKj BUSY IN_BUSY NCOMPL A Pred.
-    rewrite cumulative_interference_split//.
+    rewrite fold_cumul_interference cumulative_interference_split //.
     have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
     rewrite (no_priority_inversion j ARRj _ JPOS _ t2) //= add0n.
     have ->: A = job_arrival j - t1 by erewrite Pred with (t1 := t1); [lia | apply BUSY].

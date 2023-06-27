@@ -45,6 +45,7 @@ JLDP
 TDMA
 aRTA
 RTA
+RTAs
 IBF
 RBF
 RBFs
@@ -110,5 +111,6 @@ uniprocessor's
 modularity
 irreflexive
 parameterizes
+parameterize
 SBF
 SBFs

@@ -326,17 +326,17 @@ Section AbstractRTAforEDFwithArrivalCurves.
           module abstract_seq_RTA, we wrap the [IBF_other] function in
           a function that accepts, but simply ignores the task. *)
       Corollary instantiated_task_interference_is_bounded :
-        task_interference_is_bounded_by arr_seq sched tsk (fun tsk A R => IBF_other A R).
+        task_interference_is_bounded_by
+          arr_seq sched tsk (fun tsk A R => IBF_other A R).
       Proof.
-        rewrite /task_interference_is_bounded_by.
-        move => j R2 t1 t2 ARR TSK N NCOMPL BUSY.
+        move => t1 t2 R2 j ARR TSK BUSY LT NCOMPL A OFF.
+        move: (OFF _ _ BUSY) => EQA; subst A.
         move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
         - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
           by rewrite /completed_by /completed_by ZERO.
-        - rewrite (cumulative_task_interference_split _  _ _  _ _ _ _ _ _ j)//;
-            last exact: EDF_implies_sequential_tasks.
-          rewrite /I leq_add //;
-            first by exact: cumulative_priority_inversion_is_bounded.
+        - rewrite -/(cumul_task_interference _ _ _ _ _).
+          rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=; last exact: EDF_implies_sequential_tasks.
+          rewrite /I leq_add //; first exact: cumulative_priority_inversion_is_bounded.
           eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
           eapply leq_trans; first exact: service_of_jobs_le_workload.
           eapply leq_trans.
@@ -435,7 +435,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
     eapply uniprocessor_response_time_bound_seq with
-      (task_interference_bound_function := fun tsk A R => IBF_other A R) (L := L) => //.
+      (task_IBF := fun tsk A R => IBF_other A R) (L := L) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - exact: EDF_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.

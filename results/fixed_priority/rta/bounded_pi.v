@@ -230,17 +230,19 @@ Section AbstractRTAforFPwithArrivalCurves.
         a function that accepts, but simply ignores, the task and the
         relative arrival time. *)
     Lemma instantiated_task_interference_is_bounded :
-      task_interference_is_bounded_by arr_seq sched tsk (fun t A R => IBF_other R).
+      task_interference_is_bounded_by
+        arr_seq sched tsk (fun tsk A R => IBF_other R).
     Proof.
-      intros j R0 t1 t2 ARR TSK ? NCOMPL BUSY; simpl.
+      move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
-      { by exfalso; rewrite /completed_by ZERO in  NCOMPL. }
-      rewrite /ideal_jlfp_interference; erewrite cumulative_task_interference_split => //.
+      { by exfalso; rewrite /completed_by ZERO in NCOMPL. }
+      rewrite -/(cumul_task_interference _ _ _ _ _).
+      rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=.
       rewrite /IBF_other leq_add//.
-      { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + R0)); first by done.
+      { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ)); first by done.
         apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2);
           last by apply: H_priority_inversion_is_bounded => //; eauto 6 with basic_rt_facts.
-        by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + R0)) //= leq_addr. }
+        by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + Δ)) //= leq_addr. }
       { erewrite cumulative_i_thep_eq_service_of_othep => //;
           last by eauto 6 with basic_rt_facts.
         apply: leq_trans.
