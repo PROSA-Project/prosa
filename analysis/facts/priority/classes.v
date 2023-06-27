@@ -22,6 +22,18 @@ Section BasicLemmas.
     by move => j /andP [_ /negP NEQ]; apply: NEQ.
   Qed.
 
+  (** Second, we relate [another_hep_job] to [same_task]. *)
+  Lemma another_hep_job_diff_task :
+    forall j j',
+      ~~ same_task j j' ->
+      another_hep_job j j' = hep_job j j'.
+  Proof.
+    move => j j' DIFF; rewrite /another_hep_job.
+    case: (hep_job j j'); [rewrite andTb|rewrite andFb //].
+    apply: (contra _ DIFF) => /eqP -> {DIFF}.
+    by apply/eqP.
+  Qed.
+
   (** We show that [another_task_hep_job] is "task-wise"
       anti-reflexive; that is, given two jobs [j] and [j'] from the
       same task, [another_task_hep_job j' j] is false. *)
