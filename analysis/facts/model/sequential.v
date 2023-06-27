@@ -17,12 +17,6 @@ Section ExecutionOrder.
   (** ... and any kind of processor state model. *)
   Context {PState: ProcessorState Job}.
 
-  (** Trivially, [same_task] is symmetric. *)
-  Remark same_task_sym :
-    forall j1 j2,
-      same_task j1 j2 = same_task j2 j1.
-  Proof. by move=> j1 j2; rewrite /same_task eq_sym. Qed.
-
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 

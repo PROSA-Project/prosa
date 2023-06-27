@@ -168,8 +168,27 @@ Section SameTask.
       [job_task j1] is equal to [job_task j2]. *)
   Definition same_task (j1 j2 : Job) := job_task j1 == job_task j2.
 
+  (** Trivially, [same_task] is symmetric. *)
+  Remark same_task_sym :
+    forall j1 j2,
+      same_task j1 j2 = same_task j2 j1.
+  Proof. by move=> j1 j2; rewrite /same_task eq_sym. Qed.
+
   (** We further say that a job [j] is a job of task [tsk] iff [job_task j] is
       equal to [tsk]. *)
   Definition job_of_task (tsk : Task) (j : Job) := job_task j == tsk.
+
+  (** Trivially, if one job is a job of a given task, and another is not, then
+      the two jobs do not come from the same task. *)
+  Remark diff_task :
+    forall tsk j1 j2,
+      job_of_task tsk j1 ->
+      ~~ job_of_task tsk j2 ->
+      ~~ same_task j1 j2.
+  Proof.
+    move=> tsk j1 j2 /eqP OF /eqP NOF.
+    apply/eqP => SAME.
+    by apply: NOF; rewrite -SAME.
+  Qed.
 
 End SameTask.
