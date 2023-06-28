@@ -1,13 +1,12 @@
 From mathcomp Require Import eqtype ssrnat seq path fintype bigop.
 Require Import prosa.util.int.
 Require Import prosa.model.readiness.basic.
-Require Import prosa.analysis.abstract.ideal.iw_instantiation.
+Require Import prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
 Require Import prosa.model.schedule.priority_driven.
 Require Import prosa.model.priority.gel.
 Require Import analysis.facts.priority.gel.
-Require Import prosa.analysis.facts.busy_interval.ideal.inequalities.
 Require Import prosa.analysis.facts.model.workload.
 
 (** * Abstract RTA for GEL-Schedulers with Bounded Priority Inversion *)

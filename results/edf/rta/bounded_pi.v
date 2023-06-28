@@ -5,10 +5,9 @@ Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
-Require Import prosa.analysis.abstract.ideal.iw_instantiation.
+Require Import prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
-Require Import prosa.analysis.facts.busy_interval.ideal.inequalities.
 
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)

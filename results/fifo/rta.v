@@ -3,9 +3,8 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bi
 Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.fifo.
 Require Import prosa.analysis.facts.priority.fifo.
-Require Import prosa.analysis.abstract.ideal.iw_instantiation.
+Require Export prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Export prosa.analysis.facts.busy_interval.carry_in.
-Require Export prosa.analysis.facts.busy_interval.ideal.inequalities.
 Require Import prosa.analysis.facts.model.task_cost.
 
 (** The formal development and the proofs in this file are described in-depth in
