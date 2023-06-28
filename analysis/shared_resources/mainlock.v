@@ -78,31 +78,17 @@ Qed.
     Variable cs_end: CriticalSection -> instant.
     Variable cs_resource: CriticalSection -> Resource.
 
-
-    #[local] Instance fp_policy : FP_policy Task :=
-      {
-        hep_task (tsk1 tsk2 : Task) := task_priority tsk1 >= task_priority tsk2
-      }.
-    
-    #[local] Instance jlfp_policy : JLFP_policy Job :=
-      {
-        hep_job := FP_to_JLFP hep_task
-      }.
-
-    Let job_prio j := task_priority (job_task j).
-
-
-    Let lower_priority task1 task2 := ~~ hep_task task1 task2.
-    Let jlfp_lower_priority j1 j2 := (FP_to_JLFP lower_priority) j1 j2.
-    
+    #[local] Existing Instance NumericFPAscending.
     #[local] Existing Instance fully_preemptive_job_model.
     #[local] Existing Instance fully_preemptive_task_model.
     #[local] Existing Instance fully_preemptive_rtc_threshold.
 
+    Let job_prio j := task_priority (job_task j).
+    Let lower_priority task1 task2 := ~~ hep_task task1 task2.
+    Let jlfp_policy j1 j2 := FP_to_JLFP hep_task j1 j2.
+    Let jlfp_lower_priority j1 j2 := FP_to_JLFP lower_priority j1 j2.
 
-
-    
-    (* Let rs be a set of all available resources. *)
+    (* Let [rs] be a set of all available resources. *)
     Variable rs : seq Resource.
 
     (* Suppose there is a function that maps each task to a set 
@@ -144,16 +130,14 @@ Qed.
       arrivals_have_valid_job_costs arr_seq.
 
 
-    (* Consider a task set ts... *)
+    (** Consider a task set [ts]. *)
     Variable ts: list Task.
-    (* ...and assume that it is correct in sense of segmented tasks. *)
-    (* Hypothesis H_valid_ts: valid_segmented_taskset task_blocking task_last task_cost ts. *)
 
-    (* Let tsk be any task in ts. *)
+    (** Let tsk be any task in [ts]. *)
     Variable tsk: Task.
     Hypothesis H_tsk_in_ts: tsk \in ts.
 
-    (* Next, we assume that all jobs come from the task set. *)
+    (** Next, we assume that all jobs come from the task set. *)
     Hypothesis H_all_jobs_from_taskset:
       forall j, arrives_in arr_seq j -> job_task j \in ts.
 
@@ -178,7 +162,7 @@ Qed.
     Let job_completed_by := completed_by sched.
     Let job_backlogged_at := backlogged sched.
 
-    
+
     (** * Definitions *)
     (* In this section we ... *)
     Section Definitions.
@@ -210,7 +194,7 @@ Qed.
         (* We also introduce a computable version of section_remains_locked_at notion. *)
         Definition section_remains_locked_at_comp (j: Job) (cs: CriticalSection) (t: instant) :=
           has (fun lock_time =>
-                 (locks_at j cs lock_time) && ( cs_start cs <= service sched j t <  cs_end cs))
+                 (locks_at j cs lock_time) && (cs_start cs <= service sched j t <  cs_end cs))
               (iota 0 t).
 
         (* TODO: check comment *)
@@ -227,7 +211,7 @@ Qed.
         (* We also introduce a computable version of remains_locked_at notion. *)
         Definition remains_locked_at_comp (j: Job) (r: Resource) (t: instant) :=
           has (fun css => section_remains_locked_at_comp j css t && (cs_resource css == r)) (job_critical_sections j).
-        
+
         (* TODO: move *)
         (* TODO: comment *)
         Definition have_nonempty_intersection segment1 segment2 :=
@@ -239,7 +223,7 @@ Qed.
         Definition cs_length (cs: CriticalSection) :=
           cs_end cs - cs_start cs.
 
-        
+
         (* We define if two critical sections do overlap *)
         Definition cs_overlap (cs1 cs2: CriticalSection) :=
           (cs_start cs1 <= cs_start cs2 < cs_end cs1) \/ (cs_start cs2 <= cs_start cs1 < cs_end cs2).
@@ -291,22 +275,21 @@ Qed.
 
       End DefinitionsRelatedToCriticalSection.
 
-
       (* TODO: comment *)
       Section DefinitionsRelatedToPCPAlgorithm.
-        
+
         (* We assign a priority to each resource, we call it priority_ceiling. The priority of a 
            resource is equal to the maximum priority of the task that uses this resource. *) 
         Definition priority_ceiling (r: Resource): nat :=
           \max_(tsk <- ts | task_uses_resource tsk r) (task_priority tsk).
-       
+
         (* We define the current priority ceiling for a job j at time t, which is 
            equal to the maximum of resource priority that is locked by the job 
            j at time t. In case when there is no locked resource current 
            priority ceiling is equal to zero. *)
         Definition current_priority_ceiling (j: Job) (t: instant): nat :=
           \max_(r <- rs | (fun r => remains_locked_at_comp j r t) r) (priority_ceiling r).
-        
+
         (* Finally, we can define current priority for a job j at a moment of time t. It is
            equal to the maximun between job priority and current priority ceiling of the job. *)
         Definition current_priority (j: Job) (t: instant): nat :=
@@ -440,7 +423,7 @@ Qed.
               - by apply leq_trans with (service sched j t); last apply service_monotonic. 
               - apply leq_ltn_trans with (service sched j t); last by done.
                 rewrite /service /service_during (@big_cat_nat _ _ _ t) //= big_nat1.
-                rewrite -{2}[\sum_(0 <= t0 < t) service_at sched j t0]addn0 leq_add2l.                
+                rewrite -{2}[\sum_(0 <= t0 < t) service_at sched j t0]addn0 leq_add2l.
                 by rewrite leqn0; apply/eqP; apply not_scheduled_implies_no_service.
             }
             { move: LOCK => [cs [IN [RES SEC]]].
@@ -534,15 +517,15 @@ Qed.
               }
               by rewrite /completed_by -ltnNge.
           Qed.
-          
+
           (* TODO: comment *)
           (* CHECK: locking? *)
           Lemma moment_of_locking_exists:
             exists rc,
-              rc < t /\
-              job_scheduled_at j rc /\
-              current_priority_ceiling j rc <= k /\
-              (forall x, rc < x <= t -> k < current_priority_ceiling j x).
+              rc < t
+              /\ job_scheduled_at j rc
+              /\ current_priority_ceiling j rc <= k
+              /\ (forall x, rc < x <= t -> k < current_priority_ceiling j x).
           Proof.
             move: H_priority_ceiling_is_large_enough => CPC; clear H_priority_ceiling_is_large_enough.
             induction t.
@@ -590,12 +573,14 @@ Qed.
 
 
         (** Non-overlapping priorities property. *)
-        (* In this section we prove a property that says that normal(?) priority 
-           and ceiling priority of one job don't overlap with priorities for another job.
-           More formal, suppose there are two jobs j1 j2. Next, let them hold some resource
-           at some time t, so both of them have raised priority (due to ceiling). 
-           Then we can prove that either normal priority of job j1 is not smaller that
-           ceiled priotiry of job j2, or vice versa. *)
+        (** In this section we prove a property that says that the
+            base priority and the ceiling priority of one job don't
+            overlap with priorities of another job. More formaly,
+            suppose there are two jobs [j1] and [j2]. Let the jobs
+            hold some resource at time [t], so both of them have
+            raised priority (due to ceiling). Then we prove that
+            either the base priority of job [j1] is not smaller that
+            ceiled priotiry of job [j2], or vice versa. *)
         Section NonOverlappingPriorities.
 
           (* Let us show a detailed proof of this fact. We begin with an asymmetrical 
@@ -809,7 +794,7 @@ Qed.
                 move: BACK => /andP [_ NSCHED].
                   by rewrite addnS -lemma38.
             Qed.
-            
+
             (* TODO: comment *)
             Lemma F3:
               forall x,
@@ -837,7 +822,7 @@ Qed.
                 apply/andP; split; first by done.
                 apply/negP; intros SCHED2.
                   by move: (OOJS _ SCHED2 SCHED).
-              }              
+              }
               have NE1 := NE1.
               have NE2 := NE2.
               have NE3 := NE3.
@@ -888,11 +873,6 @@ Qed.
                   { by apply/andP; split; [rewrite leq_addr | rewrite addnS]. }
                   by move: ALL => /andP [_ NSCHED].
                 }
-                (* { by done. } *)
-                (* { specialize (ALL (t1+k)); feed ALL. *)
-                (*   { by apply/andP; split; [rewrite leq_addr | rewrite addnS]. } *)
-                (*   by move: ALL => /andP [_ NSCHED]. *)
-                (* } *)
             Qed.
 
             (* TODO: comment *)
@@ -988,7 +968,7 @@ Qed.
             job_prio jlp < job_prio j.
         Proof.
           intros jlp jhp.
-          by rewrite /jlfp_lower_priority/lower_priority /FP_to_JLFP /hep_task /fp_policy -ltnNge.
+          by rewrite /jlfp_lower_priority/lower_priority /FP_to_JLFP /hep_task /NumericFPAscending -ltnNge.
         Qed.          
 
         Lemma lemma43:
@@ -1048,7 +1028,7 @@ Qed.
                 have P := pending_hp_job_exists
                             arr_seq _ sched _ j _ _ _ _ _ PREF t.
                 feed_n 6 P => //.
-                { by move => s; rewrite /hep_job / jlfp_policy /FP_to_JLFP /hep_task /fp_policy. }
+                (* { by move => s; rewrite /hep_job / jlfp_policy /FP_to_JLFP /hep_task /NumericFPAscending. } *)
                 move: P => [jhp [ARR [PEN HP]]].
                 exists jhp; repeat split; try done.
                 { by intros EQ; subst jlp; move: LP => /negP LP; apply: LP. } 
@@ -1090,7 +1070,7 @@ Qed.
                 have EX := pending_hp_job_exists
                              arr_seq _ sched _ j _ _ _ _ _ PREF t.
                 feed_n 6 EX => //.
-                { by move => s; rewrite /hep_job / jlfp_policy /FP_to_JLFP /hep_task /fp_policy. }
+                (* { by move => s; rewrite /hep_job / jlfp_policy /FP_to_JLFP /hep_task /NumericFPAscending. } *)
                 move: EX => [jhp [ARR [PEN HP]]].
                 move: (lemma17 H_respects_policy _ _ _ ARR PEND PEN) => BACK.
                 feed BACK.
@@ -1651,7 +1631,7 @@ Qed.
         Proof.
           move=> j ARR TASK COST t1 t2 PREF.
           have REFL : reflexive_job_priorities jlfp_policy.
-          { by move => s; unfold hep_job, jlfp_policy, hep_task, fp_policy, FP_to_JLFP, hep_task. } 
+          { by move => s; unfold hep_job, jlfp_policy, hep_task, NumericFPAscending, FP_to_JLFP, hep_task. } 
           have [ZERO|POS] := posnP (cumulative_priority_inversion arr_seq sched j t1 t2); first by rewrite ZERO.
           move_neq_up CONTR.
           have [jlp1 [t [NEQ [LPjlp1 SCHEDjlp1]]]]:
@@ -1744,11 +1724,7 @@ Qed.
           task_response_time_bound arr_seq sched tsk R.
         Proof.
           eapply uniprocessor_response_time_bound_fp with (L := L) => //=.
-          - by apply NFPA_is_reflexive.
-          - apply basic_readiness_is_work_bearing_readiness.
-            + apply reflexive_priorities_FP_implies_JLFP.
-              by apply NFPA_is_reflexive.
-            + by apply priority_inversion_is_bounded with (B := B) => //.
+          - by apply priority_inversion_is_bounded.
           - rewrite !subnn => A PI.
             edestruct H_R_is_maximum as [F [EQ1 EQ2]] => //=.
             by exists F; split; [rewrite subn0 | rewrite addn0].
