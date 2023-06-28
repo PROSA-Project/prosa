@@ -1,3 +1,4 @@
+
 (* TODO: optimize imports *)
 Require Export prosa.util.all.
 Require Export prosa.analysis.facts.model.rbf.
@@ -1649,13 +1650,16 @@ Qed.
           priority_inversion_is_bounded_by_constant arr_seq sched tsk B.
         Proof.
           move=> j ARR TASK COST t1 t2 PREF.
+          have REFL : reflexive_job_priorities jlfp_policy.
+          { by move => s; unfold hep_job, jlfp_policy, hep_task, fp_policy, FP_to_JLFP, hep_task. } 
           have [ZERO|POS] := posnP (cumulative_priority_inversion arr_seq sched j t1 t2); first by rewrite ZERO.
           move_neq_up CONTR.
           have [jlp1 [t [NEQ [LPjlp1 SCHEDjlp1]]]]:
             exists jlp t, t1 <= t < t2 /\ jlfp_lower_priority jlp j /\ job_scheduled_at jlp t.
           { move: POS; rewrite sum_nat_gt0 => /hasP [t NEQ PI].
             have LE: t1 <= t < t2 by move: NEQ; rewrite mem_filter mem_iota subnKC; last move: PREF => [T1 T2].
-            move: PI; rewrite lt0b => /priority_inversion_P [] => // => NSCHED [s /andP [SCHED HEP]].
+            move: PI. rewrite lt0b.
+            move => /uni_priority_inversion_P [] => // => [s SCHED HEP].
             by exists s, t.
           }
           have FLF2:
@@ -1665,7 +1669,6 @@ Qed.
               exists jhp, arrives_in arr_seq jhp /\ job_backlogged_at jhp t /\ hep_job jhp j.
             { have EX := pending_hp_job_exists arr_seq _ sched _ j _ _ _ _ _ PREF t.
               feed_n 6 EX => //.
-              { by move => s; rewrite /hep_job / jlfp_policy /FP_to_JLFP /hep_task /fp_policy. }
               move: EX => [jhp [ARRs [PEN HP]]].
               exists jhp; repeat split => //.
               apply/andP; split => //; apply/negP => CONTR.
@@ -1680,18 +1683,13 @@ Qed.
             cumulative_priority_inversion arr_seq sched j t1 t2 = service_during sched jlp1 t1 t2.
           { rewrite /cumulative_priority_inversion /service_during.
             apply eq_big_nat => t' NEQ'; rewrite service_at_is_scheduled_at.
-            have [SCHED' | NSHED] := boolP (scheduled_at sched jlp1 t'); last first.
+            have [SCHED' | NSHED] := boolP (scheduled_at sched jlp1 t').
+            { by apply/eqP; rewrite eqb1; apply /uni_priority_inversion_P => //. }
             { apply/eqP; rewrite eqb0.
-              apply/negP => /priority_inversion_P [] => // NSCHED [jlp2 /andP [SCHEDjlp2 LP]].
+              apply/negP => /uni_priority_inversion_P [] => // [jlp2 SCHEDjlp2 LP].
               have L := only_one_lower_priority_job_can_block j ARR _ _ _ PREF jlp1 jlp2 t t'.
               feed_n 7 L => //; first by apply/eqP.
               by subst jlp2; rewrite SCHEDjlp2 in NSHED.
-            }
-            { apply/eqP; rewrite eqb1; apply /priority_inversion_P => //.
-              split; last by exists jlp1; apply/andP; split.
-              apply/negP => SCHED.
-              have EQ : j = jlp1 by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
-              by subst jlp1; apply lemma42 in LPjlp1; lia.
             }
           }
           rewrite EQ in CONTR.
