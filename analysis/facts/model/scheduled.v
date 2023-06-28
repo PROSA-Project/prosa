@@ -63,6 +63,17 @@ Section ScheduledJobs.
     exact: mem_head.
   Qed.
 
+  (** We restate the previous claim for convenience. *)
+  Corollary not_scheduled_when_idle :
+    forall j t,
+      is_idle arr_seq sched t -> ~~ scheduled_at sched j t.
+  Proof.
+    move=> j t.
+    rewrite /is_idle => /eqP/nilP.
+    by rewrite scheduled_jobs_at_nil.
+  Qed.
+
+
   (** ** The Job Scheduled on an Ideal Progress Processor *)
 
   (** In this section, we prove a simple fact about the relation
@@ -86,6 +97,7 @@ Section ScheduledJobs.
     Qed.
 
   End IdealProgress.
+
 
   (** ** The Job Scheduled on a Uniprocessor *)
 
@@ -167,6 +179,18 @@ Section ScheduledJobs.
     - left; exists j.
       rewrite -scheduled_jobs_at_iff SJA.
       exact: mem_head.
+  Qed.
+
+  (** For ease of porting, we restate the above case analysis in a form closer
+      to what was used in earlier versions of Prosa. *)
+  Corollary scheduled_at_cases :
+    forall t,
+      is_idle arr_seq sched t \/ exists j, scheduled_at sched j t.
+  Proof.
+    move=> t.
+    have [SCHED|IDLE] := (scheduled_at_dec t).
+    - by right.
+    - by left; apply/eqP/nilP; rewrite scheduled_jobs_at_nil.
   Qed.
 
 End ScheduledJobs.
