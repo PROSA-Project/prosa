@@ -1,53 +1,31 @@
+(* TODO: optimize imports *)
 Require Export prosa.util.all.
-(* Require Export prosa.analysis.abstract.abstract_rta. *)
-(* Require Export prosa.analysis.abstract.iw_auxiliary. *)
-
 Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.facts.busy_interval.ideal.busy_interval.
-(* Require Export prosa.analysis.facts.busy_interval.busy_interval_rs. *)
 Require Export prosa.analysis.facts.model.task_arrivals.
 Require Export prosa.analysis.facts.model.sequential.
-(* Require Export prosa.analysis.abstract.abstract_rta. *)
-(* Require Export prosa.model.processor.restricted_supply. *)
 Require Export prosa.model.schedule.work_conserving.
-(* Require Export prosa.analysis.abstract.abstract_rta. *)
-(* Require Export prosa.analysis.abstract.iw_auxiliary. *)
-(* Require Export prosa.analysis.abstract.definitions. *)
-
-(* Require Import rt.model.arrival.basic.job *)
-(*                rt.model.arrival.basic.task_arrival *)
-(*                rt.model.priority. *)
-(* Require Import rt.model.schedule.uni.service *)
-(*                rt.model.schedule.uni.workload *)
-(*                rt.model.schedule.uni.schedule *)
-(*                rt.model.schedule.uni.response_time. *)
-(* Require Import rt.model.schedule.uni.limited.platform *)
-(*                rt.model.schedule.uni.limited.schedule *)
-(*                rt.model.schedule.uni.limited.busy_interval *)
-(*                rt.model.schedule.uni.limited.rbf *)
-(*                rt.model.schedule.uni.limited.fixed_priority.fp_rta_theory. *)
-(* Require Import rt.model.arrival.curves.bounds.  *)
-(* Require Import rt.analysis.uni.arrival_curves.workload_bound. *)
-
-(* From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop. *)
-
-
 Require Export prosa.model.readiness.basic.
-
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 Require Export prosa.model.priority.numeric_fixed_priority.
-
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.model.task.preemption.fully_preemptive.
-
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
-Require Export prosa.analysis.facts.readiness.sequential.
-Require Export prosa.model.task.preemption.fully_preemptive.
+(* Require Export prosa.analysis.shared_resources.definitions. *)
+(* Require Export prosa.analysis.shared_resources.properties. *)
 
 
-Lemma F : forall T (xs : seq T) P F,  0 < \max_(x <- xs | P x) F x -> exists x0, (P x0) /\ 0 < F x0.
+(* ---------------------------------------------------------------------- *)
+(* -------------------------------- MOVE -------------------------------- *)
+(* ---------------------------------------------------------------------- *)
+
+(* TODO: move *) 
+Lemma pos_max_implies_exists :
+  forall {T : Type} (xs : seq T) (P : pred T) (F : T -> nat),
+    0 < \max_(x <- xs | P x) F x ->
+    exists x0, (P x0) /\ 0 < F x0.
 Proof.
   clear; move => T xs P F; elim: xs; first by rewrite big_nil.
   move => x xs IHxs MAX.
@@ -56,13 +34,22 @@ Proof.
   { move: MAX. rewrite -addn1.
     rewrite leq_max => /orP [GE|GE].
     exists x. by done.
-
     rewrite addn1 in GE.
     apply IHxs in GE.
     by rewrite addn1.
   }
   { by apply IHxs. }
 Qed.
+
+
+
+(* ---------------------------------------------------------------------- *)
+(* -------------------------------- MAIN -------------------------------- *)
+(* ---------------------------------------------------------------------- *)
+
+
+(* ----------------------------- Definitions ---------------------------- *)
+
 
   (** TODO: name *)
   Section Locks.
@@ -509,7 +496,7 @@ Qed.
             exists r, remains_locked_at j r t.
           Proof.
             apply leq_ltn_trans with (m := 0) in H_priority_ceiling_is_large_enough => //.
-            apply F in H_priority_ceiling_is_large_enough.
+            apply pos_max_implies_exists in H_priority_ceiling_is_large_enough.
             move: H_priority_ceiling_is_large_enough => [x [LOCK PRIO]].
             by exists x; apply/remains_locked_atP.
           Qed.
@@ -1558,34 +1545,24 @@ Qed.
           (* Finally we prove that for any time interval [t1, t2) the fact that the job j 
              has been scheduled more than B times inside this interval implies the existence 
              of time instant where j was scheduling without holding any resource. *)
-          Lemma blocking_cannot_be_too_long: 
+          Lemma blocking_cannot_be_too_long :
             forall t1 t2,
               B < service_during sched j t1 t2 ->
               exists tnc,
-                t1 <= tnc < t2 /\
-                job_scheduled_at j tnc /\ 
-                current_priority_ceiling j tnc = 0.
+                t1 <= tnc < t2
+                /\ job_scheduled_at j tnc
+                /\ current_priority_ceiling j tnc = 0.
           Proof.
-            intros t1 t2 SERV.
+            move=> t1 t2 SERV.
             have LT: t1 < t2.
-            { rewrite ltnNge; apply/negP; intros CONTR.
-                by move: SERV; rewrite /service_during big_geq ?ltn0.
-            }
+            { by move_neq_up CONTR; move: SERV; rewrite /service_during big_geq ?ltn0. }
             have EQ: forall P xs, has P xs = ~~ (all (fun x => ~~ P x) xs).
-            { intros.
-              induction xs.
-              - by done.
-              - by simpl; rewrite IHxs negb_and Bool.negb_involutive.
-            }
-
-            have EX := incremental_service_during sched _ j t1 t2 0.
-            feed_n 2 EX => //; first by apply leq_ltn_trans with B.
-            move: EX => [tl [NEQl [SCHEDl SERVl]]].
-
-            have EX := incremental_service_during sched _ j t1 t2 B.
-            feed_n 2 EX => //.
-            move: EX => [tu [NEQu [SCHEDu SERVu]]].
-
+            { by intros; induction xs; last rewrite //= IHxs negb_and Bool.negb_involutive. }
+            have [] := incremental_service_during sched _ j t1 t2 0 => //; first by lia.
+            move=> tl [NEQl [SCHEDl SERVl]].
+            have [] := incremental_service_during sched _ j t1 t2 B => //.
+            move=> tu [NEQu [SCHEDu SERVu]].
+            
 
             
             have L: has (fun t => (job_scheduled_at j t)&&(current_priority_ceiling j t == 0)) (iota t1 (t2-t1)).
@@ -1654,142 +1631,73 @@ Qed.
             
             move: L => /hasP [t IN /andP [SCHED /eqP CPC]].
             exists t; split; try done.
-              by move: IN; rewrite mem_iota subnKC; last apply ltnW.
+            by move: IN; rewrite mem_iota subnKC; last apply ltnW.
           Qed.
 
         End BlockingLength.
 
-        (** Some Nmae *)
+
         (* TODO: comment *)
         Variable B: instant.
         Hypothesis H_B_positive: B > 0.
         Hypothesis H_critical_sections_are_bounded: forall j, critical_sections_are_bounded j B.
         Hypothesis H_resource_locks_are_properly_nested: critical_sections_are_properly_nested.
         Hypothesis H_only_one_section_of_any_resource: only_one_critical_section_of_any_resource.
-        
+
         (* TODO: comment *)
         Lemma priority_inversion_is_bounded:
           priority_inversion_is_bounded_by_constant arr_seq sched tsk B.
         Proof.
-          intros j ARR TASK COST t1 t2 PREF.
-          have ALT: forall n, n = 0 \/ n > 0.
-          { clear; intros n.
-            by destruct n; [left | right ]. }          
-          move: (ALT (@cumulative_priority_inversion Job (ideal.processor_state Job) arr_seq sched jlfp_policy j t1 t2)) => [ZERO | POS].
-          rewrite ZERO; by done.
-          clear ALT; rewrite leqNgt; apply/negP; intros CONTR.
-          
-          have EX:
-            exists (jlp: Job) (t: instant),
-              t1 <= t < t2 /\
-              jlfp_lower_priority jlp j /\
-              job_scheduled_at jlp t.
+          move=> j ARR TASK COST t1 t2 PREF.
+          have [ZERO|POS] := posnP (cumulative_priority_inversion arr_seq sched j t1 t2); first by rewrite ZERO.
+          move_neq_up CONTR.
+          have [jlp1 [t [NEQ [LPjlp1 SCHEDjlp1]]]]:
+            exists jlp t, t1 <= t < t2 /\ jlfp_lower_priority jlp j /\ job_scheduled_at jlp t.
           { move: POS; rewrite sum_nat_gt0 => /hasP [t NEQ PI].
-            move: NEQ. rewrite mem_filter mem_iota subnKC; last first.
-            apply ltnW; by move: PREF => [T1 T2].
-            move => /andP [_ A].            
-            rewrite lt0b in PI.
-            move: PI => /priority_inversion_P [] => // => NSCHED [s /andP [SCHED HEP]].
-            exists s, t.
-            repeat split; try done.
+            have LE: t1 <= t < t2 by move: NEQ; rewrite mem_filter mem_iota subnKC; last move: PREF => [T1 T2].
+            move: PI; rewrite lt0b => /priority_inversion_P [] => // => NSCHED [s /andP [SCHED HEP]].
+            by exists s, t.
           }
-          move: EX => [jlp1 [t [NEQ [LPjlp1 SCHEDjlp1]]]].
-          
-          have EQ:
-            cumulative_priority_inversion arr_seq sched j t1 t2
-            = service_during sched jlp1 t1 t2.
-          { unfold cumulative_priority_inversion, service_during.
-            apply/eqP; rewrite eqn_leq; apply/andP; split.
-            { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond.
-              rewrite leq_sum //.
-              move => t' /andP [NEQ' _].
-              case INV: (priority_inversion_dec arr_seq sched j t') => //.
-              move: INV => /priority_inversion_P [] => // => NSCHED [jlp2 /andP [SCHEDjlp2 LP]].
-              rewrite service_at_is_scheduled_at.
-              rewrite lt0b.
-              have L := only_one_lower_priority_job_can_block j ARR _ _ _ PREF jlp1 jlp2 t t'.
-              feed_n 7 L; try done.
-              by apply/eqP.
-                by subst jlp2.
+          have FLF2:
+            forall t, t1 <= t < t2 -> job_scheduled_at jlp1 t -> ~ current_priority_ceiling jlp1 t = 0.
+          { clear CONTR SCHEDjlp1 NEQ t => t NEQ SCHED PR.
+            have [jhp [ARRhp [BACKhp HPhp]]]:
+              exists jhp, arrives_in arr_seq jhp /\ job_backlogged_at jhp t /\ hep_job jhp j.
+            { have EX := pending_hp_job_exists arr_seq _ sched _ j _ _ _ _ _ PREF t.
+              feed_n 6 EX => //.
+              { by move => s; rewrite /hep_job / jlfp_policy /FP_to_JLFP /hep_task /fp_policy. }
+              move: EX => [jhp [ARRs [PEN HP]]].
+              exists jhp; repeat split => //.
+              apply/andP; split => //; apply/negP => CONTR.
+              have EQ : jlp1 = jhp by apply: ideal_proc_model_is_a_uniprocessor_model => //.
+              by subst jlp1; move: LPjlp1 => /negP.
             }
-            { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond.
-              rewrite leq_sum //.
-              move => t' /andP [NEQ' _].
-              case SCHEDt : (job_scheduled_at jlp1 t'); last first.
-              { rewrite service_at_is_scheduled_at.
-                rewrite /job_scheduled_at in SCHEDt.
-                by rewrite SCHEDt.
-              }
-              rewrite service_at_is_scheduled_at.
-              rewrite /job_scheduled_at in SCHEDt.
-              rewrite SCHEDt.
-              rewrite lt0b.
-              apply/priority_inversion_P => //.
-              split.
+            have := H_respects_policy jhp jlp1 t ARRhp BACKhp SCHED.
+            rewrite /current_priority PR maxn0 geq_max leqNgt => /andP [/negP PRIO _]; apply: PRIO.
+            by apply: leq_trans; [apply lemma42 | apply lemma43].
+          }
+          have EQ:
+            cumulative_priority_inversion arr_seq sched j t1 t2 = service_during sched jlp1 t1 t2.
+          { rewrite /cumulative_priority_inversion /service_during.
+            apply eq_big_nat => t' NEQ'; rewrite service_at_is_scheduled_at.
+            have [SCHED' | NSHED] := boolP (scheduled_at sched jlp1 t'); last first.
+            { apply/eqP; rewrite eqb0.
+              apply/negP => /priority_inversion_P [] => // NSCHED [jlp2 /andP [SCHEDjlp2 LP]].
+              have L := only_one_lower_priority_job_can_block j ARR _ _ _ PREF jlp1 jlp2 t t'.
+              feed_n 7 L => //; first by apply/eqP.
+              by subst jlp2; rewrite SCHEDjlp2 in NSHED.
+            }
+            { apply/eqP; rewrite eqb1; apply /priority_inversion_P => //.
+              split; last by exists jlp1; apply/andP; split.
               apply/negP => SCHED.
               have EQ : j = jlp1 by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
-              subst jlp1.
-              apply lemma42 in LPjlp1; lia.
-              
-              exists jlp1.
-              apply/andP; split.
-              by done.
-              by done.
+              by subst jlp1; apply lemma42 in LPjlp1; lia.
             }
           }
-          
-          have EX:
-            forall t,
-              t1 <= t < t2 ->
-              job_scheduled_at jlp1 t ->
-              exists jhp,
-                jhp <> jlp1 /\
-                arrives_in arr_seq jhp /\
-                job_backlogged_at jhp t /\
-                hep_job jhp j.
-          { 
-            clear SCHEDjlp1 EQ NEQ t CONTR.
-            intros t NEQ SCHED.
-
-            have EX := pending_hp_job_exists
-                             arr_seq _ sched _ j _ _ _ _ _ PREF t.
-            feed_n 6 EX => //.
-            { by move => s; rewrite /hep_job / jlfp_policy /FP_to_JLFP /hep_task /fp_policy. }
-            move: EX => [jhp [ARRs [PEN HP]]].
-            exists jhp; repeat split; try done.
-            { by intros EQ; subst jlp1; move: LPjlp1 => /negP LP; apply: LP. } 
-            { apply/andP; split; first by done.
-              apply/negP; intros CONTR.
-              have OK:= ideal_proc_model_is_a_uniprocessor_model _ _ _ _ SCHED CONTR; subst jlp1.
-              by move: LPjlp1 => /negP LP; apply: LP.
-            }
-          }
-
-          have FLF2:
-            forall t,
-              t1 <= t < t2 ->
-              job_scheduled_at jlp1 t ->
-              current_priority_ceiling jlp1 t = 0 ->
-              False.
-          { clear ARR SCHEDjlp1 NEQ t.
-            intros t NEQ SCHED PR.
-            move: (EX _ NEQ SCHED) => [jhp [NJ [ARR [BACK HP]]]].
-            move: (H_respects_policy jhp jlp1 t ARR BACK SCHED) => PRIO.
-            move: PRIO; rewrite /current_priority PR maxn0 geq_max; move => /andP [PRIO _].
-            move: PRIO; rewrite leqNgt; move => /negP PRIO; apply: PRIO.
-            apply leq_trans with (job_prio j).
-            by apply lemma42.
-            by apply lemma43.
-          }
-          clear EX.
-          unfold critical_sections_are_bounded in H_critical_sections_are_bounded.
-          move: (H_critical_sections_are_bounded jlp1) => Bo.
           rewrite EQ in CONTR.
-          unfold cumulative_priority_inversion in CONTR.
-          move: (blocking_cannot_be_too_long
-                   _ B H_B_positive (H_critical_sections_are_bounded jlp1) H_resource_locks_are_properly_nested
-                   H_only_one_section_of_any_resource t1 t2 CONTR) => [tnc [NEQtnc [SCHED NICS]]].
-            by eapply FLF2 with (t := tnc).
+          have [] := blocking_cannot_be_too_long jlp1 B _ _ _ _ t1 t2 => //.
+          move => tnc [NEQtnc [SCHED NICS]].
+          by apply FLF2 with (t := tnc).
         Qed.
 
       End PriorityInversionIsBounded.
