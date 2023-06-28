@@ -1,8 +1,9 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.busy_interval.ideal.busy_interval.
+Require Export prosa.analysis.facts.busy_interval.existance.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
+Require Import prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.util.tactics.
 
 (** * Processor Executes HEP jobs at Preemption Point *)
@@ -19,7 +20,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
 
   (** Consider any arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
+  Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
   (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
@@ -70,7 +71,8 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Lemma instant_t_is_not_idle:
     ~ ideal_is_idle sched t.
   Proof.
-  by move => IDLE; exfalso; apply: not_quiet_implies_not_idle.
+    move => IDLE. apply: not_quiet_implies_not_idle => //.
+    by rewrite is_idle_def.
   Qed.
 
   (** Next we consider two cases:

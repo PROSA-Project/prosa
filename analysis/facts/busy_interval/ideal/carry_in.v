@@ -1,5 +1,6 @@
 Require Export prosa.analysis.facts.busy_interval.carry_in.
-Require Export prosa.analysis.facts.busy_interval.ideal.busy_interval.
+Require Export prosa.analysis.facts.model.ideal.schedule.
+Require Export prosa.analysis.facts.busy_interval.existance.
 
 (** The following lemma conceptually belongs in
     [prosa.analysis.facts.busy_interval.carry_in], but still has dependencies
@@ -68,9 +69,8 @@ Section BusyWindowExistence.
       busy_interval arr_seq sched j t1 t2.
   Proof.
     rename H_from_arrival_sequence into ARR, H_job_cost_positive into POS.
-    have CONSIST: consistent_arrival_times arr_seq by [].
     edestruct (exists_busy_interval_prefix
-                 arr_seq CONSIST
+                 arr_seq H_valid_arr_seq
                  sched j ARR H_priority_is_reflexive (job_arrival j))
       as [t1 [PREFIX GE]]; first by apply job_pending_at_arrival.
     move: GE => /andP [GE1 _].

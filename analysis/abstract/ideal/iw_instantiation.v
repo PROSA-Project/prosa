@@ -883,7 +883,8 @@ Section JLFPInstantiation.
         have [Idle|[jo Sched_jo]] := ideal_proc_model_sched_case_analysis sched t.
         { exfalso; clear HYP1 HYP2.
           eapply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix in H_busy_interval_prefix => //.
-          by eapply not_quiet_implies_not_idle.
+          apply: not_quiet_implies_not_idle => //.
+          by rewrite is_idle_def.
         }
         { have PINV := negP HYP1.
           have: ~~ another_hep_job jo j.

@@ -3,6 +3,7 @@ Require Export prosa.analysis.facts.model.preemption.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
+Require Import prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.facts.busy_interval.ideal.hep_job_scheduled.
 
 (** * Priority inversion is bounded *)
