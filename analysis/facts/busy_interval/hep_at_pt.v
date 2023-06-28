@@ -1,9 +1,5 @@
 Require Export prosa.model.schedule.priority_driven.
-Require Export prosa.analysis.facts.busy_interval.existance.
-
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.
-Require Import prosa.analysis.facts.model.ideal.schedule.
+Require Export prosa.analysis.facts.busy_interval.existence.
 Require Export prosa.util.tactics.
 
 (** * Processor Executes HEP jobs at Preemption Point *)
@@ -22,8 +18,10 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... and any uniprocessor schedule of this arrival sequence. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_uni : uniprocessor_model PState.
+  Variable sched : schedule PState.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
@@ -37,12 +35,11 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Context `{JobPreemptable Job}.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
+  Context `{@JobReady Job PState Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** We assume that the schedule is valid and that all jobs come from the arrival sequence. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_jobs_come_from_arrival_sequence: jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
@@ -69,10 +66,9 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** First note since [t] lies inside the busy interval,
       the processor cannot be idle at time [t]. *)
   Lemma instant_t_is_not_idle:
-    ~ ideal_is_idle sched t.
+    ~ is_idle arr_seq sched t.
   Proof.
-    move => IDLE. apply: not_quiet_implies_not_idle => //.
-    by rewrite is_idle_def.
+    by move => IDLE; apply: not_quiet_implies_not_idle => //.
   Qed.
 
   (** Next we consider two cases:
@@ -112,7 +108,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
     have BACK: backlogged sched j' t.
     { apply/andP; split=> [//|].
       apply/negP; intro SCHED'.
-      move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
+      move: (H_uni jlp j' sched t Sched_jlp SCHED') => EQ.
       by subst; apply: NOTHP.
     }
     apply NOTHP, (H_priority_is_transitive j'); last by eapply HEP.
@@ -145,7 +141,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       apply (H_respects_policy _ _ t2.-1); auto.
       apply/andP; split=> [//|].
       apply/negP; intros SCHED.
-      move: (ideal_proc_model_is_a_uniprocessor_model _ _ sched _ SCHED Sched_jlp) => EQ.
+      move: (H_uni _ _ sched _ SCHED Sched_jlp) => EQ.
       by subst; apply: NOTHP.
     }
     { feed (NOTQUIET t); first by apply/andP; split.
@@ -162,7 +158,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       have BACK: backlogged sched j' t.
       { apply/andP; split=> [//|].
         apply/negP; intro SCHED'.
-        move: (ideal_proc_model_is_a_uniprocessor_model jlp j' sched t Sched_jlp SCHED') => EQ.
+        move: (H_uni jlp j' sched t Sched_jlp SCHED') => EQ.
         by subst; apply: NOTHP.
       }
       apply NOTHP, (H_priority_is_transitive j'); last by eapply HEP.
@@ -193,7 +189,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       arrived_between jhp t1 t2.
   Proof.
     intros jhp Sched_jhp.
-    rename H_work_conserving into WORK, H_jobs_come_from_arrival_sequence into CONS.
+    rename H_work_conserving into WORK.
     move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET INBI]]].
     move: (H_t_in_busy_interval) => /andP [GEt LEt].
     have HP := scheduled_at_preemption_time_implies_higher_or_equal_priority _ Sched_jhp.
@@ -201,7 +197,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
     eapply scheduled_implies_pending in PENDING => //.
     apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
     apply contraT; rewrite -ltnNge; intro LT; exfalso.
-    feed (QUIET jhp); first by eapply CONS, Sched_jhp.
+    feed (QUIET jhp) => //.
     specialize (QUIET HP LT).
     have COMP: completed_by sched jhp t by apply: completion_monotonic QUIET.
     apply completed_implies_not_scheduled in COMP => //.
@@ -219,13 +215,11 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Proof.
     move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET INBI]]].
     move: (H_t_in_busy_interval) => /andP [GEt LEt].
-    ideal_proc_model_sched_case_analysis sched t jhp.
-    { by exfalso; apply instant_t_is_not_idle. }
-    exists jhp.
-    repeat split.
-    - exact: scheduled_at_preemption_time_implies_arrived_between_within_busy_interval.
-    - exact: scheduled_at_preemption_time_implies_higher_or_equal_priority.
-    - by [].
+    have [IDLE|[j' SCHED]] := scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) t.
+    - by exfalso; apply instant_t_is_not_idle.
+    - exists j'; repeat split => //.
+      * exact: scheduled_at_preemption_time_implies_arrived_between_within_busy_interval.
+      * exact: scheduled_at_preemption_time_implies_higher_or_equal_priority.
   Qed.
 
 End ProcessorBusyWithHEPJobAtPreemptionPoints.

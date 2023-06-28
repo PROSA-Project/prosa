@@ -4,7 +4,7 @@ Require Export prosa.analysis.facts.model.preemption.
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
 Require Import prosa.analysis.facts.model.ideal.schedule.
-Require Export prosa.analysis.facts.busy_interval.ideal.hep_job_scheduled.
+Require Export prosa.analysis.facts.busy_interval.hep_at_pt.
 
 (** * Priority inversion is bounded *)
 (** In this file, we prove that any priority inversion that occurs in
@@ -105,7 +105,8 @@ Section PriorityInversionIsBounded.
     Proof.
       move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
       have [Idle|[jhp Sched_jhp]] := ideal_proc_model_sched_case_analysis sched t.
-      { eapply instant_t_is_not_idle in Idle => //.
+      { rewrite -(is_idle_def arr_seq) // in Idle.
+        eapply instant_t_is_not_idle in Idle => //.
         by apply/andP; split; first apply leq_trans with tp. }
       exists jhp.
       have HP: hep_job jhp j.
@@ -125,7 +126,9 @@ Section PriorityInversionIsBounded.
         - move: E => /eqP /neqP E; rewrite -lt0n subn_gt0 in E.
           apply negbNE; apply/negP; intros LP; rename jhp into jlp.
           edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
-            as [jhp [_ [HEP SCHEDjhp]]]; try apply PRPOINT; move=> //; first by apply/andP; split.
+            as [jhp [_ [HEP SCHEDjhp]]]; try apply PRPOINT; move=> //.
+          * exact: ideal_proc_model_is_a_uniprocessor_model.
+          * by apply/andP; split.
           move: LP => /negP LP; apply: LP.
           enough (EQ : jhp = jlp); first by subst.
           apply: (ideal_proc_model_is_a_uniprocessor_model jhp _ _ tp); eauto.
@@ -254,7 +257,9 @@ Section PriorityInversionIsBounded.
       have LT2: pt < t1.
       { rewrite ltnNge; apply/negP; intros CONTR.
         edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
-          as [jhp [_ [HEP SCHEDjhp]]]; try apply PT; move=> //; first lia.
+          as [jhp [_ [HEP SCHEDjhp]]]; try apply PT; move=> //.
+        - exact: ideal_proc_model_is_a_uniprocessor_model.
+        - by lia.
         specialize (SCHEDc pt).
         feed SCHEDc; first by apply/andP; split; last move: NEQpt => /andP [_ T].
         move: LP => /negP LP; apply: LP.
