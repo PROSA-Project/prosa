@@ -2,7 +2,7 @@ Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.definitions.interference.
 Require Export prosa.analysis.definitions.priority.classes.
 Require Export prosa.analysis.facts.model.ideal.service_of_jobs.
-Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion.
+Require Export prosa.analysis.facts.model.ideal.priority_inversion.
 
 Section InterferenceProperties.
 

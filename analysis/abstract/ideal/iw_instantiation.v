@@ -8,7 +8,7 @@ Require Export prosa.analysis.facts.priority.classes.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
-Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion.
+Require Export prosa.analysis.facts.model.ideal.priority_inversion.
 
 (** * JLFP instantiation of Interference and Interfering Workload for ideal uni-processor. *)
 (** In this module we instantiate functions Interference and
