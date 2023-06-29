@@ -66,8 +66,15 @@ Qed.
     Context `{JobCost Job}.
 
     (* TODO: better comment *)
-    (* Opaque type of resource. *)
-    Context {Resource: eqType}.
+    Context {Resource : eqType}.
+
+    (* *)
+    Class JobResources (Job : JobType) :=
+      job_needs : Job -> work -> seq Resource.
+    
+
+
+    
     Context {CriticalSection: eqType}.
 
     (* To each job we assign a set of critical sections. *)
