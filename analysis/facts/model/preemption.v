@@ -35,6 +35,13 @@ Section PreemptionTimes.
   (** Consider a valid preemption model. *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
+  (** An idle instant is a preemption time. *)
+  Lemma idle_time_is_pt :
+    forall t,
+      is_idle arr_seq sched t ->
+      preemption_time arr_seq sched t.
+  Proof. by move=> t; rewrite is_idle_iff /preemption_time => /eqP ->. Qed.
+
   (**  We show that time 0 is a preemption time. *)
   Lemma zero_is_pt: preemption_time arr_seq sched 0.
   Proof.
@@ -59,6 +66,51 @@ Section PreemptionTimes.
     move: (SCHED); rewrite /preemption_time -(scheduled_job_at_iff arr_seq) // => ->.
     by move: (H_valid_preemption_model s ARR) => [_ [_ [_ P]]]; apply P.
   Qed.
+
+  (** If a job is scheduled at a point in time that is not a preemption time,
+      then it was previously scheduled. *)
+  Lemma neg_pt_scheduled_at :
+    forall j t,
+      scheduled_at sched j t.+1 ->
+      ~~ preemption_time arr_seq sched t.+1 ->
+      scheduled_at sched j t.
+  Proof.
+    move => j t sched_at_next.
+    apply contraNT => NSCHED.
+    exact: (first_moment_is_pt j).
+  Qed.
+
+  (** If we observe two different jobs scheduled at two points in time, then
+      there necessarily is a preemption time in between. *)
+  Lemma neq_scheduled_at_pt :
+    forall j t,
+      scheduled_at sched j t ->
+      forall j' t',
+        scheduled_at sched j' t' ->
+        j != j' ->
+        t <= t' ->
+        exists2 pt, preemption_time arr_seq sched pt & t < pt <= t'.
+  Proof.
+    move=> j t SCHED j'.
+    elim.
+    { move=> SCHED' NEQ /[!leqn0]/eqP EQ.
+      exfalso; apply/neqP; [exact: NEQ|].
+      apply: H_uniproc.
+      - exact: SCHED.
+      - by rewrite EQ. }
+    { move=> t' IH SCHED' NEQ.
+      rewrite leq_eqVlt => /orP [/eqP EQ|LT //].
+      - exfalso; apply/neqP; [exact: NEQ|].
+        by rewrite -EQ in SCHED'; exact: (H_uniproc _ _ _ _ SCHED SCHED').
+      - have [PT|NPT] := boolP (preemption_time arr_seq sched t'.+1);
+          first by exists t'.+1 => //; apply/andP; split.
+        have [pt PT /andP [tpt ptt']] :
+          exists2 pt, preemption_time arr_seq sched pt & t < pt <= t'.
+        { apply: IH => //.
+          by apply: neg_pt_scheduled_at. }
+        by exists pt => //; apply/andP; split. }
+  Qed.
+
 
 End PreemptionTimes.
 
