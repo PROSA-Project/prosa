@@ -5,8 +5,7 @@ Require Import prosa.model.task.preemption.parameters.
 Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.facts.model.arrival_curves.
 Require Export prosa.analysis.facts.model.sequential.
-Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded.
-Require Import prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded_jlfp.
+Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.analysis.facts.busy_interval.arrival.
 Require Export prosa.results.edf.rta.bounded_pi.
 Require Export prosa.util.tactics.

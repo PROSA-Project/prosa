@@ -1,8 +1,7 @@
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.facts.model.sequential.
-Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded.
-Require Export prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded_jlfp.
+Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)

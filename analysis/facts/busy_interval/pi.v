@@ -1,14 +1,10 @@
 Require Export prosa.model.task.preemption.parameters.
 Require Export prosa.analysis.facts.model.preemption.
-
-(** Throughout this file, we assume ideal uni-processor schedules. *)
-Require Import prosa.model.processor.ideal.
-Require Import prosa.analysis.facts.model.ideal.schedule.
 Require Export prosa.analysis.facts.busy_interval.hep_at_pt.
 
-(** * Priority inversion is bounded *)
-(** In this file, we prove that any priority inversion that occurs in
-    the model with bounded nonpreemptive segments is bounded. *)
+(** * Priority Inversion in a Busy Interval *)
+(** In this module, we reason about priority inversion that occurs during a busy
+    interval due to non-preemptive sections. *)
 Section PriorityInversionIsBounded.
 
   (** Consider any type of tasks ... *)
@@ -25,8 +21,10 @@ Section PriorityInversionIsBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... and any uniprocessor schedule of this arrival sequence. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_uni : uniprocessor_model PState.
+  Variable sched : schedule PState.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
@@ -40,7 +38,7 @@ Section PriorityInversionIsBounded.
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
+  Context `{@JobReady Job PState Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** We assume that the schedule is valid. *)
@@ -53,23 +51,6 @@ Section PriorityInversionIsBounded.
   Hypothesis H_respects_policy :
     respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
-  (** Finally, we introduce the notion of the maximal length of
-      (potential) priority inversion at a time instant [t], which is
-      defined as the maximum length of nonpreemptive segments among
-      all jobs that arrived so far. *)
-  Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
-    \max_(j_lp <- arrivals_before arr_seq t | (~~ hep_job j_lp j) && (job_cost j_lp > 0))
-     (job_max_nonpreemptive_segment j_lp - ε).
-
-  (** Next we prove that a priority inversion of a job is bounded by
-      function [max_length_of_priority_inversion]. *)
-
-  (** Note that any bound on function
-      [max_length_of_priority_inversion] will also be a bound on the
-      maximal priority inversion. This bound may be different for
-      different scheduler and/or task models. Thus, we don't define
-      such a bound in this module. *)
-
   (** Consider any job [j] of [tsk] with positive job cost. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
@@ -80,15 +61,15 @@ Section PriorityInversionIsBounded.
   Hypothesis H_busy_interval_prefix:
     busy_interval_prefix arr_seq sched j t1 t2.
 
-  (** * Processor Executes HEP jobs after Preemption Point *)
+  (** * Processor Executes HEP Jobs after Preemption Point *)
   (** In this section, we prove that at any time instant after any
       preemption point (inside the busy interval), the processor is
       always busy scheduling a job with higher or equal priority. *)
   Section PreemptionTimeAndPriorityInversion.
 
-    (** First, recall from file [busy_interval/ideal/hep_job_scheduled]
-        we already know that the processor at any preemptive point is always
-        busy scheduling a job with higher or equal priority. *)
+    (** First, recall from file [busy_interval.hep_at_pt] we already know that
+        the processor at any preemption time is always busy scheduling a job
+        with higher or equal priority. *)
 
     (** We show that at any time instant after a preemption point the
         processor is always busy with a job with higher or equal
@@ -104,14 +85,13 @@ Section PriorityInversionIsBounded.
           scheduled_at sched j_hp t.
     Proof.
       move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
-      have [Idle|[jhp Sched_jhp]] := ideal_proc_model_sched_case_analysis sched t.
-      { rewrite -(is_idle_def arr_seq) // in Idle.
-        eapply instant_t_is_not_idle in Idle => //.
+      have [Idle|[jhp Sched_jhp]] :=
+        scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) t.
+      { eapply instant_t_is_not_idle in Idle => //.
         by apply/andP; split; first apply leq_trans with tp. }
       exists jhp.
       have HP: hep_job jhp j.
-      { intros.
-        have PP := scheduling_of_any_segment_starts_with_preemption_time _
+      { have PP := scheduling_of_any_segment_starts_with_preemption_time _
                      arr_seq  H_valid_arrivals
                      sched H_sched_valid H_valid_preemption_model jhp t Sched_jhp.
         feed PP => //.
@@ -121,19 +101,17 @@ Section PriorityInversionIsBounded.
           edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point as [jlp [_ [HEP SCHEDjhp]]] => //.
           { by apply /andP; split; last by apply leq_ltn_trans with t. }
           enough (EQ : jhp = jlp); first by subst.
-          apply: (ideal_proc_model_is_a_uniprocessor_model _ _ _ prt); eauto;
+          apply: (H_uni _ _ _ prt); eauto;
             by apply SCH; apply/andP; split.
         - move: E => /eqP /neqP E; rewrite -lt0n subn_gt0 in E.
           apply negbNE; apply/negP; intros LP; rename jhp into jlp.
           edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
             as [jhp [_ [HEP SCHEDjhp]]]; try apply PRPOINT; move=> //.
-          * exact: ideal_proc_model_is_a_uniprocessor_model.
           * by apply/andP; split.
           move: LP => /negP LP; apply: LP.
           enough (EQ : jhp = jlp); first by subst.
-          apply: (ideal_proc_model_is_a_uniprocessor_model jhp _ _ tp); eauto.
-            by apply SCH; apply/andP; split; first apply leq_trans with t1; auto.
-      }
+          apply: (H_uni jhp _ _ tp); eauto.
+            by apply SCH; apply/andP; split; first apply leq_trans with t1; auto. }
       repeat split=> //.
       move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET EXj]]]; move: (Sched_jhp) => PENDING.
       eapply scheduled_implies_pending in PENDING => //.
@@ -141,10 +119,9 @@ Section PriorityInversionIsBounded.
       apply contraT; rewrite -ltnNge; intro LT; exfalso.
       feed (QUIET jhp) => //.
       specialize (QUIET HP LT).
-      have COMP: completed_by sched jhp t.
-      { apply: completion_monotonic QUIET; exact: leq_trans LEtp. }
-      apply completed_implies_not_scheduled in COMP => //.
-      by move : COMP => /negP COMP; apply : COMP.
+      move: Sched_jhp; apply/negP/completed_implies_not_scheduled => //.
+      apply: completion_monotonic QUIET.
+      exact: leq_trans LEtp.
     Qed.
 
     (** Now, suppose there exists some constant K that bounds the
@@ -176,9 +153,48 @@ Section PriorityInversionIsBounded.
 
   End PreemptionTimeAndPriorityInversion.
 
-  (** * Preemption Time Exists *)
-  (** In this section we prove that the function [max_length_of_priority_inversion]
-      indeed upper-bounds the priority inversion length. *)
+  (** * Priority Inversion due to Non-Preemptive Sections *)
+
+  (** First, we introduce the notion of the maximal length of
+      (potential) priority inversion at a time instant [t], which is
+      defined as the maximum length of nonpreemptive segments among
+      all jobs that arrived so far. *)
+  Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
+    \max_(j_lp <- arrivals_before arr_seq t | (~~ hep_job j_lp j) && (job_cost j_lp > 0))
+      (job_max_nonpreemptive_segment j_lp - ε).
+
+  (** Note that any bound on function [max_length_of_priority_inversion] will
+      also be a bound on the maximal priority inversion. This bound may be
+      different for different scheduler and/or task models. Thus, we don't
+      define such a bound in this module. *)
+
+  Section TaskMaxNPS.
+
+    (** First, assuming proper non-preemptive sections, ... *)
+    Hypothesis H_valid_nps :
+      valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
+
+    (** ... we observe that the maximum non-preemptive segment length of any task
+        that releases a job with lower priority (w.r.t. a given job [j]) and
+        non-zero execution cost upper-bounds the maximum possible length of
+        priority inversion (of said job [j]). *)
+    Lemma priority_inversion_is_bounded_by_max_np_segment :
+      max_length_of_priority_inversion j t1
+      <= \max_(j_lp <- arrivals_between arr_seq 0 t1 | (~~ hep_job j_lp j)
+                                                     && (job_cost j_lp > 0))
+          (task_max_nonpreemptive_segment (job_task j_lp) - ε).
+    Proof.
+      rewrite /max_length_of_priority_inversion.
+      apply: leq_big_max => j' JINB NOTHEP.
+      rewrite leq_sub2r //.
+      apply in_arrivals_implies_arrived in JINB.
+      by apply H_valid_nps.
+    Qed.
+
+  End TaskMaxNPS.
+
+  (** Next, we prove that the function [max_length_of_priority_inversion] indeed
+      upper-bounds the priority inversion length. *)
   Section PreemptionTimeExists.
 
     (** In this section, we require the jobs to have valid bounded
@@ -230,7 +246,7 @@ Section PriorityInversionIsBounded.
       edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point as [jhp [_ [HEP SCHEDjhp]]] => //.
       feed (FA pt); first (by apply/andP; split).
       move: LP => /negP LP; apply: LP.
-      by have ->: jlp = jhp by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
+      by have ->: jlp = jhp by apply: H_uni.
     Qed.
 
     (** Moreover, we show that lower-priority jobs that are scheduled
@@ -258,12 +274,11 @@ Section PriorityInversionIsBounded.
       { rewrite ltnNge; apply/negP; intros CONTR.
         edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
           as [jhp [_ [HEP SCHEDjhp]]]; try apply PT; move=> //.
-        - exact: ideal_proc_model_is_a_uniprocessor_model.
         - by lia.
         specialize (SCHEDc pt).
         feed SCHEDc; first by apply/andP; split; last move: NEQpt => /andP [_ T].
         move: LP => /negP LP; apply: LP.
-        by have ->: jlp = jhp by eapply ideal_proc_model_is_a_uniprocessor_model; eauto.
+        by have ->: jlp = jhp by apply: H_uni.
       }
       apply SCHEDc; apply/andP; split.
       - by rewrite -add1n in LT2; apply leq_subRL_impl in LT2; rewrite subn1 in LT2.
@@ -286,7 +301,7 @@ Section PriorityInversionIsBounded.
       Section Case1.
 
         (** Assume that the schedule is idle at time [t1]. *)
-        Hypothesis H_ideal_is_idle : ideal_is_idle sched t1.
+        Hypothesis H_is_idle : is_idle arr_seq sched t1.
 
         (** Then time instant [t1] is a preemption time. *)
         Lemma preemption_time_exists_case1:
@@ -298,7 +313,7 @@ Section PriorityInversionIsBounded.
           move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
           move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]].
           exists t1; split.
-          - by rewrite /preemption_time scheduled_job_at_def//; move: H_ideal_is_idle => /eqP ->.
+          - exact: idle_time_is_pt.
           - by apply/andP; split; last rewrite leq_addr.
         Qed.
 
@@ -332,6 +347,9 @@ Section PriorityInversionIsBounded.
 
       End Case2.
 
+      (** The following argument requires a unit-service assumption. *)
+      Hypothesis H_unit : unit_service_proc_model PState.
+
       (** (3) Case when a job with lower priority is scheduled at time [t1]. *)
       Section Case3.
 
@@ -349,7 +367,7 @@ Section PriorityInversionIsBounded.
 
           (** Consider the first preemption point of job [jlp] after [progr_t1]. *)
           Variable fpt : instant.
-          Hypothesis H_fpt_is_preemptio_point : job_preemptable jlp (progr_t1 + fpt).
+          Hypothesis H_fpt_is_preemption_point : job_preemptable jlp (progr_t1 + fpt).
           Hypothesis H_fpt_is_first_preemption_point:
             forall ρ,
               progr_t1 <= ρ <= progr_t1 + (job_max_nonpreemptive_segment jlp - ε) ->
@@ -401,55 +419,43 @@ Section PriorityInversionIsBounded.
             { rewrite ltn_add2l; rewrite ltn_add2l in LT.
               apply leq_ltn_trans with Δ => [|//].
               rewrite -{2}(sum_of_ones t1 Δ).
-              rewrite leq_sum //; intros t _.
-              apply service_at_most_one.
-              by apply ideal_proc_model_provides_unit_service.
-            }
+              by rewrite leq_sum. }
             { by apply/andP; split; [|rewrite leq_addr]. }
           Qed.
 
-          (** Thus, job [jlp] reaches its preemption point at time instant [t1 + fpt],
-              which implies that time instant [t1 + fpt] is a preemption time. *)
+          (** Thus, assuming an ideal-progress processor model, job [jlp]
+              reaches its preemption point at time instant [t1 + fpt], which
+              implies that time instant [t1 + fpt] is a preemption time. *)
           Lemma first_preemption_time:
+            ideal_progress_proc_model PState ->
             preemption_time arr_seq sched (t1 + fpt).
           Proof.
-            rewrite /preemption_time scheduled_job_at_def//.
-            have [Idle|[s' Sched_s']] :=
-              ideal_proc_model_sched_case_analysis sched (t1 + fpt);
-              first by rewrite (eqP Idle).
-            move: (Sched_s'); rewrite scheduled_at_def => /eqP EqSched_s'.
-            rewrite EqSched_s'; destruct (jlp == s') eqn: EQ.
-            - move: EQ => /eqP EQ; subst s'.
-              rewrite /service -(service_during_cat _ _ _ t1); last first.
+            move=> H_progress.
+            have [IDLE|[j' SCHED']] :=
+              scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) (t1 + fpt);
+              first exact: idle_time_is_pt.
+            have [EQ|NEQ] := (eqVneq jlp j').
+            { move: (SCHED'); rewrite -(scheduled_job_at_iff arr_seq) // -EQ /preemption_time => ->.
+              rewrite  /service -(service_during_cat _ _ _ t1); last first.
               { by apply/andP; split; last rewrite leq_addr. }
               have ->: service_during sched jlp t1 (t1 + fpt) = fpt => //.
               { rewrite -{2}(sum_of_ones t1 fpt) /service_during.
                 apply/eqP; rewrite eqn_leq //; apply/andP; split.
-                + rewrite leq_sum //; intros t _.
-                  apply service_at_most_one.
-                    by apply ideal_proc_model_provides_unit_service.
+                + by rewrite leq_sum.
                 + rewrite big_nat_cond [in X in _ <= X]big_nat_cond.
                   rewrite leq_sum //.
                   move => x /andP [HYP _].
-                  rewrite service_at_def lt0b -scheduled_at_def.
-                    by apply continuously_scheduled_between_preemption_points. }
-            - case: (posnP fpt) => [ZERO|POS].
-              { subst fpt.
-                exfalso; move: EQ => /negP EQ; apply: EQ.
-                move: H_jlp_is_scheduled; rewrite scheduled_at_def; move => /eqP SCHED2.
-                rewrite addn0 in EqSched_s'; rewrite EqSched_s' in SCHED2.
-                  by inversion SCHED2. }
-              { have [sm EQ2]: exists sm, sm.+1 = fpt by exists fpt.-1; lia.
-                rewrite -EQ2 addnS.
-                have COME_FROM: jobs_come_from_arrival_sequence sched arr_seq by [].
-                move: ((proj1 H_valid_model_with_bounded_nonpreemptive_segments) s' (COME_FROM _ _ Sched_s')) => T {COME_FROM}.
-                apply T. clear T. apply /negP => CONTR.
-                move: EQ => /negP; apply.
-                move: (continuously_scheduled_between_preemption_points (t1 + sm)) => SCHEDs0.
-                feed SCHEDs0; first by apply/andP; split; [rewrite leq_addr | rewrite -EQ2 addnS].
-                apply/eqP; eapply ideal_proc_model_is_a_uniprocessor_model; eauto 2.
-                by rewrite -addnS EQ2.
-              }
+                  exact/H_progress/continuously_scheduled_between_preemption_points. } }
+            { case: (posnP fpt) => [ZERO|POS].
+              { subst fpt; rewrite addn0 in SCHED'.
+                exfalso; move: NEQ => /negP; apply; apply/eqP.
+                exact: H_uni. }
+              { have [sm EQ2]: exists sm, sm.+1 = fpt by exists fpt.-1; rewrite prednK.
+                move: SCHED'; rewrite -EQ2 addnS => SCHED'.
+                apply:  first_moment_is_pt (SCHED') => //.
+                apply: scheduled_job_at_neq => //.
+                apply: (continuously_scheduled_between_preemption_points (t1 + sm)).
+                by apply/andP; split; [rewrite leq_addr | rewrite -EQ2 addnS]. } }
           Qed.
 
           (** And since [fpt <= max_length_of_priority_inversion j t1],
@@ -477,6 +483,9 @@ Section PriorityInversionIsBounded.
           Qed.
 
         End FirstPreemptionPointOfjlp.
+
+        (** For the next step, we assume an ideal-progress processor. *)
+        Hypothesis H_progress : ideal_progress_proc_model PState.
 
         (** Next, we combine the above facts to conclude the lemma. *)
         Lemma preemption_time_exists_case3:
@@ -517,6 +526,11 @@ Section PriorityInversionIsBounded.
 
     End CaseAnalysis.
 
+    (** As Case 3 depends on unit-service and ideal-progress assumptions, we
+        require the same here. *)
+    Hypothesis H_unit : unit_service_proc_model PState.
+    Hypothesis H_progress : ideal_progress_proc_model PState.
+
     (** By doing the case analysis, we show that indeed there is a
         preemption time in the time interval [[t1, t1 +
         max_length_of_priority_inversion j t1]]. *)
@@ -525,14 +539,12 @@ Section PriorityInversionIsBounded.
         preemption_time arr_seq sched pr_t /\
         t1 <= pr_t <= t1 + max_length_of_priority_inversion j t1.
     Proof.
-      set (service := service sched).
-      move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
-      move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]].
-      ideal_proc_model_sched_case_analysis sched t1 s.
+      have [Idle|[s Sched_s]] :=
+        scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) t1.
       - by apply preemption_time_exists_case1.
       - destruct (hep_job s j) eqn:PRIO.
-        + by eapply preemption_time_exists_case2; eauto.
-        + eapply preemption_time_exists_case3 with s; eauto.
+        + exact: preemption_time_exists_case2.
+        + apply: preemption_time_exists_case3 => //.
           by rewrite -eqbF_neg; apply /eqP.
     Qed.
 
@@ -586,6 +598,7 @@ Section PriorityInversionIsBounded.
     Qed.
 
   End NoPriorityInversionAfterPreemptionPoint.
+
 
   Section SingleJob.
 

@@ -1,11 +1,10 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
+Require Export prosa.analysis.facts.busy_interval.pi.
 
-Require Import prosa.analysis.facts.busy_interval.ideal.priority_inversion_bounded.
+(** * Bounded Priority Inversion Due to Non-Preemptive Sections *)
 
-(** * Priority Inversion is Bounded *)
-
-(** In this file, we prove that any priority inversion that occurs in a model with
-    a given JLFP policy and bounded nonpreemptive segments is bounded. *)
+(** In the following, we relate the maximum cumulative priority inversion with a
+    given blocking bound, assuming that priority version is caused (only) by
+    non-preemptive segments. *)
 Section PriorityInversionIsBounded.
 
   (** Consider any type of tasks ... *)
@@ -27,8 +26,9 @@ Section PriorityInversionIsBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
-  Variable sched : schedule (ideal.processor_state Job).
+  (** ... and any schedule of this arrival sequence. *)
+  Context {PState : ProcessorState Job}.
+  Variable sched : schedule PState.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
@@ -42,7 +42,7 @@ Section PriorityInversionIsBounded.
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
+  Context `{@JobReady Job PState Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** We assume that the schedule is valid. *)
@@ -72,24 +72,10 @@ Section PriorityInversionIsBounded.
       with lower priority. *)
   Variable blocking_bound: duration -> duration.
 
-  (** First, we observe that the maximum non-preemptive segment length of any
-      task that releases a job with lower priority (w.r.t. a given job [j])
-      and non-zero execution cost upper-bounds the maximum possible length
-      of priority inversion (of said job [j]).  *)
-  Lemma priority_inversion_is_bounded_by_max_np_segment:
-  forall j t1,
-    max_length_of_priority_inversion arr_seq j t1
-    <= \max_(j_lp <- arrivals_between arr_seq 0 t1 | (~~ JLFP j_lp j)
-                                                     && (job_cost j_lp >0))
-      (task_max_nonpreemptive_segment (job_task j_lp) - ε).
-  Proof.
-    move=> j t.
-    rewrite /max_length_of_priority_inversion.
-    apply: leq_big_max => j' JINB NOTHEP.
-    rewrite leq_sub2r //.
-    apply in_arrivals_implies_arrived in JINB.
-    by apply H_valid_model_with_bounded_nonpreemptive_segments.
-  Qed.
+  (** The following argument assumes an ideal uniprocessor. *)
+  Hypothesis H_uni : uniprocessor_model PState.
+  Hypothesis H_unit : unit_service_proc_model PState.
+  Hypothesis H_progress : ideal_progress_proc_model PState.
 
   (** We show that, if the maximum length of a priority inversion of a given job [j]
       is bounded by the blocking bound,... *)
@@ -101,7 +87,7 @@ Section PriorityInversionIsBounded.
       max_length_of_priority_inversion arr_seq j t1 <= blocking_bound (job_arrival j - t1).
 
   (** ... then the priority inversion incurred by any job is bounded by the blocking bound. *)
-  Lemma priority_inversion_is_bounded:
+  Lemma priority_inversion_is_bounded :
     priority_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
   Proof.
     move=> j ARR TSK POS t1 t2 PREF.
@@ -115,8 +101,8 @@ Section PriorityInversionIsBounded.
     have [ppt [PPT' /andP[GE LE]]]: exists ppt : instant,
                                       preemption_time arr_seq sched ppt /\
                                       t1 <= ppt <=
-                                      t1 + max_length_of_priority_inversion arr_seq j t1.
-    by apply /preemption_time_exists.
+                                      t1 + max_length_of_priority_inversion arr_seq j t1
+      by exact: preemption_time_exists.
     apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt);
       last apply leq_trans with (ppt - t1).
     apply: priority_inversion_occurs_only_till_preemption_point =>//.
