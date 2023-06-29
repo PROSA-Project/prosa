@@ -550,9 +550,26 @@ Section PriorityInversionIsBounded.
     Hypothesis H_preemption_point : preemption_time arr_seq sched ppt.
     Hypothesis H_after_t1 : t1 <= ppt.
 
-    (** We establish the aforementioned result by showing that [j] cannot suffer
-        priority inversion after the preemption time [ppt]. *)
-    Lemma priority_inversion_occurs_only_till_preemption_point:
+    (** We first establish the aforementioned result by showing that [j] cannot
+        suffer priority inversion after the preemption time [ppt] ... *)
+    Lemma no_priority_inversion_after_preemption_point :
+      forall t,
+        ppt <= t < t2 ->
+        ~~ priority_inversion arr_seq sched j t.
+    Proof.
+      move=> t /andP [pptt tt2].
+      have [j_hp [ARRB [HP SCHEDHP]]]:
+        exists j_hp : Job, arrived_between j_hp t1 t.+1
+                           /\ hep_job j_hp j
+                           /\ scheduled_at sched j_hp t.
+      { apply: not_quiet_implies_exists_scheduled_hp_job (ppt-t1) _ (t) _.
+        - by exists ppt; split; [|rewrite subnKC //; apply/andP; split].
+        - by rewrite subnKC //; apply/andP; split. }
+      exact: no_priority_inversion_when_hep_job_scheduled.
+    Qed.
+
+    (** ... and then lift this fact to cumulative priority inversion. *)
+    Lemma priority_inversion_occurs_only_till_preemption_point :
       cumulative_priority_inversion arr_seq sched j t1 t2 <=
       cumulative_priority_inversion arr_seq sched j t1 ppt.
     Proof.
@@ -565,15 +582,8 @@ Section PriorityInversionIsBounded.
       rewrite /cumulative_priority_inversion (@big_cat_nat _ _ _ ppt) //=.
       rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
       rewrite big_nat_cond big1 //; move => t /andP[/andP[GEt LEt] _].
-      have [j_hp [ARRB [HP SCHEDHP]]]:
-        exists j_hp : Job, arrived_between j_hp t1 t.+1
-                           /\ hep_job j_hp j
-                           /\ scheduled_at sched j_hp t.
-      { apply: not_quiet_implies_exists_scheduled_hp_job (ppt-t1) _ (t) _.
-          by exists ppt; split; [|rewrite subnKC //; apply /andP;split].
-               by rewrite subnKC //; apply/andP; split. }
       apply/eqP; rewrite eqb0.
-      exact: no_priority_inversion_when_hep_job_scheduled.
+      by apply/no_priority_inversion_after_preemption_point/andP.
     Qed.
 
   End NoPriorityInversionAfterPreemptionPoint.
