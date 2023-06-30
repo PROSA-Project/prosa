@@ -976,7 +976,7 @@ Section JLFPInstantiation.
         busy_intervals_are_bounded_by arr_seq sched tsk L.
       Proof.
         move => j ARR TSK POS.
-        edestruct exists_busy_interval_from_total_workload_bound
+        edestruct busy_interval_from_total_workload_bound
           with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]] => //.
         { by move => t; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
         exists t1, t2; split=> [//|]; split=> [//|].
