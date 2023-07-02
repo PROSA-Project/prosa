@@ -8,6 +8,7 @@ CoqEAL
 CoqdocJS
 CoqIDE
 Micromega
+MathComp
 ssreflect's
 ssreflect
 typeclass
@@ -79,7 +80,6 @@ subadditive
 subinterval
 subsequences
 summand
-summands
 afore
 ad
 hoc

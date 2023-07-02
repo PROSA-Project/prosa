@@ -4,6 +4,17 @@ Require Export prosa.util.notation.
 Require Export prosa.util.rel.
 Require Export prosa.util.nat.
 
+(* TODO: PR MathComp *)
+Lemma leq_sum_subseq (I : eqType) (r r' : seq I) (P : pred I) (F : I -> nat) :
+  subseq r r' -> \sum_(i <- r | P i) F i <= \sum_(i <- r' | P i) F i.
+Proof.
+elim: r r' => [|x r IH] r'; first by rewrite big_nil.
+elim: r' => [//|x' r' IH'] /=; have [<- /IH {}IH|_ /IH' {}IH'] := eqP.
+  by rewrite !big_cons; case: (P x); rewrite // leq_add2l.
+rewrite [X in _ <= X]big_cons; case: (P x') => //.
+exact: leq_trans (leq_addl _ _).
+Qed.
+
 Section SumsOverSequences.
 
   (** Consider any type [I] with a decidable equality ... *)
@@ -19,11 +30,14 @@ Section SumsOverSequences.
       yielding natural numbers. *)
   Section SumOfOneFunction.
 
-    (** Consider any function that yields natural numbers. *)
+    (** Consider any function that yields natural numbers... *)
     Variable (F : I -> nat).
 
     (** We start showing that having every member of [r] equal to zero is equivalent to
         having the sum of all the elements of [r] equal to zero, and vice-versa. *)
+    (* TODO: PR MathComp
+       this should probably be named [sum_nat_eq0],
+       but there is already a [sum_nat_eq0] that is less generic? *)
     Lemma sum_nat_eq0_nat :
       (\sum_(i <- r | P i) F i == 0) = all (fun x => F x == 0) [seq x <- r | P x].
     Proof.
@@ -33,6 +47,7 @@ Section SumsOverSequences.
 
     (** In the same way, if at least one element of [r] is not zero, then the sum of all
         elements of [r] must be strictly positive, and vice-versa. *)
+    (* TODO: PR MathComp *)
     Lemma sum_nat_gt0 :
       (0 < \sum_(i <- r | P i) F i) = has (fun x => 0 < F x) [seq x <- r | P x].
     Proof.
@@ -71,8 +86,29 @@ Section SumsOverSequences.
       \sum_(r <- r | P r) F r = \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
     Proof. by rewrite [X in X - _](bigID P)/= addnK. Qed.
 
-  End SumOfOneFunction.
+    (** Summing natural numbers over a superset can only yields a greater sum.
+        Requiring the absence of duplicate in [r] is a simple way to
+        guarantee that the set inclusion [r <= rs] implies the actually
+        required multiset inclusion. *)
+    (* TODO: PR MathComp
+       - add a condition [P i] *)
+    Lemma leq_sum_sub_uniq (rs : seq I) :
+      uniq r -> {subset r <= rs} ->
+      \sum_(i <- r) F i <= \sum_(i <- rs) F i.
+    Proof.
+      move=> uniq_r sub_r_rs.
+      rewrite [X in _ <= X](bigID (fun x => x \in r))/=.
+      apply: leq_trans (leq_addr _ _).
+      rewrite (perm_big (undup [seq x <- rs | x \in r])).
+      - rewrite -filter_undup big_filter_cond/=.
+        under eq_bigl => ? do rewrite andbT; exact/leq_sum_subseq/undup_subseq.
+      - apply: uniq_perm; rewrite ?undup_uniq// => x.
+        rewrite mem_undup mem_filter.
+        by case xinr: (x \in r); rewrite // (sub_r_rs _ xinr).
+    Qed.
 
+  End SumOfOneFunction.
+  
   (** In this section, we show some properties of the sum performed over two different functions. *)
   Section SumOfTwoFunctions.
 
@@ -85,6 +121,7 @@ Section SumsOverSequences.
     (** Assume that [E2] dominates [E1] in all the points contained in the set [r] and respecting
         the predicate [P]. We prove that, if we sum both function over those points, then the sum
         of [E2] will dominate the sum of [E1]. *)
+    (* TODO: PR MathComp *)
     Lemma leq_sum_seq :
       (forall i, i \in r -> P i -> E1 i <= E2 i) ->
       \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
@@ -95,6 +132,9 @@ Section SumsOverSequences.
 
     (** In the same way, if [E1] equals [E2] in all the points considered above, then also the two
         sums will be identical. *)
+    (* TODO: PR MathComp
+       - generalize as [eq_big_seq_cond] (nothing specific to [addn] here)
+       - replace == with = ? *)
     Lemma eq_sum_seq:
       (forall i, i \in r -> P i -> E1 i == E2 i) ->
       \sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i.
@@ -107,6 +147,8 @@ Section SumsOverSequences.
         the set [r]. We prove that, if we sum both functions over those
         points, then the sum of [E] conditioned by [P2] will dominate
         the sum of [E] conditioned by [P1]. *)
+    (* TODO: PR MathComp
+       - maybe [leq_sum_seq] above should be [leq_sum_seqr] and this one [leq_sum_seql] *)
     Lemma leq_sum_seq_pred:
       (forall i, i \in r -> P1 i -> P2 i) ->
       \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
@@ -120,44 +162,6 @@ Section SumsOverSequences.
   End SumOfTwoFunctions.
 
 End SumsOverSequences.
-
-(** For technical (and temporary) reasons related to the proof style, the next
-    two lemmas are stated outside of the section, but conceptually make use of a
-    similar context.
-
-    First, we observe that summing over a subset of a given sequence, if all
-    summands are natural numbers, cannot yield a larger sum. *)
-Lemma leq_sum_subseq (I : eqType) (r r' : seq I) (P : pred I) (F : I -> nat) :
-  subseq r r' ->
-  \sum_(i <- r | P i) F i <= \sum_(i <- r' | P i) F i.
-Proof.
-  elim: r r' => [|x r IH] r'; first by rewrite big_nil.
-  elim: r' => [//|x' r' IH'] /=; have [<- /IH {}IH|_ /IH' {}IH'] := eqP.
-  - by rewrite !big_cons; case: (P x); rewrite // leq_add2l.
-  - rewrite [X in _ <= X]big_cons; case: (P x') => //.
-    exact: leq_trans (leq_addl _ _).
-Qed.
-
-(** Second, we repeat the above observation that summing a superset of natural
-    numbers cannot yield a lesser sum, but phrase the claim differently.
-
-    Requiring the absence of duplicate in [r] is a simple way to guarantee that
-    the set inclusion [r <= rs] implies the actually required multiset
-    inclusion. *)
-Lemma leq_sum_sub_uniq (I : eqType) (r : seq I) (F : I -> nat) (rs : seq I) :
-  uniq r -> {subset r <= rs} ->
-  \sum_(i <- r) F i <= \sum_(i <- rs) F i.
-Proof.
-  move=> uniq_r sub_r_rs.
-  rewrite [X in _ <= X](bigID (fun x => x \in r))/=.
-  apply: leq_trans (leq_addr _ _).
-  rewrite (perm_big (undup [seq x <- rs | x \in r])).
-  - rewrite -filter_undup big_filter_cond/=.
-    under eq_bigl => ? do rewrite andbT; exact/leq_sum_subseq/undup_subseq.
-  - apply: uniq_perm; rewrite ?undup_uniq// => x.
-    rewrite mem_undup mem_filter.
-    by case xinr: (x \in r); rewrite // (sub_r_rs _ xinr).
-Qed.
 
 (** We continue establishing properties of sums over sequences, but start a new
     section here because some of the below proofs depend lemmas in the preceding
@@ -195,6 +199,7 @@ Section SumsOverSequences.
       statements hold (1) [E1 i] is less than or equal to [E2 i] and (2) the sum
       [E1 x_1, ..., E1 x_n] is equal to the sum of [E2 x_1, ..., E2 x_n], then
       [E1 x] is equal to [E2 x] for any element x of [xs]. *)
+  (* TODO: PR MathComp *)
   Lemma eq_sum_leq_seq :
     (forall i, i \in r -> P i -> E1 i <= E2 i) ->
     \sum_(x <- r | P x) E1 x == \sum_(x <- r | P x) E2 x
@@ -256,6 +261,8 @@ Section SumsOverRanges.
       the same as summing over the two functions separately, and then taking the
       difference of the two sums. Since we are using natural numbers, we have to
       require that one function dominates the other in the summing range. *)
+  (* TODO: PR MathComp
+     - add a condition P i *)
   Lemma sumnB_nat m n F G :
     (forall i, m <= i < n -> F i >= G i) ->
     \sum_(m <= i < n) (F i - G i) =
