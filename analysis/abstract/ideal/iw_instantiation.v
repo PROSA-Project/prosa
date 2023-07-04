@@ -1006,7 +1006,6 @@ Global Opaque another_hep_job_interference
 (** We add some facts into the "Hint Database" basic_rt_facts, so Coq will be
     able to apply them automatically where needed. *)
 Global Hint Resolve
-  abstract_busy_interval_classic_quiet_time
-  abstract_busy_interval_classic_busy_interval_prefix
+       abstract_busy_interval_classic_quiet_time
+       abstract_busy_interval_classic_busy_interval_prefix
   : basic_rt_facts.
-
