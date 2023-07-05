@@ -199,15 +199,17 @@ Section AbstractRTAforFPwithArrivalCurves.
       busy_intervals_are_bounded_by arr_seq sched tsk L.
     Proof.
       move => j ARR TSK POS.
-      edestruct (exists_busy_interval) with (delta := L) as [t1 [t2 [T1 [T2 BI]]]] => //; last first.
+      edestruct (exists_busy_interval) with (delta := L) (priority_inversion_bound := (fun (d : duration) => priority_inversion_bound))
+        as [t1 [t2 [T1 [T2 BI]]]] => //; last first.
       { exists t1, t2; split=> [//|]; split=> [//|].
         by eapply instantiated_busy_interval_equivalent_busy_interval. }
-      intros; rewrite {2}H_fixed_point leq_add //.
-      rewrite /workload_of_higher_or_equal_priority_jobs /total_hep_rbf
-        /total_hep_request_bound_function_FP
-        /workload_of_jobs /hep_job /FP_to_JLFP.
-      move: (TSK) =>  /eqP ->.
-      exact: sum_of_jobs_le_sum_rbf.
+      { intros; rewrite {2}H_fixed_point leq_add //.
+        rewrite /workload_of_higher_or_equal_priority_jobs /total_hep_rbf
+          /total_hep_request_bound_function_FP
+          /workload_of_jobs /hep_job /FP_to_JLFP.
+        move: (TSK) =>  /eqP ->.
+        exact: sum_of_jobs_le_sum_rbf. }
+      { by apply H_priority_inversion_is_bounded. }
     Qed.
 
     (** Next, we prove that [IBF_other] is indeed an interference

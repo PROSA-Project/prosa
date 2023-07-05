@@ -58,7 +58,7 @@ Section ExistsBusyIntervalJLFP.
   Let quiet_time_dec t1 := quiet_time_dec arr_seq sched j t1.
   Let busy_interval_prefix t1 t2 := busy_interval_prefix arr_seq sched j t1 t2.
   Let busy_interval t1 t2 := busy_interval arr_seq sched j t1 t2.
-  Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by_constant arr_seq sched j K.
+  Let is_priority_inversion_bounded_by K := priority_inversion_of_job_is_bounded_by arr_seq sched j K.
 
   (** We begin by proving a few basic lemmas about busy intervals. *)
   Section BasicLemmas.
@@ -427,9 +427,13 @@ Section ExistsBusyIntervalJLFP.
         Variable t1 : instant.
         Hypothesis H_is_busy_prefix : busy_interval_prefix t1 t_busy.+1.
 
+        (** Let's define A as the relative arrival time of job [j]
+            (with respect to time [t1]). *)
+        Let A := job_arrival j - t1.
+
         (** Let [priority_inversion_bound] be a constant that bounds
             the length of any priority inversion. *)
-        Variable priority_inversion_bound : instant.
+        Variable priority_inversion_bound : instant -> instant.
         Hypothesis H_priority_inversion_is_bounded :
           is_priority_inversion_bounded_by priority_inversion_bound.
 
@@ -439,7 +443,7 @@ Section ExistsBusyIntervalJLFP.
         Variable delta : duration.
         Hypothesis H_delta_positive : delta > 0.
         Hypothesis H_workload_is_bounded :
-          priority_inversion_bound + hp_workload t1 (t1 + delta) <= delta.
+          priority_inversion_bound A + hp_workload t1 (t1 + delta) <= delta.
 
         (** If there is a quiet time by time [t1 + delta], it
             trivially follows that the busy interval is bounded.
@@ -458,11 +462,11 @@ Section ExistsBusyIntervalJLFP.
               <<[t1, t1 + delta)>> and priority inversion equals
               [delta]. *)
           Lemma busy_interval_has_uninterrupted_service:
-            delta <= priority_inversion_bound + hp_service t1 (t1 + delta).
+            delta <= priority_inversion_bound A + hp_service t1 (t1 + delta).
           Proof.
             move: H_is_busy_prefix => [H_strictly_larger [H_quiet [_ EXj]]].
-            destruct (delta <= priority_inversion_bound) eqn:KLEΔ.
-            { by apply leq_trans with priority_inversion_bound; last rewrite leq_addr. }
+            destruct (delta <= priority_inversion_bound A) eqn:KLEΔ.
+            { by apply leq_trans with (priority_inversion_bound A); last rewrite leq_addr. }
             apply negbT in KLEΔ; rewrite -ltnNge in KLEΔ.
             apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + delta) + hp_service t1 (t1 + delta)).
             { rewrite /hp_service hep_jobs_receive_no_service_before_quiet_time // /service_of_higher_or_equal_priority_jobs.
@@ -540,9 +544,9 @@ Section ExistsBusyIntervalJLFP.
               is larger than the interval length. However, this
               contradicts the assumption [H_workload_is_bounded]. *)
           Corollary busy_interval_workload_larger_than_interval:
-            priority_inversion_bound + hp_workload t1 (t1 + delta)  > delta.
+            priority_inversion_bound A + hp_workload t1 (t1 + delta) > delta.
           Proof.
-            apply leq_ltn_trans with (priority_inversion_bound + hp_service t1 (t1 + delta)).
+            apply leq_ltn_trans with (priority_inversion_bound A + hp_service t1 (t1 + delta)).
             apply busy_interval_has_uninterrupted_service.
             rewrite ltn_add2l.
             by apply busy_interval_too_much_workload.
@@ -609,16 +613,16 @@ Section ExistsBusyIntervalJLFP.
 
       (** Let [priority_inversion_bound] be a constant that bounds the
           length of a priority inversion. *)
-      Variable priority_inversion_bound : duration.
+      Variable priority_inversion_bound : duration -> duration.
       Hypothesis H_priority_inversion_is_bounded :
-        is_priority_inversion_bounded_by priority_inversion_bound.
+        is_priority_inversion_bounded_by priority_inversion_bound .
 
       (** Assume that for some positive delta, the sum of requested workload at
           time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
       Variable delta : duration.
       Hypothesis H_delta_positive : delta > 0.
       Hypothesis H_workload_is_bounded :
-        forall t, priority_inversion_bound + hp_workload t (t + delta) <= delta.
+        forall t, priority_inversion_bound (job_arrival j - t) + hp_workload t (t + delta) <= delta.
 
       (** Next, we assume that job j has positive cost, from which we
           can infer that there is a time in which j is pending. *)
@@ -664,16 +668,16 @@ Section ExistsBusyIntervalJLFP.
     Section ResponseTimeBoundFromBusyInterval.
 
       (** Let priority_inversion_bound be a constant that bounds the length of a priority inversion. *)
-      Variable priority_inversion_bound: duration.
+      Variable priority_inversion_bound: duration -> duration.
       Hypothesis H_priority_inversion_is_bounded:
         is_priority_inversion_bounded_by priority_inversion_bound.
 
       (** Assume that for some positive delta, the sum of requested workload at
-             time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
+          time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
       Variable delta: duration.
       Hypothesis H_delta_positive: delta > 0.
       Hypothesis H_workload_is_bounded:
-        forall t, priority_inversion_bound + hp_workload t (t + delta) <= delta.
+        forall t, priority_inversion_bound (job_arrival j - t) + hp_workload t (t + delta) <= delta.
 
       (** Then, job [j] must complete by [job_arrival j + delta]. *)
       Lemma busy_interval_bounds_response_time:

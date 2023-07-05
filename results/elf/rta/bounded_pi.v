@@ -7,6 +7,9 @@ Require Export prosa.analysis.facts.interference.
 Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.priority.jlfp_with_fp.
+Require Export prosa.analysis.facts.model.rbf.
+Require Export prosa.analysis.facts.busy_interval.pi.
+Require Export prosa.analysis.facts.busy_interval.pi_cond.
 
 (** * Response-Time Analysis for the ELF Scheduling Policy *)
 
@@ -15,6 +18,11 @@ Require Export prosa.analysis.facts.priority.jlfp_with_fp.
     arrival curves executing upon an ideal uniprocessor. To this end, we
     instantiate the _abstract Response-Time Analysis_ (aRTA) as provided in the
     [prosa.analysis.abstract] module. *)
+
+(** Note that this analysis is currently specific to workloads where each task has bounded
+    nonpreemptive segments. This specificity will be further explained by the assumptions
+    which depend on it. The analysis catering to the more general model with bounded priority
+    inversion remains future work. *)
 
 Section AbstractRTAforELFwithArrivalCurves.
 
@@ -50,7 +58,7 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   (** Consider any valid arrival sequence [arr_seq]. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence (arr_seq).
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** *** Absence of Self-Suspensions and WCET Compliance *)
 
@@ -110,17 +118,11 @@ Section AbstractRTAforELFwithArrivalCurves.
   Hypothesis H_transitive_priorities : transitive_task_priorities FP.
   Hypothesis H_total_priorities : total_task_priorities FP.
 
-  (** We assume that the schedule complies with the preemption model ... *)
+  (** We further assume that the schedule complies with the preemption model ... *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** ... and finally, that it respects the [ELF] scheduling policy. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (ELF FP).
-
-  (** In this file, we assume that there exists a bound on the length of any
-      priority inversion experienced by any job of task [tsk]. *)
-  Variable priority_inversion_bound : duration -> duration.
-  Hypothesis H_priority_inversion_is_bounded :
-    priority_inversion_is_bounded_by arr_seq sched tsk priority_inversion_bound.
 
   (** ** B. Interference and Interfering Workload *)
 
@@ -132,13 +134,12 @@ Section AbstractRTAforELFwithArrivalCurves.
 
       We can simply reuse the existing general definitions of _interference_ and
       _interfering workload_ that apply to job-level fixed-priority (JLFP)
-      policy (as provided in the module
-      [analysis.abstract.ideal.iw_instantiation]).*)
+      policy (as provided in the module [analysis.abstract.ideal.iw_instantiation]).*)
   #[local] Instance ideal_elf_interference : Interference Job :=
-    ideal_jlfp_interference arr_seq sched.
+      ideal_jlfp_interference arr_seq sched.
 
   #[local] Instance ideal_elf_interfering_workload : InterferingWorkload Job :=
-    ideal_jlfp_interfering_workload arr_seq sched.
+      ideal_jlfp_interfering_workload arr_seq sched.
 
   (** ** C. Classic and Abstract Work Conservation *)
 
@@ -148,23 +149,153 @@ Section AbstractRTAforELFwithArrivalCurves.
   (** This allows us to apply [instantiated_i_and_w_are_coherent_with_schedule]
       to conclude that abstract work-conservation also holds. *)
 
-  (** ** D. Maximum Busy-Window Length *)
+  (** ** D. The Priority Inversion Bound and its Validity *)
+
+    (** In this file, we break the priority inversion experienced by any job into two
+      categories :
+      - (1) priority inversion caused by jobs belonging to tasks with lower priority than [tsk]
+      - (2) priority inversion caused by jobs belonging to tasks with equal priority as [tsk]
+    Note that, by definition of the ELF policy, no job from a task with higher priority than [tsk]
+    can cause priority inversion. *)
+
+  (** We define a predicate to identify jobs from lower-priority tasks,
+      or tasks for which [tsk] has higher priority. *)
+  Let is_lower_priority j' := hp_task tsk (job_task j').
+
+  (** We assume there exists a bound on the maximum length of priority inversion from these jobs
+      that is incurred by any job of task [tsk]. *)
+  Variable priority_inversion_lp_tasks_bound : duration.
+  Hypothesis H_priority_inversion_from_lp_tasks_is_bounded :
+    priority_inversion_cond_is_bounded_by_constant arr_seq sched tsk
+      is_lower_priority priority_inversion_lp_tasks_bound.
+
+  (* Similarly, we define a predicate to select jobs whose tasks have equal priority as [tsk]... *)
+  Let is_equal_priority j' := ep_task tsk (job_task j').
+
+  (** ... and assume that there exists a bound on the maximum length of priority inversion
+      caused by them to any job of [tsk]. *)
+  Variable priority_inversion_ep_tasks_bound : duration -> duration.
+  Hypothesis H_priority_inversion_from_ep_tasks_is_bounded :
+    priority_inversion_cond_is_bounded_by arr_seq sched tsk
+      is_equal_priority priority_inversion_ep_tasks_bound.
+
+  (** We then define the priority inversion bound as a maximum of the bounds on the two categories. *)
+  (** Note that this definition is only applicable when all tasks have bounded nonpreemptive segments. *)
+  Definition priority_inversion_bound (A: duration) := maxn priority_inversion_lp_tasks_bound
+                                                            (priority_inversion_ep_tasks_bound A).
+
+  (** Now, we define the following predicate to identify tasks that can release jobs. *)
+  Let blocking_relevant (tsk_o : Task) :=
+    (max_arrivals tsk_o ε > 0) && (task_cost tsk_o > 0).
+
+  (** We also define a predicate to identify equal priority tasks that cannot cause
+      priority inversion for a job [j], given that [j]'s busy interval starts that instant [t1]. *)
+  Let is_ep_causing_intf (j: Job) (t1 : instant) (tsk_other:Task) :=
+    ((job_arrival j)%:R - t1%:R + task_priority_point tsk - task_priority_point tsk_other >=0)%R .
+
+  (** Using the above, we define the condition that an equal-priority task must satisfy
+      for any of its jobs to cause blocking (or priority inversion) to a job [j] in [j]'s
+      busy interval starting at [t1]. *)
+  Let ep_task_blocking_relevant tsk_other j t1 :=
+    ep_task tsk_other tsk && ~~ is_ep_causing_intf j t1 tsk_other &&
+      blocking_relevant tsk_other.
+
+  (** Finally, we assume that the [priority_inversion_ep_tasks_bound] is bounded by the
+      maximum [task_cost] of tasks which satisfy the above condition. Note that this
+      assumption is valid only for the model where tasks have bounded nonpreemptive
+      segments. *)
+  Hypothesis H_priority_inversion_from_ep_tasks_concrete_bound :
+    forall j t1,
+      job_task j = tsk ->
+      priority_inversion_ep_tasks_bound (job_arrival j - t1)
+        <= \max_(i <- ts | ep_task_blocking_relevant i j t1) task_cost i.
+
+  (** Having defined bounds on two separate categories of priority inversion, we now show that
+      the defined [priority_inversion_bound] upper-bounds the priority inversion faced by any job
+      belonging to [tsk], regardless of its cause. *)
+  Lemma priority_inversion_is_bounded :
+    priority_inversion_is_bounded_by arr_seq sched tsk priority_inversion_bound.
+  Proof.
+    move=> j ARR TSK POS t1 t2 BUSY_PREF.
+    have [-> //|/andP[_ /hasP[jlp jlp_at_t1 nHEPj]]]:
+      cumulative_priority_inversion arr_seq sched j t1 t2 = 0 \/ priority_inversion arr_seq sched j t1
+      by apply: busy_interval_pi_cases.
+    rewrite scheduled_jobs_at_iff in jlp_at_t1 =>//.
+    have [lp | ep]: ~~ hep_task (job_task jlp) (job_task j)
+                    \/ ep_task (job_task jlp) (job_task j)
+      by apply/orP; rewrite -nhp_ep_nhep_task =>//; move: nHEPj; apply /contra/hp_task_implies_hep_job.
+    { have -> : cumulative_priority_inversion arr_seq sched j t1 t2
+                = cumulative_priority_inversion_cond arr_seq sched j is_lower_priority t1 t2
+        by apply: cum_task_pi_eq => //; rewrite /is_lower_priority -not_hep_hp_task //; by move: (TSK) => /eqP <-.
+      rewrite leq_max; apply/orP; left.
+      by apply: H_priority_inversion_from_lp_tasks_is_bounded. }
+    { have -> : cumulative_priority_inversion arr_seq sched j t1 t2
+                = cumulative_priority_inversion_cond arr_seq sched j is_equal_priority t1 t2
+        by apply: cum_task_pi_eq => //; rewrite /is_equal_priority ep_task_sym; move: (TSK) => /eqP <-.
+      rewrite leq_max; apply/orP; right.
+      by apply: H_priority_inversion_from_ep_tasks_is_bounded. }
+  Qed.
+
+  (** ** E. Maximum Busy-Window Length *)
 
   (** The next step is to establish a bound on the maximum busy-window length,
       which aRTA requires to be given. *)
+
+  (** Using the sum of individual request bound functions, we define
+      the request bound function of all tasks with higher-or-equal
+      priority [FP] (with respect to [tsk]). *)
+  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
 
   (** To this end, we assume that we are given a positive value [L] ...*)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
 
   (** ... that is a fixed point of the following equation. *)
-  Hypothesis H_fixed_point : L = total_request_bound_function ts L.
+  Hypothesis H_fixed_point : L = priority_inversion_lp_tasks_bound + total_hep_rbf L.
 
-  (** Given this definition of [L], we can apply the theorem
-      [instantiated_busy_intervals_are_bounded] to prove that [L] bounds the
-      length of the busy window. *)
+  (** Given this definition of [L], we prove that [L] bounds the length of the busy window. *)
+  Lemma instantiated_busy_intervals_are_bounded :
+    busy_intervals_are_bounded_by arr_seq sched tsk L.
+  Proof.
+    move => j ARR TSK POS; move: (TSK) => /eqP TSK'.
+    edestruct (exists_busy_interval) with (delta := L) (JLFP := ELF (FP)) as [t1 [t2 [T1 [T2 BI]]]] => //.
+    { by apply: priority_inversion_is_bounded. }
+    { rewrite {2}H_fixed_point => t.
+      apply leq_trans with (priority_inversion_lp_tasks_bound
+                            + priority_inversion_ep_tasks_bound (job_arrival j - t)
+                            + workload_of_higher_or_equal_priority_jobs j (arrivals_between arr_seq t (t + L)));
+        first by rewrite leq_add2r max_leq_add.
+      rewrite -addnA leq_add2l /total_hep_rbf.
+      rewrite hep_rbf_taskwise_partitioning /total_ep_request_bound_function_FP (bigID (is_ep_causing_intf j t)) /=.
+      rewrite hep_workload_partitioning_taskwise =>//; rewrite -[leqRHS]addnACl addnA.
+      apply: leq_add; first apply: leq_add.
+      { apply: (leq_trans (H_priority_inversion_from_ep_tasks_concrete_bound _ _ _)) =>//.
+        apply/(leq_trans (bigmax_leq_sum _ _ _ _)).
+        apply leq_trans with
+          (\sum_(i <- ts | ep_task_blocking_relevant i j t) task_request_bound_function i L); last first.
+        { apply: (sub_le_big addnA addnC leqnn); first by move => ? ?; apply leq_addr.
+          by move => tsk' /andP[]. }
+        rewrite  big_seq_cond [leqRHS]big_seq_cond.
+        apply: leq_sum =>tsk_other /andP[? /andP[_ /andP[MA _]]].
+        apply leq_trans with (task_request_bound_function tsk_other ε).
+        - by apply: leq_pmulr.
+        - by apply/leq_mul/(H_valid_arrival_curve _ _).2. }
+      { rewrite hep_hp_workload_hp =>//. rewrite /from_hp_task TSK'; exact: sum_of_jobs_le_sum_rbf. }
+      { apply: leq_trans; last by apply: sum_of_jobs_le_sum_rbf.
+        rewrite /workload_of_jobs big_seq_cond [leqRHS]big_seq_cond.
+        apply: (sub_le_big addnA addnC leqnn); first by move => ? ?; apply: leq_addr.
+        move=> j0; case eq: (_ \in _) =>//=.
+        move=> /andP[HEPj EP]; rewrite -TSK'; apply/andP; split =>//.
+        move: HEPj.
+        have -> : hep_job j0 j = (@hep_job _ (GEL Job Task) j0 j) by apply: hep_job_elf_gel.
+        rewrite /is_ep_causing_intf ler_subr_addl addrAC ler_subr_addl addr0 -TSK'.
+        apply: le_trans; rewrite ler_add2r ler_nat.
+        apply: job_arrival_between_ge=>//. }}
+    { exists t1, t2; split=> [//|]; split=> [//|].
+      eapply instantiated_busy_interval_equivalent_busy_interval => //. }
+  Qed.
 
-  (** ** E. The Interference-Bound Function *)
+  (** ** F. The Interference-Bound Function *)
 
   (** Next, we define the interference [IBF_other] and prove that [IBF_other]
       bounds the interference incurred by any job of [tsk]. Note that
@@ -319,7 +450,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       apply: leq_trans; first by apply: service_of_jobs_le_workload.
       rewrite /bound_on_total_ep_workload /ep_task_hep_job
         /other_ep_task_hep_job /ep_task_hep_job.
-      rewrite (workload_of_hep_jobs_partitioned_by_tasks _ _ ts _  _ tsk) //.
+      rewrite (hep_workload_from_other_ep_partitioned_by_tasks _ _ ts _  _ tsk) //.
       apply: leq_sum_seq => tsk_o IN /andP[EP OTHER].
       apply: leq_trans.
       { apply: (workload_of_jobs_weaken _
@@ -327,13 +458,13 @@ Section AbstractRTAforELFwithArrivalCurves.
                                 && ep_task (job_task j0) (job_task j)
                                 && (job_task j0 == tsk_o)))
              => i /andP[/andP[? ?] ?].
-        by apply /andP; split. }
+        by apply/andP; split. }
       { have [LEQ|GT] := leqP Δ `|Num.max 0%R (ep_task_intf_interval tsk_o A)%R|; [| apply ltnW in GT].
         { apply: leq_trans; last by eapply task_workload_le_task_rbf.
           apply: (workload_of_jobs_weaken _ (fun j0 => (job_task j0 == tsk_o))).
           by move => j'/ andP[_ EXACT]. }
         { apply: leq_trans;
-            first by apply total_workload_shorten_range => //; clear - GT H_Δ_in_busy; lia.
+            first by apply: total_workload_shorten_range => //; clear - GT H_Δ_in_busy; lia.
           rewrite (workload_of_jobs_equiv_pred _ _ (fun jo : Job => hep_job jo j && (job_task jo == tsk_o))).
           { case EQ: (0 <= ep_task_intf_interval tsk_o A)%R;
               last by rewrite arrivals_between_geq; [rewrite workload_of_jobs0|clear - EQ; lia].
@@ -356,7 +487,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     Proof.
       rewrite cumulative_intf_hp_task_service_equiv /total_hp_rbf.
       apply: leq_trans;
-        first by apply service_of_jobs_le_workload.
+        first by apply: service_of_jobs_le_workload.
       rewrite /workload_of_jobs /total_hp_request_bound_function_FP.
       rewrite [X in X <= _](eq_big (fun j0 => hp_task (job_task j0) tsk) job_cost) //;
         first by apply: sum_of_jobs_le_sum_rbf; eauto.
@@ -382,22 +513,22 @@ Section AbstractRTAforELFwithArrivalCurves.
       rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=.
       rewrite /IBF_other -addnA.
       apply: leq_add;
-        first by apply: cumulative_priority_inversion_is_bounded.
+        first by apply: cumulative_priority_inversion_is_bounded priority_inversion_is_bounded =>//.
       rewrite cumulative_hep_interference_split_tasks_new // addnC.
       apply: leq_add.
       + by apply: bound_on_ep_workload.
       + by apply: bound_on_hp_workload.
   Qed.
 
-  (** ** F. Defining the Search Space *)
+  (** ** G. Defining the Search Space *)
 
-  (** In this section, we define the concrete search space for [ELF].  Then, we
+  (** In this section, we define the concrete search space for [ELF]. Then, we
       prove that, if a given [A] is in the abstract search space, then it is
       also included in the concrete search space. *)
 
-  (** For [tsk], the total interference bound is defined as the sum of the interference
-      due to (1) jobs belonging to same task (self interference) and
-             (2) jobs belonging to other tasks [IBF_other]. *)
+  (** For [tsk], the total interference bound is defined as the sum of the interference due to
+      - (1) jobs belonging to the same task (self interference) and
+      - (2) jobs belonging to other tasks [IBF_other]. *)
   Let total_interference_bound tsk (A Δ : duration) :=
     task_request_bound_function tsk (A + ε) - task_cost tsk + IBF_other tsk A Δ.
 
@@ -406,9 +537,8 @@ Section AbstractRTAforELFwithArrivalCurves.
       bound on total equal-priority workload are dependent on the offset [A]. *)
 
   (** Therefore, in order to define the concrete search space, we define
-      predicates that capture when they change for successive values of the
-      offset [A]. *)
-
+      predicates that capture when these values change for successive
+      values of the offset [A]. *)
   Definition task_rbf_changes_at (A : duration) :=
     task_request_bound_function tsk  A != task_request_bound_function tsk (A + ε).
 
@@ -423,15 +553,14 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   (** Finally, we define the concrete search space as the set containing all
       points less than [L] at which any of the bounds on priority inversion,
-      task RBF, or total equal priority workload changes. *)
+      task RBF, or total equal-priority workload changes. *)
   Definition is_in_search_space (A : duration) :=
     (A < L) && (priority_inversion_changes_at A
                 || task_rbf_changes_at A
                 || bound_on_total_ep_workload_changes_at A).
 
   (** In this section, we prove that, for any job [j] of task [tsk], if [A] is
-      in the abstract search space, then it is also in the concrete search
-      space. *)
+      in the abstract search space, then it is also in the concrete search space. *)
   Section ConcreteSearchSpace.
 
     (** Consider any job [j] of [tsk]. *)
@@ -451,22 +580,22 @@ Section AbstractRTAforELFwithArrivalCurves.
     Proof.
       move: H_A_is_in_abstract_search_space  => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]
         ; apply/andP; split => //.
-      { apply /orP; left; apply/orP; right.
+      { apply/orP; left; apply/orP; right.
         rewrite /task_rbf_changes_at task_rbf_0_zero //; eauto 2.
-        apply contraT => /negPn /eqP ZERO.
+        apply: contraT => /negPn /eqP ZERO.
         rewrite -(ltnn 0) {2}ZERO add0n.
         apply: (@leq_trans (task_cost tsk));
           last by apply: task_rbf_1_ge_task_cost.
         apply: (@leq_trans (job_cost j)) => //.
         move: (H_job_of_tsk) => /eqP <-.
         by apply: (H_valid_job_cost _ H_j_arrives). }
-      apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
-      exfalso; apply INSP2.
+      apply: contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
+      exfalso; apply: INSP2.
       rewrite /total_interference_bound subnK // RBF.
-      apply /eqP; rewrite eqn_add2l /IBF_other PI !addnACl eqn_add2r.
+      apply/eqP; rewrite eqn_add2l /IBF_other PI !addnACl eqn_add2r.
       rewrite /bound_on_total_ep_workload.
-      apply /eqP; rewrite big_seq_cond [RHS]big_seq_cond.
-      apply eq_big => // tsk_i /andP [TS OTHER].
+      apply/eqP; rewrite big_seq_cond [RHS]big_seq_cond.
+      apply: eq_big => // tsk_i /andP [TS OTHER].
       move: WL; rewrite /bound_on_total_ep_workload_changes_at => /hasPn WL.
       move: {WL} (WL tsk_i TS) =>  /nandP [/negbTE EQ|/negPn/eqP WL].
       { by move: OTHER; rewrite EQ. }
@@ -477,8 +606,7 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   End ConcreteSearchSpace.
 
-
-  (** ** G. The Response-Time Bound [R] *)
+  (** ** H. The Response-Time Bound [R] *)
 
   (** Finally, we define the response-time bound [R] as the maximum offset by
       which any job [j] of task [tsk] has completed. *)
@@ -487,10 +615,12 @@ Section AbstractRTAforELFwithArrivalCurves.
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
-        A + F >= IBF_other tsk A (A + F)
+        A + F >= priority_inversion_bound A
+                + bound_on_total_ep_workload A (A + F)
+                + total_hp_rbf (A + F)
                 + (task_request_bound_function tsk (A + ε)
-                   - (task_cost tsk - task_rtct tsk))
-        /\ R >= F + (task_cost tsk - task_rtct tsk).
+                - (task_cost tsk - task_rtct tsk))
+          /\ R >= F + (task_cost tsk - task_rtct tsk).
 
   Section ResponseTimeReccurence.
 
@@ -502,12 +632,11 @@ Section AbstractRTAforELFwithArrivalCurves.
     Hypothesis H_job_cost_positive : job_cost_positive j.
 
     (** We have established that if [A] is in the abstract search then it is in
-        the concrete search space, too.  We also know that by assumption that,
+        the concrete search space, too.  We also know by assumption that,
         if [A] is in the concrete search space, then there exists an [R] that
         satisfies [H_R_is_maximum]. *)
 
-    (** Using these facts, here we prove that if, [A] is in the abstract search
-        space, ... *)
+    (** Using these facts, here we prove that if, [A] is in the abstract search space, ... *)
     Let is_in_search_space := search_space.is_in_search_space tsk L total_interference_bound.
 
     (** ... then there exists a solution to the response-time equation as stated
@@ -530,10 +659,9 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   End ResponseTimeReccurence.
 
-  (** ** H. Soundness of the Response-Time Bound *)
+  (** ** I. Soundness of the Response-Time Bound *)
 
-  (** Finally, we prove that [R] is a bound on the response time of the task
-      [tsk]. *)
+  (** Finally, we prove that [R] is a bound on the response time of the task [tsk]. *)
   Theorem uniprocessor_response_time_bound_elf :
     task_response_time_bound arr_seq sched tsk R.
   Proof.

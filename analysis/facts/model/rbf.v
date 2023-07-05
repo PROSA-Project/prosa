@@ -423,3 +423,45 @@ Section DegenerateTotalRBFs.
   Qed.
 
 End DegenerateTotalRBFs.
+
+(** In this section, we establish results about the task-wise partitioning of
+    total RBFs of multiple tasks. *)
+Section FP_RBF_partitioning.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType} `{TaskCost Task}.
+
+  (** ... and any type of jobs associated with these tasks, where each task has
+      a cost and an associated arrival curve. *)
+  Context {Job : JobType} `{JobTask Job Task} `{JobCost Job} `{MaxArrivals Task}.
+
+  (** Consider an FP policy that indicates a higher-or-equal priority
+      relation. *)
+  Context `{FP_policy Task}.
+
+  (** Consider a task set ts... *)
+  Variable ts : seq Task.
+
+  (** ...and let [tsk] be any task that serves as the reference point for
+     "higher or equal priority" (usually, but not necessarily, from [ts]). *)
+  Variable tsk : Task.
+
+  (** We establish that the bound on the total workload due to
+      higher-or-equal-priority tasks can be partitioned task-wise.
+      In other words, it is equal to the sum of the bound on the
+      total workload due to higher-priority tasks and the bound on
+      the total workload due to equal- priority tasks. *)
+  Lemma hep_rbf_taskwise_partitioning :
+    forall L,
+      total_hep_request_bound_function_FP ts tsk L
+      = total_hp_request_bound_function_FP ts tsk L
+        + total_ep_request_bound_function_FP ts tsk L.
+  Proof.
+    move=> L; apply sum_split_exhaustive_mutually_exclusive_preds => t.
+    - by rewrite -andb_orr orNb Bool.andb_true_r.
+    - rewrite !negb_and; case: (hep_task _ _) =>//=.
+      by case: (hep_task _ _)=>//.
+  Qed.
+
+End FP_RBF_partitioning.
+

@@ -220,6 +220,17 @@ Section FPRelationsProperties.
       forall tsk1 tsk2, ~~ hp_task tsk1 tsk2 = hep_task tsk2 tsk1.
     Proof. by move=> x y; rewrite -not_hep_hp_task negbK. Qed.
 
+    (** If a task [tsk1] does not have higher priority than a task
+        [tsk2], then [tsk1] either has lesser priority than
+        [tsk2] or the two have equal priority. *)
+    Lemma nhp_ep_nhep_task :
+      forall tsk1 tsk2,
+        ~~hp_task tsk1 tsk2 = ~~hep_task tsk1 tsk2 || ep_task tsk1 tsk2.
+    Proof.
+      move=> tsk1 tsk2; rewrite not_hp_hep_task not_hep_hp_task.
+      by rewrite hep_hp_ep_task ep_task_sym.
+    Qed.
+
   End TotalProperties.
 
 End FPRelationsProperties.

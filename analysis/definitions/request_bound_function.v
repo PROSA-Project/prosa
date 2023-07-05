@@ -1,5 +1,7 @@
 Require Export prosa.model.task.arrival.curves.
 Require Export prosa.model.priority.classes.
+Require Export prosa.analysis.facts.priority.classes.
+Require Export prosa.util.sum.
 
 (** * Request Bound Function (RBF) *)
 
@@ -18,7 +20,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
   Context `{JobTask Job Task}.
   Context `{JobCost Job}.
 
-  (** ... and an FP policy that indicates a higher-or-equal priority
+  (** Also assume an FP policy that indicates a higher-or-equal priority
       relation. *)
   Context `{FP_policy Task}.
 
@@ -60,6 +62,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
     Let is_hep_task tsk_other := hep_task tsk_other tsk.
     Let is_other_hep_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk).
     Let is_hp_task tsk_other := hp_task tsk_other tsk.
+    Let is_ep_task tsk_other := ep_task tsk_other tsk.
 
     (** Using the sum of individual workload bounds, we define the following
         bound for the total workload of tasks in any interval of length
@@ -78,6 +81,12 @@ Section TaskWorkloadBoundedByArrivalCurves.
         tasks other than [tsk] in any interval of length [delta]. *)
     Definition total_ohep_request_bound_function_FP :=
       \sum_(tsk_other <- ts | is_other_hep_task tsk_other)
+        task_request_bound_function tsk_other delta.
+
+    (** We also define a bound for the total workload of higher-or-equal-priority
+        tasks other than [tsk] in any interval of length [delta]. *)
+    Definition total_ep_request_bound_function_FP :=
+      \sum_(tsk_other <- ts | is_ep_task tsk_other)
         task_request_bound_function tsk_other delta.
 
     (** Finally, we define a bound for the total workload of higher-priority

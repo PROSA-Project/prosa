@@ -71,6 +71,31 @@ Section SumsOverSequences.
       \sum_(r <- r | P r) F r = \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
     Proof. by rewrite [X in X - _](bigID P)/= addnK. Qed.
 
+    (** Next, we show that if the predicate [P] is a disjunction of the predicates [Q]
+        and [R], and [Q] and [R] can never be simultaneously satisfied by any element,
+        then the sum of elements in [r] respecting [P] can be obtained by adding the sum of
+        elements in [r] respecting [Q] and the elements in [r] respecting [R]. *)
+    Lemma sum_split_exhaustive_mutually_exclusive_preds :
+      forall Q R,
+        (forall x, P x =  (Q x) || (R x)) -> (forall x, ~~(Q x && R x))
+          -> \sum_(r <- r | P r) F r = \sum_(r <- r | Q r) F r + \sum_(r <- r | R r) F r.
+    Proof.
+      move=> Q R XOR nAnd.
+      rewrite (bigID Q) /=; congr (_ + _); apply eq_bigl=> i;
+        specialize (XOR i); rewrite XOR; specialize (nAnd i);
+        by case: (Q i) nAnd; case : (R i).
+    Qed.
+
+    (** We also prove that the maximum value taken by a function over elements of
+        a range [r] satisfying any predicate [P] is always smaller than the sum of the
+        function over the elements. *)
+    Lemma bigmax_leq_sum:
+      \max_(i <- r | P i) F i <= \sum_(i <- r | P i) F i.
+    Proof.
+      apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2.
+      by rewrite (leq_trans (max_leq_add m1 m2)) ?leq_add.
+    Qed.
+
   End SumOfOneFunction.
 
   (** In this section, we show some properties of the sum performed over two different functions. *)
