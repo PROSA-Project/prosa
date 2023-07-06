@@ -311,6 +311,18 @@ Section AdditionalLemmas.
       nth 0 (x :: xs) n = nth 0 xs n.-1.
   Proof. by move=> ? ? []. Qed.
 
+  (** Equality of singleton lists is identical to equality of option types. *)
+  Lemma seq1_some {T : eqType} :
+    forall (x y : T),
+      ([:: x] == [:: y]) = (Some x == Some y).
+  Proof.
+    move=> x y.
+    case: (eqVneq x y) => [-> //=|/eqP NEQ]; first by rewrite !eq_refl.
+    apply/eqP; rewrite ifF.
+    - by move=> []EQ; apply: NEQ.
+    - by apply/negbTE/eqP => -[].
+  Qed.
+
   (** We prove that a sequence [xs] of size [n.+1] can be destructed
      into a sequence [xs_l] of size [n] and an element [x] such that
      [x = xs ++ [::x]]. *)

@@ -118,6 +118,42 @@ Section ScheduledJobs.
       by apply/j1j2/(H_uni j1 j2 sched t); rewrite  -scheduled_jobs_at_iff.
     Qed.
 
+    (** For convenience, we restate the fact that there is at most one job as a
+        case analysis. *)
+    Corollary scheduled_jobs_at_uni_cases :
+      forall t,
+        scheduled_jobs_at arr_seq sched t == [::]
+        \/ exists j, scheduled_jobs_at arr_seq sched t == [:: j].
+    Proof.
+      move=> t.
+      rewrite /scheduled_job_at; move: (scheduled_jobs_at_seq1 t).
+      case: scheduled_jobs_at => [//|j [|//]] _ /=.
+      by right.
+    Qed.
+
+    (** We note the obvious relationship between [scheduled_jobs_at] and
+        [scheduled_job_at] ... *)
+    Lemma scheduled_jobs_at_uni :
+      forall j t,
+        (scheduled_jobs_at arr_seq sched t == [::j])
+        = (scheduled_job_at arr_seq sched t == Some j).
+    Proof.
+      move=> j t; rewrite /scheduled_job_at.
+      have [/eqP -> //|[j' /eqP -> //=]] := scheduled_jobs_at_uni_cases t.
+      exact: seq1_some.
+    Qed.
+
+    (** ... and observe that [scheduled_job_at t] behaves as expected: it yields
+        some job [j] if and only if [j] is scheduled at time [t]. *)
+    Corollary scheduled_job_at_scheduled_at :
+      forall j t,
+        (scheduled_job_at arr_seq sched t == Some j) = scheduled_at sched j t.
+    Proof.
+      move=> j t.
+      rewrite -scheduled_jobs_at_uni -scheduled_jobs_at_iff.
+      by have [/eqP -> //|[j' /eqP -> //=]] := scheduled_jobs_at_uni_cases t.
+    Qed.
+
     (** Then [scheduled_job_at t] is correct: it yields some job [j] if and only
         if [j] is scheduled at time [t]. *)
     Corollary scheduled_job_at_iff :
@@ -157,9 +193,9 @@ Section ScheduledJobs.
         ~~ is_idle arr_seq sched t <-> exists j, scheduled_at sched j t.
     Proof.
       move=> t. rewrite is_idle_iff.
-      split => [|[j]]; last by rewrite -scheduled_job_at_iff => ->.
+      split => [|[j]]; last by rewrite -scheduled_job_at_scheduled_at => /eqP ->.
       case SJA: (scheduled_job_at _ _ _) => [j|//] _.
-      by exists j; rewrite -scheduled_job_at_iff.
+      by exists j; rewrite -scheduled_job_at_scheduled_at; apply/eqP.
     Qed.
 
   End Uniprocessors.
