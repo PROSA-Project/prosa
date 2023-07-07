@@ -154,6 +154,17 @@ Section ScheduledJobs.
       by have [/eqP -> //|[j' /eqP -> //=]] := scheduled_jobs_at_uni_cases t.
     Qed.
 
+    (** Similarly to [scheduled_job_at_scheduled_at], we relate
+        [scheduled_jobs_at] to [scheduled_at]. *)
+    Corollary scheduled_jobs_at_scheduled_at :
+      forall j t,
+        (scheduled_jobs_at arr_seq sched t == [:: j])
+        = scheduled_at sched j t.
+    Proof.
+      move=> j t.
+      by rewrite scheduled_jobs_at_uni scheduled_job_at_scheduled_at.
+    Qed.
+
     (** Then [scheduled_job_at t] is correct: it yields some job [j] if and only
         if [j] is scheduled at time [t]. *)
     Corollary scheduled_job_at_iff :
