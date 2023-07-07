@@ -1,6 +1,6 @@
 Require Export prosa.behavior.service.
 
-(** * Served At *)
+(** * Service Definitions *)
 
 (** In this section, we define a set of jobs that receive service at a
     given time. *)
@@ -15,9 +15,14 @@ Section ServedAt.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
-  (** We define jobs served at a given time [t] as a set of jobs that
-      receive service at [t]. *)
-  Definition served_at (t : instant) :=
+  (** The set of jobs served at time [t] can be obtained by filtering
+      the set of all jobs that arrive at or before time [t]. *)
+  Definition served_jobs_at (t : instant) :=
     [seq j <- arrivals_up_to arr_seq t | receives_service_at sched j t].
+
+  (** For the special case of uniprocessors, we define a convenience
+      wrapper that reduces the sequence of scheduled jobs to an
+      [option Job]. *)
+  Definition served_job_at t := ohead (served_jobs_at t).
 
 End ServedAt.

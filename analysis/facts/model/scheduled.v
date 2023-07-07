@@ -88,7 +88,7 @@ Section ScheduledJobs.
     Lemma scheduled_at_implies_in_served_at :
       forall j t,
         scheduled_at sched j t ->
-        j \in served_at arr_seq sched t.
+        j \in served_jobs_at arr_seq sched t.
     Proof.
       move=> j t SCHED.
       rewrite mem_filter; apply/andP; split.
@@ -163,18 +163,6 @@ Section ScheduledJobs.
     Proof.
       move=> j t.
       by rewrite scheduled_jobs_at_uni scheduled_job_at_scheduled_at.
-    Qed.
-
-    (** Then [scheduled_job_at t] is correct: it yields some job [j] if and only
-        if [j] is scheduled at time [t]. *)
-    Corollary scheduled_job_at_iff :
-      forall j t,
-        scheduled_job_at arr_seq sched t = Some j <-> scheduled_at sched j t.
-    Proof.
-      move=> j t; rewrite -scheduled_jobs_at_iff /scheduled_job_at.
-      have := scheduled_jobs_at_seq1 t.
-      case: scheduled_jobs_at => [//|j' [|//]] _ /=.
-      by rewrite in_cons in_nil orbF; split => [[]->|/eqP ->].
     Qed.
 
     (** Conversely, if [scheduled_job_at t] returns [None], then no job is

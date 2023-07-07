@@ -49,7 +49,7 @@ Section PreemptionTimes.
     case SCHED: (scheduled_job_at _ _  0) => [j|//].
     have ARR: arrives_in arr_seq j.
     { apply: H_jobs_come_from_arrival_sequence.
-      rewrite -(scheduled_job_at_iff arr_seq) //; exact: SCHED. }
+      rewrite -(scheduled_job_at_scheduled_at arr_seq) //; exact/eqP/SCHED. }
     rewrite /service /service_during big_geq //.
     by move: (H_valid_preemption_model j ARR) => [PP _].
   Qed.
@@ -63,7 +63,7 @@ Section PreemptionTimes.
       preemption_time arr_seq sched prt.+1.
   Proof.
     move=> s pt ARR NSCHED SCHED.
-    move: (SCHED); rewrite /preemption_time -(scheduled_job_at_iff arr_seq) // => ->.
+    move: (SCHED); rewrite /preemption_time -(scheduled_job_at_scheduled_at arr_seq) // => /eqP ->.
     by move: (H_valid_preemption_model s ARR) => [_ [_ [_ P]]]; apply P.
   Qed.
 

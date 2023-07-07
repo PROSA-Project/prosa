@@ -435,7 +435,7 @@ Section PriorityInversionIsBounded.
               scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) (t1 + fpt);
               first exact: idle_time_is_pt.
             have [EQ|NEQ] := (eqVneq jlp j').
-            { move: (SCHED'); rewrite -(scheduled_job_at_iff arr_seq) // -EQ /preemption_time => ->.
+            { move: (SCHED'); rewrite -(scheduled_job_at_scheduled_at arr_seq) // -EQ /preemption_time => /eqP ->.
               rewrite  /service -(service_during_cat _ _ _ t1); last first.
               { by apply/andP; split; last rewrite leq_addr. }
               have ->: service_during sched jlp t1 (t1 + fpt) = fpt => //.

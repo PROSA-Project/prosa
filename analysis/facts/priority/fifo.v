@@ -204,7 +204,7 @@ Section BasicLemmas.
   Proof.
     move => j t; apply /negP => /andP [/andP [SCHED1 NCOMPL] SCHED2].
     case SJA: (scheduled_job_at arr_seq sched t) => [j'|].
-    { move: SJA; rewrite scheduled_job_at_iff // => SCHED'.
+    { move: SJA => /eqP; rewrite scheduled_job_at_scheduled_at // => SCHED'.
       have: ~~ hep_job j j'.
       { apply: H_no_superfluous_preemptions; last exact: SCHED'.
         by repeat (apply /andP ; split). }

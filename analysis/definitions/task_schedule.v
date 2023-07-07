@@ -1,14 +1,11 @@
 Require Export prosa.model.task.concept.
+Require Export prosa.analysis.definitions.service.
 Require Export prosa.model.schedule.scheduled.
 
-(** Due to historical reasons this file defines the notion of a schedule of a
-    task for (arbitrary) uni-processor models. This is not a fundamental
-    limitation and the notion can be further generalized to multiprocessor
-    models. *)
-
-(** * Schedule of task *)
-(** In this section we define properties of the schedule of a task. *)
-Section ScheduleOfTask.
+(** * Schedule and Service of task *)
+(** In this section we define properties of the schedule and service
+    of a task. *)
+Section ScheduleAndServiceOfTask.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
@@ -20,32 +17,48 @@ Section ScheduleOfTask.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-    (** Consider any arrival sequence of such jobs. *)
+  (** Consider any arrival sequence of such jobs. *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** Let [sched] be any kind of uniprocessor schedule *)
+  (** Let [sched] be any kind of schedule *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
 
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** Next we define whether a task is scheduled at time [t], ... *)
+  (** We define a set of jobs of task [tsk] that are scheduled at time
+      [t]. *)
+  Definition scheduled_jobs_of_task_at (t : instant) :=
+    [seq j <- scheduled_jobs_at arr_seq sched t | job_of_task tsk j].
+
+  (** Next we define whether task [tsk] is scheduled at time [t]. *)
   Definition task_scheduled_at (t : instant) :=
-    if (scheduled_job_at arr_seq sched t) is Some j then
-      job_task j == tsk
-    else false.
+    scheduled_jobs_of_task_at t != [::].
 
-  (** ...which also corresponds to the instantaneous service it receives. *)
-  Definition task_service_at (t : instant) := task_scheduled_at t.
+  (** We define the instantaneous service of [tsk] as the total
+      instantaneous service of all jobs of this task scheduled at time
+      [t]. *)
+  Definition task_service_at (t : instant) :=
+    \sum_(j <- scheduled_jobs_of_task_at t) service_at sched j t.
 
-  (** Based on the notion of instantaneous service, we define the cumulative
-       service received by [tsk] during any interval <<[t1, t2)>>... *)
+  (** Based on the notion of instantaneous service, we define the
+      cumulative service received by [tsk] during any interval <<[t1,
+      t2)>> ... *)
   Definition task_service_during (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) task_service_at t.
 
-  (** ...and the cumulative service received by [tsk] up to time [t2], i.e., in
-       the interval <<[0, t2)>>. *)
+  (** ...and the cumulative service received by [tsk] up to time [t2],
+      i.e., in the interval <<[0, t2)>>. *)
   Definition task_service (t2 : instant) := task_service_during 0 t2.
 
-End ScheduleOfTask.
+  (** Similarly, we define a set of jobs of task [tsk] receiving
+      service at time [t]. *)
+  Definition served_jobs_of_task_at (t : instant) :=
+    [seq j <- scheduled_jobs_of_task_at t | receives_service_at sched j t].
+
+  (** Next, we define whether [tsk] is served at time [t]. *)
+  Definition task_served_at (t : instant) :=
+    served_jobs_of_task_at t != [::].
+
+End ScheduleAndServiceOfTask.

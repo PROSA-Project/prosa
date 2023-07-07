@@ -168,7 +168,7 @@ Section ScheduleClass.
       move=> t.
       case: (scheduled_at_dec arr_seq _ sched _ _ t) => //[[j SCHED]|NS].
       { move: (SCHED); rewrite scheduled_at_def => /eqP ->.
-        by rewrite scheduled_job_at_iff
+        by apply/eqP; rewrite scheduled_job_at_scheduled_at
            ; auto using ideal_proc_model_is_a_uniprocessor_model. }
       { move: (NS); rewrite -scheduled_job_at_none; eauto => NONE.
         case SCHED: (sched t) => [j|]; last by rewrite NONE.

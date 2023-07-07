@@ -300,8 +300,8 @@ Section JLFPInstantiation.
         Lemma task_interference_eq_false :
           ~ task_interference arr_seq sched j t.
         Proof.
-          move => /andP [+ _]; rewrite /non_self/task_scheduled_at.
-          move: H_j'_sched; rewrite -scheduled_job_at_iff // => ->.
+          move => /andP [+ _]; rewrite /non_self /task_scheduled_at.
+          rewrite task_served_eq_task_scheduled //=; erewrite job_of_scheduled_task => //.
           move: H_j_tsk  H_j'_tsk; rewrite /job_of_task => /eqP -> /eqP ->.
           by rewrite eq_refl.
         Qed.
@@ -352,8 +352,9 @@ Section JLFPInstantiation.
         Lemma sched_athep_implies_task_interference :
           task_interference arr_seq sched j t.
         Proof.
-          apply/andP; split.
-          - apply: job_of_task_scheduled_implies_task_scheduled' => //.
+          apply/andP; split. 
+          - rewrite /non_self task_served_eq_task_scheduled => //.
+            apply: job_of_other_task_scheduled => //.
             by move: H_j_tsk => /eqP -> .
           - apply/orP; right.
             apply/hasP; exists j'.
@@ -478,10 +479,9 @@ Section JLFPInstantiation.
         move: OH => /orP [/orP [OH11 | OH22] | OH2].
         + exact/uni_priority_inversion_P.
         + exfalso; apply: TNSCHED.
-          move: SCHED.
-          rewrite /task_scheduled_at scheduled_job_at_def => //.
-          rewrite scheduled_at_def => /eqP ->.
-          by move: OH22; rewrite negbK => /eqP ->.
+          apply: (job_of_task_scheduled _ _ _ _ _ _ _ jt) => //.
+          move: OH22; rewrite negbK => /eqP EQ.
+          by rewrite /job_of_task EQ.
         + exfalso; move: OH2 => /negP OH2; apply: OH2.
           by rewrite /receives_service_at service_at_is_scheduled_at lt0b.
     Qed.
@@ -519,7 +519,7 @@ Section JLFPInstantiation.
       { rewrite (interference_ahep_equiv_ahep _ _ _ SCHEDs).
         rewrite (interference_athep_equiv_athep _ _ _ SCHEDs) => //.
         rewrite (priority_inversion_equiv_sched_lower_priority _ _ _ _ _ _ _ _ _ SCHEDs) => //.
-        rewrite (job_scheduled_implies_task_scheduled_eq_job_task _ _ _ _ _ _ _ _ _ SCHEDs) => //.
+        rewrite task_served_eq_task_scheduled // (job_of_scheduled_task _ _ _ _ _ _ _ _ _ SCHEDs) => //.
         rewrite /another_hep_job /another_task_hep_job.
         have [EQj|NEQj] := eqVneq s j.
         { by subst; rewrite /job_of_task eq_refl H_priority_is_reflexive. }
@@ -599,7 +599,7 @@ Section JLFPInstantiation.
           with higher or equal priority. *)
       Lemma cumulative_pred_eq_service (P : pred Job) :
         (forall j', P j' -> hep_job j' j) ->
-          \sum_(t1 <= t' < t) has P (served_at arr_seq sched t')
+          \sum_(t1 <= t' < t) has P (served_jobs_at arr_seq sched t')
           = service_of_jobs sched P (arrivals_between arr_seq t1 t) t1 t.
       Proof.
         move=> Phep; clear H_job_of_tsk.

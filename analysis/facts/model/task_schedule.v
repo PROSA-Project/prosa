@@ -31,46 +31,123 @@ Section TaskSchedule.
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
+  (** First, we show that a task is served at time [t], then the task
+      is scheduled at time [t]. *)
+  Lemma task_served_task_scheduled :
+    forall t,
+      task_served_at arr_seq sched tsk t ->
+      task_scheduled_at arr_seq sched tsk t.
+  Proof.
+    move => t; apply contra => /eqP SCHED.
+    by rewrite /served_jobs_of_task_at SCHED.
+  Qed.
+
+  (** Next, we show that, under ideal-progress assumption, the notion
+      of task served coincides with the notion of task scheduled. *)
+  Lemma task_served_eq_task_scheduled :
+    ideal_progress_proc_model PState ->
+    forall t,
+      task_served_at arr_seq sched tsk t = task_scheduled_at arr_seq sched tsk t.
+  Proof.
+    move=> IDEAL t; apply/idP/idP; first by move => SERV; apply task_served_task_scheduled.
+    rewrite /task_scheduled_at -has_filter => /hasP [j SCHED TSK].
+    rewrite -[task_served_at _ _ _ _]has_filter; apply/hasP; exists j.
+    - by rewrite mem_filter; apply/andP; split.
+    - by apply IDEAL; rewrite scheduled_jobs_at_iff in SCHED.
+  Qed.
+
   (** We note that if the processor is idle at time [t], then no task
       is scheduled. *)
-  Lemma idle_implies_no_task_scheduled :
+  Lemma no_task_scheduled_when_idle :
     forall t,
       is_idle arr_seq sched t ->
       ~~ task_scheduled_at arr_seq sched tsk t.
-  Proof. by move=> t; rewrite is_idle_iff /task_scheduled_at => /eqP ->. Qed.
+  Proof.
+    move=> t IDLE.
+    rewrite -[task_scheduled_at _ _ _ _]has_filter.
+    rewrite -all_predC.
+    apply/allP => j SCHED; exfalso.
+    rewrite scheduled_jobs_at_iff in SCHED => //.
+    eapply not_scheduled_when_idle in IDLE => //.
+    exact: (negP IDLE).
+  Qed.
+
+  (** Similarly, if the processor is idle at time [t], then no task is
+      served. *)
+  Lemma no_task_served_when_idle :
+    forall t,
+      is_idle arr_seq sched t ->
+      ~~ task_served_at arr_seq sched tsk t.
+  Proof.
+    move=> t IDLE.
+    apply no_task_scheduled_when_idle in IDLE.
+    by move: IDLE; apply contra, task_served_task_scheduled.
+  Qed.
 
   (** We show that if a job is scheduled at time [t], then
       [task_scheduled_at tsk t] is equal to [job_of_task tsk j]. In
       other words, any occurrence of [task_scheduled_at] can be
       replaced with [job_of_task]. *)
-  Lemma job_scheduled_implies_task_scheduled_eq_job_task :
+  Lemma job_of_scheduled_task :
     forall j t,
       scheduled_at sched j t ->
       task_scheduled_at arr_seq sched tsk t = job_of_task tsk j.
   Proof.
-    by move=> j t; rewrite -(scheduled_job_at_iff arr_seq) // /task_scheduled_at => ->.
+    move=> j t.
+    rewrite -(scheduled_jobs_at_scheduled_at arr_seq) //.
+    rewrite /task_scheduled_at /scheduled_jobs_of_task_at => /eqP -> //=.
+    by case: (job_of_task _ _).
   Qed.
 
   (** As a corollary, we show that if a job of task [tsk] is scheduled
       at time [t], then task [tsk] is scheduled at time [t]. *)
-  Corollary job_of_task_scheduled_implies_task_scheduled :
+  Corollary job_of_task_scheduled :
     forall j t,
       job_of_task tsk j ->
       scheduled_at sched j t ->
       task_scheduled_at arr_seq sched tsk t.
   Proof.
-    by move=> j t TSK SCHED; rewrite (job_scheduled_implies_task_scheduled_eq_job_task j) => //.
+    by move=> j t TSK SCHED; rewrite (job_of_scheduled_task j) => //.
   Qed.
 
   (** And vice versa, if no job of task [tsk] is scheduled at time
       [t], then task [tsk] is not scheduled at time [t]. *)
-  Corollary job_of_task_scheduled_implies_task_scheduled':
+  Corollary job_of_other_task_scheduled :
     forall j t,
       ~~ job_of_task tsk j ->
       scheduled_at sched j t ->
       ~~ task_scheduled_at arr_seq sched tsk t.
   Proof.
-    by move=> j t TSK SCHED; rewrite (job_scheduled_implies_task_scheduled_eq_job_task j) => //.
+    by move=> j t TSK SCHED; rewrite (job_of_scheduled_task j) => //.
+  Qed.
+
+  (** Similarly, we show that if no job of task [tsk] is scheduled at
+      time [t], then task [tsk] is not served at time [t]. *)
+  Corollary job_of_other_task_scheduled' :
+    forall j t,
+      ~~ job_of_task tsk j ->
+      scheduled_at sched j t ->
+      ~~ task_served_at arr_seq sched tsk t.
+  Proof.
+    move=> j t TSK SCHED.
+    apply: (contra (task_served_task_scheduled _)).
+    exact: job_of_other_task_scheduled.
+  Qed.
+
+  (** Lastly, if a job of task [tsk] is scheduled at time [t] but
+      receives no service, then task [tsk] is not served at time
+      [t]. *)
+  Corollary job_of_task_not_served :
+    forall j t,
+      scheduled_at sched j t ->
+      job_of_task tsk j ->
+      service_at sched j t = 0 ->
+      ~~ task_served_at arr_seq sched tsk t.
+  Proof.
+    move=> j t.
+    rewrite -(scheduled_jobs_at_scheduled_at arr_seq) //.
+    rewrite /task_scheduled_at /task_served_at /served_jobs_of_task_at /scheduled_jobs_of_task_at => /eqP -> //= -> //=.
+    by rewrite /receives_service_at => ->.
   Qed.
 
 End TaskSchedule.
