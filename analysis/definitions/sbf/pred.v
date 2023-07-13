@@ -48,13 +48,19 @@ Section PredSupplyBoundFunctions.
     SBF 0 = 0
     /\ pred_sbf_respected SBF.
 
+  (** An SBF is monotone iff for any [δ1] and [δ2] such that [δ1 <=
+      δ2], [SBF δ1 <= SBF δ2]. *)
+  Definition sbf_is_monotone (SBF : duration -> work) :=
+    monotone leq SBF.
+
   (** In the context of unit-supply processor models, it is known that
       the amount of supply provided by the processor is bounded by [1]
       at any time instant. Hence, we can consider a restricted notion
       of SBF, where the bound can only increase by at most [1] at each
       time instant. *)
   Definition unit_supply_bound_function (SBF : duration -> work) :=
-    forall δ, SBF δ.+1 <= (SBF δ).+1.
+    forall (δ : duration),
+      SBF δ.+1 <= (SBF δ).+1.
 
   (** Next, suppose we are given an SBF characterizing the schedule. *)
   Context {SBF : SupplyBoundFunction}.
