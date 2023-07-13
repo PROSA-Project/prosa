@@ -4,6 +4,7 @@ Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.tactics.
+Require Export prosa.analysis.definitions.workload.bounded.
 
 (** * Facts about Request Bound Functions (RBFs) *)
 
@@ -64,10 +65,10 @@ Section ProofWorkloadBound.
     workload_of_jobs (job_of_task tsk) (arrivals_between arr_seq t1 t2).
 
   (** Finally, let us define some local names for clarity. *)
-  Let task_rbf := task_request_bound_function tsk.
+  Let rbf := task_request_bound_function.
   Let total_rbf := total_request_bound_function ts.
-  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
-
+  Let total_hep_rbf := total_hep_request_bound_function_FP ts.
+  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts.
 
   (** In this section, we prove that the workload of all jobs is
       no larger than the request bound function. *)
@@ -100,7 +101,7 @@ Section ProofWorkloadBound.
     (** As a corollary, we prove that workload of task is no larger the than
         task request bound function. *)
     Corollary task_workload_le_task_rbf:
-      task_workload t (t + Δ) <= task_rbf Δ.
+      task_workload t (t + Δ) <= rbf tsk Δ.
     Proof.
       eapply leq_trans; first by apply task_workload_le_num_of_arrivals_times_cost.
       rewrite leq_mul2l; apply/orP; right.
@@ -178,7 +179,7 @@ Section ProofWorkloadBound.
         is no larger than the total request-bound function of
         higher-or-equal priority tasks. *)
     Lemma hep_workload_le_total_hep_rbf :
-      workload_of_hep_jobs arr_seq j t (t + Δ) <= total_hep_rbf Δ.
+      workload_of_hep_jobs arr_seq j t (t + Δ) <= total_hep_rbf tsk Δ.
     Proof.
       rewrite /workload_of_hep_jobs /workload_of_jobs /total_hep_rbf /total_hep_request_bound_function_FP.
       rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
@@ -190,6 +191,21 @@ Section ProofWorkloadBound.
     Qed.
 
   End WorkloadIsBoundedByRBF.
+
+  (** We next prove that the higher-or-equal-priority workload of
+      tasks different from [tsk] is bounded by [total_ohep_rbf]. *)
+  Lemma athep_workload_le_total_ohep_rbf :
+    athep_workload_is_bounded arr_seq sched tsk (total_ohep_rbf tsk).
+  Proof.
+    move => j t1 Δ TSK _.
+    rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
+    rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
+    set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
+    rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
+            last by move=> j'; rewrite /pred_task; move: TSK => /eqP ->.
+    erewrite (eq_big pred_task) => //.
+    by eapply sum_of_jobs_le_sum_rbf => //.
+  Qed.
 
 End ProofWorkloadBound.
 
@@ -467,4 +483,3 @@ Section FP_RBF_partitioning.
   Qed.
 
 End FP_RBF_partitioning.
-
