@@ -24,6 +24,34 @@ Section SupplyBoundFunctionLemmas.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
+  (** In the following section, we prove a lemma about switching a
+      predicate inside of [valid_pred_sbf]. *)
+  Section SBFChangePred.
+
+    (** Consider an SBF ... *)
+    Context {SBF : SupplyBoundFunction}.
+
+    (** ... and two predicates [P1] and [P2] such that, for any job [j]
+        and a time interval <<[t1, t2)>>, [P2 j t1 t2] implies [P1 j t1 t2]. *)
+    Variables P1 P2 : Job -> instant -> instant -> Prop.
+    Hypothesis H_p2_implies_p1 :
+      forall j t1 t2,
+        arrives_in arr_seq j ->
+        P2 j t1 t2 -> P1 j t1 t2.
+
+    (** Then if [SBF] is a valid SBF w.r.t. predicate [P1], then [SBF]
+        is a valid SBF w.r.t. predicate [P2]. *)
+    Lemma valid_pred_sbf_switch_predicate :
+      valid_pred_sbf arr_seq sched P1 SBF ->
+      valid_pred_sbf arr_seq sched P2 SBF.
+    Proof.
+      move=> VAL; split; first by apply VAL.
+      move=> j t1 t2 ARR P2j t NEQ.
+      by eapply VAL => //.
+    Qed.
+
+  End SBFChangePred.
+
   (** Consider an arbitrary predicate on jobs and time intervals. *)
   Variable P : Job -> instant -> instant -> Prop.
 
