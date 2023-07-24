@@ -22,7 +22,7 @@ Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 (* -------------------------------- MOVE -------------------------------- *)
 (* ---------------------------------------------------------------------- *)
 
-(* TODO: move *) 
+(* TODO: move *)
 Lemma pos_max_implies_exists :
   forall {T : Type} (xs : seq T) (P : pred T) (F : T -> nat),
     0 < \max_(x <- xs | P x) F x ->
@@ -59,32 +59,115 @@ Qed.
     Context `{TaskCost Task}.
 
     Context `{TaskPriority Task}.
-    
+
     Context {Job : JobType}.
     Context `{JobTask Job Task}.
     Context `{JobArrival Job}.
     Context `{JobCost Job}.
 
-    (* TODO: better comment *)
+    (* TODO: comment *)
     Context {Resource : eqType}.
 
     (* *)
     Class JobResources (Job : JobType) :=
       job_needs : Job -> work -> seq Resource.
+
+    Context `{JobResources Job}.
+
+    Definition is_locked (j : Job) (r : Resource) (w : work) :=
+      r \in job_needs j w.
+
+    Definition acquired (j : Job) (r : Resource) (w : work) :=
+      (is_locked j r w) && ((w > 0) ==> ~~ (is_locked j r w.-1)).
+
+    Definition released (j : Job) (r : Resource) (w : work) :=
+      (w > 0) && (is_locked j r w.-1) && ((w < job_cost j) ==> ~~ (is_locked j r w)).
+
+    Definition resources (j : Job) :=
+      undup (flatten [seq (job_needs j w) | w <- iota 0 (job_cost j)]).
+
+    Structure CriticalSection :=
+      build_cs
+        { cs_job : Job
+        ; cs_resource : Resource
+        ; cs_start : work
+        ; cs_end : work
+        }.
+
+    (** To make it compatible with ssreflect, we define a decidable
+        equality for critical section. *)
+    Definition cs_eqdef (cs1 cs2 : CriticalSection) :=
+      (cs_job cs1 == cs_job cs2)
+      && (cs_resource cs1 == cs_resource cs2)
+      && (cs_start cs1 == cs_start cs2)
+      && (cs_end cs1 == cs_end cs2).
+
+    (** Next, we prove that [cs_eqdef] is indeed an equality, ... *)
+    Lemma eqn_cs : Equality.axiom cs_eqdef.
+    Proof.
+      unfold Equality.axiom; intros x y.
+      destruct (cs_eqdef x y) eqn:EQ.
+      { apply ReflectT.
+        move: EQ => /andP [/andP [/andP [/eqP JOB /eqP RES] /eqP ST] /eqP EN].
+        by destruct x, y; simpl in *; subst. }
+      { apply ReflectF.
+        unfold cs_eqdef, not in * => BUG.
+        apply negbT in EQ.
+        repeat rewrite negb_and in EQ.
+        destruct x, y.
+        move: BUG => [JOB RES ST EN].
+        rewrite JOB RES ST EN //= in EQ.
+        by subst; rewrite !eq_refl in EQ.
+      }
+    Defined.
+
+    (** ..., which allows instantiating the canonical structure for [[eqType of CriticalSection]]. *)
+    Canonical cs_eqMixin := EqMixin eqn_cs.
+    Canonical cs_eqType := Eval hnf in EqType CriticalSection cs_eqMixin.
+
+    Definition job_critical_sections (j : Job) :=
+      let all_combinations :=
+        allpairs pair (resources j) (allpairs pair (iota 0 (job_cost j)) (iota 0 (job_cost j).+1)) in
+      let is_correct '(r, (t1, t2)) :=
+        (acquired j r t1) && (released j r t2) && (all (is_locked j r) (index_iota t1 t2)) in
+      let filtered :=
+        filter is_correct all_combinations in
+      map (fun '(r, (t1, t2)) => build_cs j r t1 t2) filtered.
+
+
+  End Locks.
+
+  Section Tests.
+
+    Context {Task : TaskType}.
+
+    Context {Job : JobType}.
+    Context `{JobTask Job Task}.
+    Context `{JobArrival Job}.
+
+    #[global,program] Instance JobCost : JobCost Job := fun _ => 3.
+    Let Resource := [eqType of nat].
+
+    Variable j : Job.
     
+    
+    #[global,program] Instance JobResources2 : @JobResources Resource Job :=
+      fun _ w =>
+        match w with
+        | 0 => [::0]
+        | 1 => [::0; 1]
+        | 2 => [::0; 1]
+        | _ => [::]
+        end.
+
+    Compute (job_critical_sections j).
+    (* ==> [:: {| cs_job := j; cs_resource := 0; cs_start := 0; cs_end := 3 |};
+              {| cs_job := j; cs_resource := 1; cs_start := 1; cs_end := 3 |}]
+     *)
+
 
 
     
-    Context {CriticalSection: eqType}.
-
-    (* To each job we assign a set of critical sections. *)
-    Variable job_critical_sections: Job -> seq CriticalSection.
-    
-    (* Given some critical sections *)
-    Variable cs_start: CriticalSection -> instant.
-    Variable cs_end: CriticalSection -> instant.
-    Variable cs_resource: CriticalSection -> Resource.
-
     #[local] Existing Instance NumericFPAscending.
     #[local] Existing Instance fully_preemptive_job_model.
     #[local] Existing Instance fully_preemptive_task_model.
@@ -301,7 +384,7 @@ Qed.
            equal to the maximun between job priority and current priority ceiling of the job. *)
         Definition current_priority (j: Job) (t: instant): nat :=
           maxn (job_prio j) (current_priority_ceiling j t).
-        
+
         (* Next, we describe hypotheses for the current model. 
            We say that an FP policy is respected by the schedule iff a scheduled task has 
            higher (or same) current priority than any backlogged job. *)
@@ -320,7 +403,6 @@ Qed.
     (** In this section we prove ... *)
     Section Analysis.
 
-      
       (* TODO: comment *)
       Section Reflect.
 
