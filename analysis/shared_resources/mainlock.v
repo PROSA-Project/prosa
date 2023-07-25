@@ -1,4 +1,3 @@
-
 (* TODO: optimize imports *)
 Require Export prosa.util.all.
 Require Export prosa.analysis.facts.model.rbf.
@@ -42,21 +41,15 @@ Proof.
   { by apply IHxs. }
 Qed.
 
-
-
 (* ---------------------------------------------------------------------- *)
 (* -------------------------------- MAIN -------------------------------- *)
 (* ---------------------------------------------------------------------- *)
 
-
 (* ----------------------------- Definitions ---------------------------- *)
-
-
-  (** TODO: name *)
-  Section Locks.
+Section Definitions.
 
     Context {Task : TaskType}.
-    Context `{TaskCost Task}.
+    (* Context `{TaskCost Task}. *)
 
     Context `{TaskPriority Task}.
 
@@ -64,15 +57,38 @@ Qed.
     Context `{JobTask Job Task}.
     Context `{JobArrival Job}.
     Context `{JobCost Job}.
+    Context {jr : JobReady Job (ideal.processor_state Job)}.
+
+    #[local] Existing Instance NumericFPAscending.
+    Let job_prio j := task_priority (job_task j).
+
+    (* Consider any arrival sequence. *)
+    Variable arr_seq: arrival_sequence Job.
+
+    (* TODO: comment *)
+    Variable sched : schedule (ideal.processor_state Job).
+
+    (* --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- *)
+
+    (* TODO: comment *)
+    Class JobResources (Job : JobType) (Resource : eqType) :=
+      job_needs : Job -> work -> seq Resource.
+
+    (* TODO: comment *)
+    Class TaskResources (Task : TaskType) (Resource : eqType) :=
+      task_needs : Task -> seq Resource.
 
     (* TODO: comment *)
     Context {Resource : eqType}.
+    Context `{JobResources Job Resource}.
+    Context `{TaskResources Task Resource}.
 
-    (* *)
-    Class JobResources (Job : JobType) :=
-      job_needs : Job -> work -> seq Resource.
+    (** Let [rs] be a set of all available resources. *)
+    Variable rs : seq Resource.
 
-    Context `{JobResources Job}.
+    (** Consider a task set [ts]. *)
+    Variable ts : seq Task.
+
 
     Definition is_locked (j : Job) (r : Resource) (w : work) :=
       r \in job_needs j w.
@@ -119,55 +135,192 @@ Qed.
         rewrite JOB RES ST EN //= in EQ.
         by subst; rewrite !eq_refl in EQ.
       }
-    Defined.
+    Qed.
 
-    (** ..., which allows instantiating the canonical structure for [[eqType of CriticalSection]]. *)
+    (** ..., which allows instantiating the canonical structure for
+        [[eqType of CriticalSection]]. *)
     Canonical cs_eqMixin := EqMixin eqn_cs.
     Canonical cs_eqType := Eval hnf in EqType CriticalSection cs_eqMixin.
 
-    Definition job_critical_sections (j : Job) :=
-      let all_combinations :=
-        allpairs pair (resources j) (allpairs pair (iota 0 (job_cost j)) (iota 0 (job_cost j).+1)) in
-      let is_correct '(r, (t1, t2)) :=
-        (acquired j r t1) && (released j r t2) && (all (is_locked j r) (index_iota t1 t2)) in
-      let filtered :=
-        filter is_correct all_combinations in
-      map (fun '(r, (t1, t2)) => build_cs j r t1 t2) filtered.
 
 
-  End Locks.
 
-  Section Tests.
+
+    (* TODO: comment *)
+    Section CriticalSectionDefinitions.
+
+      (** We define a function that maps a job [j] to the sequence of
+          [j]'s critical sections. *)
+      Definition job_critical_sections (j : Job) : seq CriticalSection :=
+        let all_combinations :=
+          allpairs pair (resources j) (allpairs pair (iota 0 (job_cost j)) (iota 0 (job_cost j).+1)) in
+        let is_correct '(r, (t1, t2)) :=
+          (acquired j r t1) && (released j r t2) && (all (is_locked j r) (index_iota t1 t2)) in
+        let filtered :=
+          filter is_correct all_combinations in
+        map (fun '(r, (t1, t2)) => build_cs j r t1 t2) filtered.
+
+      (* We define a predicate which says if task tsk uses a resource r. *)
+      Definition task_uses_resource (tsk: Task) (r: Resource) := r \in task_needs tsk.
+
+      (* TODO: check comment *)
+      (* We say that job j locks a critical section r at time t, if
+           job j was scheduled at time t, and service of j at time t
+           is equal to lock time of the critical section r. *)
+      Definition cs_is_locked_at (j : Job) (cs : CriticalSection) (t : instant) :=
+        (scheduled_at sched j t) && (service sched j t == cs_start cs).
+
+      (* TODO: check comment *)
+      (* We say that a critical section res remains locked by a job j at a time t if there 
+           is a time moment lock_time < t in which the critical section was locked by j 
+           and the critical section is still not unlocked. *)
+      Definition section_remains_locked_at (j: Job) (cs: CriticalSection) (t: instant) :=
+        exists lock_time,
+          lock_time < t
+          /\ cs_is_locked_at j cs lock_time
+          /\ cs_start cs <= service sched j t < cs_end cs.
+
+      (* TODO: check comment *)
+      (* We also introduce a computable version of section_remains_locked_at notion. *)
+      Definition section_remains_locked_at_comp (j : Job) (cs : CriticalSection) (t : instant) :=
+        has (fun lock_time =>
+               (cs_is_locked_at j cs lock_time) && (cs_start cs <= service sched j t <  cs_end cs))
+            (iota 0 t).
+
+      (* TODO: check comment *)
+      (* Next we introduce the notion of being locked for a resource. We say that the 
+           resource r is locked by a job j at a time t, if there is a critical section 
+           which contains resource r and (is??) locked at time t.  *)
+      Definition remains_locked_at (j: Job) (r: Resource) (t: instant) :=
+        exists cs: CriticalSection,
+          (cs \in job_critical_sections j) /\
+            (cs_resource cs = r) /\
+            section_remains_locked_at j cs t.
+
+      (* TODO: check comment *)
+      (* We also introduce a computable version of remains_locked_at notion. *)
+      Definition remains_locked_at_comp (j: Job) (r: Resource) (t: instant) :=
+        has (fun css => section_remains_locked_at_comp j css t && (cs_resource css == r)) (job_critical_sections j).
+
+      (* TODO: move *)
+      (* TODO: comment *)
+      Definition have_nonempty_intersection segment1 segment2 :=
+        let '(x1, x2) := segment1 in
+        let '(y1, y2) := segment2 in
+        (exists t, x1 <= t < x2 /\ y1 <= t < y2).
+
+      (* We can deduce the length of the critical section *)
+      Definition cs_length (cs: CriticalSection) :=
+        cs_end cs - cs_start cs.
+
+
+      (* We define if two critical sections do overlap *)
+      Definition cs_overlap (cs1 cs2: CriticalSection) :=
+        (cs_start cs1 <= cs_start cs2 < cs_end cs1) \/ (cs_start cs2 <= cs_start cs1 < cs_end cs2).
+
+      (* A section [cs1] is said to be a subsection of [cs2] if
+           the interval of [cs1] is fully contained into the interval of [cs2].
+           every section is a subsection of itself *)
+      Definition cs_subsection (cs1 cs2: CriticalSection) :=
+        (cs_start cs2 <= cs_start cs1) /\ (cs_end cs1 <= cs_end cs2).
+
+      (* Two sections are nested if one of them is a subsection of the other *)
+      Definition cs_nested (cs1 cs2: CriticalSection) :=
+        cs_subsection cs1 cs2 \/ cs_subsection cs2 cs1.
+
+      (* TODO: check comment *)
+      (* First, we say that critical sections are properly formed if any section is not
+           empty and has been closed before the completion of the job. *)
+      Definition critical_sections_are_properly_formed :=
+        forall j cs,
+          (cs \in job_critical_sections j) ->
+          cs_start cs < cs_end cs <= job_cost j.
+
+      (* TODO: check comment *)
+      (* Also, we can assume that the length of every critical section of some job is 
+           bounded by some constant B. *)
+      Definition critical_sections_are_bounded (j: Job) (B: instant) :=
+        forall cs, cs \in job_critical_sections j -> cs_length cs <= B.
+
+      (* TODO: check comment *)
+      (* Further, we assume that a job cannot lock the same resource 
+           twice (without previously releasing it). *)
+      Definition only_one_critical_section_of_any_resource :=
+        forall j cs1 cs2,
+          (cs_resource cs1 = cs_resource cs2) ->
+          (cs1 \in job_critical_sections j) ->
+          (cs2 \in job_critical_sections j) ->
+          have_nonempty_intersection (cs_start cs1, cs_end cs1) (cs_start cs2, cs_end cs2) ->
+          cs1 = cs2.
+
+      (* TODO: check comment *)
+      (* Finally, we assume that critical sections are properly nested. *)
+      Definition critical_sections_are_properly_nested := 
+        forall j cs1 cs2,
+          (cs1 \in job_critical_sections j) ->
+          (cs2 \in job_critical_sections j) ->
+          have_nonempty_intersection (cs_start cs1, cs_end cs1) (cs_start cs2, cs_end cs2) ->
+          cs_nested cs1 cs2.
+
+    End CriticalSectionDefinitions.
+
+    (* TODO: comment *)
+    Section PCPDefinitions.
+
+      (* We assign a priority to each resource, we call it priority_ceiling. The priority of a 
+           resource is equal to the maximum priority of the task that uses this resource. *) 
+      Definition priority_ceiling (r: Resource): nat :=
+        \max_(tsk <- ts | task_uses_resource tsk r) (task_priority tsk).
+
+      (* We define the current priority ceiling for a job j at time t, which is 
+           equal to the maximum of resource priority that is locked by the job 
+           j at time t. In case when there is no locked resource current 
+           priority ceiling is equal to zero. *)
+      Definition current_priority_ceiling (j: Job) (t: instant): nat :=
+        \max_(r <- rs | (fun r => remains_locked_at_comp j r t) r) (priority_ceiling r).
+
+      (* Finally, we can define current priority for a job j at a moment of time t. It is
+           equal to the maximun between job priority and current priority ceiling of the job. *)
+      Definition current_priority (j: Job) (t: instant): nat :=
+        maxn (job_prio j) (current_priority_ceiling j t).
+
+      (* Next, we describe hypotheses for the current model. 
+           We say that an FP policy is respected by the schedule iff a scheduled task has 
+           higher (or same) current priority than any backlogged job. *)
+      Definition respects_FP_policy_with_resources :=
+        forall j j_hp t,
+          arrives_in arr_seq j ->
+          backlogged sched j t ->
+          scheduled_at sched j_hp t ->
+          current_priority j_hp t >= current_priority j t.
+
+    End PCPDefinitions.
+
+End Definitions.
+
+
+
+
+  (** TODO: name *)
+  Section Locks.
 
     Context {Task : TaskType}.
+    Context `{TaskCost Task}.
+
+    Context `{TaskPriority Task}.
 
     Context {Job : JobType}.
     Context `{JobTask Job Task}.
     Context `{JobArrival Job}.
+    Context `{JobCost Job}.
 
-    #[global,program] Instance JobCost : JobCost Job := fun _ => 3.
-    Let Resource := [eqType of nat].
+    (* TODO: comment *)
+    Context {Resource : eqType}.
 
-    Variable j : Job.
-    
-    
-    #[global,program] Instance JobResources2 : @JobResources Resource Job :=
-      fun _ w =>
-        match w with
-        | 0 => [::0]
-        | 1 => [::0; 1]
-        | 2 => [::0; 1]
-        | _ => [::]
-        end.
+    Context `{JobResources Job Resource}.
 
-    Compute (job_critical_sections j).
-    (* ==> [:: {| cs_job := j; cs_resource := 0; cs_start := 0; cs_end := 3 |};
-              {| cs_job := j; cs_resource := 1; cs_start := 1; cs_end := 3 |}]
-     *)
+    (* Print Instances JobResources. *)
 
-
-
-    
     #[local] Existing Instance NumericFPAscending.
     #[local] Existing Instance fully_preemptive_job_model.
     #[local] Existing Instance fully_preemptive_task_model.
@@ -253,151 +406,6 @@ Qed.
     Let job_backlogged_at := backlogged sched.
 
 
-    (** * Definitions *)
-    (* In this section we ... *)
-    Section Definitions.
-
-      (* TODO: comment *)
-      Section DefinitionsRelatedToCriticalSection.
-
-        (* We define a predicate which says if task tsk uses a resource r. *)
-        Definition task_uses_resource (tsk: Task) (r: Resource) := r \in task_res tsk.
-
-        (* TODO: check comment *)
-        (* We say that job j locks a critical section r at time t, if
-           job j was scheduled at time t, and service of j at time t
-           is equal to lock time of the critical section r. *)
-        Definition locks_at (j: Job) (cs: CriticalSection) (t: instant) :=
-          (job_scheduled_at j t) && (service sched j t == cs_start cs).
-
-        (* TODO: check comment *)
-        (* We say that a critical section res remains locked by a job j at a time t if there 
-           is a time moment lock_time < t in which the critical section was locked by j 
-           and the critical section is still not unlocked. *)
-        Definition section_remains_locked_at (j: Job) (cs: CriticalSection) (t: instant) :=
-          exists lock_time,
-            lock_time < t /\
-            locks_at j cs lock_time /\
-            cs_start cs <= service sched j t < cs_end cs.
-
-        (* TODO: check comment *)
-        (* We also introduce a computable version of section_remains_locked_at notion. *)
-        Definition section_remains_locked_at_comp (j: Job) (cs: CriticalSection) (t: instant) :=
-          has (fun lock_time =>
-                 (locks_at j cs lock_time) && (cs_start cs <= service sched j t <  cs_end cs))
-              (iota 0 t).
-
-        (* TODO: check comment *)
-        (* Next we introduce the notion of being locked for a resource. We say that the 
-           resource r is locked by a job j at a time t, if there is a critical section 
-           which contains resource r and (is??) locked at time t.  *)
-        Definition remains_locked_at (j: Job) (r: Resource) (t: instant) :=
-          exists cs: CriticalSection,
-            (cs \in job_critical_sections j) /\
-            (cs_resource cs = r) /\
-            section_remains_locked_at j cs t.
-
-        (* TODO: check comment *)
-        (* We also introduce a computable version of remains_locked_at notion. *)
-        Definition remains_locked_at_comp (j: Job) (r: Resource) (t: instant) :=
-          has (fun css => section_remains_locked_at_comp j css t && (cs_resource css == r)) (job_critical_sections j).
-
-        (* TODO: move *)
-        (* TODO: comment *)
-        Definition have_nonempty_intersection segment1 segment2 :=
-          let '(x1, x2) := segment1 in
-          let '(y1, y2) := segment2 in
-          (exists t, x1 <= t < x2 /\ y1 <= t < y2).
-
-        (* We can deduce the length of the critical section *)
-        Definition cs_length (cs: CriticalSection) :=
-          cs_end cs - cs_start cs.
-
-
-        (* We define if two critical sections do overlap *)
-        Definition cs_overlap (cs1 cs2: CriticalSection) :=
-          (cs_start cs1 <= cs_start cs2 < cs_end cs1) \/ (cs_start cs2 <= cs_start cs1 < cs_end cs2).
-
-        (* A section [cs1] is said to be a subsection of [cs2] if
-           the interval of [cs1] is fully contained into the interval of [cs2].
-           every section is a subsection of itself *)
-        Definition cs_subsection (cs1 cs2: CriticalSection) :=
-          (cs_start cs2 <= cs_start cs1) /\ (cs_end cs1 <= cs_end cs2).
-
-        (* Two sections are nested if one of them is a subsection of the other *)
-        Definition cs_nested (cs1 cs2: CriticalSection) :=
-          cs_subsection cs1 cs2 \/ cs_subsection cs2 cs1.
-        
-
-        (* TODO: check comment *)
-        (* First, we say that critical sections are properly formed if any section is not
-           empty and has been closed before the completion of the job. *)
-        Definition critical_sections_are_properly_formed :=
-          forall j cs,
-            (cs \in job_critical_sections j) ->
-            cs_start cs < cs_end cs <= job_cost j.
-
-        (* TODO: check comment *)
-        (* Also, we can assume that the length of every critical section of some job is 
-           bounded by some constant B. *)
-        Definition critical_sections_are_bounded (j: Job) (B: instant) :=
-          forall cs, cs \in job_critical_sections j -> cs_length cs <= B.
-
-        (* TODO: check comment *)
-        (* Further, we assume that a job cannot lock the same resource 
-           twice (without previously releasing it). *)
-        Definition only_one_critical_section_of_any_resource :=
-          forall j cs1 cs2,
-            (cs_resource cs1 = cs_resource cs2) ->
-            (cs1 \in job_critical_sections j) ->
-            (cs2 \in job_critical_sections j) ->
-            have_nonempty_intersection (cs_start cs1, cs_end cs1) (cs_start cs2, cs_end cs2) ->
-            cs1 = cs2.
-
-        (* TODO: check comment *)
-        (* Finally, we assume that critical sections are properly nested. *)
-        Definition critical_sections_are_properly_nested := 
-          forall j cs1 cs2,
-            (cs1 \in job_critical_sections j) ->
-            (cs2 \in job_critical_sections j) ->
-            have_nonempty_intersection (cs_start cs1, cs_end cs1) (cs_start cs2, cs_end cs2) ->
-            cs_nested cs1 cs2.
-
-      End DefinitionsRelatedToCriticalSection.
-
-      (* TODO: comment *)
-      Section DefinitionsRelatedToPCPAlgorithm.
-
-        (* We assign a priority to each resource, we call it priority_ceiling. The priority of a 
-           resource is equal to the maximum priority of the task that uses this resource. *) 
-        Definition priority_ceiling (r: Resource): nat :=
-          \max_(tsk <- ts | task_uses_resource tsk r) (task_priority tsk).
-
-        (* We define the current priority ceiling for a job j at time t, which is 
-           equal to the maximum of resource priority that is locked by the job 
-           j at time t. In case when there is no locked resource current 
-           priority ceiling is equal to zero. *)
-        Definition current_priority_ceiling (j: Job) (t: instant): nat :=
-          \max_(r <- rs | (fun r => remains_locked_at_comp j r t) r) (priority_ceiling r).
-
-        (* Finally, we can define current priority for a job j at a moment of time t. It is
-           equal to the maximun between job priority and current priority ceiling of the job. *)
-        Definition current_priority (j: Job) (t: instant): nat :=
-          maxn (job_prio j) (current_priority_ceiling j t).
-
-        (* Next, we describe hypotheses for the current model. 
-           We say that an FP policy is respected by the schedule iff a scheduled task has 
-           higher (or same) current priority than any backlogged job. *)
-        Definition respects_FP_policy_with_resources :=
-          forall j j_hp t,
-            arrives_in arr_seq j ->
-            backlogged sched j t ->
-            scheduled_at sched j_hp t ->
-            current_priority j_hp t >= current_priority j t.
-
-      End DefinitionsRelatedToPCPAlgorithm.
-
-    End Definitions.
 
     (** * RTA for the model *)
     (** In this section we prove ... *)
@@ -408,12 +416,12 @@ Qed.
 
         (* TODO: comment *)
         Lemma section_remains_locked_atP:
-          forall j cs t,
-            reflect (section_remains_locked_at j cs t)
-                    (section_remains_locked_at_comp j cs t).
+          forall (j : Job) (cs : CriticalSection) t,
+            reflect (section_remains_locked_at sched j cs t)
+                    (section_remains_locked_at_comp (Resource := Resource) sched j cs t).
         Proof.
           intros; apply: (iffP idP) => LOCK.
-          { move: LOCK => /hasP [lt IN /andP [H5 H6]].
+          { move: LOCK => /hasP [lt IN /andP [T5 T6]].
             exists lt; repeat split; try done.
             by move: IN; rewrite mem_iota add0n; move => /andP [_ H7].
           }
@@ -427,8 +435,10 @@ Qed.
 
         (* TODO: comment *)
         Lemma remains_locked_atP:
-          forall j res t,
-            reflect (remains_locked_at j res t) (remains_locked_at_comp j res t).
+          forall (j : Job) (res : Resource) (t : instant),
+            reflect
+              (remains_locked_at sched j res t)
+              (remains_locked_at_comp sched j res t).
         Proof.
           intros; apply: (iffP idP) => LOCK.
           { move: LOCK => /hasP [cs IN /andP [SEC /eqP RES]].
@@ -448,11 +458,10 @@ Qed.
 
       Section SectionName1.
 
-
         Hypothesis H_respects_policy: respects_FP_policy_with_resources.
-        
+
         (* TODO: move? *)
-        (* TODO: *) 
+        (* TODO: *)
         Lemma lemma17:
           forall j1 j2 t,
             arrives_in arr_seq j2 ->
@@ -1286,8 +1295,8 @@ Qed.
           Lemma earlier_resource_locks_earlier:
             forall cs1 cs2 t1 t2,
               cs_start cs1 <= cs_start cs2 ->
-              locks_at j cs1 t1 ->
-              locks_at j cs2 t2 ->
+              cs_is_locked_at j cs1 t1 ->
+              cs_is_locked_at j cs2 t2 ->
               t1 <= t2.
           Proof.
             intros ? ? ? ? NEQ LOCK1 LOCK2.
@@ -1390,7 +1399,7 @@ Qed.
               { by rewrite addn0 in LOCK2; apply cannot_be_locked_twice_in_row_induction_base with (t := t1). }
               { apply: IHk.
                 { intros; apply ICS.
-                  move: H5 => /andP [T1 T2].
+                  move: H6 => /andP [T1 T2].
                   apply/andP; split; first by done.
                   apply ltn_trans with (t1 + k); first by done.
                     by rewrite addnS. }
@@ -1423,7 +1432,7 @@ Qed.
             - feed (T t1); first by rewrite addn0; apply/andP; split.
               move: T => [r HLB].
               exists r; intros.
-                by move: H5; rewrite addn0 -eqn_leq; move => /eqP H5; subst t.
+                by move: H6; rewrite addn0 -eqn_leq; move => /eqP H6; subst t.
             - feed IHk.
               { move => t /andP [T1 T2].
                 apply T; apply/andP; split; first by done.
@@ -1511,10 +1520,10 @@ Qed.
                 exists ltl.
 
                 have NEQ: ltl < t.
-                { apply leq_trans with t1; last by move: H5 => /andP [T1 T2].
+                { apply leq_trans with t1; last by move: H6 => /andP [T1 T2].
                   move: (LOCKro t1) => L. feed L.
                   { apply/andP; split; first by done.
-                    move: H5 => /andP [T1 T2]. by rewrite leq_addr.
+                    move: H6 => /andP [T1 T2]. by rewrite leq_addr.
                   }
                   
                   move: L => [cs3 [IN3 [RES3 LOCK3]]].
@@ -1524,7 +1533,7 @@ Qed.
                   { by rewrite leq_addr //. }
                   { by rewrite RESo RES3. }
                   { intros; rewrite RES3; apply LOCKro.
-                    move: H6 => /andP [T1 T2]; apply ltnW in T2.
+                    move: H7 => /andP [T1 T2]; apply ltnW in T2.
                       by apply/andP; split.
                   }
                   subst cs3.
@@ -1541,7 +1550,7 @@ Qed.
                 apply/andP; split.
                 rewrite -SERVl. by apply service_monotonic, ltnW.
                 apply leq_ltn_trans with (service sched j (t1 + k.+1)).
-                apply service_monotonic; move: H5 => /andP [T1 T2]; by done.
+                apply service_monotonic; move: H6 => /andP [T1 T2]; by done.
                   by move: H2l => /andP [T1 T2].
               }
           Qed.
@@ -1604,7 +1613,7 @@ Qed.
               induction k.
               - by rewrite addn0 in LOCK.
               - apply IHk.
-                intros. apply NSCHED. move: H5 => /andP [T1 T2]; apply/andP; split. by done.
+                intros. apply NSCHED. move: H6 => /andP [T1 T2]; apply/andP; split. by done.
                 apply ltn_trans with (t + k). by done. by rewrite addnS.  clear IHk.
                 apply lemma24; last by rewrite -addnS.
                 apply NSCHED. apply/andP; split. by rewrite leq_addr. by rewrite addnS.
@@ -1677,7 +1686,7 @@ Qed.
               feed_n 7 CL; try done.
               { by rewrite RES1 RES2. }
               { intros; rewrite RES1; apply PR4.
-                move: H5 => /andP [T1 T2]; apply/andP; split. by done. by apply ltnW. }
+                move: H6 => /andP [T1 T2]; apply/andP; split. by done. by apply ltnW. }
               
               rewrite -CL in LOCK2.
               move: LOCK1 => [_ [_ [_ SERl]]].
@@ -1827,3 +1836,38 @@ Qed.
 
   (* ==> Closed under the global context *)
   Print Assumptions uniprocessor_response_time_bound.
+
+  
+
+
+  
+  Section Tests.
+
+    Context {Task : TaskType}.
+
+    Context {Job : JobType}.
+    Context `{JobTask Job Task}.
+    Context `{JobArrival Job}.
+
+    #[global,program] Instance JobCost : JobCost Job := fun _ => 3.
+    Let Resource := [eqType of nat].
+
+    Variable j : Job.
+    
+    
+    #[global,program] Instance JobResources2 : @JobResources Resource Job :=
+      fun _ w =>
+        match w with
+        | 0 => [::0]
+        | 1 => [::0; 1]
+        | 2 => [::0; 1]
+        | _ => [::]
+        end.
+    
+
+    Compute (job_critical_sections j).
+    (* ==> [:: {| cs_job := j; cs_resource := 0; cs_start := 0; cs_end := 3 |};
+              {| cs_job := j; cs_resource := 1; cs_start := 1; cs_end := 3 |}]
+     *)
+
+  End Tests.
