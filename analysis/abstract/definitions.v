@@ -102,6 +102,22 @@ Section AbstractRTADefinitions.
   Definition cumulative_interfering_workload j t1 t2 :=
     \sum_(t1 <= t < t2) interfering_workload j t.
 
+  (** Next, we introduce a notion of absence of speculative
+      execution. This notion is _not_ directly related to Abstract
+      RTA, but it is useful when proving the existence of bounded busy
+      intervals.
+
+      We say that the functions [Interference] and
+      [InterferingWorkload] do not allow speculative execution if the
+      cumulative interference never exceeds the cumulative interfering
+      workload. Intuitively, one can interpret this definition as
+      stating that it is not allowed to perform work before it is
+      known whether it is actually needed (i.e., before the work
+      appears as actual workload). *)
+  Definition no_speculative_execution :=
+    forall j t,
+      cumulative_interference j 0 t <= cumulative_interfering_workload j 0 t.
+
   (** Definition of Busy Interval *)
   (** Further analysis will be based on the notion of a busy
       interval. The overall idea of the busy interval is to take into
