@@ -150,6 +150,14 @@ Section CompletionFacts.
       completed_by sched j t -> ~~ scheduled_at sched j t.
   Proof. move=> ? /negPn; exact/contra/scheduled_implies_not_completed. Qed.
 
+  (** Job [j] cannot be pending before and at time [0]. *)
+  Remark not_pending_earlier_and_at_0 :
+    ~~ pending_earlier_and_at sched j 0.
+  Proof.
+    rewrite /pending_earlier_and_at negb_and; apply/orP; left.
+    by rewrite /arrived_before -ltnNge.
+  Qed.
+
 End CompletionFacts.
 
 (** In this section, we establish some facts that are really about service,
