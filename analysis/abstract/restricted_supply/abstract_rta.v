@@ -87,10 +87,10 @@ Section AbstractRTARestrictedSupply.
 
   (** Consider a valid, unit supply-bound function [SBF]. That is,
       (1) [SBF 0 = 0], (2) for any duration [Δ], the supply produced
-      during a time interval of length [Δ] is at least [SBF Δ], and
+      during a busy interval of length [Δ] is at least [SBF Δ], and
       (3) [SBF] makes steps of at most one. *)
   Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_supply_bound_function sched.
+  Hypothesis H_valid_SBF : valid_busy_sbf sched.
   Hypothesis H_unit_SBF : unit_supply_bound_function.
 
   (** Next, we assume that [intra_IBF] is a bound on the
@@ -203,7 +203,7 @@ Section AbstractRTARestrictedSupply.
         <= (Δ - SBF Δ) + cumul_intra_interference sched j t1 (t1 + Δ).
       Proof.
         rewrite -blackout_plus_local_is_interference_cumul leq_add2r.
-        by apply blackout_during_bound => //.
+        by apply: blackout_during_bound => //.
       Qed.
 
       (** Next, consider a duration [F] such that [F <= Δ] and job [j]
@@ -307,7 +307,8 @@ Section AbstractRTARestrictedSupply.
         rewrite (@addnC (_ - _) _) -addnA subnKC; last by apply complement_SBF_monotone.
         rewrite -/(cumulative_interference _ _ _).
         erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY. 
-        rewrite addnC leq_add //; last by apply blackout_during_bound.
+        rewrite addnC leq_add //; last first.
+        { by eapply blackout_during_bound; try apply BUSY; eauto. }
         rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
         rewrite -!/(cumul_intra_interference _ _ _ _).
         rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].
