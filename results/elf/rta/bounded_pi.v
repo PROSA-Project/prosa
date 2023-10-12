@@ -510,7 +510,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
       by rewrite /completed_by /completed_by ZERO.
     - rewrite -/(cumul_task_interference _ _ _ _ _).
-      rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=.
+      rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _ )) //=.
       rewrite /IBF_other -addnA.
       apply: leq_add;
         first by apply: cumulative_priority_inversion_is_bounded priority_inversion_is_bounded =>//.

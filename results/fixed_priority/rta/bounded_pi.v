@@ -239,7 +239,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in NCOMPL. }
       rewrite -/(cumul_task_interference _ _ _ _ _).
-      rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=.
+      rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
       rewrite /IBF_other leq_add//.
       { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ)); first by done.
         apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2);

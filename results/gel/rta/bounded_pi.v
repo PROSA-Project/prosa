@@ -235,7 +235,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
         by rewrite /completed_by /completed_by ZERO.
       - rewrite -/(cumul_task_interference _ _ _ _ _).
-        rewrite (cumulative_task_interference_split _ _ _ _ _ _ tsk) //=; last by exact: GEL_implies_sequential_tasks.
+        rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
         rewrite /I leq_add //.
         + exact: cumulative_priority_inversion_is_bounded.
         + eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.

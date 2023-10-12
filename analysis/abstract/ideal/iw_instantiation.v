@@ -54,10 +54,6 @@ Section JLFPInstantiation.
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** Assume we have sequential tasks, i.e., jobs of the same task
-      execute in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
-
   (** We also assume that the policy respects sequential tasks,
       meaning that later-arrived jobs of a task don't have higher
       priority than earlier-arrived jobs of the same task. *)
@@ -486,25 +482,24 @@ Section JLFPInstantiation.
           by rewrite /receives_service_at service_at_is_scheduled_at lt0b.
     Qed.
 
-    (** Let [j] be any job of task [tsk], and let [upper_bound] be any
-        time instant after job [j]'s arrival. Then for any time
-        interval lying before [upper_bound], the cumulative
-        interference received by [tsk] is equal to the sum of the
+    (** Let [j] be any job of task [tsk]. Then the cumulative task
+        interference received by job [j] is bounded to the sum of the
         cumulative priority inversion of job [j] and the cumulative
-        interference incurred by task [tsk] due to other tasks. *)
+        interference incurred by job [j] due to higher-or-equal
+        priority jobs from other tasks. *)
     Lemma cumulative_task_interference_split :
       forall j t1 t2,
         arrives_in arr_seq j ->
         job_of_task tsk j ->
         ~~ completed_by sched j t2 ->
-        cumul_task_interference arr_seq sched j t1 t2 =
-          cumulative_priority_inversion arr_seq sched j t1 t2
+        cumul_task_interference arr_seq sched j t1 t2
+        <= cumulative_priority_inversion arr_seq sched j t1 t2
           + cumulative_another_task_hep_job_interference arr_seq sched j t1 t2.
     Proof.
       move=> j t1 R ARR TSK NCOMPL.
       rewrite /cumul_task_interference /cumul_cond_interference.
-      rewrite -big_split //= big_seq_cond [RHS]big_seq_cond.
-      apply eq_bigr; move => t /andP [IN _].
+      rewrite -big_split //= big_seq_cond [leqRHS]big_seq_cond.
+      apply leq_sum; move => t /andP [IN _].
       rewrite /cond_interference /non_self /interference /ideal_jlfp_interference.
       have [IDLE|[s SCHEDs]] := ideal_proc_model_sched_case_analysis sched t.
       { move: (IDLE) => IIDLE; erewrite <-is_idle_def in IDLE => //.
@@ -525,13 +520,7 @@ Section JLFPInstantiation.
         { by subst; rewrite /job_of_task eq_refl H_priority_is_reflexive. }
         have [/eqP EQt|NEQt] := eqVneq (job_task s) (job_task j).
         { apply/eqP; move: (EQt) => /eqP <-.
-          rewrite /job_of_task eq_refl //= andbF addn0 eq_sym eqb0; apply/negP => LPs.
-          have ARRj': job_arrival j < job_arrival s
-            by move: LPs; rewrite ltnNge; apply contra, H_JLFP_respects_sequential_tasks; rewrite EQt.
-          eapply H_sequential_tasks in ARRj' => //; last by rewrite /same_task eq_sym.
-          apply ARRj' in SCHEDs; clear ARRj'; move: NCOMPL => /negP NCOMPL; apply: NCOMPL.
-          apply completion_monotonic with t => //.
-          by move: IN; rewrite mem_iota; clear; lia. }
+          by rewrite /job_of_task eq_refl //= andbF addn0 eq_sym eqb0; apply/negP => LPs. }
         { by rewrite /job_of_task NEQt //= andbT; case: hep_job. }
       }
     Qed.
