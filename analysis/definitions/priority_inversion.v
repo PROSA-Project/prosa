@@ -31,10 +31,12 @@ Section PriorityInversion.
   Variable j : Job.
 
   (** We say that the job incurs priority inversion if it has higher
-      priority than the scheduled job. Note that this definition
-      implicitly assumes that the scheduler is
-      work-conserving. Therefore, it cannot be applied to models with
-      jitter or self-suspensions. *)
+      priority than the scheduled job. Note that this definition is
+      oblivious to whether job [j] is ready. Therefore, it may not
+      apply as intuitively expected in models with jitter or
+      self-suspensions. Further generalization of the concept is
+      likely necessary to efficiently analyze models in which jobs may
+      be pending without being ready. *)
   Definition priority_inversion (t : instant) :=
     (j \notin scheduled_jobs_at arr_seq sched t)
     && has (fun jlp => ~~ hep_job jlp j) (scheduled_jobs_at arr_seq sched t).
