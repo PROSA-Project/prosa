@@ -1,4 +1,3 @@
-From mathcomp Require Import eqtype ssrnat seq path fintype bigop.
 Require Export prosa.util.int.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.model.priority.gel.

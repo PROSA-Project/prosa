@@ -1,4 +1,3 @@
-From mathcomp Require Import div.
 Require Export prosa.model.schedule.tdma.
 Require Import prosa.util.all.
 

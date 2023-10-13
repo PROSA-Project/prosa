@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-
 Require Export prosa.model.schedule.scheduled.
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.model.aggregate.service_of_jobs.

@@ -96,7 +96,7 @@ Exception to this rule: ssreflect and other standard library imports.
 3. As an important exception to the prior rule, do not re-export modules that contain type class instance definitions. Prosa uses type class instances to express key modeling choices; such assumptions should be made explicitly.
 4. Always require external libraries first, i.e., *before* stating any Prosa-internal dependencies. This way, an addition in external libraries
 cannot shadow a definition in Prosa. For example, require `mathcomp` modules before any modules in the `prosa` namespace.
-
+5. Do not import `mathcomp` modules outside of  the `util/all.v` file. The file `util/tactics.v` redefined the behavior of the `done` tactic; hence, it must be imported after the `mathcomp` modules.
 
 ## Stating Lemmas and Theorems
 

@@ -1,4 +1,3 @@
-From mathcomp Require Import all_ssreflect.
 Require Export prosa.behavior.all.
 
 (** In the following, we define a processor state that includes the possibility

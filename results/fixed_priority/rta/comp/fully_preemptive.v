@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
-
 Require Export prosa.util.fixpoint.
 Require Export prosa.results.fixed_priority.rta.fully_preemptive.
 

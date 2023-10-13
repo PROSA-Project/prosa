@@ -1,5 +1,3 @@
-From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
-
 Require Export prosa.behavior.all.
 Require Import prosa.util.nat.
 

@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
-
 Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.readiness.basic.

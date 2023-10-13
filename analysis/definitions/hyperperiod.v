@@ -1,4 +1,3 @@
-From mathcomp Require Import div.
 Require Export prosa.model.task.arrival.periodic.
 Require Export prosa.util.lcmseq.
 

@@ -1,4 +1,3 @@
-From mathcomp Require Import div.
 Require Export prosa.model.task.concept.
 Require Export prosa.util.seqset.
 Require Export prosa.util.rel.

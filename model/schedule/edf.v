@@ -1,4 +1,3 @@
-From mathcomp Require Import ssrnat ssrbool fintype.
 Require Export prosa.behavior.all.
 
 (** * Fully-Preemptive EDF Schedules *)

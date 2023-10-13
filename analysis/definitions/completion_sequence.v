@@ -1,4 +1,3 @@
-From mathcomp Require Export ssreflect seq ssrnat ssrbool eqtype.
 Require Import prosa.behavior.service.
 
 (** This module contains basic definitions and properties of job

@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
-
 Require Import prosa.model.readiness.basic.
 Require Import prosa.model.priority.fifo.
 Require Import prosa.analysis.facts.priority.fifo.

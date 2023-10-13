@@ -1,4 +1,3 @@
-From mathcomp Require Import ssrnat ssrbool fintype.
 Require Import prosa.model.readiness.basic.
 Require Export prosa.model.schedule.edf.
 Require Export prosa.analysis.definitions.schedulability.

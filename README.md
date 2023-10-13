@@ -40,6 +40,16 @@ Furthermore, there are a couple of additional folders and modules.
 - [`util`](util/): A collection of miscellaneous "helper" lemmas and tactics. Used throughout the rest of Prosa.
 - [`scripts/`](scripts/): Scripts and supporting resources required for continuous integration and documentation generation.
 
+
+## Side-effects
+
+Importing Prosa changes the behavior of ssreflect's `done` tactic by adding basic lemmas about real-time systems.
+
+```
+Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
+```
+
+
 ## Installation
 
 ### With the OCaml Package Manager (`opam`)

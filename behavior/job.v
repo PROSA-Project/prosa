@@ -1,4 +1,4 @@
-From mathcomp Require Export eqtype ssrnat.
+Require Export prosa.util.all.
 Require Export prosa.behavior.time.
 
 (** * Notion of a Job Type *)

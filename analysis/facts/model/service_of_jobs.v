@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.behavior.completion.
@@ -270,7 +268,7 @@ Section UnitServiceModelLemmas.
           [by left |right]; apply negbT in EQU; rewrite leqNgt. }
       move: (F1 t_compl t1) => /orP [LT | GT].
       - rewrite /service_of_jobs /service_during in EQ.
-        rewrite exchange_big big_geq //= in EQ; last by rewrite ltnW.
+        rewrite exchange_big big_geq //= in EQ.
         rewrite /workload_of_jobs in EQ.
         rewrite (big_rem j) ?Pj //= in EQ.
         move: EQ => /eqP; rewrite addn_eq0; move => /andP [CZ _].

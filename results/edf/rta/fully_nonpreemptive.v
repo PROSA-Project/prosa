@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
-
 Require Import prosa.model.readiness.basic.
 Require Export prosa.results.edf.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.task.nonpreemptive.

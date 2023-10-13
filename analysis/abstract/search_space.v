@@ -1,4 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
 Require Import prosa.util.epsilon.
 Require Import prosa.util.tactics.
 Require Import prosa.model.task.concept.

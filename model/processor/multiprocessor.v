@@ -1,4 +1,3 @@
-From mathcomp Require Export fintype.
 Require Export prosa.behavior.all.
 Require Import prosa.analysis.facts.behavior.service.
 

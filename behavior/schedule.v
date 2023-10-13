@@ -1,4 +1,3 @@
-From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
 Require Export prosa.behavior.arrival_sequence.
 
 (** * Generic Processor State Interface *)

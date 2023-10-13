@@ -1,4 +1,3 @@
-From mathcomp Require Import eqtype ssrnat seq path fintype bigop.
 Require Import prosa.util.int.
 Require Import prosa.model.readiness.basic.
 Require Import prosa.analysis.abstract.ideal.cumulative_bounds.

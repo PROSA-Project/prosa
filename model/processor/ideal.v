@@ -1,4 +1,3 @@
-From mathcomp Require Import all_ssreflect.
 Require Export prosa.behavior.all.
 
 (** * The Ideal Uniprocessor Model *)

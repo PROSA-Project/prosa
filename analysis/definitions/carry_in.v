@@ -1,4 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 Require Export prosa.model.priority.classes.
 
 (** * No Carry-In *)

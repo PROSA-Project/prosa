@@ -1,4 +1,3 @@
-From mathcomp Require Export ssreflect ssrbool eqtype ssrnat div seq path fintype bigop.
 Require Export prosa.behavior.time.
 Require Export prosa.util.all.
 

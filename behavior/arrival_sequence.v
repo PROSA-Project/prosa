@@ -1,4 +1,3 @@
-From mathcomp Require Export ssreflect seq ssrnat ssrbool bigop eqtype ssrfun.
 Require Export prosa.behavior.job.
 Require Export prosa.util.notation.
 

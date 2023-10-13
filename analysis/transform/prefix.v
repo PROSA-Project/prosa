@@ -1,4 +1,3 @@
-From mathcomp Require Import ssrnat ssrbool fintype.
 Require Export prosa.analysis.facts.behavior.all.
 
 (** This file provides an operation that transforms a finite prefix of

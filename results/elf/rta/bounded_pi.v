@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop ssrZ.
-
 Require Import prosa.util.int.
 Require Export prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Export prosa.analysis.facts.priority.elf.

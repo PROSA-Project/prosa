@@ -1,5 +1,3 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-
 Require Export prosa.model.schedule.work_conserving.
 Require Import prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.model.ideal.schedule.
