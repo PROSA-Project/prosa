@@ -70,7 +70,7 @@ Section InterferenceProperties.
     have: forall a b, ~~ (a && b) -> (a || b) = a + b :> nat by case; case.
     apply; apply/negP => /andP[/hasP[j' + hp] /hasP[j'' + ep]].
     rewrite !mem_filter => /andP[sj' _] /andP[sj'' _].
-    move: hp ep; have ->: j'' = j' by exact: recv_service_impl_same_job.
+    move: hp ep; have ->: j'' = j' by exact: only_one_job_receives_service_at_uni.
     move=> /andP[_ /andP[_ +]] /andP[/andP[_ +] _].
     by rewrite hep_hp_ep_task negb_or ep_task_sym => /andP[_ /negbTE].
   Qed.

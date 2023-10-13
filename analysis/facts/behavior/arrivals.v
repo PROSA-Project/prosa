@@ -487,7 +487,6 @@ Section ScheduledImpliesArrives.
   (** ... where jobs do not execute before their arrival. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
 
-
   (** Next, consider a job [j] ... *)
   Variable j : Job.
 
@@ -509,7 +508,7 @@ Section ScheduledImpliesArrives.
     by apply: H_jobs_must_arrive_to_execute H_scheduled_at.
   Qed.
 
-  (** Finally, for any future time [t'], job [j] arrives before [t']. *)
+  (** For any future time [t'], job [j] arrives before [t']. *)
   Lemma arrivals_before_scheduled_at :
     forall t',
       t < t' ->
@@ -519,6 +518,15 @@ Section ScheduledImpliesArrives.
     apply: arrived_between_implies_in_arrivals => //.
     apply: leq_ltn_trans LTtt'.
     by apply: arrived_between_jobs_must_arrive_to_execute.
+  Qed.
+
+  (** Similarly, job [j] arrives up to time [t'] for any [t'] such that [t <= t']. *)
+  Lemma arrivals_up_to_scheduled_at :
+    forall t',
+      t <= t' ->
+      j \in arrivals_up_to arr_seq t'.
+  Proof.
+    by move=> t' LEtt'; apply arrivals_before_scheduled_at; lia.
   Qed.
 
 End ScheduledImpliesArrives.

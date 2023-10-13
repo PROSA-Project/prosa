@@ -1,8 +1,9 @@
 Require Export prosa.util.all.
 Require Export prosa.behavior.all.
-Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.definitions.schedule_prefix.
-Require Export prosa.model.task.concept.
+Require Export prosa.analysis.facts.behavior.supply.
+Require Export prosa.analysis.facts.model.scheduled.
+
 
 (** * Service *)
 
@@ -223,6 +224,45 @@ Section UnitService.
   End ServiceIsUnitGrowthFunction.
 
 End UnitService.
+
+(** In this section we prove a lemma about the service received by a
+    job in a fully-consuming processor schedule. *)
+Section FullyConsumingProcessor.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+
+  (** ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+  Context `{JobTask Job Task}.
+
+  (** Consider any kind of fully-supply-consuming processor state model. *)
+  Context `{PState : ProcessorState Job}.
+  Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
+
+  (** Consider any arrival sequence ... *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** ... and any schedule of this arrival sequence. *)
+  Variable sched : schedule PState.
+
+  (** We show that, given that the processor provides supply at a time
+      instant [t], the fact that a job [j] is scheduled at time [t]
+      implies that the job receives service at time [t]. Intuitively,
+      this lemma states that "inside a supply" the model is equivalent
+      to the ideal uniprocessor model. *)
+  Lemma ideal_progress_inside_supplies :
+    forall j t,
+      has_supply sched t ->
+      scheduled_at sched j t ->
+      receives_service_at sched j t.
+  Proof.
+    by move=> jo to SUP SCHED; rewrite /receives_service_at H_consumed_supply_proc_model //.
+  Qed.
+
+End FullyConsumingProcessor.
 
 (** We establish a basic fact about the monotonicity of service. *)
 Section Monotonicity.
@@ -585,6 +625,131 @@ Section RelationToScheduled.
 
 End RelationToScheduled.
 
+(** In this section we prove a few auxiliary lemmas about the service
+    received by a job. *)
+Section GenericProcessor.
+
+  (** Consider any type of jobs. *)
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** Consider any kind of processor state model. *)
+  Context `{PState : ProcessorState Job}.
+
+  (** Consider any valid arrival sequence with consistent arrivals ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
+  (** ... and any schedule of this arrival sequence ... *)
+  Variable sched : schedule PState.
+  Hypothesis H_jobs_come_from_arrival_sequence :
+    jobs_come_from_arrival_sequence sched arr_seq.
+
+  (** ... where jobs do not execute before their arrival or after
+      completion. *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
+
+  (** If a job [j] receives service at time [t], then [j] is in the
+      set of served jobs at time [t] ... *)
+  Lemma receives_service_and_served_at_consistent :
+    forall j t,
+      receives_service_at sched j t ->
+      j \in served_jobs_at arr_seq sched t.
+  Proof.
+    move=> jo t RSERV; rewrite mem_filter; apply/andP; split => //.
+    apply service_at_implies_scheduled_at in RSERV.
+    by apply: arrivals_before_scheduled_at.
+  Qed.
+
+  (** ... and vice versa, if [j] is in the set of jobs receiving
+      service at time [t], then [j] receives service at time [t]. *)
+  Lemma served_at_and_receives_service_consistent :
+    forall j t,
+      j \in served_jobs_at arr_seq sched t ->
+      receives_service_at sched j t.
+  Proof.
+    by move=> jo t; rewrite mem_filter => /andP [RSERV _].
+  Qed.
+
+  (** If the processor is idle at time [t], then no job receives
+      service at time [t]. *)
+  Lemma no_service_received_when_idle :
+    forall j t,
+      is_idle arr_seq sched t ->
+      ~~ receives_service_at sched j t.
+  Proof.
+    move=> j t IDLE; apply/negP => SERV.
+    eapply not_scheduled_when_idle with (j := j) in IDLE => //.
+    apply service_at_implies_scheduled_at in SERV.
+    by rewrite SERV in IDLE.
+  Qed.
+
+  (** Next, if a job [j] receives service at time [t],
+      then the processor has supply at time [t]. *)
+  Lemma receives_service_implies_has_supply :
+    forall j t,
+      receives_service_at sched j t ->
+      has_supply sched t.
+  Proof.
+    by move=> j SERV; apply: pos_service_impl_pos_supply.
+  Qed.
+
+  (** Similarly, if a job [j] receives service at time [t], then time
+      [t] is not a blackout time. *)
+  Lemma no_blackout_when_service_received :
+    forall j t,
+      receives_service_at sched j t ->
+      ~~ is_blackout sched t.
+  Proof.
+    by move=> j t RSERV; apply pos_service_impl_pos_supply in RSERV; rewrite negbK.
+  Qed.
+
+  (** Finally, if time [t] is a blackout time, then no job receives
+      service at time [t]. *)
+  Lemma no_service_during_blackout :
+    forall j t,
+      is_blackout sched t ->
+      service_at sched j t = 0.
+  Proof.
+    move=> j t BL; apply/eqP; rewrite -leqn0; move_neq_up GE.
+    apply pos_service_impl_pos_supply in GE.
+    by rewrite /is_blackout /has_supply GE in BL.
+  Qed.
+
+End GenericProcessor.
+
+(** In this section we prove a lemma about the service received by a
+    job in a uniprocessor schedule. *)
+Section UniProcessor.
+
+  (** Consider any type of jobs. *)
+  Context {Job : JobType}.
+
+  (** Consider any kind of uniprocessor state model. *)
+  Context `{PState : ProcessorState Job}.
+  Hypothesis H_uniprocessor_proc_model : uniprocessor_model PState.
+
+  (** Consider any schedule. *)
+  Variable sched : schedule PState.
+
+  (** If two jobs [j1] and [j2] receive service at the same instant
+      then [j1] is equal to [j2]. *)
+  Lemma only_one_job_receives_service_at_uni :
+    forall j1 j2 t,
+      receives_service_at sched j1 t ->
+      receives_service_at sched j2 t ->
+      j1 = j2.
+  Proof.
+    move => j1 j2 t SERV1 SERV2.
+    apply service_at_implies_scheduled_at in SERV1.
+    apply service_at_implies_scheduled_at in SERV2.
+    by apply (H_uniprocessor_proc_model j1 j2 sched t).
+  Qed.
+
+End UniProcessor.
+
 (** * Incremental Service in Unit-Service Schedules  *)
 (** In unit-service schedules, any job gains at most one unit of service at any
     time. Hence, no job "skips" an service values, which we note with the lemma
@@ -714,35 +879,8 @@ Section ServiceInTwoSchedules.
 
 End ServiceInTwoSchedules.
 
-(** In this section we prove a lemma on the service received by a job
-    in a uniprocessor schedule. *)
-Section UniProcessor.
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-
-  (**  ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-
-  (** Allow for any uniprocessor model. *)
-  Context {PState : ProcessorState Job}.
-  Hypothesis H_uniproc : uniprocessor_model PState.
-
-  (** Next, consider any schedule of this arrival sequence. *)
-  Variable sched : schedule PState.
-
-  (** We prove that if two jobs [j1] and [j2] receive service at the
-      same instant then [j1] is equal to [j2]. *)
-  Lemma recv_service_impl_same_job :
-    forall j1 j2 t,
-      receives_service_at sched j1 t ->
-      receives_service_at sched j2 t ->
-      j1 = j2.
-  Proof.
-    move => j1 j2 t SERV1 SERV2.
-    apply service_at_implies_scheduled_at in SERV1.
-    apply service_at_implies_scheduled_at in SERV2.
-    by apply (H_uniproc j1 j2 sched t).
-  Qed.
-
-End UniProcessor.
+  (** We add some facts into the "Hint Database" basic_rt_facts, so
+      Coq will be able to apply them automatically where needed. *)
+Global Hint Resolve
+       served_at_and_receives_service_consistent
+  : basic_rt_facts.

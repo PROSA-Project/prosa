@@ -39,10 +39,11 @@ Section BasicFacts.
 
   (** Next, we show that, at any time instant [t], either there is
       some supply available or it is a blackout time. *)
-  Lemma blackout_or_supply_exhaustive :
-    forall t, is_blackout sched t (+) has_supply sched t.
+  Lemma blackout_or_supply :
+    forall t,
+      is_blackout sched t \/ has_supply sched t.
   Proof.
-    by move => t; rewrite /is_blackout; case: has_supply.
+    by rewrite /is_blackout; move=> t; case: (has_supply).
   Qed.
 
 End BasicFacts.
