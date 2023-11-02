@@ -162,7 +162,7 @@ Section NPUniprocessorScheduler.
               schedule_up_to_def /sched_prefix.
       destruct t => //=.
       rewrite -schedule_up_to_def.
-      by apply (schedule_up_to_prefix_inclusion policy).
+      exact: (schedule_up_to_prefix_inclusion policy).
     Qed.
 
     (** Starting from the previous result we show that, at any instant, only
@@ -170,56 +170,24 @@ Section NPUniprocessorScheduler.
     Theorem jobs_must_be_ready:
       jobs_must_be_ready_to_execute schedule.
     Proof.
-      move=> j t SCHED.
-      rewrite scheduled_at_def /schedule /uni_schedule /pmc_uni_schedule
-              /allocation_at /generic_schedule schedule_up_to_def //= in SCHED.
-      destruct (prev_job_nonpreemptive _) eqn:PREV.
-      { destruct t as [|t] => //; rewrite //= in SCHED, PREV.
-        destruct (schedule_up_to) => //.
-        move: PREV => /andP [READY _].
-        move: SCHED=> /eqP SCHED.
-        injection SCHED => EQ; rewrite -> EQ in *.
-        erewrite (H_nonclairvoyant_readiness _ _ j t.+1); [by apply READY| |by done].
-        move=> t' LT.
-        rewrite /schedule /pmc_uni_schedule /generic_schedule //=.
-        rewrite /allocation_at //=.
-        by apply (schedule_up_to_prefix_inclusion policy). }
-      { by apply chosen_job_is_ready. }
+      move=> j t.
+      rewrite scheduled_at_def /schedule/pmc_uni_schedule/allocation_at
+        /generic_schedule schedule_up_to_def.
+      case PREV: prev_job_nonpreemptive;
+        last exact: chosen_job_is_ready.
+      case: t PREV => // t.
+      rewrite /prev_job_nonpreemptive; case: (schedule_up_to) => // {}j /andP [READY _] /eqP[]<-.
+      erewrite (H_nonclairvoyant_readiness _ _ _ t.+1) => // t' LT.
+      exact: schedule_up_to_prefix_inclusion.
     Qed.
 
     (** Finally, we show that the generated schedule is valid. *)
     Theorem np_schedule_valid:
       valid_schedule schedule arr_seq.
     Proof.
-      rewrite /valid_schedule; split; first by apply np_schedule_jobs_from_arrival_sequence.
-      move=> j t; rewrite scheduled_at_def /schedule /pmc_uni_schedule /generic_schedule.
-      elim: t => [/eqP |t'  IH /eqP].
-      { rewrite schedule_up_to_def  /allocation_at  /prev_job_nonpreemptive => IN.
-        move: (H_chooses_from_set _ _ _ IN).
-        rewrite mem_filter /backlogged => /andP [/andP [READY _]  _].
-        now rewrite -(H_nonclairvoyant_job_readiness (empty_schedule idle_state) schedule j 0). }
-      { rewrite schedule_up_to_def  /allocation_at /prev_job_nonpreemptive.
-        have JOB: choose_job t'.+1 (jobs_backlogged_at arr_seq (schedule_up_to policy idle_state  t') t'.+1)
-                  = Some j
-                  -> job_ready schedule j t'.+1.
-        { move=> IN.
-          move: (H_chooses_from_set _ _ _ IN).
-          rewrite mem_filter /backlogged => /andP [/andP [READY _]  _].
-          rewrite -(H_nonclairvoyant_job_readiness (schedule_up_to policy idle_state t') schedule j t'.+1) //.
-          rewrite /identical_prefix /schedule /pmc_uni_schedule /generic_schedule => t'' LT.
-          now rewrite (schedule_up_to_prefix_inclusion _  _  t'' t') //. }
-        case: (schedule_up_to _ _ t' t') => [j' | IN]; last by apply JOB.
-        destruct (job_ready _ _ _ && ~~ job_preemptable j' _) eqn:NP => [EQ|IN]; last by apply JOB.
-        apply H_valid_preemption_behavior.
-        injection EQ => <-.
-        move: NP.
-        have <-: (service (schedule_up_to policy idle_state t') j' t'.+1
-                  = service (fun t : instant => schedule_up_to policy idle_state t t) j' t'.+1) => //.
-        rewrite /service.
-        apply equal_prefix_implies_same_service_during => t /andP [_ BOUND].
-        now rewrite (schedule_up_to_prefix_inclusion _  _ t t').
-        rewrite //=.
-        by move=> /andP [? ?]. }
+      split.
+      - exact: np_schedule_jobs_from_arrival_sequence.
+      - exact: jobs_must_be_ready.
     Qed.
 
   End Validity.
