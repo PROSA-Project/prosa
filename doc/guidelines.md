@@ -16,8 +16,8 @@ This project targets Coq *non*-experts. Accordingly, great emphasis is placed on
 - Use many, mostly short sections. Sections are a great way to structure code and to guide the reader; they serve the reader by establishing a local scope that is easier to remember.
 - Keep definitions and proofs in separate sections, and ideally in different files. This makes the definitions short, and more clearly separates the computation of the actual analysis results from their validity arguments.
 - Make extensive use of the `Hypothesis` feature. Hypotheses are very readable and are accessible even to non-Coq users, especially when paired with self-explanatory names.
-- Consider renaming general concepts with `let` bindings to introduce local names that are more meaningful. 
-- Interleave running commentary *as if you were writing a paper* with the actual definitions and lemmas. This helps greatly with making the spec more accessible to everyone. See [`results.fifo.rta`](../results/fifo/rta.v) for a nice example  of this style.
+- Consider renaming general concepts with `let` bindings to introduce local names that are more meaningful.
+- Interleave running commentary *as if you were writing a paper* with the actual definitions and lemmas. This helps greatly with making the spec more accessible to everyone. See [`results.fifo.rta`](../results/fifo/rta.v) for a nice example of this style.
 - When commenting, be careful not to leave any misspelled words: Prosa's CI system includes a spell-checker that will flag potential errors.
 - When comments have to contain variable names or mathematical notation, use square brackets (e.g. `[job_cost j]`). You can nest square brackets _only if they are balanced_: `[[t1,t2)]` will not work. In this case, use `<<[t1,t2)>>`.
 - The vocabulary of the spell-checker is extended with the words contained in [`scripts/wordlist.pws`](../scripts/wordlist.pws). Add new words only if strictly necessary.
@@ -128,7 +128,12 @@ When writing new proofs, please adhere to the following rules.
 Note: We employ an automatic proof-length checker that runs as part of continuous integration to enforce this.
 2. However, making proofs as concise as possible is a *non-goal*. We are **not** playing [code golf](https://en.wikipedia.org/wiki/Code_golf). If a proof is too long, the right answer is usually **not** to maximally compress it; rather, one should identify semantically meaningful steps that can be factored out and documented as local  "helper" lemmas. Many small steps are good for readability.
 3. Make use of the structured sub-proofs feature (i.e., indentation with `{` and `}`, or bulleted sub-proofs with `-`, `+`, `*`) to structure code.  Please use the bullets in the order `-`, `+`, `*` so that Proof General indents them correctly. You may keep going with `--`, `++`, and `**`.
-4. Make proofs "step-able." This means preferring `.` over `;` (within reason). This makes it easier for novices to learn from existing proofs.
+4. To avoid accidentally overlooking a sub-proof, add the following lines to the top of your file during development:
+```coq
+Set Bullet Behavior "Strict Subproofs".
+Set Default Goal Selector "!".
+```
+5. Make proofs "step-able." This means preferring `.` over `;` (within reason). This makes it easier for novices to learn from existing proofs.
 
 ### Maintainability
 
@@ -238,7 +243,7 @@ Although the primary focus of Prosa is on the quality of the overall structure a
     * `have [SAME|DIFF] := boolP (same_task j j').` — are `j` and `j'` jobs of the same task?
     * `have [SAME|DIFF] := (eqVneq  (job_task j) tsk_o)` — are the task of job `j` and task `tsk_o` the same?
 
-- It can be initially difficult to find lemmas applicable to `int` (in)equalities (e.g., when working with the GEL or ELF policies). The key is to note that `int` is just a particular instance of `ringType` or `numDomainType` and generic lemmas for these algebraic structures do apply (a lot of them are in [`ssralg`](https://math-comp.github.io/htmldoc/mathcomp.algebra.ssralg.html) or [`ssrnum`](https://math-comp.github.io/htmldoc/mathcomp.algebra.ssrnum.html)). To find applicable lemmas with `Search`, make sure to specify the appropriate notation scope `%R`. For example, `Search (_ + _)%R.` will find lemmas about addition that are applicable to `int`. As another example, `Search +%R -%R "K".` will find relevant cancellation lemmas (which by ssreflect convention include the letter "K" in their names). 
+- It can be initially difficult to find lemmas applicable to `int` (in)equalities (e.g., when working with the GEL or ELF policies). The key is to note that `int` is just a particular instance of `ringType` or `numDomainType` and generic lemmas for these algebraic structures do apply (a lot of them are in [`ssralg`](https://math-comp.github.io/htmldoc/mathcomp.algebra.ssralg.html) or [`ssrnum`](https://math-comp.github.io/htmldoc/mathcomp.algebra.ssrnum.html)). To find applicable lemmas with `Search`, make sure to specify the appropriate notation scope `%R`. For example, `Search (_ + _)%R.` will find lemmas about addition that are applicable to `int`. As another example, `Search +%R -%R "K".` will find relevant cancellation lemmas (which by ssreflect convention include the letter "K" in their names).
 
 - Note that `%:R` is *not* a scope delimiter; rather, it's the injection from `nat` to a `ringType` (e.g., typically the integers in our context). For example, `Search (_%:R + _%:R)%R.` will find lemmas about the addition two injected `nat` elements in ring scope.
 
