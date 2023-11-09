@@ -21,5 +21,6 @@ Section LiuAndLaylandReadiness.
   {
     job_ready sched j t := pending sched j t
   }.
+  Next Obligation. by done. Qed.
 
 End LiuAndLaylandReadiness.

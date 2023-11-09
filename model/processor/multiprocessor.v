@@ -52,7 +52,7 @@ Section Schedule.
       [mps] on a given core [cpu] is exactly the supply provided by the
       core-local state [(mps cpu)]. *)
   Definition multiproc_supply_on
-      (mps : multiprocessor_state) (cpu : processor num_cpus)
+    (mps : multiprocessor_state) (cpu : processor num_cpus)
     := supply_in (mps cpu).
 
   (** Next, the service received by a given job [j] in a given
@@ -60,7 +60,7 @@ Section Schedule.
       exactly the service given by [j] in the processor-local state
       [(mps cpu)]. *)
   Definition multiproc_service_on
-      (j : Job) (mps : multiprocessor_state) (cpu : processor num_cpus)
+    (j : Job) (mps : multiprocessor_state) (cpu : processor num_cpus)
     := service_in j (mps cpu).
 
   (** Finally, we connect the above definitions with the generic Prosa
@@ -82,7 +82,7 @@ Section Schedule.
       [mps] is given by the sum of the service received across all individual
       processors of the multiprocessor. *)
   Lemma multiproc_service_in_eq : forall (j : Job) (mps : multiprocessor_state),
-    service_in j mps = \sum_(cpu < num_cpus) service_in j (mps cpu).
+      service_in j mps = \sum_(cpu < num_cpus) service_in j (mps cpu).
   Proof. reflexivity. Qed.
 
 End Schedule.

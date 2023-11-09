@@ -57,7 +57,7 @@ Section State.
       end.
 
   End Service.
-
+  
   (** Finally, we connect the above definitions with the generic Prosa
       interface for abstract processor states. *)
   Program Definition pstate_instance : ProcessorState Job :=
@@ -68,6 +68,6 @@ Section State.
       service_on   := spin_service_on
     |}.
   Next Obligation. by move => j [] // s [] /=; case: eqP. Qed.
-  Next Obligation. by move=> j [] //= j' _ /negbTE ->. Qed.
+  Next Obligation. by move => j [] // s [] /=; case: eqP. Qed.
 
 End State.

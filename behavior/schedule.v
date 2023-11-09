@@ -104,5 +104,3 @@ Definition schedule {Job : JobType} (PState : ProcessorState Job) :=
     [scheduled_on] and [service_on] are defined. Instead,
     proofs must rely on basic lemmas about processor state classes. *)
 Global Opaque scheduled_on service_on.
-
-Obligation Tactic := try done.

@@ -79,5 +79,3 @@ Section ValidSchedule.
      properties are implied by jobs_must_be_ready_to_execute. *)
 
 End ValidSchedule.
-
-Obligation Tactic := try done.

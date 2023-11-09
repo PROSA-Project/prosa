@@ -104,6 +104,13 @@ Ltac rt_eauto := eauto 4 with basic_rt_facts.
 Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
 #[export] Hint Resolve I : basic_rt_facts.  (* ensure the database exists *)
 
+(** Note: [idtac] is a no-op. However, it suppresses the default obligation tactic,
+    which uses [intros] to introduce unnamed variables. This is a Coq technicality
+    that a casual reader may safely ignore. It is necessary to avoid triggering one
+    of Prosa's continuous integration checks that validates that no proof scripts
+    depend on automatically generated names.  *)
+#[global] Obligation Tactic := idtac.
+
 (* ************************************************************************** *)
 (** * Handier movement of inequalities. *)
 (* ************************************************************************** *)

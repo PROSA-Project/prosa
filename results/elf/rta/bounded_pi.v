@@ -286,8 +286,8 @@ Section AbstractRTAforELFwithArrivalCurves.
         move=> /andP[HEPj EP]; rewrite -TSK'; apply/andP; split =>//.
         move: HEPj.
         have -> : hep_job j0 j = (@hep_job _ (GEL Job Task) j0 j) by apply: hep_job_elf_gel.
-        rewrite /is_ep_causing_intf ler_subr_addl addrAC ler_subr_addl addr0 -TSK'.
-        apply: le_trans; rewrite ler_add2r ler_nat.
+        rewrite /is_ep_causing_intf lerBrDl addrAC lerBrDl addr0 -TSK'.
+        apply: le_trans; rewrite lerD2r ler_nat.
         apply: job_arrival_between_ge=>//. }}
     { exists t1, t2; split=> [//|]; split=> [//|].
       eapply instantiated_busy_interval_equivalent_busy_interval => //. }

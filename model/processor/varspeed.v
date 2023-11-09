@@ -64,7 +64,7 @@ Section State.
       supply_on    := varspeed_supply_on;
       service_on   := varspeed_service_on
     |}.
-  Next Obligation. by move=> j [] //= s n; case: eqP. Qed.
+  Next Obligation. by move=> j [] //= s ; case: eqP. Qed.
   Next Obligation. by move=> j [] //= j' v _; case: ifP. Qed.
 
 End State.
