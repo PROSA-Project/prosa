@@ -54,7 +54,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
       arrives_in arr_seq j ->
       job_rtct j = ε.
   Proof.
-    move=> j ARRj POSj; unfold ε in *.
+    move=> j ARRj POSj.
     unfold job_rtct.
     rewrite job_last_nps_is_job_cost.
       by rewrite subKn.

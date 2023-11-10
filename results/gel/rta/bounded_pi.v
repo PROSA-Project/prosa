@@ -195,7 +195,7 @@ Section AbstractRTAforGELwithArrivalCurves.
           move: (hep_job_arrives_after_zero _ j' HEP) => GT0.
           move: (hep_job_arrives_before _ j' HEP) => EARLIEST.
           move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
-          move: ARR'; rewrite /interval /ε => LATEST.
+          move: ARR'; rewrite /interval  => LATEST.
           have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk -
                       task_priority_point tsk_o <= (job_arrival j')%:R)%R by lia.
           by move: LATEST'; rewrite -TSK -TSK' => LATEST'; lia.

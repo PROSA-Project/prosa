@@ -37,11 +37,11 @@ Section NonPathologicalCurve.
     max_arrivals tsk ε > 0.
   Proof.
     move: (H_arrives) => [t ARR].
-    move: (H_curve_is_valid t t.+1) => VALID.
-    have -> : ε = t.+1 - t by rewrite /ε; lia.
-    apply: leq_trans; last by apply VALID.
+    move: (H_curve_is_valid t t.+1 ltac:(by done)).
+    rewrite -addn1 -addnBAC // addnBl_leq // => VALID.
+    apply: (leq_trans _ VALID).
     rewrite /number_of_task_arrivals size_of_task_arrivals_between.
-    rewrite big_ltn // big_geq // addn0.
+    rewrite big_ltn addn1 // big_geq // addn0.
     rewrite /task_arrivals_at size_filter //= -has_count.
     by apply /hasP; exists j.
   Qed.

@@ -2,8 +2,8 @@ Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.model.task.preemption.parameters.
 
-(** * Run-to-Completion Threshold *) 
-(** In this section, we provide a few basic properties 
+(** * Run-to-Completion Threshold *)
+(** In this section, we provide a few basic properties
     of run-to-completion-threshold-compliant schedules. *)
 Section RunToCompletionThreshold.
 
@@ -32,15 +32,15 @@ Section RunToCompletionThreshold.
   (** Consider an arbitrary job j from the arrival sequence. *)
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
-  
-  (** First we prove a few auxiliary lemmas about 
+
+  (** First we prove a few auxiliary lemmas about
       [job_preemption_points]. *)
   Section AuxiliaryLemmas.
-    
+
     (** We prove that the sequence of preemption points of a zero-cost
         job consists of one element -- 0. *)
     Lemma preemption_points_of_zero_cost_job:
-      job_cost j = 0 -> 
+      job_cost j = 0 ->
       job_preemption_points j = [::0].
     Proof.
       intros ZERO.
@@ -52,7 +52,7 @@ Section RunToCompletionThreshold.
 
     (** For a positive-cost job, 0 ... *)
     Lemma zero_in_preemption_points:
-      0 < job_cost j -> 
+      0 < job_cost j ->
       0 \in job_preemption_points j.
     Proof.
       intros POS.
@@ -61,10 +61,10 @@ Section RunToCompletionThreshold.
       unfold job_cannot_become_nonpreemptive_before_execution in *.
       by rewrite index_iota_lt_step//= A1 in_cons eq_refl.
     Qed.
-    
+
     (** ... and [job_cost] are in preemption points. *)
     Lemma job_cost_in_preemption_points:
-      0 < job_cost j -> 
+      0 < job_cost j ->
       job_cost j \in job_preemption_points j.
     Proof.
       intros POS.
@@ -79,7 +79,7 @@ Section RunToCompletionThreshold.
     (** Therefore, for a positive-cost job size of the sequence of
         preemption points is at least two. *)
     Lemma size_of_preemption_points:
-      0 < job_cost j -> 
+      0 < job_cost j ->
       2 <= size (job_preemption_points j).
     Proof.
       intros POS.
@@ -109,12 +109,12 @@ Section RunToCompletionThreshold.
       erewrite last0_filter.
       + by apply/eqP; apply eq_refl.
       + unfold range, index_iota; rewrite subn0 -addn1.
-          by rewrite iotaD; destruct (iota 0 (job_cost j)). 
+          by rewrite iotaD; destruct (iota 0 (job_cost j)).
       + unfold range, index_iota; rewrite subn0 -addn1.
-          by rewrite iotaD last0_cat //. 
+          by rewrite iotaD last0_cat //.
       + by apply A2.
     Qed.
-    
+
     (** Last non-preemptive segment of a positive-cost job has positive length. *)
     Lemma job_last_nonpreemptive_segment_positive:
       job_cost_positive j ->
@@ -129,7 +129,7 @@ Section RunToCompletionThreshold.
         - apply size_of_preemption_points; eauto.
         - rewrite ltnW //; apply size_of_preemption_points; eauto.
       }
-      apply iota_is_increasing_sequence; apply/andP; split. 
+      apply iota_is_increasing_sequence; apply/andP; split.
       - rewrite -(leq_add2r 2) !addn2.
         rewrite prednK//.
         rewrite -(leq_add2r 1) !addn1.
@@ -149,9 +149,9 @@ Section RunToCompletionThreshold.
       intros COST.
       eapply leq_trans.
       - by apply job_last_nonpreemptive_segment_positive.
-      - by apply last_of_seq_le_max_of_seq.        
+      - by apply last_of_seq_le_max_of_seq.
     Qed.
-    
+
     (** Next we show that max nonpreemptive segment is at most the
       cost of a job. *)
     Lemma job_max_nonpreemptive_segment_le_job_cost:
@@ -170,8 +170,8 @@ Section RunToCompletionThreshold.
         apply last_is_max_in_nondecreasing_seq; first by apply preemption_points_nondecreasing.
         apply max0_in_seq.
         have LL := size_of_preemption_points POSt.
-          by destruct (job_preemption_points j). 
-      } 
+          by destruct (job_preemption_points j).
+      }
     Qed.
 
     (** We also show that last nonpreemptive segment is at most the
@@ -194,23 +194,23 @@ Section RunToCompletionThreshold.
     job_cost_positive j ->
     0 < job_rtct j.
   Proof.
-    intros COST; unfold job_rtct, ε.
+    intros COST; unfold job_rtct.
     have N1 := job_last_nonpreemptive_segment_positive COST.
     have N2 := job_last_nonpreemptive_segment_le_job_cost.
     lia.
   Qed.
-  
+
   (** Next we show that the run-to-completion threshold is at most
         the cost of a job. *)
   Lemma job_run_to_completion_threshold_le_job_cost:
     job_rtct j <= job_cost j.
   Proof. by apply leq_subr. Qed.
 
-  
-  (** We prove that a job cannot be preempted 
+
+  (** We prove that a job cannot be preempted
         during execution of the last segment. *)
   Lemma job_cannot_be_preempted_within_last_segment:
-    forall (ρ : duration), 
+    forall (ρ : duration),
       job_rtct j <= ρ < job_cost j ->
       ~~ job_preemptable j ρ.
   Proof.
@@ -218,7 +218,7 @@ Section RunToCompletionThreshold.
     apply/negP; intros C.
     have POS : 0 < job_cost j; first by lia.
     rewrite /job_rtct subnBA in GE; last by apply job_last_nonpreemptive_segment_positive.
-    rewrite -addnBAC in GE; [rewrite addn1 in GE | by apply job_last_nonpreemptive_segment_le_job_cost]. 
+    rewrite -addnBAC in GE; [rewrite addn1 in GE | by apply job_last_nonpreemptive_segment_le_job_cost].
     rewrite job_cost_is_last_element_of_preemption_points in LT, GE.
     rewrite last_seq_minus_last_distance_seq in GE; last by apply preemption_points_nondecreasing.
     have EQ := antidensity_of_nondecreasing_seq.
@@ -235,12 +235,12 @@ Section RunToCompletionThreshold.
     eapply leq_trans; first by apply ltnW; exact LT.
     by rewrite job_cost_is_last_element_of_preemption_points.
   Qed.
-  
-  (** In order to get a consistent schedule, the scheduler should respect 
-         the notion of run-to-completion threshold. We assume that, after 
+
+  (** In order to get a consistent schedule, the scheduler should respect
+         the notion of run-to-completion threshold. We assume that, after
          a job reaches its run-to-completion threshold, it cannot be preempted
          until its completion. *)
-  Lemma job_nonpreemptive_after_run_to_completion_threshold: 
+  Lemma job_nonpreemptive_after_run_to_completion_threshold:
     forall t t',
       t <= t' ->
       job_rtct j <= service sched j t ->
@@ -256,6 +256,6 @@ Section RunToCompletionThreshold.
 
 End RunToCompletionThreshold.
 
-(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq 
-    will be able to apply them automatically. *)   
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
+    will be able to apply them automatically. *)
 Global Hint Resolve job_run_to_completion_threshold_le_job_cost : basic_rt_facts.

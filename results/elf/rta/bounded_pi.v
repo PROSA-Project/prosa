@@ -427,7 +427,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         rewrite /hep_jobs_from /hep_job /ELF.
         rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
         apply/contraT => /negPn /andP [/andP [/orP[/andP [_ /negP+]|/andP [_ HEP]] /andP [_ _]] /eqP TSKo] //.
-        move: ARR'; rewrite /ep_task_intf_interval /ε -TSKo.
+        move: ARR'; rewrite /ep_task_intf_interval  -TSKo.
         move: H_job_of_task => /eqP <-.
         move: HEP; rewrite /hep_job /GEL /job_priority_point.
         by clear; lia.

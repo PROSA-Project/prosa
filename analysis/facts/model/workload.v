@@ -220,7 +220,7 @@ Section WorkloadFacts.
       apply job_in_arrivals_between; eauto.
       - by eapply in_arrivals_implies_arrived; eauto 2.
       - apply in_arrivals_implies_arrived_between in A; auto; move: A => /andP [A E].
-        by unfold ε; apply/andP; split; lia.
+        by apply/andP; split; lia.
     Qed.
 
   End Subset.

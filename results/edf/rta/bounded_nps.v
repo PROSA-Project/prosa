@@ -185,7 +185,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     exists tsk_o; repeat (apply /andP; split) => //;
       first by apply /eqP => EQ; move: LTeps; rewrite EQ; lia.
     move: NOT; rewrite negb_and => /orP[/negP // |].
-    by move: LTeps; rewrite /ε => LTeps; lia.
+    by lia.
   Qed.
 
   (** With the above setup in place, we can show that the search space defined

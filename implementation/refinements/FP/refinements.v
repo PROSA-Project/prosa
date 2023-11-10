@@ -228,7 +228,7 @@ Proof.
   unfold blocking_bound, blocking_bound_NP_T.
   apply refinesP; eapply refine_foldr_max.
   - by rewrite refinesE; apply Rts.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; unfold ε; tc.
+  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
   - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
 Qed.
 

@@ -96,7 +96,7 @@ Section ArrivalCurvePrefixSortedLeq.
     destruct ac_prefix as [h2 steps]; simpl in LT.
     rewrite [in X in _ < X](sorted_split _ _ fst t) in LT.
     { rewrite [in X in _ ++ X](eq_filter (a2 := fun x => fst x == t + ε)) in LT; last first.
-      { by intros [a b]; simpl; rewrite -addn1 /ε eqn_leq. }
+      { by move=> [a b] /=; lia. }
       { destruct ([seq x <- steps | fst x == t + ε]) as [|p l] eqn:LST.
         { rewrite LST in LT.
           rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT; last first.

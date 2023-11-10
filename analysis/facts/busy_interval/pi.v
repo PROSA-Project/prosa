@@ -516,10 +516,10 @@ Section PriorityInversionIsBounded.
           exists (t1 + sm_pt); split.
           { apply first_preemption_time; rewrite /service.service//.
             + by intros; apply MIN; apply/andP; split.
-            + by rewrite /ε; lia.
+            + by lia.
           }
           apply: preemption_time_le_max_len_of_priority_inversion => //.
-          by rewrite /ε; lia.
+          by lia.
         Qed.
 
       End Case3.

@@ -135,7 +135,7 @@ Section Theory.
     apply refines_abstr; intros ac ac' Rac.
     rewrite -has_pred1.
     refines_apply; last first.
-    - by refines_abstr; rewrite pred1E eq_sym /ε; refines_apply.
+    - by refines_abstr; rewrite pred1E eq_sym ; refines_apply.
     - refines_abstr.
       rewrite refinesE; eapply has_R; last by apply refinesP; eassumption.
       by intros; apply refinesP; refines_apply.

@@ -242,11 +242,10 @@ Proof.
   unfold blocking_bound_NP, blocking_bound_NP_T, blocking_relevant.
   intros A A' RA; apply refinesP; eapply refine_foldr_max.
   - by rewrite refinesE map_id; apply Rts.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; unfold ε; tc.
+  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
   - rewrite refinesE => tsk1 tsk1' Rtsk1.
     apply andb_R; first apply andb_R.
-    + unfold ε.
-      apply refine_ltn; first by done.
+    + apply refine_ltn; first by done.
       by apply refinesP; rewrite /max_arrivals; refines_apply; apply refine_ConcreteMaxArrivals.
     + by apply refine_ltn; [done | apply refinesP; refines_apply].
     + move: refine_task_deadline => Ra.

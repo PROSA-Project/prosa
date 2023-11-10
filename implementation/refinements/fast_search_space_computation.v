@@ -91,7 +91,7 @@ Section FastSearchSpaceComputation.
       unfold positive_horizon in *; set (h := horizon_of evec) in *.
       move: (extrapolated_arrival_curve_change evec POSh SORT_LEQ A NEQ) => [LT|[EQdiv LTe]].
       { right.
-        exists ((A+ε) %/ h); split; first by rewrite ltnS leq_div2r // /ε; lia.
+        exists ((A+ε) %/ h); split; first by rewrite ltnS leq_div2r // ; lia.
         by symmetry; apply /eqP; rewrite -dvdn_eq; by apply ltdivn_dvdn. }
       { left.
         exists ((A + ε) %/ h), (step_at evec ((A + ε) %% h)).1; split; last split.
@@ -106,7 +106,7 @@ Section FastSearchSpaceComputation.
         { case (extrapolated_arrival_curve_change _ POSh SORT_LEQ _ NEQ) as [EQs|[EQs LT]].
           { apply ltdivn_dvdn in EQs; move: EQs => /dvdnP [k EQs]; rewrite EQs.
             by rewrite modnMl step_at_0_is_00; [rewrite addn0 mulnK | apply SORT |]. }
-          { subst h; unfold ε in *; set (h := horizon_of evec) in *.
+          { subst h; set (h := horizon_of evec) in *.
             rewrite {1}[_ + _](divn_eq _ h).
             apply/eqP; rewrite eqn_add2l; apply/eqP.
             rewrite modnD //= [h <= _]leqNgt addmod_le_mod //= subn0 in LT.
@@ -202,7 +202,7 @@ Section FastSearchSpaceComputation.
         }
         rewrite -mulSnr {1}(pred_Sn A) divn_pred -(addn1 A) DIV subn1 prednK //=.
         move: DIV => /dvdnP [k EQk]; rewrite EQk.
-        by destruct k;[rewrite /ε in EQk; lia | rewrite mulnK]. }
+        by destruct k;[lia | rewrite mulnK]. }
       { replace h with 0; rewrite /positive_horizon in POSh; lia. }
       { exfalso.
         rewrite /get_time_steps_of_task EMAX in LTH.
@@ -244,7 +244,7 @@ Section FastSearchSpaceComputation.
         set (h := get_horizon_of_task tsk) in *.
         apply /flatten_mapP; exists ((i-1)*h); first by rewrite mulnC map_f // mem_iota; lia.
         replace (i * h) with (h + (i - 1) * h); last first.
-        { destruct (posnP i) as [Z|POS]; first by subst i; rewrite /ε in EQ; lia.
+        { destruct (posnP i) as [Z|POS]; first by subst i; lia.
           by rewrite mulnBl mul1n; apply subnKC, leq_pmull. }
         have MFF := map_f (fun t0 => t0 + (i - 1) * h); apply: MFF.
         rewrite -EQh.

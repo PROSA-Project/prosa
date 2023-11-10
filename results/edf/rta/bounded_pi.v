@@ -282,7 +282,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           Proof.
             have BOUNDED: t1 + (A + ε + D tsk - D tsk_o) <= t1 + Δ by lia.
             rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN'.
-            rewrite /EDF_from /ε => ARR'.
+            rewrite /EDF_from  => ARR'.
             case: (eqVneq (job_task j') tsk_o) => TSK';
               last by rewrite andbF.
             rewrite andbT; apply: contraT  => /negPn.
@@ -399,7 +399,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             rewrite /minn.
           { by rewrite ifT //; lia. }
           { rewrite ifF //.
-            by move: gtn_x; rewrite leq_eqVlt /ε => /orP [/eqP EQ|LEQ]; lia. }
+            by move: gtn_x; rewrite leq_eqVlt  => /orP [/eqP EQ|LEQ]; lia. }
           { case: (A + D tsk - D tsk_i < x).
             - by rewrite WL.
             - by rewrite eq_x. } }

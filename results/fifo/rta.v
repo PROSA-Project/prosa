@@ -306,7 +306,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       eapply leq_trans; first exact: service_of_jobs_le_workload.
       rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)) => //.
       rewrite (workload_minus_job_cost j)//;
-        last by rewrite /ε; apply job_in_arrivals_between => //; apply/andP; split => //; rewrite -addn1.
+        last by apply job_in_arrivals_between => //; apply/andP; split => //; rewrite -addn1.
       rewrite /workload_of_jobs /IBF (big_rem tsk) //=
         (addnC (task_request_bound_function tsk (job_arrival j - t1 + ε))).
       rewrite -addnBA; last first.
