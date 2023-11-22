@@ -70,10 +70,53 @@ Section WorkloadFacts.
     by apply: PQ.
   Qed.
 
-  (** Next, consider any job arrival sequence consistent with the arrival times
-      of the jobs. *)
+  (** Next, consider any job arrival sequence consistent with the
+      arrival times of the jobs. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_consistent : consistent_arrival_times arr_seq.
+
+  (** In this section, we prove a few useful properties regarding the
+      predicate of [workload_of_jobs]. *)
+  Section PredicateProperties.
+
+    (** Consider a sequence of jobs [jobs]. *)
+    Variable jobs : seq Job.
+
+    (** First, we show that workload of [jobs] for an unsatisfiable
+        predicate is equal to [0]. *)
+    Lemma workload_of_jobs_pred0 :
+      workload_of_jobs pred0 jobs = 0.
+    Proof. by rewrite /workload_of_jobs; apply big_pred0. Qed.
+
+    (** Next, consider two arbitrary predicates [P] and [P']. *)
+    Variable P P' : pred Job.
+
+    (** We show that [workload_of_jobs] conditioned on [P] can be split into two summands:
+        (1) [workload_of_jobs] conditioned on [P /\ P'] and
+        (2) [workload_of_jobs] conditioned on [P /\ ~~ P']. *)
+    Lemma workload_of_jobs_case_on_pred :
+      workload_of_jobs P jobs =
+        workload_of_jobs (fun j => P j && P' j) jobs + workload_of_jobs (fun j => P j && ~~ P' j) jobs.
+    Proof.
+      rewrite /workload_of_jobs !big_mkcond [in X in _ = X]big_mkcond
+              [in X in _ = _ + X]big_mkcond //= -big_split //=.
+      apply: eq_big_seq => j' IN.
+      by destruct (P _), (P' _); simpl; lia.
+    Qed.
+
+    (** We show that if [P] is indistinguishable from [P'] on set
+        [jobs], then [workload_of_jobs] conditioned on [P] is equal to
+        [workload_of_jobs] conditioned on [P']. *)
+    Lemma workload_of_jobs_equiv_pred :
+      {in jobs, P =1 P'} ->
+      workload_of_jobs P jobs = workload_of_jobs P' jobs.
+    Proof.
+      intros * EQUIV.
+      rewrite /workload_of_jobs !big_mkcond [in X in _ = X]big_mkcond //=.
+      by apply: eq_big_seq => j' IN; rewrite EQUIV.
+    Qed.
+
+  End PredicateProperties.
 
   (** In this section, we bound the workload of jobs of a particular task by the task's [RBF]. *)
   Section WorkloadRBF.
@@ -124,6 +167,68 @@ Section WorkloadFacts.
     Qed.
 
   End WorkloadRBF.
+
+  (** In this section, we prove one equality about the workload of a job. *)
+  Section WorkloadOfJob.
+
+    (** Assume there are no duplicates in the arrival sequence. *)
+    Hypothesis H_arrival_sequence_is_a_set : arrival_sequence_uniq arr_seq.
+
+    (** We prove that the workload of a job in an interval <<[t1,
+        t2)>> is equal to the cost of the job if the job's arrival is
+        in the interval and [0] otherwise. *)
+    Lemma workload_of_job_eq_job_arrival :
+      forall (j : Job) (t1 t2 : instant),
+        arrives_in arr_seq j ->
+        workload_of_job arr_seq j t1 t2
+        = if t1 <= job_arrival j < t2 then job_cost j else 0.
+    Proof.
+      move=> j t1 t2 ARR; case NEQ: (_ <= _ < _).
+      { rewrite /workload_of_job /workload_of_jobs.
+        erewrite big_pred1_seq; first reflexivity.
+        - by apply arrived_between_implies_in_arrivals => //=.
+        - by done.
+        - by move => j'; rewrite /pred1 //=.
+      }
+      { apply big1_seq => j' /andP [/eqP EQ IN]; subst j'; exfalso.
+        by apply job_arrival_between in IN => //.
+      }
+    Qed.
+
+  End WorkloadOfJob.
+
+  (** In the following section, we relate three types of workload:
+      workload of a job [j], workload of higher-or-equal priority jobs
+      distinct from [j], and workload of higher-or-equal priority
+      jobs. *)
+  Section HEPWorkload.
+
+    (** Consider a JLFP policy that indicates a higher-or-equal
+        priority relation and assume that the relation is
+        reflexive. *)
+    Context {JLFP : JLFP_policy Job}.
+    Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+
+    (** We prove that the sum of the workload of a job [j] and the
+        workload of higher-or-equal priority jobs distinct from [j] is
+        equal to the workload of higher-or-equal priority jobs. *)
+    Lemma workload_job_and_ahep_eq_workload_hep :
+      forall (j : Job) (t1 t2 : instant),
+        workload_of_job arr_seq j t1 t2 + workload_of_other_hep_jobs arr_seq j t1 t2
+        = workload_of_hep_jobs arr_seq j t1 t2.
+    Proof.
+      move=> j t1 t2.
+      rewrite /workload_of_job /workload_of_other_hep_jobs /workload_of_hep_jobs.
+      rewrite [RHS](workload_of_jobs_case_on_pred _ _  (fun jhp => jhp != j)).
+      have EQ: forall a b c d, a = b -> c = d -> a + c = b + d by lia.
+      rewrite addnC; apply EQ; first by reflexivity.
+      clear EQ; apply workload_of_jobs_equiv_pred => jo IN.
+      have [EQ|NEQ] := eqVneq j jo.
+      { by subst; rewrite andbT; symmetry; apply H_priority_is_reflexive. }
+      by rewrite andbF.
+    Qed.
+
+  End HEPWorkload.
 
   (** If at some point in time [t] the predicate [P] by which we select jobs
       from the set of arrivals in an interval <<[t1, t2)>> becomes certainly
@@ -224,45 +329,5 @@ Section WorkloadFacts.
     Qed.
 
   End Subset.
-
-  (** In this section, we prove a few useful properties regarding the
-      predicate of [workload_of_jobs]. *)
-  Section PredicateProperties.
-
-    (** First, we show that workload of jobs for an unsatisfiable
-        predicate is equal to 0. *)
-    Lemma workload_of_jobs_pred0 :
-      workload_of_jobs pred0 jobs = 0.
-    Proof. by rewrite /workload_of_jobs; apply big_pred0. Qed.
-
-    (** Next, consider two arbitrary predicates [P] and [P']. *)
-    Variable P P' : pred Job.
-
-    (** We show that [workload_of_jobs] conditioned on [P] can be split into two summands:
-        (1) [workload_of_jobs] conditioned on [P /\ P'] and
-        (2) [workload_of_jobs] conditioned on [P /\ ~~ P']. *)
-    Lemma workload_of_jobs_case_on_pred :
-      workload_of_jobs P jobs =
-        workload_of_jobs (fun j => P j && P' j) jobs + workload_of_jobs (fun j => P j && ~~ P' j) jobs.
-    Proof.
-      rewrite /workload_of_jobs !big_mkcond [in X in _ = X]big_mkcond
-              [in X in _ = _ + X]big_mkcond //= -big_split //=.
-      apply: eq_big_seq => j' IN.
-      by destruct (P _), (P' _); simpl; lia.
-    Qed.
-
-    (** We show that if [P] is indistinguishable from [P'] on set
-        [jobs], then [workload_of_jobs] conditioned on [P] is equal to
-        [workload_of_jobs] conditioned on [P']. *)
-    Lemma workload_of_jobs_equiv_pred :
-      {in jobs, P =1 P'} ->
-      workload_of_jobs P jobs = workload_of_jobs P' jobs.
-    Proof.
-      intros * EQUIV.
-      rewrite /workload_of_jobs !big_mkcond [in X in _ = X]big_mkcond //=.
-      by apply: eq_big_seq => j' IN; rewrite EQUIV.
-    Qed.
-
-  End PredicateProperties.
 
 End WorkloadFacts.
