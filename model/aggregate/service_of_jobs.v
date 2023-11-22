@@ -64,6 +64,30 @@ Section ServiceOfJobs.
     Definition service_of_higher_or_equal_priority_jobs (t1 t2 : instant) :=
       service_of_jobs of_higher_or_equal_priority jobs t1 t2.
 
+    (** Furthermore, we define similar notions on jobs arriving in a
+        given time interval, such as ... *)
+
+    (** ... (1) service of all other jobs with higher-or-equal
+        priority (w.r.t. job [j]) distinct from job [j], ... *)
+    Definition service_of_other_hep_jobs (t1 t2 : instant) :=
+      service_of_jobs
+        (fun jhp => another_hep_job jhp j)
+        (arrivals_between arr_seq t1 t2) t1 t2.
+
+    (** ... (2) notion of service of higher-or-equal priority jobs
+      from other tasks, ... *)
+    Definition service_of_other_task_hep_jobs (t1 t2 : instant) :=
+      service_of_jobs
+        (fun jhp => another_task_hep_job jhp j)
+        (arrivals_between arr_seq t1 t2) t1 t2.
+
+    (** ... (3) and service of jobs with higher-or-equal priority
+        arriving in an interval <<[t1, t2)>>. *)
+    Definition service_of_hep_jobs (t1 t2 : instant) :=
+      service_of_jobs
+        (fun jhp => hep_job jhp j)
+        (arrivals_between arr_seq t1 t2) t1 t2.
+
   End PerJobPriority.
 
   (** We define the notion of cumulative service received by

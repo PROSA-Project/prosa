@@ -189,6 +189,71 @@ Section GenericModelLemmas.
 
 End GenericModelLemmas.
 
+(** In this section, we prove a lemma about the sum of service with
+    different predicates over a fixed time interval. *)
+Section HEPService.
+
+  (**  Consider any type of jobs. *)
+  Context {Job : JobType}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** Consider any kind of processor state model, ... *)
+  Context {PState : ProcessorState Job}.
+
+  (** ... any valid arrival sequence, .... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
+  (** ... and any schedule of this arrival sequence ... *)
+  Variable sched : schedule PState.
+
+  (** ... where jobs do not execute before their arrival. *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+
+  (** Consider a JLFP policy that indicates a higher-or-equal priority
+      relation and assume that the relation is reflexive. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+
+  (** Consider an interval <<[t1, t2)>> ... *)
+  Variables t1 t2 : instant.
+
+  (** ... and a job [j] arriving no earlier than [t1]. *)
+  Variable j : Job.
+  Hypothesis H_arrives :  arrives_in arr_seq j.
+  Hypothesis H_t1_le_j_arr : t1 <= job_arrival j.
+
+  (** We prove that the sum of the service during <<[t1, t2)>> of job
+      [j] and the service of higher-or-equal priority jobs distinct
+      from [j] during <<[t1, t2)>> is equal to the service of
+      higher-or-equal priority jobs in <<[t1, t2)>>. *)
+  Lemma service_plus_ahep_eq_service_hep :
+    service_during sched j t1 t2 + service_of_other_hep_jobs arr_seq sched j t1 t2
+    = service_of_hep_jobs arr_seq sched j t1 t2.
+  Proof.
+    have EQ: forall a b c, b <= c -> a = c - b -> a + b = c by lia.
+    apply: EQ; first by apply service_of_jobs_pred_impl => s IN2 /andP [AHEP _].
+    rewrite /service_of_other_hep_jobs /service_of_hep_jobs.
+    erewrite service_of_jobs_case_on_pred with (P2 := fun jhp => jhp == j).
+    have -> : forall a b, a + b - b = a by lia.
+    have [LE|LT] := leqP t2 (job_arrival j).
+    { apply eq_trans with 0; last symmetry.
+      { by apply: cumulative_service_before_job_arrival_zero => //. }
+      { rewrite /service_of_jobs // big1_seq // => s /andP [/andP [_ /eqP EQ] IN]; subst s.
+        by apply: cumulative_service_before_job_arrival_zero => //. }
+    }
+    { rewrite /service_of_jobs; erewrite big_pred1_seq => //.
+      { by apply arrived_between_implies_in_arrivals => //; apply/andP; split. }
+      { move => j'; rewrite /pred1 //=.
+        have [A|B] := eqVneq j' j; last by rewrite andbF.
+        by rewrite andbT; subst; apply H_priority_is_reflexive.
+      }
+    }
+  Qed.
+
+End HEPService.
+
 (** In this section, we prove some properties about service
     of sets of jobs for unit-service processor models. *)
 Section UnitServiceModelLemmas.
