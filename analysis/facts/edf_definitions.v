@@ -74,8 +74,8 @@ Section Equivalence.
       apply: (EDF t); [by [] | exact: LE | exact: SCHED' |].
       by apply: (backlogged_implies_arrived sched j' t). }
     apply; apply: incomplete_implies_scheduled_later.
-      exact: H_no_deadline_misses.
-    exact: (backlogged_implies_incomplete sched j' t).
+    - exact: H_no_deadline_misses.
+    - exact: (backlogged_implies_incomplete sched j' t).
   Qed.
 
   (** Conversely, the reverse direction also holds: a schedule that satisfies

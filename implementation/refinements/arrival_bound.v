@@ -339,8 +339,7 @@ Section Refinements.
       destruct evec1 as [h1 evec1], evec2 as [h2 evec2].
       rewrite /ACPrefixT_to_ACPrefix //= !xpair_eqE.
       have -> : ((h1, evec1) == (h2, evec2))%C = ((h1 == h2) && (evec1 == evec2))%C by constructor.
-      apply andb_R.
-      apply refinesP; refines_apply.
+      apply andb_R; first by apply refinesP; refines_apply.
       clear h1 h2; move: evec2; elim: evec1 => [[] //|h1 evec1 IHevec1].
       case=> [//|h2 evec2].
       rewrite //= !eqseq_cons.

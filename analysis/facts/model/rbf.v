@@ -119,8 +119,8 @@ Section ProofWorkloadBound.
         rewrite /workload_of_jobs -/l big_seq_cond [X in _ <= X]big_seq_cond.
         apply leq_sum; move => j0 /andP [IN0 HP0].
         rewrite big_mkcond (big_rem (job_task j0)) /=.
-        rewrite eq_refl; apply leq_addr.
-        by apply in_arrivals_implies_arrived in IN0; apply H_all_jobs_from_taskset. }
+        - by rewrite eq_refl; apply leq_addr.
+        - by apply in_arrivals_implies_arrived in IN0; apply H_all_jobs_from_taskset. }
       apply leq_sum_seq; intros tsk0 INtsk0 HP0.
       apply (@leq_trans (task_cost tsk0 * size (task_arrivals_between arr_seq tsk0 t (t + Δ)))).
       { rewrite -sum1_size big_distrr /= big_filter -/l /workload_of_jobs muln1.
@@ -382,7 +382,7 @@ Section DegenerateTotalRBFs.
       - move: TASK. rewrite /job_of_task => /eqP ->.
         by rewrite COST. }
     { exfalso.
-      have: 0 < max_arrivals tsk ε.
+      have: 0 < max_arrivals tsk ε
         by apply: (non_pathological_max_arrivals tsk arr_seq _ j).
       by rewrite NEVER. }
   Qed.

@@ -40,23 +40,23 @@ Section FullyPreemptiveModel.
   Proof.
     intros j ARR; split.
     - case: (posnP (job_cost j)) => [ZERO|POS].
-      + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_0. 
-      + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_ε. 
+      + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_0.
+      + by rewrite /job_respects_max_nonpreemptive_segment job_max_nps_is_ε.
     - intros t; exists t; split=> [|//].
       by apply/andP; split; [|rewrite leq_addr].
   Qed.
 
   (** Which together with lemma [valid_fully_preemptive_model] gives
       us the fact that [fully_preemptive_model] defined a valid
-      preemption model with bounded non-preemptive regions. *) 
+      preemption model with bounded non-preemptive regions. *)
   Corollary fully_preemptive_model_is_valid_model_with_bounded_nonpreemptive_segments:
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
   Proof.
     split.
-    apply valid_fully_preemptive_model.
-    apply fully_preemptive_model_is_model_with_bounded_nonpreemptive_regions.
+    - by apply valid_fully_preemptive_model.
+    - by apply fully_preemptive_model_is_model_with_bounded_nonpreemptive_regions.
   Qed.
-    
+
 End FullyPreemptiveModel.
 
 (** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)

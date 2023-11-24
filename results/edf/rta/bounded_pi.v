@@ -337,13 +337,13 @@ Section AbstractRTAforEDFwithArrivalCurves.
           eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
           eapply leq_trans; first exact: service_of_jobs_le_workload.
           eapply leq_trans.
-          eapply reorder_summation.
-          move => j' IN _.
-          apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
-          move : TSK => /eqP TSK.
-          rewrite TSK.
-          apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
-          by apply /eqP.
+          + eapply reorder_summation.
+            move => j' IN _.
+            apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
+          + move : TSK => /eqP TSK.
+            rewrite TSK.
+            apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
+            by apply /eqP.
       Qed.
 
     End TaskInterferenceIsBoundedByIBF_other.
@@ -375,13 +375,12 @@ Section AbstractRTAforEDFwithArrivalCurves.
         is_in_search_space A.
       Proof.
         move: H_A_is_in_abstract_search_space  => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]];
-          apply/andP; split => //.
+                                                  apply/andP; split => //.
         { apply/orP; left; apply/orP; right.
           rewrite /task_rbf_changes_at /task_rbf /rbf task_rbf_0_zero //; eauto 2.
           apply contraT => /negPn /eqP ZERO.
           rewrite -(ltnn 0) {2}ZERO add0n.
-          apply: (@leq_trans (task_cost tsk)); last first.
-            exact: task_rbf_1_ge_task_cost.
+          apply: (@leq_trans (task_cost tsk)); last by exact: task_rbf_1_ge_task_cost.
           apply: (@leq_trans (job_cost j)) => //.
           move: (H_job_of_tsk) => /eqP <-.
           by apply: (H_valid_job_cost _ H_j_arrives). }
@@ -394,9 +393,9 @@ Section AbstractRTAforEDFwithArrivalCurves.
           apply eq_big => // tsk_i /andP [TS OTHER].
           move: WL; rewrite /bound_on_total_hep_workload_changes_at => /hasPn WL.
           move: {WL} (WL tsk_i TS) =>  /nandP [/negPn/eqP EQ|/negPn/eqP WL];
-            first by move: OTHER; rewrite EQ => /neqP.
+                                       first by move: OTHER; rewrite EQ => /neqP.
           case: (ltngtP (A + ε + D tsk - D tsk_i) x) => [ltn_x|gtn_x|eq_x];
-            rewrite /minn.
+                                                        rewrite /minn.
           { by rewrite ifT //; lia. }
           { rewrite ifF //.
             by move: gtn_x; rewrite leq_eqVlt  => /orP [/eqP EQ|LEQ]; lia. }

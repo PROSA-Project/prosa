@@ -221,15 +221,17 @@ Section BusyIntervalExistence.
         { move=> j A B; apply: H_no_carry_in.
           - apply: in_arrivals_implies_arrived =>//.
           - by have : arrived_between j 0 t
-              by apply: (in_arrivals_implies_arrived_between arr_seq). }
+                        by apply: (in_arrivals_implies_arrived_between arr_seq). }
         apply/eqP; rewrite eqn_leq; apply/andP; split;
           last by apply: service_of_jobs_le_workload.
-        rewrite /total_workload (workload_of_jobs_cat arr_seq t).
-        rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t) //.
-        rewrite COMPL -addnA leq_add2l.
-        rewrite -service_of_jobs_cat_arrival_interval.
-        all: try by apply/andP; split; [|rewrite leq_addr].
-        by rewrite EQserv.
+        rewrite /total_workload (workload_of_jobs_cat arr_seq t);
+          last by apply/andP; split; [|rewrite leq_addr].
+        - rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t) //;
+            last by apply/andP; split; [|rewrite leq_addr].
+          + rewrite COMPL -addnA leq_add2l.
+            rewrite -service_of_jobs_cat_arrival_interval;
+              last by apply/andP; split; [|rewrite leq_addr].
+            by rewrite EQserv.
       Qed.
 
     End ProcessorIsNotTooBusyInduction.
@@ -240,19 +242,18 @@ Section BusyIntervalExistence.
       forall t, exists δ,
         δ < Δ /\ no_carry_in arr_seq sched (t + δ).
     Proof.
-      elim=> [|t [δ [LE FQT]]].
-      { by exists 0; split; [ | rewrite addn0; apply: no_carry_in_at_zero]. }
-      { move: (posnP δ) => [Z|POS]; last first.
-        { exists (δ.-1); split.
-          - by apply: leq_trans LE; rewrite prednK.
-          - by rewrite -subn1 -addn1 -addnA subnKC //. }
-        move: FQT; rewrite Z addn0 => FQT {LE}.
+      elim=> [|t [δ [LE FQT]]];
+        first by exists 0; split; [ | rewrite addn0; apply: no_carry_in_at_zero].
+      move: (posnP δ) => [Z|POS]; last first.
+      - exists (δ.-1); split.
+        + by apply: leq_trans LE; rewrite prednK.
+        + by rewrite -subn1 -addn1 -addnA subnKC //.
+      - move: FQT; rewrite Z addn0 => FQT {LE}.
         move: (total_service_is_bounded_by_Δ t); rewrite leq_eqVlt => /orP [/eqP EQ | LT].
-        - exists (Δ.-1); split.
-          + by rewrite prednK.
-          + rewrite addSn -subn1 -addn1 -addnA subnK //.
-            by apply: completion_of_all_jobs_implies_no_carry_in.
-        - by apply:low_total_service_implies_existence_of_time_with_no_carry_in. }
+        + exists (Δ.-1); split; first by rewrite prednK.
+          rewrite addSn -subn1 -addn1 -addnA subnK //.
+          by apply: completion_of_all_jobs_implies_no_carry_in.
+        + by apply:low_total_service_implies_existence_of_time_with_no_carry_in.
     Qed.
 
   End ProcessorIsNotTooBusy.
@@ -300,8 +301,7 @@ Section BusyIntervalExistence.
       by apply: NQT; apply/quiet_time_P. }
     exists t2; split=> [//|]; split.
     { by apply: (leq_trans LEt2); rewrite addSn ltn_add2l. }
-    { move: PREFIX => [_ [QTt1 [NQT _]]]; repeat split=> //; last first.
-        exact/quiet_time_P.
+    { move: PREFIX => [_ [QTt1 [NQT _]]]; repeat split=> //; last by exact/quiet_time_P.
       move => t /andP [GEt LTt] QTt.
       feed (MIN t);
         last by move: LTt; rewrite ltnNge; move => /negP LTt; apply: LTt.

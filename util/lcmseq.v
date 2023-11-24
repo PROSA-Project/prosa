@@ -36,7 +36,7 @@ Proof.
   - apply /dvdnP.
     rewrite EQ /lcml.
     by apply int_divides_lcm_in_seq.
-  + move : (IH_DIV IN) => [k EQ].
+  - move : (IH_DIV IN) => [k EQ].
     exists ((foldr lcmn 1 (z :: sq)) %/ (foldr lcmn 1 sq) * k).
     rewrite -mulnA -EQ divnK /lcml //.
     by apply lcm_seq_divides_lcm_super.

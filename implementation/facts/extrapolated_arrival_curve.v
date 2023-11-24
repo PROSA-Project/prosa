@@ -227,8 +227,8 @@ Section ExtrapolatedArrivalCurve.
           move: LEk; rewrite leq_eqVlt => /orP [/eqP EQk | LTk].
           { by subst; rewrite divnn POS mul1n; apply value_at_monotone, ltnW, ltn_pmod. }
           { rewrite -[value_at _ (t1 %% h)]mul1n; apply leq_mul.
-              by rewrite divn_gt0; [apply: ltnW|].
-            by apply value_at_monotone, ltnW, ltn_pmod.
+            - by rewrite divn_gt0; [apply: ltnW|].
+            - by apply value_at_monotone, ltnW, ltn_pmod.
           }
         }
         { rewrite divn_small // mul0n add0n.

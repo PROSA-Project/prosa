@@ -85,8 +85,9 @@ Section RunToCompletionThreshold.
       intros POS.
       replace 2 with (size [::0; job_cost j]) => [|//].
       apply subseq_leq_size.
-      - apply/andP; split. rewrite !in_cons Bool.negb_orb.
-        + by apply/andP; split; [rewrite neq_ltn POS|].
+      - apply/andP; split.
+        + rewrite !in_cons Bool.negb_orb.
+          by apply/andP; split; [rewrite neq_ltn POS|].
         + by [].
       - intros ρ; rewrite !in_cons; move => /orP [/eqP EQ| /orP [/eqP Cost | C]].
         + by subst; apply zero_in_preemption_points.
@@ -158,8 +159,8 @@ Section RunToCompletionThreshold.
       job_max_nonpreemptive_segment j <= job_cost j.
     Proof.
       eapply leq_trans.
-      apply max_distance_in_seq_le_last_element_of_seq; apply preemption_points_nondecreasing.
-      destruct (H_valid_preemption_model j) as [A1 [A2 [A3 A4]]]; auto.
+      - apply max_distance_in_seq_le_last_element_of_seq; apply preemption_points_nondecreasing.
+      - destruct (H_valid_preemption_model j) as [A1 [A2 [A3 A4]]]; auto.
       case: (posnP (job_cost j)) => [ZERO|POSt].
       { unfold job_preemption_points; rewrite ZERO.
         simpl; unfold job_cannot_become_nonpreemptive_before_execution in *.

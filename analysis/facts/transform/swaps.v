@@ -20,7 +20,7 @@ Section SwappedFacts.
   (** In the following, let [sched'] denote the schedule in which the
      allocations at [t1] and [t2] have been swapped. *)
   Let sched' := swapped sched t1 t2.
-  
+
   (** First, we note that the trivial case where t1 == t2 is not interesting
      because then the two schedules are identical. *)
   Lemma trivial_swap:
@@ -187,7 +187,7 @@ Section SwappedFacts.
   (** In the following, we lift the above basic invariants to
       statements about invariants about the cumulative amount of
       service received. *)
-  
+
   (** To avoid dealing with symmetric cases, assume in the following
      that t1 and t2 are ordered. *)
   Hypothesis H_well_ordered: t1 <= t2.
@@ -242,8 +242,7 @@ Section SwappedFacts.
     move => t t2t j.
     move: H_well_ordered. rewrite leq_eqVlt => /orP [/eqP EQ|t1_lt_t2];
       first by apply trivial_swap_service_invariant.
-    have TIME: 0 <= t1 < t.
-      by apply /andP; split; try apply ltn_trans with (n := t2).
+    have TIME: 0 <= t1 < t by apply /andP; split; try apply ltn_trans with (n := t2).
     rewrite /service !service_in_replaced// /service_at// /replace_at //.
     rewrite ifT// ifT// ifF;
       last by apply ltn_eqF; exact.

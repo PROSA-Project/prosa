@@ -108,9 +108,9 @@ Section PriorityInversionIsBounded.
           edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
             as [jhp [_ [HEP SCHEDjhp]]]; try apply PRPOINT; move=> //.
           * by apply/andP; split.
-          move: LP => /negP LP; apply: LP.
-          enough (EQ : jhp = jlp); first by subst.
-          apply: (H_uni jhp _ _ tp); eauto.
+          * move: LP => /negP LP; apply: LP.
+            enough (EQ : jhp = jlp); first by subst.
+            apply: (H_uni jhp _ _ tp); eauto.
             by apply SCH; apply/andP; split; first apply leq_trans with t1; auto. }
       repeat split=> //.
       move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET EXj]]]; move: (Sched_jhp) => PENDING.
@@ -217,8 +217,8 @@ Section PriorityInversionIsBounded.
       feed_n 3 QT => //.
       - have MATE: jobs_must_arrive_to_execute sched by [].
         by have HA: has_arrived jhp t by exact: MATE.
-      apply completed_implies_not_scheduled in QT => //.
-      by move: QT => /negP NSCHED; apply: NSCHED.
+      - apply completed_implies_not_scheduled in QT => //.
+        by move: QT => /negP NSCHED; apply: NSCHED.
     Qed.
 
     (** Also, we show that lower-priority jobs that are scheduled inside the
@@ -275,10 +275,10 @@ Section PriorityInversionIsBounded.
         edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
           as [jhp [_ [HEP SCHEDjhp]]]; try apply PT; move=> //.
         - by lia.
-        specialize (SCHEDc pt).
-        feed SCHEDc; first by apply/andP; split; last move: NEQpt => /andP [_ T].
-        move: LP => /negP LP; apply: LP.
-        by have ->: jlp = jhp by apply: H_uni.
+        - specialize (SCHEDc pt).
+          feed SCHEDc; first by apply/andP; split; last move: NEQpt => /andP [_ T].
+          move: LP => /negP LP; apply: LP.
+          by have ->: jlp = jhp by apply: H_uni.
       }
       apply SCHEDc; apply/andP; split.
       - by rewrite -add1n in LT2; apply leq_subRL_impl in LT2; rewrite subn1 in LT2.
@@ -337,8 +337,7 @@ Section PriorityInversionIsBounded.
           move :  (H_valid_model_with_bounded_nonpreemptive_segments) =>  [VALID BOUNDED].
           move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
           move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]].
-          exists t1; split; last first.
-            by apply/andP; split; [|rewrite leq_addr].
+          exists t1; split; last by apply/andP; split; [|rewrite leq_addr].
           destruct t1.
           - exact: zero_is_pt.
           - apply: first_moment_is_pt H_jhp_is_scheduled => //.
@@ -469,8 +468,7 @@ Section PriorityInversionIsBounded.
             unfold max_length_of_priority_inversion.
             rewrite (big_rem jlp) //=.
             { rewrite H_jlp_low_priority //=.
-              have NZ: service sched jlp t1 < job_cost jlp.
-                exact: service_lt_cost.
+              have NZ: service sched jlp t1 < job_cost jlp by exact: service_lt_cost.
               rewrite ifT; last lia.
               apply leq_trans with (job_max_nonpreemptive_segment jlp - ε).
               - by apply H_progr_le_max_nonp_segment.

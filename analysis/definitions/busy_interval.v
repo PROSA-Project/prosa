@@ -4,11 +4,11 @@ Require Export prosa.analysis.facts.behavior.completion.
 (** * Busy Interval for JLFP-models *)
 (** In this file we define the notion of busy intervals for uniprocessor for JLFP schedulers. *)
 Section BusyIntervalJLFP.
-  
+
   (** Consider any type of jobs. *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
-  Context `{JobCost Job}.    
+  Context `{JobCost Job}.
 
   (** Consider any kind of processor state model. *)
   Context {PState : ProcessorState Job}.
@@ -16,20 +16,20 @@ Section BusyIntervalJLFP.
   (** Consider any arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  
+
   (** ... and a schedule of this arrival sequence. *)
   Variable sched : schedule PState.
-  
+
   (** Assume a given JLFP policy. *)
-  Context `{JLFP_policy Job}. 
+  Context `{JLFP_policy Job}.
 
   (** In this section, we define the notion of a busy interval. *)
   Section BusyInterval.
-    
+
     (** Consider any job j. *)
     Variable j : Job.
     Hypothesis H_from_arrival_sequence : arrives_in arr_seq j.
-    
+
     (** We say that [t] is a quiet time for [j] iff every higher-priority job from
          the arrival sequence that arrived before [t] has completed by that time. *)
     Definition quiet_time (t : instant) :=
@@ -38,12 +38,12 @@ Section BusyIntervalJLFP.
         hep_job j_hp j ->
         arrived_before j_hp t ->
         completed_by sched j_hp t.
-    
+
     (** Based on the definition of quiet time, we say that interval
          <<[t1, t_busy)>> is a (potentially unbounded) busy-interval prefix
-         iff the interval starts with a quiet time where a higher or equal 
+         iff the interval starts with a quiet time where a higher or equal
          priority job is released and remains non-quiet. We also require
-         job [j] to be released in the interval. *)    
+         job [j] to be released in the interval. *)
     Definition busy_interval_prefix (t1 t_busy : instant) :=
       t1 < t_busy /\
       quiet_time t1 /\
@@ -77,8 +77,8 @@ Section BusyIntervalJLFP.
       - intros QT s ARRs HPs BEFs.
         move: QT => /allP QT.
         specialize (QT s); feed QT.
-        eapply arrived_between_implies_in_arrivals; eauto 2.
-          by move: QT => /implyP Q; apply Q in HPs.
+        + by eapply arrived_between_implies_in_arrivals; eauto 2.
+        + by move: QT => /implyP Q; apply Q in HPs.
       - move => /negP DEC; intros QT; apply: DEC.
         apply/allP; intros s ARRs.
         apply/implyP; intros HPs.

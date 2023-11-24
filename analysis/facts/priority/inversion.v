@@ -124,14 +124,14 @@ Section PI.
           (priority_inversion arr_seq sched j t).
     Proof.
       move=> t; apply: (iffP idP) => [PI | [j' SCHED' NHEP]].
-      have [j' SCHED'] := priority_inversion_scheduled_at t PI.
-      { by move: PI; rewrite (priority_inversion_hep_job t j'). }
-      apply/andP; split.
-      - rewrite scheduled_jobs_at_iff //.
-        apply: scheduled_job_at_neq => //.
-        by apply/eqP => EQ; move: NHEP; rewrite EQ H_priority_is_reflexive.
-      - by apply/hasP; exists j' => //; rewrite scheduled_jobs_at_iff.
-  Qed.
+      - have [j' SCHED'] := priority_inversion_scheduled_at t PI.
+        by move: PI; rewrite (priority_inversion_hep_job t j').
+      - apply/andP; split.
+        + rewrite scheduled_jobs_at_iff //.
+          apply: scheduled_job_at_neq => //.
+          by apply/eqP => EQ; move: NHEP; rewrite EQ H_priority_is_reflexive.
+        + by apply/hasP; exists j' => //; rewrite scheduled_jobs_at_iff.
+    Qed.
 
   End Uniprocessors.
 

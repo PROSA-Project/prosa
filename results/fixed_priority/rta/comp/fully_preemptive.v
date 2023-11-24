@@ -126,8 +126,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Proof.
     (* First, eliminate the trivial case of no higher- or equal-priority
        interference. *)
-    case: (leqP (total_hep_request_bound_function_FP ts tsk ε) 0).
-      by rewrite leqn0 => /eqP ZERO; apply: pathological_total_hep_rbf_any_bound.
+    case: (leqP (total_hep_request_bound_function_FP ts tsk ε) 0);
+      first by rewrite leqn0 => /eqP ZERO; apply: pathological_total_hep_rbf_any_bound.
     move=> GT0.
     (* Second, apply the general result. *)
     eapply uniprocessor_response_time_bound_fully_preemptive_fp

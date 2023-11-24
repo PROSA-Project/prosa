@@ -223,8 +223,8 @@ Section JobIndexLemmas.
   Proof.
     rewrite lt0n; apply /eqP; intro Z.
     apply size0nil in Z.
-    have J_IN : (j1 \in task_arrivals_up_to_job_arrival arr_seq j1).
-      by apply arrives_in_task_arrivals_up_to.
+    have J_IN : (j1 \in task_arrivals_up_to_job_arrival arr_seq j1)
+                  by apply arrives_in_task_arrivals_up_to.
     by rewrite Z in J_IN.
   Qed.
 

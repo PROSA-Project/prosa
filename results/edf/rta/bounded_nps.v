@@ -235,8 +235,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         max_length_of_priority_inversion j t1 <= blocking_bound (job_arrival j - t1).
     Proof.
       move=> j t1 t2 ARR TSK BUSY; rewrite /max_length_of_priority_inversion /blocking_bound.
-      apply: leq_trans.
-        exact: priority_inversion_is_bounded_by_max_np_segment.
+      apply: leq_trans;first by exact: priority_inversion_is_bounded_by_max_np_segment.
       apply /bigmax_leq_seqP => j' JINB NOTHEP.
       have ARR': arrives_in arr_seq j'
         by apply: in_arrivals_implies_arrived; exact: JINB.

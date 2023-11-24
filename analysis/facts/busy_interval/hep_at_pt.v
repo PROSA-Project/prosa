@@ -134,7 +134,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
         rewrite ltnS -pred_Sn in INBI.
         by rewrite -pred_Sn.
       }
-      have PEND: pending sched j t2.-1.
+      have PEND: pending sched j t2.-1
         by rewrite -ARR; apply job_pending_at_arrival.
       apply H_job_ready in PEND => //; destruct PEND as [jhp [ARRhp [PENDhp HEPhp]]].
       eapply NOTHP, H_priority_is_transitive; last by apply HEPhp.

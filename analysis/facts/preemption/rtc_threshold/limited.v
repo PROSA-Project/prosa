@@ -71,27 +71,25 @@ Section TaskRTCThresholdLimitedPreemptions.
     have EQ: 2 = size [::0; task_cost tsk] by [].
     rewrite EQ; clear EQ.
     apply subseq_leq_size.
-    rewrite !cons_uniq.
-    { apply/andP; split=> [|//].
+    - rewrite !cons_uniq.
+      apply/andP; split=> [|//].
       rewrite in_cons negb_or; apply/andP; split=> [|//].
-      by rewrite neq_ltn; apply/orP; left. }
-    intros t EQ; move: EQ; rewrite !in_cons.
-    move => /orP[/eqP EQ | /orP[/eqP EQ|//]].
-    { rewrite EQ; clear EQ.
-      move: (BEG _ H_tsk_in_ts) => EQ.
-      rewrite -EQ; clear EQ.
-      rewrite /first0 -nth0.
-      apply/(nthP 0).
-      by exists 0.
-    }
-    { rewrite EQ; clear EQ.
-      move: (END _ H_tsk_in_ts) => EQ.
-      rewrite -EQ; clear EQ.
-      rewrite /last0 -nth_last.
-      apply/(nthP 0).
-      exists ((size (task_preemption_points tsk)).-1) => [|//].
-      by rewrite -(leq_add2r 1) !addn1 prednK.
-    }
+      by rewrite neq_ltn; apply/orP; left. 
+    - intros t EQ; move: EQ; rewrite !in_cons.
+      move => /orP[/eqP EQ | /orP[/eqP EQ|//]].
+      + rewrite EQ; clear EQ.
+        move: (BEG _ H_tsk_in_ts) => EQ.
+        rewrite -EQ; clear EQ.
+        rewrite /first0 -nth0.
+        apply/(nthP 0).
+        by exists 0.
+      + rewrite EQ; clear EQ.
+        move: (END _ H_tsk_in_ts) => EQ.
+        rewrite -EQ; clear EQ.
+        rewrite /last0 -nth_last.
+        apply/(nthP 0).
+        exists ((size (task_preemption_points tsk)).-1) => [|//].
+        by rewrite -(leq_add2r 1) !addn1 prednK.
   Qed.
 
   (** Then, we prove that [task_rtct] function

@@ -191,9 +191,9 @@ Section Sequential_Abstract_RTA.
       rewrite addnA leq_add2r.
       rewrite addnBA; last first.
       { apply leq_trans with (task_rbf 1).
-        apply: task_rbf_1_ge_task_cost => //.
-        eapply task_rbf_monotone; eauto 2.
-        by rewrite addn1.
+        - by apply: task_rbf_1_ge_task_cost => //.
+        - eapply task_rbf_monotone; eauto 2.
+          by rewrite addn1.
       }
       by rewrite subnBA; auto; rewrite addnC.
     Qed.

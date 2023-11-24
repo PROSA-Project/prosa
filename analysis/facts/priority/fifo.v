@@ -97,8 +97,8 @@ Section BasicLemmas.
       ~~ priority_inversion arr_seq sched j t.
   Proof.
     move=> j t IN /andP[ARR]; apply: contraNN => pijt.
-    have [j' + PRIO] : exists2 j', scheduled_at sched j' t & ~~ hep_job j' j.
-      exact/uni_priority_inversion_P.
+    have [j' + PRIO] : exists2 j', scheduled_at sched j' t & ~~ hep_job j' j
+      by exact/uni_priority_inversion_P.
     apply: (early_hep_job_is_scheduled arr_seq) => //.
     - by rewrite -not_hep_job_arrival_FIFO.
     - exact: not_hep_job_always_higher_priority_FIFO.
@@ -152,8 +152,8 @@ Section BasicLemmas.
       rewrite leqn0; apply/eqP; rewrite big_nat_eq0 => t /andP[T1 T2].
       apply/eqP; rewrite eqb0.
       apply: contraT => /negPn pijt.
-      have [j' SCHED NHEP] : exists2 j', scheduled_at sched j' t & ~~ hep_job j' j.
-        exact/uni_priority_inversion_P.
+      have [j' SCHED NHEP] : exists2 j', scheduled_at sched j' t & ~~ hep_job j' j
+        by exact/uni_priority_inversion_P.
       move: T1; rewrite leq_eqVlt => /orP [/eqP EQ | GT].
       { have /completed_implies_scheduled_before [//|//|t' [/andP [+ +] _]]:
           completed_by sched j t by apply: (scheduled_implies_higher_priority_completed j').

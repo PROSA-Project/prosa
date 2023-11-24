@@ -211,7 +211,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       Proof.
         apply leq_sum_seq => tsko INtsko NEQT.
         have [EQ|EQ] := leqP Δ `|Num.max 0%R (interval tsko A)|.
-          exact: (workload_le_rbf' arr_seq tsko).
+          { exact: (workload_le_rbf' arr_seq tsko). }
         apply: (leq_trans (total_workload_shorten_range _ _ _ _)) => //; [lia|].
         rewrite /GEL_from.
         have [EQ1|EQ1] := lerP 0%R (interval tsko A).
@@ -367,8 +367,8 @@ Section AbstractRTAforGELwithArrivalCurves.
                     IBF_other A (A + F) /\ R >= F + (task_cost tsk - task_rtct tsk).
     Proof.
       move => A IN.
-      edestruct H_R_is_maximum as [F [FIX NEQ]].
-      eapply A_is_in_concrete_search_space => //.
+      edestruct H_R_is_maximum as [F [FIX NEQ]];
+        first by eapply A_is_in_concrete_search_space => //.
       exists F; split=> [|//].
       rewrite -{2}(leqRW FIX).
       by rewrite addnA [_ + priority_inversion_bound A]addnC -!addnA.
@@ -389,7 +389,7 @@ Section AbstractRTAforGELwithArrivalCurves.
     eapply uniprocessor_response_time_bound_seq with
       (task_IBF := fun tsk A R => IBF_other A R) (L := L) => //.
     - eapply instantiated_i_and_w_are_coherent_with_schedule => //.
-      exact: GEL_implies_sequential_tasks.
+    - exact: GEL_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - exact: instantiated_busy_intervals_are_bounded.
     - exact: instantiated_task_interference_is_bounded.

@@ -108,15 +108,15 @@ Proof.
     destruct x, y.
     rewrite negb_and in EQ.
     move: EQ => /orP [EQ | /eqP TASK].
-    move: EQ => /orP [EQ | /eqP DL].
-    rewrite negb_and in EQ.
-    move: EQ => /orP [EQ | /eqP COST].
-    rewrite negb_and in EQ.
-    move: EQ => /orP [/eqP ID | /eqP ARR].
-    - by apply ID; inversion BUG.
-    - by apply ARR; inversion BUG.
-    - by apply COST; inversion BUG.
-    - by apply DL; inversion BUG.
+    - move: EQ => /orP [EQ | /eqP DL].
+      + rewrite negb_and in EQ.
+        move: EQ => /orP [EQ | /eqP COST].
+        * rewrite negb_and in EQ.
+          move: EQ => /orP [/eqP ID | /eqP ARR].
+          ** by apply ID; inversion BUG.
+          ** by apply ARR; inversion BUG.
+        * by apply COST; inversion BUG.
+      + by apply DL; inversion BUG.
     - by apply TASK; inversion BUG. }
 Qed.
 

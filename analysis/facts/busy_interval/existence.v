@@ -488,8 +488,8 @@ Section ExistsBusyIntervalJLFP.
                   clear SCH; rewrite lt0b; apply/andP; split.
                   + apply/negP; intros SCHED'.
                     have EQ : j = j'.
-                      apply: H_uni SCHED.
-                      by rewrite -(scheduled_jobs_at_iff arr_seq).
+                    { apply: H_uni SCHED.
+                      by rewrite -(scheduled_jobs_at_iff arr_seq). }
                     subst; move: PRIO1 => /negP PRIO1; apply: PRIO1.
                     apply H_priority_is_reflexive.
                   + apply/hasP; exists j'; last by rewrite PRIO1.
@@ -547,9 +547,9 @@ Section ExistsBusyIntervalJLFP.
             priority_inversion_bound A + hp_workload t1 (t1 + delta) > delta.
           Proof.
             apply leq_ltn_trans with (priority_inversion_bound A + hp_service t1 (t1 + delta)).
-            apply busy_interval_has_uninterrupted_service.
-            rewrite ltn_add2l.
-            by apply busy_interval_too_much_workload.
+            - by apply busy_interval_has_uninterrupted_service.
+            - rewrite ltn_add2l.
+              by apply busy_interval_too_much_workload.
           Qed.
 
         End CannotBeBusyForSoLong.
@@ -689,8 +689,8 @@ Section ExistsBusyIntervalJLFP.
         feed_n 4 BUSY => //.
         move: BUSY => [t1 [t2 [/andP [GE1 LT2] [GE2 BUSY]]]].
         apply completion_monotonic with (t := t2) => //.
-          by apply leq_trans with (n := t1 + delta); [| rewrite leq_add2r].
-        by apply job_completes_within_busy_interval with (t1 := t1).
+          - by apply leq_trans with (n := t1 + delta); [| rewrite leq_add2r].
+          - by apply job_completes_within_busy_interval with (t1 := t1).
       Qed.
 
     End ResponseTimeBoundFromBusyInterval.

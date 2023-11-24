@@ -225,13 +225,13 @@ Section SumsOverSequences.
     \sum_(x <- r | P x) E1 x == \sum_(x <- r | P x) E2 x
       = all (fun x => E1 x == E2 x) [seq x <- r | P x].
   Proof.
-    move=> le; rewrite all_filter; case aE: all.
-    apply: eq_sum_seq => i ir Pi; move: aE => /allP/(_ i ir)/implyP; exact.
+    move=> le; rewrite all_filter; case aE: all;
+      first by apply: eq_sum_seq => i ir Pi; move: aE => /allP/(_ i ir)/implyP; exact.
     have [j /andP[jr Pj] ltj] : exists2 j, (j \in r) && P j & E1 j < E2 j.
-    have /negbT := aE; rewrite -has_predC => /hasP[j jr /=].
-    rewrite negb_imply => /andP[Pj neq].
-    - by exists j; first exact/andP; rewrite ltn_neqAle neq le.
-    - by apply/negbTE; rewrite neq_ltn (ltn_sum_leq_seq j).
+    { have /negbT := aE; rewrite -has_predC => /hasP[j jr /=].
+      rewrite negb_imply => /andP[Pj neq].
+      by exists j; first exact/andP; rewrite ltn_neqAle neq le. }
+    by apply/negbTE; rewrite neq_ltn (ltn_sum_leq_seq j).
   Qed.
 
 End SumsOverSequences.

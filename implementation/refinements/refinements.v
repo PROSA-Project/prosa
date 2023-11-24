@@ -118,15 +118,12 @@ Proof.
   { eapply refines_eq.
     apply refines_bool_eq; unfold "%|", dvdn_T.
     by refines_apply. }
-  destruct (y %| x) eqn:B.
+  destruct (y %| x) eqn:B; first by eapply refines_apply;[refines_abstr| exact: Ry].
   { eapply refines_apply.
-    refines_abstr.
-    by exact Ry. }
-  { eapply refines_apply.
-    refines_abstr.
-    eapply refines_apply.
-    refines_abstr.
-    by exact Ry. }
+    - refines_abstr.
+    - eapply refines_apply.
+      + by refines_abstr.
+      + exact: Ry. }
 Qed.
 
 (** Next, we prove a refinement for the minimum function. *)

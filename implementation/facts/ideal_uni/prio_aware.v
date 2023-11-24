@@ -126,12 +126,12 @@ Section PrioAwareUniprocessorScheduler.
       { move: BACK_j1.
         have ->: backlogged (uni_schedule arr_seq) j1 t = backlogged (prefix t) j1 t.
         { apply backlogged_prefix_invariance' with (h := t) => //.
-          rewrite /identical_prefix /uni_schedule /prefix => t' LT.
-          elim: t PREEMPT SCHED_j2 NOT_SCHED_j1 LT => [//|t IHt] PREEMPT SCHED_j2 NOT_SCHED_j1 LT.
-          rewrite /pmc_uni_schedule/generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
-          rewrite /prefix scheduled_at_def.
-          induction t => //.
-          by rewrite schedule_up_to_empty. }
+          - rewrite /identical_prefix /uni_schedule /prefix => t' LT.
+            elim: t PREEMPT SCHED_j2 NOT_SCHED_j1 LT => [//|t IHt] PREEMPT SCHED_j2 NOT_SCHED_j1 LT.
+            rewrite /pmc_uni_schedule/generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
+          - rewrite /prefix scheduled_at_def.
+            induction t => //.
+            by rewrite schedule_up_to_empty. }
         move=> BACK_j1.
         move: (scheduled_job_is_supremum j2 t SCHED_j2 PREEMPT) => SUPREMUM.
         apply supremum_spec with (s := jobs_backlogged_at arr_seq (prefix t) t) => //.

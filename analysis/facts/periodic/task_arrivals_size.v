@@ -45,8 +45,8 @@ Section TaskArrivalsSize.
     move : (A_ARR) => A_IN; apply CONSISTENT in A_IN.
     rewrite -A_IN in T; rewrite /arrivals_at in A_ARR.
     apply in_arrseq_implies_arrives in A_ARR.
-    have EXISTS_N : exists n, job_arrival a = task_offset tsk + n * task_period tsk.
-      exact: (job_arrival_times arr_seq).
+    have EXISTS_N : exists n, job_arrival a = task_offset tsk + n * task_period tsk
+        by exact: (job_arrival_times arr_seq).
     move : EXISTS_N => [n A_ARRIVAL].
     by move : (T n) => T1.
   Qed.
@@ -56,11 +56,11 @@ Section TaskArrivalsSize.
   Lemma task_arrivals_at_size_cases:
     forall t,
       size (task_arrivals_at arr_seq tsk t) = 0 \/
-      size (task_arrivals_at arr_seq tsk t) = 1.
+        size (task_arrivals_at arr_seq tsk t) = 1.
   Proof.
     intro t.
-    case: (ltngtP (size (task_arrivals_at arr_seq tsk t)) 1) => [LT|GT|EQ]; try by auto.
-    destruct (size (task_arrivals_at arr_seq tsk t)); now left.
+    case: (ltngtP (size (task_arrivals_at arr_seq tsk t)) 1) => [LT|GT|EQ];
+         [by destruct (size (task_arrivals_at arr_seq tsk t)); left| |by lia].
     specialize (exists_two (task_arrivals_at arr_seq tsk t)) => EXISTS_TWO.
     move : H_valid_arrival_sequence => [CONSISTENT UNIQ].
     destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by [] | by apply filter_uniq | ].
@@ -160,22 +160,22 @@ Section TaskArrivalsSize.
         size (task_arrivals_up_to arr_seq tsk l) = n + 1.
     Proof.
       elim=> [|n IHn].
-      intros l r; rewrite /l mul0n add0n addn0.
-      by apply size_task_arrivals_up_to_offset.
-      intros l r.
-      specialize (task_arrivals_cat arr_seq tsk (task_offset tsk + n * task_period tsk)
-                                    (task_offset tsk + n.+1 * task_period tsk)) => CAT.
-      feed_n 1 CAT; first by lia.
-      rewrite CAT size_cat IHn.
-      specialize (task_arrivals_between_cat arr_seq tsk (task_offset tsk + n * task_period tsk).+1
-                 (task_offset tsk + n.+1 * task_period tsk) (task_offset tsk + n.+1 * task_period tsk).+1) => S_CAT.
-      feed_n 2 S_CAT; try by lia.
-      { rewrite ltn_add2l ltn_mul2r.
-        by apply /andP; split => //.
-      }
-      rewrite S_CAT size_cat /task_arrivals_between /arrivals_between big_nat1.
-      rewrite size_task_arrivals_between_eq0 task_arrivals_at_size => //.
-      by lia.
+      - intros l r; rewrite /l mul0n add0n addn0.
+        by apply size_task_arrivals_up_to_offset.
+      - intros l r.
+        specialize (task_arrivals_cat arr_seq tsk (task_offset tsk + n * task_period tsk)
+                      (task_offset tsk + n.+1 * task_period tsk)) => CAT.
+        feed_n 1 CAT; first by lia.
+        rewrite CAT size_cat IHn.
+        specialize (task_arrivals_between_cat arr_seq tsk (task_offset tsk + n * task_period tsk).+1
+                      (task_offset tsk + n.+1 * task_period tsk) (task_offset tsk + n.+1 * task_period tsk).+1) => S_CAT.
+        feed_n 2 S_CAT; try by lia.
+        { rewrite ltn_add2l ltn_mul2r.
+          by apply /andP; split => //.
+        }
+        rewrite S_CAT size_cat /task_arrivals_between /arrivals_between big_nat1.
+        rewrite size_task_arrivals_between_eq0 task_arrivals_at_size => //.
+        by lia.
     Qed.
 
     (** We show that the number of jobs released by task [tsk] at any instant [t]

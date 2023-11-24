@@ -85,7 +85,7 @@ Section CondPI.
     { apply => j' SCHED' NHEP.
       move: SCHED'; rewrite scheduled_jobs_at_iff // => SCHED''.
       have PI: priority_inversion arr_seq sched j t by apply /uni_priority_inversion_P.
-      have j't1: scheduled_at sched j' t1.
+      have j't1: scheduled_at sched j' t1
         by apply: (pi_job_remains_scheduled arr_seq) =>//; apply /andP.
       have -> // : j' = jlp.
       { apply /eqP/contraT => NEQ; move: SCHED; apply /contraLR => _.

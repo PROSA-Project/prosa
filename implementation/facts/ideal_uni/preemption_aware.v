@@ -98,8 +98,7 @@ Section NPUniprocessorScheduler.
       move=> j t ARRIVES BACKLOGGED.
       move: (@ideal_proc_model_sched_case_analysis Job schedule t) => [IDLE|SCHED]; last by exact.
       exfalso.
-      have NON_EMPTY: j \in jobs_backlogged_at arr_seq schedule t.
-        exact: mem_backlogged_jobs.
+      have NON_EMPTY: j \in jobs_backlogged_at arr_seq schedule t by exact: mem_backlogged_jobs.
       move: (idle_schedule_no_backlogged_jobs t IDLE) => EMPTY.
       by rewrite EMPTY in NON_EMPTY.
     Qed.
@@ -226,21 +225,21 @@ Section NPUniprocessorScheduler.
         ~~ preemption_time arr_seq schedule t.
     Proof.
       move=> t.
-      rewrite /preemption_time scheduled_job_at_def//; last first.
-      - exact/jobs_must_arrive_to_be_ready/jobs_must_be_ready.
+      rewrite /preemption_time scheduled_job_at_def//;
+        last by exact/jobs_must_arrive_to_be_ready/jobs_must_be_ready.
+      - elim: t => [|t _]; first by rewrite /prev_job_nonpreemptive.
+        rewrite /schedule /pmc_uni_schedule /generic_schedule
+          schedule_up_to_def /prefix /allocation_at => NP.
+        rewrite ifT // -pred_Sn.
+        move: NP; rewrite /prev_job_nonpreemptive.
+        elim: (schedule_up_to policy idle_state t t) => // j.
+        have ->: (service (fun t0 : instant => schedule_up_to policy idle_state t0 t0) j t.+1 =
+                    service (schedule_up_to policy idle_state t) j t.+1) => //.
+        + rewrite /service.
+          apply equal_prefix_implies_same_service_during => t' /andP [_ BOUND].
+          rewrite (schedule_up_to_prefix_inclusion _ _ t' t) //.
+        + by move=> /andP [? ?].
       - exact: np_schedule_jobs_from_arrival_sequence.
-      elim: t => [|t _]; first by rewrite /prev_job_nonpreemptive.
-      rewrite /schedule /pmc_uni_schedule /generic_schedule
-              schedule_up_to_def /prefix /allocation_at => NP.
-      rewrite ifT // -pred_Sn.
-      move: NP; rewrite /prev_job_nonpreemptive.
-      elim: (schedule_up_to policy idle_state t t) => // j.
-      have ->: (service (fun t0 : instant => schedule_up_to policy idle_state t0 t0) j t.+1 =
-                service (schedule_up_to policy idle_state t) j t.+1) => //.
-      rewrite /service.
-      apply equal_prefix_implies_same_service_during => t' /andP [_ BOUND].
-      rewrite (schedule_up_to_prefix_inclusion _ _ t' t) //.
-      by move=> /andP [? ?].
     Qed.
 
   End PreemptionTimes.

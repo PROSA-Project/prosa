@@ -100,15 +100,15 @@ Section ModelWithLimitedPreemptions.
       have EQ: 2 = size [::0; job_cost j] => [//|].
       rewrite EQ; clear EQ.
       apply subseq_leq_size.
-      rewrite !cons_uniq.
-      { apply/andP; split.
-        rewrite in_cons negb_or; apply/andP; split=> [|//].
-        rewrite neq_ltn; apply/orP; left; eauto 2.
-        by apply/andP. }
-      intros t EQ; move: EQ; rewrite !in_cons.
-      move => /orP [/eqP EQ| /orP [/eqP EQ|EQ]] //.
-      - by rewrite EQ; apply zero_in_preemption_points.
-      - by rewrite EQ; apply job_cost_in_nonpreemptive_points.
+      - rewrite !cons_uniq.
+        { apply/andP; split.
+          + rewrite in_cons negb_or; apply/andP; split=> [|//].
+            rewrite neq_ltn; apply/orP; left; eauto 2.
+          + by apply/andP. }
+      - intros t EQ; move: EQ; rewrite !in_cons.
+        move => /orP [/eqP EQ| /orP [/eqP EQ|EQ]] //.
+        + by rewrite EQ; apply zero_in_preemption_points.
+        + by rewrite EQ; apply job_cost_in_nonpreemptive_points.
     Qed.
 
     (** Next we prove that "anti-density" property (from
@@ -188,8 +188,8 @@ Section ModelWithLimitedPreemptions.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
       unfold job_preemption_points, job_preemptable, limited_preemptive_job_model.
       intros; rewrite distances_iota_filtered; eauto 2.
-      rewrite max0_rem0 //.
-      rewrite -A2 //.
+      - by rewrite max0_rem0 //.
+      - rewrite -A2 //.
         by intros; apply last_is_max_in_nondecreasing_seq; eauto 2.
     Qed.
 

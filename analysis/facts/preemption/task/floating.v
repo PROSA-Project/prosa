@@ -58,9 +58,9 @@ Section FloatingNonPreemptiveRegionsModel.
     move: (H_valid_model_with_floating_nonpreemptive_regions) => LIM; move: LIM (LIM) => [LIM L] [[BEG [END NDEC]] MAX].
     case: (posnP (job_cost j)) => [ZERO|POS].
     - split.
-      rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
+      + rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
               /lengths_of_segments /job_preemption_points; rewrite ZERO; simpl.
-      rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
+        by rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
       + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.
           by eapply zero_in_preemption_points; eauto 2.
@@ -102,7 +102,7 @@ Section FloatingNonPreemptiveRegionsModel.
     split.
     - apply valid_fixed_preemption_points_model_lemma; auto.
         by apply H_valid_model_with_floating_nonpreemptive_regions.
-    - apply floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions.
+    - by apply floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions.
   Qed.
 
 End FloatingNonPreemptiveRegionsModel.

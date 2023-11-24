@@ -186,8 +186,8 @@ Section PeriodicLemmas.
     move : (J_IN) => J_ARR; apply all_jobs_arrive_within_hyperperiod in J_IN.
     rewrite /jobs_in_hp /jobs_in_hyperperiod /task_arrivals_up_to /task_arrivals_between mem_filter in J_ARR.
     move : J_ARR =>  /andP [/eqP TSK' NTH_IN].
-    apply job_in_task_arrivals_between => //.
-      by apply in_arrivals_implies_arrived in NTH_IN.
+    apply job_in_task_arrivals_between => //;
+      first by apply in_arrivals_implies_arrived in NTH_IN.
     apply mem_bigcat_nat_exists in NTH_IN.
     apply /andP; split => //.
     rewrite ltnS.

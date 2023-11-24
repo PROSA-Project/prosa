@@ -14,10 +14,10 @@ Definition last0 := last 0.
 Section Last0.
 
   (** Let [xs] be a non-empty sequence and [x] be an arbitrary element,
-      then we prove that [last0 (x::xs) = last0 xs]. *) 
+      then we prove that [last0 (x::xs) = last0 xs]. *)
   Lemma last0_cons :
     forall x xs,
-      xs <> [::] -> 
+      xs <> [::] ->
       last0 (x::xs) = last0 xs.
   Proof. by move=> x; elim. Qed.
 
@@ -33,13 +33,13 @@ Section Last0.
     - by apply IHxs_l.
     - by intros C; apply: NEQ; destruct xs_l.
   Qed.
-  
+
   (** We also prove that [last0 xs = xs [| size xs -1 |] ]. *)
   Lemma last0_nth :
     forall xs,
       last0 xs = nth 0 xs (size xs).-1.
   Proof. by intros; rewrite nth_last. Qed.
-  
+
   (** We prove that for any non-empty sequence [xs] there is a sequence [xsh]
       such that [xsh ++ [::last0 x] = [xs]]. *)
   Lemma last0_ex_cat :
@@ -55,7 +55,7 @@ Section Last0.
       destruct IHxs as [xsh EQ].
       by exists (a::xsh); rewrite //= EQ.
   Qed.
-  
+
   (** We prove that if [x] is the last element of a sequence [xs] and
       [x] satisfies a predicate, then [x] remains the last element in
       the filtered sequence. *)
@@ -71,12 +71,12 @@ Section Last0.
     rewrite filter_cat last0_cat.
     all:rewrite //= PX //=.
   Qed.
-  
+
 End Last0.
 
 (** Additional lemmas about [max0]. *)
 Section Max0.
-  
+
   (** First we prove that [max0 (x::xs)] is equal to [max {x, max0 xs}]. *)
   Lemma max0_cons : forall x xs, max0 (x :: xs) = maxn x (max0 xs).
   Proof. by move=> x xs; rewrite /max0 !foldlE /= !big_cons maxnCA. Qed.
@@ -124,7 +124,7 @@ Section Max0.
       by rewrite /max0 //= max0n in_cons eq_refl.
     - rewrite max0_cons.
       move: (leq_total a (max0 (n::xs))) => /orP [LE|LE].
-      + by rewrite maxnE subnKC // in_cons; apply/orP; right; apply IHxs. 
+      + by rewrite maxnE subnKC // in_cons; apply/orP; right; apply IHxs.
       + rewrite maxnE; move: LE; rewrite -subn_eq0; move => /eqP EQ.
         by rewrite EQ addn0 in_cons; apply/orP; left.
   Qed.
@@ -132,7 +132,7 @@ Section Max0.
   (** We prove a technical lemma stating that one can remove
       duplicating element from the head of a sequence. *)
   Lemma max0_2cons_eq :
-    forall x xs, 
+    forall x xs,
       max0 (x::x::xs) = max0 (x::xs).
   Proof. by intros; rewrite !max0_cons maxnA maxnn. Qed.
 
@@ -141,16 +141,16 @@ Section Max0.
       sequence. *)
   Lemma max0_2cons_le :
     forall x1 x2 xs,
-      x1 <= x2 -> 
+      x1 <= x2 ->
       max0 (x1::x2::xs) = max0 (x2::xs).
   Proof.
     by move=> x1 x2 ? ?; rewrite !max0_cons maxnA [maxn x1 x2]maxnE subnKC.
   Qed.
 
-  (** We prove that [max0] of a sequence [xs] 
+  (** We prove that [max0] of a sequence [xs]
       is equal to [max0] of sequence [xs] without 0s. *)
   Lemma max0_rem0 :
-    forall xs, 
+    forall xs,
       max0 ([seq x <- xs | 0 < x]) = max0 xs.
   Proof.
     elim=> [//|a xs IHxs].
@@ -158,21 +158,21 @@ Section Max0.
     - by rewrite max0_cons max0n.
     - by rewrite !max0_cons IHxs.
   Qed.
-  
+
   (** Note that the last element is at most the max element. *)
   Lemma last_of_seq_le_max_of_seq:
     forall xs, last0 xs <= max0 xs.
   Proof.
     intros xs.
     have EX: exists len, size xs <= len.
-    { by exists (size xs). } 
+    { by exists (size xs). }
     move: EX => [len LE].
     generalize dependent xs; elim: len => [|n IHlen] xs LE.
     - by intros; move: LE; rewrite leqn0 size_eq0; move => /eqP EQ; subst.
-    - move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LE]; last by apply IHlen. 
+    - move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LE]; last by apply IHlen.
       destruct xs as [ | x1 xs]; first by inversion EQ.
       destruct xs as [ | x2 xs]; first by rewrite /max leq_max; apply/orP; right.
-      have ->: last0 [:: x1, x2 & xs] = last0 [:: x2 & xs] by done. 
+      have ->: last0 [:: x1, x2 & xs] = last0 [:: x2 & xs] by done.
       rewrite max0_cons leq_max; apply/orP; right; apply IHlen.
       move: EQ => /eqP; simpl; rewrite eqSS; move => /eqP EQ.
       by subst.
@@ -180,9 +180,9 @@ Section Max0.
 
   (** Let's introduce the notion of the nth element of a sequence. *)
   Notation "xs [| n |]" := (nth 0 xs n) (at level 30).
-  
+
   (** If any element of a sequence [xs] is less-than-or-equal-to
-      the corresponding element of a sequence [ys], then [max0] of 
+      the corresponding element of a sequence [ys], then [max0] of
       [xs] is less-than-or-equal-to max of [ys]. *)
   Lemma max_of_dominating_seq :
     forall xs ys,
@@ -205,10 +205,10 @@ Section Max0.
           apply/eqP; rewrite eqn_leq; apply/andP; split; last by done.
           rewrite geq_max; apply/andP; split.
           - by specialize (H 0); simpl in H; rewrite H.
-          - rewrite leqn0; apply/eqP; apply: IHxs. 
+          - rewrite leqn0; apply/eqP; apply: IHxs.
             by move=> n; specialize (H n.+1); simpl in H.
         }
-        rewrite L; first by done. 
+        rewrite L; first by done.
         move=> n0; specialize (H n0).
         by destruct n0; simpl in *; apply/eqP; rewrite -leqn0.
       }
@@ -225,7 +225,7 @@ Section Max0.
 End Max0.
 
 (** Additional lemmas about [rem] for lists. *)
-Section RemList.  
+Section RemList.
 
   (** We prove that if [x] lies in [xs] excluding [y], then
       [x] also lies in [xs]. *)
@@ -250,7 +250,7 @@ Section RemList.
   Lemma in_neq_impl_rem_in :
     forall {X : eqType} (x y : X) (xs : seq X),
       x \in xs ->
-      x != y ->       
+      x != y ->
       x \in rem y xs.
   Proof.
     move=> X x y; elim=> [//|a xs IHxs].
@@ -267,8 +267,8 @@ Section RemList.
 
   (** We prove that if we remove an element [x] for which [P x] from a
       filter, then the size of the filter decreases by [1]. *)
-  Lemma filter_size_rem : 
-    forall {X : eqType} (x : X) (xs : seq X) (P : pred X), 
+  Lemma filter_size_rem :
+    forall {X : eqType} (x : X) (xs : seq X) (P : pred X),
       (x \in xs) ->
       P x ->
       size [seq y <- xs | P y] = size [seq y <- rem x xs | P y] + 1.
@@ -276,7 +276,7 @@ Section RemList.
     move=> X x + P + H0; elim=> [|a xs IHxs] H; first by inversion H.
     move: H; rewrite in_cons; move => /orP [/eqP H | H]; subst.
     { by simpl; rewrite H0 -[X in X = _]addn1 eq_refl. }
-    { specialize (IHxs H); simpl in *. 
+    { specialize (IHxs H); simpl in *.
       case EQab: (a == x); simpl.
       { move: EQab => /eqP EQab; subst.
         by rewrite H0 addn1. }
@@ -290,10 +290,10 @@ Section RemList.
 End RemList.
 
 (** Additional lemmas about sequences. *)
-Section AdditionalLemmas.  
+Section AdditionalLemmas.
 
   (** First, we prove that [x::xs = ys] is a sufficient condition for
-      [x] to be in [ys]. *) 
+      [x] to be in [ys]. *)
   Lemma mem_head_impl :
     forall {X : eqType} (x : X) (xs ys : seq X),
       x::xs = ys ->
@@ -303,7 +303,7 @@ Section AdditionalLemmas.
     move: EQ => /eqP; rewrite eqseq_cons => /andP [/eqP EQ _].
     by subst y; rewrite in_cons; apply/orP; left.
   Qed.
-  
+
   (** We show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
   Lemma nth0_cons :
     forall x xs n,
@@ -338,7 +338,7 @@ Section AdditionalLemmas.
       by exists x, [::]; split.
     - destruct xs as [|x xs]; first by done.
       specialize (IHn xs).
-      feed IHn; first by simpl in SIZE; apply eq_add_S in SIZE. 
+      feed IHn; first by simpl in SIZE; apply eq_add_S in SIZE.
       destruct IHn as [x__n [xs__n [EQ__n SIZE__n]]]; subst xs.
       exists x__n, (x :: xs__n); split; first by done.
       simpl in SIZE; apply eq_add_S in SIZE.
@@ -346,7 +346,7 @@ Section AdditionalLemmas.
       by apply eq_S.
   Qed.
 
-  (** Next, we prove that [x ∈ xs] implies that [xs] can be split 
+  (** Next, we prove that [x ∈ xs] implies that [xs] can be split
      into two parts such that [xs = xsl ++ [::x] ++ [xsr]]. *)
   Lemma in_cat :
     forall {X : eqType} (x : X) (xs : list X),
@@ -360,7 +360,7 @@ Section AdditionalLemmas.
       by subst; exists (a::xsl), xsr.
   Qed.
 
-  (** We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence 
+  (** We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence
      of [ys] implies that the size of [xs] is at most the size of [ys]. *)
   Lemma subseq_leq_size :
     forall {X : eqType} (xs ys: seq X),
@@ -376,7 +376,7 @@ Section AdditionalLemmas.
     { move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys.
       destruct xs as [|s xs]; first by done.
       specialize (SUB s).
-      by feed SUB; [rewrite in_cons; apply/orP; left | done]. 
+      by feed SUB; [rewrite in_cons; apply/orP; left | done].
     }
     { destruct xs as [ | x xs]; first by done.
       move: (@in_cat _ x ys) => Lem.
@@ -404,7 +404,7 @@ Section AdditionalLemmas.
 
   (** Given two sequences [xs] and [ys], two elements [x] and [y], and
       an index [idx] such that [nth xs idx = x, nth ys idx = y], we
-      show that the pair [(x, y)] is in [zip xs ys]. *)      
+      show that the pair [(x, y)] is in [zip xs ys]. *)
   Lemma in_zip :
     forall {X Y : eqType} (xs : seq X) (ys : seq Y) (x x__d : X) (y y__d : Y),
       size xs = size ys ->
@@ -413,7 +413,7 @@ Section AdditionalLemmas.
   Proof.
     move=> X Y xs ys x x__d y y__d.
     elim: xs ys => [|x1 xs IHxs] ys EQ [idx [LT [NTHx NTHy]]] //.
-    destruct ys as [ | y1 ys]; first by done.    
+    destruct ys as [ | y1 ys]; first by done.
     rewrite //= in_cons; apply/orP.
     destruct idx as [ | idx]; [left | right].
     { by simpl in NTHx, NTHy; subst. }
@@ -424,31 +424,31 @@ Section AdditionalLemmas.
     }
   Qed.
 
-  (** This lemma allows us to check proposition of the form 
-      [forall x ∈ xs, exists y ∈ ys, P x y] using a boolean expression 
+  (** This lemma allows us to check proposition of the form
+      [forall x ∈ xs, exists y ∈ ys, P x y] using a boolean expression
       [all P (zip xs ys)]. *)
   Lemma forall_exists_implied_by_forall_in_zip:
     forall {X Y : eqType} (P_bool : X * Y -> bool) (P_prop : X -> Y -> Prop) (xs : seq X),
       (forall x y, P_bool (x, y) <-> P_prop x y) ->
-      (exists ys, size xs = size ys /\ all P_bool (zip xs ys) == true) -> 
+      (exists ys, size xs = size ys /\ all P_bool (zip xs ys) == true) ->
       (forall x, x \in xs -> exists y, P_prop x y).
-  Proof.    
+  Proof.
     move=> X Y P_bool P_prop xs EQ TR x IN.
     destruct TR as [ys [SIZE ALL]].
     set (idx := index x xs).
     have x__d : Y by destruct xs, ys.
     have y__d : Y by destruct xs, ys.
     exists (nth y__d ys idx); apply EQ; clear EQ.
-    move: ALL => /eqP/allP -> //.  
+    move: ALL => /eqP/allP -> //.
     eapply in_zip; first by done.
     exists idx; repeat split.
     - by rewrite index_mem.
     - by apply nth_index.
-    - Unshelve. by done.
+      Unshelve. by done.
   Qed.
 
   (** Given two sequences [xs] and [ys] of equal size and without
-      duplicates, the fact that [xs ⊆ ys] implies that [ys ⊆ xs]. *) 
+      duplicates, the fact that [xs ⊆ ys] implies that [ys ⊆ xs]. *)
   Lemma subseq_eq:
     forall {X : eqType} (xs ys : seq X),
       uniq xs ->
@@ -456,33 +456,37 @@ Section AdditionalLemmas.
       size xs = size ys ->
       (forall x, x \in xs -> x \in ys) ->
       (forall x, x \in ys -> x \in xs).
-  Proof.  
+  Proof.
     intros X xs ys UNIQ SUB.
     have EXm: exists m, size ys <= m; first by exists (size ys).
     move: EXm => [m SIZEm].
     move: SIZEm UNIQ SUB; move: xs ys.
     elim: m => [|m IHm] xs ys SIZEm UNIQx UNIQy EQ SUB a IN.
-    { by move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys. } 
+    { by move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys. }
     { destruct xs as [ | x xs].
-      { by move: EQ; simpl => /eqP; rewrite eq_sym size_eq0 => /eqP EQ; subst ys. } 
+      { by move: EQ; simpl => /eqP; rewrite eq_sym size_eq0 => /eqP EQ; subst ys. }
       { destruct (x == a) eqn:XA; first by rewrite in_cons eq_sym; apply/orP; left.
         move: XA => /negP/negP NEQ.
         rewrite in_cons eq_sym; apply/orP; right.
         specialize (IHm xs (rem x ys)); apply IHm.
         { rewrite size_rem; last by apply SUB; rewrite in_cons; apply/orP; left.
           by rewrite -EQ //=; move: SIZEm; rewrite -EQ //=. }
-        { by move: UNIQx; rewrite cons_uniq => /andP [_ UNIQ]. } 
+        { by move: UNIQx; rewrite cons_uniq => /andP [_ UNIQ]. }
         { by apply rem_uniq. }
         { rewrite size_rem; last by apply SUB; rewrite in_cons; apply/orP; left.
           by rewrite -EQ //=. }
         { intros b INb.
-          apply in_neq_impl_rem_in. apply SUB. by rewrite in_cons; apply/orP; right.
-          move: UNIQx. rewrite cons_uniq => /andP [NIN _].
-          apply/negP => /eqP EQbx; subst.
-          by move: NIN => /negP NIN; apply: NIN. 
+          apply in_neq_impl_rem_in.
+          -  apply SUB.
+             rewrite in_cons.
+             by apply/orP; right.
+          - move: UNIQx.
+            rewrite cons_uniq => /andP [NIN _].
+            apply/negP => /eqP EQbx; subst.
+            by move: NIN => /negP NIN; apply: NIN.
         }
         { by apply in_neq_impl_rem_in; last rewrite eq_sym. }
-      }          
+      }
     }
   Qed.
 
@@ -491,7 +495,7 @@ Section AdditionalLemmas.
      sequence. *)
   Lemma filter_in_pred0 :
     forall {X : eqType} (xs : seq X) (P : pred X),
-      (forall x, x \in xs -> ~~ P x) -> 
+      (forall x, x \in xs -> ~~ P x) ->
       filter P xs = [::].
   Proof.
     move=> X xs P; elim: xs => [//|a xs IHxs] ALLF.
@@ -548,7 +552,7 @@ Section AdditionalLemmas.
     apply /eqP; apply contraNneq with (b := (0 == 1)) => // /eqP.
     by rewrite nth_uniq.
   Qed.
-  
+
 
   (** The predicate [all] implies the predicate [has], if the sequence is not empty. *)
   Lemma has_all_nilp {T : eqType}:
@@ -568,19 +572,19 @@ End AdditionalLemmas.
 Section Sorted.
 
   (** We show that if [[x | x ∈ xs : P x]] is sorted with respect to
-      values of some function [f], then it can be split into two parts: 
+      values of some function [f], then it can be split into two parts:
       [[x | x ∈ xs : P x /\ f x <= t]] and [[x | x ∈ xs : P x /\ f x <= t]]. *)
   Lemma sorted_split :
     forall {X : eqType} (xs : seq X) P f t,
       sorted (fun x y => f x <= f y) xs ->
-      [seq x <- xs | P x] = [seq x <- xs | P x & f x <= t] ++ [seq x <- xs | P x & f x > t]. 
+      [seq x <- xs | P x] = [seq x <- xs | P x & f x <= t] ++ [seq x <- xs | P x & f x > t].
   Proof.
     clear; move=> X xs P f t; elim: xs => [//|a xs IHxs] /= SORT.
     have TR : transitive (T:=X) (fun x y : X => f x <= f y).
     { intros ? ? ? LE1 LE2; lia. }
     destruct (P a) eqn:Pa, (leqP (f a) t) as [R1 | R1]; simpl.
     { erewrite IHxs; first by reflexivity.
-      by eapply path_sorted; eauto. } 
+      by eapply path_sorted; eauto. }
     { erewrite IHxs; last by eapply path_sorted; eauto.
       replace ([seq x <- xs | P x & f x <= t]) with (@nil X); first by done.
       symmetry; move: SORT; rewrite path_sortedE // => /andP [ALL SORT].
@@ -595,7 +599,7 @@ Section Sorted.
       subsequences [xs1] and [xs2] are sorted as well. *)
   Lemma sorted_cat:
     forall {X : eqType} {R : rel X} (xs1 xs2 : seq X),
-      transitive R -> 
+      transitive R ->
       sorted R (xs1 ++ xs2) -> sorted R xs1 /\ sorted R xs2.
   Proof.
     move=> X R; elim=> [//|a xs1 IHxs1] xs2 TR SORT; split.
@@ -612,9 +616,9 @@ End Sorted.
 
 (** Additional lemmas about [last]. *)
 Section Last.
-    
+
   (** First, we show that the default element does not change the
-      value of [last] for non-empty sequences.  *) 
+      value of [last] for non-empty sequences.  *)
   Lemma nonnil_last :
     forall {X : eqType} (xs : seq X) (d1 d2 : X),
       xs != [::] ->
@@ -622,17 +626,17 @@ Section Last.
   Proof. by move=> X xs d1 d2; elim: xs => [//|a xs IHxs] _. Qed.
 
   (** We show that if a sequence [xs] contains an element that
-      satisfies a predicate [P], then the last element of [filter P xs] 
-      is in [xs]. *) 
+      satisfies a predicate [P], then the last element of [filter P xs]
+      is in [xs]. *)
   Lemma filter_last_mem :
     forall {X : eqType} (xs : seq X) (d : X) (P : pred X),
-      has P xs -> 
+      has P xs ->
       last d (filter P xs) \in xs.
   Proof.
     move=> X; elim=> [//|a xs IHxs] d P /hasP [x + Px].
     rewrite in_cons => /orP [/eqP EQ | IN].
     { simpl; subst a; rewrite Px; simpl.
-      destruct (has P xs) eqn:HAS. 
+      destruct (has P xs) eqn:HAS.
       { by rewrite in_cons; apply/orP; right; apply IHxs. }
       { replace (filter _ _) with (@nil X).
         - by simpl; rewrite in_cons; apply/orP; left.
@@ -656,7 +660,7 @@ End Last.
 Fixpoint rem_all {X : eqType} (x : X) (xs : seq X) :=
   match xs with
   | [::] => [::]
-  | a :: xs => 
+  | a :: xs =>
     if a == x then rem_all x xs else a :: rem_all x xs
   end.
 
@@ -665,19 +669,19 @@ Section RemAllList.
 
   (** First we prove that [x ∉ rem_all x xs]. *)
   Lemma nin_rem_all :
-    forall {X : eqType} (x : X) (xs : seq X), 
+    forall {X : eqType} (x : X) (xs : seq X),
       ~ (x \in rem_all x xs).
   Proof.
     move=> X x; elim=> [//|a xs IHxs] IN.
     apply: IHxs.
-    simpl in IN; destruct (a == x) eqn:EQ; first by done. 
+    simpl in IN; destruct (a == x) eqn:EQ; first by done.
     move: IN; rewrite in_cons; move => /orP [/eqP EQ2 | IN]; last by done.
     by subst; exfalso; rewrite eq_refl in EQ.
   Qed.
 
   (** Next we show that [rem_all x xs ⊆ xs].  *)
   Lemma in_rem_all :
-    forall {X : eqType} (a x : X) (xs : seq X), 
+    forall {X : eqType} (a x : X) (xs : seq X),
       a \in rem_all x xs -> a \in xs.
   Proof.
     intros X a x; elim=> [//|a0 xs IHxs] /= IN.
@@ -691,7 +695,7 @@ Section RemAllList.
   (** If an element [x] is smaller than any element of
       a sequence [xs], then [rem_all x xs = xs]. *)
   Lemma rem_lt_id :
-    forall x xs, 
+    forall x xs,
       (forall y, y \in xs -> x < y) ->
       rem_all x xs = xs.
   Proof.
@@ -714,11 +718,11 @@ Definition range (a b : nat) := index_iota a b.+1.
 (** Additional lemmas about [index_iota] and [range] for lists. *)
 Section IotaRange.
 
-  (** First, we show that [iota m n] can be split into two parts 
-      [iota m nle] and [iota (m + nle) (n - nle)] for any [nle <= n]. *) 
+  (** First, we show that [iota m n] can be split into two parts
+      [iota m nle] and [iota (m + nle) (n - nle)] for any [nle <= n]. *)
   Lemma iotaD_impl :
     forall n_le m n,
-      n_le <= n -> 
+      n_le <= n ->
       iota m n = iota m n_le ++ iota (m + n_le) (n - n_le).
   Proof.
     move=> n_le m n LE.
@@ -730,7 +734,7 @@ Section IotaRange.
       for [a < b]. *)
   Remark index_iota_lt_step :
     forall a b,
-      a < b -> 
+      a < b ->
       index_iota a b = a :: index_iota a.+1 b.
   Proof.
     move=> a b LT; unfold index_iota.
@@ -742,7 +746,7 @@ Section IotaRange.
   (** We prove that one can remove duplicating element from the
       head of a sequence by which [range] is filtered. *)
   Lemma range_filter_2cons :
-    forall x xs k, 
+    forall x xs k,
       [seq ρ <- range 0 k | ρ \in x :: x :: xs] =
       [seq ρ <- range 0 k | ρ \in x :: xs].
   Proof.
@@ -750,12 +754,12 @@ Section IotaRange.
     by rewrite !in_cons; destruct (x0 == x), (x0 \in xs).
   Qed.
 
-  (** Consider [a], [b], and [x] s.t. [a ≤ x < b], 
+  (** Consider [a], [b], and [x] s.t. [a ≤ x < b],
       then filter of [iota_index a b] with predicate
       [(_ == x)] yields [::x]. *)
   Lemma index_iota_filter_eqx :
     forall x a b,
-      a <= x < b -> 
+      a <= x < b ->
       [seq ρ <- index_iota a b | ρ == x] = [::x].
   Proof.
     move=> x a b.
@@ -763,31 +767,31 @@ Section IotaRange.
     { exists (b-a); by simpl. }
     destruct EX as [k BO].
     revert x a b BO; elim: k => [|k IHk] => x a b BO /andP [GE LT].
-    { by exfalso; move: BO; rewrite leqn0 subn_eq0; move => BO; lia. } 
+    { by exfalso; move: BO; rewrite leqn0 subn_eq0; move => BO; lia. }
     { destruct a as [|a].
       { destruct b; first by done.
         rewrite index_iota_lt_step //; simpl.
         destruct (0 == x) eqn:EQ.
         - move: EQ => /eqP EQ; subst x.
           rewrite filter_in_pred0 //.
-          by intros x; rewrite mem_index_iota -lt0n; move => /andP [T1 _]. 
-        - by apply IHk; lia. 
+          by intros x; rewrite mem_index_iota -lt0n; move => /andP [T1 _].
+        - by apply IHk; lia.
       }
       rewrite index_iota_lt_step; last by lia.
-      simpl; destruct (a.+1 == x) eqn:EQ. 
+      simpl; destruct (a.+1 == x) eqn:EQ.
       - move: EQ => /eqP EQ; subst x.
         rewrite filter_in_pred0 //.
         intros x; rewrite mem_index_iota; move => /andP [T1 _].
         by rewrite neq_ltn; apply/orP; right.
-      - by rewrite IHk //; lia. 
-    } 
+      - by rewrite IHk //; lia.
+    }
   Qed.
 
-  (** As a corollary we prove that filter of [iota_index a b] 
+  (** As a corollary we prove that filter of [iota_index a b]
       with predicate [(_ ∈ [::x])] yields [::x]. *)
   Corollary index_iota_filter_singl :
     forall x a b,
-      a <= x < b -> 
+      a <= x < b ->
       [seq ρ <- index_iota a b | ρ \in [:: x]] = [::x].
   Proof.
     move=> x a b NEQ.
@@ -802,7 +806,7 @@ Section IotaRange.
       x xs)]. *)
   Lemma index_iota_filter_inxs :
     forall a b x xs,
-      x < a -> 
+      x < a ->
       [seq ρ <- index_iota a b | ρ \in xs] =
       [seq ρ <- index_iota a b | ρ \in rem_all x xs].
   Proof.
@@ -828,7 +832,7 @@ Section IotaRange.
       [seq ρ <- index_iota a b | ρ \in x :: xs] =
       x :: [seq ρ <- index_iota a b | ρ \in rem_all x xs].
   Proof.
-    intros x xs a b B MIN. 
+    intros x xs a b B MIN.
     have EX : exists k, b - a <= k.
     { exists (b-a); by simpl. } destruct EX as [k BO].
     revert x xs a b B MIN BO.
@@ -844,9 +848,9 @@ Section IotaRange.
         }
         rewrite (index_iota_filter_inxs _ _ x) //; simpl.
         rewrite eq_refl.
-        replace (@in_mem nat x (@mem nat (seq_predType nat_eqType) (@rem_all nat_eqType x xs))) with false; last first.
-        apply/eqP; rewrite eq_sym eqbF_neg. apply/negP; apply nin_rem_all.
-        reflexivity.
+        replace (@in_mem nat x (@mem nat (seq_predType nat_eqType) (@rem_all nat_eqType x xs))) with false; first by reflexivity.
+        apply/eqP; rewrite eq_sym eqbF_neg.
+        apply/negP; apply nin_rem_all.
       + rewrite index_iota_lt_step //; last by lia.
         replace ([seq ρ <- a :: index_iota a.+1 b | ρ \in x :: xs])
           with ([seq ρ <- index_iota a.+1 b | ρ \in x :: xs]); last first.
@@ -862,7 +866,7 @@ Section IotaRange.
           apply/eqP; rewrite eq_sym eqbF_neg; apply/negP; intros C.
           apply in_rem_all in C.
           by move_neq_down LT; apply MIN.
-        } 
+        }
         by rewrite IHk //; lia.
   Qed.
 
@@ -884,9 +888,9 @@ Section IotaRange.
   Lemma iota_filter_gt:
     forall x a b idx P,
       x < a ->
-      idx < size ([seq x <- index_iota a b | P x]) -> 
+      idx < size ([seq x <- index_iota a b | P x]) ->
       x < nth 0 [seq x <- index_iota a b | P x] idx.
-  Proof. 
+  Proof.
     clear=> x a b idx P.
     have EX : exists k, b - a <= k.
     { exists (b-a); by simpl. } destruct EX as [k BO].
@@ -907,14 +911,14 @@ Section IotaRange.
             by rewrite index_iota_lt_step // //= PA //= in LT2.
   Qed.
 
-End IotaRange. 
+End IotaRange.
 
 (** A sequence [xs] is a prefix of another sequence [ys] iff
-    there exists a sequence [xs_tail] such that [ys] is a 
+    there exists a sequence [xs_tail] such that [ys] is a
     concatenation of [xs] and [xs_tail]. *)
 Definition prefix_of {T : eqType} (xs ys : seq T) := exists xs_tail, xs ++ xs_tail = ys.
 
-(** Furthermore, every prefix of a sequence is said to be 
+(** Furthermore, every prefix of a sequence is said to be
     strict if it is not equal to the sequence itself. *)
 Definition strict_prefix_of {T : eqType} (xs ys : seq T) :=
   exists xs_tail, xs_tail <> [::] /\ xs ++ xs_tail = ys.

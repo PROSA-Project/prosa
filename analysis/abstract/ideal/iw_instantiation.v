@@ -174,8 +174,8 @@ Section JLFPInstantiation.
       Proof.
         move => j.
         rewrite /interference /ideal_jlfp_interference => /orP [PI | HEPI].
-        - have [j' schj'] : exists j' : Job, scheduled_at sched j' t.
-            exact/priority_inversion_scheduled_at.
+        - have [j' schj'] : exists j' : Job, scheduled_at sched j' t
+            by exact/priority_inversion_scheduled_at.
           exact: ideal_sched_implies_not_idle schj' H_idle.
         - exact: idle_implies_no_hep_job_interference HEPI.
       Qed.
@@ -225,8 +225,8 @@ Section JLFPInstantiation.
           apply/idP/idP => [/hasP[jhp /[!mem_filter]/andP[PSERV IN] AHEP] | AHEP].
           - apply service_at_implies_scheduled_at in PSERV.
             by have -> := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_sched PSERV.
-          - apply/hasP; exists j' => //; rewrite mem_filter; apply/andP; split.
-              by rewrite /receives_service_at service_at_is_scheduled_at H_sched.
+          - apply/hasP; exists j' => //; rewrite mem_filter; apply/andP; split;
+              first by rewrite /receives_service_at service_at_is_scheduled_at H_sched.
             apply: arrived_between_implies_in_arrivals => //.
             apply/andP; split=> [//|].
             by apply H_jobs_must_arrive_to_execute in H_sched; rewrite ltnS.
@@ -241,8 +241,8 @@ Section JLFPInstantiation.
           apply/idP/idP => [/hasP[jhp /[!mem_filter]/andP[PSERV IN] AHEP] | AHEP].
           - apply service_at_implies_scheduled_at in PSERV.
             by have -> := ideal_proc_model_is_a_uniprocessor_model _ _ _ _ H_sched PSERV.
-          - apply/hasP; exists j' => //; rewrite mem_filter; apply/andP; split.
-              by rewrite /receives_service_at service_at_is_scheduled_at H_sched.
+          - apply/hasP; exists j' => //; rewrite mem_filter; apply/andP; split;
+              first by rewrite /receives_service_at service_at_is_scheduled_at H_sched.
             apply: arrived_between_implies_in_arrivals => //.
             apply/andP; split=> [//|].
             by apply H_jobs_must_arrive_to_execute in H_sched; rewrite ltnS.
@@ -401,8 +401,8 @@ Section JLFPInstantiation.
       }
       { move => t _; rewrite /ideal_jlfp_interference.
         destruct (ideal_proc_model_sched_case_analysis sched t) as [IDLE | [s SCHED]].
-        - have -> : priority_inversion arr_seq sched j t = false.
-            exact/negbTE/idle_implies_no_priority_inversion.
+        - have -> : priority_inversion arr_seq sched j t = false
+            by exact/negbTE/idle_implies_no_priority_inversion.
           by rewrite add0n.
         - destruct (hep_job s j) eqn:PRIO.
           + by erewrite sched_hep_implies_no_priority_inversion => //; rewrite add0n.
@@ -450,8 +450,7 @@ Section JLFPInstantiation.
       - apply/hasP => -[jhp /[!mem_filter]/andP[RS__jhp IN__jhp]].
         move=> /andP[ATHEP__hp BB].
         have [jlp SCHED__jlp LEP__jlp] :
-            exists2 j', scheduled_at sched j' t & ~~ hep_job j' j.
-          exact/uni_priority_inversion_P.
+            exists2 j', scheduled_at sched j' t & ~~ hep_job j' j by exact/uni_priority_inversion_P.
         enough (EQ: jlp = jhp); first by (subst; rewrite ATHEP__hp in LEP__jlp).
         apply: ideal_proc_model_is_a_uniprocessor_model => //; move: RS__jhp.
         by rewrite /receives_service_at service_at_is_scheduled_at lt0b.
@@ -713,7 +712,8 @@ Section JLFPInstantiation.
         erewrite service_of_jobs_case_on_pred with (P2 := fun j' => j' != j).
         erewrite workload_of_jobs_case_on_pred with (P' := fun j' => j' != j) => //.
         replace ((fun j0 : Job => hep_job j0 j && (j0 != j))) with (another_hep_job^~j); last by rewrite /another_hep_job.
-        rewrite -/(service_of_another_hep_jobs j 0 t) -cumulative_i_ohep_eq_service_of_ohep; eauto.
+        rewrite -/(service_of_another_hep_jobs j 0 t) -cumulative_i_ohep_eq_service_of_ohep; eauto;
+          last by move => ? _ _ ; unfold arrived_before; lia.
         rewrite -/(workload_of_another_hep_jobs j 0 t) -cumulative_iw_hep_eq_workload_of_ohep; eauto.
         move: T1; rewrite negb_and => /orP [NA | /negPn COMP].
         { have PRED__eq: {in arrivals_between arr_seq 0 t, (fun j__copy : Job => hep_job j__copy j && ~~ (j__copy != j)) =1 pred0}.
@@ -740,7 +740,6 @@ Section JLFPInstantiation.
             (P := eq_op j) (t1 := 0) (t2 := t) => //.
           by move => j__copy _ /eqP EQ; subst j__copy.
         }
-        move => ? _ _ ; unfold arrived_before; lia.
       Qed.
 
       (** The equivalence trivially follows from the lemmas above. *)

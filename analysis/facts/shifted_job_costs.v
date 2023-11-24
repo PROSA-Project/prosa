@@ -70,15 +70,16 @@ Section ValidJobCostsShifted.
     rewrite /arrivals_have_valid_job_costs /valid_job_cost.
     intros j' ARR.
     unfold job_cost; rewrite /job_costs_in_oi /job_costs_shifted.
-    destruct (leqP O_max (job_arrival j)) as [A | B].
-    destruct (leqP (O_max + HP) (job_arrival j')) as [NEQ | NEQ].
-    destruct (leqP (O_max + 2 * HP) (job_arrival j')) as [LT | LT].
-    all : try by apply H_arrivals_have_valid_job_costs => //.
-    simpl.
+    destruct (leqP O_max (job_arrival j)) as [A | B];
+      last by apply H_arrivals_have_valid_job_costs => //.
+    destruct (leqP (O_max + HP) (job_arrival j')) as [NEQ | NEQ];
+      last by apply H_arrivals_have_valid_job_costs => //.
+    destruct (leqP (O_max + 2 * HP) (job_arrival j')) as [LT | LT];
+      first by apply H_arrivals_have_valid_job_costs => //.
     specialize (corresponding_jobs_have_same_task arr_seq ts j' j) => TSK.
     rewrite -[in X in _ <= task_cost X]TSK.
     have IN : job_task j' \in ts by apply H_jobs_from_taskset.
-    apply H_arrivals_have_valid_job_costs, corresponding_job_arrives => //; lia.
+    by apply H_arrivals_have_valid_job_costs, corresponding_job_arrives => //; lia.
   Qed.
 
 End ValidJobCostsShifted.
