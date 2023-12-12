@@ -85,6 +85,17 @@ Section ScheduleClass.
       by rewrite /scheduled_at scheduled_in_def.
   Qed.
 
+  (** The ideal processor model is a fully supply-consuming processor
+      model. *)
+  Lemma ideal_proc_model_fully_consuming :
+    fully_consuming_proc_model (processor_state Job).
+  Proof.
+    move=> j S t SCHED.
+    rewrite /service_at /supply_at /supply_in service_in_def.
+    move: SCHED; rewrite scheduled_at_def => ->.
+    by rewrite /index_enum Finite.EnumDef.enumDef /= big_seq1.
+  Qed.
+
   Lemma service_in_is_scheduled_in (j : Job) s :
     service_in j s = scheduled_in j s.
   Proof.
@@ -105,6 +116,15 @@ Section ScheduleClass.
     service_at sched j t = (sched t == Some j).
   Proof.
     by rewrite /service_at service_in_def.
+  Qed.
+
+  (** The ideal uniprocessor always has supply. *)
+  Lemma ideal_proc_has_supply :
+    forall (sched : schedule (ideal.processor_state Job)) (t : instant),
+      has_supply sched t.
+  Proof.
+    move=> sched t; rewrite /has_supply /supply_at /supply_in //=.
+    by rewrite /index_enum Finite.EnumDef.enumDef /= big_seq1.
   Qed.
 
   (** Next we prove a lemma which helps us to do a case analysis on
@@ -197,7 +217,9 @@ End ScheduleClass.
     will be able to apply them automatically. *)
 Global Hint Resolve ideal_proc_model_is_a_uniprocessor_model
      ideal_proc_model_ensures_ideal_progress
-     ideal_proc_model_provides_unit_service : basic_rt_facts.
+     ideal_proc_model_provides_unit_service
+     ideal_proc_model_fully_consuming
+     ideal_proc_has_supply : basic_rt_facts.
 
 (** We also provide tactics for case analysis on ideal processor state. *)
 
