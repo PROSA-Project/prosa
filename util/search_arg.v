@@ -1,5 +1,7 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export mathcomp.zify.zify.
 Require Import prosa.util.tactics.
+
 
 (** This file introduces a function called [search_arg] that allows finding the
     argument within a given range for which a function is minimal w.r.t. to a
@@ -14,6 +16,32 @@ Require Import prosa.util.tactics.
     default value, which is rather unnatural when searching through a schedule.
 *)
 
+
+(** First, we show that, given an interval <<[t1, t2)>> and a
+    predicate [P], either no element in the interval satisfy [P] or
+    there is an element that satisfies [P]. *)
+Lemma earliest_pred_element_exists_case :
+  forall (P : pred nat) (t1 t2 : nat),
+    (forall t, t1 <= t < t2 -> ~~ P t)
+    \/ (exists t,
+          t1 <= t < t2
+          /\ P t
+          /\ forall t', t1 <= t' -> P t' -> t <= t').
+Proof.
+  move=> P t1 t2.
+  have [/allP ALL|/allPn [x /[!mem_index_iota] IN /negPn Px]]:=
+    boolP(all (fun x => ~~ P x) (index_iota t1 t2)).
+  { by left => t IN; apply: ALL; rewrite mem_index_iota. }
+  { right.
+    have EX : exists n : nat, (t1 <= n < t2) && P n
+        by exists x; apply/andP; split.
+    have [x' /andP [IN' Px'] MIN] := (ex_minnP EX).
+    exists x'; (repeat split) => // t' LT Pt'.
+    have [NEQ1|NEQ2] := leqP t2 t'; first by lia.
+    by apply: MIN; repeat(apply/andP; split => //). }
+Qed.
+
+(** Next, we proceed to the function [search_arg]. *)
 Section ArgSearch.
   
   (* Given a function [f] that maps the naturals to elements of type [T]... *)

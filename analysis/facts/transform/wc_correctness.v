@@ -313,8 +313,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
           rewrite -(service_cat sched j t max_dl);
             last by apply (leq_trans t_is_less_than_deadline_of_j), max_dl_is_greatest_dl.
           have ZERO_SERVICE: service_during sched j t max_dl = 0.
-          { apply not_scheduled_during_implies_zero_service;
-              first by apply ideal_proc_model_ensures_ideal_progress.
+          { apply not_scheduled_during_implies_zero_service.
             move=> t_at RANGE.
             move:(no_relevant_state_in_range t_at RANGE) => NOT_REL.
             rewrite scheduled_at_def.

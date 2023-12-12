@@ -66,12 +66,21 @@ Section CompletionFacts.
     by rewrite -incomplete_is_positive_remaining_cost.
   Qed.
 
-
   (** In the remainder of this section, we assume that schedules are
       "well-formed": jobs are scheduled neither before their arrival
       nor after their completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs : completed_jobs_dont_execute sched.
+
+  (** Clearly, if a job is scheduled, its cost is positive. *)
+  Lemma scheduled_implies_positive_cost :
+    forall t,
+      scheduled_at sched j t ->
+      0 < job_cost j.
+  Proof.
+    move=> t SCHED; move_neq_up ZE; move: ZE.
+    by rewrite leqn0 => /eqP ZE; apply H_completed_jobs in SCHED; rewrite ZE in SCHED.
+  Qed.
 
   (** To simplify subsequent proofs, we restate the assumption
       [H_completed_jobs] as a trivial corollary. *)

@@ -318,6 +318,17 @@ Section RelationToScheduled.
       ~~ scheduled_at sched j t -> service_at sched j t = 0.
   Proof. move=> ?; exact: service_in_implies_scheduled_in. Qed.
 
+  (** Similarly, if a job is not scheduled during an interval, then it
+      does not receive any service in that interval. *)
+  Lemma not_scheduled_during_implies_zero_service:
+    forall t1 t2,
+      (forall t, t1 <= t < t2 -> ~~ scheduled_at sched j t) ->
+      service_during sched j t1 t2 = 0.
+  Proof.
+    move=> t1 t2; rewrite big_nat_eq0 => + t titv => /(_ t titv).
+    by apply not_scheduled_implies_no_service.
+  Qed.
+
   (** Conversely, if a job receives service, then it must be scheduled. *)
   Lemma service_at_implies_scheduled_at :
     forall t,
@@ -445,17 +456,6 @@ Section RelationToScheduled.
     Proof.
       move=> t1 t2.
       by move=> + t titv; rewrite no_service_not_scheduled big_nat_eq0; apply.
-    Qed.
-
-    (** Conversely, if a job is not scheduled during an interval, then
-        it does not receive any service in that interval *)
-    Lemma not_scheduled_during_implies_zero_service:
-      forall t1 t2,
-        (forall t, t1 <= t < t2 -> ~~ scheduled_at sched j t) ->
-        service_during sched j t1 t2 = 0.
-    Proof.
-      move=> t1 t2; rewrite big_nat_eq0 => + t titv => /(_ t titv).
-      by rewrite no_service_not_scheduled.
     Qed.
 
     (** If a job is scheduled at some point in an interval, it receives
@@ -773,7 +773,7 @@ Section IncrementalService.
       units of service, then there exists a time instant <<t ∈ [t1,t2)>> such
       that [j] is scheduled at time [t] and service of job [j] within interval
       <<[t1,t)>> is equal to [k]. *)
-  Lemma incremental_service_during:
+  Lemma incremental_service_during :
     forall j t1 t2 k,
       service_during sched j t1 t2 > k ->
       exists t, t1 <= t < t2 /\ scheduled_at sched j t /\ service_during sched j t1 t = k.
@@ -818,6 +818,37 @@ Section IncrementalService.
     have: service_at sched j t'.-1 > 1 by lia.
     have: service_at sched j t'.-1 <= 1 by apply/service_at_most_one.
     by lia.
+  Qed.
+
+  (** An implication of the above lemma is that for any job [j] that
+      has [k] units of service at time [t] and more than [k] units of
+      service at time [t'], there exists a time instant [st] such that
+      [t <= st < t'] and the job is scheduled but still has [k] units
+      of service. *)
+  Lemma kth_scheduling_time :
+    forall j t t' k,
+      service sched j t = k ->
+      k < service sched j t' ->
+      exists st,
+        t <= st < t'
+        /\ service sched j st = k
+        /\ scheduled_at sched j st.
+  Proof.
+    move=> j t t' σ SERVEQ GT.
+    have LT : t <= t'.
+    { move_neq_up LT.
+      rewrite -(service_cat _ _ t') in SERVEQ; last by lia.
+      move_neq_down GT.
+      by rewrite -SERVEQ leq_addr. }
+    have POS : service_during sched j t t' > 0.
+    { rewrite -(service_cat _ _ t) in GT; last by done.
+      by rewrite SERVEQ -addn1 leq_add2l in GT. }
+    apply service_during_service_at_earliest in POS.
+    move: POS => [st [/andP [NEQ1 NEQ2 ] [SERV SDZ]]].
+    exists st; split; [by lia | split].
+    { erewrite <-service_cat; last by apply: NEQ1.
+      by rewrite SERVEQ SDZ addn0. }
+    { by apply service_at_implies_scheduled_at. }
   Qed.
 
 End IncrementalService.
