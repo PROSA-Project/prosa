@@ -35,6 +35,18 @@ Section PreemptionTimes.
   (** Consider a valid preemption model. *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
+  (** We start with a trivial fact that, given a time interval <<[t1,
+      t2)>>, the interval either contains a preemption time [t] or it
+      does not.  *)
+  Lemma preemption_time_interval_case :
+    forall t1 t2,
+      (forall t, t1 <= t < t2 -> ~~ preemption_time arr_seq sched t)
+      \/ (exists t,
+            t1 <= t < t2
+            /\ preemption_time arr_seq sched t
+            /\ forall t', t1 <= t' -> preemption_time arr_seq sched t' -> t <= t').
+  Proof. by apply earliest_pred_element_exists_case. Qed.
+
   (** An idle instant is a preemption time. *)
   Lemma idle_time_is_pt :
     forall t,
@@ -80,6 +92,61 @@ Section PreemptionTimes.
     exact: (first_moment_is_pt j).
   Qed.
 
+  (** If a job is scheduled at time [t-1] and time [t] is not a
+      preemption time, then the job is scheduled at time [t] as
+      well. *)
+  Lemma neg_pt_scheduled_before :
+    forall j t,
+      ~~ preemption_time arr_seq sched t ->
+      scheduled_at sched j t.-1 ->
+      scheduled_at sched j t.
+  Proof.
+    move => j t NP SCHED; apply negbNE; apply/negP => NSCHED.
+    have [Z|POS] := posnP t.
+    { by move: SCHED; subst => //= => SCHED; rewrite SCHED in NSCHED. }
+    { edestruct scheduled_at_cases as [IDLE| [s SCHEDs]] => //.
+      { move: NP => /negP NP; apply: NP; rewrite /preemption_time.
+        by rewrite is_idle_iff in IDLE; move: IDLE => /eqP ->. }
+      { instantiate (1 := t) in SCHEDs.
+        destruct t as [ | t]; [by done | rewrite -pred_Sn in SCHED].
+        move: (SCHEDs) => SCHEDst; eapply neg_pt_scheduled_at in SCHEDs => //.
+        have EQ : s = j by apply: H_uniproc; [apply SCHEDs | apply SCHED].
+        by subst; rewrite SCHEDst in NSCHED. } }
+  Qed.
+
+  (** We extend the previous lemma to a time interval. That is, assume
+      that there is no preemption time in an interval <<[t1, t2)>>,
+      then if a job is scheduled at time <<t ∈ [t1, t2)>>, then the
+      same job is scheduled at another time <<t' ∈ [t1, t2)>>. *)
+  Lemma neg_pt_scheduled_continuous :
+    forall j t1 t2 t t',
+      t1 <= t < t2 ->
+      t1 <= t' < t2 ->
+      (forall t, t1 <= t < t2 -> ~~ preemption_time arr_seq sched t) ->
+      scheduled_at sched j t ->
+      scheduled_at sched j t'.
+  Proof.
+    move=> j t1 t2 t t' NEQ1 NEQ2 NP SCHED.
+    have NEQ3 : t1 < t2 by lia.
+    interval_to_duration t1 t2 δ.
+    generalize dependent t; generalize dependent t'.
+    induction δ as [ | δ IHδ]; first by move => t' NEQ; exfalso; lia.
+    feed IHδ; first by move => t NEQ; apply: NP; lia.
+    move => t NEQ t'; move: NEQ.
+    rewrite addnS !ltnS [_ <= t1 + δ]leq_eqVlt [t' <= t1 + δ]leq_eqVlt.
+    move => /andP [LE1 /orP [/eqP EQ1 | LT1]] /andP [LE2 /orP [/eqP EQ2 | LT2]]; subst.
+    { by done. }
+    { move => SCHED; apply IHδ with (t' := (t1 + δ).-1) in SCHED; try lia.
+      by apply: neg_pt_scheduled_before => //; apply NP; lia. }
+    { have POS: t1 + δ > 0 by lia.
+      move => SCHED; apply IHδ with (t := (t1 + δ).-1); try lia.
+      apply: neg_pt_scheduled_at => //.
+      { by rewrite (@ltn_predK 0) //. }
+      { by rewrite (@ltn_predK 0) //; apply NP; lia. }
+    }
+    { by apply IHδ; lia. }
+  Qed.
+
   (** If we observe two different jobs scheduled at two points in time, then
       there necessarily is a preemption time in between. *)
   Lemma neq_scheduled_at_pt :
@@ -110,7 +177,6 @@ Section PreemptionTimes.
           by apply: neg_pt_scheduled_at. }
         by exists pt => //; apply/andP; split. }
   Qed.
-
 
 End PreemptionTimes.
 

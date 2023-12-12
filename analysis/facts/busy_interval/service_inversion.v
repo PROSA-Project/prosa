@@ -1,10 +1,6 @@
-Require Export prosa.model.task.arrival.curves.
-Require Export prosa.analysis.definitions.schedulability.
-Require Export prosa.analysis.definitions.service_inversion.pred.
-Require Export prosa.analysis.facts.model.sequential.
-Require Export prosa.analysis.facts.model.task_schedule.
-Require Export prosa.analysis.facts.busy_interval.pi_bound.
-Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.analysis.definitions.service_inversion.busy_prefix.
+Require Export prosa.analysis.facts.busy_interval.pi.
+
 
 (** * Service Inversion Lemmas *)
 (** In this section, we prove a few lemmas about service inversion. *)
@@ -202,3 +198,300 @@ Section ServiceInversion.
   End PriorityInversion.
 
 End ServiceInversion.
+
+(** In the following, we prove that the cumulative service inversion
+    in a busy interval prefix is bounded. *)
+Section ServiceInversionIsBounded.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+  Context `{TaskMaxNonpreemptiveSegment Task}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** Consider any kind of fully supply-consuming unit-supply
+      uniprocessor state model. *)
+  Context `{PState : ProcessorState Job}.
+  Hypothesis H_uniprocessor_proc_model : uniprocessor_model PState.
+  Hypothesis H_unit_supply_proc_model : unit_supply_proc_model PState.
+  Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
+
+  (** Consider an JLFP policy that indicates a higher-or-equal priority
+      relation, and assume that the relation is reflexive and
+      transitive. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
+
+  (** Consider any arrival sequence with consistent, non-duplicate arrivals ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
+  (** ... and any uni-processor schedule of this arrival sequence. *)
+  Variable sched : schedule PState.
+
+  (** Next, allow for any work-bearing notion of job readiness ... *)
+  Context `{!JobReady Job PState}.
+  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+
+  (** ... and assume that the schedule is valid.  *)
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+
+  (** In addition, we assume the existence of a function mapping jobs
+      to their preemption points ... *)
+  Context `{JobPreemptable Job}.
+
+  (** ... and assume that it defines a valid preemption model with
+      bounded non-preemptive segments. *)
+  Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
+  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
+    valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
+
+  (** Next, we assume that the schedule is a work-conserving schedule... *)
+  Hypothesis H_work_conserving : work_conserving arr_seq sched.
+
+  (** ... and that the schedule respects the scheduling policy. *)
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
+
+  (** In this section, we prove that, given a job [j] with a busy
+      interval prefix <<[t1, t2)>> and a lower-priority job [jlp], the
+      service of [jlp] within the busy interval prefix is bounded by
+      the maximum non-preemptive segment of job [jlp]. *)
+  Section ServiceOfLowPriorityJobIsBounded.
+
+    (** Consider an arbitrary job [j] with positive cost ... *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+    Hypothesis H_j_job_cost_positive : job_cost_positive j.
+
+    (** ... and a lower-priority job [jlp]. *)
+    Variable jlp : Job.
+    Hypothesis H_jlp_arrives : arrives_in arr_seq jlp.
+    Hypothesis H_jlp_lp : ~~ hep_job jlp j.
+
+    (** Let <<[t1, t2)>> be a busy interval prefix of job [j]. *)
+    Variable t1 t2 : instant.
+    Hypothesis H_busy_prefix : busy_interval_prefix arr_seq sched j t1 t2.
+
+    (** First, we consider a scenario when there is no preemption time
+        inside of the busy interval prefix _but_ there is a time
+        instant where [jlp] is scheduled. In this case, the cumulative
+        service inversion of job [j] in the time interval <<[t1, t2)>>
+        is bounded by the total service of job [jlp] received in the
+        interval <<[t1, t2)>>. *)
+    Local Lemma no_preemption_impl_service_inv_bounded :
+      (forall t, t1 <= t < t2 -> ~~ preemption_time arr_seq sched t) ->
+      (exists t, t1 <= t < t2 /\ scheduled_at sched jlp t) ->
+      cumulative_service_inversion arr_seq sched j t1 t2 <= service_during sched jlp t1 t2.
+    Proof.
+      move=> NPT SCHED.
+      rewrite [leqLHS]big_seq [leqRHS]big_seq; apply leq_sum => t.
+      rewrite mem_index_iota => /andP [LE LT].
+      have F : forall (b : bool) (n : nat), (b -> 0 < n) -> b <= n by lia.
+      apply: F => /andP [ZE /hasP [h IN LPh]].
+      have EQ: h = jlp; last by subst; apply: served_at_and_receives_service_consistent.
+      apply: H_uniprocessor_proc_model.
+      { by apply served_at_and_receives_service_consistent in IN; apply: service_at_implies_scheduled_at. }
+      { move: SCHED => [t' [/andP [LE' LT'] SCHED]].
+        unshelve apply: neg_pt_scheduled_continuous => //.
+        - by generalize dependent t'; clear; lia.
+        - by generalize dependent t; clear; lia.
+      }
+    Qed.
+
+    (** In this section, we assume that [jlp] is scheduled inside of
+        the busy interval prefix and prove that its service is bounded
+        by [jlp]'s maximum non-preemptive segment. *)
+    Section ServiceOfLPJobIsBounded.
+
+      (** Consider an arbitrary time instant [t] such that [t <= t2]. *)
+      Variables t : instant.
+      Hypothesis H_t_le_t2 : t <= t2.
+
+      (** Consider a second time instant [st] such that [t1 <= st < t]
+          and [jlp] is scheduled at time [st]. *)
+      Variable st : instant.
+      Hypothesis H_t1_le_st_lt_t : t1 <= st < t.
+      Hypothesis H_jlp_sched : scheduled_at sched jlp st.
+
+      (** Consider a preemption point [σ] of job [jlp] such that ... *)
+      Variable σ : duration.
+      Hypothesis H_σ_is_pt : job_preemptable jlp σ.
+
+      (** ... [σ] is greater than or equal to the service of [jlp] at
+          time [t1] but exceeds the service by at most
+          [job_max_nonpreemptive_segment jlp - ε]. *)
+      Hypothesis H_σ_constrained :
+        service sched jlp t1
+        <= σ
+        <= service sched jlp t1 + (job_max_nonpreemptive_segment jlp - ε).
+
+      (** Next, we perform case analysis on whether job [jlp] has
+          reached [σ] units of service by time [t]. *)
+
+      (** First, assume that the service of [jlp] at time [t] is
+          smaller than [σ]. In this case, it is easy to see from the
+          hypothesis [H_σ_constrained] that the service received by
+          [jlp] within time interval <<[t1, t)>> is bounded by
+          [job_max_nonpreemptive_segment jlp - ε]. *)
+      Local Lemma small_service_implies_bounded_service :
+        service sched jlp t < σ ->
+        service_during sched jlp t1 t <= job_max_nonpreemptive_segment jlp - ε.
+      Proof.
+        move => B; move_neq_up CO.
+        have E : σ <= service sched jlp t1 + service_during sched jlp t1 t by lia.
+        by move: B E; rewrite service_cat /service; lia.
+      Qed.
+
+      (** Next, assume that [σ <= service sched jlp t]. In this case,
+          we can show that [jlp] is preempted after it reaches [σ]
+          units of service and hence, again, the service during <<[t1,
+          t)>> is bounded by [job_max_nonpreemptive_segment jlp - ε]. *)
+      Local Lemma big_service_implies_bounded_service :
+        σ <= service sched jlp t ->
+        service_during sched jlp t1 t <= job_max_nonpreemptive_segment jlp - ε.
+      Proof.
+        rewrite -[service_during _ _ _ _ <= _](leq_add2l (service sched jlp t1)).
+        rewrite leq_eqVlt => /orP [/eqP EQ|GT].
+        { by rewrite service_cat; [ rewrite -EQ; move: H_σ_constrained => /andP [A B] | lia]. }
+        have [pt [LTpt EQ]] : exists pt, pt < t /\ service sched jlp pt = σ.
+        { by apply exists_intermediate_service => //; apply unit_supply_is_unit_service. }
+        have PI: priority_inversion arr_seq sched j st.
+        { apply/andP; split.
+          { apply/negP => IN; rewrite scheduled_jobs_at_iff in IN => //.
+            have EQj: jlp = j by apply: H_uniprocessor_proc_model => //.
+            by move: H_jlp_lp => /negP LP2; apply: LP2; subst jlp; apply H_priority_is_reflexive. }
+          { by apply/hasP; exists jlp; [rewrite scheduled_jobs_at_iff => // | done]. }
+        }
+        have NPT : ~~ preemption_time arr_seq sched t1.
+        { (apply: no_preemption_time_before_pi; try apply: H_busy_prefix) => //; lia. }
+        have SCHEDt1 : scheduled_at sched jlp t1.
+        { by (apply: pi_job_remains_scheduled; try apply: H_busy_prefix) => //; lia. }
+        have LEpt: t1 <= pt.
+        { move_neq_up LEpt.
+          have EQ1: service sched jlp t1 = σ.
+          { apply/eqP; rewrite eqn_leq; apply/andP; split; first by move: H_σ_constrained => /andP [A B].
+            by rewrite -EQ; apply: service_monotonic; lia. }
+          move: NPT => /negP NPT; apply: NPT; rewrite /preemption_time.
+          have ->: scheduled_job_at arr_seq sched t1 = Some jlp.
+          { by apply/eqP; rewrite scheduled_job_at_scheduled_at => //. }
+          by rewrite EQ1.
+        }
+        exfalso.
+        have [t' [NEQ' [SERV' SCHED']]] := kth_scheduling_time sched _ _ _ _ EQ GT.
+        have PT : preemption_time arr_seq sched t'.
+        { move: SCHED'; erewrite <-scheduled_job_at_scheduled_at => //.
+          by rewrite /preemption_time; move => /eqP ->; rewrite SERV'. }
+        move: H_jlp_lp => /negP LP2; apply: LP2.
+        apply: scheduled_at_preemption_time_implies_higher_or_equal_priority => //.
+        by move: NEQ' LEpt H_t_le_t2; clear; lia.
+      Qed.
+
+      (** Either way, the service of job [jlp] during the time
+          interval <<[t1, t)>> is bounded by
+          [job_max_nonpreemptive_segment jlp - ε]. *)
+      Local Lemma lp_job_bounded_service_aux :
+        service_during sched jlp t1 t <= job_max_nonpreemptive_segment jlp - ε.
+      Proof.
+        have [B|S] := leqP σ (service sched jlp t); last first.
+        - by apply small_service_implies_bounded_service.
+        - by apply big_service_implies_bounded_service.
+      Qed.
+
+    End ServiceOfLPJobIsBounded.
+
+    (** Note that the preemption point [σ] assumed in the previous
+        section always exists. *)
+    Local Remark preemption_point_of_jlp_exists :
+      exists σ,
+        service sched jlp t1 <= σ <= service sched jlp t1 + (job_max_nonpreemptive_segment jlp - ε)
+        /\ job_preemptable jlp σ.
+    Proof.
+      move: (proj2 (H_valid_model_with_bounded_nonpreemptive_segments) jlp H_jlp_arrives) =>[_ EXPP].
+      have T: 0 <= service sched jlp t1 <= job_cost jlp.
+      { by apply/andP; split=> [//|]; apply service_at_most_cost, unit_supply_is_unit_service => //. }
+      by move: (EXPP (service sched jlp t1) T) => [pt [NEQ2 PP]]; exists pt.
+    Qed.
+
+    (** Finally, we strengthen the lemma [lp_job_bounded_service_aux]
+        by removing the assumption that [jlp] is scheduled somewhere
+        in the busy interval prefix. *)
+    Lemma lp_job_bounded_service :
+      forall t,
+        t <= t2 ->
+        service_during sched jlp t1 t <= max_lp_nonpreemptive_segment arr_seq j t1.
+    Proof.
+      move=> t LT.
+      have [ZE|POS] := posnP (service_during sched jlp t1 t); first by rewrite ZE.
+      have [st [NEQ SCHED]] := cumulative_service_implies_scheduled _ _ _ _ POS.
+      rewrite /max_lp_nonpreemptive_segment -(leqRW (leq_bigmax_cond_seq _ _ _ jlp _ _)); first last.
+      { by rewrite H_jlp_lp andTb; apply: scheduled_implies_positive_cost. }
+      { apply: arrived_between_implies_in_arrivals => //.
+        apply/andP; split => //.
+        by (apply: low_priority_job_arrives_before_busy_interval_prefix; try apply: H_busy_prefix) => //; lia.
+      }
+      { have [σ [EX PTσ]] := preemption_point_of_jlp_exists.
+        by apply: lp_job_bounded_service_aux. }
+    Qed.
+
+  End ServiceOfLowPriorityJobIsBounded.
+
+  (** Let [tsk] be any task to be analyzed. *)
+  Variable tsk : Task.
+
+  (** Let [blocking_bound] be a bound on the maximum length of a
+      nonpreemptive segment of a lower-priority job. *)
+  Variable blocking_bound : duration -> duration.
+
+  (** We show that, if the maximum length of a nonpreemptive segment
+      is bounded by the blocking bound, ... *)
+  Hypothesis H_priority_inversion_is_bounded_by_blocking :
+    forall j t1 t2,
+      arrives_in arr_seq j ->
+      job_of_task tsk j ->
+      busy_interval_prefix arr_seq sched j t1 t2 ->
+      max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound (job_arrival j - t1).
+
+  (** ... then the service inversion incurred by any job is bounded by
+      the blocking bound. *)
+  Lemma service_inversion_is_bounded :
+    service_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
+  Proof.
+    move=> j ARR TSK POS t1 t2 BUSY.
+    rewrite -(leqRW (H_priority_inversion_is_bounded_by_blocking _ _ _ _ _ _ )) //.
+    edestruct busy_interval_pi_cases as [CPI|PI]; (try apply BUSY) => //.
+    { by rewrite (leqRW (cumul_service_inv_le_cumul_priority_inv _ _  _ _ _ _ _ _ _ _)) //. }
+    { move: (PI) => /andP [_ /hasP [jlp INjlp LPjlp]].
+      have SCHEDjlp : scheduled_at sched jlp t1 by erewrite <-scheduled_jobs_at_iff => //.
+      have [NPT| [pt [/andP [LE1 LE2] [PT MIN]]]] := preemption_time_interval_case arr_seq sched t1 t2.
+      { rewrite (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //.
+        - by apply: lp_job_bounded_service.
+        - by exists t1; split => //; apply/andP; split; [ | move: BUSY => [T _]]; lia. }
+      { have LEQ : cumulative_service_inversion arr_seq sched j t1 t2
+                   <= cumulative_service_inversion arr_seq sched j t1 pt.
+        { have [LE|WF] := leqP t2 pt.
+          { by rewrite (leqRW (service_inversion_widen arr_seq sched j t1 _ _ pt _ _ )) => //. }
+          { rewrite (service_inversion_cat _ _ _ _ _ pt) //
+                    -{2}[_ _ _ j t1 pt]addn0 leq_add2l
+                    (leqRW (cumul_service_inv_le_cumul_priority_inv _ _ _ _ _ _ _ _ _ _))//  leqn0.
+            rewrite /cumulative_priority_inversion big_nat_cond; apply/eqP; apply big1 => t /andP [NEQ3 _]; apply/eqP.
+            by rewrite eqb0; apply: no_priority_inversion_after_preemption_point => //; lia. } }
+        rewrite (leqRW LEQ) (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //; clear LEQ.
+        { by apply: lp_job_bounded_service => //; lia. }
+        { move=> t /andP [NEQ1 NEQ2]; apply/negP => PTt.
+          by specialize (MIN _ NEQ1 PTt); move: MIN NEQ2; clear; lia. }
+        { exists t1; split => //.
+          apply/andP; split => //.
+          move_neq_up LE; have EQ: pt = t1; [by lia | subst].
+          eapply no_preemption_time_before_pi with (t := t1) in PI => //.
+          - by rewrite PT in PI.
+          - by move: LE2; clear; lia.
+          - by clear; lia. } } }
+  Qed.
+
+End ServiceInversionIsBounded.
