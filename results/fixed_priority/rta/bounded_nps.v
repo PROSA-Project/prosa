@@ -103,8 +103,6 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** Let's define some local names for clarity. *)
-  Let max_length_of_priority_inversion :=
-    max_length_of_priority_inversion arr_seq.
   Let task_rbf := task_request_bound_function tsk.
   Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
@@ -128,11 +126,11 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         arrives_in arr_seq j ->
         job_of_task tsk j ->
         busy_interval_prefix arr_seq sched j t1 t2 ->
-        max_length_of_priority_inversion j t1 <= blocking_bound .
+        max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound .
     Proof.
       move=> j t1 t2 ARR TSK BUSY; move: TSK => /eqP TSK.
-      rewrite /max_length_of_priority_inversion /blocking_bound /max_length_of_priority_inversion.
-      apply: leq_trans; first exact: priority_inversion_is_bounded_by_max_np_segment.
+      rewrite /blocking_bound /max_lp_nonpreemptive_segment.
+      apply: leq_trans; first exact: max_np_job_segment_bounded_by_max_np_task_segment.
       apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t1
                 | (~~ hep_task (job_task j_lp) tsk) && (0 < job_cost j_lp))
                             (task_max_nonpreemptive_segment (job_task j_lp) - ε))).

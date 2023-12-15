@@ -18,8 +18,8 @@ Section PriorityInversionIsBounded.
   (**  ... and any type of preemptable jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{Arrival : JobArrival Job}.
-  Context `{Cost : JobCost Job}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
   Context `{JobPreemptable Job}.
 
   (** Consider any valid arrival sequence,... *)
@@ -42,7 +42,7 @@ Section PriorityInversionIsBounded.
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job PState Cost Arrival}.
+  Context `{!JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** We assume that the schedule is valid. *)
@@ -84,7 +84,7 @@ Section PriorityInversionIsBounded.
       arrives_in arr_seq j ->
       job_of_task tsk j ->
       busy_interval_prefix arr_seq sched j t1 t2 ->
-      max_length_of_priority_inversion arr_seq j t1 <= blocking_bound (job_arrival j - t1).
+      max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound (job_arrival j - t1).
 
   (** ... then the priority inversion incurred by any job is bounded by the blocking bound. *)
   Lemma priority_inversion_is_bounded :
@@ -101,7 +101,7 @@ Section PriorityInversionIsBounded.
     have [ppt [PPT' /andP[GE LE]]]: exists ppt : instant,
                                       preemption_time arr_seq sched ppt /\
                                       t1 <= ppt <=
-                                      t1 + max_length_of_priority_inversion arr_seq j t1
+                                      t1 + max_lp_nonpreemptive_segment arr_seq j t1
       by exact: preemption_time_exists.
     apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt).
     - by apply: priority_inversion_occurs_only_till_preemption_point =>//.
@@ -110,7 +110,7 @@ Section PriorityInversionIsBounded.
                 -iter_addn -big_const_nat.
         by rewrite leq_sum //; move=> t _; case: priority_inversion. 
       + rewrite leq_subLR.
-        apply leq_trans with (t1 + max_length_of_priority_inversion arr_seq j t1) => [//|].
+        apply leq_trans with (t1 + max_lp_nonpreemptive_segment arr_seq j t1) => [//|].
         by rewrite leq_add2l; apply: (H_priority_inversion_is_bounded_by_blocking j t1 t2).
   Qed.
 

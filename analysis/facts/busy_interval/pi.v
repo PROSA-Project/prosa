@@ -14,8 +14,8 @@ Section PriorityInversionIsBounded.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{Arrival : JobArrival Job}.
-  Context `{Cost : JobCost Job}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
 
   (** Consider any arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -38,7 +38,7 @@ Section PriorityInversionIsBounded.
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job PState Cost Arrival}.
+  Context `{!JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** We assume that the schedule is valid. *)
@@ -56,9 +56,9 @@ Section PriorityInversionIsBounded.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
 
-  (** Consider any busy interval prefix <<[t1, t2)>> of job j. *)
+  (** Consider any busy interval prefix <<[t1, t2)>> of job [j]. *)
   Variable t1 t2 : instant.
-  Hypothesis H_busy_interval_prefix:
+  Hypothesis H_busy_interval_prefix :
     busy_interval_prefix arr_seq sched j t1 t2.
 
   (** * Processor Executes HEP Jobs after Preemption Point *)
@@ -124,7 +124,7 @@ Section PriorityInversionIsBounded.
       exact: leq_trans LEtp.
     Qed.
 
-    (** Now, suppose there exists some constant K that bounds the
+    (** Now, suppose there exists some constant [K] that bounds the
         distance to a preemption time from the beginning of the busy
         interval. *)
     Variable K : duration.
@@ -155,18 +155,19 @@ Section PriorityInversionIsBounded.
 
   (** * Priority Inversion due to Non-Preemptive Sections *)
 
-  (** First, we introduce the notion of the maximal length of
-      (potential) priority inversion at a time instant [t], which is
-      defined as the maximum length of nonpreemptive segments among
-      all jobs that arrived so far. *)
-  Definition max_length_of_priority_inversion (j : Job) (t : instant) :=
+  (** First, we introduce the notion of the maximum length of a
+      nonpreemptive segment among all lower priority jobs (w.r.t. a
+      given job [j]) arrived so far. *)
+  Definition max_lp_nonpreemptive_segment (j : Job) (t : instant) :=
     \max_(j_lp <- arrivals_before arr_seq t | (~~ hep_job j_lp j) && (job_cost j_lp > 0))
       (job_max_nonpreemptive_segment j_lp - ε).
 
-  (** Note that any bound on function [max_length_of_priority_inversion] will
-      also be a bound on the maximal priority inversion. This bound may be
-      different for different scheduler and/or task models. Thus, we don't
-      define such a bound in this module. *)
+  (** Note that any bound on the [max_lp_nonpreemptive_segment]
+      function is also be a bound on the maximum priority inversion
+      (assuming there are no other mechanisms that could cause
+      priority inversion). This bound may be different for different
+      scheduler and/or task models. Thus, we don't define such a bound
+      in this module. *)
 
   Section TaskMaxNPS.
 
@@ -174,17 +175,18 @@ Section PriorityInversionIsBounded.
     Hypothesis H_valid_nps :
       valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
-    (** ... we observe that the maximum non-preemptive segment length of any task
-        that releases a job with lower priority (w.r.t. a given job [j]) and
-        non-zero execution cost upper-bounds the maximum possible length of
-        priority inversion (of said job [j]). *)
-    Lemma priority_inversion_is_bounded_by_max_np_segment :
-      max_length_of_priority_inversion j t1
+    (** ... we observe that the maximum non-preemptive segment length
+        of any task that releases a job with lower priority (w.r.t. a
+        given job [j]) and non-zero execution cost upper-bounds the
+        maximum possible non-preemptive segment length of any
+        lower-priority job. *)
+    Lemma max_np_job_segment_bounded_by_max_np_task_segment :
+      max_lp_nonpreemptive_segment j t1
       <= \max_(j_lp <- arrivals_between arr_seq 0 t1 | (~~ hep_job j_lp j)
                                                      && (job_cost j_lp > 0))
           (task_max_nonpreemptive_segment (job_task j_lp) - ε).
     Proof.
-      rewrite /max_length_of_priority_inversion.
+      rewrite /max_lp_nonpreemptive_segment.
       apply: leq_big_max => j' JINB NOTHEP.
       rewrite leq_sub2r //.
       apply in_arrivals_implies_arrived in JINB.
@@ -193,18 +195,18 @@ Section PriorityInversionIsBounded.
 
   End TaskMaxNPS.
 
-  (** Next, we prove that the function [max_length_of_priority_inversion] indeed
-      upper-bounds the priority inversion length. *)
+  (** Next, we prove that the function [max_lp_nonpreemptive_segment]
+      indeed upper-bounds the priority inversion length. *)
   Section PreemptionTimeExists.
 
     (** In this section, we require the jobs to have valid bounded
         non-preemptive segments. *)
-    Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
+    Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
       valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
     (** First, we prove that, if a job with higher-or-equal priority is scheduled at
         a quiet time [t+1], then this is the first time when this job is scheduled. *)
-    Lemma hp_job_not_scheduled_before_quiet_time:
+    Lemma hp_job_not_scheduled_before_quiet_time :
       forall jhp t,
         quiet_time arr_seq sched j t.+1 ->
         scheduled_at sched jhp t.+1 ->
@@ -286,13 +288,13 @@ Section PriorityInversionIsBounded.
     Qed.
 
     (** Thus, there must be a preemption time in the interval [t1, t1
-        + max_priority_inversion t1]. That is, if a job with
-        higher-or-equal priority is scheduled at time instant [t1], then
-        [t1] is a preemption time. Otherwise, if a job with lower
+        + max_lp_nonpreemptive_segment j t1]. That is, if a job with
+        higher-or-equal priority is scheduled at time instant [t1],
+        then [t1] is a preemption time. Otherwise, if a job with lower
         priority is scheduled at time [t1], then this job also should
         be scheduled before the beginning of the busy interval. So,
         the next preemption time will be no more than
-        [max_priority_inversion t1] time units later. *)
+        [max_lp_nonpreemptive_segment j t1] time units later. *)
 
     (** We proceed by doing a case analysis. *)
     Section CaseAnalysis.
@@ -307,7 +309,7 @@ Section PriorityInversionIsBounded.
         Lemma preemption_time_exists_case1:
           exists pr_t,
             preemption_time arr_seq sched pr_t /\
-            t1 <= pr_t <= t1 + max_length_of_priority_inversion j t1.
+            t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).
           move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
@@ -331,7 +333,7 @@ Section PriorityInversionIsBounded.
         Lemma preemption_time_exists_case2:
           exists pr_t,
             preemption_time arr_seq sched pr_t /\
-            t1 <= pr_t <= t1 + max_length_of_priority_inversion j t1.
+            t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).
           move :  (H_valid_model_with_bounded_nonpreemptive_segments) =>  [VALID BOUNDED].
@@ -367,7 +369,7 @@ Section PriorityInversionIsBounded.
           (** Consider the first preemption point of job [jlp] after [progr_t1]. *)
           Variable fpt : instant.
           Hypothesis H_fpt_is_preemption_point : job_preemptable jlp (progr_t1 + fpt).
-          Hypothesis H_fpt_is_first_preemption_point:
+          Hypothesis H_fpt_is_first_preemption_point :
             forall ρ,
               progr_t1 <= ρ <= progr_t1 + (job_max_nonpreemptive_segment jlp - ε) ->
               job_preemptable jlp ρ ->
@@ -376,7 +378,7 @@ Section PriorityInversionIsBounded.
           (** For correctness, we also assume that [fpt] does not
               exceed the length of the maximum non-preemptive
               segment. *)
-          Hypothesis H_progr_le_max_nonp_segment:
+          Hypothesis H_progr_le_max_nonp_segment :
             fpt <= job_max_nonpreemptive_segment jlp - ε.
 
           (** First we show that [fpt] is indeed the first preemption point after [progr_t1]. *)
@@ -425,7 +427,7 @@ Section PriorityInversionIsBounded.
           (** Thus, assuming an ideal-progress processor model, job [jlp]
               reaches its preemption point at time instant [t1 + fpt], which
               implies that time instant [t1 + fpt] is a preemption time. *)
-          Lemma first_preemption_time:
+          Lemma first_preemption_time :
             ideal_progress_proc_model PState ->
             preemption_time arr_seq sched (t1 + fpt).
           Proof.
@@ -457,15 +459,15 @@ Section PriorityInversionIsBounded.
                 by apply/andP; split; [rewrite leq_addr | rewrite -EQ2 addnS]. } }
           Qed.
 
-          (** And since [fpt <= max_length_of_priority_inversion j t1],
-              [t1 <= t1 + fpt <= t1 + max_length_of_priority_inversion j t1]. *)
-          Lemma preemption_time_le_max_len_of_priority_inversion:
-            t1 <= t1 + fpt <= t1 + max_length_of_priority_inversion j t1.
+          (** And since [fpt <= max_lp_nonpreemptive_segment j t1],
+              [t1 <= t1 + fpt <= t1 + max_lp_nonpreemptive_segment j t1]. *)
+          Lemma preemption_time_le_max_len_of_np_segment :
+            t1 <= t1 + fpt <= t1 + max_lp_nonpreemptive_segment j t1.
           Proof.
             have ARRs : arrives_in arr_seq jlp by [].
             apply/andP; split; first by rewrite leq_addr.
             rewrite leq_add2l.
-            unfold max_length_of_priority_inversion.
+            unfold max_lp_nonpreemptive_segment.
             rewrite (big_rem jlp) //=.
             { rewrite H_jlp_low_priority //=.
               have NZ: service sched jlp t1 < job_cost jlp by exact: service_lt_cost.
@@ -489,7 +491,7 @@ Section PriorityInversionIsBounded.
         Lemma preemption_time_exists_case3:
           exists pr_t,
             preemption_time arr_seq sched pr_t /\
-            t1 <= pr_t <= t1 + max_length_of_priority_inversion j t1.
+            t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).
           have EX: exists pt,
@@ -516,7 +518,7 @@ Section PriorityInversionIsBounded.
             + by intros; apply MIN; apply/andP; split.
             + by lia.
           }
-          apply: preemption_time_le_max_len_of_priority_inversion => //.
+          apply: preemption_time_le_max_len_of_np_segment => //.
           by lia.
         Qed.
 
@@ -531,11 +533,11 @@ Section PriorityInversionIsBounded.
 
     (** By doing the case analysis, we show that indeed there is a
         preemption time in the time interval [[t1, t1 +
-        max_length_of_priority_inversion j t1]]. *)
-    Lemma preemption_time_exists:
+        max_lp_nonpreemptive_segment j t1]]. *)
+    Lemma preemption_time_exists :
       exists pr_t,
         preemption_time arr_seq sched pr_t /\
-        t1 <= pr_t <= t1 + max_length_of_priority_inversion j t1.
+        t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
     Proof.
       have [Idle|[s Sched_s]] :=
         scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) t1.
@@ -598,10 +600,10 @@ Section PriorityInversionIsBounded.
   End NoPriorityInversionAfterPreemptionPoint.
 
 
+  (** In this section, we will prove that priority inversion only
+      occurs at the start of the busy window and occurs due to only
+      one job. *)
   Section SingleJob.
-
-    (** Here, we will prove that priority inversion only occurs at the start of
-        the busy window and occurs due to only one job. *)
 
     (** Suppose job [j] incurs priority inversion at a time [t_pi] in its busy window. *)
     Variable t_pi : instant.

@@ -126,8 +126,6 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
      rbf tsk_o (minn ((A + ε) + D tsk - D tsk_o) Δ).
 
   (** Let's define some local names for clarity. *)
-  Let max_length_of_priority_inversion :=
-    max_length_of_priority_inversion arr_seq.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
   (** For a job with the relative arrival offset [A] within its busy window, we
@@ -232,10 +230,10 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         arrives_in arr_seq j ->
         job_of_task tsk j ->
         busy_interval_prefix  arr_seq sched j t1 t2 ->
-        max_length_of_priority_inversion j t1 <= blocking_bound (job_arrival j - t1).
+        max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound (job_arrival j - t1).
     Proof.
-      move=> j t1 t2 ARR TSK BUSY; rewrite /max_length_of_priority_inversion /blocking_bound.
-      apply: leq_trans;first by exact: priority_inversion_is_bounded_by_max_np_segment.
+      move=> j t1 t2 ARR TSK BUSY; rewrite /max_lp_nonpreemptive_segment /blocking_bound.
+      apply: leq_trans;first by exact: max_np_job_segment_bounded_by_max_np_task_segment.
       apply /bigmax_leq_seqP => j' JINB NOTHEP.
       have ARR': arrives_in arr_seq j'
         by apply: in_arrivals_implies_arrived; exact: JINB.
