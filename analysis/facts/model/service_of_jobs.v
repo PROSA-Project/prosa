@@ -16,7 +16,7 @@ Section GenericModelLemmas.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context {ja : JobArrival Job}.
+  Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
   (** Consider any kind of processor state model, ... *)
@@ -61,7 +61,7 @@ Section GenericModelLemmas.
       move => x /andP [/andP [GEi LTi] _].
       rewrite big_seq_cond big1 //.
       move => j /andP [ARR Ps].
-      apply service_before_job_arrival_zero with ja; auto.
+      apply: service_before_job_arrival_zero => //.
       eapply in_arrivals_implies_arrived_between in ARR; eauto 2.
       by move: ARR => /andP [N1 N2]; apply leq_trans with t.
     Qed.
