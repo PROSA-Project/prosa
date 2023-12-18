@@ -82,8 +82,7 @@ Section GenericModelLemmas.
       rewrite [in X in _ = X](arrivals_between_cat _ _ t) //.
       by rewrite {3}/service_of_jobs -big_cat //=.
     Qed.
-    
-    
+
     (** In the following, we consider an arbitrary sequence of jobs [jobs]. *)
     Variable jobs : seq Job.
 
@@ -109,8 +108,8 @@ Section GenericModelLemmas.
       rewrite [in X in _ = _ + X]big_mkcond //=.
       rewrite -big_split; apply eq_big_seq; intros j IN.
       by destruct (P1 _), (P2 _); simpl; lia.
-    Qed.      
-    
+    Qed.
+
     (** We show that the service received by [{jobs | P}] is equal to the
         difference between the total service received by [jobs] and the service
         of [{jobs | ¬ P}]. *)
@@ -144,7 +143,7 @@ Section GenericModelLemmas.
       intros j IN; specialize (EQUIV j IN); simpl in EQUIV; rewrite EQUIV; clear EQUIV.
       by case: (P2 j) => //.
     Qed.
-    
+
     (** Next, we show an auxiliary lemma that allows us to change the order of
         summation.
 
@@ -193,7 +192,7 @@ End GenericModelLemmas.
 (** In this section, we prove some properties about service
     of sets of jobs for unit-service processor models. *)
 Section UnitServiceModelLemmas.
-  
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
 
@@ -206,23 +205,23 @@ Section UnitServiceModelLemmas.
   (** Consider any kind of unit-service processor state model. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
-  
+
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  
+
   (** Next, consider any unit-service schedule of this arrival sequence ... *)
   Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence:
     jobs_come_from_arrival_sequence sched arr_seq.
-  
+
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Let P be any predicate over jobs. *)
   Variable P : pred Job.
-  
+
   (** First, we prove that the service received by any set of jobs is
       upper-bounded by the corresponding workload. *) 
   Lemma service_of_jobs_le_workload:
@@ -233,7 +232,7 @@ Section UnitServiceModelLemmas.
     apply leq_sum; intros j _.
     by apply cumulative_service_le_job_cost.
   Qed.
-  
+
   (** In this section, we introduce a connection between the cumulative
       service, cumulative workload, and completion of jobs. *)
   Section WorkloadServiceAndCompletion.
@@ -329,13 +328,13 @@ Section UnitServiceModelLemmas.
     Qed.
 
   End WorkloadServiceAndCompletion.
-  
+
 End UnitServiceModelLemmas.
 
 (** In this section, we prove some properties about service
     of sets of jobs for unit-service uniprocessor models. *)
 Section UnitServiceUniProcessorModelLemmas.
-  
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
 
@@ -349,23 +348,23 @@ Section UnitServiceUniProcessorModelLemmas.
   Context {PState : ProcessorState Job}.
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
   Hypothesis H_uniprocessor_model : uniprocessor_model PState.
-  
+
   (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  
+
   (** Next, consider any unit-service uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
-  
+
   (** ... where jobs do not execute before their arrival or after completion. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Let [P] be any predicate over jobs. *)
   Variable P : pred Job.
-  
+
   (** In this section, we prove that the service received by any set of jobs
       is upper-bounded by the corresponding interval length. *)
   Section ServiceOfJobsIsBoundedByLength.
@@ -373,10 +372,10 @@ Section UnitServiceUniProcessorModelLemmas.
     (** Let [jobs] denote any set of jobs. *)
     Variable jobs : seq Job.
     Hypothesis H_no_duplicate_jobs : uniq jobs.
-          
+
     (** We prove that the overall service of [jobs] at a single time instant is at most [1]. *)
     Lemma service_of_jobs_le_1:
-      forall t, service_of_jobs_at sched P jobs t <= 1. 
+      forall t, service_of_jobs_at sched P jobs t <= 1.
     Proof.
       intros t.
       eapply leq_trans.
@@ -388,8 +387,8 @@ Section UnitServiceUniProcessorModelLemmas.
         destruct (service_is_zero_or_one H_unit_service_proc_model  sched j t) as [Z | O].
         + by rewrite Z (leqRW IHjs).
         + have -> : \sum_(j <- js) service_in j (sched t) = 0; last by rewrite O.
-          have POS: service_at sched j t > 0 by rewrite O. 
-          apply service_at_implies_scheduled_at in POS.          
+          have POS: service_at sched j t > 0 by rewrite O.
+          apply service_at_implies_scheduled_at in POS.
           apply/eqP; rewrite big_seq big1 //; intros j' IN.
           apply/eqP; rewrite -leqn0 leqNgt.
           eapply contra with (b := scheduled_at sched j' t);
