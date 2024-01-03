@@ -1,0 +1,3 @@
+# Prosa: include pretty documentation targets
+include scripts/coqdocjs/Makefile.coqdocjs
+include scripts/Makefile.alectryon

@@ -22,14 +22,3 @@
  
  mlihtml: $(MLIFILES:.mli=.cmi)
  	$(SHOW)'CAMLDOC -d $@'
-@@ -504,6 +512,10 @@
- 		-toc $(COQDOCFLAGS) -pdf $(GAL) $(COQDOCLIBS) \
- 		-o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
- 
-+# Prosa: include pretty documentation targets
-+include scripts/coqdocjs/Makefile.coqdocjs
-+include scripts/Makefile.alectryon
-+
- # FIXME: not quite right, since the output name is different
- gallinahtml: GAL=-g
- gallinahtml: html

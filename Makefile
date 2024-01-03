@@ -61,7 +61,6 @@ mangle-namesCoqProject: commonCoqProject
 $(COQ_MAKEFILE): $(COQ_PROJ) scripts/Makefile.coq.patch
 	@coq_makefile -f $< -o $@ COQDOCEXTRAFLAGS = "--parse-comments --external https://math-comp.github.io/htmldoc/ mathcomp --external mathcomp https://math-comp.github.io/htmldoc/"
 	@# Patch HTML target to switch out color.
-	@# Also include Makefile.coqdocjs for 'htmlpretty' documentation target.
 	@patch -s < scripts/Makefile.coq.patch
 
 install html gallinahtml htmlpretty clean cleanall validate alectryon: $(COQ_MAKEFILE)
