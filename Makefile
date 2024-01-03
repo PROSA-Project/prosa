@@ -58,13 +58,17 @@ mangle-namesCoqProject: commonCoqProject
 	@find $(FIND_OPTS) \
 	  -print | scripts/module-toc-order.py >> $(COQ_PROJ)
 
-$(COQ_MAKEFILE): $(COQ_PROJ) scripts/Makefile.coq.patch
+$(COQ_MAKEFILE): $(COQ_PROJ)
 	@coq_makefile -f $< -o $@ COQDOCEXTRAFLAGS = "--parse-comments --external https://math-comp.github.io/htmldoc/ mathcomp --external mathcomp https://math-comp.github.io/htmldoc/"
-	@# Patch HTML target to switch out color.
-	@patch -s < scripts/Makefile.coq.patch
 
-install html gallinahtml htmlpretty clean cleanall validate alectryon: $(COQ_MAKEFILE)
+install htmlpretty clean cleanall validate alectryon: $(COQ_MAKEFILE)
 	$(MAKE) -f $(COQ_MAKEFILE) $@
+
+html gallinahtml: $(COQ_MAKEFILE)
+	$(MAKE) -f $(COQ_MAKEFILE) $@
+	@# Prosa hack: let's tweak the style a bit
+	@sed -i.bak "s/#90bdff/#eeeeee/" html/coqdoc.css
+	@rm html/coqdoc.css.bak
 
 %.vo: %.v
 	$(MAKE) -f $(COQ_MAKEFILE) $@
