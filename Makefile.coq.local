@@ -1,3 +1,10 @@
 # Prosa: include pretty documentation targets
 include scripts/coqdocjs/Makefile.coqdocjs
 include scripts/Makefile.alectryon
+
+# Hack to enable esy support:
+#
+# In the esy container, $HOME is hidden, but this causes Coq to complain.
+# We thus include a dummy $HOME value.
+HOME ?= $(DESTDIR)
+export HOME
