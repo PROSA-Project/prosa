@@ -296,7 +296,7 @@ Section JLFPInstantiation.
         Lemma task_interference_eq_false :
           ~ task_interference arr_seq sched j t.
         Proof.
-          move => /andP [+ _]; rewrite /non_self /task_scheduled_at.
+          move => /andP [+ _]; rewrite /nonself /task_scheduled_at.
           rewrite task_served_eq_task_scheduled //=; erewrite job_of_scheduled_task => //.
           move: H_j_tsk  H_j'_tsk; rewrite /job_of_task => /eqP -> /eqP ->.
           by rewrite eq_refl.
@@ -349,7 +349,7 @@ Section JLFPInstantiation.
           task_interference arr_seq sched j t.
         Proof.
           apply/andP; split. 
-          - rewrite /non_self task_served_eq_task_scheduled => //.
+          - rewrite /nonself task_served_eq_task_scheduled => //.
             apply: job_of_other_task_scheduled => //.
             by move: H_j_tsk => /eqP -> .
           - apply/orP; right.
@@ -499,7 +499,7 @@ Section JLFPInstantiation.
       rewrite /cumul_task_interference /cumul_cond_interference.
       rewrite -big_split //= big_seq_cond [leqRHS]big_seq_cond.
       apply leq_sum; move => t /andP [IN _].
-      rewrite /cond_interference /non_self /interference /ideal_jlfp_interference.
+      rewrite /cond_interference /nonself /interference /ideal_jlfp_interference.
       have [IDLE|[s SCHEDs]] := ideal_proc_model_sched_case_analysis sched t.
       { move: (IDLE) => IIDLE; erewrite <-is_idle_def in IDLE => //.
         have ->: priority_inversion arr_seq sched j t = false

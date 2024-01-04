@@ -47,19 +47,19 @@ Section TaskInterferenceBound.
 
   (** Let us define a predicate stating that the task of a job [j] is
       _not_ scheduled at a time instant [t]. *)
-  Definition non_self (j : Job) (t : instant) :=
+  Definition nonself (j : Job) (t : instant) :=
     ~~ task_served_at arr_seq sched (job_task j) t.
 
   (** We define task interference as conditional interference where
-      [non_self] is used as the predicate. This way,
-      [task_interference j t] is [false] if the interference to a job
-      [j] is caused by a job of the same task. *)
+      [nonself] is used as the predicate. This way, [task_interference
+      j t] is [false] if the interference experienced by a job [j] is
+      caused by a job of the same task. *)
   Definition task_interference (j : Job) (t : instant) :=
-    cond_interference non_self j t.
+    cond_interference nonself j t.
 
   (** Next, we define the cumulative task interference. *)
   Definition cumul_task_interference j t1 t2 :=
-    cumul_cond_interference non_self j t1 t2.
+    cumul_cond_interference nonself j t1 t2.
 
   (** Consider an interference bound function [task_IBF]. *)
   Variable task_IBF : Task -> duration -> duration -> work.
@@ -69,7 +69,7 @@ Section TaskInterferenceBound.
       the interval <<[t1, t1 + R)>> is bounded by function [task_IBF(tsk, A, R)]. *)
   Definition task_interference_is_bounded_by :=
     cond_interference_is_bounded_by
-      arr_seq sched tsk task_IBF (relative_arrival_time_of_job_is_A sched) non_self.
+      arr_seq sched tsk task_IBF (relative_arrival_time_of_job_is_A sched) nonself.
 
 End TaskInterferenceBound.
 
@@ -348,7 +348,7 @@ Section TaskIBFtoJobIBF.
               by subst; move: H_not_job_of_tsk; rewrite H_job_of_tsk. }
             case INT: (interference j t) => [|//].
             rewrite andbT.
-            have ->: non_self arr_seq sched j t.
+            have ->: nonself arr_seq sched j t.
             { eapply job_of_other_task_scheduled' => //.
               by move: (H_job_of_tsk) => /eqP ->; apply: H_not_job_of_tsk. }
             by clear; lia.
@@ -390,7 +390,7 @@ Section TaskIBFtoJobIBF.
               apply/negPn/negP; move => CONTR; move: CONTR => /negP CONTR.
               by apply Hn in CONTR; move: CONTR; rewrite /receives_service_at SERVj.
             }
-            have /eqP-> : non_self arr_seq sched j t == true.
+            have /eqP-> : nonself arr_seq sched j t == true.
             { rewrite eqb_id.
               apply: job_of_task_not_served => //.
               by move: H_job_of_tsk => /eqP ->.

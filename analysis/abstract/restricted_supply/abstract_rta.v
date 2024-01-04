@@ -5,7 +5,7 @@ Require Export prosa.analysis.abstract.abstract_rta.
 Require Export prosa.analysis.abstract.iw_auxiliary.
 Require Export prosa.analysis.abstract.IBF.supply.
 
-(** * Abstract Response-Time Analysis for Restricted-Supply Processors *)
+(** * Abstract Response-Time Analysis for Restricted-Supply Processors (aRSA) *)
 (** In this section we propose a general framework for response-time
     analysis ([RTA]) for real-time tasks with arbitrary arrival models
     under uni-processor scheduling subject to supply restrictions,
@@ -93,10 +93,10 @@ Section AbstractRTARestrictedSupply.
   Hypothesis H_valid_SBF : valid_busy_sbf sched.
   Hypothesis H_unit_SBF : unit_supply_bound_function.
 
-  (** Next, we assume that [intra_IBF] is a bound on the
-      intra-reservation interference incurred by task [tsk]. *)
+  (** Next, we assume that [intra_IBF] is a bound on the intra-supply
+      interference incurred by task [tsk]. *)
   Variable intra_IBF : Task -> duration -> duration -> duration.
-  Hypothesis H_interference_inside_reservation_is_bounded :
+  Hypothesis H_intra_supply_interference_is_bounded :
     intra_interference_is_bounded_by arr_seq sched tsk intra_IBF.
 
   (** Given any job [j] of task [tsk] that arrives exactly [A] units
@@ -181,8 +181,8 @@ Section AbstractRTARestrictedSupply.
 
       (** As a corollary, cumulative interference during a time
           interval <<[t1, t1 + Δ)>> can be split into a sum of total
-          blackouts in <<[t1, t1 + Δ)>> and cumulative
-          intra-interference during <<[t1, t1 + Δ)>>. *)
+          blackouts in <<[t1, t1 + Δ)>> and cumulative intra-supply
+          interference during <<[t1, t1 + Δ)>>. *)
       Corollary blackout_plus_local_is_interference_cumul :
         blackout_during sched t1 (t1 + Δ) + cumul_intra_interference sched j t1 (t1 + Δ)
         = cumulative_interference j t1 (t1 + Δ).
@@ -197,7 +197,7 @@ Section AbstractRTARestrictedSupply.
           of length [Δ] is bounded by [Δ - SBF Δ], the cumulative
           interference during the time interval <<[t1, t1 + Δ)>> is
           bounded by the sum of [Δ - SBF Δ] and cumulative
-          intra-interference during <<[t1, t1 + Δ)>>. *)
+          intra-supply interference during <<[t1, t1 + Δ)>>. *)
       Corollary cumulative_job_interference_bound :
         cumulative_interference j t1 (t1 + Δ)
         <= (Δ - SBF Δ) + cumul_intra_interference sched j t1 (t1 + Δ).
@@ -214,7 +214,7 @@ Section AbstractRTARestrictedSupply.
       Hypothesis H_enough_service : task_rtct tsk <= service sched j (t1 + F).
 
       (** Then, we show that job [j] does not experience any
-          intra-interference in the time interval <<[t1 + F, t1 +
+          intra-supply interference in the time interval <<[t1 + F, t1 +
           Δ)>>. *)
       Lemma no_intra_interference_after_F :
         cumul_intra_interference sched j (t1 + F) (t1 + Δ) = 0.
@@ -273,7 +273,7 @@ Section AbstractRTARestrictedSupply.
       rewrite fold_cumul_interference.
       rewrite (leqRW (cumulative_job_interference_bound _ _ _ _ _ t2 _ _ _ _)) => //.
       - rewrite leq_add2l /cumul_intra_interference.
-        by apply: H_interference_inside_reservation_is_bounded => //.
+        by apply: H_intra_supply_interference_is_bounded => //.
       - by eapply incomplete_implies_positive_cost => //.
       - by apply BUSY.
     Qed.
@@ -312,7 +312,7 @@ Section AbstractRTARestrictedSupply.
         rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
         rewrite -!/(cumul_intra_interference _ _ _ _).
         rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].
-        rewrite addn0 //; eapply H_interference_inside_reservation_is_bounded => //.
+        rewrite addn0 //; eapply H_intra_supply_interference_is_bounded => //.
         - by move : NCOM; apply contra, completion_monotonic; lia.
         - move => t1' t2' BUSY'.
           have [EQ1 E2] := busy_interval_is_unique _ _ _ _ _ _ BUSY BUSY'.
