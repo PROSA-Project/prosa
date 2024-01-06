@@ -1,9 +1,9 @@
-Require Export prosa.model.processor.sbf.
 Require Export prosa.analysis.facts.behavior.supply.
 Require Export prosa.analysis.facts.SBF.
 Require Export prosa.analysis.abstract.abstract_rta.
 Require Export prosa.analysis.abstract.iw_auxiliary.
 Require Export prosa.analysis.abstract.IBF.supply.
+Require Export prosa.analysis.abstract.restricted_supply.busy_sbf.
 
 (** * Abstract Response-Time Analysis for Restricted-Supply Processors (aRSA) *)
 (** In this section we propose a general framework for response-time
@@ -90,8 +90,8 @@ Section AbstractRTARestrictedSupply.
       during a busy interval of length [Δ] is at least [SBF Δ], and
       (3) [SBF] makes steps of at most one. *)
   Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_busy_sbf sched.
-  Hypothesis H_unit_SBF : unit_supply_bound_function.
+  Hypothesis H_valid_SBF : valid_busy_sbf sched SBF.
+  Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** Next, we assume that [intra_IBF] is a bound on the intra-supply
       interference incurred by task [tsk]. *)
@@ -308,7 +308,7 @@ Section AbstractRTARestrictedSupply.
         rewrite -/(cumulative_interference _ _ _).
         erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY. 
         rewrite addnC leq_add //; last first.
-        { by eapply blackout_during_bound; try apply BUSY; eauto. }
+        { by eapply blackout_during_bound with (t2 := t2) => //; apply BUSY. }
         rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
         rewrite -!/(cumul_intra_interference _ _ _ _).
         rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].

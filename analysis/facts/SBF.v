@@ -1,4 +1,4 @@
-Require Export prosa.analysis.definitions.busy_sbf.
+Require Export prosa.analysis.definitions.sbf.pred.
 Require Export prosa.analysis.facts.behavior.supply.
 Require Export prosa.model.task.concept.
 
@@ -24,18 +24,16 @@ Section SupplyBoundFunctionLemmas.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
-  (** Assume we are provided with abstract functions for Interference
-      and Interfering Workload. *)
-  Context `{Interference Job}.
-  Context `{InterferingWorkload Job}.
+  (** Consider an arbitrary predicate on jobs and time intervals. *)
+  Variable P : Job -> instant -> instant -> Prop.
 
-  (** Consider a supply-bound function [SBF] that is valid within a
-      busy interval. That is, (1) [SBF 0 = 0] and (2) for any
-      subinterval of a busy interval with a duration [Δ], the supply
-      produced during a time interval of length [Δ] is at least [SBF
-      Δ]. *)
+  (** Consider a supply-bound function [SBF] that is valid w.r.t. the
+      predicate [P]. That is, (1) [SBF 0 = 0] and (2) for any job [j],
+      an interval <<[t1, t2)>> satisfying [P j], and a subinterval
+      <<[t1, t) ⊆ [t1, t2)>>, the supply produced during the time
+      interval <<[t1, t)>> is at least [SBF (t - t1)]. *)
   Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_busy_sbf sched.
+  Hypothesis H_valid_SBF : valid_pred_sbf sched P SBF.
 
   (** In this section, we show a simple upper bound on the blackout
       during an interval of length [Δ]. *)
@@ -43,15 +41,14 @@ Section SupplyBoundFunctionLemmas.
 
     (** Consider any job [j]. *)
     Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
 
-    (** Consider a busy interval prefix <<[t1, t2)>> of job [j]. *)
+    (** Consider an interval <<[t1, t2)>> satisfying [P j]. *)
     Variables t1 t2 : instant.
-    Hypothesis H_busy_interval : busy_interval_prefix sched j t1 t2.
+    Hypothesis H_P_interval : P j t1 t2.
 
     (** Consider an arbitrary duration [Δ] such that [t1 + Δ <= t2]. *)
     Variable Δ : duration.
-    Hypothesis H_inside_busy_interval : t1 + Δ <= t2.
+    Hypothesis H_subinterval : t1 + Δ <= t2.
 
     (** We show that the total blackout time during an interval of
         length [Δ] is bounded by [Δ - SBF Δ]. *)
@@ -61,7 +58,7 @@ Section SupplyBoundFunctionLemmas.
       rewrite blackout_during_complement // leq_sub => //.
       rewrite -(leqRW (snd (H_valid_SBF) _ _ _ _ _ _)).
       { by have -> : (t1 + Δ) - t1 = Δ by lia. }
-      { by eapply H_busy_interval. }
+      { by eapply H_P_interval. }
       { lia. }
      Qed.
 
@@ -72,7 +69,7 @@ Section SupplyBoundFunctionLemmas.
 
     (** In addition, let us assume that [SBF] is a unit-supply SBF.
         That is, [SBF] makes steps of at most one. *)
-    Hypothesis H_unit_SBF : unit_supply_bound_function.
+    Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
     (** We prove that the complement of such an SBF (i.e., [fun Δ => Δ -
         SBF Δ]) is monotone. *)
