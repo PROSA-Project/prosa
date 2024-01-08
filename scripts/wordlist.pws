@@ -12,6 +12,7 @@ ssreflect's
 ssreflect
 typeclass
 iff
+injective
 schedulability
 schedulable
 computable
@@ -84,6 +85,9 @@ afore
 ad
 hoc
 mailinglist
+Wellings
+Tindell
+Audsley
 Gonthier
 Viktor
 Vafeiadis
