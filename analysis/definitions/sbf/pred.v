@@ -1,7 +1,7 @@
-Require Export util.all.
-Require Export behavior.schedule.
-Require Export model.processor.supply.
-Require Export analysis.definitions.sbf.sbf.
+Require Export prosa.util.all.
+Require Export prosa.behavior.schedule.
+Require Export prosa.model.processor.supply.
+Require Export prosa.analysis.definitions.sbf.sbf.
 
 (** ** SBF Parameter Semantics *)
 
