@@ -57,42 +57,25 @@ Section PriorityInversion.
 
   (** Cumulative priority inversion incurred by a job from jobs satisfying
       a predefined condition [P] within some time interval <<[t1, t2)>>
-      is the total number of time instances within <<[t1,t2)>>
+      is the total number of time instances within <<[t1, t2)>>
       at which job [j] incurred priority inversion due to jobs satisfying [P]. *)
   Definition cumulative_priority_inversion_cond (P : pred Job) (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) priority_inversion_cond P t.
 
-  (** We say that the priority inversion experienced by a job [j] is
-      bounded by a constant [B] if the cumulative priority inversion
-      within any busy interval prefix is bounded by [B]. *)
-  Definition priority_inversion_of_job_is_bounded_by_constant (B : duration) :=
-    forall (t1 t2 : instant),
-      busy_interval_prefix arr_seq sched j t1 t2 ->
-      cumulative_priority_inversion t1 t2 <= B.
-
-  (** Similarly, the priority inversion experienced by a job (due to jobs
-      satisfying a predicate [P]) is bounded by a constant [B] if the
-      [cumulative_priority_inversion_cond] within any busy interval
-      is bounded by [B]. *)
-  Definition priority_inversion_of_job_cond_is_bounded_by_constant (P : pred Job) (B : duration) :=
-    forall (t1 t2 : instant),
-      busy_interval_prefix arr_seq sched j t1 t2 ->
-      cumulative_priority_inversion_cond P t1 t2 <= B.
-
-  (** More generally, if the priority inversion experienced by job [j]
-      depends on its relative arrival time w.r.t. the beginning of its
-      busy interval at a time [t1], we say that the priority inversion
-      of job [j] is bounded by a function [B : duration -> duration] if
+  (** Suppose the priority inversion experienced by job [j] depends on
+      its relative arrival time w.r.t. the beginning of its busy
+      interval at a time [t1]. We say that the priority inversion of
+      job [j] is bounded by a function [B : duration -> duration] if
       the cumulative priority inversion within any busy interval
-      prefix is bounded by [B (job_arrival j - t1)] *)
+      prefix is bounded by [B (job_arrival j - t1)]. *)
   Definition priority_inversion_of_job_is_bounded_by (B : duration -> duration) :=
     forall (t1 t2 : instant),
       busy_interval_prefix arr_seq sched j t1 t2 ->
       cumulative_priority_inversion t1 t2 <= B (job_arrival j - t1).
 
-  (** We use a similar notion as defined above for the priority inversion
-      that is experienced by a job due to jobs satisfying the predicate [P],
-      if it depends on its relative arrival time. *)
+  (** We define a similar notion as defined above for the priority
+      inversion that is experienced by a job due to jobs satisfying
+      the predicate [P]. *)
   Definition priority_inversion_of_job_cond_is_bounded_by (P : pred Job) (B : duration -> duration) :=
     forall (t1 t2 : instant),
       busy_interval_prefix arr_seq sched j t1 t2 ->
@@ -127,27 +110,6 @@ Section TaskPriorityInversionBound.
 
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
-
-  (** We say that priority inversion of task [tsk] is bounded by a constant
-      [B] if all jobs released by the task have cumulative priority inversion
-      bounded by [B]. *)
-  Definition priority_inversion_is_bounded_by_constant (B : duration) :=
-    forall (j : Job),
-      arrives_in arr_seq j ->
-      job_of_task tsk j ->
-      job_cost j > 0 ->
-      priority_inversion_of_job_is_bounded_by_constant arr_seq sched j B.
-
-  (** Similarly, we say that the priority inversion experienced by a task [tsk]
-      from jobs satisfying some predicate [P] is bounded by a constant [B] if
-      all jobs released by [tsk] have [cumulative_priority_inversion_cond P]
-      bounded by [B]. *)
-  Definition priority_inversion_cond_is_bounded_by_constant (P: pred Job) (B : duration) :=
-    forall (j : Job),
-      arrives_in arr_seq j ->
-      job_of_task tsk j ->
-      job_cost j > 0 ->
-      priority_inversion_of_job_cond_is_bounded_by_constant arr_seq sched j P B.
 
   (** We say that task [tsk] has bounded priority inversion if all its
       jobs have bounded cumulative priority inversion that depends on

@@ -267,7 +267,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         last by apply.
       apply: cumulative_priority_inversion_is_bounded => //.
       have -> : priority_inversion_is_bounded_by arr_seq sched tsk zf
-               = priority_inversion_is_bounded_by_constant arr_seq sched tsk 0 by [].
+               = priority_inversion_is_bounded_by arr_seq sched tsk (constant 0) by [].
       exact: FIFO_implies_no_pi.
     Qed.
 

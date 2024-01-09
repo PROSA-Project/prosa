@@ -1,6 +1,10 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 
-(* We define a notation for the big concatenation operator.*)
+(** We define a function converting a constant [c] to a function that
+    ignores its argument and returns [c].  *)
+Definition constant {X Y : Type} (c : Y) : (X -> Y) := fun _ => c.
+
+(** We define a notation for the big concatenation operator.*)
   
  Reserved Notation "\cat_ ( m <= i < n ) F"
   (at level 41, F at level 41, i, m, n at level 50,

@@ -146,7 +146,7 @@ Section BasicLemmas.
 
     (** Then we prove that the amount of priority inversion is bounded by 0. *)
     Lemma FIFO_implies_no_pi :
-      priority_inversion_is_bounded_by_constant arr_seq sched tsk 0.
+      priority_inversion_is_bounded_by arr_seq sched tsk (constant 0).
     Proof.
       move=> j ARRIN TASK POS t1 t2 BUSY.
       rewrite leqn0; apply/eqP; rewrite big_nat_eq0 => t /andP[T1 T2].

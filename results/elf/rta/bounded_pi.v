@@ -164,8 +164,8 @@ Section AbstractRTAforELFwithArrivalCurves.
       that is incurred by any job of task [tsk]. *)
   Variable priority_inversion_lp_tasks_bound : duration.
   Hypothesis H_priority_inversion_from_lp_tasks_is_bounded :
-    priority_inversion_cond_is_bounded_by_constant arr_seq sched tsk
-      is_lower_priority priority_inversion_lp_tasks_bound.
+    priority_inversion_cond_is_bounded_by arr_seq sched tsk
+      is_lower_priority (constant priority_inversion_lp_tasks_bound).
 
   (* Similarly, we define a predicate to select jobs whose tasks have equal priority as [tsk]... *)
   Let is_equal_priority j' := ep_task tsk (job_task j').

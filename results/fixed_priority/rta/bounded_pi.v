@@ -145,8 +145,8 @@ Section AbstractRTAforFPwithArrivalCurves.
       tasks. *)
   Variable priority_inversion_bound : duration.
   Hypothesis H_priority_inversion_is_bounded :
-    priority_inversion_is_bounded_by_constant
-      arr_seq sched tsk priority_inversion_bound.
+    priority_inversion_is_bounded_by
+      arr_seq sched tsk (constant priority_inversion_bound).
 
   (** Let [L] be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
@@ -209,7 +209,6 @@ Section AbstractRTAforFPwithArrivalCurves.
           /workload_of_jobs /hep_job /FP_to_JLFP.
         move: (TSK) =>  /eqP ->.
         exact: sum_of_jobs_le_sum_rbf. }
-      { by apply H_priority_inversion_is_bounded. }
     Qed.
 
     (** Next, we prove that [IBF_other] is indeed an interference
