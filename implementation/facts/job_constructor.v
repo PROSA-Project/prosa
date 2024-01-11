@@ -49,7 +49,7 @@ Section JobConstructor.
   Proof.
     move=> t.
     apply bigcat_uniq => //=;
-      first by move=> tau; apply: generate_jobs_at_unique.
+      first by move=> tau _; apply: generate_jobs_at_unique.
     move=> j task1 task2 /mapP[i1 IN1 EQj1] /mapP[i2 IN2 EQj2].
     by move: EQj1 EQj2 => -> [_].
   Qed.

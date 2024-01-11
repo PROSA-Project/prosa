@@ -217,12 +217,16 @@ Section BigCatLemmas.
   (** Conversely, we prove that any element belonging to a concatenation of sequences 
       must come from one of the sequences. *)
   Lemma mem_bigcat_exists :
-    forall s y,
-      y \in \cat_(x <- s) f x ->
+    forall {P} s y,
+      y \in \cat_(x <- s | P x) f x ->
       exists x, x \in s /\ y \in f x.
   Proof.
+    move=> P.
     elim=> [|a s IHs] y; first by rewrite big_nil.
-    rewrite big_cons mem_cat => /orP[HEAD | CONS].
+    rewrite big_cons.
+    case: (P a) => [|IN];
+      last by move: (IHs y IN) => [x [INx INy]]; exists x; split => //; rewrite in_cons INx orbT.
+    rewrite mem_cat => /orP[HEAD | CONS].
     - exists a.
       by split => //; apply mem_head.
     - move: (IHs _ CONS) => [x [INs INfx]].
@@ -247,9 +251,15 @@ Section BigCatLemmas.
       (i.e. the absence of a duplicate) over a concatenation of sequences. *)
   Section BigCatDistinctElements.
 
-    (** Assume that there are no duplicates in each of the possible
-        sequences to concatenate... *)      
-    Hypothesis H_uniq_f : forall x, uniq (f x).
+    (** Consider a list [xs], ... *)
+    Context {xs : seq X}.
+
+    (** ... a filter predicate [P], ... *)
+    Context {P : pred X}.
+
+    (** ... assume that there are no duplicates in each of the possible
+        sequences to concatenate... *)
+    Hypothesis H_uniq_f : forall x, P x -> uniq (f x).
     
     (** ...and that there are no elements in common between the sequences. *)
     Hypothesis H_no_elements_in_common :
@@ -258,13 +268,15 @@ Section BigCatLemmas.
     
     (** We prove that the concatenation will yield a sequence with unique elements. *)
     Lemma bigcat_uniq :
-      forall xs,
         uniq xs ->
-        uniq (\cat_(x <- xs) (f x)).
+        uniq (\cat_(x <- xs | P x) (f x)).
     Proof.
-      elim=> [|a xs IHxs]; first by rewrite big_nil.
+      move: xs.
+      elim=> [|a xs' IHxs]; first by rewrite big_nil.
       rewrite cons_uniq => /andP [NINxs UNIQ].
-      rewrite big_cons cat_uniq.
+      rewrite big_cons.
+      case Pa: (P a) => //.
+      rewrite cat_uniq.
       apply /andP; split; first by apply H_uniq_f.
       apply /andP; split; last by apply IHxs.
       apply /hasPn=> x IN; apply /negP=> INfa.
