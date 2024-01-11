@@ -17,6 +17,9 @@ Section BusySupplyBoundFunctions.
   (** ... any kind of processor state model, ... *)
   Context `{PState : ProcessorState Job}.
 
+  (** ... any arrival sequence, ... *)
+  Variable arr_seq : arrival_sequence Job.
+
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
@@ -30,10 +33,10 @@ Section BusySupplyBoundFunctions.
       t) ⊆ [t1, t2)>>, at least [SBF (t - t1)] cumulative supply is
       provided. *)
   Definition sbf_respected_in_busy_interval (SBF : duration -> work) :=
-    pred_sbf_respected sched (busy_interval_prefix sched) SBF.
+    pred_sbf_respected arr_seq sched (busy_interval_prefix sched) SBF.
 
   (** Next, we define an SBF that is valid within an (abstract) busy interval. *)
   Definition valid_busy_sbf (SBF : duration -> work) :=
-    valid_pred_sbf sched (busy_interval_prefix sched) SBF.
+    valid_pred_sbf arr_seq sched (busy_interval_prefix sched) SBF.
 
 End BusySupplyBoundFunctions.

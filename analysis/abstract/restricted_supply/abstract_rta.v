@@ -90,7 +90,7 @@ Section AbstractRTARestrictedSupply.
       during a busy interval of length [Δ] is at least [SBF Δ], and
       (3) [SBF] makes steps of at most one. *)
   Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_busy_sbf sched SBF.
+  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** Next, we assume that [intra_IBF] is a bound on the intra-supply

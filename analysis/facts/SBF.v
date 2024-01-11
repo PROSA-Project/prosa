@@ -33,7 +33,7 @@ Section SupplyBoundFunctionLemmas.
       <<[t1, t) ⊆ [t1, t2)>>, the supply produced during the time
       interval <<[t1, t)>> is at least [SBF (t - t1)]. *)
   Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_pred_sbf sched P SBF.
+  Hypothesis H_valid_SBF : valid_pred_sbf arr_seq sched P SBF.
 
   (** In this section, we show a simple upper bound on the blackout
       during an interval of length [Δ]. *)
@@ -41,6 +41,7 @@ Section SupplyBoundFunctionLemmas.
 
     (** Consider any job [j]. *)
     Variable j : Job.
+    Hypothesis H_arrives_in : arrives_in arr_seq j.
 
     (** Consider an interval <<[t1, t2)>> satisfying [P j]. *)
     Variables t1 t2 : instant.
@@ -56,8 +57,9 @@ Section SupplyBoundFunctionLemmas.
       blackout_during sched t1 (t1 + Δ) <= Δ - SBF Δ.
     Proof.
       rewrite blackout_during_complement // leq_sub => //.
-      rewrite -(leqRW (snd (H_valid_SBF) _ _ _ _ _ _)).
+      rewrite -(leqRW (snd H_valid_SBF _ _ _ _ _ _ _)).
       { by have -> : (t1 + Δ) - t1 = Δ by lia. }
+      { by apply H_arrives_in. }
       { by eapply H_P_interval. }
       { lia. }
      Qed.

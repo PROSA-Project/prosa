@@ -17,10 +17,13 @@ Section PredSupplyBoundFunctions.
   (** Consider any type of jobs, ... *)
   Context {Job : JobType}.
 
-  (** ... any kind of processor state model, and ... *)
+  (** ... any kind of processor state model, ... *)
   Context `{PState : ProcessorState Job}.
 
-  (** ... any schedule. *)
+  (** ... any arrival sequence, ... *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** ... and any schedule. *)
   Variable sched : schedule PState.
 
   (** Consider an arbitrary predicate on jobs and time intervals. *)
@@ -32,6 +35,7 @@ Section PredSupplyBoundFunctions.
       cumulative supply is provided. *)
   Definition pred_sbf_respected (SBF : duration -> work) :=
     forall (j : Job) (t1 t2 : instant),
+      arrives_in arr_seq j ->
       P j t1 t2 ->
       forall (t : instant),
         t1 <= t <= t2 ->

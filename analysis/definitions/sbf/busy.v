@@ -30,10 +30,10 @@ Section BusySupplyBoundFunctions.
       busy interval <<[t1, t2)>> and a subinterval <<[t1, t) ⊆ [t1,
       t2)>>, at least [SBF (t - t1)] cumulative supply is provided. *)
   Definition sbf_respected_in_busy_interval (SBF : duration -> work) :=
-    pred_sbf_respected sched (busy_interval_prefix arr_seq sched) SBF.
+    pred_sbf_respected arr_seq sched (busy_interval_prefix arr_seq sched) SBF.
 
   (** Next, we define an SBF that is valid within a busy interval. *)
   Definition valid_busy_sbf (SBF : duration -> work) :=
-    valid_pred_sbf sched (busy_interval_prefix arr_seq sched) SBF.
+    valid_pred_sbf arr_seq sched (busy_interval_prefix arr_seq sched) SBF.
 
 End BusySupplyBoundFunctions.
