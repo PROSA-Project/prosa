@@ -1,15 +1,10 @@
+Require Export prosa.util.tactics.
 Require Import prosa.model.readiness.basic.
-Require Import prosa.model.priority.edf.
-Require Import prosa.model.schedule.work_conserving.
-Require Import prosa.model.task.preemption.parameters.
-Require Export prosa.analysis.facts.model.rbf.
-Require Export prosa.analysis.facts.model.arrival_curves.
-Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.analysis.facts.busy_interval.arrival.
 Require Export prosa.results.edf.rta.bounded_pi.
-Require Export prosa.util.tactics.
-
+Require Export model.schedule.work_conserving.
+Require Export analysis.definitions.busy_interval.
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 

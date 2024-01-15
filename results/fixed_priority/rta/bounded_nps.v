@@ -1,8 +1,8 @@
-Require Export prosa.analysis.definitions.schedulability.
-Require Export prosa.analysis.definitions.request_bound_function.
-Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
+Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.analysis.definitions.busy_interval.
+
 
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)
 

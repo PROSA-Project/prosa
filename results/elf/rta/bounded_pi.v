@@ -8,6 +8,7 @@ Require Export prosa.analysis.facts.priority.jlfp_with_fp.
 Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.facts.busy_interval.pi.
 Require Export prosa.analysis.facts.busy_interval.pi_cond.
+Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 
 (** * Response-Time Analysis for the ELF Scheduling Policy *)
 

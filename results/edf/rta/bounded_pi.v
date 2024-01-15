@@ -6,7 +6,7 @@ Require Import prosa.model.task.absolute_deadline.
 Require Import prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
-
+Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis

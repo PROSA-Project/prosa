@@ -1,3 +1,4 @@
+Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 Require Import prosa.util.int.
 Require Import prosa.model.readiness.basic.
 Require Import prosa.analysis.abstract.ideal.cumulative_bounds.

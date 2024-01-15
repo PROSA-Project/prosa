@@ -1,6 +1,7 @@
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.analysis.abstract.ideal.iw_instantiation.
 Require Export prosa.analysis.facts.busy_interval.existence.
+Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis

@@ -1,9 +1,8 @@
 Require Import prosa.model.readiness.basic.
-Require Import prosa.model.priority.fifo.
 Require Import prosa.analysis.facts.priority.fifo.
 Require Export prosa.analysis.abstract.ideal.cumulative_bounds.
-Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.model.task_cost.
+Require Export prosa.analysis.abstract.ideal.abstract_rta.
 
 (** The formal development and the proofs in this file are described in-depth in
     the following paper:

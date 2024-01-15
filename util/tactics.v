@@ -53,7 +53,27 @@ Ltac exploit x :=
   || refine (modusponens _ _ (x _ _) _)
   || refine (modusponens _ _ (x _) _).
 
- 
+(** If a subexpression [expr] of a goal is known to be equal to
+    [false], it may be tempting to use a lemma of the form [expr =
+    false] to simply rewrite the [expr] with [false]. However, the
+    coding style of Prosa dictates that lemmas should be stated in the
+    form [~~ expr]. Therefore, direct rewriting with such lemmas is
+    not possible. This tactic implicitly transforms a lemma of the
+    form [~~ expr] into [expr = false].
+
+    As an example, suppose we have a goal [f(B1 || B2 && B3 ) = 1],
+    where [B1, B2, B3 : bool] and [f : bool -> nat]. Suppose we also have
+    several lemmas of the form [Li : H1 -> H2 -> ... -> Hn -> ~~ Bi]. One
+    possible way to reduce [f(B1 || B2 && B3)] to [f(false)] is to
+    somehow replace [Bi]-s with [false] (e.g., via [negbTE]) and then
+    apply [Li]-s. This can be tedious if boolean variable names are
+    long. The [rewrite_neg] tactic allows one to simply write
+    [rewrite_neg Bi] to replace [Bi] with [false]. *)
+Ltac rewrite_neg H :=
+  let NEWH := fresh in
+  (unshelve ((exploit H; last (rewrite -eqbF_neg => /eqP NEWH; rewrite NEWH; clear NEWH)) => //)) => //.
+
+
 (* This tactic feeds the precondition of an implication in order to derive the conclusion
    (taken from http://comments.gmane.org/gmane.science.mathematics.logic.coq.club/7013).
 
