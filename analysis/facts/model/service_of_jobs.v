@@ -1,7 +1,7 @@
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.behavior.completion.
-
+Require Export prosa.analysis.facts.busy_interval.quiet_time.
 
 (** * Lemmas about Service Received by Sets of Jobs *)
 (** In this file, we establish basic facts about the service received by _sets_ of jobs. *)
@@ -496,5 +496,83 @@ Section UnitServiceUniProcessorModelLemmas.
     Qed.
 
   End ServiceOfJobsIsBoundedByLength.
+
+  (** In this section, we prove a relation between a predicate defined
+      on a set of jobs and the total service of these jobs. *)
+  Section PredServedEqService.
+
+    (** Assume that the arrival sequence does not contain duplicate
+        arrivals. *)
+    Hypothesis H_arrival_sequence_is_a_set : arrival_sequence_uniq arr_seq.
+
+    (** Consider a JLFP-policy that indicates a higher-or-equal
+        priority relation. *)
+    Context {JLFP : JLFP_policy Job}.
+
+    (** Consider a job [j]. *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+
+    (** We consider an arbitrary time interval <<[t1, t)>> that starts
+        with a quiet time. *)
+    Variable t1 t : instant.
+    Hypothesis H_quiet_time : quiet_time arr_seq sched j t1.
+
+    (** We prove that the number of points in the interval that
+        satisfy the predicate [exists j ∈ served jobs: P j] is equal to the
+        total service of all jobs that satisfy [P].
+
+        Note that this lemma uses [served_jobs_at] instead of its
+        uniprocessor variant [served_job_at]. This is done on purpose
+        so that this lemma fits better with abstract functions and
+        predicates defined in [/analysis/abstract/...] since such
+        functions are usually defined on a general (not necessarily
+        uniprocessor) class of processor models. *)
+    Lemma cumulative_pred_served_eq_service :
+      (forall j', P j' -> hep_job j' j) ->
+      \sum_(t1 <= t' < t) has P (served_jobs_at arr_seq sched t')
+      = service_of_jobs sched P (arrivals_between arr_seq t1 t) t1 t.
+    Proof.
+      move => Phep.
+      rewrite [RHS]exchange_big /=; apply: eq_big_nat => x /andP[t1lex xltt].
+      have L (js : seq Job) (UNIQ : uniq js):
+        \sum_(i <- js | P i) service_at sched i x
+        = has (fun j => (P j) && (receives_service_at sched j x)) js.
+      { clear xltt t1lex Phep.
+        have L : forall (n : nat) (b : bool), (b -> n = 1) -> (~~ b -> n = 0) -> (n = b)
+            by clear; move => n [] A B; [rewrite A | rewrite B].
+        apply: L.
+        { move=> /hasP [jo IN /andP [Pjo SERVjo]].
+          apply/eqP; rewrite eqn_leq; apply/andP; split.
+          - by apply service_of_jobs_le_1 => //.
+          - by rewrite sum_nat_gt0; apply/hasP; exists jo => //; rewrite mem_filter IN Pjo. }
+        { move=> /hasPn ALL; rewrite big1_seq // => jo /andP [Pjo IN].
+          move: (ALL _ IN); rewrite negb_and => /orP [A | B]; first by rewrite Pjo in A.
+          by move: B; rewrite /receives_service_at -leqNgt leqn0 => /eqP ->. } }
+      rewrite L; clear L; last by apply arrivals_uniq.
+      have L :
+        forall {X : Type} (P Q : pred X) (xs : seq X),
+          has (fun x => P x && Q x) xs = has P ([ seq x <- xs | Q x]).
+      { clear. move => X P Q xs; induction xs as [ | x xs IHxs]; first by done.
+        by rewrite //= IHxs; destruct (P x) eqn:Px, (Q x) eqn:Qx; rewrite //= ?Px ?Qx. }
+      rewrite -L; clear L; f_equal.
+      rewrite /arrivals_up_to (arrivals_between_cat _ _ t1); [ | lia | lia ].
+      rewrite has_cat -[RHS]orFb; f_equal.
+      - apply/eqP; rewrite eqbF_neg; apply/hasPn => jo IN; apply/negP => /andP [Pjo SERV].
+        apply service_at_implies_scheduled_at, scheduled_implies_not_completed in SERV => //.
+        move: SERV => /negP SERV; apply:SERV.
+        (eapply completion_monotonic; last apply: H_quiet_time) => //.
+        + by apply: in_arrivals_implies_arrived.
+        + by apply: job_arrival_between_lt.
+      - rewrite [in RHS](arrivals_between_cat _ _ x.+1); [ | lia | lia ].
+        rewrite has_cat -[LHS]orbF; f_equal; symmetry.
+        apply/eqP; rewrite eqbF_neg; apply/hasPn => jo IN; apply/negP => /andP [Pjo SERV].
+        apply service_at_implies_scheduled_at in SERV.
+        apply H_jobs_must_arrive_to_execute in SERV.
+        apply job_arrival_between_ge in IN => //.
+        by move: IN SERV; rewrite /has_arrived; lia.
+    Qed.
+
+  End PredServedEqService.
 
 End UnitServiceUniProcessorModelLemmas.

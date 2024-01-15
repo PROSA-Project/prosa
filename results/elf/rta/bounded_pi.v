@@ -362,9 +362,10 @@ Section AbstractRTAforELFwithArrivalCurves.
       rewrite /cumulative_interference_from_hep_jobs_from_other_ep_tasks
         /service_of_hp_jobs_from_other_ep_tasks
         /hep_job_from_other_ep_task_interference.
-      rewrite (cumulative_pred_eq_service arr_seq _ sched _ _ _ j t1) //;
-        first by eauto 6 with basic_rt_facts.
-      by move => j' /andP[/andP[HEP _] _].
+      erewrite cumulative_pred_served_eq_service => //.
+      - apply instantiated_quiet_time_equivalent_quiet_time => //.
+        by apply H_busy_window.
+      - by move => j' /andP[/andP[HEP _] _].
     Qed.
 
     (** Similarly, we define the service required by jobs belonging to other
@@ -381,11 +382,12 @@ Section AbstractRTAforELFwithArrivalCurves.
       = service_of_hp_jobs_from_other_hp_tasks j t1 (t1 + Δ).
     Proof.
       rewrite /cumulative_interference_from_hep_jobs_from_hp_tasks
-        /service_of_hp_jobs_from_other_hp_tasks
-        /hep_job_from_hp_task_interference.
-      rewrite (cumulative_pred_eq_service arr_seq _ sched _ _ _ j t1) //;
-        first by eauto 6 with basic_rt_facts.
-      by move => j' /andP[HEP HP].
+              /service_of_hp_jobs_from_other_hp_tasks
+              /hep_job_from_hp_task_interference.
+      erewrite cumulative_pred_served_eq_service => //.
+      - apply instantiated_quiet_time_equivalent_quiet_time => //.
+        by apply H_busy_window.
+      - by move => j' /andP[HEP HP].
     Qed.
 
     (** Assume the arrival time of [j] relative to the busy window start is

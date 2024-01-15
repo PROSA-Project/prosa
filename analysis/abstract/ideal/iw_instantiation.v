@@ -1,5 +1,6 @@
 Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.abstract.IBF.task.
+Require Export prosa.analysis.facts.model.service_of_jobs.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.
@@ -358,68 +359,24 @@ Section JLFPInstantiation.
       Variable t1 t : instant.
       Hypothesis H_quiet_time : busy_interval.quiet_time arr_seq sched j t1.
 
-      (** Then for job [j], the (abstract) instantiated function of
-          interference is equal to the total service of any subset of jobs
-          with higher or equal priority. *)
-      Lemma cumulative_pred_eq_service (P : pred Job) :
-        (forall j', P j' -> hep_job j' j) ->
-          \sum_(t1 <= t' < t) has P (served_jobs_at arr_seq sched t')
-          = service_of_jobs sched P (arrivals_between arr_seq t1 t) t1 t.
-      Proof.
-        move=> Phep; clear H_job_of_tsk.
-        rewrite [RHS]exchange_big /=; apply: eq_big_nat => x /andP[t1lex xltt].
-        have [Idle|[jo Sched_jo]] := ideal_proc_model_sched_case_analysis sched x.
-        { rewrite has_filter -filter_predI -has_filter.
-          rewrite (@eq_has _ _ pred0) ?has_pred0 ?big1 // => [j' _ | j'].
-          + exact: ideal_not_idle_implies_sched.
-          + by rewrite /= /receives_service_at ideal_not_idle_implies_sched // andbF. }
-        have arr_jo : arrives_in arr_seq jo.
-        { exact: H_jobs_come_from_arrival_sequence Sched_jo. }
-        have arr_jo_x : job_arrival jo <= x.
-        { exact: H_jobs_must_arrive_to_execute Sched_jo. }
-        have [jo_hep_j|PRIO] := boolP (P jo).
-        - transitivity true.
-          { rewrite has_filter -filter_predI -has_filter.
-            congr nat_of_bool; apply/hasP; exists jo.
-            - exact: arrived_between_implies_in_arrivals.
-            - rewrite /= jo_hep_j /receives_service_at service_at_is_scheduled_at.
-              by rewrite Sched_jo. }
-          apply/esym/eqP; rewrite eqn_leq; apply/andP; split.
-          + exact: service_of_jobs_le_1.
-          + rewrite sum_nat_gt0; apply/hasP; exists jo; last first.
-            { by rewrite service_at_is_scheduled_at Sched_jo. }
-            rewrite mem_filter jo_hep_j /=.
-            apply: arrived_between_implies_in_arrivals => //.
-            apply/negPn; rewrite negb_and -ltnNge -leqNgt.
-            apply/negP => /orP[arr_jo_t1|]; last by lia.
-            move: Sched_jo; apply/negP.
-            apply: completed_implies_not_scheduled => //.
-            apply: completion_monotonic t1lex _.
-            by apply: H_quiet_time => //; apply: Phep jo_hep_j.
-        - rewrite has_filter -filter_predI -has_filter.
-          rewrite (@eq_in_has _ _ pred0) ?has_pred0 ?big1// => [j' AHEP|j' IN].
-          + apply/eqP; rewrite service_at_is_scheduled_at eqb0; apply/negP.
-            move=> SCHED; move: AHEP PRIO; suff -> : jo = j' by move=> ->.
-            exact: ideal_proc_model_is_a_uniprocessor_model.
-          + apply/negbTE; rewrite negb_and orbC -implyNb negbK; apply/implyP.
-            rewrite /receives_service_at service_at_is_scheduled_at lt0b.
-            move=> SCHED; suff <- : jo = j' by [].
-            exact: ideal_proc_model_is_a_uniprocessor_model.
-      Qed.
+      (** As follows from lemma [cumulative_pred_served_eq_service],
+          the (abstract) instantiated function of interference is
+          equal to the total service of any subset of jobs with higher
+          or equal priority. *)
 
       (** The above is in particular true for the jobs other
           than [j] with higher or equal priority... *)
       Lemma  cumulative_i_ohep_eq_service_of_ohep :
         cumulative_another_hep_job_interference arr_seq sched j t1 t
         = service_of_other_hep_jobs arr_seq sched j t1 t.
-      Proof. by apply: cumulative_pred_eq_service => // => ? /andP[]. Qed.
+      Proof. by apply: cumulative_pred_served_eq_service => // => ? /andP[]. Qed.
 
       (** ...and for jobs from other tasks than [j] with higher
           or equal priority. *)
       Lemma cumulative_i_thep_eq_service_of_othep :
         cumulative_another_task_hep_job_interference arr_seq sched j t1 t
         = service_of_other_task_hep_jobs arr_seq sched j t1 t.
-      Proof. by apply: cumulative_pred_eq_service => // => ? /andP[]. Qed.
+      Proof. by apply: cumulative_pred_served_eq_service => // => ? /andP[]. Qed.
 
     End InstantiatedServiceEquivalences.
 
