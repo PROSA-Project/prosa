@@ -1,5 +1,6 @@
 Require Export prosa.model.task.concept.
 Require Export prosa.analysis.definitions.task_schedule.
+Require Export prosa.analysis.facts.behavior.service.
 Require Export prosa.analysis.facts.model.scheduled.
 
 (** In this file we provide basic properties related to schedule of a task. *)
@@ -149,5 +150,40 @@ Section TaskSchedule.
     rewrite /task_scheduled_at /task_served_at /served_jobs_of_task_at /scheduled_jobs_of_task_at => /eqP -> //= -> //=.
     by rewrite /receives_service_at => ->.
   Qed.
+
+  (** In the following section, we prove a rewriting rule between the
+      predicate [task_served_at] and [job_of_task]. *)
+  Section SomeJobIsScheduled.
+
+    (** Assume that the processor is fully supply-consuming. *)
+    Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
+
+    (** Consider a time instant [t] ... *)
+    Variable t : instant.
+
+    (** ... and assume that there is supply at [t]. *)
+    Hypothesis H_supply : has_supply sched t.
+
+    (** Consider jobs [j] and [j'] ([j'] is not necessarily distinct
+        from job [j]). Assume that [j] is scheduled at time [t]. *)
+    Variable j : Job.
+    Hypothesis H_sched : scheduled_at sched j t.
+
+    (** Then the predicate [task_served_at] is equal to the predicate
+        [job_of_task]. *)
+    Lemma task_served_at_eq_job_of_task :
+      task_served_at arr_seq sched tsk t = job_of_task tsk j.
+    Proof.
+      have SERV : receives_service_at sched j t by apply ideal_progress_inside_supplies.
+      rewrite /task_served_at /served_jobs_of_task_at /scheduled_jobs_of_task_at.
+      move: (H_sched) => SCHED.
+      erewrite <-scheduled_jobs_at_scheduled_at in SCHED => //.
+      move: SCHED => /eqP ->.
+      have [TSK|/negPf NTSK] := boolP (job_of_task tsk j).
+      { by rewrite //= TSK //= SERV. }
+      by rewrite //= NTSK //=.
+    Qed.
+
+  End SomeJobIsScheduled.
 
 End TaskSchedule.
