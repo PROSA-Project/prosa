@@ -2,7 +2,7 @@ Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.busy_interval.
-
+Require Export prosa.analysis.definitions.blocking_bound_fp.
 
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)
 
@@ -108,11 +108,6 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
-  (** We also define a bound for the priority inversion caused by jobs with lower priority. *)
-  Definition blocking_bound :=
-    \max_(tsk_other <- ts | ~~ hep_task tsk_other tsk)
-      (task_max_nonpreemptive_segment tsk_other - ε).
-
   (** ** Priority inversion is bounded *)
   (** In this section, we prove that a priority inversion for task [tsk] is bounded by
       the maximum length of non-preemptive segments among the tasks with lower priority. *)
@@ -126,7 +121,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         arrives_in arr_seq j ->
         job_of_task tsk j ->
         busy_interval_prefix arr_seq sched j t1 t2 ->
-        max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound .
+        max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound ts tsk.
     Proof.
       move=> j t1 t2 ARR TSK BUSY; move: TSK => /eqP TSK.
       rewrite /blocking_bound /max_lp_nonpreemptive_segment.
@@ -149,9 +144,9 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         is bounded by the blocking_bound. *)
     Lemma priority_inversion_is_bounded:
       priority_inversion_is_bounded_by
-        arr_seq sched tsk (constant blocking_bound).
+        arr_seq sched tsk (constant (blocking_bound ts tsk)).
     Proof.
-      have PIB: priority_inversion_is_bounded_by arr_seq sched tsk (fun=> blocking_bound); last by done.
+      have PIB: priority_inversion_is_bounded_by arr_seq sched tsk (fun=> blocking_bound ts tsk); last by done.
       apply: priority_inversion_is_bounded => //.
       by exact: priority_inversion_is_bounded_by_blocking.
     Qed.
@@ -166,7 +161,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     (** Let L be any positive fixed point of the busy interval recurrence. *)
     Variable L : duration.
     Hypothesis H_L_positive : L > 0.
-    Hypothesis H_fixed_point : L = blocking_bound + total_hep_rbf L.
+    Hypothesis H_fixed_point : L = blocking_bound ts tsk + total_hep_rbf L.
 
     (** To reduce the time complexity of the analysis, recall the notion of search space. *)
     Let is_in_search_space := is_in_search_space tsk L.
@@ -178,7 +173,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
       forall (A : duration),
         is_in_search_space A ->
         exists (F : duration),
-          A + F >= blocking_bound
+          A + F >= blocking_bound ts tsk
                   + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
                   + total_ohep_rbf (A + F) /\
           F + (task_cost tsk - task_rtct tsk) <= R.

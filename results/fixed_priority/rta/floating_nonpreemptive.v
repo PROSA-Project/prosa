@@ -1,6 +1,7 @@
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
 Require Export prosa.analysis.facts.readiness.sequential.
+Require Export prosa.analysis.definitions.blocking_bound_fp.
 
 (** * RTA for Model with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating non-preemptive regions FP model. *)
@@ -100,16 +101,11 @@ Section RTAforFloatingModelwithArrivalCurves.
       priority other than task [tsk]. *)
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
 
-  (** Next, we define a bound for the priority inversion caused by tasks of lower priority. *)
-  Let blocking_bound :=
-    \max_(tsk_other <- ts | ~~ hep_task tsk_other tsk)
-     (task_max_nonpreemptive_segment tsk_other - ε).
-
   (** Let L be any positive fixed point of the busy interval recurrence, determined by
       the sum of blocking and higher-or-equal-priority workload. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
-  Hypothesis H_fixed_point : L = blocking_bound + total_hep_rbf L.
+  Hypothesis H_fixed_point : L = blocking_bound ts tsk + total_hep_rbf L.
 
   (** ** Response-Time Bound *)
 
@@ -124,7 +120,7 @@ Section RTAforFloatingModelwithArrivalCurves.
     forall (A : duration),
       is_in_search_space A ->
       exists  (F : duration),
-        A + F >= blocking_bound + task_rbf (A + ε) + total_ohep_rbf (A + F) /\
+        A + F >= blocking_bound ts tsk + task_rbf (A + ε) + total_ohep_rbf (A + F) /\
         R >= F.
 
   (** Now, we can reuse the results for the abstract model with

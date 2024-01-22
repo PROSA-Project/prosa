@@ -129,8 +129,8 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Proof.
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L:=L) => //.
     move => A /andP [LT CHANGE].
-    have BLOCK: forall A', bounded_nps.blocking_bound ts tsk A' = blocking_bound A'.
-    { by move=> A'; rewrite /bounded_nps.blocking_bound /parameters.task_max_nonpreemptive_segment
+    have BLOCK: forall A', blocking_bound_edf.blocking_bound ts tsk A' = blocking_bound A'.
+    { by move=> A'; rewrite /blocking_bound_edf.blocking_bound /parameters.task_max_nonpreemptive_segment
          /fully_preemptive_task_model subnn big1_eq. }
     specialize (H_R_is_maximum A); feed H_R_is_maximum; first by apply/andP; split; done.
     move: H_R_is_maximum => [F [FIX BOUND]].

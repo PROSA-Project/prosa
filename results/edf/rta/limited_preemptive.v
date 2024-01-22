@@ -4,6 +4,7 @@ Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.model.task.preemption.limited_preemptive.
 Require Export prosa.model.priority.edf.
+Require Export prosa.analysis.definitions.blocking_bound_edf.
 
 (** * RTA for EDF with Fixed Preemption Points *)
 (** In this module we prove the RTA theorem for EDF-schedulers with
@@ -93,12 +94,6 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
-  (** We define a bound for the priority inversion caused by jobs with lower priority. *)
-  Let blocking_bound A :=
-    \max_(tsk_other <- ts | (blocking_relevant tsk_other)
-                             && (task_deadline tsk_other > task_deadline tsk + A))
-     (task_max_nonpreemptive_segment tsk_other - ε).
-
   (** Next, we define an upper bound on interfering workload received from jobs
      of other tasks with higher-than-or-equal priority. *)
   Let bound_on_total_hep_workload A Δ :=
@@ -123,7 +118,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
-        A + F >= blocking_bound A
+        A + F >= blocking_bound ts tsk A
                 + (task_rbf (A + ε) - (task_last_nonpr_segment tsk - ε))
                 + bound_on_total_hep_workload A (A + F) /\
         R >= F + (task_last_nonpr_segment tsk - ε).
