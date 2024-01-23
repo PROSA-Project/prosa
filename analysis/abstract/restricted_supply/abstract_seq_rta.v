@@ -180,11 +180,11 @@ Section AbstractRTARestrictedSupplySequential.
         by move=> s t; split=> //; rewrite andbC. }
     Qed.
 
-
-    (** Consider any job [j] of [tsk]. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
+    (** To rule out pathological cases with the
+        [H_R_is_maximum_seq_rs] equation (such as [task_cost tsk]
+        being greater than [task_rbf (A + ε)]), we assume that the
+        arrival curve is non-pathological. *)
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** To later apply the theorem
         [uniprocessor_response_time_bound_restricted_supply], we need

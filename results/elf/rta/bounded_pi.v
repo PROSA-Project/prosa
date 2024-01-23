@@ -9,6 +9,7 @@ Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.facts.busy_interval.pi.
 Require Export prosa.analysis.facts.busy_interval.pi_cond.
 Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
+Require Export prosa.analysis.facts.model.task_cost.
 
 (** * Response-Time Analysis for the ELF Scheduling Policy *)
 
@@ -168,7 +169,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     priority_inversion_cond_is_bounded_by arr_seq sched tsk
       is_lower_priority (constant priority_inversion_lp_tasks_bound).
 
-  (* Similarly, we define a predicate to select jobs whose tasks have equal priority as [tsk]... *)
+  (** Similarly, we define a predicate to select jobs whose tasks have equal priority as [tsk]... *)
   Let is_equal_priority j' := ep_task tsk (job_task j').
 
   (** ... and assume that there exists a bound on the maximum length of priority inversion
@@ -564,11 +565,11 @@ Section AbstractRTAforELFwithArrivalCurves.
       in the abstract search space, then it is also in the concrete search space. *)
   Section ConcreteSearchSpace.
 
-    (** Consider any job [j] of [tsk]. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_job_cost_positive : job_cost_positive j.
+    (** To rule out pathological cases with the concrete search space,
+        we assume that the task cost is positive and the arrival curve
+        is non-pathological. *)
+    Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** Any point [A] in the abstract search space... *)
     Variable A : duration.
@@ -579,17 +580,11 @@ Section AbstractRTAforELFwithArrivalCurves.
     Lemma A_is_in_concrete_search_space :
       is_in_search_space A.
     Proof.
-      move: H_A_is_in_abstract_search_space  => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]
-        ; apply/andP; split => //.
+      move: H_A_is_in_abstract_search_space  => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]; apply/andP; split => //.
       { apply/orP; left; apply/orP; right.
-        rewrite /task_rbf_changes_at task_rbf_0_zero //; eauto 2.
-        apply: contraT => /negPn /eqP ZERO.
-        rewrite -(ltnn 0) {2}ZERO add0n.
-        apply: (@leq_trans (task_cost tsk));
-          last by apply: task_rbf_1_ge_task_cost.
-        apply: (@leq_trans (job_cost j)) => //.
-        move: (H_job_of_tsk) => /eqP <-.
-        by apply: (H_valid_job_cost _ H_j_arrives). }
+        rewrite /task_rbf_changes_at task_rbf_0_zero // eq_sym -lt0n add0n.
+        by apply task_rbf_epsilon_gt_0 => //.
+      }
       apply: contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
       exfalso; apply: INSP2.
       rewrite /total_interference_bound subnK // RBF.
@@ -625,12 +620,12 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   Section ResponseTimeReccurence.
 
-    (** Consider any job [j] of task [tsk] that has a positive job cost and is
-        in the arrival sequence. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_job_cost_positive : job_cost_positive j.
+    (** To rule out pathological cases with the [H_R_is_maximum]
+        equation (such as [task_cost tsk] being greater than [task_rbf
+        (A + ε)]), we assume that the arrival curve is
+        non-pathological. *)
+    Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** We have established that if [A] is in the abstract search then it is in
         the concrete search space, too.  We also know by assumption that,
@@ -670,11 +665,11 @@ Section AbstractRTAforELFwithArrivalCurves.
     have [ZERO|POS] := posnP (job_cost j);
       first by rewrite /job_response_time_bound /completed_by ZERO.
     eapply uniprocessor_response_time_bound_seq with (L := L) => //.
-    - by apply: instantiated_i_and_w_are_coherent_with_schedule.
-    - by apply: instantiated_interference_and_workload_consistent_with_sequential_tasks.
-    - by apply: instantiated_busy_intervals_are_bounded.
-    - by apply: instantiated_task_interference_is_bounded.
-    - by apply: response_time_recurrence_solution_exists.
+    - exact: instantiated_i_and_w_are_coherent_with_schedule.
+    - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
+    - exact: instantiated_busy_intervals_are_bounded.
+    - exact: instantiated_task_interference_is_bounded.
+    - exact: response_time_recurrence_solution_exists.
   Qed.
 
 End AbstractRTAforELFwithArrivalCurves.

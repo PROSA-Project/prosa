@@ -7,6 +7,7 @@ Require Import prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
+Require Export prosa.analysis.facts.model.task_cost.
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
@@ -351,11 +352,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
     (** Finally, we show that there exists a solution for the response-time recurrence. *)
     Section SolutionOfResponseTimeReccurenceExists.
 
-      (** Consider any job j of [tsk]. *)
-      Variable j : Job.
-      Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_of_tsk : job_of_task tsk j.
-      Hypothesis H_job_cost_positive : job_cost_positive j.
+      (** To rule out pathological cases with the concrete search
+          space, we assume that the task cost is positive and the
+          arrival curve is non-pathological. *)
+      Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+      Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
       (** Given any job [j] of task [tsk] that arrives exactly [A] units
           after the beginning of the busy interval, the bound of the
@@ -374,16 +375,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
       Lemma A_is_in_concrete_search_space:
         is_in_search_space A.
       Proof.
-        move: H_A_is_in_abstract_search_space  => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]];
-                                                  apply/andP; split => //.
+        move: H_A_is_in_abstract_search_space => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]; apply/andP; split => //.
         { apply/orP; left; apply/orP; right.
-          rewrite /task_rbf_changes_at /task_rbf /rbf task_rbf_0_zero //; eauto 2.
-          apply contraT => /negPn /eqP ZERO.
-          rewrite -(ltnn 0) {2}ZERO add0n.
-          apply: (@leq_trans (task_cost tsk)); last by exact: task_rbf_1_ge_task_cost.
-          apply: (@leq_trans (job_cost j)) => //.
-          move: (H_job_of_tsk) => /eqP <-.
-          by apply: (H_valid_job_cost _ H_j_arrives). }
+          rewrite /task_rbf_changes_at /task_rbf /rbf task_rbf_0_zero // eq_sym -lt0n add0n.
+          by apply task_rbf_epsilon_gt_0 => //.
+        }
         { apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
           exfalso; apply INSP2.
           rewrite /total_interference_bound subnK // RBF.
@@ -393,9 +389,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
           apply eq_big => // tsk_i /andP [TS OTHER].
           move: WL; rewrite /bound_on_total_hep_workload_changes_at => /hasPn WL.
           move: {WL} (WL tsk_i TS) =>  /nandP [/negPn/eqP EQ|/negPn/eqP WL];
-                                       first by move: OTHER; rewrite EQ => /neqP.
-          case: (ltngtP (A + ε + D tsk - D tsk_i) x) => [ltn_x|gtn_x|eq_x];
-                                                        rewrite /minn.
+            first by move: OTHER; rewrite EQ => /neqP.
+          case: (ltngtP (A + ε + D tsk - D tsk_i) x) => [ltn_x|gtn_x|eq_x]; rewrite /minn.
           { by rewrite ifT //; lia. }
           { rewrite ifF //.
             by move: gtn_x; rewrite leq_eqVlt  => /orP [/eqP EQ|LEQ]; lia. }

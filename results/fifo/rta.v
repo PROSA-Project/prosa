@@ -1,8 +1,8 @@
 Require Import prosa.model.readiness.basic.
 Require Import prosa.analysis.facts.priority.fifo.
 Require Export prosa.analysis.abstract.ideal.cumulative_bounds.
-Require Import prosa.analysis.facts.model.task_cost.
 Require Export prosa.analysis.abstract.ideal.abstract_rta.
+Require Export prosa.analysis.facts.model.task_cost.
 
 (** The formal development and the proofs in this file are described in-depth in
     the following paper:
@@ -309,9 +309,9 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       rewrite /workload_of_jobs /IBF (big_rem tsk) //=
         (addnC (task_request_bound_function tsk (job_arrival j - t1 + ε))).
       rewrite -addnBA; last first.
-      - apply leq_trans with (task_request_bound_function tsk ε);
-          first exact: (task_rbf_1_ge_task_cost arr_seq).
-        by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia].
+      - apply leq_trans with (task_request_bound_function tsk ε).
+        { by apply: task_rbf_1_ge_task_cost; exact: non_pathological_max_arrivals. }
+        { by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia]. }
       - eapply leq_trans;
           last by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
         rewrite addnBA.
@@ -384,13 +384,11 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   Section SearchSpaceRefinement.
 
-    (** Suppose we are given a job [j] of the task under analysis [tsk] with
-        positive cost. We use the existence of such a job in the subsequent
-        proof, even if it does not feature in the claim directly. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_positive_cost : 0 < task_cost tsk.
+    (** To rule out pathological cases with the concrete search space,
+        we assume that the task cost is positive and the arrival curve
+        is non-pathological. *)
+    Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** Under this assumption, given any [A] from the _abstract_ search space, ... *)
     Variable A : nat.
@@ -406,10 +404,9 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         apply/andP; split=> [//|].
         apply /hasP. exists tsk => [//|].
         rewrite neq_ltn;apply/orP; left.
-        erewrite task_rbf_0_zero; eauto 2.
-        rewrite add0n ; apply leq_trans with (task_cost tsk).
-        - by eapply leq_trans; eauto 2.
-        - exact: task_rbf_1_ge_task_cost. }
+        rewrite task_rbf_0_zero // add0n.
+        by apply task_rbf_epsilon_gt_0 => //.
+      }
       { apply /andP; split=> [//|].
         apply /hasPn.
         move => EQ2. unfold IBF in INSP2.
@@ -445,13 +442,13 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       bound equation that aRTA expects, which we do next. *)
 
   Section ResponseTimeBoundRestated.
-    (** Suppose again we are given a job [j] of the task under analysis [tsk]
-        with positive cost. We use the existence of such a job in the subsequent
-        proof, even if it does not feature in the claim directly. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_job_cost_positive : job_cost_positive j.
+
+    (** To rule out pathological cases with the [H_R_is_maximum_seq]
+        equation (such as [task_cost tsk] being greater than [task_rbf
+        (A + ε)]), we assume that the arrival curve is
+        non-pathological. *)
+    Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** We know that:
         - if [A] is in the abstract search space, then it is also in
@@ -477,7 +474,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         move: SEARCH => [F' [LE1 LE2]].
         rewrite !add0n in LE1.
         rewrite -(leqRW LE2) -(leqRW LE1).
-        exact: (task_cost_le_sum_rbf arr_seq). }
+        by apply: task_cost_le_sum_rbf. }
       exists (R - (task_cost tsk - task_rtct tsk)); split.
       - rewrite /IBF.
         rewrite (leqRW FIX) addnC -subnA; first last.
@@ -510,7 +507,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     - exact: abstractly_work_conserving.
     - exact: busy_windows_are_bounded.
     - exact: IBF_correct.
-    - by apply: soln_abstract_response_time_recurrence; eauto.
+    - exact: soln_abstract_response_time_recurrence.
   Qed.
 
   (** The preceding theorem [uniprocessor_response_time_bound_FIFO] corresponds

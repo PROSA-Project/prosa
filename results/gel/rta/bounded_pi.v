@@ -1,13 +1,11 @@
 Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 Require Import prosa.util.int.
-Require Import prosa.model.readiness.basic.
 Require Import prosa.analysis.abstract.ideal.cumulative_bounds.
-Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
 Require Import prosa.model.schedule.priority_driven.
 Require Import prosa.model.priority.gel.
 Require Import analysis.facts.priority.gel.
-Require Import prosa.analysis.facts.model.workload.
+Require Export prosa.analysis.facts.model.task_cost.
 
 (** * Abstract RTA for GEL-Schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the abstract response-time analysis
@@ -282,15 +280,15 @@ Section AbstractRTAforGELwithArrivalCurves.
       the concrete search space. *)
   Section ConcreteSearchSpace.
 
-    (** Consider any job j of [tsk]. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_job_cost_positive : job_cost_positive j.
+    (** To rule out pathological cases with the concrete search space,
+        we assume that the task cost is positive and the arrival curve
+        is non-pathological. *)
+    Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** For [j], the total interference bound is defined as follows. *)
     Let total_interference_bound tsk (A Δ : duration) :=
-          task_request_bound_function tsk (A + ε) - task_cost tsk + IBF_other A Δ.
+      task_request_bound_function tsk (A + ε) - task_cost tsk + IBF_other A Δ.
 
     (** Consider any point [A] in the abstract search space. *)
     Variable A : duration.
@@ -304,13 +302,9 @@ Section AbstractRTAforGELwithArrivalCurves.
       move: H_A_is_in_abstract_search_space  => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]];
                                                apply/andP; split => //.
       { apply/orP; left; apply/orP; right.
-        rewrite /task_rbf_changes_at task_rbf_0_zero //; eauto 2.
-        apply contraT => /negPn /eqP ZERO.
-        rewrite -(ltnn 0) {2}ZERO add0n.
-        apply: (@leq_trans (task_cost tsk)); [|exact: task_rbf_1_ge_task_cost].
-        apply: (@leq_trans (job_cost j)) => //.
-        move: (H_job_of_tsk) => /eqP <-.
-        by apply: (H_valid_job_cost _ H_j_arrives). }
+        rewrite /task_rbf_changes_at task_rbf_0_zero // eq_sym -lt0n add0n.
+        by apply task_rbf_epsilon_gt_0 => //.
+      }
       apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
       exfalso; apply INSP2.
       rewrite /total_interference_bound subnK // RBF.
@@ -346,10 +340,12 @@ Section AbstractRTAforGELwithArrivalCurves.
     (** In order to connect the concrete definition of [R]
         with the shape of response-time bound equation that aRTA expects,
         we prove the theorem [correct_search_space]. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_job_cost_positive : job_cost_positive j.
+
+    (** To rule out pathological cases with the concrete search space,
+        we assume that the task cost is positive and the arrival curve
+        is non-pathological. *)
+    Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** We define the total interference as defined above. *)
     Let total_interference_bound tsk (A Δ : duration) :=

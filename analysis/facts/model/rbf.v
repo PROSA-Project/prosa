@@ -196,9 +196,10 @@ Section RequestBoundFunctions.
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** Let [max_arrivals] be a family of valid arrival curves, i.e., for any task [tsk] in [ts]
-     [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function
-     that equals 0 for the empty interval Δ = 0. *)
+  (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
+      for any task [tsk] in [ts] [max_arrival tsk] is (1) an arrival
+      bound of [tsk], and (2) it is a monotonic function that equals 0
+      for the empty interval [Δ = 0]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_arrival_curve (max_arrivals tsk).
   Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
@@ -225,11 +226,12 @@ Section RequestBoundFunctions.
     by move: H_valid_arrival_curve => [_ T]; apply T.
   Qed.
 
-  (** Consider any job [j] of [tsk]. This guarantees that there exists at least one
-      job of task [tsk]. *)
-  Variable j : Job.
-  Hypothesis H_j_arrives : arrives_in arr_seq j.
-  Hypothesis H_job_of_tsk : job_of_task tsk j.
+
+  (** In the following, we assume that [tsk] has a positive cost ... *)
+  Hypothesis H_positive_cost : 0 < task_cost tsk.
+
+  (** ... and [max_arrivals tsk ε] is positive. *)
+  Hypothesis H_arrival_curve_positive : max_arrivals tsk ε > 0.
 
   (** Then we prove that [task_rbf] at [ε] is greater than or equal to the task's WCET. *)
   Lemma task_rbf_1_ge_task_cost:
@@ -237,22 +239,8 @@ Section RequestBoundFunctions.
   Proof.
     have ALT: forall n, n = 0 \/ n > 0 by clear; intros n; destruct n; [left | right].
     specialize (ALT (task_cost tsk)); destruct ALT as [Z | POS]; first by rewrite Z.
-    rewrite leqNgt; apply/negP; intros CONTR.
-    move: H_is_arrival_curve => ARRB.
-    specialize (ARRB (job_arrival j) (job_arrival j + ε)).
-    feed ARRB; first by rewrite leq_addr.
-    move: CONTR; rewrite /task_rbf /task_request_bound_function.
-    rewrite -{2}[task_cost tsk]muln1 ltn_mul2l => /andP [_ CONTR].
-    move: CONTR; rewrite -addn1 -[1]add0n leq_add2r leqn0 => /eqP CONTR.
-    move: ARRB; rewrite addKn CONTR leqn0 eqn0Ngt => /negP T; apply: T.
-    rewrite /number_of_task_arrivals -has_predT /task_arrivals_between.
-    apply/hasP; exists j => [|//].
-    rewrite /arrivals_between addn1 big_nat_recl//.
-    rewrite big_geq ?cats0 //= mem_filter.
-    apply/andP; split=> [//|].
-    move: H_j_arrives => [t ARR]; move: (ARR) => CONS.
-    apply H_arrival_times_are_consistent in CONS.
-    by rewrite CONS.
+    rewrite -[task_cost tsk]muln1 /task_rbf /task_request_bound_function.
+    by rewrite leq_pmul2l //=.
   Qed.
 
   (** As a corollary, we prove that the [task_rbf] at any point [A] greater than
@@ -266,9 +254,6 @@ Section RequestBoundFunctions.
     apply: (leq_trans task_rbf_1_ge_task_cost).
     exact: task_rbf_monotone.
   Qed.
-
-  (** Assume that [tsk] has a positive cost. *)
-  Hypothesis H_positive_cost : 0 < task_cost tsk.
 
   (** Then, we prove that [task_rbf] at [ε] is greater than [0]. *)
   Lemma task_rbf_epsilon_gt_0 : 0 < task_rbf ε.

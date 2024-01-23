@@ -2,6 +2,7 @@ Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.analysis.abstract.ideal.iw_instantiation.
 Require Export prosa.analysis.facts.busy_interval.existence.
 Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
+Require Export prosa.analysis.facts.model.task_cost.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
@@ -263,11 +264,11 @@ Section AbstractRTAforFPwithArrivalCurves.
         response-time recurrence. *)
     Section SolutionOfResponseTimeRecurrenceExists.
 
-      (** Consider any job [j] of [tsk]. *)
-      Variable j : Job.
-      Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_of_tsk : job_of_task tsk j.
-      Hypothesis H_job_cost_positive: job_cost_positive j.
+      (** To rule out pathological cases with the concrete search
+          space, we assume that the task cost is positive and the
+          arrival curve is non-pathological. *)
+      Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+      Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
       (** Given any job [j] of task [tsk] that arrives exactly [A]
           units after the beginning of the busy interval, the bound of
@@ -292,14 +293,11 @@ Section AbstractRTAforFPwithArrivalCurves.
           apply/andP; split; first by done.
           rewrite neq_ltn; apply/orP; left.
           rewrite {1}/task_rbf; erewrite task_rbf_0_zero; eauto 2; try done.
-          rewrite add0n /task_rbf; apply leq_trans with (task_cost tsk).
-          + by apply leq_trans with (job_cost j); eauto 2; move: (H_job_of_tsk) => /eqP <-; eauto 2.
-          + exact: task_rbf_1_ge_task_cost.
+          rewrite add0n /task_rbf; apply leq_trans with (task_cost tsk) => //.
+          exact: task_rbf_1_ge_task_cost.
         - apply/andP; split; first by done.
           apply/negP; intros EQ; move: EQ => /eqP EQ.
-          apply INSP2.
-          unfold total_interference_bound in *.
-          by rewrite subn1 addn1 prednK //.
+          by apply INSP2; rewrite /total_interference_bound subn1 addn1 prednK //.
       Qed.
 
       (** Then, there exists a solution for the response-time

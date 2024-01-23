@@ -19,7 +19,8 @@ Section TaskCost.
   Hypothesis H_valid_job_cost : valid_job_cost j.
 
   (** Then, the task cost of [tsk] is also positive. *)
-  Lemma job_cost_positive_implies_task_cost_positive : 0 < task_cost tsk.
+  Lemma job_cost_positive_implies_task_cost_positive :
+    0 < task_cost tsk.
   Proof.
     apply leq_trans with (job_cost j) => [//|].
     by move : H_job_of_task => /eqP TSK; rewrite -TSK.
@@ -29,5 +30,5 @@ End TaskCost.
 
 (** We add the above lemma to the global hints database. *)
 Global Hint Resolve
-  job_cost_positive_implies_task_cost_positive:
+  job_cost_positive_implies_task_cost_positive :
   basic_rt_facts.

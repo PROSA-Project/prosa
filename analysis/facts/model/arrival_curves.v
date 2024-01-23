@@ -47,3 +47,6 @@ Section NonPathologicalCurve.
   Qed.
 
 End NonPathologicalCurve.
+
+(** We add the above lemma to the global hints database. *)
+Global Hint Resolve non_pathological_max_arrivals : basic_rt_facts.

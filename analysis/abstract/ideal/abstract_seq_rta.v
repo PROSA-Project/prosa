@@ -165,14 +165,15 @@ Section Sequential_Abstract_RTA.
   (** In this section, we prove that [H_R_is_maximum_seq] implies [H_R_is_maximum]. *)
   Section MaxInSeqHypothesisImpMaxInNonseqHypothesis.
 
-    (** Consider any job [j] of [tsk]. *)
-    Variable j : Job.
-    Hypothesis H_j_arrives : arrives_in arr_seq j.
-    Hypothesis H_job_of_tsk : job_of_task tsk j.
+    (** To rule out pathological cases with the [H_R_is_maximum_seq]
+        equation (such as [task_cost tsk] being greater than [task_rbf
+        (A + ε)]), we assume that the arrival curve is
+        non-pathological. *)
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** For simplicity, let's define a local name for the search space. *)
     Let is_in_search_space A :=
-          is_in_search_space tsk L total_interference_bound A.
+      is_in_search_space tsk L total_interference_bound A.
 
     (** We prove that [H_R_is_maximum] holds. *)
     Lemma max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis:
@@ -191,9 +192,8 @@ Section Sequential_Abstract_RTA.
       rewrite addnA leq_add2r.
       rewrite addnBA; last first.
       { apply leq_trans with (task_rbf 1).
-        - by apply: task_rbf_1_ge_task_cost => //.
-        - eapply task_rbf_monotone; eauto 2.
-          by rewrite addn1.
+        - exact: task_rbf_1_ge_task_cost.
+        - by apply: task_rbf_monotone => //; rewrite addn1.
       }
       by rewrite subnBA; auto; rewrite addnC.
     Qed.
@@ -208,8 +208,8 @@ Section Sequential_Abstract_RTA.
   Proof.
     move => j ARR TSK.
     eapply uniprocessor_response_time_bound_ideal => //.
-    { by apply: task_IBF_implies_job_IBF => //. }
-    { by apply: max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis => //. }
+    { exact: task_IBF_implies_job_IBF => //. }
+    { exact: max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis => //. }
   Qed.
 
 End Sequential_Abstract_RTA.
