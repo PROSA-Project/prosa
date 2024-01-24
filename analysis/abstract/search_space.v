@@ -158,5 +158,40 @@ Section AbstractRTAReduction.
     Qed.
 
   End FixpointSolutionForAnotherA.
-  
-End AbstractRTAReduction. 
+
+End AbstractRTAReduction.
+
+(** In this section, we prove a simple lemma that allows one to switch
+    IBFs inside of the [is_in_search_space] predicate. *)
+Section SearchSpaceSwitch.
+
+  (** Consider any type of tasks. *)
+  Context {Task : TaskType}.
+
+  (** Let [tsk] be any task that is to be analyzed. *)
+  Variable tsk : Task.
+
+  (** Similarly to the previous section, to ensure that the analysis
+      procedure terminates, we assume an upper bound [B] on the values
+      of [A] that must be checked. *)
+  Variable B : duration.
+
+  (** Given two IBFs [IBF1] and [IBF2] such that they are equal for
+      all inputs, if an offset [A] is in the search space of [IBF1],
+      then [A] is in the search space of [IBF2]. *)
+  Lemma search_space_switch_IBF :
+    forall IBF1 IBF2,
+      (forall A Δ, A < B -> IBF1 tsk A Δ = IBF2 tsk A Δ) ->
+      forall A,
+        is_in_search_space tsk B IBF1 A ->
+        is_in_search_space tsk B IBF2 A.
+  Proof.
+    move=> IBF1 IBF2 EQU A [EQ|[NEQ NEQU]]; first by left; subst.
+    right; split; first by done.
+    move: NEQU => [x [LT NEQf]].
+    exists x; split; first by done.
+    move: NEQf.
+    by rewrite !EQU //=; lia.
+  Qed.
+
+End SearchSpaceSwitch.
