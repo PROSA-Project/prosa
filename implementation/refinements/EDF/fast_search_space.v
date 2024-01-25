@@ -31,8 +31,8 @@ Section SearchSpaceDefinition.
 
   (** Assume that an arrival curve based on a concrete prefix is given. *)
   #[local] Existing Instance ConcreteMaxArrivals.
-  Definition Task := [eqType of concrete_task].
-  Definition Job := [eqType of concrete_job].
+  Definition Task := concrete_task : eqType.
+  Definition Job := concrete_job : eqType.
 
   Context (TMNSP: TaskMaxNonpreemptiveSegment Task).
 

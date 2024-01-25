@@ -1,3 +1,4 @@
+From HB Require Import structures.
 Require Export prosa.implementation.definitions.extrapolated_arrival_curve.
 
 (** * Implementation of a Task's Arrival Bound *)
@@ -42,7 +43,5 @@ Proof.
   }
 Qed.
 
-(** ..., which allows instantiating the canonical structure for [[eqType of task_arrivals_bound]]. *)
-Canonical task_arrivals_bound_eqMixin := EqMixin eqn_task_arrivals_bound.
-Canonical task_arrivals_bound_eqType := Eval hnf in EqType task_arrivals_bound task_arrivals_bound_eqMixin.
-
+(** ..., which allows instantiating the canonical structure for [task_arrivals_bound : eqType]. *)
+HB.instance Definition _ := hasDecEq.Build task_arrivals_bound eqn_task_arrivals_bound.

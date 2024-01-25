@@ -39,7 +39,7 @@ Section ScheduleClass.
   Lemma service_in_service_on (j : Job) s :
     service_in j s = service_on j s tt.
   Proof.
-    by rewrite /service_in /index_enum Finite.EnumDef.enumDef /= big_seq1.
+    by rewrite /service_in sum_unit1.
   Qed.
 
   (** Furthermore, since the ideal uniprocessor state is represented
@@ -93,7 +93,7 @@ Section ScheduleClass.
     move=> j S t SCHED.
     rewrite /service_at /supply_at /supply_in service_in_def.
     move: SCHED; rewrite scheduled_at_def => ->.
-    by rewrite /index_enum Finite.EnumDef.enumDef /= big_seq1.
+    by rewrite sum_unit1.
   Qed.
 
   Lemma service_in_is_scheduled_in (j : Job) s :
@@ -124,7 +124,7 @@ Section ScheduleClass.
       has_supply sched t.
   Proof.
     move=> sched t; rewrite /has_supply /supply_at /supply_in //=.
-    by rewrite /index_enum Finite.EnumDef.enumDef /= big_seq1.
+    by rewrite sum_unit1.
   Qed.
 
   (** Next we prove a lemma which helps us to do a case analysis on

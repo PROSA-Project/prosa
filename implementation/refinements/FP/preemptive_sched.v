@@ -16,8 +16,8 @@ Require Export prosa.implementation.definitions.task.
 Section Schedule.
 
   (** In this file, we adopt the Prosa standard implementation of jobs and tasks. *)
-  Definition Task := [eqType of concrete_task].
-  Definition Job := [eqType of concrete_job].
+  Definition Task := concrete_task : eqType.
+  Definition Job := concrete_job : eqType.
 
   (** Consider any valid arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.

@@ -1,3 +1,4 @@
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype seq fintype.
 
 (** In this section, we define a notion of a set (based on a sequence
@@ -16,10 +17,9 @@ Section SeqSet.
 
   (** Now we add the [ssreflect] boilerplate code to support [_ == _]
       and [_ ∈ _] operations. *)
-  Canonical Structure setSubType := [subType for _set_seq].
-  Definition set_eqMixin := [eqMixin of set by <:].
-  Canonical Structure set_eqType := EqType set set_eqMixin.
   Set Warnings "-redundant-canonical-projection".
+  HB.instance Definition _  setSubType := [isSub for _set_seq].
+  HB.instance Definition _ := [Equality of set by <:].
   Canonical Structure mem_set_predType := PredType (fun (l : set) => mem_seq (_set_seq l)).
   Set Warnings "redundant-canonical-projection".
   Definition set_of of phant T := set.

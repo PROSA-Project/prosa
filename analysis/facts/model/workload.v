@@ -336,8 +336,7 @@ Section WorkloadFacts.
   Proof.
     move => P.
     rewrite /workload_of_jobs.
-    rewrite [in X in _ = X - _](bigID_idem _ _ _ _ (fun jo => (jo != j))) //=;
-      [| apply addnA| apply addnC].
+    rewrite [in X in _ = X - _](bigID_idem _ _ (fun jo => (jo != j))) //=.
     have -> :  \sum_(j0 <- jobs | P j0 && ~~ (j0 != j)) job_cost j0 =(if P j then job_cost j else 0);
       last by lia.
     rewrite (big_rem j) //=.

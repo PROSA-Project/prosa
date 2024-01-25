@@ -499,9 +499,8 @@ Section FP_RBF_partitioning.
   Proof.
     move => Δ IN UNIQ.
     rewrite /total_hep_request_bound_function_FP /total_ohep_request_bound_function_FP.
-    rewrite (bigID_idem _ _ _ _  (fun tsko => tsko != tsk)) //=;
-      [ apply /eqP| by apply addnA| by apply addnC].
-    rewrite eqn_add2l.
+    rewrite (bigID_idem _ _ (fun tsko => tsko != tsk)) //=.
+    apply /eqP; rewrite eqn_add2l.
     rewrite (eq_bigl (fun i => i == tsk)); last first.
     - move => tsko.
       case (tsko == tsk) eqn: EQ; last by lia.
@@ -527,8 +526,7 @@ Section FP_RBF_partitioning.
   Proof.
     move => Δ IN.
     rewrite /total_hep_request_bound_function_FP /total_ohep_request_bound_function_FP.
-    rewrite [leqRHS](bigID_idem _ _ _ _  (fun tsko => tsko != tsk)) //=;
-      [| by apply addnA| by apply addnC].
+    rewrite [leqRHS](bigID_idem _ _ (fun tsko => tsko != tsk)) //=.
     apply leq_add; first by done.
     rewrite (eq_bigl (fun tsko => tsko == tsk)); last first.
     - move => tsko.

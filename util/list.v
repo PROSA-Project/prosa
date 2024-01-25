@@ -843,18 +843,17 @@ Section IotaRange.
         rewrite index_iota_lt_step //.
         replace ([seq ρ <- x :: index_iota x.+1 b | ρ \in x :: xs])
           with (x :: [seq ρ <- index_iota x.+1 b | ρ \in x :: xs]); last first.
-        { simpl; replace (@in_mem nat x (@mem nat (seq_predType nat_eqType) (x::xs))) with true.
-          all: by auto; rewrite in_cons eq_refl.
+        { by rewrite /= in_cons eqxx.
         }
         rewrite (index_iota_filter_inxs _ _ x) //; simpl.
         rewrite eq_refl.
-        replace (@in_mem nat x (@mem nat (seq_predType nat_eqType) (@rem_all nat_eqType x xs))) with false; first by reflexivity.
+        replace (@in_mem nat x (@mem nat (seq_predType _) (@rem_all _ x xs))) with false; first by reflexivity.
         apply/eqP; rewrite eq_sym eqbF_neg.
         apply/negP; apply nin_rem_all.
       + rewrite index_iota_lt_step //; last by lia.
         replace ([seq ρ <- a :: index_iota a.+1 b | ρ \in x :: xs])
           with ([seq ρ <- index_iota a.+1 b | ρ \in x :: xs]); last first.
-        { simpl; replace (@in_mem nat a (@mem nat (seq_predType nat_eqType) (@cons nat x xs))) with false; first by done.
+        { simpl; replace (@in_mem nat a (@mem nat (seq_predType _) (@cons nat x xs))) with false; first by done.
           apply/eqP; rewrite eq_sym eqbF_neg.
           apply/negP; rewrite in_cons; intros C; move: C => /orP [/eqP C|C].
           - by subst; rewrite ltnn in LT.
@@ -862,7 +861,7 @@ Section IotaRange.
         }
         replace ([seq ρ <- a :: index_iota a.+1 b | ρ \in rem_all x xs])
           with ([seq ρ <- index_iota a.+1 b | ρ \in rem_all x xs]); last first.
-        { simpl; replace (@in_mem nat a (@mem nat (seq_predType nat_eqType) (@rem_all nat_eqType x xs))) with false; first by done.
+        { simpl; replace (@in_mem nat a (@mem nat (seq_predType _) (@rem_all _ x xs))) with false; first by done.
           apply/eqP; rewrite eq_sym eqbF_neg; apply/negP; intros C.
           apply in_rem_all in C.
           by move_neq_down LT; apply MIN.

@@ -1,3 +1,4 @@
+From HB Require Import structures.
 Require Export prosa.implementation.definitions.arrival_bound.
 Require Export prosa.model.task.arrival.curves.
 Require Export prosa.model.priority.numeric_fixed_priority.
@@ -53,9 +54,8 @@ Proof.
   }
 Qed.
 
-(** ..., which allows instantiating the canonical structure for [[eqType of concrete_task]]. *)
-Canonical concrete_task_eqMixin := EqMixin eqn_task.
-Canonical concrete_task_eqType := Eval hnf in EqType concrete_task concrete_task_eqMixin.
+(** ..., which allows instantiating the canonical structure for [concrete_task : eqType]. *)
+HB.instance Definition _  := hasDecEq.Build concrete_task eqn_task.
 
 
 (** ** Implementation of a Concrete Job *)
@@ -68,7 +68,7 @@ Record concrete_job :=
   ; job_arrival: instant
   ; job_cost: nat
   ; job_deadline: instant
-  ; job_task: [eqType of concrete_task]
+  ; job_task: concrete_task : eqType
   }.
 
 (** For convenience, we define a function that converts each possible arrival
@@ -120,10 +120,8 @@ Proof.
     - by apply TASK; inversion BUG. }
 Qed.
 
-(** ... which allows instantiating the canonical structure for [[eqType of concrete_job]].*)
-Canonical concrete_job_eqMixin := EqMixin eqn_job.
-Canonical concrete_job_eqType := Eval hnf in EqType concrete_job concrete_job_eqMixin.
-
+(** ... which allows instantiating the canonical structure for [concrete_job : eqType].*)
+HB.instance Definition _  := hasDecEq.Build concrete_job eqn_job.
 
 (** ** Instances for Concrete Jobs and Tasks. *)
 
@@ -133,14 +131,14 @@ Section Parameters.
 
   (** First, we connect the above definition of tasks with the
       generic Prosa task-parameter interfaces. *)
-  Let Task := [eqType of concrete_task].
+  Let Task := concrete_task : eqType.
   #[global,program] Instance TaskCost : TaskCost Task := task_cost.
   #[global,program] Instance TaskPriority : TaskPriority Task := task_priority.
   #[global,program] Instance TaskDeadline : TaskDeadline Task := task_deadline.
   #[global,program] Instance ConcreteMaxArrivals : MaxArrivals Task := concrete_max_arrivals.
 
   (** Second, we do the same for the above definition of job. *)
-  Let Job := [eqType of concrete_job].
+  Let Job := concrete_job : eqType.
   #[global,program] Instance JobTask : JobTask Job Task := job_task.
   #[global,program] Instance JobArrival : JobArrival Job := job_arrival.
   #[global,program] Instance JobCost : JobCost Job := job_cost.

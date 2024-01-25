@@ -9,8 +9,8 @@ Require Export prosa.implementation.definitions.task.
     hypotheses in abstract RTA. *)
 
 (** The generated jobs to belong to the concrete task type. *)
-Definition Task := [eqType of concrete_task].
-Definition Job := [eqType of concrete_job].
+Definition Task := concrete_task : eqType.
+Definition Job := concrete_job : eqType.
 
 
 (** We first define a job-generation function that produces one concrete job of

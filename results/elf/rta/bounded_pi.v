@@ -273,7 +273,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         apply/(leq_trans (bigmax_leq_sum _ _ _ _)).
         apply leq_trans with
           (\sum_(i <- ts | ep_task_blocking_relevant i j t) task_request_bound_function i L); last first.
-        { apply: (sub_le_big addnA addnC leqnn); first by move => ? ?; apply leq_addr.
+        { apply: sub_le_big => //=; first by move => ? ?; apply leq_addr.
           by move => tsk' /andP[]. }
         rewrite  big_seq_cond [leqRHS]big_seq_cond.
         apply: leq_sum =>tsk_other /andP[? /andP[_ /andP[MA _]]].
@@ -283,7 +283,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       { rewrite hep_hp_workload_hp =>//. rewrite /from_hp_task TSK'; exact: sum_of_jobs_le_sum_rbf. }
       { apply: leq_trans; last by apply: sum_of_jobs_le_sum_rbf.
         rewrite /workload_of_jobs big_seq_cond [leqRHS]big_seq_cond.
-        apply: (sub_le_big addnA addnC leqnn); first by move => ? ?; apply: leq_addr.
+        apply: sub_le_big => //; first by move => ? ?; apply: leq_addr.
         move=> j0; case eq: (_ \in _) =>//=.
         move=> /andP[HEPj EP]; rewrite -TSK'; apply/andP; split =>//.
         move: HEPj.

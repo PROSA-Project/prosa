@@ -463,3 +463,16 @@ Section Monotonicity.
   Qed.
 
 End Monotonicity.
+
+(** As a rewriting aid, it is useful to note that summing over "all" elements of
+    [unit : finType] is a no-op. *)
+Lemma sum_unit1 :
+  forall {F : unit -> nat},
+    \sum_r F r = F tt.
+Proof.
+  move=> F.
+  rewrite /index_enum unlock_with -enumT /=.
+  have -> : enum (unit : finType) = [:: tt]
+    by rewrite /(enum _) unlock //=.
+  by rewrite big_seq1.
+Qed.
