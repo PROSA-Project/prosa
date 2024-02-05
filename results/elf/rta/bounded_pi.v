@@ -297,9 +297,9 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   (** ** F. The Interference-Bound Function *)
 
-  (** Next, we define the interference [IBF_other] and prove that [IBF_other]
+  (** Next, we define the interference [task_IBF] and prove that [task_IBF]
       bounds the interference incurred by any job of [tsk]. Note that
-      [IBF_other] only takes the interference from jobs of other tasks into
+      [task_IBF] only takes the interference from jobs of other tasks into
       account i.e., self-interference is not included. *)
 
   (** We first consider the interference incurred due to strictly
@@ -323,13 +323,13 @@ Section AbstractRTAforELFwithArrivalCurves.
     \sum_(tsk_o <- ts | ep_task tsk tsk_o && (tsk_o != tsk))
       task_request_bound_function tsk_o (minn `|Num.max 0%R (ep_task_intf_interval tsk_o A)| Δ).
 
-  (** Finally, [IBF_other] for an interval [Δ] is defined as the sum of
+  (** Finally, [task_IBF] for an interval [Δ] is defined as the sum of
       [priority_inversion_bound], [bound_on_total_ep_workload], and
       [total_hp_rbf] on [Δ]. *)
-  Definition IBF_other (tsk : Task) (A Δ : duration) :=
+  Definition task_IBF (A Δ : duration) :=
     priority_inversion_bound A + bound_on_total_ep_workload A Δ + total_hp_rbf Δ.
 
-  (** In this section, we prove the soundness of [IBF_other].*)
+  (** In this section, we prove the soundness of [task_IBF].*)
   Section BoundingIBF.
 
     (** Consider any job [j] of task [tsk] that has a positive job cost and is
@@ -501,10 +501,10 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   End BoundingIBF.
 
-  (** Finally, we use the above two lemmas to prove that [IBF_other] bounds the
+  (** Finally, we use the above two lemmas to prove that [task_IBF] bounds the
       interference incurred by [tsk]. *)
   Lemma instantiated_task_interference_is_bounded :
-    task_interference_is_bounded_by arr_seq sched tsk IBF_other.
+    task_interference_is_bounded_by arr_seq sched tsk task_IBF.
   Proof.
     move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
     move: (OFF _ _ BUSY) => EQA; subst A.
@@ -513,7 +513,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       by rewrite /completed_by /completed_by ZERO.
     - rewrite -/(cumul_task_interference _ _ _ _ _).
       rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _ )) //=.
-      rewrite /IBF_other -addnA.
+      rewrite /task_IBF -addnA.
       apply: leq_add;
         first by apply: cumulative_priority_inversion_is_bounded priority_inversion_is_bounded =>//.
       rewrite cumulative_hep_interference_split_tasks_new // addnC.
@@ -530,9 +530,9 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   (** For [tsk], the total interference bound is defined as the sum of the interference due to
       - (1) jobs belonging to the same task (self interference) and
-      - (2) jobs belonging to other tasks [IBF_other]. *)
-  Let total_interference_bound tsk (A Δ : duration) :=
-    task_request_bound_function tsk (A + ε) - task_cost tsk + IBF_other tsk A Δ.
+      - (2) jobs belonging to other tasks [task_IBF]. *)
+  Let total_interference_bound (A Δ : duration) :=
+    task_request_bound_function tsk (A + ε) - task_cost tsk + task_IBF A Δ.
 
   (** In the case of ELF, of the four terms that constitute the total
       interference bound, only the [priority_inversion_bound], task RBF and the
@@ -574,7 +574,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     (** Any point [A] in the abstract search space... *)
     Variable A : duration.
     Hypothesis H_A_is_in_abstract_search_space :
-      search_space.is_in_search_space tsk L total_interference_bound A.
+      search_space.is_in_search_space L total_interference_bound A.
 
     (** ... is also in the concrete search space. *)
     Lemma A_is_in_concrete_search_space :
@@ -588,7 +588,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       apply: contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
       exfalso; apply: INSP2.
       rewrite /total_interference_bound subnK // RBF.
-      apply/eqP; rewrite eqn_add2l /IBF_other PI !addnACl eqn_add2r.
+      apply/eqP; rewrite eqn_add2l /task_IBF PI !addnACl eqn_add2r.
       rewrite /bound_on_total_ep_workload.
       apply/eqP; rewrite big_seq_cond [RHS]big_seq_cond.
       apply: eq_big => // tsk_i /andP [TS OTHER].
@@ -633,7 +633,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         satisfies [H_R_is_maximum]. *)
 
     (** Using these facts, here we prove that if, [A] is in the abstract search space, ... *)
-    Let is_in_search_space := search_space.is_in_search_space tsk L total_interference_bound.
+    Let is_in_search_space := search_space.is_in_search_space L total_interference_bound.
 
     (** ... then there exists a solution to the response-time equation as stated
             in the aRTA.  *)
@@ -643,7 +643,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         exists F,
           A + F >= task_request_bound_function tsk (A + ε)
                   - (task_cost tsk - task_rtct tsk)
-                  + IBF_other tsk A (A + F)
+                  + task_IBF A (A + F)
           /\ R >= F + (task_cost tsk - task_rtct tsk).
     Proof.
       move => A0 IN.

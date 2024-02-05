@@ -109,18 +109,19 @@ Section AbstractRTARestrictedSupplySequential.
       interference incurred by task [tsk]. That is, [task_intra_IBF]
       bounds interference ignoring interference due to lack of supply
       _and_ due to self-interference. *)
-  Variable task_intra_IBF : Task -> duration -> duration -> duration.
+  Variable task_intra_IBF : duration -> duration -> duration.
   Hypothesis H_interference_inside_reservation_is_bounded :
     task_intra_interference_is_bounded_by arr_seq sched tsk task_intra_IBF.
 
   (** We use the function [task_intra_IBF], which satisfies the
       hypothesis [task_intra_interference_is_bounded_by], to construct
       a new function [intra_IBF := (task_rbf (A + ε) - task_cost tsk)
-      + task_intra_IBF tsk A Δ] that satisfies the hypothesis
+      + task_intra_IBF A Δ] that satisfies the hypothesis
       [intra_interference_is_bounded_by]. This is needed to later
-      apply the lemma [uniprocessor_response_time_bound_restricted_supply]
-      from file [restricted_supply/abstract_rta] (recall that it
-      requires [intra_IBF], not [task_intra_IBF]). *)
+      apply the lemma
+      [uniprocessor_response_time_bound_restricted_supply] from file
+      [restricted_supply/abstract_rta] (recall that it requires
+      [intra_IBF], not [task_intra_IBF]). *)
 
   (** The logic behind [intra_IBF] is quite simple. Consider a job [j]
       of task [tsk] that arrives exactly [A] units after the beginning
@@ -132,11 +133,11 @@ Section AbstractRTARestrictedSupplySequential.
       other jobs of task [tsk] -- [task_rbf (A + ε) - task_cost tsk]
       -- and (2) any other interference that is bounded by
       [task_intra_IBF(tsk, A, Δ)]. *)
-  Let intra_IBF (tsk : Task) (A Δ : duration) :=
-    (task_rbf (A + ε) - task_cost tsk) + task_intra_IBF tsk A Δ.
+  Let intra_IBF (A Δ : duration) :=
+    (task_rbf (A + ε) - task_cost tsk) + task_intra_IBF A Δ.
 
   (** For clarity, let's define a local name for the search space. *)
-  Let is_in_search_space_rs := is_in_search_space tsk L intra_IBF.
+  Let is_in_search_space_rs := is_in_search_space L intra_IBF.
 
   (** We use the following equation to bound the response-time of a
       job of task [tsk]. Consider any value [R] that upper-bounds the
@@ -144,7 +145,7 @@ Section AbstractRTARestrictedSupplySequential.
       relative arrival time [A] in the search space, there exists a
       corresponding solution [F] such that
       (1) [F <= A + R],
-      (2) [(task_rbf (A + ε) - (task_cost tsk - task_rtct tsk)) + task_intra_IBF tsk A F <= SBF F],
+      (2) [(task_rbf (A + ε) - (task_cost tsk - task_rtct tsk)) + task_intra_IBF A F <= SBF F],
       (3) and [SBF F + (task_cost tsk - task_rtct tsk) <= SBF (A + R)]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum_seq_rs :
@@ -152,7 +153,7 @@ Section AbstractRTARestrictedSupplySequential.
       is_in_search_space_rs A ->
       exists (F : duration),
         F <= A + R
-        /\ (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk)) + task_intra_IBF tsk A F <= SBF F
+        /\ (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk)) + task_intra_IBF A F <= SBF F
         /\ SBF F + (task_cost tsk - task_rtct tsk) <= SBF (A + R).
 
   (** In the following section we prove that all the premises of
@@ -189,7 +190,7 @@ Section AbstractRTARestrictedSupplySequential.
     (** To later apply the theorem
         [uniprocessor_response_time_bound_restricted_supply], we need
         to provide the IBF, which bounds the total interference. *)
-    Let IBF tsk A Δ := Δ - SBF Δ + intra_IBF tsk A Δ.
+    Let IBF A Δ := Δ - SBF Δ + intra_IBF A Δ.
 
     (** Next we prove that [H_R_is_maximum_seq_rs] implies
         [H_R_is_maximum_rs] from file ([.../restricted_supply/abstract_rta.v]).
@@ -199,10 +200,10 @@ Section AbstractRTARestrictedSupplySequential.
         non-necessarily sequential tasks. *)
     Lemma sol_seq_rs_equation_impl_sol_rs_equation :
       forall (A : duration),
-        is_in_search_space tsk L IBF  A ->
+        is_in_search_space L IBF  A ->
         exists F : duration,
           F <= A + R
-          /\ task_rtct tsk + intra_IBF tsk A F <= SBF F
+          /\ task_rtct tsk + intra_IBF A F <= SBF F
           /\ SBF F + (task_cost tsk - task_rtct tsk) <= SBF (A + R).
     Proof.
       rewrite /IBF; move=> A SP.

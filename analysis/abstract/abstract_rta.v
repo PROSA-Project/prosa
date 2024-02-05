@@ -111,7 +111,7 @@ Section Abstract_RTA.
       can use information about relative time arrival of a job of task
       [tsk]. Recall that an interference bound function gives a bound on
       the cumulative interference incurred by jobs of task [tsk]. *)
-  Variable IBF_P : Task -> (* A *) duration -> (* Δ *) duration -> duration.
+  Variable IBF_P : (* A *) duration -> (* Δ *) duration -> duration.
   Hypothesis H_job_interference_is_bounded_IBFP :
     job_interference_is_bounded_by
       arr_seq sched tsk IBF_P relative_arrival_time_of_job_is_A.
@@ -140,30 +140,30 @@ Section Abstract_RTA.
   Definition relative_time_to_reach_rtct (j : Job) (F : duration) :=
     forall (t1 t2 : instant),
       busy_interval sched j t1 t2 ->
-      task_rtct tsk + IBF_P tsk (job_arrival j - t1) F <= F /\
+      task_rtct tsk + IBF_P (job_arrival j - t1) F <= F /\
       task_rtct tsk <= service sched j (t1 + F).
 
   (** Next, consider a valid interference bound function [IBF_NP] that
       can use information about the relative time when any given job of task
       [tsk] receives at least [task_rtc tsk] units of service. *)
-  Variable IBF_NP : Task -> (* F *) duration -> (* Δ *) duration -> duration.
+  Variable IBF_NP : (* F *) duration -> (* Δ *) duration -> duration.
   Hypothesis H_job_interference_is_bounded_IBFNP:
     job_interference_is_bounded_by
       arr_seq sched tsk IBF_NP relative_time_to_reach_rtct.
 
   (** In addition, we assume that [IBF_NP] indeed takes into account
       information received in the first stage. Specifically, we assume
-      that the sum of [tsk]'s cost and [IBF_NP tsk F Δ] is never smaller
+      that the sum of [tsk]'s cost and [IBF_NP F Δ] is never smaller
       than [F]. This intuitively means that the second stage cannot
       have a solution that is smaller than the solution to the first
       stage. *)
-  Hypothesis H_IBF_NP_ge_param : forall F Δ, F <= task_cost tsk + IBF_NP tsk F Δ.
+  Hypothesis H_IBF_NP_ge_param : forall F Δ, F <= task_cost tsk + IBF_NP F Δ.
 
 
   (** Given [IBF_P] and [IBF_NP] we construct a response-time recurrence. *)
 
   (** For clarity, let's define a local name for the search space. *)
-  Let is_in_search_space A := is_in_search_space tsk L IBF_P A.
+  Let is_in_search_space A := is_in_search_space L IBF_P A.
 
   (** We use the following equation to bound the response-time of a
       job of task [tsk]. Consider any value [R] that upper-bounds the
@@ -176,8 +176,8 @@ Section Abstract_RTA.
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
-        task_rtct tsk + IBF_P tsk A F <= F /\
-        task_cost tsk + IBF_NP tsk F (A + R) <= A + R.
+        task_rtct tsk + IBF_P A F <= F /\
+        task_cost tsk + IBF_NP F (A + R) <= A + R.
 
   (** * Proof of the Theorem *)
   (** In the next section we show a detailed proof of the main theorem
@@ -243,7 +243,7 @@ Section Abstract_RTA.
 
     (** (b) [IBF_P A x] is equal to [IBF_P A_sp x] for all [x] less than [L]. *)
     Hypothesis H_equivalent :
-      are_equivalent_at_values_less_than (IBF_P tsk A) (IBF_P tsk A_sp) L.
+      are_equivalent_at_values_less_than (IBF_P A) (IBF_P A_sp) L.
 
     (** (c) [A_sp] is in the search space. *)
     Hypothesis H_Asp_is_in_search_space : is_in_search_space A_sp.
@@ -252,12 +252,12 @@ Section Abstract_RTA.
     Variable F : duration.
 
     (** ... [F] is a solution of the response-time recurrence. *)
-    Hypothesis H_F_fixpoint : task_rtct tsk + IBF_P tsk A_sp F <= F.
+    Hypothesis H_F_fixpoint : task_rtct tsk + IBF_P A_sp F <= F.
 
-    (** And finally, (e) [task_cost tsk + IBF_NP tsk F (A_sp + R)] is
+    (** And finally, (e) [task_cost tsk + IBF_NP F (A_sp + R)] is
         no greater than [A_sp + R]. *)
     Hypothesis H_Asp_R_fixpoint :
-      task_cost tsk + IBF_NP tsk F (A_sp + R) <= A_sp + R.
+      task_cost tsk + IBF_NP F (A_sp + R) <= A_sp + R.
 
     (** ** Case 1 *)
 
@@ -467,7 +467,7 @@ Section Abstract_RTA.
     { by rewrite /completed_by ZERO. }
     move: (H_bounded_busy_interval_exists  _ ARR JOBtsk POS) => [t1 [t2 [NEQ [T2 BUSY]]]].
     move: (relative_arrival_is_bounded _ ARR JOBtsk POS _ _ BUSY) => AltL.
-    move: (representative_exists tsk _ IBF_P _ AltL) => [A__sp [ALEA2 [EQΦ INSP]]].
+    move: (representative_exists _ IBF_P _ AltL) => [A__sp [ALEA2 [EQΦ INSP]]].
     set (A := job_arrival j - t1) in *.
     move: (H_R_is_maximum _ INSP) => [F [FIX1 FIX2]].
     edestruct (leqP t2 (t1 + F)) as [LE1|LE1];

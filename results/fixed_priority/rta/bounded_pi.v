@@ -51,7 +51,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   Variable sched : schedule (ideal.processor_state Job).
 
   (** ... allow for any work-bearing notion of job readiness, ... *)
-  Context `{@JobReady Job (ideal.processor_state Job) Cost Arrival}.
+  Context `{!JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** ... and assume that the schedule is valid.  *)
@@ -177,12 +177,12 @@ Section AbstractRTAforFPwithArrivalCurves.
         R >= F + (task_cost tsk - task_rtct tsk).
 
   (** Finally, we define the interference bound function
-      ([IBF_other]). [IBF_other] bounds the interference if tasks are
+      ([task_IBF]). [task_IBF] bounds the interference if tasks are
       sequential. Since tasks are sequential, we exclude interference
-      from other jobs of the same task. For FP, we define [IBF_other]
+      from other jobs of the same task. For FP, we define [task_IBF]
       as the sum of the priority interference bound and the
       higher-or-equal-priority workload. *)
-  Let IBF_other (R : duration) := priority_inversion_bound + total_ohep_rbf R.
+  Let task_IBF (R : duration) := priority_inversion_bound + total_ohep_rbf R.
 
   (** ** Filling Out Hypotheses Of Abstract RTA Theorem *)
   (** In this section we prove that all preconditions necessary to use
@@ -213,7 +213,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         exact: sum_of_jobs_le_sum_rbf. }
     Qed.
 
-    (** Next, we prove that [IBF_other] is indeed an interference
+    (** Next, we prove that [task_IBF] is indeed an interference
         bound.
 
         Recall that in module abstract_seq_RTA hypothesis
@@ -224,24 +224,24 @@ Section AbstractRTAforFPwithArrivalCurves.
 
         However, in this module we analyze only one task -- [tsk],
         therefore it is “hard-coded” inside the interference bound
-        function [IBF_other]. Moreover, in case of a model with fixed
+        function [task_IBF]. Moreover, in case of a model with fixed
         priorities, interference that some job [j] incurs from
         higher-or-equal priority jobs does not depend on the relative
         arrival time of job [j]. Therefore, in order for the
-        [IBF_other] signature to match the required signature in
-        module [abstract_seq_RTA], we wrap the [IBF_other] function in
+        [task_IBF] signature to match the required signature in
+        module [abstract_seq_RTA], we wrap the [task_IBF] function in
         a function that accepts, but simply ignores, the task and the
         relative arrival time. *)
     Lemma instantiated_task_interference_is_bounded :
       task_interference_is_bounded_by
-        arr_seq sched tsk (fun tsk A R => IBF_other R).
+        arr_seq sched tsk (fun A R => task_IBF R).
     Proof.
       move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
       move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
       { by exfalso; rewrite /completed_by ZERO in NCOMPL. }
       rewrite -/(cumul_task_interference _ _ _ _ _).
       rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
-      rewrite /IBF_other leq_add//.
+      rewrite /task_IBF leq_add//.
       { apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ)); first by done.
         apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 t2);
           last by apply: H_priority_inversion_is_bounded => //; eauto 6 with basic_rt_facts.
@@ -274,15 +274,15 @@ Section AbstractRTAforFPwithArrivalCurves.
           units after the beginning of the busy interval, the bound of
           the total interference incurred by [j] within an interval of
           length [Δ] is equal to [task_rbf (A + ε) - task_cost tsk +
-          IBF_other Δ]. *)
-      Let total_interference_bound tsk A Δ :=
-        task_rbf (A + ε) - task_cost tsk + IBF_other Δ.
+          task_IBF Δ]. *)
+      Let total_interference_bound A Δ :=
+        task_rbf (A + ε) - task_cost tsk + task_IBF Δ.
 
       (** Next, consider any [A] from the search space (in the
           abstract sense). *)
       Variable A : duration.
       Hypothesis H_A_is_in_abstract_search_space :
-        search_space.is_in_search_space tsk L total_interference_bound A.
+        search_space.is_in_search_space L total_interference_bound A.
 
       (** We prove that [A] is also in the concrete search space. *)
       Lemma A_is_in_concrete_search_space :
@@ -304,7 +304,7 @@ Section AbstractRTAforFPwithArrivalCurves.
           recurrence (in the abstract sense). *)
       Corollary correct_search_space :
         exists (F : duration),
-          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + IBF_other (A + F) /\
+          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF (A + F) /\
           R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         move: (H_R_is_maximum A) => FIX.

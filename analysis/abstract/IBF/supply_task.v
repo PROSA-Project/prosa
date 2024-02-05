@@ -53,12 +53,12 @@ Section TaskIntraInterferenceBound.
     cond_interference nonself_intra j t.
 
   (** Consider an interference bound function [task_intra_IBF]. *)
-  Variable task_intra_IBF : Task -> duration -> duration -> work.
+  Variable task_intra_IBF : duration -> duration -> work.
 
   (** We say that task intra-supply interference is bounded by
       [task_intra_IBF] iff, for any job [j] of task [tsk], the
       cumulative task intra-supply interference within the interval
-      <<[t1, t1 + R)>> is bounded by [task_intra_IBF(tsk, A, R)]. *)
+      <<[t1, t1 + R)>> is bounded by [task_intra_IBF(A, R)]. *)
   Definition task_intra_interference_is_bounded_by :=
     cond_interference_is_bounded_by
       arr_seq sched tsk task_intra_IBF

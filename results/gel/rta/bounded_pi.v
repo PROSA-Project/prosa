@@ -110,8 +110,8 @@ Section AbstractRTAforGELwithArrivalCurves.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_request_bound_function ts L.
 
-  (** ** E. Defining [IBF_other] *)
-  (** Next, we define [IBF_other] and prove that [IBF_other] bounds
+  (** ** E. Defining [task_IBF] *)
+  (** Next, we define [task_IBF] and prove that [task_IBF] bounds
       the interference incurred by any job of [tsk]. *)
 
   (** Consider the following parametrized interval. *)
@@ -125,14 +125,14 @@ Section AbstractRTAforGELwithArrivalCurves.
   Let bound_on_total_hep_workload (A Δ : duration) :=
         \sum_(tsk_o <- ts | tsk_o != tsk)
           task_request_bound_function tsk_o (minn `|Num.max 0%R (interval tsk_o A)| Δ).
-  (** Finally, [IBF_other] for an interval [R] is defined as the sum of
+  (** Finally, [task_IBF] for an interval [R] is defined as the sum of
       [bound_on_total_hep_workload] in [R] and [priority_inversion_bound]. *)
-  Let IBF_other (A R : duration) := priority_inversion_bound A + bound_on_total_hep_workload A R.
+  Let task_IBF (A R : duration) := priority_inversion_bound A + bound_on_total_hep_workload A R.
 
   (** For convenience, we define the following acronym. *)
   Let PP (task : Task) := (task_priority_point task).
 
-  (** In this section, we prove the soundness of [IBF_other]. We start
+  (** In this section, we prove the soundness of [task_IBF]. We start
       by establishing a bound on the HEP workload.*)
     Section HepWorkloadBound.
 
@@ -222,10 +222,10 @@ Section AbstractRTAforGELwithArrivalCurves.
 
     End HepWorkloadBound.
 
-    (** Finally, we prove that [IBF_other] bounds the interference incurred by [tsk]. *)
+    (** Finally, we prove that [task_IBF] bounds the interference incurred by [tsk]. *)
     Corollary instantiated_task_interference_is_bounded :
       task_interference_is_bounded_by
-        arr_seq sched tsk (fun t A R => IBF_other A R).
+        arr_seq sched tsk task_IBF.
     Proof.
       move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
       move: (OFF _ _ BUSY) => EQA; subst A.
@@ -287,13 +287,13 @@ Section AbstractRTAforGELwithArrivalCurves.
     Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** For [j], the total interference bound is defined as follows. *)
-    Let total_interference_bound tsk (A Δ : duration) :=
-      task_request_bound_function tsk (A + ε) - task_cost tsk + IBF_other A Δ.
+    Let total_interference_bound (A Δ : duration) :=
+      task_request_bound_function tsk (A + ε) - task_cost tsk + task_IBF A Δ.
 
     (** Consider any point [A] in the abstract search space. *)
     Variable A : duration.
     Hypothesis H_A_is_in_abstract_search_space:
-      search_space.is_in_search_space tsk L total_interference_bound A.
+      search_space.is_in_search_space L total_interference_bound A.
 
     (** Then, [A] is also in the concrete search space. *)
     Lemma A_is_in_concrete_search_space:
@@ -308,7 +308,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
       exfalso; apply INSP2.
       rewrite /total_interference_bound subnK // RBF.
-      apply /eqP; rewrite eqn_add2l /IBF_other PI eqn_add2l.
+      apply /eqP; rewrite eqn_add2l /task_IBF PI eqn_add2l.
       rewrite /bound_on_total_hep_workload.
       apply /eqP; rewrite big_seq_cond [RHS]big_seq_cond.
       apply eq_big => // tsk_i /andP [TS OTHER].
@@ -348,8 +348,8 @@ Section AbstractRTAforGELwithArrivalCurves.
     Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
 
     (** We define the total interference as defined above. *)
-    Let total_interference_bound tsk (A Δ : duration) :=
-          task_request_bound_function tsk (A + ε) - task_cost tsk + IBF_other A Δ.
+    Let total_interference_bound (A Δ : duration) :=
+          task_request_bound_function tsk (A + ε) - task_cost tsk + task_IBF A Δ.
 
     (** We know that if [A] is in the abstract search then it is in the concrete search space.
         We also know that if [A] is in the concrete search space then there exists an [R] that
@@ -358,10 +358,10 @@ Section AbstractRTAforGELwithArrivalCurves.
         equation as stated in the aRTA. *)
     Corollary correct_search_space:
       forall A,
-        search_space.is_in_search_space tsk L total_interference_bound A ->
+        search_space.is_in_search_space L total_interference_bound A ->
         exists F,
           A + F >= task_request_bound_function tsk (A + ε) - (task_cost tsk - task_rtct tsk) +
-                    IBF_other A (A + F) /\ R >= F + (task_cost tsk - task_rtct tsk).
+                    task_IBF A (A + F) /\ R >= F + (task_cost tsk - task_rtct tsk).
     Proof.
       move => A IN.
       edestruct H_R_is_maximum as [F [FIX NEQ]];
@@ -384,8 +384,8 @@ Section AbstractRTAforGELwithArrivalCurves.
     move: (posnP (@job_cost _ Cost js)) => [ZERO|POS].
     { by rewrite /job_response_time_bound /completed_by ZERO. }
     eapply uniprocessor_response_time_bound_seq with
-      (task_IBF := fun tsk A R => IBF_other A R) (L := L) => //.
-    - eapply instantiated_i_and_w_are_coherent_with_schedule => //.
+      (task_IBF := task_IBF) (L := L) => //.
+    - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - exact: GEL_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - exact: instantiated_busy_intervals_are_bounded.

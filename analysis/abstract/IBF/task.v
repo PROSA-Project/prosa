@@ -62,7 +62,7 @@ Section TaskInterferenceBound.
     cumul_cond_interference nonself j t1 t2.
 
   (** Consider an interference bound function [task_IBF]. *)
-  Variable task_IBF : Task -> duration -> duration -> work.
+  Variable task_IBF : duration -> duration -> work.
 
   (** We say that task interference is bounded by [task_IBF] iff for
       any job [j] of task [tsk] cumulative _task_ interference within
@@ -188,7 +188,7 @@ Section TaskIBFtoJobIBF.
 
   (** Next, we assume that [task_IBF] is a bound on interference
       incurred by the task. *)
-  Variable task_IBF : Task -> duration -> duration -> duration.
+  Variable task_IBF : duration -> duration -> duration.
   Hypothesis H_task_interference_is_bounded :
     task_interference_is_bounded_by arr_seq sched tsk task_IBF.
 
@@ -619,7 +619,7 @@ Section TaskIBFtoJobIBF.
   Lemma task_IBF_implies_job_IBF :
     job_interference_is_bounded_by
       arr_seq sched tsk
-      (fun tsk A R => (task_rbf (A + ε) - task_cost tsk) + task_IBF tsk A R)
+      (fun A R => (task_rbf (A + ε) - task_cost tsk) + task_IBF A R)
       (relative_arrival_time_of_job_is_A sched).
   Proof.
     move => t1 t2 R j ARR TSK BUSY NEQ COMPL.

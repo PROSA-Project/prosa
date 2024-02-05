@@ -217,8 +217,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       actually relevant. We therefore define [IBF] as the sum, across all
       tasks, of the per-task request-bound functions (RBFs) in the interval [A +
       ε] minus the WCET of the task under analysis [tsk]. *)
-  Let IBF tsk (A Δ : duration) :=
-        (\sum_(tsko <- ts) task_request_bound_function tsko (A + ε)) - task_cost tsk.
+  Let IBF (A Δ : duration) :=
+    (\sum_(tsko <- ts) task_request_bound_function tsko (A + ε)) - task_cost tsk.
 
   (** As discussed in the paper, our proof obligation now is to show that the
       stated [IBF] is indeed correct. To this end, we first establish two
@@ -380,7 +380,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       refinement of the abstract search space assumed by aRTA. *)
 
   (** To this end, first recall the notion of the abstract search space in aRTA. *)
-  Let is_in_abstract_search_space A := abstract.search_space.is_in_search_space tsk L IBF A.
+  Let is_in_abstract_search_space A := abstract.search_space.is_in_search_space L IBF A.
 
   Section SearchSpaceRefinement.
 
@@ -433,8 +433,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     forall (A : duration),
       is_in_concrete_search_space A ->
       exists (F : nat),
-        A + F >= \sum_(tsko <- ts) task_request_bound_function tsko (A + ε) /\
-          F <= R.
+        A + F >= \sum_(tsko <- ts) task_request_bound_function tsko (A + ε)
+        /\ F <= R.
 
   (** Ultimately, we seek to apply aRTA to prove the correctness of this [R].
       However, in order to connect the concrete definition of [R] with aRTA, we
@@ -462,8 +462,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       forall A,
         is_in_abstract_search_space A ->
         exists (F : nat),
-          A + F >= task_rtct tsk + IBF tsk A (A + F) /\
-            F + (task_cost tsk - task_rtct tsk) <= R.
+          A + F >= task_rtct tsk + IBF A (A + F)
+          /\ F + (task_cost tsk - task_rtct tsk) <= R.
     Proof.
       move => A IN.
       eapply search_space_refinement in IN => //.

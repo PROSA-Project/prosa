@@ -101,7 +101,7 @@ Section Sequential_Abstract_RTA.
 
   (** Next, we assume that [task_IBF] is a bound on interference
       incurred by the task. *)
-  Variable task_IBF : Task -> duration -> duration -> duration.
+  Variable task_IBF : duration -> duration -> duration.
   Hypothesis H_task_interference_is_bounded :
     task_interference_is_bounded_by arr_seq sched tsk task_IBF.
 
@@ -118,16 +118,16 @@ Section Sequential_Abstract_RTA.
       from other jobs of task [tsk] -- [task_rbf (A + ε) - task_cost
       tsk] and (2) any other interference that is bounded by
       [task_IBF(tsk, A, Δ)]. *)
-  Let total_interference_bound (tsk : Task) (A Δ : duration) :=
-    task_rbf (A + ε) - task_cost tsk + task_IBF tsk A Δ.
+  Let total_interference_bound (A Δ : duration) :=
+    task_rbf (A + ε) - task_cost tsk + task_IBF A Δ.
 
   (** Note that since we consider the modified interference bound
       function, the search space has also changed. One can see that
       the new search space is guaranteed to include any A for which
       [task_rbf (A) ≠ task_rbf (A + ε)], since this implies the fact
-      that [total_interference_bound (tsk, A, Δ) ≠
-      total_interference_bound (tsk, A + ε, Δ)]. *)
-  Let is_in_search_space_seq := is_in_search_space tsk L total_interference_bound.
+      that [total_interference_bound (A, Δ) ≠ total_interference_bound
+      (A + ε, Δ)]. *)
+  Let is_in_search_space_seq := is_in_search_space L total_interference_bound.
 
   (** Consider any value [R], and assume that for any relative arrival
       time [A] from the search space there is a solution [F] of the
@@ -149,7 +149,7 @@ Section Sequential_Abstract_RTA.
     forall (A : duration),
       is_in_search_space_seq A ->
       exists (F : duration),
-        A + F >= (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk)) + task_IBF tsk A (A + F)
+        A + F >= (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk)) + task_IBF A (A + F)
         /\ R >= F + (task_cost tsk - task_rtct tsk).
 
   (** Since we are going to use the
@@ -173,7 +173,7 @@ Section Sequential_Abstract_RTA.
 
     (** For simplicity, let's define a local name for the search space. *)
     Let is_in_search_space A :=
-      is_in_search_space tsk L total_interference_bound A.
+      is_in_search_space L total_interference_bound A.
 
     (** We prove that [H_R_is_maximum] holds. *)
     Lemma max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis:
@@ -181,7 +181,7 @@ Section Sequential_Abstract_RTA.
         is_in_search_space A ->
         exists (F : duration),
           A + F >= task_rtct tsk +
-                    (task_rbf (A + ε) - task_cost tsk + task_IBF tsk A (A + F))
+                    (task_rbf (A + ε) - task_cost tsk + task_IBF A (A + F))
           /\ R >= F + (task_cost tsk - task_rtct tsk).
     Proof.
       move: H_valid_run_to_completion_threshold => [PRT1 PRT2]; move => A INSP.

@@ -50,9 +50,9 @@ Section AbstractRTAReduction.
   Variable B : duration.
 
   (** Instead of searching for the maximum interference of each individual job, we 
-     assume a per-task interference bound function [IBF(tsk, A, x)] that is parameterized 
+     assume a per-task interference bound function [IBF(A, x)] that is parameterized 
      by the relative arrival time [A] of a potential job (see abstract_RTA.definitions.v file). *)
-  Variable interference_bound_function : Task -> duration -> duration -> duration.
+  Variable interference_bound_function : duration -> duration -> duration.
 
   (** Recall the definition of [ε], which defines the neighborhood of a point in the timeline.
      Note that [ε = 1] under discrete time. *)
@@ -62,7 +62,7 @@ Section AbstractRTAReduction.
   Definition is_in_search_space A :=
     A = 0 \/
     0 < A < B /\ are_not_equivalent_at_values_less_than
-                  (interference_bound_function tsk (A - ε)) (interference_bound_function tsk A) B.
+                  (interference_bound_function (A - ε)) (interference_bound_function A) B.
   
   (** In this section we prove that for every [A] there exists a smaller [A_sp] 
      in the search space such that [interference_bound_function(A_sp,x)] is 
@@ -81,16 +81,16 @@ Section AbstractRTAReduction.
     Lemma representative_exists:
       exists A_sp, 
         A_sp <= A /\
-        are_equivalent_at_values_less_than (interference_bound_function tsk A)
-                                           (interference_bound_function tsk A_sp) B /\
+        are_equivalent_at_values_less_than (interference_bound_function A)
+                                           (interference_bound_function A_sp) B /\
         is_in_search_space A_sp.
     Proof.
       induction A as [|n IHn].
       - exists 0; repeat split.
           by rewrite /is_in_search_space; left.
       - have ALT:
-          all (fun t => interference_bound_function tsk n t == interference_bound_function tsk n.+1 t) (iota 0 B)
-          \/ has (fun t => interference_bound_function tsk n t != interference_bound_function tsk n.+1 t) (iota 0 B).
+          all (fun t => interference_bound_function n t == interference_bound_function n.+1 t) (iota 0 B)
+          \/ has (fun t => interference_bound_function n t != interference_bound_function n.+1 t) (iota 0 B).
         { apply/orP.
           rewrite -[_ || _]Bool.negb_involutive Bool.negb_orb.
           apply/negP; intros CONTR.
@@ -129,7 +129,7 @@ Section AbstractRTAReduction.
     (** Suppose [A_sp + F_sp] is a "small" solution (i.e. less than [B]) of the response-time recurrence. *)
     Variables A_sp F_sp : duration.
     Hypothesis H_less_than : A_sp + F_sp < B.
-    Hypothesis H_fixpoint : A_sp + F_sp >= interference_bound_function tsk A_sp (A_sp + F_sp).
+    Hypothesis H_fixpoint : A_sp + F_sp >= interference_bound_function A_sp (A_sp + F_sp).
 
     (** Next, let [A] be any point such that: (a) [A_sp <= A <= A_sp + F_sp] and 
        (b) [interference_bound_function(A, x)] is equal to 
@@ -138,8 +138,8 @@ Section AbstractRTAReduction.
     Hypothesis H_bounds_for_A : A_sp <= A <= A_sp + F_sp.
     Hypothesis H_equivalent :
       are_equivalent_at_values_less_than
-        (interference_bound_function tsk A)
-        (interference_bound_function tsk A_sp) B.
+        (interference_bound_function A)
+        (interference_bound_function A_sp) B.
 
     (** We prove that there exists a constant [F] such that [A + F] is equal to [A_sp + F_sp]
        and [A + F] is a solution for the response-time recurrence for [A]. *)
@@ -147,7 +147,7 @@ Section AbstractRTAReduction.
       exists F,
         A_sp + F_sp = A + F /\
         F <= F_sp /\
-        A + F >= interference_bound_function tsk A (A + F).
+        A + F >= interference_bound_function A (A + F).
     Proof.  
       move: H_bounds_for_A => /andP [NEQ1 NEQ2].
       set (X := A_sp + F_sp) in *.
@@ -181,10 +181,10 @@ Section SearchSpaceSwitch.
       then [A] is in the search space of [IBF2]. *)
   Lemma search_space_switch_IBF :
     forall IBF1 IBF2,
-      (forall A Δ, A < B -> IBF1 tsk A Δ = IBF2 tsk A Δ) ->
+      (forall A Δ, A < B -> IBF1 A Δ = IBF2 A Δ) ->
       forall A,
-        is_in_search_space tsk B IBF1 A ->
-        is_in_search_space tsk B IBF2 A.
+        is_in_search_space B IBF1 A ->
+        is_in_search_space B IBF2 A.
   Proof.
     move=> IBF1 IBF2 EQU A [EQ|[NEQ NEQU]]; first by left; subst.
     right; split; first by done.

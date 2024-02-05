@@ -70,7 +70,7 @@ Section SearchSpaceSubset.
 
   (** For brevity, let us introduce a shorthand for an intra-IBF (used
       by aRTA). The abstract search space is derived via intra-IBF. *)
-  Let intra_IBF (tsk : Task) (A F : duration) :=
+  Let intra_IBF (A F : duration) :=
     task_rbf (A + ε) - task_cost tsk
     + (blocking_bound ts tsk + total_ohep_rbf F).
 
@@ -78,7 +78,7 @@ Section SearchSpaceSubset.
       computation-oriented version defined above. *)
   Lemma search_space_sub :
     forall A,
-      search_space.is_in_search_space tsk L intra_IBF A ->
+      search_space.is_in_search_space L intra_IBF A ->
       is_in_search_space A.
   Proof.
     move => A [ZERO|[/andP [GTA LTA]] [x [LTx NEQ]]]; rewrite /is_in_search_space.

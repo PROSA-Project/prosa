@@ -59,12 +59,12 @@ Section IntraInterferenceBound.
     cumul_cond_interference (fun j t => has_supply sched t) j t1 t2.
 
   (** Consider an interference bound function [intra_IBF]. *)
-  Variable intra_IBF : Task -> duration -> duration -> work.
+  Variable intra_IBF : duration -> duration -> work.
 
   (** We say that intra-supply interference is bounded by [intra_IBF]
       iff, for any job [j] of task [tsk], cumulative _intra-supply_
       interference within the interval <<[t1, t1 + R)>> is bounded by
-      [intra_IBF(tsk, A, R)].*)
+      [intra_IBF(A, R)].*)
   Definition intra_interference_is_bounded_by :=
     cond_interference_is_bounded_by
       arr_seq sched tsk intra_IBF

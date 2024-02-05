@@ -249,20 +249,19 @@ Section AbstractRTADefinitions.
 
     (** As a first step, we introduce a notion of an "interference
         bound function" [IBF]. An interference bound function is any
-        function with a type [Task -> duration -> duration -> work] that
-        bounds cumulative conditional interference of a job of a task
-        under analysis (a precise definition will be presented below).
+        function with a type [duration -> duration -> work] that bounds
+        cumulative conditional interference of a job of task [tsk] (a
+        precise definition will be presented below).
 
-        Note that the function has three parameters. The first and the
-        last parameters are a task under analysis and the length of an
-        interval in which the interference is supposed to be bounded,
-        respectively. These are quite intuitive; so, we will not
-        explain them in more detail. However, the second parameter
-        deserves more thoughtful explanation, which we provide
-        next. *)
-    Variable IBF : Task -> duration -> duration -> work.
+        Note that the function has two parameters. The second
+        parameter is the length of an interval in which the
+        interference is supposed to be bounded. It is quite intuitive;
+        so, we will not explain it in more detail. However, the first
+        parameter deserves more thoughtful explanation, which we
+        provide next. *)
+    Variable IBF : duration -> duration -> work.
 
-    (** The second parameter of [IBF] allows one to organize a case
+    (** The first parameter of [IBF] allows one to organize a case
         analysis over a set of values that are known only during the
         computation. For example, the most common parameter is the
         relative arrival time [A] of a job (of a task under
@@ -272,14 +271,13 @@ Section AbstractRTADefinitions.
         such as "a time instant when a job under analysis has received
         enough service to become non-preemptive."
 
-        To make the second parameter customizable, we introduce a
+        To make the first parameter customizable, we introduce a
         predicate [ParamSem : Job -> instant -> Prop] that is used to
         assign meaning to the second parameter. More precisely,
-        consider an expression [IBF(tsk, X, delta)], and assume that
-        we instantiated [ParamSem] as some predicate [P]. Then, it is
-        assumed that [IBF(tsk, X, delta)] bounds (conditional)
-        interference of a job under analysis [j ∈ tsk] if [P j X]
-        holds. *)
+        consider an expression [IBF(X, delta)], and assume that we
+        instantiated [ParamSem] as some predicate [P]. Then, it is
+        assumed that [IBF(X, delta)] bounds (conditional) interference
+        of a job under analysis [j ∈ tsk] if [P j X] holds. *)
     Variable ParamSem : Job -> nat -> Prop.
 
     (** As mentioned, [IBF] must upper-bound the cumulative
@@ -302,11 +300,10 @@ Section AbstractRTADefinitions.
         function" [IBF] iff for any job [j] of task [tsk] and its busy
         interval <<[t1, t2)>> the cumulative conditional interference
         incurred by [j] w.r.t. predicate [Cond] in the sub-interval
-        <<[t1, t1 + Δ)>> does not exceed [IBF(tsk, X, Δ)], where [X]
-        is a constant that satisfies a predefined predicate
-        [ParamSem].
+        <<[t1, t1 + Δ)>> does not exceed [IBF(X, Δ)], where [X] is a
+        constant that satisfies a predefined predicate [ParamSem].
 
-        In other words, for a job [j ∈ tsk], the term [IBF(tsk, X, Δ)]
+        In other words, for a job [j ∈ tsk], the term [IBF(X, Δ)]
         provides an upper-bound on the cumulative conditional
         interference (w.r.t. the predicate [Cond]) that [j] might
         experience in an interval of length [Δ] _assuming_ that
@@ -331,7 +328,7 @@ Section AbstractRTADefinitions.
             satisfying predicate [Param]. *)
         forall X,
           ParamSem j X ->
-          cumul_cond_interference Cond j t1 (t1 + Δ) <= IBF tsk X Δ.
+          cumul_cond_interference Cond j t1 (t1 + Δ) <= IBF X Δ.
 
   End BusyIntervalProperties.
 

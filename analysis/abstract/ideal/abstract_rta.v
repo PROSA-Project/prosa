@@ -85,7 +85,7 @@ Section AbstractRTAIdeal.
   (** Next, assume that [interference_bound_function] is a bound on
       the interference incurred by jobs of task [tsk] parametrized by
       the relative arrival time [A]. *)
-  Variable interference_bound_function : Task -> (* A *) duration -> (* Δ *) duration -> duration.
+  Variable interference_bound_function : (* A *) duration -> (* Δ *) duration -> duration.
   Hypothesis H_job_interference_is_bounded :
     job_interference_is_bounded_by
       arr_seq sched tsk interference_bound_function (relative_arrival_time_of_job_is_A sched).
@@ -99,8 +99,8 @@ Section AbstractRTAIdeal.
   (** However, we still have to instantiate function [IBF_NP], which
       is a function that bounds interference in a non-preemptive stage
       of execution. We prove that this function can be instantiated
-      with a constant function [λ tsk F Δ ⟹ F - task_rtct tsk]. *)
-  Let IBF_NP (tsk : Task) (F : duration) (Δ : duration) := F - task_rtct tsk.
+      with a constant function [λ F Δ ⟹ F - task_rtct tsk]. *)
+  Let IBF_NP (F : duration) (Δ : duration) := F - task_rtct tsk.
 
   (** Let us re-iterate on the intuitive interpretation of this
       function. Since [F] is a solution to the first equation
@@ -158,7 +158,7 @@ Section AbstractRTAIdeal.
   Qed.
 
   (** For simplicity, let's define a local name for the search space. *)
-  Let is_in_search_space A := is_in_search_space tsk L interference_bound_function A.
+  Let is_in_search_space A := is_in_search_space L interference_bound_function A.
 
   (** Consider any value [R] that upper-bounds the solution of each
       response-time recurrence, i.e., for any relative arrival time A
@@ -169,7 +169,7 @@ Section AbstractRTAIdeal.
     forall A,
       is_in_search_space A ->
       exists F,
-        task_rtct tsk + interference_bound_function tsk A (A + F) <= A + F /\
+        task_rtct tsk + interference_bound_function A (A + F) <= A + F /\
         F + (task_cost tsk - task_rtct tsk) <= R.
 
   (** Using the lemma about [IBF_NP], we instantiate the general RTA
@@ -178,7 +178,7 @@ Section AbstractRTAIdeal.
   Theorem uniprocessor_response_time_bound_ideal :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
-    eapply uniprocessor_response_time_bound with (IBF_NP := fun tsk F Δ => F - task_rtct tsk) => //.
+    eapply uniprocessor_response_time_bound with (IBF_NP := fun F Δ => F - task_rtct tsk) => //.
     { by apply nonpreemptive_interference_is_bounded. }
     { move => F _.
       destruct (leqP F (task_rtct tsk)) as [NEQ|NEQ].

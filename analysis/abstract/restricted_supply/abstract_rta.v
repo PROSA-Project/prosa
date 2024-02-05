@@ -95,7 +95,7 @@ Section AbstractRTARestrictedSupply.
 
   (** Next, we assume that [intra_IBF] is a bound on the intra-supply
       interference incurred by task [tsk]. *)
-  Variable intra_IBF : Task -> duration -> duration -> duration.
+  Variable intra_IBF : duration -> duration -> duration.
   Hypothesis H_intra_supply_interference_is_bounded :
     intra_interference_is_bounded_by arr_seq sched tsk intra_IBF.
 
@@ -103,8 +103,8 @@ Section AbstractRTARestrictedSupply.
       after the beginning of the busy interval, the bound on the
       interference incurred by [j] within an interval of length [Δ] is
       no greater than [(Δ - SBF Δ) + intra_IBF A Δ]. *)
-  Let IBF_P (tsk : Task) (A Δ : duration) :=
-    (Δ - SBF Δ) + intra_IBF tsk A Δ.
+  Let IBF_P (A Δ : duration) :=
+    (Δ - SBF Δ) + intra_IBF A Δ.
 
   (** Next, we instantiate function [IBF_NP], which is a function that
       bounds interference in a non-preemptive stage of execution. We
@@ -113,7 +113,7 @@ Section AbstractRTARestrictedSupply.
 
   (** Let us reiterate on the intuitive interpretation of this
       function. Since [F] is a solution to the first equation
-      [task_rtct tsk + IBF_P tsk A F <= F], we know that by time
+      [task_rtct tsk + IBF_P A F <= F], we know that by time
       instant [t1 + F] a job receives [task_rtct tsk] units of service
       and, hence, it becomes non-preemptive. Knowing this information,
       how can we bound the job's interference in an interval <<[t1, t1
@@ -125,7 +125,7 @@ Section AbstractRTARestrictedSupply.
       (F - SBF F)] since part of this interference has already been
       accounted for in the preemptive part of the execution ([F - SBF
       F]). *)
-  Let IBF_NP (tsk : Task) (F Δ : duration) :=
+  Let IBF_NP (F Δ : duration) :=
     (F - task_rtct tsk) + (Δ - SBF Δ - (F - SBF F)).
 
   (** In the next section, we prove a few helper lemmas. *)
@@ -236,7 +236,7 @@ Section AbstractRTARestrictedSupply.
   End AuxiliaryLemmas.
 
   (** For clarity, let's define a local name for the search space. *)
-  Let is_in_search_space_rs := is_in_search_space tsk L IBF_P.
+  Let is_in_search_space_rs := is_in_search_space L IBF_P.
 
   (** We use the following equation to bound the response-time of a
       job of task [tsk]. Consider any value [R] that upper-bounds the
@@ -256,7 +256,7 @@ Section AbstractRTARestrictedSupply.
       is_in_search_space_rs A ->
       exists (F : duration),
         F <= A + R
-        /\ task_rtct tsk + intra_IBF tsk A F <= SBF F
+        /\ task_rtct tsk + intra_IBF A F <= SBF F
         /\ SBF F + (task_cost tsk - task_rtct tsk) <= SBF (A + R).
 
   (** In the following section we prove that all the premises of
@@ -324,13 +324,13 @@ Section AbstractRTARestrictedSupply.
     Qed.
 
     (** Next, we prove that [F] is bounded by [task_cost tsk + IBF_NP
-        tsk F Δ] for any [F] and [Δ]. As explained in file
+        F Δ] for any [F] and [Δ]. As explained in file
         [analysis/abstract/abstract_rta], this shows that the second
-        stage indeed takes into account service received in the
-        first stage. *)
+        stage indeed takes into account service received in the first
+        stage. *)
     Lemma IBF_P_sol_le_IBF_NP :
       forall (F Δ : duration),
-        F <= task_cost tsk + IBF_NP tsk F Δ.
+        F <= task_cost tsk + IBF_NP F Δ.
     Proof.
       move=> F Δ.
       have [NEQ|NEQ] := leqP F (task_rtct tsk).
@@ -343,9 +343,9 @@ Section AbstractRTARestrictedSupply.
     (** Next we prove that [H_R_is_maximum_rs] implies [H_R_is_maximum]. *)
     Lemma max_in_rs_hypothesis_impl_max_in_arta_hypothesis :
       forall (A : duration),
-        is_in_search_space tsk L IBF_P A ->
+        is_in_search_space L IBF_P A ->
         exists (F : duration),
-          task_rtct tsk + (F - SBF F + intra_IBF tsk A F) <= F
+          task_rtct tsk + (F - SBF F + intra_IBF A F) <= F
           /\ task_cost tsk + (F - task_rtct tsk + (A + R - SBF (A + R) - (F - SBF F))) <= A + R.
     Proof.
       move=> A SP.
