@@ -244,7 +244,6 @@ Section HEPService.
         by apply: cumulative_service_before_job_arrival_zero => //. }
     }
     { rewrite /service_of_jobs; erewrite big_pred1_seq => //.
-      { by apply arrived_between_implies_in_arrivals => //; apply/andP; split. }
       { move => j'; rewrite /pred1 //=.
         have [A|B] := eqVneq j' j; last by rewrite andbF.
         by rewrite andbT; subst; apply H_priority_is_reflexive.
@@ -551,7 +550,7 @@ Section UnitServiceUniProcessorModelLemmas.
           by move: B; rewrite /receives_service_at -leqNgt leqn0 => /eqP ->. } }
       rewrite L; clear L; last by apply arrivals_uniq.
       have L :
-        forall {X : Type} (P Q : pred X) (xs : seq X),
+        forall (X : Type) (P Q : pred X) (xs : seq X),
           has (fun x => P x && Q x) xs = has P ([ seq x <- xs | Q x]).
       { clear. move => X P Q xs; induction xs as [ | x xs IHxs]; first by done.
         by rewrite //= IHxs; destruct (P x) eqn:Px, (Q x) eqn:Qx; rewrite //= ?Px ?Qx. }

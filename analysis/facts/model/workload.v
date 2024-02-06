@@ -320,12 +320,12 @@ Section WorkloadFacts.
       rewrite /workload_of_jobs big_seq_cond.
       rewrite -[in X in X <= _]big_filter -[in X in _ <= X]big_filter.
       apply leq_sum_sub_uniq; first by apply filter_uniq, arrivals_uniq.
-      move => j'; rewrite mem_filter => [/andP [/andP [A /andP [C D]] _]].
+      move => j'; rewrite mem_filter => [/andP [/andP [A  /andP [C D]] _]].
+      rewrite job_arrival_in_bounds in A => //=.
+      move : A => [A /andP[A1 A2]].
       rewrite mem_filter; apply/andP; split=> [//|].
-      apply job_in_arrivals_between; eauto.
-      - by eapply in_arrivals_implies_arrived; eauto 2.
-      - apply in_arrivals_implies_arrived_between in A; auto; move: A => /andP [A E].
-        by apply/andP; split; lia.
+      apply job_in_arrivals_between => //=.
+      by lia.
     Qed.
 
   End Subset.

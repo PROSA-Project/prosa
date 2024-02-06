@@ -237,10 +237,9 @@ Section ACPropFacts.
       { move: H_valid_mapping => [CONS _].
         move: TSK2; rewrite /tsk1 /job_of_task MAP => /eqP <-.
         by apply/eqP/CONS. }
-      { apply: job_in_arrivals_between => //.
-        - rewrite MAP.
-          exact/arrives_in_propagated_only_if/in_arrivals_implies_arrived.
-        - exact: trigger_job_arrival_bounded. }
+      { have /andP[Hge Hlt] := trigger_job_arrival_bounded j1 IN.
+        apply : job_in_arrivals_between => // /[!MAP].
+        exact/arrives_in_propagated_only_if/in_arrivals_implies_arrived. }
     Qed.
 
     (** Additionally, from the assumption that each type-one job has at most one

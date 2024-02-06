@@ -353,11 +353,13 @@ Section ArrivalSequencePrefix.
     Lemma job_in_arrivals_between:
       forall j t1 t2,
         arrives_in arr_seq j ->
-        t1 <= job_arrival j < t2 ->
+        t1 <= job_arrival j ->
+        job_arrival j < t2 ->
         j \in arrivals_between arr_seq t1 t2.
     Proof.
-      move=> j t1 t2 [t jarr] jitv; apply: mem_bigcat_nat (jarr).
-      by rewrite -(job_arrival_at jarr).
+      move=> j t1 t2 ARRSEQ ARR1 ARR2; apply: mem_bigcat_nat.
+      - by apply /andP; split; [exact ARR1| exact ARR2].
+      - by apply job_in_arrivals_at => //=.
     Qed.
 
     (** Next, we prove that if the arrival sequence doesn't contain duplicate
@@ -395,11 +397,26 @@ Section ArrivalSequencePrefix.
     Proof.
       move=> j1 j2 P t1 t2.
       rewrite !mem_filter => /andP[_ j1arr] /andP[Pj2 j2arr] arr_lt.
-      rewrite Pj2/=; apply: job_in_arrivals_between.
+      rewrite Pj2/=; apply: job_in_arrivals_between => //=.
       - exact: in_arrivals_implies_arrived j2arr.
       - by rewrite (job_arrival_between_ge j2arr).
     Qed.
 
+    (** For ease of rewriting, we establish the equivalence between a job's membership in
+        [arrivals_between] and its membership in [arrives_in], subject to constraints on
+        the job's arrival time. *)
+    Lemma job_arrival_in_bounds :
+      forall (j : Job) (t1 t2 : instant),
+        (j \in arrivals_between arr_seq t1 t2)
+        <-> (arrives_in arr_seq j /\ t1 <= job_arrival j < t2).
+    Proof.
+      move => j t1 t2; split.
+      - move => IN; split.
+        + by eapply in_arrivals_implies_arrived => //=.
+        + by apply in_arrivals_implies_arrived_between in IN => //=.
+      - move => [IN ARR].
+        by apply arrived_between_implies_in_arrivals => //=.
+    Qed.
 
     (** We observe that, by construction, the sequence of arrivals is
         sorted by arrival times. To this end, we first define the
@@ -551,4 +568,5 @@ Global Hint Resolve
        uniq_valid_arrival
        consistent_times_valid_arrival
        job_arrival_arrives_at
+       job_in_arrivals_between
   : basic_rt_facts.
