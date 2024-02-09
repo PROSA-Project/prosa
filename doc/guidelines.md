@@ -93,7 +93,6 @@ A brief explanation of implicit arguments can be found when discussing
 1. Prefer `Require Export full.path.to.module.that.you.want` over `From full.path.to.module.that.you Require Export want` because (as of Coq 8.10) the latter is brittle w.r.t. the "auto-magic" module finding heuristics employed by Coq (see also: Coq issues [9080](https://github.com/coq/coq/issues/9080), [9839](https://github.com/coq/coq/issues/9839), and [11124](https://github.com/coq/coq/issues/11124)).
 Exception to this rule: ssreflect and other standard library imports.
 2. Avoid repetitive, lengthy blocks of `Require Import` statements at the beginning of files through the judicious use of `Require Export`.
-3. As an important exception to the prior rule, do not re-export modules that contain type class instance definitions. Prosa uses type class instances to express key modeling choices; such assumptions should be made explicitly.
 4. Always require external libraries first, i.e., *before* stating any Prosa-internal dependencies. This way, an addition in external libraries
 cannot shadow a definition in Prosa. For example, require `mathcomp` modules before any modules in the `prosa` namespace.
 5. Do not import `mathcomp` modules outside of  the `util/all.v` file. The file `util/tactics.v` redefined the behavior of the `done` tactic; hence, it must be imported after the `mathcomp` modules.
@@ -248,6 +247,8 @@ Although the primary focus of Prosa is on the quality of the overall structure a
 - Note that `%:R` is *not* a scope delimiter; rather, it's the injection from `nat` to a `ringType` (e.g., typically the integers in our context). For example, `Search (_%:R + _%:R)%R.` will find lemmas about the addition two injected `nat` elements in ring scope.
 
 - If `apply: (FOO a b c)` doesn't given useful feedback, try `Check (FOO a b c)` to help with debugging the root cause.
+
+- Putting a bang in front of the typeclass in context declarations prevents implicit generalization (manual: [implicit generalization](https://coq.inria.fr/refman/language/extensions/implicit-arguments.html#implicit-arguments)). For example, if you have `{!Typeclass argA argB}` as opposed to `{Typeclass argA argB}`, if `argA` and `argB` already exist in the context, repeated instantiations of those would be avoided. In Prosa, this frequently comes up with the `JobReady` type class. Don't overuse the bang in front of typeclass declarations --- use it selectively, only where it is actually needed.
 
 
 *To be continued… Merge requests welcome: please feel free to propose new advice and better guidelines.*
