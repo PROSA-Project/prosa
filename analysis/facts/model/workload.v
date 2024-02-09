@@ -1,6 +1,8 @@
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.analysis.facts.behavior.arrivals.
 Require Export prosa.analysis.definitions.request_bound_function.
+Require Export prosa.analysis.facts.model.task_arrivals.
+
 
 (** * Lemmas about Workload of Sets of Jobs *)
 (** In this file, we establish basic facts about the workload of sets of jobs. *)
@@ -70,8 +72,44 @@ Section WorkloadFacts.
     by apply: PQ.
   Qed.
 
-  (** Next, consider any job arrival sequence consistent with the
-      arrival times of the jobs. *)
+  (** In this section we state a lemma about splitting the workload among tasks
+      of different priority relative to a job [j]. *)
+  Section WorkloadPartitioningByPriority.
+
+    (** Consider any JLFP policy. *)
+    Context `{JLFP_policy Job}.
+
+    (** Consider the workload of all the jobs that have priority
+        higher-than-or-equal-to the priority of [j]. This workload can be split
+        by task into the workload of higher-or-equal priority jobs from the task of [j]
+        and higher-or-equal priority jobs from all tasks except for the task of [j]. *)
+    Lemma workload_of_other_jobs_split :
+      forall jobs j,
+        workload_of_jobs (another_hep_job^~j) jobs =
+          workload_of_jobs (another_task_hep_job^~j) jobs
+          + workload_of_jobs (another_hep_job_of_same_task^~j) jobs.
+    Proof.
+      move => jobs j.
+      rewrite /workload_of_jobs.
+      apply sum_split_exhaustive_mutually_exclusive_preds  => jo.
+      - rewrite /another_hep_job /another_task_hep_job /another_hep_job_of_same_task
+          /same_task /another_hep_job.
+        case (hep_job jo j) eqn: EQ1;
+          case (jo != j) eqn: EQ2;
+          case (job_task jo != job_task j) eqn: EQ3; try lia.
+        move : EQ2 => /eqP EQ2.
+        rewrite EQ2 in EQ3.
+        contradict EQ3.
+        by apply /negP /negPn /eqP.
+      - rewrite /another_hep_job /another_task_hep_job /another_hep_job_of_same_task
+          /same_task /another_hep_job.
+        by case (hep_job jo j) eqn: EQ1; case (jo != j) eqn: EQ2;
+          case (job_task jo != job_task j) eqn: EQ3; try lia.
+    Qed.
+
+  End WorkloadPartitioningByPriority.
+
+  (** Consider any arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_consistent : consistent_arrival_times arr_seq.
 
@@ -264,6 +302,20 @@ Section WorkloadFacts.
     by rewrite (arrivals_between_cat _ _ t) // big_cat.
   Qed.
 
+  (** As a corollary, we prove that the workload in any range <<[t1,t3)>>
+      always bounds the workload in any sub-range <<[t1,t2)>>. *)
+    Corollary workload_of_jobs_reduce_range :
+      forall t1 t2 t3 P,
+        t1 <= t2 ->
+        t2 <= t3 ->
+        workload_of_jobs P (arrivals_between t1 t2)
+        <= workload_of_jobs P (arrivals_between t1 t3).
+    Proof.
+      move => t1 t2 t3 P ??.
+      rewrite (workload_of_jobs_cat t2 t1 t3 P _  ) //=; [| apply /andP; split; done].
+      by apply leq_addr.
+    Qed.
+
   (** Consider a job [j] ... *)
   Variable j : Job.
 
@@ -276,23 +328,38 @@ Section WorkloadFacts.
 
   (** To help with rewriting, we prove that the workload of [jobs]
       minus the job cost of [j] is equal to the workload of all jobs
-      except [j]. To define the workload of all jobs, since
-      [workload_of_jobs] expects a predicate, we use [predT], which
-      is the always-true predicate. *)
-  Lemma workload_minus_job_cost :
+      except [j]. *)
+  Lemma workload_minus_job_cost' :
+    forall P,
+      workload_of_jobs (fun jhp : Job => P jhp && (jhp != j)) jobs
+      = workload_of_jobs P jobs - (if P j then job_cost j else 0).
+  Proof.
+    move => P.
+    rewrite /workload_of_jobs.
+    rewrite [in X in _ = X - _](bigID_idem _ _ _ _ (fun jo => (jo != j))) //=;
+      [| apply addnA| apply addnC].
+    have -> :  \sum_(j0 <- jobs | P j0 && ~~ (j0 != j)) job_cost j0 =(if P j then job_cost j else 0);
+      last by lia.
+    rewrite (big_rem j) //=.
+    rewrite negbK eq_refl andbT.
+    have -> :  \sum_(y <- rem (T:=Job) j jobs | P y && ~~ (y != j)) job_cost y= 0;
+      last by rewrite addn0.
+    rewrite big_seq_cond.
+    apply big_pred0 => jo.
+    rewrite negbK andbA andbC andbA.
+    case (P jo); [rewrite andbT | lia].
+    case (jo == j) eqn: JJ; [rewrite andTb| lia].
+    move : JJ => /eqP ->.
+    by apply mem_rem_uniqF => //=.
+  Qed.
+
+  (** Next, we specialize the above lemma to the trivial predicate [predT]. *)
+  Corollary workload_minus_job_cost :
     workload_of_jobs (fun jhp : Job => jhp != j) jobs =
     workload_of_jobs predT jobs - job_cost j.
   Proof.
-    rewrite /workload_of_jobs (big_rem j) //=  eq_refl //= add0n.
-    rewrite [in RHS](big_rem j) //= addnC -subnBA //= subnn subn0.
-    rewrite [in LHS]big_seq_cond [in RHS]big_seq_cond.
-    apply eq_bigl => j'.
-    rewrite Bool.andb_true_r.
-    destruct (j' \in rem (T:=Job) j jobs) eqn:INjobs => [|//].
-    apply /negP => /eqP EQUAL.
-    by rewrite EQUAL mem_rem_uniqF in INjobs.
+    by rewrite (workload_minus_job_cost' predT) //=.
   Qed.
-
 
   (** In this section, we prove the relation between two different ways of constraining
       [workload_of_jobs] to only those jobs that arrive prior to a given time. *)
