@@ -456,7 +456,7 @@ Section FP_RBF_partitioning.
 
   (** Consider an FP policy that indicates a higher-or-equal priority
       relation. *)
-  Context `{FP_policy Task}.
+  Context `{FP : FP_policy Task}.
 
   (** Consider a task set ts... *)
   Variable ts : seq Task.
@@ -482,4 +482,132 @@ Section FP_RBF_partitioning.
       by case: (hep_task _ _)=>//.
   Qed.
 
+  (** Now, assume that the priorities are reflexive. *)
+  Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
+
+  (** If the task set does not contain duplicates, then the total
+      higher-or-equal-priority RBF for any task can be split as the sum of
+      the total _other_ higher-or-equal-priority workload and the RBF of the
+      task itself. *)
+  Lemma split_hep_rbf :
+    forall Δ,
+      tsk \in ts ->
+      uniq ts ->
+      total_hep_request_bound_function_FP ts tsk Δ
+      = total_ohep_request_bound_function_FP ts tsk Δ
+        + task_request_bound_function tsk Δ.
+  Proof.
+    move => Δ IN UNIQ.
+    rewrite /total_hep_request_bound_function_FP /total_ohep_request_bound_function_FP.
+    rewrite (bigID_idem _ _ _ _  (fun tsko => tsko != tsk)) //=;
+      [ apply /eqP| by apply addnA| by apply addnC].
+    rewrite eqn_add2l.
+    rewrite (eq_bigl (fun i => i == tsk)); last first.
+    - move => tsko.
+      case (tsko == tsk) eqn: EQ; last by lia.
+      move : EQ => /eqP ->.
+      by rewrite H_priority_is_reflexive //=.
+    - rewrite  (big_rem tsk) //= eq_refl.
+      rewrite big_seq_cond big_pred0; first by rewrite addn0 //=.
+      move => tsko.
+      case (tsko == tsk) eqn: EQ; last by lia.
+      move : EQ => /eqP ->.
+      rewrite andbT.
+      by apply mem_rem_uniqF => //=.
+  Qed.
+
+  (** If the task set may contain duplicates, then the we can only say that
+      the sum of other higher-or-equal-priority [RBF] and task [tsk]'s [RBF]
+      is at most the total higher-or-equal-priority workload. *)
+  Lemma split_hep_rbf_weaken:
+    forall Δ,
+      tsk \in ts ->
+      total_ohep_request_bound_function_FP ts tsk Δ + task_request_bound_function tsk Δ
+      <= total_hep_request_bound_function_FP ts tsk Δ.
+  Proof.
+    move => Δ IN.
+    rewrite /total_hep_request_bound_function_FP /total_ohep_request_bound_function_FP.
+    rewrite [leqRHS](bigID_idem _ _ _ _  (fun tsko => tsko != tsk)) //=;
+      [| by apply addnA| by apply addnC].
+    apply leq_add; first by done.
+    rewrite (eq_bigl (fun tsko => tsko == tsk)); last first.
+    - move => tsko.
+      case (tsko ==tsk) eqn: TSKEQ; last by lia.
+      move : TSKEQ => /eqP ->.
+      by rewrite (H_priority_is_reflexive tsk) //=.
+    - rewrite  (big_rem tsk) //= eq_refl.
+      by apply leq_addr.
+  Qed.
+
 End FP_RBF_partitioning.
+
+
+(** In this section, we state a few facts for RBFs in the context of a
+    fixed-priority policy. *)
+Section RBFFOrFP.
+
+  (** Consider a set of tasks characterized by WCETs and arrival curves. *)
+  Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task}.
+  Variable ts : seq Task.
+  Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
+
+  (** For any fixed-priority policy, ... *)
+  Context `{FP_policy Task}.
+
+  (** ... [total_ohep_request_bound_function_FP] at [0] is always [0]. *)
+  Lemma total_ohep_rbf0 :
+    forall (tsk : Task),
+      total_ohep_request_bound_function_FP ts tsk 0 = 0.
+  Proof.
+    rewrite /total_ohep_request_bound_function_FP => tsk.
+    apply /eqP.
+    rewrite sum_nat_eq0_nat.
+    apply /allP => tsk' IN.
+    apply /eqP.
+    apply task_rbf_0_zero => //=.
+    apply H_valid_arrival_curve.
+    rewrite mem_filter in IN.
+    by move : IN => /andP[_ ->].
+  Qed.
+
+  (** Next we show how [total_ohep_request_bound_function_FP] can bound the
+      workload of jobs in a given interval. *)
+
+  (** Consider any types of jobs. *)
+  Context `{Job : JobType} `{JobTask Job Task} `{JobCost Job}.
+
+  (** Consider any arrival sequence that only has jobs from the task set and
+      where all arrivals have a valid job cost. *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
+
+  (** Assume there exists an arrival curve and that the arrival sequence
+      respects this curve. *)
+  Context `{MaxArrivals Task}.
+  Hypothesis H_respects_max_arrivals : taskset_respects_max_arrivals arr_seq ts.
+
+  (** Consider any task [tsk] and any job [j] of the task [tsk]. *)
+  Variable j : Job.
+  Variable tsk : Task.
+  Hypothesis H_job_of_task : job_of_task tsk j.
+
+  (** For any interval <<[t1, t1 + Δ)>>, the workload of jobs that have higher
+      task priority than the task priority of [j] is bounded by
+      [total_ohep_request_bound_function_FP] for the duration [Δ]. *)
+  Lemma ohep_workload_le_rbf :
+    forall Δ t1,
+      workload_of_jobs (another_task_hep_job^~ j) (arrivals_between arr_seq t1 (t1 + Δ))
+      <= total_ohep_request_bound_function_FP ts tsk Δ.
+  Proof.
+    move => Δ t1.
+    rewrite /workload_of_jobs /total_ohep_request_bound_function_FP.
+    rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
+    set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
+    rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
+      last by move=> j'; rewrite /pred_task; move: H_job_of_task => /eqP ->.
+    erewrite (eq_big pred_task); [|by done|by move=> tsk'; eauto].
+    by apply: sum_of_jobs_le_sum_rbf.
+  Qed.
+
+End RBFFOrFP.
