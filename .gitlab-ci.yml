@@ -99,7 +99,8 @@ compile-and-doc-and-validate:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - make -j ${NJOBS} all
+    - make -j ${NJOBS} all 2>&1 | tee coqc-messages.txt
+    - if grep -q Warning coqc-messages.txt; then (echo "Please fix all Coq warnings:"; echo "--"; grep -B1 Warning coqc-messages.txt; exit 1); fi
     - !reference [.make-html, script]
     - make validate 2>&1 | tee validation-results.txt
     - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
