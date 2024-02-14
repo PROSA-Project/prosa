@@ -545,56 +545,6 @@ Section TaskIBFtoJobIBF.
 
     End TaskInterferenceBoundsInterference.
 
-    (** In order to obtain a more convenient bound on the cumulative
-        interference, we need to abandon the actual workload in favor
-        of a bound that depends on task parameters only. So, we show
-        that the actual workload of the task excluding workload of any
-        job [j] is no greater than the bound on the workload excluding
-        the cost of job [j]'s task. *)
-    Lemma task_rbf_excl_tsk_bounds_task_workload_excl_j:
-      task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j <= task_rbf (A + ε) - task_cost tsk.
-    Proof.
-      move: H_j_arrives H_job_of_tsk H_busy_interval => ARR TSK [[/andP [JAGET1 JALTT2] _] _].
-      apply leq_trans with
-        (task_cost tsk * number_of_task_arrivals arr_seq tsk t1 (t1 + A + ε) - task_cost tsk); last first.
-      { rewrite leq_sub2r // leq_mul2l; apply/orP; right.
-        rewrite -addnA -{2}[(A+1)](addKn t1).
-        by apply H_is_arrival_curve; auto using leq_addr. }
-      have Fact6: j \in arrivals_between (t1 + A) (t1 + A + ε).
-      { apply arrived_between_implies_in_arrivals => //.
-        apply/andP; split; rewrite /A subnKC //.
-        by rewrite addn1 ltnSn //. }
-      have Fact4: j \in arrivals_at arr_seq (t1 + A).
-      { have CONSISTENT : consistent_arrival_times arr_seq by [].
-        by move: ARR => [t ARR]; rewrite subnKC //; feed (CONSISTENT j t); try (subst t).
-      }
-      have Fact1: 1 <= number_of_task_arrivals arr_seq tsk (t1 + A) (t1 + A + ε).
-      { rewrite /number_of_task_arrivals /task_arrivals_between /arrival_sequence.arrivals_between.
-        by rewrite size_filter -has_count; apply/hasP; exists j; last rewrite TSK.
-      }
-      rewrite (@num_arrivals_of_task_cat _ _ _ _ _ (t1 + A)); last by apply/andP; split; rewrite leq_addr //.
-      rewrite mulnDr.
-      have Step1: task_workload_between arr_seq tsk t1 (t1 + A + ε)
-                  = task_workload_between arr_seq tsk t1 (t1 + A) + task_workload_between arr_seq tsk (t1 + A) (t1 + A + ε).
-      { by apply workload_of_jobs_cat; apply/andP; split; rewrite leq_addr. } rewrite Step1; clear Step1.
-      rewrite -!addnBA; first last.
-      { by rewrite /task_workload_between /workload.task_workload_between /task_workload
-                   /workload_of_jobs (big_rem j) //= TSK leq_addr. }
-      { apply leq_trans with (task_cost tsk) => [//|].
-        by rewrite -{1}[task_cost tsk]muln1 leq_mul2l; apply/orP; right. }
-      rewrite leq_add//; first exact: task_workload_le_num_of_arrivals_times_cost.
-      rewrite /task_workload_between /workload.task_workload_between /task_workload /workload_of_jobs
-              /arrival_sequence.arrivals_between /number_of_task_arrivals /task_arrivals_between
-              /arrival_sequence.arrivals_between.
-      rewrite {1}addn1 big_nat1 addn1 big_nat1.
-      rewrite (big_rem j) //= TSK //= addnC -addnBA // subnn addn0.
-      rewrite (filter_size_rem j)//.
-      rewrite mulnDr mulnC muln1 -addnBA // subnn addn0 mulnC.
-      apply sum_majorant_constant.
-      move => j' ARR' /eqP TSK2.
-      by rewrite -TSK2; apply H_valid_job_cost; exists (t1 + A); apply rem_in in ARR'.
-    Qed.
-
     (** We use the lemmas above to obtain the bound on [interference]
         in terms of [task_rbf] and [task_interference]. *)
     Lemma cumulative_job_interference_bound :
@@ -609,8 +559,10 @@ Section TaskIBFtoJobIBF.
           task_workload_between arr_seq tsk t1 (t1+A+ε) - job_cost j + cumul_task_interference arr_seq sched j t1 y
         ).
       - by apply cumulative_job_interference_le_task_interference_bound.
-      - rewrite leq_add2r.
-        by eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 2.
+      - rewrite leq_add2r /A.
+        have -> : (t1 + (job_arrival j - t1) + ε) = (t1 + (job_arrival j - t1 + ε)) by lia.
+        apply: task_rbf_without_job_under_analysis => //=.
+        by move: IN => /[!job_arrival_in_bounds] // -[]; lia.
     Qed.
 
   End BoundOfCumulativeJobInterference.

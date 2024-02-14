@@ -313,12 +313,16 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         { by apply: task_rbf_1_ge_task_cost; exact: non_pathological_max_arrivals. }
         { by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia]. }
       - eapply leq_trans;
-          last by erewrite leq_add2l; eapply task_rbf_excl_tsk_bounds_task_workload_excl_j; eauto 1.
+          last by (
+            erewrite leq_add2l;
+            eapply task_rbf_without_job_under_analysis with (t1 := t1) =>//;
+            lia).
         rewrite addnBA.
         + rewrite leq_sub2r //; eapply leq_trans.
           * apply sum_over_partitions_le => j' inJOBS => _.
             by apply H_all_jobs_from_taskset, (in_arrivals_implies_arrived _ _ _ _ inJOBS).
-          * rewrite (big_rem tsk) //= addnC leq_add //; last by rewrite subnKC.
+          * rewrite (big_rem tsk) //= addnC leq_add //;
+              last by rewrite addnBAC //= subnKC // addn1; apply leqW.
             rewrite big_seq_cond [in X in _ <= X]big_seq_cond big_mkcond [in X in _ <= X]big_mkcond //=.
             apply leq_sum => tsk' _; rewrite andbC //=.
             destruct (tsk' \in rem (T:=Task) tsk ts) eqn:IN; last by [].

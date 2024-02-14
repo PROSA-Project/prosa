@@ -541,7 +541,6 @@ Section FP_RBF_partitioning.
 
 End FP_RBF_partitioning.
 
-
 (** In this section, we state a few facts for RBFs in the context of a
     fixed-priority policy. *)
 Section RBFFOrFP.
@@ -611,3 +610,121 @@ Section RBFFOrFP.
   Qed.
 
 End RBFFOrFP.
+
+(** We know that the workload of a task in any interval must be
+    bounded by the task's RBF in that interval. However, in the proofs
+    of several lemmas, we are required to reason about the workload of
+    a task in an interval excluding the cost of a particular job
+    (usually the job under analysis). Such a workload can be tightly
+    bounded by the task's RBF for the interval excluding the cost of
+    one task.
+
+    Notice, however, that this is not a trivial result since a naive
+    approach to proving it would fail.  Suppose we want to prove that
+    some quantity [A - B] is upper bounded by some quantity [C -
+    D]. This usually requires us to prove that [A] is upper bounded by
+    [C] _and_ [D] is upper bounded by [B]. In our case, this would be
+    equivalent to proving that the task cost is upper-bounded by the
+    job cost, which of course is not true.
+
+    So, a different approach is needed, which we show in this
+    section. *)
+Section TaskWorkload.
+
+   (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+
+  (** ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** Consider any arrival sequence ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arrival_times_are_consistent:
+    consistent_arrival_times arr_seq.
+
+  (** ... and assume that WCETs are respected. *)
+  Hypothesis H_arrivals_have_valid_job_costs :
+    arrivals_have_valid_job_costs arr_seq.
+
+  (** Let [tsk] be any task ... *)
+  Variable tsk : Task.
+
+  (** ... characterized by a valid arrival curve. *)
+  Context `{MaxArrivals Task}.
+  Hypothesis H_valid_arrival_curve : valid_arrival_curve (max_arrivals tsk).
+  Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
+
+  (** Consider any job [j] of [tsk] ... *)
+  Variable j : Job.
+  Hypothesis H_job_of_task : job_of_task tsk j.
+
+  (** ... that arrives in the given arrival sequence. *)
+  Hypothesis H_j_arrives_in : arrives_in arr_seq j.
+
+  (** Consider any time instant [t1] and duration [Δ] such that [j]
+      arrives before [t1 + Δ]. *)
+  Variables (t1 : instant) (Δ : duration).
+  Hypothesis H_job_arrival_lt : job_arrival j < t1 + Δ.
+
+  (** As a preparatory step, we restrict our attention to the sub-interval
+      containing the job's arrival. We know that the job's arrival necessarily
+      happens in the interval (<<[job_arrival j], t1 + Δ>>). This allows us to
+      show that the task workload excluding the task cost can be bounded by the
+      cost of the arrivals in the interval as follows. *)
+  Lemma task_rbf_without_job_under_analysis_from_arrival :
+    task_workload_between arr_seq tsk (job_arrival j) (t1 + Δ) - job_cost j
+    <= task_cost tsk * number_of_task_arrivals arr_seq tsk (job_arrival j) (t1 + Δ)
+       - task_cost tsk.
+  Proof.
+    rewrite /task_workload_between /workload.task_workload_between /task_workload
+      /workload_of_jobs /number_of_task_arrivals /task_arrivals_between.
+    rewrite (big_rem j) //= addnC //= H_job_of_task addnK (filter_size_rem j)//.
+    rewrite mulnDr mulnC muln1 addnK mulnC.
+    apply sum_majorant_constant => j' ARR' /eqP TSK2.
+    rewrite -TSK2; apply H_arrivals_have_valid_job_costs.
+    apply rem_in in ARR'.
+    by eapply in_arrivals_implies_arrived => //=.
+  Qed.
+
+  (** To use the above lemma in our final theorem, we require that the arrival
+      of the job under analysis necessarily happens in the interval we are
+      considering. *)
+  Hypothesis H_j_arrives_after_t : t1 <= job_arrival j.
+
+  (** Under the above assumption, we can finally establish the desired bound. *)
+  Lemma task_rbf_without_job_under_analysis :
+    task_workload_between arr_seq tsk t1 (t1 + Δ) - job_cost j
+    <= task_request_bound_function tsk Δ - task_cost tsk.
+  Proof.
+    apply leq_trans with
+      (task_cost tsk * number_of_task_arrivals arr_seq tsk t1 (t1 + Δ) - task_cost tsk); last first.
+    - rewrite leq_sub2r // leq_mul2l; apply/orP => //=; right.
+      have POSE: Δ = (t1 + Δ - t1) by lia.
+      rewrite [in leqRHS]POSE.
+      eapply (H_is_arrival_curve t1 (t1 + Δ)).
+      by lia.
+    - rewrite (@num_arrivals_of_task_cat _ _ _ _ _ (job_arrival j)); last by apply /andP; split.
+      rewrite mulnDr.
+      rewrite /task_workload_between /task_workload (workload_of_jobs_cat _ (job_arrival j) );
+        last by apply/andP; split; lia.
+      rewrite -!addnBA; first last.
+      + by rewrite /task_workload_between /task_workload
+          /workload_of_jobs (big_rem j) //= H_job_of_task leq_addr.
+      + rewrite -{1}[task_cost tsk]muln1 leq_mul2l; apply/orP; right.
+        rewrite /number_of_task_arrivals /task_arrivals_between.
+        rewrite size_filter -has_count; apply/hasP; exists j; last by rewrite H_job_of_task.
+        apply (mem_bigcat _ Job _ (job_arrival j) _); last by apply job_in_arrivals_at => //=.
+        rewrite mem_index_iota.
+        by apply /andP;split.
+      + have ->: job_arrival j =  t1 + (job_arrival j - t1) by lia.
+        have ->: t1 + (job_arrival j - t1) = job_arrival j by lia.
+        rewrite leq_add//; last by apply task_rbf_without_job_under_analysis_from_arrival => //=.
+        have ->: job_arrival j =  t1 + (job_arrival j - t1) by lia.
+        by eapply (task_workload_le_num_of_arrivals_times_cost ) => //=.
+  Qed.
+
+End TaskWorkload.
