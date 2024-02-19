@@ -3,8 +3,8 @@ Require Export prosa.analysis.facts.model.restricted_supply.schedule.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.abstract.restricted_supply.task_intra_interference_bound.
-Require Export prosa.analysis.abstract.restricted_supply.fp_bounded_bi.
-Require Export prosa.analysis.abstract.restricted_supply.search_space_fp.
+Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.fp.
+Require Export prosa.analysis.abstract.restricted_supply.search_space.fp.
 Require Export prosa.analysis.facts.model.task_cost.
 
 (** * RTA for Fully Preemptive FP Scheduling on Restricted-Supply Uniprocessors *)
@@ -57,7 +57,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       time [job_arrival]. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context `{Cost : JobCost Job}.
+  Context `{JobCost Job}.
   Context `{JobArrival Job}.
 
   (** Furthermore, assume that jobs and tasks are fully preemptive. *)
@@ -191,7 +191,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     have BLOCK: forall tsk , blocking_bound ts tsk = 0.
     { by move=> tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
                  /fully_preemptive_task_model subnn big1_eq. }
-    have [ZERO|POS] := posnP (@job_cost _ Cost js);
+    have [ZERO|POS] := posnP (job_cost js);
       first by rewrite /job_response_time_bound /completed_by ZERO.
     have READ : work_bearing_readiness arr_seq sched
       by exact: sequential_readiness_implies_work_bearing_readiness.
