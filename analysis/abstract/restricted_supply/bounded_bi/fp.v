@@ -1,6 +1,7 @@
- Require Export prosa.analysis.facts.blocking_bound.fp.
+Require Export prosa.analysis.facts.blocking_bound.fp.
 Require Export prosa.analysis.abstract.restricted_supply.abstract_rta.
 Require Export prosa.analysis.abstract.restricted_supply.iw_instantiation.
+Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.aux.
 Require Export prosa.analysis.definitions.sbf.busy.
 
 
@@ -16,7 +17,6 @@ Section BoundedBusyIntervals.
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
-  Context `{TaskMaxNonpreemptiveSegment Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -52,12 +52,10 @@ Section BoundedBusyIntervals.
   (** ... and assume that the schedule is valid. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-  (** In addition, we assume the existence of a function mapping jobs
-      to their preemption points ... *)
+  (** Assume that jobs have bounded non-preemptive segments. *)
   Context `{JobPreemptable Job}.
-
-  (** ... and assume that it defines a valid preemption model with
-      bounded non-preemptive segments. *)
+  Context `{TaskMaxNonpreemptiveSegment Task}.
+  Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
   Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
@@ -93,10 +91,10 @@ Section BoundedBusyIntervals.
   (** ... and that the cost of a job does not exceed its task's WCET. *)
   Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
-  (** Consider a valid, unit supply-bound function "busy" [SBF]. That
-      is, (1) [SBF 0 = 0], (2) for any duration [Δ], the supply
-      produced during a busy-interval prefix of length [Δ] is at least
-      [SBF Δ], and (3) [SBF] makes steps of at most one. *)
+  (** Consider a unit SBF valid in busy intervals. That is, (1) [SBF 0
+      = 0], (2) for any duration [Δ], the supply produced during a
+      busy-interval prefix of length [Δ] is at least [SBF Δ], and (3)
+      [SBF] makes steps of at most one. *)
   Context {SBF : SupplyBoundFunction}.
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
@@ -112,10 +110,6 @@ Section BoundedBusyIntervals.
   (** Let [tsk] be any task in [ts] that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
-
-  (** Consider a valid preemption model. *)
-  Hypothesis H_valid_preemption_model :
-    valid_preemption_model arr_seq sched.
 
   (** Let [L] be any positive fixed point of the busy-interval recurrence. *)
   Variable L : duration.
@@ -133,22 +127,7 @@ Section BoundedBusyIntervals.
     Hypothesis H_job_of_tsk : job_of_task tsk j.
     Hypothesis H_job_cost_positive : job_cost_positive j.
 
-    (** First, we note that since job [j] is pending at time
-        [job_arrival j], there is a (potentially unbounded) busy
-        interval that starts no later than with the arrival of [j]. *)
-    Local Lemma busy_interval_prefix_exists :
-      exists t1,
-        t1 <= job_arrival j
-        /\ busy_interval_prefix arr_seq sched j t1 (job_arrival j).+1.
-    Proof.
-      have PEND : pending sched j (job_arrival j) by apply job_pending_at_arrival => //.
-      have PREFIX := busy_interval.exists_busy_interval_prefix ltac:(eauto) j.
-      feed (PREFIX (job_arrival j)); first by done.
-      move: PREFIX => [t1 [PREFIX /andP [GE1 _]]].
-      by eexists; split; last by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix => //.
-    Qed.
-
-    (** Next, consider two cases: (1) when the busy-interval prefix
+    (** Consider two cases: (1) when the busy-interval prefix
         continues until time instant [t1 + L] and (2) when the busy
         interval prefix terminates earlier. In either case, we can
         show that the busy-interval prefix is bounded. *)
@@ -176,7 +155,7 @@ Section BoundedBusyIntervals.
         workload_of_job arr_seq j t1 (t1 + L) + cumulative_interfering_workload j t1 (t1 + L) <= L.
       Proof.
         rewrite (cumulative_interfering_workload_split _ _ _).
-        (rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ _ _ _ _)); try apply H_busy_prefix) => //.
+        rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ _ _ _ _)) => //.
         rewrite // addnC -!addnA.
         have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
         apply: E; first by lia.
@@ -219,91 +198,6 @@ Section BoundedBusyIntervals.
         is not a busy-interval prefix. *)
     Section Case2.
 
-      (** First, we prove a few helper lemmas. *)
-      Section HelperLemmas.
-
-        (** Let <[t1, t2)>> be a busy-interval prefix. *)
-        Variable t1 t2 : instant.
-        Hypothesis H_busy_prefix : busy_interval_prefix arr_seq sched j t1 t2.
-
-        (** Then, the service of higher-or-equal-priority jobs is less
-            than the workload of higher-or-equal-priority jobs in any
-            subinterval <<[t1, t)>> of the interval <<[t1, t2)>>. *)
-        Local Lemma service_lt_workload_in_busy :
-          forall t,
-            t1 < t < t2 ->
-            service_of_hep_jobs arr_seq sched j t1 t < workload_of_hep_jobs arr_seq j t1 t.
-        Proof.
-          move=> t /andP [LT1 LT2]; move: (H_busy_prefix) => PREF.
-          move_neq_up LE.
-          have EQ: workload_of_hep_jobs arr_seq j t1 t = service_of_hep_jobs arr_seq sched j t1 t.
-          { apply/eqP; rewrite eqn_leq; apply/andP; split => //.
-            apply service_of_jobs_le_workload => //.
-            by apply unit_supply_is_unit_service.
-          }
-          clear LE; move: PREF => [LT [QT1 [NQT QT2]]].
-          specialize (NQT t ltac:(lia)); apply: NQT => s ARR HEP BF.
-          have EQ2: workload_of_hep_jobs arr_seq j 0 t = service_of_hep_jobs arr_seq sched j 0 t. (* TODO: new lemma *)
-          { rewrite /workload_of_hep_jobs (workload_of_jobs_cat _ t1); last by lia.
-            rewrite /service_of_hep_jobs (service_of_jobs_cat_scheduling_interval _ _ _ _ _ 0 t t1) //; last by lia.
-            rewrite /workload_of_hep_jobs in EQ; rewrite EQ; clear EQ.
-            apply/eqP; rewrite eqn_add2r.
-            replace (service_of_jobs sched (hep_job^~ j) (arrivals_between arr_seq 0 t1) t1 t) with 0; last first.
-            { symmetry; apply: big1_seq => h /andP [HEPh BWh].
-              apply big1_seq => t' /andP [_ IN].
-              apply not_scheduled_implies_no_service, completed_implies_not_scheduled => //.
-              apply: completion_monotonic; last apply QT1 => //.
-              { by rewrite mem_index_iota in IN; lia. }
-              { by apply: in_arrivals_implies_arrived. }
-              { by apply: in_arrivals_implies_arrived_before. }
-            }
-            rewrite addn0; apply/eqP.
-            apply all_jobs_have_completed_impl_workload_eq_service => //; first by apply unit_supply_is_unit_service.
-            move => h ARRh HEPh; apply: QT1 => //.
-            - by apply: in_arrivals_implies_arrived.
-            - by apply: in_arrivals_implies_arrived_before.
-          }
-          apply: workload_eq_service_impl_all_jobs_have_completed => //.
-          by apply unit_supply_is_unit_service.
-        Qed.
-
-        (** Consider a subinterval <<[t1, t1 + Δ)>> of the interval
-            <<[t1, t2)>>.  We show that the sum of [j]'s workload and
-            the cumulative workload in <<[t1, t1 + Δ)>> is strictly
-            larger than [Δ]. *)
-        Local Lemma workload_exceeds_interval :
-          forall Δ,
-            0 < Δ ->
-            t1 + Δ < t2 ->
-            Δ < workload_of_job arr_seq j t1 (t1 + Δ) + cumulative_interfering_workload j t1 (t1 + Δ).
-        Proof.
-          move=> δ POS LE; move: (H_busy_prefix) => PREF.
-          apply leq_ltn_trans with (service_during sched j t1 (t1 + δ) + cumulative_interference j t1 (t1 + δ)).
-          { rewrite /service_during /cumulative_interference /cumul_cond_interference  /cond_interference /service_at.
-            rewrite -big_split //= -{1}(sum_of_ones t1 δ) big_nat [in X in _ <= X]big_nat.
-            apply leq_sum => x /andP[Lo Hi].
-            { eapply instantiated_i_and_w_are_coherent_with_schedule in H_work_conserving; eauto 2 => //.
-              move: (H_work_conserving j t1 t2 x) => Workj.
-              feed_n 4 Workj; try done.
-              { by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix. }
-              { by apply/andP; split; eapply leq_trans; eauto. }
-              destruct interference.
-              - by lia.
-              - by rewrite //= addn0; apply Workj.
-            }
-          }
-          rewrite cumulative_interfering_workload_split // cumulative_interference_split //.
-          rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //; last by apply PREF.
-          rewrite -[leqRHS]addnC -[leqRHS]addnA [(_ + workload_of_job _ _ _ _ )]addnC.
-          rewrite workload_job_and_ahep_eq_workload_hep //.
-          rewrite -addnC -addnA [(_ + service_during _ _ _ _ )]addnC.
-          rewrite service_plus_ahep_eq_service_hep //; last by move: PREF => [_ [_ [_ /andP [A B]]]].
-          rewrite ltn_add2l.
-          by apply: service_lt_workload_in_busy; eauto; lia.
-        Qed.
-
-      End HelperLemmas.
-
       (** Consider a time instant [t1] such that <<[t1, job_arrival
           j]>> is a busy-interval prefix of [j] and <<[t1, t1 + L)>>
           is _not_. *)
@@ -314,7 +208,7 @@ Section BoundedBusyIntervals.
 
       (** From the properties of busy intervals, one can conclude that
           [j]'s arrival time is less than [t1 + L]. *)
-      Lemma job_arrival_is_bounded :
+      Local Lemma job_arrival_is_bounded :
         job_arrival j < t1 + L.
       Proof.
         move_neq_up FF.
@@ -356,7 +250,7 @@ Section BoundedBusyIntervals.
           (1) [j]'s arrival is bounded by [t2], (2) [t2] is bounded by
           [t1 + L], and (3) <<[t1, t2)>> is busy interval of job
           [j]. *)
-      Lemma busy_prefix_is_bounded_case2:
+      Local Lemma busy_prefix_is_bounded_case2:
         exists t2, job_arrival j < t2 /\ t2 <= t1 + L /\ busy_interval arr_seq sched j t1 t2.
       Proof.
         have LE: job_arrival j < t1 + L
@@ -393,7 +287,10 @@ Section BoundedBusyIntervals.
   Proof.
     move => j ARR TSK POS.
     have PEND : pending sched j (job_arrival j) by apply job_pending_at_arrival => //.
-    have [t1 [GE PREFIX]] := busy_interval_prefix_exists _ ARR POS.
+    have [t1 [GE PREFIX]]:
+      exists t1, t1 <= job_arrival j
+            /\ busy_interval_prefix arr_seq sched j t1 (job_arrival j).+1
+        by apply: busy_interval_prefix_exists.
     exists t1.
     enough(exists t2, job_arrival j < t2 /\ t2 <= t1 + L /\ busy_interval arr_seq sched j t1 t2) as BUSY.
     { move: BUSY => [t2 [LT [LE BUSY]]]; eexists; split; last first.
