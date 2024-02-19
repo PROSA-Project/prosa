@@ -8,6 +8,7 @@ Require Import prosa.analysis.facts.busy_interval.carry_in.
 Require Import prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 Require Export prosa.analysis.facts.model.task_cost.
+Require Export prosa.analysis.facts.workload.edf_athep_bound.
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
@@ -34,7 +35,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Context `{TaskDeadline Task}.
   Context `{TaskRunToCompletionThreshold Task}.
   Context `{TaskMaxNonpreemptiveSegment Task}.
-
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -159,12 +159,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = total_rbf L.
 
-  (** Next, we define an upper bound on interfering workload received
-      from jobs of other tasks with higher-than-or-equal priority. *)
-  Let bound_on_total_hep_workload (A Δ : duration) :=
-    \sum_(tsk_o <- ts | tsk_o != tsk)
-     rbf tsk_o (minn ((A + ε) + D tsk - D tsk_o) Δ).
-
   (** To reduce the time complexity of the analysis, we introduce the
       notion of search space for EDF. Intuitively, this corresponds to
       all "interesting" arrival offsets that the job under analysis
@@ -211,134 +205,52 @@ Section AbstractRTAforEDFwithArrivalCurves.
       exists (F : duration),
         A + F >= priority_inversion_bound A
                 + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
-                + bound_on_total_hep_workload  A (A + F) /\
+                + bound_on_athep_workload ts tsk  A (A + F) /\
         R >= F + (task_cost tsk - task_rtct tsk).
 
-  
+
   (** Finally, we define the interference bound function
       ([task_IBF]). [task_IBF] bounds the interference if tasks are
       sequential. Since tasks are sequential, we exclude interference
       from other jobs of the same task. For EDF, we define [task_IBF]
       as the sum of the priority interference bound and the
       higher-or-equal-priority workload. *)
-  Let task_IBF (A R : duration) := priority_inversion_bound A + bound_on_total_hep_workload A R.
+  Let task_IBF (A R : duration) :=
+    priority_inversion_bound A + bound_on_athep_workload ts tsk A R.
 
   (** ** Filling Out Hypothesis Of Abstract RTA Theorem *)
   (** In this section we prove that all hypotheses necessary to use
       the abstract theorem are satisfied. *)
   Section FillingOutHypothesesOfAbstractRTATheorem.
 
-    (** First, we prove that [task_IBF] is indeed an interference bound. *)
-    Section TaskInterferenceIsBoundedBytask_IBF.
+    (** First, we prove that [task_IBF] is indeed a valid bound on the
+        cumulative task interference. *)
+    Lemma instantiated_task_interference_is_bounded :
+      task_interference_is_bounded_by arr_seq sched tsk task_IBF.
+    Proof.
+      move => t1 t2 R2 j ARR TSK BUSY LT NCOMPL A OFF.
+      move: (OFF _ _ BUSY) => EQA; subst A.
+      move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
+      - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
+        by rewrite /completed_by /completed_by ZERO.
+      - rewrite -/(cumul_task_interference _ _ _ _ _).
+        rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
+        rewrite /I leq_add //; first exact: cumulative_priority_inversion_is_bounded.
+        eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
+        eapply leq_trans; first exact: service_of_jobs_le_workload.
+        eapply leq_trans.
+        + eapply reorder_summation.
+          move => j' IN _.
+          apply H_all_jobs_from_taskset.
+          eapply in_arrivals_implies_arrived.
+          exact IN.
+        + move : TSK => /eqP TSK.
+          rewrite TSK.
+          apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
+          by apply /eqP.
+    Qed.
 
-      Section HepWorkloadBound.
-
-        (** Consider an arbitrary job [j] of [tsk]. *)
-        Variable j : Job.
-        Hypothesis H_j_arrives : arrives_in arr_seq j.
-        Hypothesis H_job_of_tsk : job_of_task tsk j.
-        Hypothesis H_job_cost_positive: job_cost_positive j.
-
-        (** Consider any busy interval <<[t1, t2)>> of job [j]. *)
-        Variable t1 t2 : duration.
-        Hypothesis H_busy_interval : definitions.busy_interval sched j t1 t2.
-
-        (** Let's define A as a relative arrival time of job j (with respect to time t1). *)
-        Let A := job_arrival j - t1.
-
-        (** Consider an arbitrary shift Δ inside the busy interval ...  *)
-        Variable Δ : duration.
-        Hypothesis H_Δ_in_busy : t1 + Δ < t2.
-
-        (** ... and the set of all arrivals between [t1] and [t1 + Δ]. *)
-        Let jobs := arrivals_between arr_seq t1 (t1 + Δ).
-
-        (** We define a predicate [EDF_from tsk]. Predicate [EDF_from
-            tsk] holds true for any job [jo] of task [tsk] such that
-            [job_deadline jo <= job_deadline j]. *)
-        Let EDF_from (tsk : Task) := fun (jo : Job) => EDF jo j && (job_task jo == tsk).
-
-        (** Now, consider the case where [A + ε + D tsk - D tsk_o ≤ Δ]. *)
-        Section ShortenRange.
-
-          (** Consider an arbitrary task [tsk_o ≠ tsk] from [ts]. *)
-          Variable tsk_o : Task.
-          Hypothesis H_tsko_in_ts: tsk_o \in ts.
-          Hypothesis H_neq: tsk_o != tsk.
-
-          (** And assume that [A + ε + D tsk - D tsk_o ≤ Δ]. *)
-          Hypothesis H_Δ_ge : A + ε + D tsk - D tsk_o <= Δ.
-          
-          (** Then we prove that the total workload of jobs with
-              higher-or-equal priority from task [tsk_o] over time
-              interval [t1, t1 + Δ] is bounded by workload over time
-              interval [t1, t1 + A + ε + D tsk - D tsk_o].  The
-              intuition behind this inequality is that jobs which
-              arrive after time instant [t1 + A + ε + D tsk - D tsk_o]
-              have lower priority than job [j] due to the term [D tsk
-              - D tsk_o]. *)
-          Lemma total_workload_shorten_range:
-            workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + Δ))
-            <= workload_of_jobs (EDF_from tsk_o) (arrivals_between arr_seq t1 (t1 + (A + ε + D tsk - D tsk_o))).
-          Proof.
-            have BOUNDED: t1 + (A + ε + D tsk - D tsk_o) <= t1 + Δ by lia.
-            rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN'.
-            rewrite /EDF_from  => ARR'.
-            case: (eqVneq (job_task j') tsk_o) => TSK';
-              last by rewrite andbF.
-            rewrite andbT; apply: contraT  => /negPn.
-            rewrite /EDF/edf.EDF/job_deadline/job_deadline_from_task_deadline.
-            move: H_job_of_tsk; rewrite TSK' /job_of_task => /eqP -> HEP.
-            have LATEST: job_arrival j' <= t1 + A + D tsk - D tsk_o by rewrite /D/A; lia.
-            have EARLIEST: t1 <= job_arrival j' by apply: job_arrival_between_ge.
-            by case: (leqP (A + 1 + D tsk) (D tsk_o)); [rewrite /D/A|]; lia.
-          Qed.
-
-        End ShortenRange.
-
-        (** Using the above lemma, we prove that the total workload of the
-            tasks is at most [bound_on_total_hep_workload(A, Δ)]. *)
-        Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload :
-          \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (EDF_from tsk_o) jobs
-          <= bound_on_total_hep_workload A Δ.
-        Proof.
-          apply leq_sum_seq => tsko INtsko NEQT.
-          edestruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; [ | apply ltnW in NEQ].
-          - exact: (workload_le_rbf' arr_seq tsko).
-          - eapply leq_trans; first by eapply total_workload_shorten_range; eauto 2.
-            exact: workload_le_rbf'.
-        Qed.
-
-      End HepWorkloadBound.
-
-      (** The above lemma, in turn, implies that [task_IBF] is a valid
-          bound on the cumulative task interference. *)
-      Corollary instantiated_task_interference_is_bounded :
-        task_interference_is_bounded_by arr_seq sched tsk task_IBF.
-      Proof.
-        move => t1 t2 R2 j ARR TSK BUSY LT NCOMPL A OFF.
-        move: (OFF _ _ BUSY) => EQA; subst A.
-        move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
-        - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
-          by rewrite /completed_by /completed_by ZERO.
-        - rewrite -/(cumul_task_interference _ _ _ _ _).
-          rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _ )) //=.
-          rewrite /I leq_add //; first exact: cumulative_priority_inversion_is_bounded.
-          eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
-          eapply leq_trans; first exact: service_of_jobs_le_workload.
-          eapply leq_trans.
-          + eapply reorder_summation.
-            move => j' IN _.
-            apply H_all_jobs_from_taskset. eapply in_arrivals_implies_arrived. exact IN.
-          + move : TSK => /eqP TSK.
-            rewrite TSK.
-            apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
-            by apply /eqP.
-      Qed.
-
-    End TaskInterferenceIsBoundedBytask_IBF.
-
-    (** Finally, we show that there exists a solution for the response-time recurrence. *)
+      (** Finally, we show that there exists a solution for the response-time recurrence. *)
     Section SolutionOfResponseTimeReccurenceExists.
 
       (** To rule out pathological cases with the concrete search
@@ -373,9 +285,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
           exfalso; apply INSP2.
           rewrite /total_interference_bound subnK // RBF.
           apply /eqP; rewrite eqn_add2l /task_IBF PI eqn_add2l.
-          rewrite /bound_on_total_hep_workload subnK //.
+          rewrite /bound_on_athep_workload subnK //.
           apply /eqP; rewrite big_seq_cond [RHS]big_seq_cond.
           apply eq_big => // tsk_i /andP [TS OTHER].
+          fold (D tsk) (D tsk_i).
           move: WL; rewrite /bound_on_total_hep_workload_changes_at => /hasPn WL.
           move: {WL} (WL tsk_i TS) =>  /nandP [/negPn/eqP EQ|/negPn/eqP WL];
             first by move: OTHER; rewrite EQ => /neqP.
@@ -384,7 +297,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
           { rewrite ifF //.
             by move: gtn_x; rewrite leq_eqVlt  => /orP [/eqP EQ|LEQ]; lia. }
           { case: (A + D tsk - D tsk_i < x).
-            - by rewrite WL.
+            - by rewrite -/(rbf _) WL.
             - by rewrite eq_x. } }
       Qed.
 

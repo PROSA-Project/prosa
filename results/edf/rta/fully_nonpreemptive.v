@@ -91,12 +91,6 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
                          && (task_deadline tsk_o > task_deadline tsk + A))
      (task_cost tsk_o - ε).
 
-  (** Next, we define an upper bound on interfering workload received from jobs
-       of other tasks with higher-than-or-equal priority. *)
-  Let bound_on_total_hep_workload A Δ :=
-    \sum_(tsk_o <- ts | tsk_o != tsk)
-     rbf tsk_o (minn ((A + ε) + task_deadline tsk - task_deadline tsk_o) Δ).
-
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
@@ -116,7 +110,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       is_in_search_space A ->
       exists F,
         A + F >= blocking_bound A + (task_rbf (A + ε) - (task_cost tsk - ε))
-                + bound_on_total_hep_workload A (A + F) /\
+                + bound_on_athep_workload ts tsk A (A + F) /\
         R >= F + (task_cost tsk - ε).
 
   (** Now, we can leverage the results for the abstract model with bounded nonpreemptive segments

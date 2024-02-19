@@ -6,6 +6,7 @@ Require Export prosa.results.edf.rta.bounded_pi.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.busy_interval.classical.
 Require Export prosa.analysis.facts.blocking_bound.edf.
+Require Export prosa.analysis.facts.workload.edf_athep_bound.
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
@@ -115,12 +116,6 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
-  (** Next, we define an upper bound on interfering workload received from jobs
-     of other tasks with higher-than-or-equal priority. *)
-  Let bound_on_total_hep_workload  A Δ :=
-    \sum_(tsk_o <- ts | tsk_o != tsk)
-     rbf tsk_o (minn ((A + ε) + D tsk - D tsk_o) Δ).
-
   (** Let's define some local names for clarity. *)
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
@@ -219,7 +214,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         exists (F : duration),
           A + F >= blocking_bound ts tsk A
                   + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
-                  + bound_on_total_hep_workload  A (A + F) /\
+                  + bound_on_athep_workload ts tsk A (A + F) /\
           R >= F + (task_cost tsk - task_rtct tsk).
 
     (** Then, using the results for the general RTA for EDF-schedulers, we establish a

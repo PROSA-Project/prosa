@@ -93,12 +93,6 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
       function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
-  (** Next, we define an upper bound on interfering workload received from jobs
-      of other tasks with higher-than-or-equal priority. *)
-  Let bound_on_total_hep_workload A Δ :=
-    \sum_(tsk_o <- ts | tsk_o != tsk)
-     rbf tsk_o (minn ((A + ε) + task_deadline tsk - task_deadline tsk_o) Δ).
-
   (** Let L be any positive fixed point of the busy interval recurrence. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
@@ -117,7 +111,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
-        A + F >= blocking_bound ts tsk A + task_rbf (A + ε) + bound_on_total_hep_workload A (A + F) /\
+        A + F >= blocking_bound ts tsk A + task_rbf (A + ε) + bound_on_athep_workload ts tsk A (A + F) /\
         R >= F.
 
   (** Now, we can leverage the results for the abstract model with
