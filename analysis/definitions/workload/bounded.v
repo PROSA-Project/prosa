@@ -32,16 +32,19 @@ Section WorkloadBound.
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** We say that [B : duration -> work] is a bound on the
+  (** We say that [B : duration -> duration -> work] is a bound on the
       higher-or-equal-priority workload of tasks different from [tsk]
-      iff, for any interval <<[t1, t1 + Δ)>> that starts with a quiet
-      time, the total workload of higher-or-equal-priority tasks
-      distinct from [tsk] in the interval <<[t1, t1 + Δ)>> is bounded
-      by [B Δ]. *)
-  Definition athep_workload_is_bounded (B : duration -> work) :=
+      iff, for any job [j ∈ tsk] and any interval <<[t1, t1 + Δ)>>
+      that starts with a quiet time (w.r.t. job [j]), the total
+      workload of higher-or-equal-priority tasks distinct from [tsk]
+      in the interval <<[t1, t1 + Δ)>> is bounded by
+      [B (job_arrival j - t1) Δ]. *)
+  Definition athep_workload_is_bounded (B : duration -> duration -> work) :=
     forall (j : Job) (t1 : instant) (Δ : duration),
+      job_cost_positive j ->
       job_of_task tsk j ->
       quiet_time arr_seq sched j t1 ->
-      workload_of_jobs (another_task_hep_job^~ j) (arrivals_between arr_seq t1 (t1 + Δ)) <= B Δ.
+      workload_of_jobs (another_task_hep_job^~ j) (arrivals_between arr_seq t1 (t1 + Δ))
+      <= B (job_arrival j - t1) Δ.
 
 End WorkloadBound.

@@ -193,11 +193,19 @@ Section ProofWorkloadBound.
   End WorkloadIsBoundedByRBF.
 
   (** We next prove that the higher-or-equal-priority workload of
-      tasks different from [tsk] is bounded by [total_ohep_rbf]. *)
+      tasks different from [tsk] is bounded by [total_ohep_rbf].
+
+      The [athep_workload_is_bounded] predicate allows the workload
+      bound to depend on two arguments: the relative offset [A]
+      (w.r.t. the beginning of the corresponding busy interval) of a
+      job to be analyzed and the length of an interval [Δ]. In the
+      case of FP and [total_ohep_rbf] function, the relative offset
+      ([A]) does not play a role and is therefore ignored. *)
   Lemma athep_workload_le_total_ohep_rbf :
-    athep_workload_is_bounded arr_seq sched tsk (total_ohep_rbf tsk).
+    athep_workload_is_bounded
+      arr_seq sched tsk (fun (A Δ : duration) => total_ohep_rbf tsk Δ).
   Proof.
-    move => j t1 Δ TSK _.
+    move => j t1 Δ POS TSK _.
     rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
     rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
     set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).

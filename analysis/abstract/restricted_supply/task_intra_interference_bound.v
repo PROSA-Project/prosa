@@ -1,7 +1,6 @@
 Require Export prosa.analysis.abstract.restricted_supply.abstract_seq_rta.
 Require Export prosa.analysis.abstract.restricted_supply.iw_instantiation.
 Require Export prosa.analysis.definitions.sbf.busy.
-Require Export prosa.analysis.facts.blocking_bound_fp.
 Require Export prosa.analysis.definitions.workload.bounded.
 
 
@@ -85,13 +84,13 @@ Section TaskIntraInterferenceIsBounded.
 
   (** Assume that there exists a bound on the higher-or-equal-priority
       (w.r.t. a [tsk]'s job) workload of tasks different from [tsk]. *)
-  Variable athep_workload_bound : (* Δ *) duration -> duration.
+  Variable athep_workload_bound : (* A *) duration -> (* Δ *) duration -> duration.
   Hypothesis H_workload_is_bounded :
     athep_workload_is_bounded arr_seq sched tsk athep_workload_bound.
 
   (** Finally, we define the interference-bound function ([task_intra_IBF]). *)
   Definition task_intra_IBF (A R : duration) :=
-    service_inversion_bound A + athep_workload_bound R.
+    service_inversion_bound A + athep_workload_bound A R.
 
   (** Next, we prove that [task_intra_IBF] is indeed an interference bound. *)
   Lemma instantiated_task_intra_interference_is_bounded :
