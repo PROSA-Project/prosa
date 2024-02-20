@@ -697,7 +697,11 @@ Section JLFPInstantiation.
         move => j ARR TSK POS.
         edestruct busy_interval_from_total_workload_bound
           with (Δ := L) as [t1 [t2 [T1 [T2 GGG]]]] => //.
-        { by move => t; rewrite {2}H_fixed_point; apply total_workload_le_total_rbf. }
+        { move => t _; rewrite {3}H_fixed_point.
+          have ->: blackout_during sched t (t + L) = 0.
+          { apply/eqP; rewrite /blackout_during big1 // => l _.
+            by rewrite /is_blackout ideal_proc_has_supply. }
+          by rewrite add0n; apply total_workload_le_total_rbf. }
         exists t1, t2; split=> [//|]; split=> [//|].
         by apply instantiated_busy_interval_equivalent_busy_interval.
       Qed.

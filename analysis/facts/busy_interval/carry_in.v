@@ -21,17 +21,17 @@ Section BusyIntervalExistence.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
-  Context {Arrival: JobArrival Job}.
-  Context {Cost : JobCost Job}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
 
   (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arr_seq : valid_arrival_sequence arr_seq.
 
-  (** Allow for any uniprocessor model that ensures ideal progress. *)
+  (** Allow for any fully-consuming uniprocessor model. *)
   Context {PState : ProcessorState Job}.
-  Hypothesis H_ideal_progress_proc_model : ideal_progress_proc_model PState.
   Hypothesis H_uniproc : uniprocessor_model PState.
+  Hypothesis H_fully_consuming_proc_model : fully_consuming_proc_model PState.
 
   (** Next, consider any schedule of the arrival sequence ... *)
   Variable sched : schedule PState.
@@ -47,7 +47,7 @@ Section BusyIntervalExistence.
   Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
 
   (** Further, allow for any work-bearing notion of job readiness ... *)
-  Context `{@JobReady Job PState Cost Arrival}.
+  Context `{!JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
   (** ... and assume that the schedule is work-conserving. *)
@@ -74,10 +74,8 @@ Section BusyIntervalExistence.
       ~ is_idle arr_seq sched t.
   Proof.
     move=> j t ARR PEND IDLE.
-    have [jhp [ARRhp [READYhp _]]] : exists j_hp : Job,
-                                       arrives_in arr_seq j_hp
-                                       /\ job_ready sched j_hp t
-                                       /\ hep_job j_hp j
+    have [jhp [ARRhp [READYhp _]]] :
+      exists j_hp : Job, arrives_in arr_seq j_hp /\ job_ready sched j_hp t /\ hep_job j_hp j
       by apply: H_job_ready.
     move: IDLE; rewrite is_idle_iff => /eqP; rewrite scheduled_job_at_none => // IDLE.
     have [j_other SCHED]:  exists j_other : Job, scheduled_at sched j_other t
@@ -124,14 +122,18 @@ Section BusyIntervalExistence.
   Let total_service t1 t2 :=
     service_of_jobs sched predT (arrivals_between arr_seq 0 t2) t1 t2.
 
-  (** We assume that, for some positive [Δ], the total workload generated in any
-      interval of length [Δ] is bounded by [Δ] (i.e., the supply provided by an
-      ideal-progress unit-speed processor). Note that this assumption bounds the
-      total workload of jobs released in a time interval <<[t, t + Δ)>>
-      regardless of their priorities. *)
+  (** We assume that, for some positive [Δ], the sum of the total
+      blackout and the total workload generated in any interval of
+      length [Δ] starting with no carry-in is bounded by [Δ]. Note
+      that this assumption bounds the total workload of jobs released
+      in a time interval <<[t, t + Δ)>> regardless of their
+      priorities. *)
   Variable Δ : duration.
   Hypothesis H_delta_positive : Δ > 0.
-  Hypothesis H_workload_is_bounded : forall t, total_workload t (t + Δ) <= Δ.
+  Hypothesis H_workload_is_bounded :
+    forall t,
+      no_carry_in arr_seq sched t ->
+      blackout_during sched t (t + Δ) + total_workload t (t + Δ) <= Δ.
 
   (** In the following, we also require a unit-speed processor. *)
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
@@ -155,31 +157,46 @@ Section BusyIntervalExistence.
       Hypothesis H_no_carry_in : no_carry_in arr_seq sched t.
 
       (** First, recall that the total service is bounded by the total
-          workload. Therefore the total service of jobs in the interval
-          <<[t, t + Δ)>> is bounded by [Δ]. *)
+          workload. Therefore the sum of the total blackout and the
+          total service of jobs in the interval <<[t, t + Δ)>> is
+          bounded by [Δ]. *)
       Lemma total_service_is_bounded_by_Δ :
-        total_service t (t + Δ) <= Δ.
+        blackout_during sched t (t + Δ) + total_service t (t + Δ) <= Δ.
       Proof.
-        rewrite /total_service -{3}[Δ]addn0 -{2}(subnn t) addnBA // [in X in _ <= X]addnC.
-        by apply: service_of_jobs_le_length_of_interval'.
+        have EQ: \sum_(t <= x < t + Δ) 1 = Δ.
+        { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t]addn0 subnDl subn0. }
+        rewrite -{3}EQ {EQ}.
+        rewrite /total_service /blackout_during /supply.blackout_during.
+        rewrite /service_of_jobs/service_during/service_at exchange_big //=.
+        rewrite -big_split //= leq_sum //; move => t' _.
+        have [BL|SUP] := blackout_or_supply sched t'.
+        { rewrite -[1]addn0; apply leq_add; first by case: (is_blackout).
+          rewrite leqn0; apply/eqP; apply big1 => j _.
+          eapply no_service_during_blackout in BL.
+          by apply: BL. }
+        { rewrite /is_blackout SUP add0n.
+          exact: service_of_jobs_le_1. }
       Qed.
 
       (** Next we consider two cases:
-          (1) The case when the total service is strictly less than [Δ], and
-          (2) the case when the total service is equal to [Δ]. *)
+          (1) The case when the sum of blackout and service is strictly less than [Δ], and
+          (2) the case when the sum of blackout and service is equal to [Δ]. *)
 
       (** In the first case, we use the pigeonhole principle to
           conclude that there is an idle time instant; which in turn
           implies existence of a time instant with no carry-in. *)
       Lemma low_total_service_implies_existence_of_time_with_no_carry_in :
-        total_service t (t + Δ) < Δ ->
-        exists δ, δ < Δ /\ no_carry_in arr_seq sched (t.+1 + δ).
+        blackout_during sched t (t + Δ) + total_service t (t + Δ) < Δ ->
+        exists δ,
+          δ < Δ /\ no_carry_in arr_seq sched (t.+1 + δ).
       Proof.
-        rewrite /total_service-{3}[Δ]addn0 -{2}(subnn t) addnBA // [Δ + t]addnC => ?.
+        rewrite /total_service-{3}[Δ]addn0 -{2}(subnn t) addnBA // [Δ + t]addnC => LTS.
         have [t_idle [/andP [LEt GTe] IDLE]]: exists t0 : nat,
                                                 t <= t0 < t + Δ
-                                                /\ is_idle arr_seq sched t0
-          by apply: low_service_implies_existence_of_idle_time =>//.
+                                                /\ is_idle arr_seq sched t0.
+        { apply: low_service_implies_existence_of_idle_time_rs =>//.
+          rewrite !subnKC in LTS; try by apply leq_addr.
+          by rewrite addKn. }
         move: LEt; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
         { exists 0; split => //.
           rewrite addn0 EQ => s ARR BEF.
@@ -196,14 +213,15 @@ Section BusyIntervalExistence.
           exact: idle_instant_no_carry_in.
       Qed.
 
-      (** In the second case, the total service within the time interval
-          <<[t, t + Δ)>> is equal to [Δ].  We also know that the total
-          workload is lower-bounded by the total service and upper-bounded
-          by [Δ]. Therefore, the total workload is equal to the total service,
-          which implies completion of all jobs by time [t + Δ] and hence no
-          carry-in at time [t + Δ]. *)
+      (** In the second case, the sum of blackout and service within
+          the time interval <<[t, t + Δ)>> is equal to [Δ]. We also
+          know that the total workload is lower-bounded by the total
+          service and upper-bounded by [Δ]. Therefore, the total
+          workload is equal to the total service, which implies
+          completion of all jobs by time [t + Δ] and hence no carry-in
+          at time [t + Δ]. *)
       Lemma completion_of_all_jobs_implies_no_carry_in :
-        total_service t (t + Δ) = Δ ->
+        blackout_during sched t (t + Δ) + total_service t (t + Δ) = Δ ->
         no_carry_in arr_seq sched (t + Δ).
       Proof.
         rewrite /total_service => EQserv s ARR BEF.
@@ -231,7 +249,7 @@ Section BusyIntervalExistence.
           + rewrite COMPL -addnA leq_add2l.
             rewrite -service_of_jobs_cat_arrival_interval;
               last by apply/andP; split; [|rewrite leq_addr].
-            by rewrite EQserv.
+            by evar (b : nat); rewrite -(leq_add2l b) EQserv.
       Qed.
 
     End ProcessorIsNotTooBusyInduction.
@@ -259,10 +277,6 @@ Section BusyIntervalExistence.
   End ProcessorIsNotTooBusy.
 
   (** ** Busy Interval Existence *)
-
-  (** We now derive the existence of a busy interval from the preceding lemma,
-      under the strengthened assumption of an ideal-progress processor. *)
-  Hypothesis H_progress : ideal_progress_proc_model PState.
 
   (** Consider an arbitrary job [j] with positive cost. *)
   Variable j : Job.
@@ -311,4 +325,3 @@ Section BusyIntervalExistence.
   Qed.
 
 End BusyIntervalExistence.
-
