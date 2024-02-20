@@ -3,9 +3,9 @@ Require Import prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.analysis.facts.busy_interval.arrival.
 Require Export prosa.results.edf.rta.bounded_pi.
-Require Export model.schedule.work_conserving.
-Require Export analysis.definitions.busy_interval.
-Require Export analysis.definitions.blocking_bound_edf.
+Require Export prosa.model.schedule.work_conserving.
+Require Export prosa.analysis.definitions.busy_interval.
+Require Export prosa.analysis.facts.blocking_bound.edf.
 
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
@@ -199,51 +199,6 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
    Qed.
 
 
-  (** ** Priority inversion is bounded *)
-  (** In this section, we prove that a priority inversion for task [tsk] is bounded by
-      the maximum length of non-preemptive segments among the tasks with lower priority. *)
-  Section PriorityInversionIsBounded.
-
-    (** Since EDF is a JLFP policy, the maximum non-preemptive segment length of any task
-        that releases a job with an earlier absolute deadline (w.r.t. a given job [j]) and
-        non-zero execution cost upper-bounds the maximum possible length of priority
-        inversion (experienced by said job [j]). *)
-
-    (** Using this fact, we prove that the maximum length of a priority inversion of a given
-        job [j] is indeed bounded by the defined blocking bound. *)
-    Lemma priority_inversion_is_bounded_by_blocking:
-      forall j t1 t2,
-        arrives_in arr_seq j ->
-        job_of_task tsk j ->
-        busy_interval_prefix  arr_seq sched j t1 t2 ->
-        max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound ts tsk (job_arrival j - t1).
-    Proof.
-      move=> j t1 t2 ARR TSK BUSY; rewrite /max_lp_nonpreemptive_segment /blocking_bound.
-      apply: leq_trans;first by exact: max_np_job_segment_bounded_by_max_np_task_segment.
-      apply /bigmax_leq_seqP => j' JINB NOTHEP.
-      have ARR': arrives_in arr_seq j'
-        by apply: in_arrivals_implies_arrived; exact: JINB.
-      apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
-        first by apply H_all_jobs_from_taskset.
-      apply in_arrivals_implies_arrived_between in JINB => [|//].
-      move: JINB; move => /andP [_ TJ'].
-      repeat (apply/andP; split); last first.
-      { rewrite /EDF -ltnNge in NOTHEP.
-        move: TSK => /eqP <-.
-        have ARRLE: job_arrival j' < job_arrival j by apply: (@leq_trans t1).
-        move: NOTHEP; rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline /D.
-        by lia. }
-      { move: NOTHEP => /andP [_ NZ].
-        move: (H_valid_job_cost j' ARR'); rewrite /valid_job_cost.
-        by lia. }
-      { apply: non_pathological_max_arrivals; last first.
-          - exact: ARR'.
-          - by rewrite /job_of_task.
-          - by apply H_is_arrival_curve, H_all_jobs_from_taskset, ARR'. }
-    Qed.
-
-  End PriorityInversionIsBounded.
-
   (** ** Response-Time Bound *)
   (** In this section, we prove that the maximum among the solutions of the response-time
       bound recurrence is a response-time bound for [tsk]. *)
@@ -278,7 +233,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     Proof.
       apply: uniprocessor_response_time_bound_edf; eauto 4 with basic_rt_facts.
       { apply: priority_inversion_is_bounded => //.
-        apply: priority_inversion_is_bounded_by_blocking. }
+        by move=> *; apply: nonpreemptive_segments_bounded_by_blocking. }
       - move=> A BPI_SP.
         by apply H_R_is_maximum, search_space_inclusion.
     Qed.

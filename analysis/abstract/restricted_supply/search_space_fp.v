@@ -1,6 +1,6 @@
 Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.abstract.search_space.
-Require Export prosa.analysis.definitions.blocking_bound_fp.
+Require Export prosa.analysis.definitions.blocking_bound.fp.
 
 
 (** * Abstract Search Space is a Subset of Restricted Supply FP Search Space *)
@@ -50,9 +50,10 @@ Section SearchSpaceSubset.
   Let task_rbf := task_request_bound_function tsk.
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
 
-  (** Let [L] be any positive constant. Typically, [L] denotes an
-      upper bound on the length of a busy interval of a [tsk]'s upper
-      bound on the length of a busy interval of any job of [tsk]. *)
+  (** Let [L] be an arbitrary positive constant. Typically, [L]
+      denotes an upper bound on the length of a busy interval of a job
+      of [tsk]. In this file, however, [L] can be any positive
+      constant. *)
   Variable L : duration.
   Hypothesis H_L_positive : 0 < L.
 

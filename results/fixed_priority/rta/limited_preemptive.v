@@ -2,7 +2,7 @@ Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.facts.readiness.sequential.
 Require Export prosa.model.task.preemption.limited_preemptive.
-Require Export prosa.analysis.definitions.blocking_bound_fp.
+Require Export prosa.analysis.definitions.blocking_bound.fp.
 
 (** * RTA for FP-schedulers with Fixed Preemption Points *)
 (** In this module we prove the RTA theorem for FP-schedulers with

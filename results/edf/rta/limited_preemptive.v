@@ -4,7 +4,7 @@ Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.model.task.preemption.limited_preemptive.
 Require Export prosa.model.priority.edf.
-Require Export prosa.analysis.definitions.blocking_bound_edf.
+Require Export prosa.analysis.definitions.blocking_bound.edf.
 
 (** * RTA for EDF with Fixed Preemption Points *)
 (** In this module we prove the RTA theorem for EDF-schedulers with

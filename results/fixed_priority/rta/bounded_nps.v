@@ -2,7 +2,7 @@ Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.results.fixed_priority.rta.bounded_pi.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.busy_interval.
-Require Export prosa.analysis.definitions.blocking_bound_fp.
+Require Export prosa.analysis.definitions.blocking_bound.fp.
 
 (** * RTA for FP-schedulers with Bounded Non-Preemptive Segments *)
 

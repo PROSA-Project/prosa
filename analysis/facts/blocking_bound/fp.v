@@ -1,4 +1,4 @@
-Require Export prosa.analysis.definitions.blocking_bound_fp.
+Require Export prosa.analysis.definitions.blocking_bound.fp.
 Require Export prosa.analysis.facts.busy_interval.pi.
 
 
@@ -57,7 +57,7 @@ Section  MaxNPSegmentIsBounded.
   (** Then, the maximum length of a nonpreemptive segment among all
       lower-priority jobs (w.r.t. the given job [j]) arrived so far is
       bounded by [blocking_bound]. *)
-  Lemma priority_inversion_is_bounded_by_blocking :
+  Lemma nonpreemptive_segments_bounded_by_blocking :
     forall t,
       max_lp_nonpreemptive_segment arr_seq j t <= blocking_bound ts tsk.
   Proof.

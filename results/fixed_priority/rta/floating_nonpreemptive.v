@@ -1,7 +1,7 @@
 Require Export prosa.results.fixed_priority.rta.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
 Require Export prosa.analysis.facts.readiness.sequential.
-Require Export prosa.analysis.definitions.blocking_bound_fp.
+Require Export prosa.analysis.definitions.blocking_bound.fp.
 
 (** * RTA for Model with Floating Non-Preemptive Regions *)
 (** In this module we prove the RTA theorem for floating non-preemptive regions FP model. *)

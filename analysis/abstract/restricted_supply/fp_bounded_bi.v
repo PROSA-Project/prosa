@@ -1,4 +1,4 @@
- Require Export prosa.analysis.facts.blocking_bound_fp.
+ Require Export prosa.analysis.facts.blocking_bound.fp.
 Require Export prosa.analysis.abstract.restricted_supply.abstract_rta.
 Require Export prosa.analysis.abstract.restricted_supply.iw_instantiation.
 Require Export prosa.analysis.definitions.sbf.busy.
@@ -184,7 +184,7 @@ Section BoundedBusyIntervals.
         rewrite -(leqRW H_fixed_point); apply leq_add.
         - apply: leq_trans; first apply: service_inversion_is_bounded => //.
           + instantiate (1 := fun _ => blocking_bound ts tsk) => //=.
-            by move=> jo t t' ARRo TSKo PREFo; apply: priority_inversion_is_bounded_by_blocking => //.
+            by move=> jo t t' ARRo TSKo PREFo; apply: nonpreemptive_segments_bounded_by_blocking => //.
           + by done.
         - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
           by apply hep_workload_le_total_hep_rbf.
@@ -339,7 +339,7 @@ Section BoundedBusyIntervals.
             - apply: leq_trans.
               + apply: service_inversion_is_bounded => //.
                 move => *; instantiate (1 := fun _ => blocking_bound ts tsk) => //.
-                by apply: priority_inversion_is_bounded_by_blocking => //.
+                by apply: nonpreemptive_segments_bounded_by_blocking => //.
               + by done.
             - by done.
             - lia.
