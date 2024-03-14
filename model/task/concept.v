@@ -16,19 +16,19 @@ Definition TaskType := eqType.
 
 (** First, we define a job-model parameter [job_task] that maps each job to its
     corresponding task. *)
-Class JobTask (Job : JobType) (Task : TaskType) := job_task : Job -> Task.
+Class JobTask (Job : JobType) (Task : TaskType) := {job_task : Job -> Task}.
 
 (** Second, we define a task-model parameter to express each task's relative
     deadline. *)
-Class TaskDeadline (Task : TaskType) := task_deadline : Task -> duration.
+Class TaskDeadline (Task : TaskType) := {task_deadline : Task -> duration}.
 
 (** Third, we define a task-model parameter to express each task's worst-case
     execution cost (WCET). *)
-Class TaskCost (Task : TaskType) := task_cost : Task -> duration.
+Class TaskCost (Task : TaskType) := {task_cost : Task -> duration}.
 
 (** And finally, we define a task-model parameter to express each task's best-case
     execution cost (BCET). *)
-Class TaskMinCost (Task : TaskType) := task_min_cost : Task -> duration.
+Class TaskMinCost (Task : TaskType) := {task_min_cost : Task -> duration}.
 
 
 (** * Task Model Validity *)

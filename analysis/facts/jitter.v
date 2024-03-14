@@ -66,7 +66,7 @@ Section JitterPropagationFacts.
       curve. *)
   Corollary valid_release_curve :
     valid_taskset_arrival_curve ts max_arrivals ->
-    valid_taskset_arrival_curve ts release_curve.
+    valid_taskset_arrival_curve ts release_curve.(max_arrivals).
   Proof.
     move=> VALID.
     apply: propagated_arrival_curve_valid => tsk IN.

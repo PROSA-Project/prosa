@@ -13,7 +13,8 @@ Section SporadicArrivalCurve.
   (** The bound on the maximum number of arrivals in a given interval
       [max_sporadic_arrivals] is in fact a valid arrival curve, which
       we note with the following arrival-curve declaration. *)
-  Global Program Instance MaxArrivalsSporadic : MaxArrivals Task := max_sporadic_arrivals.
+  Global Program Instance MaxArrivalsSporadic : MaxArrivals Task := {
+      max_arrivals := max_sporadic_arrivals }.
 
   (** It remains to be shown that [max_sporadic_arrivals] satisfies
       all expectations placed on arrival curves. First, we observe

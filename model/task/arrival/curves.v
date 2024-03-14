@@ -16,11 +16,11 @@ Require Export prosa.model.task.arrivals.
 
 (** We let [max_arrivals tsk Δ] denote a bound on the maximum number of
     arrivals of jobs of task [tsk] in any interval of length [Δ]. *)
-Class MaxArrivals (Task : TaskType) := max_arrivals : Task -> duration -> nat.
+Class MaxArrivals (Task : TaskType) := {max_arrivals : Task -> duration -> nat}.
 
 (** Conversely, we let [min_arrivals tsk Δ] denote a bound on the minimum
     number of arrivals of jobs of task [tsk] in any interval of length [Δ]. *)
-Class MinArrivals (Task : TaskType) := min_arrivals : Task -> duration -> nat.
+Class MinArrivals (Task : TaskType) := {min_arrivals : Task -> duration -> nat}.
 
 (** Alternatively, it is also possible to describe arbitrary arrival processes
     by specifying the minimum and maximum lengths of an interval in which a
@@ -29,11 +29,11 @@ Class MinArrivals (Task : TaskType) := min_arrivals : Task -> duration -> nat.
 
 (** We let [min_separation tsk N] denote the minimal length of an interval in
     which exactly [N] jobs of task [tsk] arrive. *)
-Class MinSeparation (Task : TaskType) := min_separation : Task -> nat -> duration.
+Class MinSeparation (Task : TaskType) := { min_separation : Task -> nat -> duration }.
 
 (** Conversely, we let [max_separation tsk N] denote the maximal length of an interval in
     which exactly [N] jobs of task [tsk] arrive. *)
-Class MaxSeparation (Task : TaskType) := max_separation : Task -> nat -> duration.
+Class MaxSeparation (Task : TaskType) := { max_separation : Task -> nat -> duration }.
 
 
 (** ** Parameter Semantics *)

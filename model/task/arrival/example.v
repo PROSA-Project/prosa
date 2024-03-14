@@ -65,8 +65,12 @@ Section AutoArrivalModelConversion.
   Hypothesis H_valid_costs : jobs_have_valid_job_costs.
 
   (** ... the tasks satisfy the RBF validity constraint... *)
+  (** FIXME: why didnt this work? *)
   Goal valid_taskset_request_bound_function ts (task_max_rbf max_arrivals).
-  Proof. by []. Qed.
+  Proof.
+    apply valid_taskset_arrival_curve_to_max_rbf.
+    by [].
+  Qed.
 
   (** ... and the arrival sequence is legal under the RBF model. *)
   Goal taskset_respects_max_request_bound arr_seq ts.
