@@ -329,7 +329,8 @@ Section RelationToScheduled.
     by apply not_scheduled_implies_no_service.
   Qed.
 
-  (** Conversely, if a job receives service, then it must be scheduled. *)
+  (** Conversely, if the job's instantaneous received service is
+      positive, then it must be scheduled. *)
   Lemma service_at_implies_scheduled_at :
     forall t,
       service_at sched j t > 0 -> scheduled_at sched j t.
@@ -338,8 +339,8 @@ Section RelationToScheduled.
     by rewrite not_scheduled_implies_no_service// negbT.
   Qed.
 
-  (** Thus, if the cumulative amount of service changes, then it must be
-     scheduled, too. *)
+  (** Thus, if the cumulative amount of service changes, then it must
+      be scheduled, too. *)
   Lemma service_delta_implies_scheduled :
     forall t,
       service sched j t < service sched j t.+1 -> scheduled_at sched j t.
