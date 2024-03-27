@@ -217,6 +217,62 @@ Section ProofWorkloadBound.
 
 End ProofWorkloadBound.
 
+(** In this section, we show that total RBF is a bound on
+    higher-or-equal priority workload under any JLFP policy. *)
+Section TotalRBFBound.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** Consider an JLFP policy that indicates a higher-or-equal
+      priority relation ... *)
+  Context `{JLFP_policy Job}.
+
+  (** ... and any valid arrival sequence. *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
+  (** Further, consider a task set [ts]. *)
+  Variable ts : seq Task.
+
+  (** Assume that the job costs are no larger than the task costs ... *)
+  Hypothesis H_valid_job_cost :
+    arrivals_have_valid_job_costs arr_seq.
+
+  (** ... and that all jobs come from the task set. *)
+  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+  (** Let [max_arrivals] be any arrival bound for task set [ts]. *)
+  Context `{MaxArrivals Task}.
+  Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
+
+  (** Consider any time [t] and any interval of length [Δ]. *)
+  Variable t : instant.
+  Variable Δ : duration.
+
+  (** Next, we consider any job [j]. *)
+  Variable j : Job.
+
+  (** A simple consequence of lemma [hep_workload_le_total_hep_rbf] is
+      that the workload of higher-or-equal priority jobs is bounded by
+      the total request-bound function. *)
+  Corollary hep_workload_le_total_rbf :
+    workload_of_hep_jobs arr_seq j t (t + Δ)
+    <= total_request_bound_function ts Δ.
+  Proof.
+    rewrite /workload_of_hep_jobs (leqRW (workload_of_jobs_weaken _ predT _ _ )); last by done.
+    by apply total_workload_le_total_rbf.
+  Qed.
+
+End TotalRBFBound.
+
 (** ** RBF Properties *)
 (** In this section, we prove simple properties and identities of RBFs. *)
 Section RequestBoundFunctions.
