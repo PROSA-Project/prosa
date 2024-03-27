@@ -357,7 +357,7 @@ Section JLFPInstantiation.
       (** We consider an arbitrary time interval <<[t1, t)>> that
           starts with a quiet time. *)
       Variable t1 t : instant.
-      Hypothesis H_quiet_time : busy_interval.quiet_time arr_seq sched j t1.
+      Hypothesis H_quiet_time : classical.quiet_time arr_seq sched j t1.
 
       (** As follows from lemma [cumulative_pred_served_eq_service],
           the (abstract) instantiated function of interference is
@@ -389,15 +389,15 @@ Section JLFPInstantiation.
           time in the _classical_ sense as [quiet_time_cl], and the
           notion of quiet time in the _abstract_ sense as
           [quiet_time_ab]. *)
-      Let quiet_time_cl := busy_interval.quiet_time arr_seq sched.
+      Let quiet_time_cl := classical.quiet_time arr_seq sched.
       Let quiet_time_ab := definitions.quiet_time sched.
 
       (** Same for the two notions of a busy interval prefix ... *)
-      Let busy_interval_prefix_cl := busy_interval.busy_interval_prefix arr_seq sched.
+      Let busy_interval_prefix_cl := classical.busy_interval_prefix arr_seq sched.
       Let busy_interval_prefix_ab := definitions.busy_interval_prefix sched.
 
       (** ... and the two notions of a busy interval. *)
-      Let busy_interval_cl := busy_interval.busy_interval arr_seq sched.
+      Let busy_interval_cl := classical.busy_interval arr_seq sched.
       Let busy_interval_ab := definitions.busy_interval sched.
 
       (** Consider any job j of [tsk]. *)

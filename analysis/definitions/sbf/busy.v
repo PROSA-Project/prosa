@@ -1,6 +1,6 @@
 Require Export prosa.util.all.
 Require Export prosa.analysis.definitions.sbf.pred.
-Require Export prosa.analysis.definitions.busy_interval.
+Require Export prosa.analysis.definitions.busy_interval.classical.
 
 (** * SBF within Busy Interval *)
 

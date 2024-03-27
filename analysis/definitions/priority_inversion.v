@@ -1,4 +1,4 @@
-Require Export prosa.analysis.definitions.busy_interval.
+Require Export prosa.analysis.definitions.busy_interval.classical.
 Require Export prosa.analysis.facts.model.scheduled.
 
 (** * Priority Inversion *)

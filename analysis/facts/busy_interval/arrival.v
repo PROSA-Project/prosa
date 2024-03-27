@@ -1,4 +1,4 @@
-Require Export prosa.analysis.definitions.busy_interval.
+Require Export prosa.analysis.definitions.busy_interval.classical.
 
 (** In this module we collect some basic facts about arrival times in busy
     windows. These are primarily useful for proof automation. *)

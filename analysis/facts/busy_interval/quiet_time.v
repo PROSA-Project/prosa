@@ -1,4 +1,4 @@
-Require Export prosa.analysis.definitions.busy_interval.
+Require Export prosa.analysis.definitions.busy_interval.classical.
 Require Export prosa.analysis.definitions.carry_in.
 
 (** In this module we collect some basic facts about quiet times. *)

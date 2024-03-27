@@ -1,5 +1,5 @@
 Require Export prosa.model.aggregate.workload.
-Require Export prosa.analysis.definitions.busy_interval.
+Require Export prosa.analysis.definitions.busy_interval.classical.
 
 (** * Workload Bound in an Interval Starting with Quiet Time *)
 (** In this section, we define the notion of a bound on the total
