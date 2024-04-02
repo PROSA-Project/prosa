@@ -255,6 +255,80 @@ Section ServiceInversionIsBounded.
   (**  Next, we assume that the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
+  (** In the following section, we prove that cumulative service
+      inversion in a busy-interval prefix is necessarily caused by one
+      lower-priority job. *)
+  Section CumulativeServiceInversionFromOneJob.
+
+    (** Consider any job [j] with a positive job cost. *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
+
+    (** Let <[t1, t2)>> be a busy-interval prefix. *)
+    Variable t1 t2 : instant.
+    Hypothesis H_busy_prefix : busy_interval_prefix arr_seq sched j t1 t2.
+
+    (** Consider a time instant [t : t <= t2] such that ... *)
+    Variable t : instant.
+    Hypothesis H_t_le_t2 : t <= t2.
+
+    (** ... the cumulative service inversion is positive in <<[t1, t)>>. *)
+    Hypothesis H_service_inversion_positive : 0 < cumulative_service_inversion arr_seq sched j t1 t.
+
+    (** First, note that there is a lower-priority job that receives
+        service at some time during the time interval <<[t1, t)>>. *)
+    Local Lemma lower_priority_job_receives_service :
+      exists (jlp : Job) (to : instant),
+        t1 <= to < t
+        /\ ~~ hep_job jlp j
+        /\ receives_service_at sched jlp to.
+    Proof.
+      move: H_service_inversion_positive; rewrite sum_nat_gt0 filter_predT => /hasP [t' IN POS].
+      rewrite mem_index_iota in IN; rewrite lt0b in POS.
+      move: POS => /andP [NIN /hasP [jlp INlp LP]].
+      exists jlp, t'.
+      by rewrite IN LP.
+    Qed.
+
+    (** Then we prove that the service inversion incurred by job [j]
+        can only be caused by _one_ lower priority job. *)
+    Lemma cumulative_service_inversion_from_one_job :
+      exists (jlp : Job),
+        job_arrival jlp < t1
+        /\ ~~ hep_job jlp j
+        /\ cumulative_service_inversion arr_seq sched j t1 t = service_during sched jlp t1 t.
+    Proof.
+      have [jlp [to [NEQ [LP SERV]]]] := lower_priority_job_receives_service.
+      exists jlp; split; last split => //.
+      - apply: low_priority_job_arrives_before_busy_interval_prefix => //=.
+        + by instantiate (1 := to); lia.
+        + by apply service_at_implies_scheduled_at.
+      - apply: eq_sum_seq => t'; rewrite mem_index_iota => NEQt' _.
+        have [ZERO | POS] := unit_supply_proc_service_case H_unit_supply_proc_model sched jlp t'.
+        + rewrite ZERO eqb0; apply/negP => /andP [_ /hasP [joo SERVoo LPoo]].
+          have EQ : jlp = joo.
+          { apply: only_one_pi_job => //=.
+            * by instantiate (1 := to); lia.
+            * by apply service_at_implies_scheduled_at.
+            * by instantiate (1 := t'); lia.
+            * apply: service_at_implies_scheduled_at.
+              by apply: served_at_and_receives_service_consistent.
+          }
+          subst joo.
+          apply served_at_and_receives_service_consistent in SERVoo.
+          by move: SERVoo; rewrite /receives_service_at ZERO.
+        + rewrite POS eqb1; apply/andP; split.
+          * apply/negP => IN; apply served_at_and_receives_service_consistent in IN.
+            have EQ: j = jlp by apply: only_one_job_receives_service_at_uni => //; rewrite /receives_service_at.
+            by subst jlp; move: LP => /negP LP; apply: LP; apply H_priority_is_reflexive. 
+          * apply/hasP; exists jlp; last by apply: LP.
+            apply receives_service_and_served_at_consistent => //.
+            by rewrite /receives_service_at POS.
+    Qed.
+
+  End CumulativeServiceInversionFromOneJob.
+
   (** In this section, we prove that, given a job [j] with a busy
       interval prefix <<[t1, t2)>> and a lower-priority job [jlp], the
       service of [jlp] within the busy interval prefix is bounded by
