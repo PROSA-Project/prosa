@@ -17,17 +17,18 @@ Section Lemmas.
       intermediate value theorem for continuous functions. *)
   Section ExistsIntermediateValue.
 
-    (** Consider any interval [x1, x2]. *)
+    (** Consider any interval <<[x1, x2]>>. *)
     Variable x1 x2 : nat.
     Hypothesis H_is_interval : x1 <= x2.
 
-    (** Let [t] be any value such that [f x1 <= y < f x2]. *)
+    (** Let [y] be any value such that [f x1 <= y < f x2]. *)
     Variable y : nat.
     Hypothesis H_between : f x1 <= y < f x2.
 
     (** Then, we prove that there exists an intermediate point [x_mid] such that [f x_mid = y]. *)
     Lemma exists_intermediate_point :
-      exists x_mid, x1 <= x_mid < x2 /\ f x_mid = y.
+      exists x_mid,
+        x1 <= x_mid < x2 /\ f x_mid = y.
     Proof.
       rename H_is_interval into INT, H_unit_growth_function into UNIT, H_between into BETWEEN.
       move: x2 INT BETWEEN; clear x2.
@@ -36,7 +37,6 @@ Section Lemmas.
           f x1 <= y < f (x1 + delta) ->
           exists x_mid, x1 <= x_mid < x1 + delta /\ f x_mid = y.
       { move => x2 LE /andP [GEy LTy].
-        (* apply DELTA. *) 
         specialize (DELTA (x2 - x1)); feed DELTA.
         { by apply/andP; split; last by rewrite addnBA // addKn. }
         by rewrite subnKC in DELTA.
@@ -63,11 +63,44 @@ Section Lemmas.
           exists x_mid; split; last by done.
           apply/andP; split; first by done.
           by apply: (leq_trans LT0); rewrite addnS.
-        }  
+        }
       }
     Qed.
 
   End ExistsIntermediateValue.
+
+  (** Next, we prove the same lemma with slightly different boundary conditions. *)
+  Section ExistsIntermediateValueLEQ.
+
+    (** Consider any interval <<[x1, x2]>>. *)
+    Variable x1 x2 : nat.
+    Hypothesis H_is_interval : x1 <= x2.
+
+    (** Let [y] be any value such that [f x1 <= y <= f x2]. Note that
+        [y] is allowed to be equal to [f x2]. *)
+    Variable y : nat.
+    Hypothesis H_between : f x1 <= y <= f x2.
+
+    (** Then, we prove that there exists an intermediate point [x_mid] such that [f x_mid = y]. *)
+    Corollary exists_intermediate_point_leq :
+      exists x_mid,
+        x1 <= x_mid <= x2 /\ f x_mid = y.
+    Proof.
+      move: (H_between) => /andP [H1 H2].
+      move: H2; rewrite leq_eqVlt => /orP [/eqP EQ | LT].
+      { exists x2; split.
+        - by apply /andP; split => //.
+        - by done.
+      }
+      { edestruct exists_intermediate_point with (x1 := x1) (x2 := x2) as [mid [NEQ EQ]] => //.
+        { by apply/andP; split; [ apply H1 | apply LT]. }
+        exists mid; split; last by done.
+        move: NEQ => /andP [NEQ1 NEQ2].
+        by apply/andP; split => //.
+      }
+    Qed.
+
+  End ExistsIntermediateValueLEQ.
 
   (** In this section, we, again, prove an analogue of the
       intermediate value theorem, but for predicates over natural
