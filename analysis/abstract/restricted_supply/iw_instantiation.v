@@ -189,6 +189,27 @@ Section JLFPInstantiation.
       }
     Qed.
 
+    (** We also show that the cumulative intra-supply interference can
+        be split into the sum of the cumulative service inversion and
+        cumulative interference incurred by the job due to other
+        higher-or-equal priority jobs. *)
+    Lemma cumulative_intra_interference_split :
+      forall j t1 t2,
+        cumul_cond_interference (fun (_j : Job) (t : instant) => has_supply sched t) j t1 t2
+        <= cumulative_service_inversion arr_seq sched j t1 t2
+          + cumulative_another_hep_job_interference arr_seq sched j t1 t2.
+    Proof.
+      move=> j t1 t2.
+      rewrite /cumul_cond_interference -big_split //= big_seq_cond [leqRHS]big_seq_cond.
+      apply leq_sum; move => t /andP [IN _].
+      rewrite /cond_interference /nonself /interference /rs_jlfp_interference.
+      have [SUP|NOSUP] := boolP (has_supply sched t); last first.
+      { by move: (NOSUP); rewrite /is_blackout => -> //=; rewrite andbT andbF //. }
+      { move: (SUP); rewrite /is_blackout => ->; rewrite andTb //=.
+        have L : forall (a b : bool), a || b <= a + b by clear => [] [] [].
+        by apply L. }
+    Qed.
+
     (** In this section, we prove that the (abstract) cumulative
         interfering workload due to other higher-or-equal priority
         jobs is equal to the conventional workload (from other
