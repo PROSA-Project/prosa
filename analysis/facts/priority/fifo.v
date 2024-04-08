@@ -8,6 +8,7 @@ Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.busy_interval.all.
 Require Export prosa.analysis.facts.preemption.job.nonpreemptive.
 Require Export prosa.analysis.facts.priority.inversion.
+Require Export prosa.analysis.facts.busy_interval.service_inversion.
 
 (** We first make some trivial observations about the FIFO priority policy to
     avoid having to re-reason these steps repeatedly in the subsequent
@@ -163,6 +164,15 @@ Section BasicLemmas.
         apply: (scheduled_implies_higher_priority_completed j') => //.
         move: NHEP; rewrite !not_hep_job_arrival_FIFO.
         by apply: leq_trans. }
+    Qed.
+
+    (** As a corollary, FIFO implies the absence of service inversion. *)
+    Corollary FIFO_implies_no_service_inversion :
+      service_inversion_is_bounded_by arr_seq sched tsk (constant 0).
+    Proof.
+      move=> j ARR TSK POS t1 t2 PREF.
+      rewrite (leqRW (cumul_service_inv_le_cumul_priority_inv _ _ _ _ _ _ _ _ _ _)) //=.
+      by apply FIFO_implies_no_pi.
     Qed.
 
   End PriorityInversionBounded.
