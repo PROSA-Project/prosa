@@ -122,10 +122,10 @@ Section SumsOverSequences.
         sums will be identical. *)
     Lemma eq_sum_seq:
       (forall i, i \in r -> P i -> E1 i == E2 i) ->
-      \sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i.
+      \sum_(i <- r | P i) E1 i = \sum_(i <- r | P i) E2 i.
     Proof.
-      move=> eqE; apply/eqP; rewrite -big_filter -[RHS]big_filter.
-      apply: eq_big_seq => x; rewrite mem_filter => /andP[Px xr]; exact/eqP/eqE.
+      move=> eqE; rewrite -big_filter -[RHS]big_filter.
+      by apply: eq_big_seq => x; rewrite mem_filter => /andP[Px xr]; exact/eqP.
     Qed.
 
     (** Assume that [P1] implies [P2] in all the points contained in
@@ -226,7 +226,7 @@ Section SumsOverSequences.
       = all (fun x => E1 x == E2 x) [seq x <- r | P x].
   Proof.
     move=> le; rewrite all_filter; case aE: all;
-      first by apply: eq_sum_seq => i ir Pi; move: aE => /allP/(_ i ir)/implyP; exact.
+      first by apply/eqP/eq_sum_seq => i ir Pi; move: aE => /allP/(_ i ir)/implyP; exact.
     have [j /andP[jr Pj] ltj] : exists2 j, (j \in r) && P j & E1 j < E2 j.
     { have /negbT := aE; rewrite -has_predC => /hasP[j jr /=].
       rewrite negb_imply => /andP[Pj neq].
