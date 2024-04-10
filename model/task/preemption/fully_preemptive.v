@@ -32,7 +32,7 @@ Section TaskRTCThresholdFullyPreemptiveModel.
   (** In the fully preemptive model, any job can be preempted at any
       time. Thus, the only safe run-to-completion threshold for a task
       is its WCET. *)
-  Definition fully_preemptive_rtc_threshold : TaskRunToCompletionThreshold Task :=
-    fun tsk : Task => task_cost tsk.
+  #[local] Instance fully_preemptive_rtc_threshold : TaskRunToCompletionThreshold Task :=
+    task_cost.
 
 End TaskRTCThresholdFullyPreemptiveModel.

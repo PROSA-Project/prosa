@@ -31,7 +31,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
       completion. In other words, once a job starts running, it is guaranteed
       to finish. Thus, we can set the task-level run-to-completion threshold
       to ε. *)
-  Definition fully_nonpreemptive_rtc_threshold : TaskRunToCompletionThreshold Task :=
-    fun tsk : Task => ε.
+  #[local] Instance fully_nonpreemptive_rtc_threshold : TaskRunToCompletionThreshold Task :=
+    constant ε.
 
 End TaskRTCThresholdFullyNonPreemptive.

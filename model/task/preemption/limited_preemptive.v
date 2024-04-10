@@ -106,7 +106,7 @@ Section TaskRTCThresholdLimitedPreemptions.
       reaches its last non-preemptive segment. Thus, we can set the task-level
       run-to-completion threshold to [task_cost tsk - (task_last_nonpr_seg tsk - ε)],
       which safely bounds [job_cost j - (job_last_nonpr_seg j - ε)]. *)
-  Definition limited_preemptions_rtc_threshold : TaskRunToCompletionThreshold Task :=
+  #[local] Instance limited_preemptions_rtc_threshold : TaskRunToCompletionThreshold Task :=
     fun tsk : Task => task_cost tsk - (task_last_nonpr_segment tsk - ε).
 
 End TaskRTCThresholdLimitedPreemptions.
