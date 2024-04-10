@@ -91,15 +91,14 @@ Section ArrivalCurvePrefixSortedLeq.
       value_at ac_prefix t < value_at ac_prefix (t + ε) ->
       exists v, (t + ε, v) \in steps_of ac_prefix.
   Proof.
-    move=> t LT.
+    move=> t LT /=.
     unfold value_at, step_at in LT.
     destruct ac_prefix as [h2 steps]; simpl in LT.
-    rewrite [in X in _ < X](sorted_split _ _ fst t) in LT.
+    rewrite [in X in _ < X](sorted_split _ _ fst t) /= in LT.
     { rewrite [in X in _ ++ X](eq_filter (a2 := fun x => fst x == t + ε)) in LT; last first.
       { by move=> [a b] /=; lia. }
-      { destruct ([seq x <- steps | fst x == t + ε]) as [|p l] eqn:LST.
-        { rewrite LST in LT.
-          rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT; last first.
+      { destruct ([seq x <- steps | fst x == t + ε]) as [|p l] eqn:LST => //=.
+        { rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT; last first.
           { clear; intros [a b]; simpl.
             destruct (leqP a t).
             - by rewrite Bool.andb_true_r; apply/eqP; lia.
@@ -107,10 +106,10 @@ Section ArrivalCurvePrefixSortedLeq.
           }
           { by rewrite cats0 ltnn in LT. }
         }
-        { destruct p as [t__c v__c]; exists v__c.
-          rewrite /steps_of //=; symmetry in LST.
-          apply mem_head_impl in LST.
-          by move: LST; rewrite mem_filter //= => /andP [/eqP -> IN].
+        { have: p \in [seq x <- steps | x.1 == t + 1]
+            by rewrite LST; apply: mem_head.
+          move=> {LT} {LST}; move: p => //= [t_c v_c].
+          by rewrite mem_filter => //= /andP [/eqP ->].
         }
       }
     }

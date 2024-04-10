@@ -292,18 +292,6 @@ End RemList.
 (** Additional lemmas about sequences. *)
 Section AdditionalLemmas.
 
-  (** First, we prove that [x::xs = ys] is a sufficient condition for
-      [x] to be in [ys]. *)
-  Lemma mem_head_impl :
-    forall {X : eqType} (x : X) (xs ys : seq X),
-      x::xs = ys ->
-      x \in ys.
-  Proof.
-    intros X x xs [ |y ys] EQ; first by done.
-    move: EQ => /eqP; rewrite eqseq_cons => /andP [/eqP EQ _].
-    by subst y; rewrite in_cons; apply/orP; left.
-  Qed.
-
   (** We show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
   Lemma nth0_cons :
     forall x xs n,
