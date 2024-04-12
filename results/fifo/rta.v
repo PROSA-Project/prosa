@@ -1,5 +1,6 @@
 Require Import prosa.model.readiness.basic.
 Require Import prosa.analysis.facts.priority.fifo.
+Require Export prosa.analysis.facts.priority.fifo_ahep_bound.
 Require Export prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Export prosa.analysis.abstract.ideal.abstract_rta.
 Require Export prosa.analysis.facts.model.task_cost.
@@ -274,70 +275,11 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   (** *** Higher- and Equal-Priority Interference *)
 
-  (** Next, we establish a bound on the interference produced by higher- and
-      equal-priority jobs. *)
-  Section BoundOnHEPWorkload.
-
-    (** Consider again a job [j] of the task under analysis [tsk] with a positive cost. *)
-    Variable j : Job.
-    Hypothesis H_job_of_task : job_of_task tsk j.
-    Hypothesis H_j_in_arrivals : arrives_in arr_seq j.
-    Hypothesis H_job_cost_positive : job_cost_positive j.
-
-    (** Consider the (abstract) busy window of [j] and denote it as  <<[t1, t2)>>. *)
-    Variable t1 t2 : instant.
-    Hypothesis H_busy_window :
-      definitions.busy_interval sched j t1 t2.
-
-    (** Consider any arbitrary sub-interval <<[t1, Δ)>> within the busy window
-        of [j]. *)
-    Variable Δ : instant.
-    Hypothesis H_in_busy : t1 + Δ < t2.
-
-    (** The cumulative interference from higher- and equal-priority jobs during
-        <<[t1, Δ)>> is bounded as follows. *)
-    Lemma bound_on_hep_workload :
-      cumulative_another_hep_job_interference arr_seq sched j t1 (t1 + Δ) <=
-        \sum_(tsko <- ts) task_request_bound_function tsko (job_arrival j - t1 + ε) - task_cost tsk.
-    Proof.
-      rewrite (cumulative_i_ohep_eq_service_of_ohep arr_seq) => //;
-        last by eauto 6 with basic_rt_facts.
-      eapply leq_trans; first exact: service_of_jobs_le_workload.
-      rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)) => //.
-      rewrite (workload_minus_job_cost j)//;
-        last by apply job_in_arrivals_between => //; last by rewrite addn1.
-      rewrite /workload_of_jobs /IBF (big_rem tsk) //=
-        (addnC (task_request_bound_function tsk (job_arrival j - t1 + ε))).
-      rewrite -addnBA; last first.
-      - apply leq_trans with (task_request_bound_function tsk ε).
-        { by apply: task_rbf_1_ge_task_cost; exact: non_pathological_max_arrivals. }
-        { by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia]. }
-      - eapply leq_trans;
-          last by (
-            erewrite leq_add2l;
-            eapply task_rbf_without_job_under_analysis with (t1 := t1) =>//;
-            lia).
-        rewrite addnBA.
-        + rewrite leq_sub2r //; eapply leq_trans.
-          * apply sum_over_partitions_le => j' inJOBS => _.
-            by apply H_all_jobs_from_taskset, (in_arrivals_implies_arrived _ _ _ _ inJOBS).
-          * rewrite (big_rem tsk) //= addnC leq_add //;
-              last by rewrite addnBAC //= subnKC // addn1; apply leqW.
-            rewrite big_seq_cond [in X in _ <= X]big_seq_cond big_mkcond [in X in _ <= X]big_mkcond //=.
-            apply leq_sum => tsk' _; rewrite andbC //=.
-            destruct (tsk' \in rem (T:=Task) tsk ts) eqn:IN; last by [].
-            apply rem_in in IN.
-            eapply leq_trans;
-              last by apply (task_workload_le_task_rbf _ _ _ IN H_valid_job_cost H_is_arrival_curve t1).
-            by rewrite addnBAC //= subnKC //= addn1; apply leqW.
-        + move : H_job_of_task => TSKj.
-          rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=;
-            first by rewrite TSKj; apply leq_addr.
-          apply job_in_arrivals_between => //.
-          by lia.
-    Qed.
-
-  End BoundOnHEPWorkload.
+  (** We establish a bound on the interference produced by higher- and
+      equal-priority jobs in a separate file. To see the result,
+      simply click on the link bellow. *)
+  Let bound_on_hep_workload :=
+    @analysis.facts.priority.fifo_ahep_bound.bound_on_hep_workload.
 
   (** *** Correctness of [IBF]  *)
 
@@ -361,7 +303,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
     have JPOS: job_cost_positive j by rewrite -ltnNge in NCOMPL; unfold job_cost_positive; lia.
     rewrite (no_priority_inversion j ARRj _ JPOS _ t2) //= add0n.
     have ->: A = job_arrival j - t1 by erewrite Pred with (t1 := t1); [lia | apply BUSY].
-    exact: bound_on_hep_workload.
+    apply: bound_on_hep_workload; (try apply IN_BUSY) => //.
+    by apply instantiated_busy_interval_equivalent_busy_interval.
   Qed.
 
   (** The preceding lemma [IBF_correct] corresponds to Lemma 3 in the paper. To

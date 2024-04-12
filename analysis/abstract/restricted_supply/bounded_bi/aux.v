@@ -156,7 +156,10 @@ Section BoundedBusyIntervalsAux.
       }
     }
     rewrite cumulative_interfering_workload_split // cumulative_interference_split //.
-    rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //; last by apply PREF.
+    rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //;
+            [
+            | exact: unit_supply_is_unit_service
+            | by apply PREF ].
     rewrite -[leqRHS]addnC -[leqRHS]addnA [(_ + workload_of_job _ _ _ _ )]addnC.
     rewrite workload_job_and_ahep_eq_workload_hep //.
     rewrite -addnC -addnA [(_ + service_during _ _ _ _ )]addnC.

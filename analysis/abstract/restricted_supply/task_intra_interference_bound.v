@@ -110,6 +110,7 @@ Section TaskIntraInterferenceIsBounded.
       by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + Δ)) //= leq_addr. }
     { erewrite cumulative_i_thep_eq_service_of_othep; eauto 2 => //; last first.
       { by apply instantiated_quiet_time_equivalent_quiet_time => //; apply BUSY. }
+      { exact: unit_supply_is_unit_service. }
       apply: leq_trans.
       { by apply service_of_jobs_le_workload => //; apply unit_supply_is_unit_service. }
       { apply H_workload_is_bounded => //; apply: abstract_busy_interval_classic_quiet_time => //. }

@@ -344,42 +344,6 @@ Section JLFPInstantiation.
 
     End InstantiatedWorkloadEquivalence.
 
-    (** In this section, we prove that the (abstract) cumulative
-        interference of jobs with higher or equal priority is equal to
-        total service of jobs with higher or equal priority. *)
-    Section InstantiatedServiceEquivalences.
-
-      (** Consider any job [j] of [tsk]. *)
-      Variable j : Job.
-      Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_of_tsk : job_of_task tsk j.
-
-      (** We consider an arbitrary time interval <<[t1, t)>> that
-          starts with a quiet time. *)
-      Variable t1 t : instant.
-      Hypothesis H_quiet_time : classical.quiet_time arr_seq sched j t1.
-
-      (** As follows from lemma [cumulative_pred_served_eq_service],
-          the (abstract) instantiated function of interference is
-          equal to the total service of any subset of jobs with higher
-          or equal priority. *)
-
-      (** The above is in particular true for the jobs other
-          than [j] with higher or equal priority... *)
-      Lemma  cumulative_i_ohep_eq_service_of_ohep :
-        cumulative_another_hep_job_interference arr_seq sched j t1 t
-        = service_of_other_hep_jobs arr_seq sched j t1 t.
-      Proof. by apply: cumulative_pred_served_eq_service => // => ? /andP[]. Qed.
-
-      (** ...and for jobs from other tasks than [j] with higher
-          or equal priority. *)
-      Lemma cumulative_i_thep_eq_service_of_othep :
-        cumulative_another_task_hep_job_interference arr_seq sched j t1 t
-        = service_of_other_task_hep_jobs arr_seq sched j t1 t.
-      Proof. by apply: cumulative_pred_served_eq_service => // => ? /andP[]. Qed.
-
-    End InstantiatedServiceEquivalences.
-
     (** In this section we prove that the abstract definition of busy
         interval is equivalent to the conventional, concrete
         definition of busy interval for JLFP scheduling. *)
@@ -390,15 +354,15 @@ Section JLFPInstantiation.
           notion of quiet time in the _abstract_ sense as
           [quiet_time_ab]. *)
       Let quiet_time_cl := classical.quiet_time arr_seq sched.
-      Let quiet_time_ab := definitions.quiet_time sched.
+      Let quiet_time_ab := abstract.definitions.quiet_time sched.
 
       (** Same for the two notions of a busy interval prefix ... *)
       Let busy_interval_prefix_cl := classical.busy_interval_prefix arr_seq sched.
-      Let busy_interval_prefix_ab := definitions.busy_interval_prefix sched.
+      Let busy_interval_prefix_ab := abstract.definitions.busy_interval_prefix sched.
 
       (** ... and the two notions of a busy interval. *)
       Let busy_interval_cl := classical.busy_interval arr_seq sched.
-      Let busy_interval_ab := definitions.busy_interval sched.
+      Let busy_interval_ab := abstract.definitions.busy_interval sched.
 
       (** Consider any job j of [tsk]. *)
       Variable j : Job.
@@ -445,8 +409,7 @@ Section JLFPInstantiation.
         erewrite service_of_jobs_case_on_pred with (P2 := fun j' => j' != j).
         erewrite workload_of_jobs_case_on_pred with (P' := fun j' => j' != j) => //.
         replace ((fun j0 : Job => hep_job j0 j && (j0 != j))) with (another_hep_job^~j); last by rewrite /another_hep_job.
-        rewrite -/(service_of_other_hep_jobs arr_seq _ j 0 t) -cumulative_i_ohep_eq_service_of_ohep; eauto;
-          last by move => ? _ _ ; unfold arrived_before; lia.
+        rewrite -/(service_of_other_hep_jobs arr_seq _ j 0 t) -cumulative_i_ohep_eq_service_of_ohep => //.
         rewrite -/(workload_of_other_hep_jobs _ j 0 t) -cumulative_iw_hep_eq_workload_of_ohep; eauto.
         move: T1; rewrite negb_and => /orP [NA | /negPn COMP].
         { have PRED__eq: {in arrivals_between arr_seq 0 t, (fun j__copy : Job => hep_job j__copy j && ~~ (j__copy != j)) =1 pred0}.

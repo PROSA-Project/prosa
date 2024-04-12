@@ -1,5 +1,6 @@
 Require Export prosa.analysis.abstract.iw_auxiliary.
 Require Export prosa.analysis.facts.model.workload.
+Require Export prosa.analysis.abstract.definitions.
 
 (** * Lemmas About Abstract Busy Intervals *)
 

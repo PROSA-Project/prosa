@@ -2,6 +2,9 @@ Require Export prosa.analysis.definitions.interference.
 Require Export prosa.analysis.definitions.task_schedule.
 Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.abstract.restricted_supply.busy_prefix.
+Require Export prosa.model.aggregate.service_of_jobs.
+Require Export prosa.analysis.facts.model.service_of_jobs.
+
 
 (** * Auxiliary Lemmas About Interference and Interfering Workload. *)
 
@@ -415,6 +418,53 @@ Section InterferenceAndInterferingWorkloadAuxiliary.
       End LowerPriority.
 
     End SupplyAndScheduledJob.
+
+    (** In this section, we prove that the (abstract) cumulative
+        interference of jobs with higher or equal priority is equal to
+        total service of jobs with higher or equal priority. *)
+    Section InstantiatedServiceEquivalences.
+
+      (** First, let us assume that the introduced processor model is
+          unit-service. *)
+      Hypothesis H_unit_service : unit_service_proc_model PState.
+
+      (** Consider any job [j] of [tsk]. *)
+      Variable j : Job.
+      Hypothesis H_j_arrives : arrives_in arr_seq j.
+      Hypothesis H_job_of_tsk : job_of_task tsk j.
+
+      (** We consider an arbitrary time interval <<[t1, t)>> that
+          starts with a (classic) quiet time. *)
+      Variable t1 t : instant.
+      Hypothesis H_quiet_time : classical.quiet_time arr_seq sched j t1.
+
+      (** As follows from lemma [cumulative_pred_served_eq_service],
+          the (abstract) instantiated function of interference is
+          equal to the total service of any subset of jobs with higher
+          or equal priority. *)
+
+      (** The above is in particular true for the jobs other
+          than [j] with higher or equal priority... *)
+      Lemma  cumulative_i_ohep_eq_service_of_ohep :
+        cumulative_another_hep_job_interference arr_seq sched j t1 t
+        = service_of_other_hep_jobs arr_seq sched j t1 t.
+      Proof.
+        apply: cumulative_pred_served_eq_service => //.
+        - by move => ? /andP[].
+      Qed.
+
+      (** ...and for jobs from other tasks than [j] with higher
+          or equal priority. *)
+      Lemma cumulative_i_thep_eq_service_of_othep :
+        cumulative_another_task_hep_job_interference arr_seq sched j t1 t
+        = service_of_other_task_hep_jobs arr_seq sched j t1 t.
+      Proof.
+        apply: cumulative_pred_served_eq_service => //.
+        by move => ? /andP[].
+      Qed.
+
+    End InstantiatedServiceEquivalences.
+
 
   End Equivalences.
 
