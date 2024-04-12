@@ -102,8 +102,7 @@ Section BoundedBusyIntervalsAux.
     move_neq_up LE.
     have EQ: workload_of_hep_jobs arr_seq j t1 t = service_of_hep_jobs arr_seq sched j t1 t.
     { apply/eqP; rewrite eqn_leq; apply/andP; split => //.
-      apply service_of_jobs_le_workload => //.
-      by apply unit_supply_is_unit_service.
+      by apply service_of_jobs_le_workload => //.
     }
     clear LE; move: PREF => [LT [QT1 [NQT QT2]]].
     specialize (NQT t ltac:(lia)); apply: NQT => s ARR HEP BF.
@@ -122,13 +121,12 @@ Section BoundedBusyIntervalsAux.
         { by apply: in_arrivals_implies_arrived_before. }
       }
       rewrite addn0; apply/eqP.
-      apply all_jobs_have_completed_impl_workload_eq_service => //; first by apply unit_supply_is_unit_service.
+      apply all_jobs_have_completed_impl_workload_eq_service => //.
       move => h ARRh HEPh; apply: QT1 => //.
       - by apply: in_arrivals_implies_arrived.
       - by apply: in_arrivals_implies_arrived_before.
     }
-    apply: workload_eq_service_impl_all_jobs_have_completed => //.
-    by apply unit_supply_is_unit_service.
+    by apply: workload_eq_service_impl_all_jobs_have_completed => //.
   Qed.
 
   (** Consider a subinterval <<[t1, t1 + Δ)>> of the interval <<[t1,
@@ -156,10 +154,7 @@ Section BoundedBusyIntervalsAux.
       }
     }
     rewrite cumulative_interfering_workload_split // cumulative_interference_split //.
-    rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //;
-            [
-            | exact: unit_supply_is_unit_service
-            | by apply PREF ].
+    rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //; last by apply PREF.
     rewrite -[leqRHS]addnC -[leqRHS]addnA [(_ + workload_of_job _ _ _ _ )]addnC.
     rewrite workload_job_and_ahep_eq_workload_hep //.
     rewrite -addnC -addnA [(_ + service_during _ _ _ _ )]addnC.

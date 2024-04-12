@@ -288,11 +288,9 @@ Section JLFPInstantiation.
         { rewrite negb_and negbK; apply/orP.
           by case ARR: (arrived_before j t); [right | left]; [apply QT | ]. }
         { erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l.
-          rewrite cumulative_i_ohep_eq_service_of_ohep //=; last first.
-          { exact: unit_supply_is_unit_service. }
+          rewrite cumulative_i_ohep_eq_service_of_ohep //.
           rewrite //= cumulative_iw_hep_eq_workload_of_ohep eq_sym; apply/eqP.
           apply all_jobs_have_completed_equiv_workload_eq_service => //.
-          { by apply unit_supply_is_unit_service. }
           move => j0 IN HEP; apply QT.
           - by apply in_arrivals_implies_arrived in IN.
           - by move: HEP => /andP [HEP HP].
@@ -310,12 +308,10 @@ Section JLFPInstantiation.
         move => t /andP [T0 T1] jhp ARR HP ARB.
         eapply all_jobs_have_completed_equiv_workload_eq_service with
           (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t) => //.
-        { by apply unit_supply_is_unit_service. }
         erewrite service_of_jobs_case_on_pred with (P2 := fun j' => j' != j).
         erewrite workload_of_jobs_case_on_pred with (P' := fun j' => j' != j) => //.
         replace ((fun j0 : Job => hep_job j0 j && (j0 != j))) with (another_hep_job^~j); last by rewrite /another_hep_job.
-        rewrite -/(service_of_other_hep_jobs arr_seq sched j 0 t) -cumulative_i_ohep_eq_service_of_ohep //; last first.
-        { exact: unit_supply_is_unit_service. }
+        rewrite -/(service_of_other_hep_jobs arr_seq sched j 0 t) -cumulative_i_ohep_eq_service_of_ohep //.
         rewrite -/(workload_of_other_hep_jobs arr_seq j 0 t) -cumulative_iw_hep_eq_workload_of_ohep //.
         move: T1; rewrite negb_and => /orP [NA | /negPn COMP].
         { have PRED__eq: {in arrivals_between arr_seq 0 t, (fun j__copy : Job => hep_job j__copy j && ~~ (j__copy != j)) =1 pred0}.
@@ -340,7 +336,6 @@ Section JLFPInstantiation.
           rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
           apply/eqP; eapply all_jobs_have_completed_equiv_workload_eq_service with
             (P := eq_op j) (t1 := 0) (t2 := t) => //.
-          { by apply unit_supply_is_unit_service. }
           { by move => j__copy _ /eqP EQ; subst j__copy. }
         }
       Qed.
@@ -526,7 +521,6 @@ Section JLFPInstantiation.
       move => j t1 t2 ARR /eqP TSK POS BUSY.
       eapply instantiated_busy_interval_equivalent_busy_interval in BUSY => //.
       eapply all_jobs_have_completed_equiv_workload_eq_service => //.
-      { by apply unit_supply_is_unit_service. }
       move => s INs /eqP TSKs.
       move: (INs) => NEQ.
       eapply in_arrivals_implies_arrived_between in NEQ => //.
@@ -544,11 +538,9 @@ Section JLFPInstantiation.
     Proof.
       move=> j t1.
       rewrite cumulative_interference_split cumulative_interfering_workload_split.
-      rewrite leq_add2l cumulative_i_ohep_eq_service_of_ohep //=; last first.
-      { exact: unit_supply_is_unit_service. }
+      rewrite leq_add2l cumulative_i_ohep_eq_service_of_ohep //=.
       rewrite cumulative_iw_hep_eq_workload_of_ohep.
-      apply service_of_jobs_le_workload => //.
-      by apply unit_supply_is_unit_service.
+      by apply service_of_jobs_le_workload => //.
     Qed.
 
   End I_IW_correctness.

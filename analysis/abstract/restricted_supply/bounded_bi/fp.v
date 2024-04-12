@@ -185,7 +185,6 @@ Section BoundedBusyIntervals.
           by apply instantiated_busy_interval_equivalent_busy_interval.
         }
         eapply busy_interval.busy_interval_is_bounded; eauto 2 => //.
-        - by apply unit_supply_is_unit_service.
         - by eapply instantiated_i_and_w_no_speculative_execution; eauto 2 => //.
         - by eapply instantiated_i_and_w_are_coherent_with_schedule; eauto 2 => //.
         - by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix => //.

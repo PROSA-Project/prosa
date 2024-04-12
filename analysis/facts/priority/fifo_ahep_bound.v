@@ -89,10 +89,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
     move: (H_busy_window) => [[_ [_ [_ /andP [ARR1 ARR2]]]] _].
     rewrite (cumulative_i_ohep_eq_service_of_ohep _ arr_seq) => //; last  eauto 6 with basic_rt_facts; last first.
     { by move: (H_busy_window) => [[_ [Q _]] _]. }
-    { exact: unit_supply_is_unit_service. }
-    eapply leq_trans.
-    { apply service_of_jobs_le_workload => //.
-      by apply unit_supply_is_unit_service. }
+    eapply leq_trans; first by apply service_of_jobs_le_workload => //.
     rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)) => //.
     rewrite (workload_minus_job_cost j)//;
             last by apply job_in_arrivals_between => //; last by rewrite addn1.

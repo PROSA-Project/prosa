@@ -173,8 +173,7 @@ Section AbstractRTARestrictedSupplySequential.
       rewrite /intra_IBF addnC leq_add; first by done.
       { rewrite -(leq_add2r (cumul_task_interference arr_seq sched j t1 (t1 + Δ))).
         eapply leq_trans; first last.
-        { rewrite EQ; apply: task.cumulative_job_interference_bound => //.
-          by apply unit_supply_is_unit_service. }
+        { by rewrite EQ; apply: task.cumulative_job_interference_bound => //. }
         { rewrite -big_split //= leq_sum // /cond_interference  => t _.
           by case (interference j t), (has_supply sched t), (nonself arr_seq sched j t) => //. } }
       { rewrite (cumul_cond_interference_pred_eq _ (nonself_intra arr_seq sched)) => //.
