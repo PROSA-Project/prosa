@@ -117,16 +117,12 @@ Section BoundedBusyIntervals.
       analyzed. *)
   Variable blocking_bound : (* A *) duration -> duration.
 
-  (** Assume that the maximum length of a nonpreemptive segment is
-      bounded by the blocking bound, ... *)
-  Hypothesis H_priority_inversion_is_bounded_by_blocking :
-    forall j t1 t2,
-      arrives_in arr_seq j ->
-      job_of_task tsk j ->
-      busy_interval_prefix arr_seq sched j t1 t2 ->
-      max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound (job_arrival j - t1).
+  (** Assume that the service inversion is bounded by the blocking
+      bound, ... *)
+  Hypothesis H_service_inversion_bounded :
+    service_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
 
-  (** ... and that [blocking_bound 0] is maximum. *)
+  (** ... and that [blocking_bound] reaches its maximum at [0]. *)
   Hypothesis H_blocking_bound_max :
     forall A, blocking_bound 0 >= blocking_bound A.
 
@@ -181,8 +177,7 @@ Section BoundedBusyIntervals.
         apply: E; first by lia.
         rewrite subKn; last by apply: sbf_bounded_by_duration => //.
         rewrite -(leqRW H_fixed_point); apply leq_add.
-        - apply: leq_trans; first apply: service_inversion_is_bounded => //.
-          by apply H_blocking_bound_max.
+        - by rewrite (leqRW (H_service_inversion_bounded _ _ _ _ _ _ _)) //=.
         - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
           by apply hep_workload_le_total_rbf.
       Qed.
@@ -248,9 +243,7 @@ Section BoundedBusyIntervals.
           rewrite subKn; last by apply: sbf_bounded_by_duration => //.
           rewrite -(leqRW H_fixed_point); apply leq_add.
           { rewrite (leqRW (service_inversion_widen _ _ _ t1 _ _ (job_arrival j).+1 _ _ )).
-            - apply: leq_trans.
-              + by apply: service_inversion_is_bounded => //.
-              + by apply H_blocking_bound_max.
+            - by rewrite (leqRW (H_service_inversion_bounded _ _ _ _ _ _ _)) //=.
             - by done.
             - by lia.
           }

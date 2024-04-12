@@ -10,6 +10,7 @@ Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.analysis.facts.blocking_bound.edf.
 Require Export prosa.analysis.facts.workload.edf_athep_bound.
 
+
 (** * RTA for Fully Preemptive EDF Scheduling on Restricted-Supply Uniprocessors *)
 
 (** In the following, we derive a response-time analysis for EDF
@@ -182,10 +183,10 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - exact: EDF_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
-    - by eapply busy_intervals_are_bounded_rs_jlfp;
-      try (move => ? ? ? ? ? ?; apply: nonpreemptive_segments_bounded_by_blocking => //);
-      try done;
-      rewrite BLOCK add0n; apply H_fixed_point.
+    - eapply busy_intervals_are_bounded_rs_jlfp; try done.
+      + apply: service_inversion_is_bounded => // => ? ? ? ? ? ?.
+        exact: nonpreemptive_segments_bounded_by_blocking.
+      + by rewrite BLOCK add0n; apply H_fixed_point.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
       by move => ? ? ? ? ?; apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
