@@ -70,6 +70,13 @@ Section ScheduleClass.
     by case:ifP.
   Qed.
 
+  (** The ideal processor model is a unit-supply model. *)
+  Lemma ideal_proc_model_provides_unit_supply :
+    unit_supply_proc_model (processor_state Job).
+  Proof.
+    by move=> s; rewrite /supply_in /index_enum sum_unit1.
+  Qed.
+
   Lemma scheduled_in_def (j : Job) s :
     scheduled_in j s = (s == Some j).
   Proof.
@@ -216,6 +223,7 @@ End ScheduleClass.
 (** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
     will be able to apply them automatically. *)
 Global Hint Resolve ideal_proc_model_is_a_uniprocessor_model
+     ideal_proc_model_provides_unit_supply
      ideal_proc_model_ensures_ideal_progress
      ideal_proc_model_provides_unit_service
      ideal_proc_model_fully_consuming
