@@ -153,7 +153,7 @@ Section PriorityInversionIsBounded.
 
   (** In this section, we prove that priority inversion only
       occurs at the start of the busy window and occurs due to only
-      one job. *) 
+      one job. *)
   Section SingleJob.
 
     (** Suppose job [j] incurs priority inversion at a time [t_pi] in its busy window. *)
@@ -205,6 +205,47 @@ Section PriorityInversionIsBounded.
     Qed.
 
   End SingleJob.
+
+  (** As a simple corollary to the lemmas proved in the previous
+      section, we show that for any two jobs [j1] and [j2] that cause
+      priority inversion to job [j], it is the case that [j1 = j2]. *)
+  Section SingleJobEq.
+
+    (** Consider a time instant [ts1] in <<[t1, t2)>> ... *)
+    Variable ts1 : instant.
+    Hypothesis H_ts1_in_busy_prefix : t1 <= ts1 < t2.
+
+    (** ... and a lower-priority (w.r.t. job [j]) job [j1] that is
+        scheduled at time [ts1]. *)
+    Variable j1 : Job.
+    Hypothesis H_j1_sched : scheduled_at sched j1 ts1.
+    Hypothesis H_j1_lower_prio : ~~ hep_job j1 j.
+
+    (** Similarly, consider a time instant [ts2] in <<[t1, t2)>> ... *)
+    Variable ts2 : instant.
+    Hypothesis H_ts2_in_busy_prefix : t1 <= ts2 < t2.
+
+    (** ... and a lower-priority job [j2] that is scheduled at time [ts2]. *)
+    Variable j2 : Job.
+    Hypothesis H_j2_sched : scheduled_at sched j2 ts2.
+    Hypothesis H_j2_lower_prio : ~~ hep_job j2 j.
+
+    (** Then, [j1] is equal to [j2]. *)
+    Corollary only_one_pi_job :
+      j1 = j2.
+    Proof.
+      have [NEQ|NEQ] := leqP ts1 ts2.
+      { apply: H_uni; first by apply H_j1_sched.
+        apply: pi_job_remains_scheduled; try apply H_j2_sched; try lia.
+        by erewrite priority_inversion_hep_job.
+      }
+      { apply: H_uni; last by apply H_j2_sched.
+        apply: pi_job_remains_scheduled; try apply H_j1_sched; try lia.
+        by erewrite priority_inversion_hep_job; try apply H_j1_sched.
+      }
+    Qed.
+
+  End SingleJobEq.
 
   (** From the above lemmas, it follows that either job [j] incurs no priority
       inversion at all or certainly at time [t1], i.e., the beginning of its
