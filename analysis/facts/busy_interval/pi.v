@@ -17,7 +17,7 @@ Section PriorityInversionIsBounded.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider any arrival sequence with consistent arrivals ... *)
+  (** Consider any valid arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
@@ -41,13 +41,11 @@ Section PriorityInversionIsBounded.
   Context `{!JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
-  (** We assume that the schedule is valid. *)
+  (** We assume that the schedule is valid ... *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-  (** Next, we assume that the schedule is a work-conserving schedule... *)
-  Hypothesis H_work_conserving : work_conserving arr_seq sched.
-
-  (** ... and the schedule respects the scheduling policy at every preemption point. *)
+  (** ... and that the schedule respects the scheduling policy at every
+      preemption point. *)
   Hypothesis H_respects_policy :
     respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
@@ -61,97 +59,168 @@ Section PriorityInversionIsBounded.
   Hypothesis H_busy_interval_prefix :
     busy_interval_prefix arr_seq sched j t1 t2.
 
-  (** * Processor Executes HEP Jobs after Preemption Point *)
-  (** In this section, we prove that at any time instant after any
-      preemption point (inside the busy interval), the processor is
-      always busy scheduling a job with higher or equal priority. *)
-  Section PreemptionTimeAndPriorityInversion.
+  (** ** Lower Priority In Busy Intervals *)
+  (** First, we state some basic properties about a lower priority job executing
+      in the busy interval of the job under consideration. From the definition
+      of the busy interval it follows that a lower priority job can only be
+      executing inside the busy interval as a result of priority inversion. *)
+  Section LowerPriorityJobScheduled.
 
-    (** First, recall from file [busy_interval.hep_at_pt] we already know that
-        the processor at any preemption time is always busy scheduling a job
-        with higher or equal priority. *)
+    (** Consider a lower-priority job. *)
+    Variable jlp : Job.
+    Hypothesis H_jlp_lp : ~~hep_job jlp j.
 
-    (** We show that at any time instant after a preemption point the
-        processor is always busy with a job with higher or equal
-        priority. *)
-    Lemma not_quiet_implies_exists_scheduled_hp_job_after_preemption_point:
-      forall tp t,
-        preemption_time arr_seq sched tp ->
-        t1 <= tp < t2 ->
-        tp <= t < t2 ->
-        exists j_hp,
-          arrived_between j_hp t1 t.+1 /\
-          hep_job j_hp j /\
-          scheduled_at sched j_hp t.
+    (** Consider an instant [t] within the busy window of the job such that
+        [jlp] is scheduled at [t]. *)
+    Variable t : instant.
+    Hypothesis H_t_in_busy : t1 <= t < t2.
+    Hypothesis H_jlp_scheduled_at_t : scheduled_at sched jlp t.
+
+    (** First, we prove that no time from [t1] up to the instant [t] can
+        be a preemption point. *)
+    Lemma lower_priority_job_scheduled_implies_no_preemption_time :
+      forall t',
+        t1 <= t' <= t ->
+        ~~ preemption_time arr_seq sched t'.
     Proof.
-      move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
-      have [Idle|[jhp Sched_jhp]] :=
-        scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) t.
-      { eapply instant_t_is_not_idle in Idle => //.
-        by apply/andP; split; first apply leq_trans with tp. }
-      exists jhp.
-      have HP: hep_job jhp j.
-      { have PP := scheduling_of_any_segment_starts_with_preemption_time _
-                     arr_seq  H_valid_arrivals
-                     sched H_sched_valid H_valid_preemption_model jhp t Sched_jhp.
-        feed PP => //.
-        move: PP => [prt [/andP [_ LE] [PR SCH]]].
-        case E:(t1 <= prt).
-        - move: E => /eqP /eqP E; rewrite subn_eq0 in E.
-          edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point as [jlp [_ [HEP SCHEDjhp]]] => //.
-          { by apply /andP; split; last by apply leq_ltn_trans with t. }
-          enough (EQ : jhp = jlp); first by subst.
-          apply: (H_uni _ _ _ prt); eauto;
-            by apply SCH; apply/andP; split.
-        - move: E => /eqP /neqP E; rewrite -lt0n subn_gt0 in E.
-          apply negbNE; apply/negP; intros LP; rename jhp into jlp.
-          edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
-            as [jhp [_ [HEP SCHEDjhp]]]; try apply PRPOINT; move=> //.
-          * by apply/andP; split.
-          * move: LP => /negP LP; apply: LP.
-            enough (EQ : jhp = jlp); first by subst.
-            apply: (H_uni jhp _ _ tp); eauto.
-            by apply SCH; apply/andP; split; first apply leq_trans with t1; auto. }
-      repeat split=> //.
-      move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET EXj]]]; move: (Sched_jhp) => PENDING.
-      eapply scheduled_implies_pending in PENDING => //.
-      apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
-      apply contraT; rewrite -ltnNge; intro LT; exfalso.
-      feed (QUIET jhp) => //.
-      specialize (QUIET HP LT).
-      move: Sched_jhp; apply/negP/completed_implies_not_scheduled => //.
-      apply: completion_monotonic QUIET.
-      exact: leq_trans LEtp.
+      move => t' /andP[LE1 GT1].
+      apply /negP => PT.
+      move: H_jlp_lp => /negP LP; apply: LP.
+      have [ptst [IN1 [PTT STT]]] : exists ptst : nat,
+          t' <= ptst <= t /\ preemption_time arr_seq sched ptst /\ scheduled_at sched jlp ptst.
+      { by apply: scheduling_of_any_segment_starts_with_preemption_time_continuously_sched => //=. }
+      apply: (scheduled_at_preemption_time_implies_higher_or_equal_priority arr_seq _ sched _ _ _ _ j _ _ t1 t2 _ ptst)  => //.
+      by lia.
     Qed.
 
-    (** Now, suppose there exists some constant [K] that bounds the
-        distance to a preemption time from the beginning of the busy
-        interval. *)
-    Variable K : duration.
-    Hypothesis H_preemption_time_exists :
-      exists pr_t, preemption_time arr_seq sched pr_t /\ t1 <= pr_t <= t1 + K.
+    (** Then it follows that the job must have been continuously scheduled from
+        [t1] up to [t]. *)
+    Lemma lower_priority_job_continuously_scheduled:
+      forall t',
+        t1 <= t' <= t ->
+        scheduled_at sched jlp t'.
+    Proof.
+      move => t' IN.
+      move : IN => /andP [IN1' IN2'].
+      apply: neg_pt_scheduled_continuously_after => //.
+      move => ??.
+      apply lower_priority_job_scheduled_implies_no_preemption_time.
+      by lia.
+    Qed.
 
-    (** Then we prove that the processor is always busy with a job
-        with higher-or-equal priority after time instant [t1 + K]. *)
-    Lemma not_quiet_implies_exists_scheduled_hp_job:
+    (** Any lower-priority jobs that are scheduled inside the
+        busy-interval prefix <<[t1,t2)>> must arrive before that interval. *)
+    Lemma low_priority_job_arrives_before_busy_interval_prefix:
+      job_arrival jlp < t1.
+    Proof.
+      have SCHED1 : scheduled_at sched jlp t1.
+      { apply lower_priority_job_continuously_scheduled => //. lia. }
+      have ARR1: job_arrival jlp <= t1 by apply: (has_arrived_scheduled sched jlp _ t1 SCHED1).
+      rewrite /has_arrived leq_eqVlt in ARR1.
+      move : ARR1 => /orP[/eqP EQ| ?]; last by done.
+      exfalso.
+      have PP := scheduling_of_any_segment_starts_with_preemption_time _
+                   arr_seq H_valid_arrivals
+                   sched H_sched_valid
+                   H_valid_preemption_model jlp t H_jlp_scheduled_at_t.
+      feed PP => //.
+      move: PP => [pt [/andP [NEQ1 NEQ2] [PT FA]]].
+      contradict PT.
+      apply /negP.
+      by apply (lower_priority_job_scheduled_implies_no_preemption_time ) => //=; lia.
+    Qed.
+
+    (** Finally, we show that lower-priority jobs that are scheduled
+        inside the busy-interval prefix <<[t1,t2)>> must also be scheduled
+        before the interval. *)
+    Lemma low_priority_job_scheduled_before_busy_interval_prefix:
+      exists t', t' < t1 /\ scheduled_at sched jlp t'.
+    Proof.
+      move: H_t_in_busy => /andP [GE LT].
+      have ARR := low_priority_job_arrives_before_busy_interval_prefix .
+      exists t1.-1; split.
+      { by rewrite prednK; last apply leq_ltn_trans with (job_arrival jlp). }
+      eapply neg_pt_scheduled_at => //.
+      - rewrite prednK; last by apply leq_ltn_trans with (job_arrival jlp).
+        apply lower_priority_job_continuously_scheduled => //. lia.
+      - rewrite prednK; last by apply leq_ltn_trans with (job_arrival jlp).
+        apply lower_priority_job_scheduled_implies_no_preemption_time.
+        by lia.
+    Qed.
+
+  End LowerPriorityJobScheduled.
+
+
+  (** In this section, we prove that priority inversion only
+      occurs at the start of the busy window and occurs due to only
+      one job. *) 
+  Section SingleJob.
+
+    (** Suppose job [j] incurs priority inversion at a time [t_pi] in its busy window. *)
+    Variable t_pi : instant.
+    Hypothesis H_from_t1_before_t2 : t1 <= t_pi < t2.
+    Hypothesis H_PI_occurs : priority_inversion arr_seq sched j t_pi.
+
+    (** First, we show that there is no preemption time in the interval <<[t1,t_pi]>>. *)
+    Lemma no_preemption_time_before_pi :
       forall t,
-        t1 + K <= t < t2 ->
-        exists j_hp,
-          arrived_between j_hp t1 t.+1 /\
-          hep_job j_hp j /\
-          scheduled_at sched j_hp t.
+        t1 <= t <= t_pi ->
+        ~~ preemption_time arr_seq sched t.
     Proof.
-      move => t /andP [GE LT].
-      move: H_preemption_time_exists => [prt [PR /andP [GEprt LEprt]]].
-      apply not_quiet_implies_exists_scheduled_hp_job_after_preemption_point with (tp := prt); eauto 2.
-      - apply/andP; split=> [//|].
-        apply leq_ltn_trans with (t1 + K) => [//|].
-        by apply leq_ltn_trans with t.
-      - apply/andP; split=> [|//].
-        by apply leq_trans with (t1 + K).
+      move => ppt intl.
+      move : H_PI_occurs => /uni_priority_inversion_P PI.
+      feed_n 5 PI => //=.
+      move : PI => [jlp SCHED NHEP].
+      by apply (lower_priority_job_scheduled_implies_no_preemption_time jlp NHEP t_pi).
     Qed.
 
-  End PreemptionTimeAndPriorityInversion.
+    (** Next, we show that the same job will be scheduled from the start of the 
+        busy interval to the priority inversion time [t_pi]. *)
+    Lemma pi_job_remains_scheduled :
+      forall jlp,
+        scheduled_at sched jlp t_pi ->
+        forall t,
+          t1 <= t <= t_pi -> scheduled_at sched jlp t.
+    Proof.
+      move : H_PI_occurs => /uni_priority_inversion_P PI.
+      feed_n 5 PI => //=.
+      move : PI => [jlp SCHED NHEP].
+      move => jlp1 SCHED3 t IN.
+      apply: lower_priority_job_continuously_scheduled => //.
+      by have -> : jlp1 = jlp.
+    Qed.
+
+    (** Thus, priority inversion takes place from the start of the busy interval
+        to the instant [t_pi], i.e., priority inversion takes place
+        continuously. *)
+    Lemma pi_continuous :
+      forall t,
+        t1 <= t <= t_pi ->
+        priority_inversion arr_seq sched j t.
+    Proof.
+      move: (H_PI_occurs) => /andP[j_nsched_pi /hasP[jlp jlp_sched_pi nHEPj]] t INTL.
+      apply /uni_priority_inversion_P => // ; exists jlp => //.
+      apply: pi_job_remains_scheduled => //.
+      by rewrite -(scheduled_jobs_at_iff arr_seq).
+    Qed.
+
+  End SingleJob.
+
+  (** From the above lemmas, it follows that either job [j] incurs no priority
+      inversion at all or certainly at time [t1], i.e., the beginning of its
+      busy interval. *)
+  Lemma busy_interval_pi_cases :
+    cumulative_priority_inversion arr_seq sched j t1 t2 = 0
+    \/ priority_inversion arr_seq sched j t1.
+  Proof.
+    case: (posnP (cumulative_priority_inversion arr_seq sched j t1 t2)); first by left.
+    rewrite sum_nat_gt0 // => /hasP[pi].
+    rewrite mem_filter /= mem_index_iota lt0b => INTL PI_pi.
+    by right; apply: pi_continuous =>//; lia.
+  Qed.
+
+  (** Next, we use the above facts to establish bounds on the maximum priority
+      inversion that can be incurred in a busy interval. *)
 
   (** * Priority Inversion due to Non-Preemptive Sections *)
 
@@ -223,70 +292,6 @@ Section PriorityInversionIsBounded.
         by move: QT => /negP NSCHED; apply: NSCHED.
     Qed.
 
-    (** Also, we show that lower-priority jobs that are scheduled inside the
-        busy-interval prefix <<[t1,t2)>> must arrive before that interval. *)
-    Lemma low_priority_job_arrives_before_busy_interval_prefix:
-      forall jlp t,
-        t1 <= t < t2 ->
-        scheduled_at sched jlp t ->
-        ~~ hep_job jlp j ->
-        job_arrival jlp < t1.
-    Proof.
-      move => jlp t /andP [GE LT] SCHED LP.
-      move: (H_busy_interval_prefix) => [NEM [QT [NQT HPJ]]].
-      apply negbNE; apply/negP; intros ARR; rewrite -leqNgt in ARR.
-      have PP := scheduling_of_any_segment_starts_with_preemption_time _
-                   arr_seq H_valid_arrivals
-                   sched H_sched_valid
-                   H_valid_preemption_model jlp t SCHED.
-      feed PP => //.
-      move: PP => [pt [/andP [NEQ1 NEQ2] [PT FA]]].
-      have NEQ: t1 <= pt < t2.
-      { apply/andP; split.
-        - by apply leq_trans with (job_arrival jlp).
-        - by apply leq_ltn_trans with t. }
-      edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point as [jhp [_ [HEP SCHEDjhp]]] => //.
-      feed (FA pt); first (by apply/andP; split).
-      move: LP => /negP LP; apply: LP.
-      by have ->: jlp = jhp by apply: H_uni.
-    Qed.
-
-    (** Moreover, we show that lower-priority jobs that are scheduled
-        inside the busy-interval prefix <<[t1,t2)>> must be scheduled
-        before that interval. *)
-    Lemma low_priority_job_scheduled_before_busy_interval_prefix:
-      forall jlp t,
-        t1 <= t < t2 ->
-        scheduled_at sched jlp t ->
-        ~~ hep_job jlp j ->
-        exists t', t' < t1 /\ scheduled_at sched jlp t'.
-    Proof.
-      move => jlp t NEQ SCHED LP; move: (NEQ) => /andP [GE LT].
-      have ARR := low_priority_job_arrives_before_busy_interval_prefix _ _ NEQ SCHED LP.
-      exists t1.-1; split.
-      { by rewrite prednK; last apply leq_ltn_trans with (job_arrival jlp). }
-      move: (H_busy_interval_prefix) => [NEM [QT [NQT HPJ]]].
-      have PP := scheduling_of_any_segment_starts_with_preemption_time _
-                   arr_seq H_valid_arrivals
-                   sched H_sched_valid
-                   H_valid_preemption_model jlp t SCHED.
-      feed PP => //.
-      move: PP => [pt [NEQpt [PT SCHEDc]]].
-      have LT2: pt < t1.
-      { rewrite ltnNge; apply/negP; intros CONTR.
-        edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
-          as [jhp [_ [HEP SCHEDjhp]]]; try apply PT; move=> //.
-        - by lia.
-        - specialize (SCHEDc pt).
-          feed SCHEDc; first by apply/andP; split; last move: NEQpt => /andP [_ T].
-          move: LP => /negP LP; apply: LP.
-          by have ->: jlp = jhp by apply: H_uni.
-      }
-      apply SCHEDc; apply/andP; split.
-      - by rewrite -add1n in LT2; apply leq_subRL_impl in LT2; rewrite subn1 in LT2.
-      - by apply leq_trans with t1; first apply leq_pred.
-    Qed.
-
     (** Thus, there must be a preemption time in the interval [t1, t1
         + max_lp_nonpreemptive_segment j t1]. That is, if a job with
         higher-or-equal priority is scheduled at time instant [t1],
@@ -308,8 +313,8 @@ Section PriorityInversionIsBounded.
         (** Then time instant [t1] is a preemption time. *)
         Lemma preemption_time_exists_case1:
           exists pr_t,
-            preemption_time arr_seq sched pr_t /\
-            t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
+            preemption_time arr_seq sched pr_t 
+            /\ t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).
           move: (H_valid_model_with_bounded_nonpreemptive_segments) => CORR.
@@ -569,14 +574,23 @@ Section PriorityInversionIsBounded.
         ~~ priority_inversion arr_seq sched j t.
     Proof.
       move=> t /andP [pptt tt2].
-      have [j_hp [ARRB [HP SCHEDHP]]]:
-        exists j_hp : Job, arrived_between j_hp t1 t.+1
-                           /\ hep_job j_hp j
-                           /\ scheduled_at sched j_hp t.
-      { apply: not_quiet_implies_exists_scheduled_hp_job (ppt-t1) _ (t) _.
-        - by exists ppt; split; [|rewrite subnKC //; apply/andP; split].
-        - by rewrite subnKC //; apply/andP; split. }
-      exact: no_priority_inversion_when_hep_job_scheduled.
+      apply /negP => PI.
+      move: PI => /andP[j_nsched_pi /hasP[jlp jlp_sched_pi nHEPj]].
+      have [/eqP SCHED1 //|[j' /eqP SCHED2 //=]] :=
+        scheduled_jobs_at_uni_cases arr_seq ltac:(done) sched ltac:(done)
+                                                                     ltac:(done) ltac:(done) t; first by rewrite SCHED1 in jlp_sched_pi.
+      rewrite SCHED2 mem_seq1 in jlp_sched_pi.
+      move : jlp_sched_pi => /eqP HJLP.
+      replace j' with jlp in *; clear HJLP.
+      move : SCHED2 => /eqP SCHED2.
+      rewrite scheduled_jobs_at_scheduled_at in SCHED2 => //=.
+      have [ptst [IN1 [PTT STT]]] : exists ptst : nat,
+          ppt <= ptst <= t /\ preemption_time arr_seq sched ptst /\ scheduled_at sched jlp ptst.
+      { by apply: scheduling_of_any_segment_starts_with_preemption_time_continuously_sched. }
+       contradict nHEPj.
+       apply /negP /negPn.
+       apply: scheduled_at_preemption_time_implies_higher_or_equal_priority => //.
+       by lia.
     Qed.
 
     (** ... and then lift this fact to cumulative priority inversion. *)
@@ -598,82 +612,5 @@ Section PriorityInversionIsBounded.
     Qed.
 
   End NoPriorityInversionAfterPreemptionPoint.
-
-
-  (** In this section, we will prove that priority inversion only
-      occurs at the start of the busy window and occurs due to only
-      one job. *)
-  Section SingleJob.
-
-    (** Suppose job [j] incurs priority inversion at a time [t_pi] in its busy window. *)
-    Variable t_pi : instant.
-    Hypothesis H_from_t1_before_t2 : t1 <= t_pi < t2.
-    Hypothesis H_PI_occurs : priority_inversion arr_seq sched j t_pi.
-
-    (** First, we show that there is no preemption time in the interval <<[t1,
-        t_pi]>>. *)
-    Lemma no_preemption_time_before_pi :
-      forall t,
-        t1 <= t <= t_pi ->
-        ~~ preemption_time arr_seq sched t.
-    Proof.
-      move => ppt intl.
-      apply: (contraTN _ H_PI_occurs) => PT.
-      have [jhp [_ [HEP SCHED]]] :=
-        (not_quiet_implies_exists_scheduled_hp_job_after_preemption_point ppt t_pi PT ltac:(lia) ltac:(lia)).
-      by apply: no_priority_inversion_when_hep_job_scheduled.
-    Qed.
-
-    (** Next, we show that the same job will be scheduled from the start of the
-        busy interval to the priority inversion time [t_pi]. *)
-    Lemma pi_job_remains_scheduled :
-      forall jlp,
-        scheduled_at sched jlp t_pi ->
-        forall t,
-          t1 <= t <= t_pi -> scheduled_at sched jlp t.
-    Proof.
-      move=> jlp SCHED t TIME.
-      have [IDLE|BUSY] := boolP (is_idle arr_seq sched t).
-      { exfalso; apply/negP.
-        - exact: (no_preemption_time_before_pi t).
-        - apply: idle_time_is_pt => //. }
-      { move: BUSY; rewrite is_nonidle_iff // => -[j' SCHED'].
-        have [<- //|DIFF] := eqVneq j' jlp.
-        have [pt premp_ppt INTL]: exists2 pt, preemption_time arr_seq sched pt & t < pt <= t_pi.
-        { (apply: neq_scheduled_at_pt; try exact: DIFF) => //.
-          by move: TIME => /andP [_ +]. }
-        exfalso; apply/(@negP (preemption_time arr_seq sched pt)) => //.
-        apply: no_preemption_time_before_pi.
-        by clear - INTL TIME; lia. }
-    Qed.
-
-    (** Thus, priority inversion takes place from the start of the busy interval
-        to the instant [t_pi], i.e., priority inversion takes place
-        continuously. *)
-    Lemma pi_continuous :
-      forall t,
-        t1 <= t <= t_pi ->
-        priority_inversion arr_seq sched j t.
-    Proof.
-      move: (H_PI_occurs) => /andP[j_nsched_pi /hasP[jlp jlp_sched_pi nHEPj]] t INTL.
-      apply /uni_priority_inversion_P => // ; exists jlp => //.
-      apply: pi_job_remains_scheduled => //.
-      by rewrite -(scheduled_jobs_at_iff arr_seq).
-    Qed.
-
-  End SingleJob.
-
-  (** From the above lemmas, it follows that either job [j] incurs no priority
-      inversion at all or certainly at time [t1], i.e., the beginning of its
-      busy interval. *)
-  Lemma busy_interval_pi_cases :
-    cumulative_priority_inversion arr_seq sched j t1 t2 = 0
-    \/ priority_inversion arr_seq sched j t1.
-  Proof.
-    case: (posnP (cumulative_priority_inversion arr_seq sched j t1 t2)); first by left.
-    rewrite sum_nat_gt0 // => /hasP[pi].
-    rewrite mem_filter /= mem_index_iota lt0b => INTL PI_pi.
-    by right; apply: pi_continuous =>//; lia.
-  Qed.
 
 End PriorityInversionIsBounded.

@@ -1,6 +1,8 @@
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.analysis.facts.busy_interval.existence.
 Require Export prosa.util.tactics.
+Require Export prosa.model.task.preemption.parameters.
+Require Export prosa.analysis.facts.model.preemption.
 
 (** * Processor Executes HEP jobs at Preemption Point *)
 
@@ -223,3 +225,148 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Qed.
 
 End ProcessorBusyWithHEPJobAtPreemptionPoints.
+
+(** * Processor Executes HEP Jobs after Preemption Point *)
+(** In this section, we prove that at any time instant after any
+    preemption point (inside the busy interval), the processor is
+    always busy scheduling a job with higher or equal priority. *)
+Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+
+  (**  ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JobCost Job}.
+
+  (** Consider any arrival sequence with consistent arrivals ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
+
+  (** ... and any uniprocessor schedule of this arrival sequence. *)
+  Context {PState : ProcessorState Job}.
+  Hypothesis H_uni : uniprocessor_model PState.
+  Variable sched : schedule PState.
+
+  (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
+      and assume that the relation is reflexive and transitive. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
+
+  (** Consider a valid preemption model with known maximum non-preemptive
+      segment lengths. *)
+  Context `{TaskMaxNonpreemptiveSegment Task} `{JobPreemptable Job}.
+  Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
+
+  (** Further, allow for any work-bearing notion of job readiness. *)
+  Context `{!JobReady Job PState}.
+  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+
+  (** We assume that the schedule is valid. *)
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+
+  (** Next, we assume that the schedule is work-conserving ... *)
+  Hypothesis H_work_conserving : work_conserving arr_seq sched.
+
+  (** ... and the schedule respects the scheduling policy at every preemption point. *)
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
+
+  (** Consider any job [j] with positive job cost. *)
+  Variable j : Job.
+  Hypothesis H_j_arrives : arrives_in arr_seq j.
+  Hypothesis H_job_cost_positive : job_cost_positive j.
+
+  (** Consider any busy interval prefix <<[t1, t2)>> of job [j]. *)
+  Variable t1 t2 : instant.
+  Hypothesis H_busy_interval_prefix :
+    busy_interval_prefix arr_seq sched j t1 t2.
+
+  (** First, recall from the above section that the processor at any
+      preemption time is always busy scheduling a job with higher or equal
+      priority. *)
+
+  (** We show that, at any time instant after a preemption point, the
+      processor is always busy with a job with higher or equal
+      priority. *)
+  Lemma not_quiet_implies_exists_scheduled_hp_job_after_preemption_point:
+    forall tp t,
+      preemption_time arr_seq sched tp ->
+      t1 <= tp < t2 ->
+      tp <= t < t2 ->
+      exists j_hp,
+        arrived_between j_hp t1 t.+1 /\
+          hep_job j_hp j /\
+          scheduled_at sched j_hp t.
+  Proof.
+    move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
+    have [Idle|[jhp Sched_jhp]] :=
+      scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) t.
+    { eapply instant_t_is_not_idle in Idle => //.
+      by apply/andP; split; first apply leq_trans with tp. }
+    exists jhp.
+    have HP: hep_job jhp j.
+    { have PP := scheduling_of_any_segment_starts_with_preemption_time _
+                   arr_seq  H_valid_arrivals
+                   sched H_sched_valid H_valid_preemption_model jhp t Sched_jhp.
+      feed PP => //.
+      move: PP => [prt [/andP [_ LE] [PR SCH]]].
+      case E:(t1 <= prt).
+      - move: E => /eqP /eqP E; rewrite subn_eq0 in E.
+        edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point as [jlp [_ [HEP SCHEDjhp]]] => //.
+        { by apply /andP; split; last by apply leq_ltn_trans with t. }
+        enough (EQ : jhp = jlp); first by subst.
+        apply: (H_uni _ _ _ prt); eauto;
+          by apply SCH; apply/andP; split.
+      - move: E => /eqP /neqP E; rewrite -lt0n subn_gt0 in E.
+        apply negbNE; apply/negP; intros LP; rename jhp into jlp.
+        edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
+          as [jhp [_ [HEP SCHEDjhp]]]; try apply PRPOINT; move=> //.
+        * by apply/andP; split.
+        * move: LP => /negP LP; apply: LP.
+          enough (EQ : jhp = jlp); first by subst.
+          apply: (H_uni jhp _ _ tp); eauto.
+          by apply SCH; apply/andP; split; first apply leq_trans with t1; auto. }
+    repeat split=> //.
+    move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET EXj]]]; move: (Sched_jhp) => PENDING.
+    eapply scheduled_implies_pending in PENDING => //.
+    apply/andP; split; last by apply leq_ltn_trans with (n := t); first by move: PENDING => /andP [ARR _].
+    apply contraT; rewrite -ltnNge; intro LT; exfalso.
+    feed (QUIET jhp) => //.
+    specialize (QUIET HP LT).
+    move: Sched_jhp; apply/negP/completed_implies_not_scheduled => //.
+    apply: completion_monotonic QUIET.
+    exact: leq_trans LEtp.
+  Qed.
+
+  (** Now, suppose there exists some constant [K] that bounds the
+      distance to a preemption time from the beginning of the busy
+      interval. *)
+  Variable K : duration.
+  Hypothesis H_preemption_time_exists :
+    exists pr_t, preemption_time arr_seq sched pr_t /\ t1 <= pr_t <= t1 + K.
+
+  (** Then we prove that the processor is always busy with a job
+      with higher-or-equal priority after time instant [t1 + K]. *)
+  Lemma not_quiet_implies_exists_scheduled_hp_job:
+    forall t,
+      t1 + K <= t < t2 ->
+      exists j_hp,
+        arrived_between j_hp t1 t.+1 /\
+          hep_job j_hp j /\
+          scheduled_at sched j_hp t.
+  Proof.
+    move => t /andP [GE LT].
+    move: H_preemption_time_exists => [prt [PR /andP [GEprt LEprt]]].
+    apply not_quiet_implies_exists_scheduled_hp_job_after_preemption_point with (tp := prt); eauto 2.
+    - apply/andP; split=> [//|].
+      apply leq_ltn_trans with (t1 + K) => [//|].
+      by apply leq_ltn_trans with t.
+    - apply/andP; split=> [|//].
+      by apply leq_trans with (t1 + K).
+  Qed.
+
+End ProcessorBusyWithHEPJobAfterPreemptionPoints.

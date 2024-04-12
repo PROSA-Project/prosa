@@ -252,10 +252,7 @@ Section ServiceInversionIsBounded.
   Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
-  (** Next, we assume that the schedule is a work-conserving schedule... *)
-  Hypothesis H_work_conserving : work_conserving arr_seq sched.
-
-  (** ... and that the schedule respects the scheduling policy. *)
+  (**  Next, we assume that the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** In this section, we prove that, given a job [j] with a busy
@@ -359,30 +356,27 @@ Section ServiceInversionIsBounded.
         rewrite -[service_during _ _ _ _ <= _](leq_add2l (service sched jlp t1)).
         rewrite leq_eqVlt => /orP [/eqP EQ|GT].
         { by rewrite service_cat; [ rewrite -EQ; move: H_σ_constrained => /andP [A B] | lia]. }
+        exfalso.
         have [pt [LTpt EQ]] : exists pt, pt < t /\ service sched jlp pt = σ.
         { by apply exists_intermediate_service => //; apply unit_supply_is_unit_service. }
-        have PI: priority_inversion arr_seq sched j st.
-        { apply/andP; split.
-          { apply/negP => IN; rewrite scheduled_jobs_at_iff in IN => //.
-            have EQj: jlp = j by apply: H_uniprocessor_proc_model => //.
-            by move: H_jlp_lp => /negP LP2; apply: LP2; subst jlp; apply H_priority_is_reflexive. }
-          { by apply/hasP; exists jlp; [rewrite scheduled_jobs_at_iff => // | done]. }
-        }
         have NPT : ~~ preemption_time arr_seq sched t1.
-        { (apply: no_preemption_time_before_pi; try apply: H_busy_prefix) => //; lia. }
-        have SCHEDt1 : scheduled_at sched jlp t1.
-        { by (apply: pi_job_remains_scheduled; try apply: H_busy_prefix) => //; lia. }
+        { by eapply lower_priority_job_scheduled_implies_no_preemption_time
+          with (t1 := t1) (t2:= t2) (t := st) (jlp := jlp) (j := j)=> //; lia. }
         have LEpt: t1 <= pt.
         { move_neq_up LEpt.
           have EQ1: service sched jlp t1 = σ.
-          { apply/eqP; rewrite eqn_leq; apply/andP; split; first by move: H_σ_constrained => /andP [A B].
+          { apply/eqP; rewrite eqn_leq; apply/andP; split;
+              first by move: H_σ_constrained => /andP [A B].
             by rewrite -EQ; apply: service_monotonic; lia. }
-          move: NPT => /negP NPT; apply: NPT; rewrite /preemption_time.
-          have ->: scheduled_job_at arr_seq sched t1 = Some jlp.
-          { by apply/eqP; rewrite scheduled_job_at_scheduled_at => //. }
-          by rewrite EQ1.
-        }
-        exfalso.
+          have PT :  preemption_time arr_seq sched t1.
+          { rewrite /preemption_time.
+            have ->: scheduled_job_at arr_seq sched t1 = Some jlp.
+            { apply/eqP; rewrite scheduled_job_at_scheduled_at => //.
+              eapply lower_priority_job_continuously_scheduled
+                with (t1 := t1) (t2:= t2) (t := st) (jlp := jlp) (j := j)=> //=; lia. }
+            by rewrite EQ1.
+          }
+          by rewrite PT in NPT. }
         have [t' [NEQ' [SERV' SCHED']]] := kth_scheduling_time sched _ _ _ _ EQ GT.
         have PT : preemption_time arr_seq sched t'.
         { move: SCHED'; erewrite <-scheduled_job_at_scheduled_at => //.
@@ -464,25 +458,26 @@ Section ServiceInversionIsBounded.
   Proof.
     move=> j ARR TSK POS t1 t2 BUSY.
     rewrite -(leqRW (H_priority_inversion_is_bounded_by_blocking _ _ _ _ _ _ )) //.
-    edestruct busy_interval_pi_cases as [CPI|PI]; (try apply BUSY) => //.
-    { by rewrite (leqRW (cumul_service_inv_le_cumul_priority_inv _ _  _ _ _ _ _ _ _ _)) //. }
-    { move: (PI) => /andP [_ /hasP [jlp INjlp LPjlp]].
-      have SCHEDjlp : scheduled_at sched jlp t1 by erewrite <-scheduled_jobs_at_iff => //.
-      have [NPT| [pt [/andP [LE1 LE2] [PT MIN]]]] := preemption_time_interval_case arr_seq sched t1 t2.
-      { rewrite (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //.
-        - by apply: lp_job_bounded_service.
-        - by exists t1; split => //; apply/andP; split; [ | move: BUSY => [T _]]; lia. }
-      { have LEQ : cumulative_service_inversion arr_seq sched j t1 t2
-                   <= cumulative_service_inversion arr_seq sched j t1 pt.
-        { have [LE|WF] := leqP t2 pt.
-          { by rewrite (leqRW (service_inversion_widen arr_seq sched j t1 _ _ pt _ _ )) => //. }
-          { rewrite (service_inversion_cat _ _ _ _ _ pt) //
-                    -{2}[_ _ _ j t1 pt]addn0 leq_add2l
-                    (leqRW (cumul_service_inv_le_cumul_priority_inv _ _ _ _ _ _ _ _ _ _))//  leqn0.
-            rewrite /cumulative_priority_inversion big_nat_cond; apply/eqP; apply big1 => t /andP [NEQ3 _]; apply/eqP.
-            by rewrite eqb0; apply: no_priority_inversion_after_preemption_point => //; lia. } }
-        rewrite (leqRW LEQ) (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //; clear LEQ.
-        { by apply: lp_job_bounded_service => //; lia. }
+    edestruct busy_interval_pi_cases as [CPI|PI];
+      (try apply BUSY) => //; first by
+                            rewrite (leqRW (cumul_service_inv_le_cumul_priority_inv _ _  _ _ _ _ _ _ _ _)) //.
+    move: (PI) => /andP [_ /hasP [jlp INjlp LPjlp]].
+    have SCHEDjlp : scheduled_at sched jlp t1 by erewrite <-scheduled_jobs_at_iff => //.
+    have [NPT| [pt [/andP [LE1 LE2] [PT MIN]]]] := preemption_time_interval_case arr_seq sched t1 t2.
+    { rewrite (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //.
+      - by apply: lp_job_bounded_service.
+      - by exists t1; split => //; apply/andP; split; [ | move: BUSY => [T _]]; lia. }
+    have LEQ : cumulative_service_inversion arr_seq sched j t1 t2
+               <= cumulative_service_inversion arr_seq sched j t1 pt.
+    { have [LE|WF] := leqP t2 pt.
+      { by rewrite (leqRW (service_inversion_widen arr_seq sched j t1 _ _ pt _ _ )) => //. }
+      { rewrite (service_inversion_cat _ _ _ _ _ pt) //
+                -{2}[_ _ _ j t1 pt]addn0 leq_add2l
+                   (leqRW (cumul_service_inv_le_cumul_priority_inv _ _ _ _ _ _ _ _ _ _))//  leqn0.
+        rewrite /cumulative_priority_inversion big_nat_cond; apply/eqP; apply big1 => t /andP [NEQ3 _]; apply/eqP.
+        by rewrite eqb0; apply: no_priority_inversion_after_preemption_point => //; lia. } }
+      rewrite (leqRW LEQ) (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //; clear LEQ.
+      { by apply: lp_job_bounded_service => //; lia. }
         { move=> t /andP [NEQ1 NEQ2]; apply/negP => PTt.
           by specialize (MIN _ NEQ1 PTt); move: MIN NEQ2; clear; lia. }
         { exists t1; split => //.
@@ -491,7 +486,7 @@ Section ServiceInversionIsBounded.
           eapply no_preemption_time_before_pi with (t := t1) in PI => //.
           - by rewrite PT in PI.
           - by move: LE2; clear; lia.
-          - by clear; lia. } } }
+          - by clear; lia. } 
   Qed.
 
 End ServiceInversionIsBounded.
