@@ -96,6 +96,20 @@ Section SumsOverSequences.
       by rewrite (leq_trans (max_leq_add m1 m2)) ?leq_add.
     Qed.
 
+    (** We show that if [r1] is a subsequence of [r2], then the sum of
+        function [F] over elements satisfying predicate [P] in [r1] is
+        less than or equal to the sum over elements satisfying [P] in [r2].  *)
+    Lemma sum_le_subseq :
+      forall r1 r2,
+        subseq r1 r2 ->
+        \sum_(x <- r1 | P x) F x <= \sum_(x <- r2 | P x) F x.
+    Proof.
+      move => r1 r2 SUB.
+      apply: sub_le_big_seq => //= [x y|]; first exact: leq_addr.
+      rewrite count_subseqP.
+      by exists r1.
+    Qed.
+
   End SumOfOneFunction.
 
   (** In this section, we show some properties of the sum performed over two different functions. *)

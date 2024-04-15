@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-Require Export prosa.util.notation prosa.util.nat prosa.util.list.
+Require Export prosa.util.notation prosa.util.nat prosa.util.list prosa.util.setoid.
 
 (** Additional lemmas about [BigMax]. *)
 Section ExtraLemmas.
@@ -11,6 +11,19 @@ Section ExtraLemmas.
     forall {X : eqType} (F : X -> nat) (P : pred X) (xs : seq X) (x : X),
       x \in xs -> P x -> F x <= \max_(i <- xs | P i) F i.
   Proof. by move=> X F P xs x IN Px; rewrite (big_rem x) //= Px leq_maxl. Qed.
+
+  (** Similarly, we show that for a constant [n] to be bounded by [max
+      { F i | ∀ i ∈ xs, P i}], it is sufficient to find an element [x
+      ∈ xs] such that [P x] and [n <= F x]. *)
+  Corollary leq_bigmax_sup :
+    forall {X : eqType} (P : pred X) (F : X -> nat) (xs : seq X) (n : nat),
+      (exists x, x \in xs /\ P x /\ n <= F x) ->
+      n <= \max_(x <- xs | P x) F x.
+  Proof.
+    move=> X P F xs n [x [IN [Px LE]]].
+    apply: leq_trans; first by exact: LE.
+    by apply leq_bigmax_cond_seq.
+  Qed.
 
   (** Next, we show that the fact [max { F i | ∀ i ∈ xs, P i} <= m] for
       some [m] is equivalent to the fact that [∀ x ∈ xs, P x -> F x <= m]. *)

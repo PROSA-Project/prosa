@@ -292,6 +292,32 @@ End RemList.
 (** Additional lemmas about sequences. *)
 Section AdditionalLemmas.
 
+  (** First, we show that a sequence [xs] contains the same elements
+      as a sequence [undup xs]. *)
+  Lemma in_seq_equiv_undup :
+    forall {X : eqType} (xs : seq X) (x : X),
+      (x \in undup xs) = (x \in xs).
+  Proof.
+    move=> X xs; induction xs as [ | x0 xs IHxs]; first by done.
+    move=> x; rewrite in_cons //=; case IN: (x0 \in xs).
+    - case EQ: (x == x0).
+      + by move: EQ => /eqP EQ; subst; rewrite orTb IHxs.
+      + by rewrite orFb; apply IHxs.
+    - by rewrite in_cons IHxs.
+  Qed.
+
+  (** We prove that [x::xs = ys] is a sufficient condition for [x] to
+      be in [ys]. *)
+  Lemma mem_head_impl :
+    forall {X : eqType} (x : X) (xs ys : seq X),
+      x::xs = ys ->
+      x \in ys.
+  Proof.
+    intros X x xs [ |y ys] EQ; first by done.
+    move: EQ => /eqP; rewrite eqseq_cons => /andP [/eqP EQ _].
+    by subst y; rewrite in_cons; apply/orP; left.
+  Qed.
+
   (** We show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
   Lemma nth0_cons :
     forall x xs n,

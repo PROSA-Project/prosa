@@ -72,15 +72,25 @@ Section UnitService.
     by rewrite /is_blackout /has_supply /supply_at; case: supply_in => [|[]].
   Qed.
 
-  (** We show that supply during an interval <<[t, t + δ)>> is bounded
-      by [δ]. *)
-  Lemma supply_at_le_1 :
+  (** We note that supply is bounded at all times by [1] ... *)
+  Remark supply_at_le_1 :
     forall t,
       supply_at sched t <= 1.
   Proof. by move=> t; apply H_unit_supply_proc_model. Qed.
 
-  (** We show that supply during an interval <<[t, t + δ)>> is bounded
-      by [δ]. *)
+  (** ... and as a trivial consequence, we show that the service of
+      any job is either [0] or [1]. *)
+  Corollary unit_supply_proc_service_case :
+    forall j t,
+      service_at sched j t = 0 \/ service_at sched j t = 1.
+  Proof.
+    move=> j t.
+    have SER := service_at_le_supply_at sched j t.
+    have SUP := supply_at_le_1 t.
+    by lia.
+  Qed.
+
+  (** We show that supply during an interval <<[t, t + δ)>> is bounded by [δ]. *)
   Lemma supply_during_bound :
     forall t δ,
       supply_during sched t (t + δ) <= δ.
