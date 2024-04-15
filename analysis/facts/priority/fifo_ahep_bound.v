@@ -1,4 +1,4 @@
-Require Export prosa.analysis.abstract.iw_auxiliary.
+Require Export prosa.analysis.facts.interference.
 Require Export prosa.analysis.facts.model.restricted_supply.schedule.
 Require Import prosa.analysis.facts.priority.fifo.
 Require Import prosa.analysis.facts.model.rbf.

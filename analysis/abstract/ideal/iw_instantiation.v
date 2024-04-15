@@ -1,6 +1,6 @@
 Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.abstract.IBF.task.
-Require Export prosa.analysis.facts.model.service_of_jobs.
+Require Export prosa.analysis.facts.interference.
 
 (** Throughout this file, we assume ideal uni-processor schedules. *)
 Require Import prosa.model.processor.ideal.

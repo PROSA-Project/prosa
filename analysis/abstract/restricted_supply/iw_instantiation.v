@@ -1,3 +1,4 @@
+Require Export prosa.analysis.facts.interference.
 Require Export prosa.analysis.abstract.IBF.supply_task.
 Require Export prosa.analysis.facts.busy_interval.service_inversion.
 
