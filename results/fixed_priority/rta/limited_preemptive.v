@@ -147,22 +147,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       with (L := L) => //.
     - exact: sequential_readiness_implies_work_bearing_readiness.
     - exact: sequential_readiness_implies_sequential_tasks.
-    - intros A SP.
-      destruct (H_R_is_maximum _ SP) as[FF [EQ1 EQ2]].
-      exists FF; rewrite subKn; first by done.
-      rewrite /task_last_nonpr_segment  -(leq_add2r 1) subn1 !addn1 prednK; last first.
-      + rewrite /last0 -nth_last.
-        apply HYP3; try by done.
-        rewrite -(ltn_add2r 1) !addn1 prednK //.
-        move: (number_of_preemption_points_in_task_at_least_two
-                 _ _ H_valid_model_with_fixed_preemption_points _ H_tsk_in_ts POSt) => Fact2.
-        move: (Fact2) => Fact3.
-        by rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2.
-      + apply leq_trans with (task_max_nonpreemptive_segment tsk).
-        * by apply last_of_seq_le_max_of_seq.
-        * rewrite -END; last by done.
-          apply ltnW; rewrite ltnS; try done.
-          by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
+    - move=> A SP; destruct (H_R_is_maximum _ SP) as[FF [EQ1 EQ2]].
+      by exists FF; erewrite last_segment_eq_cost_minus_rtct => //.
   Qed.
 
 End RTAforFixedPreemptionPointsModelwithArrivalCurves.

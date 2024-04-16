@@ -138,5 +138,20 @@ Section TaskRTCThresholdLimitedPreemptions.
     - by apply SORT__task; rewrite TSK__j.
   Qed.
 
+  (** We show that the last non-preemptive segment of a task can be
+      easily expressed in terms of the task cost and the task
+      run-to-completion threshold. *)
+  Lemma last_segment_eq_cost_minus_rtct :
+    task_cost tsk - task_rtct tsk = task_last_nonpr_segment tsk - ε.
+  Proof.
+    move: (H_valid_fixed_preemption_points_model) => [MLP [BEG [END [INCR _]]]].
+    rewrite /task_last_nonpr_segment /task_rtct /limited_preemptions_rtc_threshold.
+    rewrite subKn // -[leqRHS]subn0 leq_sub //.
+    apply leq_trans with (task_max_nonpreemptive_segment tsk).
+    - by apply last_of_seq_le_max_of_seq.
+    - rewrite -END; last by done.
+      by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
+  Qed.
+
 End TaskRTCThresholdLimitedPreemptions.
 Global Hint Resolve limited_valid_task_run_to_completion_threshold : basic_rt_facts.
