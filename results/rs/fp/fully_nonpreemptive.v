@@ -203,7 +203,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - exact: sequential_readiness_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
-    - by apply: busy_intervals_are_bounded_rs_fp => //; rewrite BLOCK add0n.
+    - apply: busy_intervals_are_bounded_rs_fp => //.
+      by apply: instantiated_i_and_w_are_coherent_with_schedule.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.

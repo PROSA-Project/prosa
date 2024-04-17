@@ -188,6 +188,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
     - exact: EDF_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - eapply busy_intervals_are_bounded_rs_jlfp; try done.
+      + exact: instantiated_i_and_w_are_coherent_with_schedule.
       + apply: service_inversion_is_bounded => // => ? ? ? ? ? ?.
         exact: nonpreemptive_segments_bounded_by_blocking.
       + by rewrite BLOCK add0n; apply H_fixed_point.
@@ -205,5 +206,6 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
         rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
         by rewrite BLOCK subnn //= add0n addn0 subn0.
   Qed.
+
 
 End RTAforFullyPreemptiveEDFModelwithArrivalCurves.

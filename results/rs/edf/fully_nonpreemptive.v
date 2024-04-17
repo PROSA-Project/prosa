@@ -197,6 +197,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     - exact: EDF_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - apply: busy_intervals_are_bounded_rs_edf => //.
+      exact: instantiated_i_and_w_are_coherent_with_schedule.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
@@ -210,5 +211,6 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
         rewrite /task_intra_IBF /task_rtct /fully_nonpreemptive_rtc_threshold /constant.
         by split; [rewrite -(leqRW FIX1) /task_rbf | ]; lia.
   Qed.
+
 
 End RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.

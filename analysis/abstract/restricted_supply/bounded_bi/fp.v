@@ -59,10 +59,7 @@ Section BoundedBusyIntervals.
   Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
-  (** Furthermore, we assume that the schedule is work-conserving ... *)
-  Hypothesis H_work_conserving : work_conserving arr_seq sched.
-
-  (** ... and that it respects the scheduling policy. *)
+  (** Furthermore, assume that the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_FP_policy_at_preemption_point arr_seq sched FP.
 
   (** Recall that [busy_intervals_are_bounded_by] is an abstract
@@ -81,6 +78,9 @@ Section BoundedBusyIntervals.
       interfering workload of jobs with higher or equal priority. *)
   #[local] Instance rs_jlfp_interfering_workload : InterferingWorkload Job :=
     rs_jlfp_interfering_workload arr_seq sched.
+
+  (** Assume that the schedule is work-conserving in the abstract sense. *)
+  Hypothesis H_work_conserving : definitions.work_conserving arr_seq sched.
 
   (** Consider an arbitrary task set [ts], ... *)
   Variable ts : list Task.
@@ -186,7 +186,6 @@ Section BoundedBusyIntervals.
         }
         eapply busy_interval.busy_interval_is_bounded; eauto 2 => //.
         - by eapply instantiated_i_and_w_no_speculative_execution; eauto 2 => //.
-        - by eapply instantiated_i_and_w_are_coherent_with_schedule; eauto 2 => //.
         - by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix => //.
         - by apply workload_is_bounded => //.
       Qed.
@@ -303,3 +302,4 @@ Section BoundedBusyIntervals.
   Qed.
 
 End BoundedBusyIntervals.
+

@@ -190,7 +190,8 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
            (intra_IBF  := fun A Δ => (\sum_(tsko <- ts) task_request_bound_function tsko (A + ε)) - task_cost tsk) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - eapply busy_intervals_are_bounded_rs_jlfp with (blocking_bound := fun _ => 0)=> //.
-      by apply: FIFO_implies_no_service_inversion.
+      + exact: instantiated_i_and_w_are_coherent_with_schedule.
+      + by apply: FIFO_implies_no_service_inversion.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.

@@ -45,9 +45,6 @@ Section BoundedBusyIntervalsAux.
   (** ... and assume that the schedule is valid. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-  (** Furthermore, we assume that the schedule is work-conserving. *)
-  Hypothesis H_work_conserving : work_conserving arr_seq sched.
-
   (** Recall that [busy_intervals_are_bounded_by] is an abstract
       notion. Hence, we need to introduce interference and interfering
       workload. We will use the restricted-supply instantiations. *)
@@ -64,6 +61,9 @@ Section BoundedBusyIntervalsAux.
       interfering workload of jobs with higher or equal priority. *)
   #[local] Instance rs_jlfp_interfering_workload : InterferingWorkload Job :=
     rs_jlfp_interfering_workload arr_seq sched.
+
+  (** Assume that the schedule is work-conserving in the abstract sense. *)
+  Hypothesis H_work_conserving : abstract.definitions.work_conserving arr_seq sched.
 
   (** Consider any job [j] of task [tsk] that has a positive job cost
       and is in the arrival sequence. *)
@@ -143,8 +143,7 @@ Section BoundedBusyIntervalsAux.
     { rewrite /service_during /cumulative_interference /cumul_cond_interference  /cond_interference /service_at.
       rewrite -big_split //= -{1}(sum_of_ones t1 δ) big_nat [in X in _ <= X]big_nat.
       apply leq_sum => x /andP[Lo Hi].
-      { eapply instantiated_i_and_w_are_coherent_with_schedule in H_work_conserving; eauto 2 => //.
-        move: (H_work_conserving j t1 t2 x) => Workj.
+      { move: (H_work_conserving j t1 t2 x) => Workj.
         feed_n 4 Workj; try done.
         { by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix. }
         { by apply/andP; split; eapply leq_trans; eauto. }
