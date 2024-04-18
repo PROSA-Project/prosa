@@ -231,8 +231,8 @@ Section TotalRBFBound.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider an JLFP policy that indicates a higher-or-equal
-      priority relation ... *)
+  (** Consider a JLFP policy that indicates a higher-or-equal priority
+      relation ... *)
   Context `{JLFP_policy Job}.
 
   (** ... and any valid arrival sequence. *)
