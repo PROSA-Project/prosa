@@ -13,7 +13,7 @@ Require Export prosa.analysis.facts.model.task_cost.
     schedulers, assuming a workload of sporadic real-time tasks
     characterized by arbitrary arrival curves executing upon a
     uniprocessor with arbitrary supply restrictions. To this end, we
-    instantiate the _abstract Sequential Restricted-Supply
+    instantiate the sequential variant of _abstract Restricted-Supply
     Response-Time Analysis_ (aRSA) as provided in the
     [prosa.analysis.abstract.restricted_supply] module. *)
 Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
@@ -29,20 +29,14 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       - tasks, jobs, and their parameters,
       - the sequence of job arrivals,
       - worst-case execution time (WCET) and the absence of self-suspensions,
-      - the set of tasks under analysis,
-      - the task under analysis, and, finally,
-      - an arbitrary schedule of the task set. *)
+      - the task under analysis,
+      - an arbitrary schedule of the task set, and finally,
+      - a supply-bound function. *)
 
   (** *** Processor Model *)
 
-  (** Consider a restricted-supply uniprocessor model, ... *)
+  (** Consider a restricted-supply uniprocessor model. *)
   #[local] Existing Instance rs_processor_state.
-
-  (** ... where the minimum amount of supply is defined via a monotone
-      unit-supply-bound function [SBF]. *)
-  Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_SBF_monotone : sbf_is_monotone SBF.
-  Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** *** Tasks and Jobs  *)
 
@@ -107,7 +101,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** *** The Schedule *)
 
-  (** Finally, consider any arbitrary, work-conserving, valid
+  (** Consider any arbitrary, work-conserving, valid
       restricted-supply uni-processor schedule of the given arrival
       sequence [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
@@ -121,15 +115,22 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
   Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
 
-  (** We assume that the schedule respects the
-      [FP] scheduling policy. *)
+  (** We assume that the schedule respects the [FP] scheduling policy. *)
   Hypothesis H_respects_policy_at_preemption_point :
     respects_FP_policy_at_preemption_point arr_seq sched FP.
 
-  (** Last but not least, we assume that [SBF] properly characterizes
-      all busy intervals in [sched]. That is, (1) [SBF 0 = 0] and (2)
-      for any duration [Δ], at least [SBF Δ] supply is available in
-      any busy-interval prefix of length [Δ]. *)
+  (** *** Supply-Bound Function *)
+
+  (** Assume the minimum amount of supply that any job of task [tsk]
+      receives is defined by a monotone unit-supply-bound function [SBF]. *)
+  Context {SBF : SupplyBoundFunction}.
+  Hypothesis H_SBF_monotone : sbf_is_monotone SBF.
+  Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
+
+  (** We assume that [SBF] properly characterizes all busy intervals
+      in [sched]. That is, (1) [SBF 0 = 0] and (2) for any duration
+      [Δ], at least [SBF Δ] supply is available in any busy-interval
+      prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
 
   (** ** Workload Abbreviation *)
@@ -152,13 +153,13 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** ** Length of Busy Interval *)
 
   (** The next step is to establish a bound on the maximum busy-window
-      length, which aRTA requires to be given. *)
+      length, which aRSA requires to be given. *)
 
   (** To this end, let [L] be any positive fixed point of the
-      busy-interval recurrence. As the
-      [busy_intervals_are_bounded_rs_fp] lemma shows, under [FP]
-      scheduling, this is sufficient to guarantee that all busy
-      intervals are bounded by [L]. *)
+      busy-interval recurrence. As the lemma
+      [busy_intervals_are_bounded_rs_fp] shows, under [FP] scheduling,
+      this is sufficient to guarantee that all busy intervals are
+      bounded by [L]. *)
   Variable L : duration.
   Hypothesis H_L_positive : 0 < L.
   Hypothesis H_fixed_point : total_hep_rbf L <= SBF L.
@@ -166,13 +167,12 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** ** Response-Time Bound *)
 
   (** Having established all necessary preliminaries, it is finally
-      time to state the claimed response-time bound [R].
+      time to state the claimed response-time bound [R]. *)
 
-      A value [R] is a response-time bound if, for any given offset
+  (** A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
       a solution [F] not exceeding [R]. *)
-  Variable R : duration.
-  Hypothesis H_R_is_maximum :
+  Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
@@ -185,9 +185,11 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       fully-preemptive fixed-priority scheduling with arbitrary supply
       restrictions.  *)
   Theorem uniprocessor_response_time_bound_fully_preemptive_fp :
-    task_response_time_bound arr_seq sched tsk R.
+    forall (R : duration),
+      rta_recurrence_solution R ->
+      task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> js ARRs TSKs.
+    move=> R SOL js ARRs TSKs.
     have BLOCK: forall tsk , blocking_bound ts tsk = 0.
     { by move=> tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
                  /fully_preemptive_task_model subnn big1_eq. }
@@ -206,7 +208,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
         by unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //.
-    - move => A SP; move: (H_R_is_maximum A) => [].
+    - move => A SP; move: (SOL A) => [].
       + apply: search_space_sub => //; apply: search_space_switch_IBF; last by exact: SP.
         by move=> A1 Δ1; rewrite //= BLOCK.
       + move => F [/andP [_ LE] FIX]; exists F; split => //.

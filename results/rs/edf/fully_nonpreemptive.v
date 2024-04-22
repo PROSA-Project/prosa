@@ -188,7 +188,6 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     move=> js ARRs TSKs.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have READ : work_bearing_readiness arr_seq sched by done.
-    have UNIT: unit_service_proc_model (rs_processor_state Job) by exact: unit_supply_is_unit_service.
     have VPR : valid_preemption_model arr_seq sched by exact: valid_fully_nonpreemptive_model => //.
     eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.

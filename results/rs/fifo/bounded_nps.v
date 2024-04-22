@@ -30,9 +30,9 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
       - tasks, jobs, and their parameters,
       - the sequence of job arrivals,
       - worst-case execution time (WCET) and the absence of self-suspensions,
-      - the task under analysis, and, finally,
-      - an arbitrary schedule of the task set,
-      - and a supply-bound function. *)
+      - the task under analysis,
+      - an arbitrary schedule of the task set, and finally,
+      - a supply-bound function. *)
 
   (** *** Processor Model *)
 
