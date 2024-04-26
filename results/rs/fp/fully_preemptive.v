@@ -128,10 +128,10 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** We assume that [SBF] properly characterizes all busy intervals
-      in [sched]. That is, (1) [SBF 0 = 0] and (2) for any duration
-      [Δ], at least [SBF Δ] supply is available in any busy-interval
-      prefix of length [Δ]. *)
-  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
+      (w.r.t. task [tsk]) in [sched]. That is, (1) [SBF 0 = 0] and (2)
+      for any duration [Δ], at least [SBF Δ] supply is available in
+      any busy-interval prefix of length [Δ]. *)
+  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
   (** ** Workload Abbreviation *)
 
@@ -203,7 +203,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - by apply: busy_intervals_are_bounded_rs_fp => //; rewrite BLOCK add0n.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
-      by move => *; apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix => //.
+      move => ? ? ? ? [? ?]; split => //.
+      by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.

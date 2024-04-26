@@ -85,12 +85,12 @@ Section AbstractRTARestrictedSupply.
   Hypothesis H_busy_interval_exists :
     busy_intervals_are_bounded_by arr_seq sched tsk L.
 
-  (** Consider a valid, unit supply-bound function [SBF]. That is,
-      (1) [SBF 0 = 0], (2) for any duration [Δ], the supply produced
-      during a busy interval of length [Δ] is at least [SBF Δ], and
-      (3) [SBF] makes steps of at most one. *)
+  (** Consider a unit SBF valid in busy intervals (w.r.t. task
+      [tsk]). That is, (1) [SBF 0 = 0], (2) for any duration [Δ], the
+      supply produced during a busy-interval prefix of length [Δ] is
+      at least [SBF Δ], and (3) [SBF] makes steps of at most one. *)
   Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
+  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** Next, we assume that [intra_IBF] is a bound on the intra-supply
@@ -203,7 +203,7 @@ Section AbstractRTARestrictedSupply.
         <= (Δ - SBF Δ) + cumul_intra_interference sched j t1 (t1 + Δ).
       Proof.
         rewrite -blackout_plus_local_is_interference_cumul leq_add2r.
-        by apply: blackout_during_bound => //.
+        by eapply blackout_during_bound with (t2 := t2) => //.
       Qed.
 
       (** Next, consider a duration [F] such that [F <= Δ] and job [j]
@@ -308,7 +308,7 @@ Section AbstractRTARestrictedSupply.
         rewrite -/(cumulative_interference _ _ _).
         erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY. 
         rewrite addnC leq_add //; last first.
-        { by eapply blackout_during_bound with (t2 := t2) => //; apply BUSY. }
+        { by eapply blackout_during_bound with (t2 := t2) => //; split; [ | apply BUSY]. }
         rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
         rewrite -!/(cumul_intra_interference _ _ _ _).
         rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].

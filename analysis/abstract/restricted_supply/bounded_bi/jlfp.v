@@ -94,14 +94,6 @@ Section BoundedBusyIntervals.
   (** ... and that the cost of a job does not exceed its task's WCET. *)
   Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
-  (** Consider a unit SBF valid in busy intervals. That is, (1) [SBF 0
-      = 0], (2) for any duration [Δ], the supply produced during a
-      busy-interval prefix of length [Δ] is at least [SBF Δ], and (3)
-      [SBF] makes steps of at most one. *)
-  Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
-  Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
-
   (** Let [max_arrivals] be a family of valid arrival curves. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
@@ -109,6 +101,14 @@ Section BoundedBusyIntervals.
   (** Let [tsk] be any task in [ts] that is to be analyzed. *)
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
+
+  (** Consider a unit SBF valid in busy intervals (w.r.t. task
+      [tsk]). That is, (1) [SBF 0 = 0], (2) for any duration [Δ], the
+      supply produced during a busy-interval prefix of length [Δ] is
+      at least [SBF Δ], and (3) [SBF] makes steps of at most one. *)
+  Context {SBF : SupplyBoundFunction}.
+  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
+  Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** Let [blocking_bound] be a function that bounds the priority
       inversion caused by lower-priority jobs, where the argument
@@ -171,7 +171,7 @@ Section BoundedBusyIntervals.
         workload_of_job arr_seq j t1 (t1 + L) + cumulative_interfering_workload j t1 (t1 + L) <= L.
       Proof.
         rewrite (cumulative_interfering_workload_split _ _ _).
-        rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ _ _ _ _)); (try apply H_busy_prefix_L) => //.
+        rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ (t1 + L) _ _ _)); (try apply H_valid_SBF) => //.
         rewrite // addnC -!addnA.
         have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
         apply: E; first by lia.
@@ -230,12 +230,7 @@ Section BoundedBusyIntervals.
         eapply workload_exceeds_interval with (Δ := L) in PREFIX => //.
         { move_neq_down PREFIX.
           rewrite (cumulative_interfering_workload_split _ _ _).
-          (rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ _ _ _ _)); try apply GTC) => //; first last.
-          { move=> *; split; first by apply H_valid_SBF.
-            move => *; destruct H_valid_SBF as [A B].
-            apply: B => //.
-            by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix => //.
-          }
+          rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ (job_arrival j).+1 _ _ _)); (try apply H_valid_SBF) => //.
           rewrite addnC -!addnA.
           have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
           apply: E; first by lia.

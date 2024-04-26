@@ -125,10 +125,11 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
 
   (** Last but not least, we assume that [SBF] properly characterizes
-      all busy intervals in [sched]. That is, (1) [SBF 0 = 0] and (2)
-      for any duration [Δ], at least [SBF Δ] supply is available in
-      any busy-interval prefix of length [Δ]. *)
-  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
+      all busy intervals (w.r.t. task [tsk]) in [sched]. That is, (1)
+      [SBF 0 = 0] and (2) for any duration [Δ], at least [SBF Δ]
+      supply is available in any busy-interval prefix of length
+      [Δ]. *)
+  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
   (** ** Workload Abbreviation *)
 
@@ -195,7 +196,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - apply: busy_intervals_are_bounded_rs_edf => //.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
-      by move => ? ? ? ? ?; apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
+      move => ? ? ? ? [? ?]; split => //.
+      by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by (apply: bound_on_athep_workload_is_valid; try apply H_fixed_point) => //.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.

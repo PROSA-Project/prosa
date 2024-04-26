@@ -97,12 +97,12 @@ Section AbstractRTARestrictedSupplySequential.
   Hypothesis H_busy_interval_exists :
     busy_intervals_are_bounded_by arr_seq sched tsk L.
 
-  (** Consider a unit SBF valid in busy intervals. That is, (1) [SBF 0
-      = 0], (2) for any duration [Δ], the supply produced during a
-      busy-interval prefix of length [Δ] is at least [SBF Δ], and (3)
-      [SBF] makes steps of at most one. *)
+  (** Consider a unit SBF valid in busy intervals (w.r.t. task
+      [tsk]). That is, (1) [SBF 0 = 0], (2) for any duration [Δ], the
+      supply produced during a busy-interval prefix of length [Δ] is
+      at least [SBF Δ], and (3) [SBF] makes steps of at most one. *)
   Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched SBF.
+  Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** Next, we assume that [task_intra_IBF] is a bound on intra-supply
