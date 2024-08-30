@@ -72,7 +72,7 @@ Section ModelValidity.
     Definition valid_job_cost j :=
       job_cost j <= task_cost (job_task j).
 
-    (** Every job have a valid job cost *)
+    (** Every job has a valid job cost. *)
     Definition jobs_have_valid_job_costs :=
       forall j, valid_job_cost j.
 
