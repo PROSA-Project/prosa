@@ -50,6 +50,8 @@ RTAs
 IBF
 RBF
 RBFs
+DBF
+DBFs
 WCET
 WCETs
 BCET
@@ -128,3 +130,4 @@ boundedness
 RHS
 LHS
 subsequence
+Baruah

@@ -22,7 +22,7 @@ Section TaskArrivals.
       in a given half-open interval <<[t1, t2)>>. *)
   Definition task_arrivals_between (t1 t2 : instant) :=
     [seq j <- arrivals_between arr_seq t1 t2 | job_of_task tsk j].
-  
+
   (** Based on that, we define the list of jobs of task [tsk] that
       arrive up to and including time [t], ... *)
   Definition task_arrivals_up_to (t : instant) :=
@@ -44,6 +44,19 @@ Section TaskArrivals.
   (** ... and also count the cost of job arrivals. *)
   Definition cost_of_task_arrivals (t1 t2 : instant) :=
     \sum_(j <- task_arrivals_between t1 t2) job_cost j.
+
+  (** In the following, suppose there is a deadline associated with each job. *)
+  Context `{JobDeadline Job}.
+
+  (** We define the list of jobs of task [tsk] that arrive in
+      a given half-open interval <<[t1, t2)>> and that also have a deadline
+      within the closed interval <<[t1, t2]>>, ... *)
+  Definition task_arrivals_with_deadline_within (t1 t2 : instant) :=
+    [seq j <- arrivals_between arr_seq t1 t2 | job_of_task tsk j & job_deadline j <= t2].
+
+  (** ... and similarly define the count of such jobs. *)
+  Definition number_of_task_arrivals_with_deadline_within (t1 t2 : instant) :=
+    size (task_arrivals_with_deadline_within t1 t2).
 
 End TaskArrivals.
 

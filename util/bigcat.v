@@ -385,3 +385,48 @@ Section BigCatNestedCount.
   Qed.
 
 End BigCatNestedCount.
+
+(** In the following section we introduce a lemma that relates to partitioning.*)
+Section BigCatPartitionLemma.
+  (** Consider an item type [X] and partition type [Y] both supporting equality comparisons. *)
+  Variable X Y : eqType.
+
+  (** Consider a sequence of items of type [X] ... *)
+  Variable xs : seq X.
+  (** ... and a sequence of partitions. *)
+  Variable ys : seq Y.
+
+  (** Consider a predicate [P] on [X]. *)
+  Variable P : pred X.
+
+  (** Define a mapping from items to partitions. *)
+  Variable x_to_y : X -> Y.
+
+  (** We assume that any item in [xs] has its corresponding partition in the sequence of partitions [ys]. *)
+  Hypothesis H_no_partition_missing : forall x, x \in xs -> P x -> x_to_y x \in ys.
+
+  (** Consider a partition of [xs]. *)
+  Let partitioned_seq (y : Y) := [seq x <- xs | P x && (x_to_y x == y)].
+
+  (** We prove that any element in [xs] is also contained in the union of the partitions. *)
+  Lemma bigcat_partitions:
+    forall j,
+      (j \in [seq x <- xs | P x])
+      = (j \in \cat_(y <- ys) partitioned_seq y).
+  Proof.
+    move=> j.
+    apply /idP/idP.
+    { rewrite mem_filter => /andP [PredJ_true IN].
+      apply mem_bigcat with (x := x_to_y j).
+      { move: IN PredJ_true.
+        by apply H_no_partition_missing. }
+      rewrite mem_filter.
+      by do 2! [apply /andP; split; eauto]. }
+    { move=> /mem_bigcat_exists [x [x_IN IN]].
+      move: IN.
+      rewrite !mem_filter.
+      move=> /andP [/andP [PredJ X_to_Y_eq] IN].
+      by apply /andP. }
+  Qed.
+
+End BigCatPartitionLemma.

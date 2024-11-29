@@ -2,8 +2,6 @@ Require Export prosa.behavior.all.
 Require Export prosa.util.all.
 Require Export prosa.model.task.arrivals.
 
-
-
 (** * Arrival Sequence *)
 
 (** First, we relate the stronger to the weaker arrival predicates. *)
@@ -478,6 +476,34 @@ Section ArrivalSequencePrefix.
    Qed.
 
   End ArrivalTimes.
+
+  (** In the following section, we establish a lemma that allows splitting the arrival sequence by task. *)
+  Section ArrivalPartition.
+
+    (** If all jobs stem from tasks in a given task set [ts]... *)
+    Variable ts : seq Task.
+    Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+    (** ... then we can partition the arrival sequence by task. *)
+    Lemma arrivals_between_partitioned_by_task:
+      forall t1 t2 j,
+        (j \in arrivals_between arr_seq t1 t2)
+        = (j \in \cat_(tsk <- ts) task_arrivals_between arr_seq tsk t1 t2).
+    Proof.
+      move=> t1 t2 j.
+      rewrite /task_arrivals_between.
+      set l:= arrivals_between arr_seq t1 t2.
+      rewrite -{1}(@filter_predT _ l).
+      under eq_big_seq.
+      { move=> tsk tsk_IN.
+        rewrite (@eq_in_filter _ _ (fun j => (predT j) && (job_of_task tsk j))) => //.
+        over. }
+      apply bigcat_partitions => j' IN' pred_true.
+      apply H_all_jobs_from_taskset.
+      by apply in_arrivals_implies_arrived in IN'.
+    Qed.
+
+  End ArrivalPartition.
 
 End ArrivalSequencePrefix.
 
