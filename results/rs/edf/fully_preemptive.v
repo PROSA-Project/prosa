@@ -17,7 +17,7 @@ Require Export prosa.analysis.facts.workload.edf_athep_bound.
     schedulers, assuming a workload of sporadic real-time tasks
     characterized by arbitrary arrival curves executing upon a
     uniprocessor with arbitrary supply restrictions. To this end, we
-    instantiate the _abstract Sequential Restricted-Supply
+    instantiate the sequential variant of _abstract Restricted-Supply
     Response-Time Analysis_ (aRSA) as provided in the
     [prosa.analysis.abstract.restricted_supply] module. *)
 Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
@@ -34,19 +34,14 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       - the sequence of job arrivals,
       - worst-case execution time (WCET) and the absence of self-suspensions,
       - the set of tasks under analysis,
-      - the task under analysis, and, finally,
-      - an arbitrary schedule of the task set. *)
+      - the task under analysis,
+      - an arbitrary schedule of the task set, and finally,
+      - a supply-bound function. *)
 
   (** *** Processor Model *)
 
-  (** Consider a restricted-supply uniprocessor model, ... *)
+  (** Consider a restricted-supply uniprocessor model. *)
   #[local] Existing Instance rs_processor_state.
-
-  (** ... where the minimum amount of supply is lower-bounded via a
-      monotone unit-supply-bound function [SBF]. *)
-  Context {SBF : SupplyBoundFunction}.
-  Hypothesis H_SBF_monotone : sbf_is_monotone SBF.
-  Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** *** Tasks and Jobs  *)
 
@@ -112,27 +107,34 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
 
   (** *** The Schedule *)
 
-  (** Finally, consider any arbitrary, work-conserving, valid
-      restricted-supply uni-processor schedule of the given arrival
-      sequence [arr_seq] (and hence the given task set [ts]) ... *)
+  (** Consider any arbitrary, work-conserving, valid restricted-supply
+      uni-processor schedule of the given arrival sequence [arr_seq]
+      (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-  (** ... and assume that the schedule respects the EDF policy. *)
+  (** Assume that the schedule respects the EDF policy. *)
   Hypothesis H_respects_policy :
     respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
 
-  (** Last but not least, we assume that [SBF] properly characterizes
-      all busy intervals (w.r.t. task [tsk]) in [sched]. That is, (1)
-      [SBF 0 = 0] and (2) for any duration [Δ], at least [SBF Δ]
-      supply is available in any busy-interval prefix of length
-      [Δ]. *)
+  (** *** Supply-Bound Function *)
+
+  (** Assume the minimum amount of supply that any job of task [tsk]
+      receives is defined by a monotone unit-supply-bound function [SBF]. *)
+  Context {SBF : SupplyBoundFunction}.
+  Hypothesis H_SBF_monotone : sbf_is_monotone SBF.
+  Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
+
+  (** We assume that [SBF] properly characterizes all busy intervals
+      (w.r.t. task [tsk]) in [sched]. That is, (1) [SBF 0 = 0] and (2)
+      for any duration [Δ], at least [SBF Δ] supply is available in
+      any busy-interval prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
   (** ** Workload Abbreviation *)
 
-  (** For brevity, let's denote the relative deadline of a task as [D]. *)
+  (** Let's denote the relative deadline of a task as [D]. *)
   Let D tsk := task_deadline tsk.
 
   (** ** Length of Busy Interval *)
@@ -157,8 +159,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
       a solution [F] not exceeding [R]. *)
-  Variable R : duration.
-  Hypothesis H_R_is_maximum :
+  Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
@@ -171,9 +172,11 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       fully-preemptive EDF scheduling with arbitrary supply
       restrictions.  *)
   Theorem uniprocessor_response_time_bound_fully_preemptive_edf :
-    task_response_time_bound arr_seq sched tsk R.
+    forall (R : duration),
+      rta_recurrence_solution R ->
+      task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> js ARRs TSKs.
+    move=> R SOL js ARRs TSKs.
     have [ZERO|POS] := posnP (job_cost js);
                        first by rewrite /job_response_time_bound /completed_by ZERO.
     have READ : work_bearing_readiness arr_seq sched by done.
@@ -196,7 +199,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
         by apply: nonpreemptive_segments_bounded_by_blocking => //.
     - move => A SP.
-      move: (H_R_is_maximum A) => [].
+      move: (SOL A) => [].
       + by apply: search_space_sub => //.
       + move => F [/andP [_ LE] FIX]; exists F; split => //.
         rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
