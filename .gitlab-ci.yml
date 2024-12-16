@@ -102,8 +102,10 @@ compile-and-doc-and-validate:
     - make -j ${NJOBS} all 2>&1 | tee coqc-messages.txt
     - if grep -q Warning coqc-messages.txt; then (echo "Please fix all Coq warnings:"; echo "--"; grep -B1 Warning coqc-messages.txt; exit 1); fi
     - !reference [.make-html, script]
-    - make validate 2>&1 | tee validation-results.txt
-    - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
+    - scripts/check-axiom-free.sh results
+##### `make validate` disabled because of https://github.com/LPCIC/coq-elpi/issues/677 and https://github.com/coq/coq/issues/17345
+#     - make validate 2>&1 | tee validation-results.txt
+#     - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -128,8 +130,10 @@ compile-and-validate:
     - .preferred-stable-version
   script:
     - make -j ${NJOBS}
-    - make validate 2>&1 | tee validation-results.txt
-    - scripts/check-validation-output.sh validation-results.txt
+    - scripts/check-axiom-free.sh results
+##### `make validate` disabled because of https://github.com/LPCIC/coq-elpi/issues/677 and https://github.com/coq/coq/issues/17345
+#     - make validate 2>&1 | tee validation-results.txt
+#     - scripts/check-validation-output.sh validation-results.txt
 
 proof-length:
   stage: build
