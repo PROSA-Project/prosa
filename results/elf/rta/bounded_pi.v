@@ -263,7 +263,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     { rewrite {2}H_fixed_point => t.
       apply leq_trans with (priority_inversion_lp_tasks_bound
                             + priority_inversion_ep_tasks_bound (job_arrival j - t)
-                            + workload_of_higher_or_equal_priority_jobs j (arrivals_between arr_seq t (t + L)));
+                            + workload_of_hep_jobs arr_seq j t (t + L));
         first by rewrite leq_add2r max_leq_add.
       rewrite -addnA leq_add2l /total_hep_rbf.
       rewrite hep_rbf_taskwise_partitioning /total_ep_request_bound_function_FP (bigID (is_ep_causing_intf j t)) /=.
@@ -280,8 +280,10 @@ Section AbstractRTAforELFwithArrivalCurves.
         apply leq_trans with (task_request_bound_function tsk_other ε).
         - by apply: leq_pmulr.
         - by apply/leq_mul/(H_valid_arrival_curve _ _).2. }
-      { rewrite hep_hp_workload_hp =>//. rewrite /from_hp_task TSK'; exact: sum_of_jobs_le_sum_rbf. }
-      { apply: leq_trans; last by apply: sum_of_jobs_le_sum_rbf.
+      { rewrite hep_hp_workload_hp =>//. rewrite /from_hp_task TSK'; exact: workload_of_jobs_bounded. }
+      { apply leq_trans with (n := workload_of_jobs
+          (fun j0 : Job => ep_task (job_task j0) tsk && is_ep_causing_intf j t (job_task j0))
+          (arrivals_between arr_seq t (t + L))); last by apply workload_of_jobs_bounded.
         rewrite /workload_of_jobs big_seq_cond [leqRHS]big_seq_cond.
         apply: sub_le_big => //; first by move => ? ?; apply: leq_addr.
         move=> j0; case eq: (_ \in _) =>//=.
@@ -462,7 +464,7 @@ Section AbstractRTAforELFwithArrivalCurves.
              => i /andP[/andP[? ?] ?].
         by apply/andP; split. }
       { have [LEQ|GT] := leqP Δ `|Num.max 0%R (ep_task_intf_interval tsk_o A)%R|; [| apply ltnW in GT].
-        { apply: leq_trans; last by eapply task_workload_le_task_rbf.
+        { apply: leq_trans; last by eapply rbf_spec.
           apply: (workload_of_jobs_weaken _ (fun j0 => (job_task j0 == tsk_o))).
           by move => j'/ andP[_ EXACT]. }
         { apply: leq_trans;
@@ -473,7 +475,7 @@ Section AbstractRTAforELFwithArrivalCurves.
             have -> : `|Num.max 0%R (t1%:R + ep_task_intf_interval tsk_o A)%R|
                      = t1 + `|Num.max 0%R (ep_task_intf_interval tsk_o A)|
               by clear -EQ; lia.
-            by apply: (workload_le_rbf' arr_seq tsk_o _ _  t1 _ (fun jo => hep_job jo j)). }
+            by apply: rbf_spec' => // ? /andP[]. }
           { move => j' IN1.
             have [TSK'|_] := (eqVneq  (job_task j') tsk_o).
             - by rewrite !andbT TSK TSK' ep_task_sym EP andbT.
@@ -492,7 +494,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         first by apply: service_of_jobs_le_workload.
       rewrite /workload_of_jobs /total_hp_request_bound_function_FP.
       rewrite [X in X <= _](eq_big (fun j0 => hp_task (job_task j0) tsk) job_cost) //;
-        first by apply: sum_of_jobs_le_sum_rbf; eauto.
+        first by apply: workload_of_jobs_bounded; eauto.
       rewrite /hp_task_hep_job  => j'.
       rewrite andb_idl => [|?].
       - by move: H_job_of_task => /eqP ->.

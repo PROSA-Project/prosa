@@ -105,9 +105,8 @@ Section Sequential_Abstract_RTA.
   Hypothesis H_task_interference_is_bounded :
     task_interference_is_bounded_by arr_seq sched tsk task_IBF.
 
-  (** Let's define some local names for clarity. *)
+  (** Let us abbreviate task [tsk]'s RBF for clarity. *)
   Let task_rbf := task_request_bound_function tsk.
-  Let arrivals_between := arrivals_between arr_seq.
 
   (** Given any job [j] of task [tsk] that arrives exactly [A] units
       after the beginning of the busy interval, the bound on the total

@@ -45,7 +45,6 @@ Section WorkloadTaskSum.
 
   (** ... and focus on the jobs arriving in an arbitrary interval <<[t1, t2)>>. *)
   Variable t1 t2 : duration.
-  Let jobs_arrived := arrivals_between arr_seq t1 t2.
 
   (** We first consider jobs that belong to other tasks that have equal priority
       as [tsk] and have higher-or-equal priority [JLFP] than [j]. *)
@@ -58,11 +57,11 @@ Section WorkloadTaskSum.
   (** We then establish that the cumulative workload of these jobs can be partitioned
       task-wise. *)
   Lemma hep_workload_from_other_ep_partitioned_by_tasks :
-    workload_of_jobs hep_job_of_ep_other_task jobs_arrived
+    workload_of_jobs hep_job_of_ep_other_task (arrivals_between arr_seq t1 t2)
       = \sum_(tsk_o <- ts | other_ep_task tsk_o)
         workload_of_jobs
           (fun j0 => hep_job_of_ep_other_task j0 && (job_task j0 == tsk_o))
-          jobs_arrived.
+          (arrivals_between arr_seq t1 t2).
   Proof.
     apply: workload_of_jobs_partitioned_by_tasks => //.
     - by move=> j' IN'; apply/H_all_jobs_from_taskset/in_arrivals_implies_arrived/IN'.
@@ -71,7 +70,6 @@ Section WorkloadTaskSum.
         => /andP [/andP [_ EP] NEQ].
       apply/andP; split => //.
       by rewrite ep_task_sym.
-    - by apply: arrivals_uniq.
   Qed.
 
   (** Now we focus on jobs belonging to tasks which have higher priority than [tsk]. *)
@@ -91,7 +89,8 @@ Section WorkloadTaskSum.
       jobs belonging to tasks having higher priority than [tsk] is equal to the
       cumulative workload of jobs belonging to higher-priority tasks. *)
   Lemma hep_hp_workload_hp :
-    workload_of_jobs hep_from_hp_task jobs_arrived = workload_of_jobs from_hp_task jobs_arrived.
+    workload_of_jobs hep_from_hp_task (arrivals_between arr_seq t1 t2)
+    = workload_of_jobs from_hp_task (arrivals_between arr_seq t1 t2).
   Proof.
     apply/eq_bigl =>j0; apply /idP/idP.
     - by move=> /andP[].
@@ -104,11 +103,11 @@ Section WorkloadTaskSum.
       belonging to higher-priority tasks and the cumulative workload of
       higher-or-equal-priority jobs belonging to equal-priority tasks. *)
   Lemma hep_workload_partitioning_taskwise :
-    workload_of_higher_or_equal_priority_jobs j jobs_arrived
-    = workload_of_jobs hep_from_hp_task jobs_arrived
-      + workload_of_jobs hep_from_ep_task jobs_arrived.
+    workload_of_hep_jobs arr_seq j t1 t2
+    = workload_of_jobs hep_from_hp_task (arrivals_between arr_seq t1 t2)
+      + workload_of_jobs hep_from_ep_task (arrivals_between arr_seq t1 t2).
   Proof.
-    rewrite /workload_of_higher_or_equal_priority_jobs /workload_of_jobs.
+    rewrite /workload_of_hep_jobs /workload_of_jobs.
     rewrite (bigID from_hp_task) /=; congr (_ + _); apply: eq_bigl => j0.
     apply: andb_id2l => HEPj.
     have HEPt : hep_task (job_task j0) (job_task j) by apply (hep_job_implies_hep_task JLFP).

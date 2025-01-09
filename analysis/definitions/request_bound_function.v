@@ -10,91 +10,57 @@ Require Export prosa.util.sum.
 
 Section TaskWorkloadBoundedByArrivalCurves.
 
-  (** Consider any type of tasks ... *)
+  (** Consider any type of task characterized by a WCET bound and an arrival curve. *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task}.
-
-  (** ... and any type of jobs associated with these tasks, where each task has
-      a cost. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobCost Job}.
-
-  (** Also assume an FP policy that indicates a higher-or-equal priority
-      relation. *)
-  Context `{FP_policy Task}.
-
-  (** Let [MaxArrivals] denote any function that takes a task and an interval length
-      and returns the associated number of job arrivals of the task. *)
-  Context `{MaxArrivals Task}.
+  Context `{TaskCost Task} `{MaxArrivals Task}.
 
   (** ** RBF of a Single Task *)
 
-  (** In this section, we define a bound for the workload of a single task
-      under uni-processor FP scheduling. *)
-  Section SingleTask.
-
-    (** Consider any task [tsk] that is to be scheduled in an interval of length delta. *)
-    Variable tsk : Task.
-    Variable delta : duration.
-
-    (** We define the following workload bound for the task. *)
-    Definition task_request_bound_function :=
-      task_cost tsk * max_arrivals tsk delta.
-
-  End SingleTask.
+  (** We define the classic notion of an RBF, which for a given task [tsk]
+      and interval length [Δ], bounds the maximum cumulative processor demand
+      of all jobs released by [tsk] in any interval of length [Δ]. *)
+  Definition task_request_bound_function (tsk : Task) (Δ : duration) :=
+    task_cost tsk * max_arrivals tsk Δ.
 
   (** ** Total RBF of Multiple Tasks *)
 
-  (** In this section, we define a bound for the workload of multiple tasks. *)
-  Section AllTasks.
+  (** Next, we extend the notion of an RBF to multiple tasks in the obvious way. *)
 
-    (** Consider a task set ts... *)
-    Variable ts : list Task.
+  (** Consider a set of tasks [ts]. *)
+  Variable ts : seq Task.
 
-    (** ...and let [tsk] be any task in task set. *)
-    Variable tsk : Task.
+  (** The joint total RBF of all tasks in [ts] is simply the sum of each task's RBF. *)
+  Definition total_request_bound_function (Δ : duration) :=
+    \sum_(tsk <- ts) task_request_bound_function tsk Δ.
 
-    (** Let delta be the length of the interval of interest. *)
-    Variable delta : duration.
+  (** For convenience, we additionally introduce specialized notions of total RBF for use 
+      under FP scheduling that consider only certain tasks.
+      relation. *)
+  Context `{FP_policy Task}.
 
-    (** Recall the definition of higher-or-equal-priority task for FP scheduling. *)
-    Let is_hep_task tsk_other := hep_task tsk_other tsk.
-    Let is_other_hep_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk).
-    Let is_hp_task tsk_other := hp_task tsk_other tsk.
-    Let is_ep_task tsk_other := ep_task tsk_other tsk.
+  (** We define the following bound for the total workload of
+      tasks of higher-or-equal priority (with respect to [tsk]) in any interval
+      of length Δ. *)
+  Definition total_hep_request_bound_function_FP (tsk : Task) (Δ : duration) :=
+    \sum_(tsk_other <- ts | hep_task tsk_other tsk)
+     task_request_bound_function tsk_other Δ.
 
-    (** Using the sum of individual workload bounds, we define the following
-        bound for the total workload of tasks in any interval of length
-        delta. *)
-    Definition total_request_bound_function :=
-      \sum_(tsk <- ts) task_request_bound_function tsk delta.
+  (** We also define a bound for the total workload of higher-or-equal-priority
+      tasks other than [tsk] in any interval of length [Δ]. *)
+  Definition total_ohep_request_bound_function_FP (tsk : Task) (Δ : duration) :=
+    \sum_(tsk_other <- ts | hep_task tsk_other tsk && (tsk_other != tsk))
+      task_request_bound_function tsk_other Δ.
 
-    (** Similarly, we define the following bound for the total workload of
-        tasks of higher-or-equal priority (with respect to [tsk]) in any interval
-        of length delta. *)
-    Definition total_hep_request_bound_function_FP :=
-      \sum_(tsk_other <- ts | is_hep_task tsk_other)
-       task_request_bound_function tsk_other delta.
+  (** We also define a bound for the total workload of higher-or-equal-priority
+      tasks other than [tsk] in any interval of length [Δ]. *)
+  Definition total_ep_request_bound_function_FP (tsk : Task) (Δ : duration) :=
+    \sum_(tsk_other <- ts | ep_task tsk_other tsk)
+      task_request_bound_function tsk_other Δ.
 
-    (** We also define a bound for the total workload of higher-or-equal-priority
-        tasks other than [tsk] in any interval of length [delta]. *)
-    Definition total_ohep_request_bound_function_FP :=
-      \sum_(tsk_other <- ts | is_other_hep_task tsk_other)
-        task_request_bound_function tsk_other delta.
-
-    (** We also define a bound for the total workload of higher-or-equal-priority
-        tasks other than [tsk] in any interval of length [delta]. *)
-    Definition total_ep_request_bound_function_FP :=
-      \sum_(tsk_other <- ts | is_ep_task tsk_other)
-        task_request_bound_function tsk_other delta.
-
-    (** Finally, we define a bound for the total workload of higher-priority
-        tasks in any interval of length delta. *)
-    Definition total_hp_request_bound_function_FP :=
-      \sum_(tsk_other <- ts | is_hp_task tsk_other)
-       task_request_bound_function tsk_other delta.
-
-  End AllTasks.
+  (** Finally, we define a bound for the total workload of higher-priority
+      tasks in any interval of length [Δ]. *)
+  Definition total_hp_request_bound_function_FP (tsk : Task) (Δ : duration) :=
+    \sum_(tsk_other <- ts | hp_task tsk_other tsk)
+     task_request_bound_function tsk_other Δ.
 
 End TaskWorkloadBoundedByArrivalCurves.

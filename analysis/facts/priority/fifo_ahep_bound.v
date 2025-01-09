@@ -110,9 +110,9 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
           apply leq_sum => tsk' _; rewrite andbC //=.
           destruct (tsk' \in rem (T:=Task) tsk ts) eqn:IN; last by [].
           apply rem_in in IN.
-          eapply leq_trans;
-            last by apply (task_workload_le_task_rbf _ _ _ IN H_valid_job_cost H_is_arrival_curve t1).
-          by rewrite addnBAC //= subnKC //= addn1; apply leqW.
+          rewrite addnBAC //=.
+          apply: leq_trans; last by apply rbf_spec with (t := t1) (Δ := job_arrival j + 1 - t1).
+          by rewrite subnKC //= addn1; apply leqW.
       + move : H_job_of_task => TSKj.
         rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=;
                 first by rewrite TSKj; apply leq_addr.

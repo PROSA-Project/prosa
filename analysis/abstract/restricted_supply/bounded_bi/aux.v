@@ -96,7 +96,8 @@ Section BoundedBusyIntervalsAux.
   Lemma service_lt_workload_in_busy :
     forall t,
       t1 < t < t2 ->
-      service_of_hep_jobs arr_seq sched j t1 t < workload_of_hep_jobs arr_seq j t1 t.
+      service_of_hep_jobs arr_seq sched j t1 t
+      < workload_of_hep_jobs arr_seq j t1 t.
   Proof.
     move=> t /andP [LT1 LT2]; move: (H_busy_prefix) => PREF.
     move_neq_up LE.
@@ -154,7 +155,7 @@ Section BoundedBusyIntervalsAux.
     }
     rewrite cumulative_interfering_workload_split // cumulative_interference_split //.
     rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //; last by apply PREF.
-    rewrite -[leqRHS]addnC -[leqRHS]addnA [(_ + workload_of_job _ _ _ _ )]addnC.
+    rewrite -[leqRHS]addnC -[leqRHS]addnA [(_ + workload_of_job _ _ _ _)]addnC.
     rewrite workload_job_and_ahep_eq_workload_hep //.
     rewrite -addnC -addnA [(_ + service_during _ _ _ _ )]addnC.
     rewrite service_plus_ahep_eq_service_hep //; last by move: PREF => [_ [_ [_ /andP [A B]]]].

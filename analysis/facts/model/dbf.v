@@ -87,15 +87,15 @@ Section ProofDemandBoundDefinition.
   Proof.
     move=> tsk t delta IN0.
     have ->: task_demand_within tsk t (t + delta)
-      = task_workload_between arr_seq tsk t (t + (delta - (task_deadline tsk - 1))).
-      { rewrite /task_demand_within/task_workload_between/task_workload/workload_of_jobs.
-        under eq_bigl do rewrite andbC.
-        rewrite -big_filter.
-        move: (task_arrivals_with_deadline_within_eq tsk t delta).
-        rewrite /task_arrivals_with_deadline_within/task_arrivals_between => ->.
-        by rewrite big_filter. }
-    rewrite /task_demand_bound_function/task_workload_between/task_workload.
-    by apply workload_le_rbf.
+             = task_workload tsk (arrivals_between arr_seq t (t + (delta - (task_deadline tsk - 1)))).
+    { rewrite /task_demand_within/task_workload/workload_of_jobs.
+      under eq_bigl do rewrite andbC.
+      rewrite -big_filter.
+      move: (task_arrivals_with_deadline_within_eq tsk t delta).
+      rewrite /task_arrivals_with_deadline_within/task_arrivals_between => ->.
+      by rewrite big_filter. }
+    rewrite /task_demand_bound_function/task_workload.
+    by apply: rbf_spec.
   Qed.
 
   (** We also prove that [task_demand_within] is less than shifted RBF. *)
@@ -119,43 +119,15 @@ Section ProofDemandBoundDefinition.
   (** Assume that all jobs come from the task set [ts]. *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
-  (** We relate [total_demand_within] to the sum of each task's demand [task_demand_within]. *)
-  Lemma total_demand_within_le_sum_over_partitions:
-    forall (t : instant) (delta : duration),
-      total_demand_within t (t + delta) <= \sum_(tsk <- ts) task_demand_within tsk t (t + delta).
-  Proof.
-    move=> t delta.
-    rewrite /total_demand_within/task_demand_within.
-    rewrite /workload_of_jobs.
-    apply sum_over_partitions_le.
-    move=> j' IN ?.
-    apply H_all_jobs_from_taskset.
-    by apply in_arrivals_implies_arrived in IN.
-  Qed.
-
-  (** Here we prove a stronger version of the above lemma by assuming that the task set [ts] is indeed a set. *)
-  Lemma total_demand_within_partitioned_by_tasks:
-    forall (t : instant) (delta : duration),
-      uniq ts ->
-      total_demand_within t (t + delta) = \sum_(tsk <- ts) task_demand_within tsk t (t + delta).
-  Proof.
-    move=> t delta UniqTS.
-    rewrite /total_demand_within/task_demand_within.
-    rewrite /job_of_task.
-    apply workload_of_jobs_partitioned_by_tasks => //=.
-    move=> j' IN.
-    apply H_all_jobs_from_taskset.
-    by apply in_arrivals_implies_arrived in IN.
-  Qed.
-
   (** Finally we establish that [total_demand_within] is bounded by [total_demand_bound_function]. *)
   Lemma total_demand_within_le_total_dbf:
     forall (t : instant) (delta : duration),
       total_demand_within t (t + delta) <= total_demand_bound_function ts delta.
   Proof.
     move=> t delta.
-    apply (@leq_trans (\sum_(tsk <- ts) task_demand_within tsk t (t + delta)));
-      first by apply total_demand_within_le_sum_over_partitions.
+    apply (@leq_trans (\sum_(tsk <- ts) task_demand_within tsk t (t + delta))).
+    { apply workload_of_jobs_le_sum_over_partitions => //.
+      move=> j IN; by apply in_arrivals_implies_arrived in IN. }
     rewrite /total_demand_bound_function.
     apply leq_sum_seq => tsk' tsk_IN P_tsk.
     by apply task_demand_within_le_task_dbf.

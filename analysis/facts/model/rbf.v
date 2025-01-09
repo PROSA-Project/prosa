@@ -1,24 +1,23 @@
 Require Export prosa.analysis.facts.model.workload.
 Require Export prosa.analysis.facts.model.arrival_curves.
+Require Export prosa.analysis.facts.model.task_cost.
 Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.tactics.
 Require Export prosa.analysis.definitions.workload.bounded.
 
-(** * Facts about Request Bound Functions (RBFs) *)
+(** * Facts about Request-Bound Functions (RBFs) *)
 
-(** In this file, we prove some lemmas about request bound functions. *)
+(** In this file, we prove some lemmas about RBFs. *)
 
 (** ** RBF is a Bound on Workload *)
 
-(** First, we show that a task's RBF is indeed an upper bound on its
-    workload. *)
-Section ProofWorkloadBound.
+Section ProofRequestBoundFunction.
 
-  (** Consider any type of tasks ... *)
+  (** Consider any type of tasks characterized by WCETs and arrival curves ... *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task}.
+  Context `{TaskCost Task} `{MaxArrivals Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -26,252 +25,241 @@ Section ProofWorkloadBound.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider any arrival sequence with consistent, non-duplicate arrivals, ... *)
+  (** Consider any valid arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... any schedule corresponding to this arrival sequence, ... *)
+  (** ... and any schedule corresponding to this arrival sequence. *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
-  Hypothesis H_jobs_come_from_arrival_sequence :
-    jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
-  (** ... and an FP policy that indicates a higher-or-equal priority relation. *)
-  Context `{FP_policy Task}.
+  (** Assume that the job costs are no larger than the task costs. *)
+  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
-  (** Further, consider a task set [ts]... *)
-  Variable ts : seq Task.
+  (** In this section, we establish that a task's RBF is indeed an upper bound
+      on the task's workload. *)
+  Section RBF.
 
-  (** ... and let [tsk] be any task in [ts]. *)
-  Variable tsk : Task.
-  Hypothesis H_tsk_in_ts : tsk \in ts.
+    (** Consider a given task [tsk]. *)
+    Variable tsk : Task.
 
-  (** Assume that the job costs are no larger than the task costs ... *)
-  Hypothesis H_valid_job_cost :
-    arrivals_have_valid_job_costs arr_seq.
-
-  (** ... and that all jobs come from the task set. *)
-  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
-
-  (** Let [max_arrivals] be any arrival bound for task-set [ts]. *)
-  Context `{MaxArrivals Task}.
-  Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
-
-  (** Next, recall the notions of total workload of jobs... *)
-  Let total_workload t1 t2 := workload_of_jobs predT (arrivals_between arr_seq t1 t2).
-
-  (** ... and the workload of jobs of the same task as job j. *)
-  Let task_workload t1 t2 :=
-    workload_of_jobs (job_of_task tsk) (arrivals_between arr_seq t1 t2).
-
-  (** Finally, let us define some local names for clarity. *)
-  Let rbf := task_request_bound_function.
-  Let total_rbf := total_request_bound_function ts.
-  Let total_hep_rbf := total_hep_request_bound_function_FP ts.
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts.
-
-  (** In this section, we prove that the workload of all jobs is
-      no larger than the request bound function. *)
-  Section WorkloadIsBoundedByRBF.
-
-    (** Consider any time [t] and any interval of length [Δ]. *)
-    Variable t : instant.
-    Variable Δ : instant.
-
-    (** First, we show that workload of task [tsk] is bounded by the number of
-        arrivals of the task times the cost of the task. *)
-    Lemma task_workload_le_num_of_arrivals_times_cost:
-      task_workload t (t + Δ)
-      <= task_cost tsk * number_of_task_arrivals arr_seq tsk t (t + Δ).
+    (** First, as a stepping stone, we observe that any sequence of jobs of the
+        task jointly satisfy the task's WCET. *)
+    Lemma task_workload_between_bounded :
+      forall t1 t2,
+        task_workload_between arr_seq tsk t1 t2
+        <= task_cost tsk * number_of_task_arrivals arr_seq tsk t1 t2.
     Proof.
-      rewrite /task_workload /workload_of_jobs/ number_of_task_arrivals
-              /task_arrivals_between -big_filter -sum1_size big_distrr big_filter.
-      destruct (task_arrivals_between arr_seq tsk t (t + Δ)) eqn:TASK.
-      { unfold task_arrivals_between in TASK.
-        by rewrite -big_filter !TASK !big_nil. }
-      { rewrite //= big_filter big_seq_cond [in X in _ <= X]big_seq_cond.
-        apply leq_sum.
-        move => j' /andP [IN TSKj'].
-        rewrite muln1.
-        move: TSKj' => /eqP TSKj'; rewrite -TSKj'.
-        apply H_valid_job_cost.
-        by apply in_arrivals_implies_arrived in IN. }
+      move=> t Δ.
+      rewrite /number_of_task_arrivals/task_arrivals_between.
+      rewrite /task_workload_between/task_workload/workload_of_jobs -big_filter.
+      apply: sum_job_costs_bounded.
+      move=> j /[! mem_filter ] /andP [TSK IN]; apply /andP; split => //.
+      by apply/H_valid_job_cost/in_arrivals_implies_arrived.
     Qed.
 
-    (** As a corollary, we prove that workload of task is no larger the than
-        task request bound function. *)
-    Corollary task_workload_le_task_rbf:
-      task_workload t (t + Δ) <= rbf tsk Δ.
+    (** Next, suppose that task [tsk] respects its arrival curve [max_arrivals]. *)
+    Hypothesis H_tsk_arrivals_bounded : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
+
+    (** From this assumption, we establish the RBF spec: In any interval of any
+        length, the RBF upper-bounds the task's actual workload. *)
+    Lemma rbf_spec :
+      forall t Δ,
+        task_workload_between arr_seq tsk t (t + Δ)
+        <= task_request_bound_function tsk Δ.
     Proof.
-      eapply leq_trans; first by apply task_workload_le_num_of_arrivals_times_cost.
+      move=> t Δ.
+      apply: leq_trans; first by apply: task_workload_between_bounded.
+      rewrite /task_request_bound_function.
       rewrite leq_mul2l; apply/orP; right.
       rewrite -{2}[Δ](addKn t).
-      by apply H_is_arrival_bound; last rewrite leq_addr.
+      by apply/H_tsk_arrivals_bounded/leq_addr.
     Qed.
 
-    (** Next, we prove that total workload of tasks is no larger than the total
-        request bound function. *)
-    Lemma total_workload_le_total_rbf:
-      total_workload t (t + Δ) <= total_rbf Δ.
+  End RBF.
+
+  (** In this section, we prove a trivial corollary stating that the RBF still
+      upper-bounds the workload when considering only a subset of a task's jobs
+      (namely those satisfying a filter predicate). *)
+  Section SubsetOfJobs.
+
+    (** Consider any predicate [P] on jobs. *)
+    Variable P : pred Job.
+
+    (** Consider any task [tsk] that respects its arrival curve [max_arrivals] *)
+    Variable tsk : Task.
+    Hypothesis H_tsk_arrivals_bounded : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
+
+    (** Assume that all jobs that satisfy [P] come from task [tsk]. *)
+    Hypothesis H_jobs_of_tsk : forall j, P j -> job_of_task tsk j.
+
+    (** Trivially, the workload of jobs from task [tsk] that satisfy the
+        predicate [P] is bounded by the task's RBF. *)
+    Corollary rbf_spec' :
+      forall t Δ,
+        workload_of_jobs P
+          (arrivals_between arr_seq t (t + Δ))
+        <= task_request_bound_function tsk Δ.
     Proof.
-      set l := arrivals_between arr_seq t (t + Δ).
-      apply (@leq_trans (\sum_(tsk' <- ts) (\sum_(j0 <- l | job_task j0 == tsk') job_cost j0))).
-      { rewrite /total_workload.
-        have EXCHANGE := exchange_big_dep predT.
-        rewrite EXCHANGE //=; clear EXCHANGE.
-        rewrite /workload_of_jobs -/l big_seq_cond [X in _ <= X]big_seq_cond.
-        apply leq_sum; move => j0 /andP [IN0 HP0].
-        rewrite big_mkcond (big_rem (job_task j0)) /=.
-        - by rewrite eq_refl; apply leq_addr.
-        - by apply in_arrivals_implies_arrived in IN0; apply H_all_jobs_from_taskset. }
-      apply leq_sum_seq; intros tsk0 INtsk0 HP0.
-      apply (@leq_trans (task_cost tsk0 * size (task_arrivals_between arr_seq tsk0 t (t + Δ)))).
-      { rewrite -sum1_size big_distrr /= big_filter -/l /workload_of_jobs muln1.
-        apply leq_sum_seq => j0 IN0 /eqP <-.
-        apply H_valid_job_cost.
-        by apply in_arrivals_implies_arrived in IN0. }
-      { rewrite leq_mul2l; apply/orP; right.
-        rewrite -{2}[Δ](addKn t).
-        by apply H_is_arrival_bound; last rewrite leq_addr. }
+      move=> t Δ.
+      apply: leq_trans; last by apply: rbf_spec.
+      rewrite /task_workload_between/task_workload/workload_of_jobs.
+      by apply leq_sum_seq_pred.
     Qed.
 
-    (** Next, we consider any job [j] of [tsk]. *)
+  End SubsetOfJobs.
+
+  (** Now, consider a task set [ts] ... *)
+  Variable ts : seq Task.
+
+  (** ... and assume that all jobs come from the task set. *)
+  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+  (** Assume that all tasks in the task set respect [max_arrivals]. *)
+  Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
+
+  (** Next, we prove that total workload is upper-bounded by the total RBF. *)
+  Lemma total_workload_le_total_rbf :
+    forall t Δ,
+      total_workload_between arr_seq t (t + Δ) <= total_request_bound_function ts Δ.
+  Proof.
+    move=> t Δ.
+    apply leq_trans with (n := \sum_(tsk <- ts) task_workload_between arr_seq tsk t (t + Δ)).
+    { apply: workload_of_jobs_le_sum_over_partitions => //.
+      move=> j IN; by apply in_arrivals_implies_arrived in IN. }
+    rewrite /total_request_bound_function.
+    apply leq_sum_seq => tsk' tsk_IN ?.
+    by apply rbf_spec.
+  Qed.
+
+  (** In this section, we prove a more general result about the workload of
+      arbitrary sets of jobs. *)
+  Section SumRBF.
+
+    (** Consider two predicates, one on jobs and one on tasks. *)
+    Variable pred1 : pred Job.
+    Variable pred2 : pred Task.
+
+    (** Assume that for all jobs satisfying [pred1], the task it belongs to
+        satisfies [pred2]. *)
+    Hypothesis H_also_satisfied : forall j, pred1 j -> pred2 (job_task j).
+
+    (** We prove that the workload of all jobs satisfying predicate [pred1] is
+        bounded by the sum of task RBFs over tasks that satisfy the predicate
+        [pred2]. *)
+    Lemma workload_of_jobs_bounded :
+      forall t Δ,
+        workload_of_jobs (pred1) (arrivals_between arr_seq t (t + Δ))
+        <= \sum_(tsk' <- ts | pred2 tsk') task_request_bound_function tsk' Δ.
+    Proof.
+      move=> t Δ.
+      rewrite /workload_of_jobs.
+      apply (@leq_trans (\sum_(tsk <- ts | pred2 tsk)
+                (\sum_(j <- arrivals_between arr_seq t (t + Δ) | (job_task j == tsk) && (pred1 j))
+                    job_cost j))).
+      { rewrite (exchange_big_dep pred1) //=;
+          last by move=> ? ? ? /andP[].
+        rewrite big_seq_cond [X in _ <= X]big_seq_cond.
+        rewrite leq_sum //= => j' /andP [IN' Pj'].
+        rewrite Pj'.
+        under eq_bigl do [rewrite andbA; rewrite andbT].
+        rewrite (big_rem (job_task j')) //=;
+          last by apply/H_all_jobs_from_taskset/in_arrivals_implies_arrived.
+        rewrite (H_also_satisfied _  Pj') eq_refl //=.
+        by apply leq_addr. }
+      { rewrite leq_sum_seq //=.
+        move=> tsk' tsk_in_ts' P_tsk'.
+        apply (@leq_trans (\sum_(j <- arrivals_between arr_seq t (t + Δ)
+                | job_task j == tsk') job_cost j)).
+        - rewrite leq_sum_seq_pred //=.
+          by move=> ? ? /andP[].
+        - exact: rbf_spec. }
+    Qed.
+
+  End SumRBF.
+
+
+  (** Next, we establish bounds specific to fixed-priority scheduling. *)
+  Section FP.
+
+    (** Consider an arbitrary fixed-priority policy ... *)
+    Context {FP : FP_policy Task}.
+
+    (** ... and any given task. *)
+    Variable tsk : Task.
+
+    (** The [athep_workload_is_bounded] predicate used below allows the workload
+        bound to depend on two arguments: the relative offset [A] (w.r.t. the
+        beginning of the corresponding busy interval) of a job to be analyzed
+        and the length of an interval [Δ]. In the case of FP scheduling, the
+        relative offset ([A]) does not play a role and is therefore ignored.
+
+        Let's abbreviate [total_ohep_request_bound_function_FP] such that the
+        [A] argument is ignored. *)
+    Let total_ohep_rbf (_A Δ : duration) :=
+          total_ohep_request_bound_function_FP ts tsk Δ.
+
+    (** We next prove that the higher-or-equal-priority workload of tasks
+        different from [tsk] is bounded by [total_ohep_rbf]. *)
+    Lemma athep_workload_le_total_ohep_rbf :
+      athep_workload_is_bounded arr_seq sched tsk total_ohep_rbf.
+    Proof.
+      move => j t1 Δ POS TSK _.
+      rewrite /workload_of_jobs /total_ohep_request_bound_function_FP.
+      rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
+      apply: workload_of_jobs_bounded.
+      by move: TSK => /eqP ->.
+    Qed.
+
+    (** Consider any job [j] of [tsk]. *)
     Variable j : Job.
     Hypothesis H_job_of_tsk : job_of_task tsk j.
 
-    (** We prove that the sum of job cost of jobs whose corresponding
-        task satisfies a predicate [pred] is bounded by the RBF of
-        these tasks. *)
-    Lemma sum_of_jobs_le_sum_rbf :
-      forall (pred : pred Task),
-        \sum_(j' <- arrivals_between arr_seq t (t + Δ) | pred (job_task j'))
-         job_cost j' <=
-          \sum_(tsk' <- ts| pred tsk')
-           task_request_bound_function tsk' Δ.
-    Proof.
-      move => pred.
-      apply (@leq_trans (\sum_(tsk' <- filter pred ts)
-                           (\sum_(j' <-  arrivals_between arr_seq t (t + Δ)
-                                 | job_task j' == tsk') job_cost j'))).
-      - move: (H_job_of_tsk) => /eqP TSK.
-        rewrite [X in _ <= X]big_filter.
-        set P := fun x => pred (job_task x).
-        rewrite (exchange_big_dep P) //=; last by rewrite /P; move => ???/eqP->.
-        rewrite  /P /workload_of_jobs big_seq_cond [X in _ <= X]big_seq_cond.
-        apply leq_sum => j0 /andP [IN0 HP0].
-        rewrite big_mkcond (big_rem (job_task j0)).
-        + by rewrite HP0 andTb eq_refl; apply leq_addr.
-        + by apply in_arrivals_implies_arrived in IN0; apply H_all_jobs_from_taskset.
-      - rewrite big_filter.
-        apply leq_sum_seq => tsk0 INtsk0 HP0.
-        apply (@leq_trans (task_cost tsk0 * size (task_arrivals_between arr_seq tsk0 t (t + Δ)))).
-        + rewrite -sum1_size big_distrr /= big_filter /workload_of_jobs.
-          rewrite  muln1  /arrivals_between /arrival_sequence.arrivals_between.
-          apply leq_sum_seq; move => j0 IN0 /eqP EQ.
-          by rewrite -EQ; apply H_valid_job_cost; apply in_arrivals_implies_arrived in IN0.
-        + rewrite leq_mul2l; apply/orP; right.
-          rewrite -{2}[Δ](addKn t).
-          by apply H_is_arrival_bound; last by rewrite leq_addr.
-    Qed.
-
-    (** Using lemma [sum_of_jobs_le_sum_rbf], we prove that the
+    (** Using lemma [workload_of_jobs_bounded], we prove that the
         workload of higher-or-equal priority jobs (w.r.t. task [tsk])
         is no larger than the total request-bound function of
         higher-or-equal priority tasks. *)
     Lemma hep_workload_le_total_hep_rbf :
-      workload_of_hep_jobs arr_seq j t (t + Δ) <= total_hep_rbf tsk Δ.
+      forall t Δ,
+        workload_of_hep_jobs arr_seq j t (t + Δ)
+        <= total_hep_request_bound_function_FP ts tsk Δ.
     Proof.
-      rewrite /workload_of_hep_jobs /workload_of_jobs /total_hep_rbf /total_hep_request_bound_function_FP.
-      rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
-      set (pred_task tsk_other := hep_task tsk_other tsk).
-      rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
-              last by move=> j'; rewrite /pred_task; move: H_job_of_tsk => /eqP ->.
-      erewrite (eq_big pred_task); [|by done|by move=> tsk'; eauto].
-      by apply: sum_of_jobs_le_sum_rbf.
+      move=> t Δ.
+      apply workload_of_jobs_bounded.
+      rewrite /hep_job /FP_to_JLFP.
+      by move: H_job_of_tsk => /eqP <-.
     Qed.
 
-  End WorkloadIsBoundedByRBF.
+  End FP.
 
-  (** We next prove that the higher-or-equal-priority workload of
-      tasks different from [tsk] is bounded by [total_ohep_rbf].
+  (** In this section, we show that the total RBF is a bound on higher-or-equal
+      priority workload under any JLFP policy. *)
+  Section JLFP.
 
-      The [athep_workload_is_bounded] predicate allows the workload
-      bound to depend on two arguments: the relative offset [A]
-      (w.r.t. the beginning of the corresponding busy interval) of a
-      job to be analyzed and the length of an interval [Δ]. In the
-      case of FP and [total_ohep_rbf] function, the relative offset
-      ([A]) does not play a role and is therefore ignored. *)
-  Lemma athep_workload_le_total_ohep_rbf :
-    athep_workload_is_bounded
-      arr_seq sched tsk (fun (A Δ : duration) => total_ohep_rbf tsk Δ).
-  Proof.
-    move => j t1 Δ POS TSK _.
-    rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
-    rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
-    set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
-    rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
-            last by move=> j'; rewrite /pred_task; move: TSK => /eqP ->.
-    erewrite (eq_big pred_task) => //.
-    by eapply sum_of_jobs_le_sum_rbf => //.
-  Qed.
+    (** Consider a JLFP policy that indicates a higher-or-equal priority
+        relation ... *)
+    Context `{JLFP_policy Job}.
 
-End ProofWorkloadBound.
+    (** ... and any job [j]. *)
+    Variable j : Job.
 
-(** In this section, we show that total RBF is a bound on
-    higher-or-equal priority workload under any JLFP policy. *)
-Section TotalRBFBound.
+    (** A simple consequence of lemma [hep_workload_le_total_hep_rbf] is that
+        the workload of higher-or-equal priority jobs is bounded by the total
+        request-bound function. *)
+    Corollary hep_workload_le_total_rbf :
+      forall t Δ,
+        workload_of_hep_jobs arr_seq j t (t + Δ)
+        <= total_request_bound_function ts Δ.
+    Proof.
+      move=> t Δ.
+      rewrite /workload_of_hep_jobs (leqRW (workload_of_jobs_weaken _ predT _ _ )); last by done.
+      by apply total_workload_le_total_rbf.
+    Qed.
 
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-  Context `{TaskCost Task}.
+  End JLFP.
 
-  (**  ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
-
-  (** Consider a JLFP policy that indicates a higher-or-equal priority
-      relation ... *)
-  Context `{JLFP_policy Job}.
-
-  (** ... and any valid arrival sequence. *)
-  Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
-
-  (** Further, consider a task set [ts]. *)
-  Variable ts : seq Task.
-
-  (** Assume that the job costs are no larger than the task costs ... *)
-  Hypothesis H_valid_job_cost :
-    arrivals_have_valid_job_costs arr_seq.
-
-  (** ... and that all jobs come from the task set. *)
-  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
-
-  (** Let [max_arrivals] be any arrival bound for task set [ts]. *)
-  Context `{MaxArrivals Task}.
-  Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
-
-  (** Consider any time [t] and any interval of length [Δ]. *)
-  Variable t : instant.
-  Variable Δ : duration.
-
-  (** Next, we consider any job [j]. *)
-  Variable j : Job.
-
-  (** A simple consequence of lemma [hep_workload_le_total_hep_rbf] is
-      that the workload of higher-or-equal priority jobs is bounded by
-      the total request-bound function. *)
-  Corollary hep_workload_le_total_rbf :
-    workload_of_hep_jobs arr_seq j t (t + Δ)
-    <= total_request_bound_function ts Δ.
-  Proof.
-    rewrite /workload_of_hep_jobs (leqRW (workload_of_jobs_weaken _ predT _ _ )); last by done.
-    by apply total_workload_le_total_rbf.
-  Qed.
-
-End TotalRBFBound.
+End ProofRequestBoundFunction.
 
 (** ** RBF Properties *)
 (** In this section, we prove simple properties and identities of RBFs. *)
@@ -302,24 +290,21 @@ Section RequestBoundFunctions.
   Hypothesis H_valid_arrival_curve : valid_arrival_curve (max_arrivals tsk).
   Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
 
-  (** Let's define some local names for clarity. *)
-  Let task_rbf := task_request_bound_function tsk.
-
-  (** We prove that [task_rbf 0] is equal to [0]. *)
+  (** We prove that [task_request_bound_function 0] is equal to [0]. *)
   Lemma task_rbf_0_zero:
-    task_rbf 0 = 0.
+    task_request_bound_function tsk 0 = 0.
   Proof.
-    rewrite /task_rbf /task_request_bound_function.
+    rewrite /task_request_bound_function.
     apply/eqP; rewrite muln_eq0; apply/orP; right; apply/eqP.
     by move: H_valid_arrival_curve => [T1 T2].
   Qed.
 
-  (** We prove that [task_rbf] is monotone. *)
+  (** We prove that [task_request_bound_function] is monotone. *)
   Lemma task_rbf_monotone:
-    monotone leq task_rbf.
+    monotone leq (task_request_bound_function tsk).
   Proof.
-    rewrite /monotone; intros ? ? LE.
-    rewrite /task_rbf /task_request_bound_function leq_mul2l.
+    rewrite /monotone => ? ? LE.
+    rewrite /task_request_bound_function leq_mul2l.
     apply/orP; right.
     by move: H_valid_arrival_curve => [_ T]; apply T.
   Qed.
@@ -331,30 +316,30 @@ Section RequestBoundFunctions.
   (** ... and [max_arrivals tsk ε] is positive. *)
   Hypothesis H_arrival_curve_positive : max_arrivals tsk ε > 0.
 
-  (** Then we prove that [task_rbf] at [ε] is greater than or equal to the task's WCET. *)
+  (** Then we prove that [task_request_bound_function] at [ε] is greater than or equal to the task's WCET. *)
   Lemma task_rbf_1_ge_task_cost:
-    task_rbf ε >= task_cost tsk.
+    task_request_bound_function tsk ε >= task_cost tsk.
   Proof.
     have ALT: forall n, n = 0 \/ n > 0 by clear; intros n; destruct n; [left | right].
     specialize (ALT (task_cost tsk)); destruct ALT as [Z | POS]; first by rewrite Z.
-    rewrite -[task_cost tsk]muln1 /task_rbf /task_request_bound_function.
+    rewrite -[task_cost tsk]muln1 /task_request_bound_function.
     by rewrite leq_pmul2l //=.
   Qed.
 
-  (** As a corollary, we prove that the [task_rbf] at any point [A] greater than
+  (** As a corollary, we prove that the [task_request_bound_function] at any point [A] greater than
       [0] is no less than the task's WCET. *)
   Lemma task_rbf_ge_task_cost:
     forall A,
       A > 0 ->
-      task_rbf A >= task_cost tsk.
+      task_request_bound_function tsk A >= task_cost tsk.
   Proof.
     case => // A GEQ.
     apply: (leq_trans task_rbf_1_ge_task_cost).
     exact: task_rbf_monotone.
   Qed.
 
-  (** Then, we prove that [task_rbf] at [ε] is greater than [0]. *)
-  Lemma task_rbf_epsilon_gt_0 : 0 < task_rbf ε.
+  (** Then, we prove that [task_request_bound_function] at [ε] is greater than [0]. *)
+  Lemma task_rbf_epsilon_gt_0 : 0 < task_request_bound_function tsk ε.
   Proof.
     apply leq_trans with (task_cost tsk) => [//|].
     exact: task_rbf_1_ge_task_cost.
@@ -668,7 +653,7 @@ Section RBFFOrFP.
     rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
       last by move=> j'; rewrite /pred_task; move: H_job_of_task => /eqP ->.
     erewrite (eq_big pred_task); [|by done|by move=> tsk'; eauto].
-    by apply: sum_of_jobs_le_sum_rbf.
+    by apply: workload_of_jobs_bounded.
   Qed.
 
 End RBFFOrFP.
@@ -742,8 +727,7 @@ Section TaskWorkload.
     <= task_cost tsk * number_of_task_arrivals arr_seq tsk (job_arrival j) (t1 + Δ)
        - task_cost tsk.
   Proof.
-    rewrite /task_workload_between /workload.task_workload_between /task_workload
-      /workload_of_jobs /number_of_task_arrivals /task_arrivals_between.
+    rewrite /task_workload_between /task_workload /workload_of_jobs /number_of_task_arrivals.
     rewrite (big_rem j) //= addnC //= H_job_of_task addnK (filter_size_rem j)//.
     rewrite mulnDr mulnC muln1 addnK mulnC.
     apply sum_majorant_constant => j' ARR' /eqP TSK2.
@@ -774,7 +758,7 @@ Section TaskWorkload.
       rewrite /task_workload_between /task_workload (workload_of_jobs_cat _ (job_arrival j) );
         last by apply/andP; split; lia.
       rewrite -!addnBA; first last.
-      + by rewrite /task_workload_between /task_workload
+      + by rewrite /task_workload
           /workload_of_jobs (big_rem j) //= H_job_of_task leq_addr.
       + rewrite -{1}[task_cost tsk]muln1 leq_mul2l; apply/orP; right.
         rewrite /number_of_task_arrivals /task_arrivals_between.
@@ -782,11 +766,9 @@ Section TaskWorkload.
         apply (mem_bigcat _ Job _ (job_arrival j) _); last by apply job_in_arrivals_at => //=.
         rewrite mem_index_iota.
         by apply /andP;split.
-      + have ->: job_arrival j =  t1 + (job_arrival j - t1) by lia.
-        have ->: t1 + (job_arrival j - t1) = job_arrival j by lia.
-        rewrite leq_add//; last by apply task_rbf_without_job_under_analysis_from_arrival => //=.
-        have ->: job_arrival j =  t1 + (job_arrival j - t1) by lia.
-        by eapply (task_workload_le_num_of_arrivals_times_cost ) => //=.
+      + rewrite leq_add //; last by apply: task_rbf_without_job_under_analysis_from_arrival.
+        rewrite -/(task_workload _ _) -/(task_workload_between _ _ _ _).
+        by apply: task_workload_between_bounded.
   Qed.
 
 End TaskWorkload.

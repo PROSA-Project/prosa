@@ -206,11 +206,11 @@ Section AbstractRTAforFPwithArrivalCurves.
       { exists t1, t2; split=> [//|]; split=> [//|].
         by eapply instantiated_busy_interval_equivalent_busy_interval. }
       { intros; rewrite {2}H_fixed_point leq_add //.
-        rewrite /workload_of_higher_or_equal_priority_jobs /total_hep_rbf
+        rewrite /workload_of_hep_jobs /total_hep_rbf
           /total_hep_request_bound_function_FP
           /workload_of_jobs /hep_job /FP_to_JLFP.
         move: (TSK) =>  /eqP ->.
-        exact: sum_of_jobs_le_sum_rbf. }
+        exact: workload_of_jobs_bounded. }
     Qed.
 
     (** Next, we prove that [task_IBF] is indeed an interference
@@ -257,7 +257,7 @@ Section AbstractRTAforFPwithArrivalCurves.
           rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
             last by move=> j'; rewrite /pred_task; move: TSK => /eqP ->.
           erewrite (eq_big pred_task); [|by done|by move=> tsk'; eauto].
-          by apply: sum_of_jobs_le_sum_rbf; eauto. } }
+          by apply: workload_of_jobs_bounded; eauto. } }
     Qed.
 
     (** Finally, we show that there exists a solution for the

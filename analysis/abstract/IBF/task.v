@@ -136,9 +136,8 @@ Section TaskIBFtoJobIBF.
   (** We assume that the schedule is work-conserving. *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-  (** Let's define some local names for clarity. *)
+  (** Let us abbreviate task [tsk]'s RBF for clarity. *)
   Let task_rbf := task_request_bound_function tsk.
-  Let arrivals_between := arrivals_between arr_seq.
 
   (** When assuming sequential tasks, we need to introduce an
       additional hypothesis to ensure that the values of interference
@@ -174,7 +173,7 @@ Section TaskIBFtoJobIBF.
       job_cost j > 0 ->
       busy_interval sched j t1 t2 ->
       task_workload_between arr_seq tsk 0 t1
-      = task_service_of_jobs_in sched tsk (arrivals_between 0 t1) 0 t1.
+      = task_service_of_jobs_in sched tsk (arrivals_between arr_seq 0 t1) 0 t1.
 
   (** To prove the reduction from [task_IBF] to [job_IBF], we need to
       ensure that the scheduling policy, interference, and interfering
@@ -303,7 +302,7 @@ Section TaskIBFtoJobIBF.
               1]. *)
           Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_idle :
             interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
+            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
               + task_interference arr_seq sched j t.
           Proof.
             replace (service_of_jobs_at _ _ _ _) with 0; last first.
@@ -336,7 +335,7 @@ Section TaskIBFtoJobIBF.
               1]. *)
           Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_task:
             interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
+            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
               + task_interference arr_seq sched j t.
           Proof.
             have ARRs : arrives_in arr_seq j'.
@@ -373,7 +372,7 @@ Section TaskIBFtoJobIBF.
               1]. *)
           Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_job :
             interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
+            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
               + task_interference arr_seq sched j t.
           Proof.
             rewrite /task_interference /cond_interference.
@@ -438,7 +437,7 @@ Section TaskIBFtoJobIBF.
               service_at = 1], we get the inequality to [1 ≤ 1]. *)
           Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_j :
             interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
+            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
               + task_interference arr_seq sched j t.
           Proof.
             rewrite interference_and_service_eq_1 -addn1 addnC leq_add //.
@@ -467,7 +466,7 @@ Section TaskIBFtoJobIBF.
             [task_iterference tsk t]. *)
         Lemma interference_plus_sched_le_serv_of_task_plus_task_interference:
           interference j t + service_at sched j t
-          <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between t1 (t1 + A + ε)) t
+          <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
             + task_interference arr_seq sched j t.
         Proof.
           rewrite /task_interference /cond_interference.
@@ -489,17 +488,17 @@ Section TaskIBFtoJobIBF.
       (** Next we prove cumulative version of the lemma above. *)
       Lemma cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference:
         cumulative_interference j t1 (t1 + x)
-        <= (task_service_of_jobs_in sched tsk (arrivals_between t1 (t1 + A + ε)) t1 (t1 + x)
+        <= (task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
            - service_during sched j t1 (t1 + x)) + cumul_task_interference arr_seq sched j t1 (t1 + x).
       Proof.
-        have j_is_in_arrivals_between: j \in arrivals_between t1 (t1 + A + ε).
+        have j_is_in_arrivals_between: j \in arrivals_between arr_seq t1 (t1 + A + ε).
         { eapply arrived_between_implies_in_arrivals => //.
           by apply/andP; split; last rewrite /A subnKC // addn1.
         }
         rewrite /task_service_of_jobs_in /service_of_jobs.task_service_of_jobs_in /service_of_jobs exchange_big //=.
         rewrite -(leq_add2r (\sum_(t1 <= t < (t1 + x)) service_at sched j t)).
         rewrite [X in _ <= X]addnC addnA subnKC; last first.
-        { rewrite (exchange_big _ _ (arrivals_between _ _)) /= (big_rem j) //=.
+        { rewrite (exchange_big _ _ (arrivals_between _ _ _)) /= (big_rem j) //=.
           by rewrite H_job_of_tsk leq_addr. }
         rewrite -big_split -big_split //=.
         rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum //; move => t /andP [NEQ _].
@@ -509,16 +508,16 @@ Section TaskIBFtoJobIBF.
       (** As the next step, the service terms in the inequality above
           can be upper-bound by the workload terms. *)
       Lemma serv_of_task_le_workload_of_task_plus:
-        task_service_of_jobs_in sched tsk (arrivals_between t1 (t1 + A + ε)) t1 (t1 + x)
+        task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
         - service_during sched j t1 (t1 + x) + cumul_task_interference arr_seq sched j t1 (t1 + x)
         <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)
           + cumul_task_interference arr_seq sched j t1 (t1 + x).
       Proof.
-        have j_is_in_arrivals_between: j \in arrivals_between t1 (t1 + A + ε).
+        have j_is_in_arrivals_between: j \in arrivals_between arr_seq t1 (t1 + A + ε).
         { eapply arrived_between_implies_in_arrivals => //.
           by apply/andP; split; last rewrite /A subnKC // addn1. }
         rewrite leq_add2r.
-        rewrite /task_workload /task_service_of_jobs_in/task_service_of_jobs_in/service_of_jobs.
+        rewrite /task_workload_between/task_service_of_jobs_in/task_service_of_jobs_in/service_of_jobs.
         rewrite (big_rem j) ?[X in _ <= X - _](big_rem j) //=; auto using j_is_in_arrivals_between.
         rewrite H_job_of_tsk addnC -addnBA// [X in _ <= X - _]addnC -addnBA//.
         rewrite !subnn !addn0.
@@ -536,7 +535,7 @@ Section TaskIBFtoJobIBF.
           + cumul_task_interference arr_seq sched j t1 (t1 + x).
       Proof.
         by apply leq_trans with
-          (task_service_of_jobs_in sched tsk (arrivals_between t1 (t1 + A + ε)) t1 (t1 + x)
+          (task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
            - service_during sched j t1 (t1 + x)
            + cumul_task_interference arr_seq sched j t1 (t1 + x));
         [ apply cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference
@@ -552,7 +551,7 @@ Section TaskIBFtoJobIBF.
       <= (task_rbf (A + ε) - task_cost tsk) + cumul_task_interference arr_seq sched j t1 (t1 + x).
     Proof.
       set (y := t1 + x) in *.
-      have IN: j \in arrivals_between t1 (t1 + A + ε).
+      have IN: j \in arrivals_between arr_seq t1 (t1 + A + ε).
       { apply: arrived_between_implies_in_arrivals => //.
         by apply/andP; split; last rewrite /A subnKC // addn1. }
       apply leq_trans with (

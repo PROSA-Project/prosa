@@ -174,7 +174,9 @@ Section BoundedBusyIntervals.
           by rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline; lia. }
         erewrite workload_of_jobs_partitioned_by_tasks with (ts := undup ts).
         + eapply leq_trans; first by apply sum_le_subseq, undup_subseq.
-          apply leq_sum_seq => tsk_o INo HEP; rewrite -(leqRW (workload_le_rbf' _ _ _ _ _ _ _)) //.
+          apply leq_sum_seq => tsk_o INo HEP.
+          set P := (fun j' : Job => hep_job j' jlp && (job_task j' == tsk_o)).
+          rewrite -(leqRW (rbf_spec' _ _ P _ _ _ _ _)) /P //; last by move=> ? /andP[].
           have [A | B] := (leqP δ (task_deadline (job_task jlp) - task_deadline tsk_o)).
           { by apply workload_of_jobs_reduce_range; lia. }
           { have EQt: forall a b, a = b -> a <= b; [by lia | apply: EQt].

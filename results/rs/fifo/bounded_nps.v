@@ -213,9 +213,6 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
       all: try done.
       apply instantiated_busy_interval_equivalent_busy_interval => //.
     - apply: soln_abstract_response_time_recurrence => //.
-      move: TSKs => /eqP <-.
-      apply: leq_trans; first by apply POS.
-      by apply H_valid_job_cost.
   Qed.
 
 End RTAforFullyPreemptiveFIFOModelwithArrivalCurves.

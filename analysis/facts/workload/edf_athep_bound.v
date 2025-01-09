@@ -1,9 +1,8 @@
 Require Export prosa.model.priority.edf.
 Require Export prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.definitions.workload.bounded.
-Require Export prosa.analysis.facts.model.workload.
+Require Export prosa.analysis.facts.model.rbf.
 Require Export prosa.analysis.definitions.workload.edf_athep_bound.
-
 
 (** * Bound on Higher-or-Equal Priority Workload under EDF Scheduling is Valid *)
 
@@ -133,11 +132,10 @@ Section ATHEPWorkloadBoundIsValidForEDF.
       \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (EDF_from tsk_o) jobs
       <= bound_on_athep_workload ts tsk A Δ.
     Proof.
-      apply leq_sum_seq => tsko INtsko NEQT; fold (D tsk) (D tsko).
-      edestruct (leqP Δ (A + ε + D tsk - D tsko)) as [NEQ|NEQ]; [ | apply ltnW in NEQ].
-      - exact: (workload_le_rbf' arr_seq tsko).
-      - eapply leq_trans; first by eapply total_workload_shorten_range; eauto 2.
-        exact: workload_le_rbf'.
+      apply: leq_sum_seq => tsko INtsko NEQT; fold (D tsk) (D tsko).
+      have [LEQ|LT] := leqP Δ (A + ε + D tsk - D tsko);
+        last (apply: leq_trans; first by apply: total_workload_shorten_range).
+      all: by apply: rbf_spec' => // ? /andP[].
     Qed.
 
   End HepWorkloadBound.

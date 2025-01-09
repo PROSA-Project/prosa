@@ -113,12 +113,8 @@ Section BusyIntervalExistence.
   (** We now introduce the central assumption from which we deduce the existence
       of a busy interval. *)
 
-  (** To this end, recall the notion of workload of all jobs released in a
-      given interval <<[t1, t2)>>... *)
-  Let total_workload t1 t2 :=
-    workload_of_jobs predT (arrivals_between arr_seq t1 t2).
-
-  (** ... and total service of jobs within some time interval <<[t1, t2)>>. *)
+  (** To this end, recall the notion of the total service of all jobs within
+      some time interval <<[t1, t2)>>. *)
   Let total_service t1 t2 :=
     service_of_jobs sched predT (arrivals_between arr_seq 0 t2) t1 t2.
 
@@ -133,7 +129,7 @@ Section BusyIntervalExistence.
   Hypothesis H_workload_is_bounded :
     forall t,
       no_carry_in arr_seq sched t ->
-      blackout_during sched t (t + Δ) + total_workload t (t + Δ) <= Δ.
+      blackout_during sched t (t + Δ) + total_workload_between arr_seq t (t + Δ) <= Δ.
 
   (** In the following, we also require a unit-speed processor. *)
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
@@ -226,7 +222,7 @@ Section BusyIntervalExistence.
       Proof.
         rewrite /total_service => EQserv s ARR BEF.
         move: (H_workload_is_bounded t) => WORK.
-        have EQ: total_workload 0 (t + Δ)
+        have EQ: total_workload_between arr_seq 0 (t + Δ)
                  = service_of_jobs sched predT (arrivals_between arr_seq 0 (t + Δ)) 0 (t + Δ);
           last exact: workload_eq_service_impl_all_jobs_have_completed.
         have CONSIST: consistent_arrival_times arr_seq by [].
@@ -242,7 +238,7 @@ Section BusyIntervalExistence.
                         by apply: (in_arrivals_implies_arrived_between arr_seq). }
         apply/eqP; rewrite eqn_leq; apply/andP; split;
           last by apply: service_of_jobs_le_workload.
-        rewrite /total_workload (workload_of_jobs_cat arr_seq t);
+        rewrite /total_workload_between/total_workload (workload_of_jobs_cat arr_seq t);
           last by apply/andP; split; [|rewrite leq_addr].
         - rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t) //;
             last by apply/andP; split; [|rewrite leq_addr].

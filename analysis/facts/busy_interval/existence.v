@@ -348,7 +348,7 @@ Section ExistsBusyIntervalJLFP.
         a given interval <<[t1, t2)>> that have higher-or-equal
         priority w.r.t. the job [j] being analyzed. *)
     Let hp_workload t1 t2 :=
-      workload_of_higher_or_equal_priority_jobs j (arrivals_between arr_seq t1 t2).
+      workload_of_hep_jobs arr_seq j t1 t2.
 
     (** With regard to the jobs with higher-or-equal priority that are released
            in a given interval <<[t1, t2)>>, we also recall the service received by these
@@ -516,7 +516,7 @@ Section ExistsBusyIntervalJLFP.
             set l := arrivals_between arr_seq t1 (t1 + delta).
             set hep := hep_job.
             unfold hp_service, service_of_higher_or_equal_priority_jobs, service_of_jobs,
-            hp_workload, workload_of_higher_or_equal_priority_jobs, workload_of_jobs.
+            hp_workload, workload_of_hep_jobs, workload_of_jobs.
             fold l hep.
             move: (PREFIX) => [_ [QUIET _]].
             move: (NOTQUIET) => NOTQUIET'.
