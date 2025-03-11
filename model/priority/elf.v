@@ -1,3 +1,4 @@
+Require Export prosa.util.int.
 Require Export prosa.model.priority.classes.
 Require Export prosa.model.priority.gel.
 

@@ -1,7 +1,6 @@
 Require Export prosa.model.priority.elf.
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.analysis.facts.priority.classes.
-Require Export prosa.analysis.definitions.priority.classes.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.priority.sequential.
