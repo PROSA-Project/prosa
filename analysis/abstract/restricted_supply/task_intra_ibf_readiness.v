@@ -75,9 +75,9 @@ Section TaskIntraInterferenceIsBounded.
 
   (** Assume that there exists a bound on the length of any service
       inversion experienced by any job of task [tsk]. *)
-  Variable service_inversion_bound : duration -> duration.
+  Variable service_inversion_bound : duration.
   Hypothesis H_service_inversion_is_bounded :
-    service_inversion_is_bounded_by
+    service_inversion_is_bounded
      arr_seq sched tsk service_inversion_bound.
 
   (** Assume that there exists a bound on the higher-or-equal-priority
@@ -86,12 +86,13 @@ Section TaskIntraInterferenceIsBounded.
   Hypothesis H_workload_is_bounded :
     athep_workload_is_bounded arr_seq sched tsk athep_workload_bound.
 
-  Variable readiness_interference_bound : duration -> duration.
-  
+  Variable readiness_interference_bound : duration.
+  Hypothesis H_readiness_interference_bounded :
+    readiness_interference_is_bounded arr_seq sched tsk readiness_interference_bound.
 
   (** Finally, we define the interference-bound function ([task_intra_IBF]). *)
   Definition task_intra_IBF (A R : duration) :=
-   athep_workload_bound A R + service_inversion_bound A + readiness_interference_bound R.
+   athep_workload_bound A R + service_inversion_bound + readiness_interference_bound.
 
   (** Next, we prove that [task_intra_IBF] is indeed an interference bound. *)
   Lemma instantiated_task_intra_interference_is_bounded :
@@ -104,19 +105,22 @@ Section TaskIntraInterferenceIsBounded.
     { by exfalso; rewrite /completed_by ZERO in NCOMPL. }
     eapply leq_trans; first eapply cumulative_task_interference_split => //.
     rewrite /task_intra_IBF leq_add //; last first.
-    { admit. }
+    { apply leq_trans with (cumulative_readiness_interference arr_seq sched j t1 (t1 + Δ));
+        first by apply leq_sum_seq => ? ? ?; lia.
+      apply H_readiness_interference_bounded => //=.
+      by apply BUSY.
+    }
     { rewrite leq_add //; last first.
-      { apply leq_trans with (cumulative_service_inversion arr_seq sched j t1 (t1 + Δ)); first by lia.
-        apply leq_trans with (cumulative_service_inversion arr_seq sched j t1 t2); last first.
-      { apply: H_service_inversion_is_bounded; eauto 2 => //.
-        apply abstract_busy_interval_classic_busy_interval_prefix => //. }
-      by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + Δ)) //= leq_addr. }
+      { apply leq_trans with (cumulative_service_inversion arr_seq sched j t1 t2); last first.
+        { apply: H_service_inversion_is_bounded => //.
+          by apply BUSY. }
+        by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + Δ)) //= leq_addr. }
     { erewrite cumulative_i_thep_eq_service_of_othep; eauto 2 => //; last first.
-      { by apply instantiated_quiet_time_equivalent_quiet_time => //; apply BUSY. }
+      { rewrite instantiated_quiet_time_equivalent_quiet_time => //; apply BUSY. }
       apply: leq_trans.
       { by apply service_of_jobs_le_workload => //; apply unit_supply_is_unit_service. }
       { by apply H_workload_is_bounded => //; apply: abstract_busy_interval_classic_quiet_time => //. }
-    }
+    } }
   Qed.
 
 End TaskIntraInterferenceIsBounded.

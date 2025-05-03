@@ -1,6 +1,7 @@
 Require Export prosa.model.priority.classes.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.definitions.service.
+Require Export prosa.analysis.abstract.definitions.
 
 (** * Service Inversion *)
 (** In this section, we define the notion of service inversion for
@@ -31,9 +32,6 @@ Section ServiceInversion.
   (** Assume a given JLDP policy. *)
   Context `{JLFP_policy Job}.
 
-  (** Consider an arbitrary predicate on time intervals. *)
-  Variable P : Job -> instant -> instant -> Prop.
-
   (** Consider a job [j]. *)
   Variable j : Job.
 
@@ -53,20 +51,6 @@ Section ServiceInversion.
   Definition cumulative_service_inversion (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) service_inversion t.
 
-  (** For proof purposes, it is often useful to bound the cumulative
-      service interference in a time interval <<[t1, t2)>> that
-      satisfies a given predicate (e.g., <<[t1, t2)>> is a busy
-      interval prefix). To this end, we say that the cumulative
-      service inversion of job [j] is bounded by a function [B :
-      duration -> duration] w.r.t. to predicate [P] iff, for any
-      interval <<[t1, t2)>> that satisfies [P j], the cumulative
-      priority inversion in <<[t1, t2)>> is bounded by [B (job_arrival
-      j - t1)]. *)
-  Definition pred_service_inversion_of_job_is_bounded_by (B : duration -> duration) :=
-    forall (t1 t2 : instant),
-      P j t1 t2 ->
-      cumulative_service_inversion t1 t2 <= B (job_arrival j - t1).
-
 End ServiceInversion.
 
 (** In this section, we define a notion of the bounded service
@@ -75,7 +59,6 @@ Section TaskServiceInversionBound.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -85,7 +68,7 @@ Section TaskServiceInversionBound.
 
   (** Consider _any_ kind of processor state model, ... *)
   Context {PState : ProcessorState Job}.
-
+  
   Context `{!JobReady Job PState}.
   
   (** ... any arrival sequence, ... *)
@@ -96,21 +79,21 @@ Section TaskServiceInversionBound.
 
   (** Assume a given JLDP policy. *)
   Context `{JLFP_policy Job}.
-
-  (** Consider an arbitrary predicate on jobs and time intervals. *)
-  Variable P : Job -> instant -> instant -> Prop.
+ 
+  Context `{Interference Job}.
+  Context `{InterferingWorkload Job}. 
 
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
+
+  Let busy_interval_prefix_ab := busy_interval_prefix sched.
   
-  (** We say that task [tsk] has bounded service inversion if all its
-      jobs have cumulative service inversion bounded by function [B :
-      duration -> duration]. *)
-  Definition pred_service_inversion_is_bounded_by (B : duration -> duration) :=
-    forall (j : Job),
+  Definition service_inversion_is_bounded (B : duration) :=
+    forall j t1 t2,
       arrives_in arr_seq j ->
       job_of_task tsk j ->
-      job_cost j > 0 ->
-      pred_service_inversion_of_job_is_bounded_by arr_seq sched P j B.
-
+      job_cost_positive j ->
+      busy_interval_prefix_ab j t1 t2 ->
+      cumulative_service_inversion arr_seq sched j t1 t2 <= B.
+ 
 End TaskServiceInversionBound.
