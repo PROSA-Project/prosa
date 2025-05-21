@@ -4,8 +4,7 @@ Require Export prosa.analysis.definitions.service.
 Require Export prosa.analysis.abstract.definitions.
 
 (** * Service Inversion *)
-(** In this section, we define the notion of service inversion for
-    arbitrary processors. *)
+(** In this section, we define a readiness aware notion of service inversion. *)
 Section ServiceInversion.
 
   (** Consider any type of tasks ... *)
@@ -18,12 +17,14 @@ Section ServiceInversion.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Next, consider _any_ kind of processor state model, ... *)
+  (** Next, consider any kind of uniprocessor model. *)
   Context {PState : ProcessorState Job}.
+  Hypothesis H_uni : uniprocessor_model PState.
 
+  (** Consider any notion of readiness. *)
   Context `{!JobReady Job PState}.
 
-  (** ... any arrival sequence, ... *)
+  (** Consider any arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
 
   (** ... and any schedule of this arrival sequence. *)
@@ -35,13 +36,9 @@ Section ServiceInversion.
   (** Consider a job [j]. *)
   Variable j : Job.
 
-  (** We say that the job incurs service inversion if it has higher
-      priority than the job receiving service. Note that this
-      definition is oblivious to whether job [j] is ready. Therefore,
-      it may not apply as intuitively expected in models with jitter
-      or self-suspensions. Further generalization of the concept is
-      likely necessary to efficiently analyze models in which jobs may
-      be pending without being ready. *)
+  (** We say that the service inversion is taking place at some instant [t] if a
+      lower priority job is being served in spite of a higher-or-equal-priority
+      job being schedulable. Note that the priority relation is based on [j]. *)
   Definition service_inversion (t : instant) :=
     has (hep_job ^~ j) [seq jhep <- arrivals_up_to arr_seq t | job_ready sched jhep t]
     && has (fun jlp => ~~ hep_job jlp j) (served_jobs_at arr_seq sched t).
@@ -66,9 +63,11 @@ Section TaskServiceInversionBound.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider _any_ kind of processor state model, ... *)
+  (** Next, consider any kind of uniprocessor model. *)
   Context {PState : ProcessorState Job}.
+  Hypothesis H_uni : uniprocessor_model PState.
   
+  (** Consider any notion of job readiness ... *)
   Context `{!JobReady Job PState}.
   
   (** ... any arrival sequence, ... *)
@@ -77,17 +76,19 @@ Section TaskServiceInversionBound.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
-  (** Assume a given JLDP policy. *)
+  (** Assume a given JLFP policy. *)
   Context `{JLFP_policy Job}.
  
+  (** Assume that we have some definition of interference and interfering workload. *)
   Context `{Interference Job}.
   Context `{InterferingWorkload Job}. 
 
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
 
+  (** Recall the notion of abstract busy interval prefix. *)
   Let busy_interval_prefix_ab := busy_interval_prefix sched.
-  
+
   Definition service_inversion_is_bounded (B : duration) :=
     forall j t1 t2,
       arrives_in arr_seq j ->

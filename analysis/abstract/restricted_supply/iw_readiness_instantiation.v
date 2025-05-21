@@ -6,6 +6,11 @@ Require Export prosa.analysis.facts.readiness_interference.
 Require Export prosa.analysis.facts.model.uniprocessor.
 Require Export prosa.model.schedule.work_conserving.
 
+
+(** * JLFP Instantiation of Interference and Interfering Workload for Restricted-Supply Uniprocessor*)
+(** Note that this version of Interference and Interfering Workload incorporates interference that may arise due to non-readiness. *)
+
+(** Here we instantiate functions Interference and Interfering Workload. *)
 Section IWInstantiation.
   
   (** Consider any type of tasks ... *)
@@ -25,16 +30,18 @@ Section IWInstantiation.
   Hypothesis H_unit_supply_proc_model : unit_supply_proc_model PState.
   Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
 
+  (** Consider any notion of job readiness. *)
   Context `{!JobReady Job PState}.
 
-  (** Consider any valid arrival sequence with consistent arrivals... *)
+  (** Consider any valid arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any valid uni-processor schedule of this arrival sequence... *)
+  (** ... and any valid schedule of this arrival sequence... *)
   Variable sched : schedule PState.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
+  (** Consider any JLFP policy and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
   Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
@@ -52,7 +59,8 @@ Section IWInstantiation.
       cannot execute due to (1) the lack of supply at time [t], (2)
       due to service inversion (i.e., a lower-priority job receiving
       service at [t]), or higher-or-equal-priority job receiving
-      service. *)
+      service. (3) due to the [j] and other higher-or-equal-priority job
+      becoming non-ready. *)
   #[local] Instance rs_readiness_jlfp_interference : Interference Job :=
     {
       interference (j : Job) (t : instant) :=
@@ -65,8 +73,9 @@ Section IWInstantiation.
   (** ** Instantiation of Interfering Workload *)
 
   (** The interfering workload, in turn, is defined as the sum of the
-      blackout predicate, service inversion predicate, and interfering
-      workload of jobs with higher or equal priority. *)
+      blackout predicate, interfering workload of jobs with higher or
+      equal priority, service inversion predicate and interference due to
+      non-readiness predicate. *)
   
   #[local] Instance rs_readiness_jlfp_interfering_workload : InterferingWorkload Job :=
     {
@@ -77,16 +86,16 @@ Section IWInstantiation.
         + ~~ is_blackout sched t && no_hep_ready arr_seq sched j t
     }.
 
-  (** *)
-  Definition readiness_interference_during (j : Job) (t1 t2 : instant) :=
+  (** We define the notion of [cumulative_readiness_interference] that is disjoin from blackout *)
+  (** Note that this is done in order to make the interference factors
+      mutually exclusive, there is no stated requirement that this needs to be done,
+      but this would help us in simplifying the proofs. *)
+  Let readiness_interference_during (j : Job) (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) ~~ is_blackout sched t && no_hep_ready arr_seq sched j t.
 
   Section Equivalences.
 
-    (** We prove that we can split cumulative interference into three
-        parts: (1) blackout time, (2) cumulative service inversion,
-        and (3) cumulative interference from jobs with higher or equal
-        priority. *)
+    (** We prove that we can split cumulative interference into disjoint parts. *)
     Lemma cumulative_interference_split :
       forall j t1 t2,
         cumulative_interference j t1 t2
@@ -128,9 +137,7 @@ Section IWInstantiation.
     Qed.
 
     (** Similarly, we prove that we can split cumulative interfering
-        workload into three parts: (1) blackout time, (2) cumulative
-        service inversion, and (3) cumulative interfering workload
-        from jobs with higher or equal priority. *)
+        workload into disjoint parts. *)
     Lemma cumulative_interfering_workload_split :
       forall j t1 t2,
         cumulative_interfering_workload j t1 t2 =
@@ -143,11 +150,8 @@ Section IWInstantiation.
     Qed.
 
     (** Let <<[t1, t2)>> be a time interval and let [j] be any job of
-        task [tsk] that is not completed by time [t2]. Then cumulative
-        interference received due jobs of other tasks executing can be
-        bounded by the sum of the cumulative service inversion of job
-        [j] and the cumulative interference incurred by task [tsk] due
-        to other tasks. *)
+        task [tsk] that is not completed by time [t2]. Then we prove a
+        bound on the cumulative interference received due jobs of other tasks executing. *)
     Lemma cumulative_task_interference_split :
       forall j t1 t2,
         arrives_in arr_seq j ->
@@ -187,9 +191,7 @@ Section IWInstantiation.
     Qed.
 
     (** We also show that the cumulative intra-supply interference can
-        be split into the sum of the cumulative service inversion and
-        cumulative interference incurred by the job due to other
-        higher-or-equal priority jobs. *)
+        be split into three disoint parts. *)
     Lemma cumulative_intra_interference_split :
       forall j t1 t2,
         cumul_cond_interference (fun (_j : Job) (t : instant) => has_supply sched t) j t1 t2
@@ -417,11 +419,11 @@ Section IWInstantiation.
   Section I_IW_correctness.
 
     (** Note that we differentiate between abstract and classical
-        notions of work-conserving schedule ... *)
+        notions of work-conserving schedule. *)
     Let work_conserving_ab := definitions.work_conserving arr_seq sched.
     Let work_conserving_cl := work_conserving.work_conserving arr_seq sched.
 
-    (** ... as well as notions of busy interval prefix. *)
+    (** Recall the notion of abstract busy interval prefix. *)
     Let busy_interval_prefix_ab := definitions.busy_interval_prefix sched.
 
     (** We assume that the schedule is a work-conserving schedule in
@@ -449,6 +451,11 @@ Section IWInstantiation.
       Variable t : instant.
       Hypothesis H_t_in_busy_interval : t1 <= t < t2.
 
+      (** We first prove that, inside the busy interval there always exists a
+          pending higher-or-equal-priority job.
+          To prove this, we make use of the obtained result that for the
+          given Interference and InterferingWorkload functions the notion of
+          abstract and classical busy interval is equivalent. *)
       Lemma pending_hep_job_exists_inside_busy_interval :
         exists jhp,
           arrives_in arr_seq jhp /\
@@ -462,9 +469,8 @@ Section IWInstantiation.
       move: (ltngtP t1.+1 t2) => [GT|CONTR|EQ]; first last.
       - subst t2; rewrite ltnS in LT.
         have EQ: t1 = t by apply/eqP; rewrite eqn_leq; apply/andP; split.
-        subst t1; clear GE LT.
-        exists j; repeat split=> //.
-        + move: REL; rewrite ltnS -eqn_leq eq_sym; move => /eqP REL.
+        subst t1; clear GE LT; exists j; repeat split=> //.
+        + move: REL; rewrite ltnS -eqn_leq eq_sym; move => /eqP REL;
             by rewrite -REL; eapply job_pending_at_arrival; eauto 2.
       - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
       - have EX: exists hp__seq: seq Job,
@@ -498,7 +504,7 @@ Section IWInstantiation.
           by exists jhp; apply SE1; rewrite in_cons; apply/orP; left. 
       Qed.
 
-      (** We then prove that if interference is [false] at a time [t]
+      (** We now prove that if interference is [false] at a time [t]
           then the job is scheduled. *)
       Lemma not_interference_implies_scheduled :
         ~~ interference j t -> receives_service_at sched j t.

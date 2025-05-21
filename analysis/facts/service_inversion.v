@@ -2,6 +2,7 @@ Require Export prosa.analysis.definitions.service_inversion.readiness_aware.
 
 (** * Service Inversion Lemmas *)
 (** In this section, we prove a few lemmas about service inversion. *)
+(** Note that the service inversion used here is the readiness aware notion of service inversion. *)
 Section ServiceInversion.
 
   (** Consider any type of jobs. *)
@@ -123,7 +124,7 @@ Section ServiceInversion.
     Hypothesis H_sched : scheduled_at sched j' t.
 
     (** Then the predicate "is there service inversion for job [j'] at
-        time [t]?" is equal to the predicate "is job [j] has lower
+        time [t]?" implies the predicate "is job [j] has lower
         priority than job [j']?" *)
     Lemma service_inversion_supply_sched :
       service_inversion arr_seq sched j t -> ~~ hep_job j' j.
@@ -135,8 +136,6 @@ Section ServiceInversion.
     Qed.
 
   End ServiceInversionRewrite.
-
-
 
 End ServiceInversion.
 

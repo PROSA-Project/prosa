@@ -7,11 +7,7 @@ Require Export prosa.analysis.definitions.workload.bounded.
 (** * Task Intra-Supply Interference is Bounded *)
 
 (** In this file, we define the task intra-supply IBF [task_intra_IBF]
-    assuming that we have two functions: one bounding service
-    inversion and the other bounding the higher-or-equal-priority
-    workload (w.r.t. a job under analysis). We then prove that
-    [task_intra_IBF] indeed bounds the cumulative task intra-supply
-    interference. *)
+    assuming that we have two a bound on the inteference factors. *)
 Section TaskIntraInterferenceIsBounded.
 
   (** Consider any type of tasks ... *)
@@ -60,13 +56,14 @@ Section TaskIntraInterferenceIsBounded.
   (** We say that job [j] incurs interference at time [t] iff it
       cannot execute due to (1) the lack of supply at time [t], (2)
       service inversion (i.e., a lower-priority job receiving service
-      at [t]), or a higher-or-equal-priority job receiving service. *)
+      at [t]), or a higher-or-equal-priority job receiving service.
+     (3) [j] and all the other higher-or-equal-priority jobs becoming non-ready. *)
   #[local] Instance rs_jlfp_interference : Interference Job :=
     rs_readiness_jlfp_interference arr_seq sched.
 
   (** The interfering workload, in turn, is defined as the sum of the
-      blackout predicate, service-inversion predicate, and the
-      interfering workload of jobs with higher or equal priority. *)
+      blackout predicate, interfering workload of jobs with higher or equal priority
+     service inversion predicate, and the inteference due to non-readiness predicate . *)
   #[local] Instance rs_jlfp_interfering_workload : InterferingWorkload Job :=
     rs_readiness_jlfp_interfering_workload arr_seq sched.
 
@@ -86,6 +83,8 @@ Section TaskIntraInterferenceIsBounded.
   Hypothesis H_workload_is_bounded :
     athep_workload_is_bounded arr_seq sched tsk athep_workload_bound.
 
+  (** Assume that we have a bound on the interference due to all higher-or-equal-priority
+      jobs becoming non-ready. *)
   Variable readiness_interference_bound : duration.
   Hypothesis H_readiness_interference_bounded :
     readiness_interference_is_bounded arr_seq sched tsk readiness_interference_bound.
