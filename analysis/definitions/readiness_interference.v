@@ -7,7 +7,7 @@ Require Export prosa.analysis.abstract.definitions.
     higher or equal priority jobs being ready. The motivation behind having
     such a definition is :
     1) It helps us to handle readiness models where a job may become not ready
-       in between its arrival and completion. eg. self-suspensions. Note that
+       in between its arrival and completion. e.g. self-suspensions. Note that
        another job may be still be executed at this executed at this instance.
        Thus, the below point.
     2) It helps us to handle instances where a job is facing interference
@@ -30,7 +30,7 @@ Section Definitions.
       be false in that case. *)
   Context `{!JobReady Job PState}.
 
-  (** Consider any arrival sequnce of jobs. *)
+  (** Consider any arrival sequence of jobs. *)
   Variable arr_seq : arrival_sequence Job.
 
   (** Consider any schedule. *)
@@ -93,7 +93,7 @@ Section Bound.
 
   (** Now we define the required bound as, for any job [j ∈ tsk] and any interval <<[t1, t1 + Δ)>>
       that starts with a quiet time (w.r.t. job [j]), [B : duration] is a bound
-      on the total inteference due to no higher-or-equal priority jobs being
+      on the total interference due to no higher-or-equal priority jobs being
       ready in any interval <<[t1, t1 + Δ)>>. *)
   Definition readiness_interference_is_bounded (B : duration) :=
     forall j t1 Δ,

@@ -70,7 +70,7 @@ Section ReadinessInterference.
 
   End BasicLemmas.
 
-  (** In this section we establish some bounds on the inteference due
+  (** In this section we establish some bounds on the interference due
       to no higher-or-equal-priority jobs being ready. *)
   Section ReadinessInterferenceBound.
 

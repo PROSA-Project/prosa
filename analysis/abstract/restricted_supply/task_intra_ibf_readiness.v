@@ -7,7 +7,7 @@ Require Export prosa.analysis.definitions.workload.bounded.
 (** * Task Intra-Supply Interference is Bounded *)
 
 (** In this file, we define the task intra-supply IBF [task_intra_IBF]
-    assuming that we have two a bound on the inteference factors. *)
+    assuming that we have two a bound on the interference factors. *)
 Section TaskIntraInterferenceIsBounded.
 
   (** Consider any type of tasks ... *)
@@ -63,7 +63,7 @@ Section TaskIntraInterferenceIsBounded.
 
   (** The interfering workload, in turn, is defined as the sum of the
       blackout predicate, interfering workload of jobs with higher or equal priority
-     service inversion predicate, and the inteference due to non-readiness predicate . *)
+     service inversion predicate, and the interference due to non-readiness predicate . *)
   #[local] Instance rs_jlfp_interfering_workload : InterferingWorkload Job :=
     rs_readiness_jlfp_interfering_workload arr_seq sched.
 

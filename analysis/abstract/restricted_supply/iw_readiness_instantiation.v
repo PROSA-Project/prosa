@@ -86,7 +86,7 @@ Section IWInstantiation.
         + ~~ is_blackout sched t && no_hep_ready arr_seq sched j t
     }.
 
-  (** We define the notion of [cumulative_readiness_interference] that is disjoin from blackout *)
+  (** We define the notion of [cumulative_readiness_interference] that is disjoint from blackout *)
   (** Note that this is done in order to make the interference factors
       mutually exclusive, there is no stated requirement that this needs to be done,
       but this would help us in simplifying the proofs. *)
@@ -191,7 +191,7 @@ Section IWInstantiation.
     Qed.
 
     (** We also show that the cumulative intra-supply interference can
-        be split into three disoint parts. *)
+        be split into three disjoint parts. *)
     Lemma cumulative_intra_interference_split :
       forall j t1 t2,
         cumul_cond_interference (fun (_j : Job) (t : instant) => has_supply sched t) j t1 t2
@@ -454,7 +454,7 @@ Section IWInstantiation.
       (** We first prove that, inside the busy interval there always exists a
           pending higher-or-equal-priority job.
           To prove this, we make use of the obtained result that for the
-          given Interference and InterferingWorkload functions the notion of
+          given Interference and Interfering Workload functions the notion of
           abstract and classical busy interval is equivalent. *)
       Lemma pending_hep_job_exists_inside_busy_interval :
         exists jhp,
