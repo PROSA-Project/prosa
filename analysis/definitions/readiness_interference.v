@@ -3,16 +3,17 @@ Require Export prosa.analysis.abstract.definitions.
 
 (** Readiness Interference *)
 
-(** In this file, we define the notion of interference due to none of the
-    higher or equal priority jobs being ready. The motivation behind having
-    such a definition is :
-    1) It helps us to handle readiness models where a job may become not ready
-       in between its arrival and completion. e.g. self-suspensions. Note that
-       another job may be still be executed at this executed at this instance.
-       Thus, the below point.
-    2) It helps us to handle instances where a job is facing interference
-       specifically due to the job being not ready, and separate from
-       [another_hep_job_interference] and [service_inversion]. *)
+(** In this file, we define the interference incurred by a job due to the
+    fact that the job may become non-ready before its completion.
+
+    We model this interference as an instant when all of the higher-or-equal-priority
+    jobs (w.r.t the job under analysis) becomes non-ready. Such an instant may occur due to,
+    1) All of the pending jobs becoming non-ready, so the processor is in idle state.
+    2) A lower priority job is scheduled, but no priority inversion is taking place.
+
+    The motivation behind such a definition is to have the interference due to non-readiness
+    exclusive of other interference factors like priority inversion, and interference due
+    to other higher-or-equal-priority jobs. *)
 
 Section Definitions.
   (** Consider any kind of jobs. *)
@@ -44,7 +45,7 @@ Section Definitions.
 
   (** Now we define interference due to no higher or equal priority jobs being ready. *)
   Definition no_hep_ready (t : instant) :=
-    all (fun j' => ~~ job_ready sched j' t) 
+    all (fun j' => ~~ job_ready sched j' t)
       [seq j' <- arrivals_up_to arr_seq t | pending sched j' t && hep_job j' j].
 
   (** Using the above definition we define cumulative interference due to
@@ -88,18 +89,19 @@ Section Bound.
   (** Now consider a task [tsk]. *)
   Variable tsk : Task.
 
-  (** Recall the definition of abstract quiet time. *)
-  Let quiet_time_ab := quiet_time sched.
+  (** Recall the notion of abstract busy interval. *)
+  Let busy_interval_ab := busy_interval sched.
 
   (** Now we define the required bound as, for any job [j ∈ tsk] and any interval <<[t1, t1 + Δ)>>
-      that starts with a quiet time (w.r.t. job [j]), [B : duration] is a bound
+      that is inside the busy interval <<[t1, t2]>> of [j], [B : duration] is a bound
       on the total interference due to no higher-or-equal priority jobs being
       ready in any interval <<[t1, t1 + Δ)>>. *)
   Definition readiness_interference_is_bounded (B : duration) :=
-    forall j t1 Δ,
+    forall j t1 t2 Δ,
+      t1 + Δ < t2 ->
       arrives_in arr_seq j ->
       job_of_task tsk j ->
-      quiet_time_ab j t1  ->
+      busy_interval_ab j t1 t2 ->
       cumulative_readiness_interference arr_seq sched j t1 (t1 + Δ) <= B.
 
 End Bound.

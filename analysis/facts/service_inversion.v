@@ -28,7 +28,6 @@ Section ServiceInversion.
   (** Consider an JLFP policy that indicates a higher-or-equal
       priority relation, and assume that the relation is
       reflexive and transitive. *)
-
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
   Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
@@ -43,9 +42,9 @@ Section ServiceInversion.
         is_blackout sched t ->
         ~~ service_inversion arr_seq sched j t.
     Proof.
-      move=> j t SUP.
+      move=> j t /negP SUP.
       apply/negP => /andP [_ /hasP [s IN LP]].
-      move: (SUP) => /negP NSUP; apply: NSUP.
+      apply: SUP.
       by apply: receives_service_implies_has_supply.
     Qed.
 
@@ -78,8 +77,8 @@ Section ServiceInversion.
 
     (** We show that cumulative service inversion received during an
         interval <<[t1, t2)>> can be split into the sum of cumulative
-        service inversion <<[t1, t)>> and <<[t, t2)>> for any <<t2 \in
-        [t1, t3]>>.  *)
+        service inversion <<[t1, t)>> and <<[t, t2)>> for any
+        <<t2 ∈ [t1, t3]>>. *)
     Lemma service_inversion_cat :
       forall (j : Job) (t1 t2 t : instant),
         t1 <= t ->
@@ -117,15 +116,14 @@ Section ServiceInversion.
 
     (** ... and assume that there is supply at [t]. *)
     Hypothesis H_supply : has_supply sched t.
-    
+
     (** Consider two (not necessarily distinct) jobs [j] and [j'] and
         assume that job [j] is scheduled at time [t]. *)
     Variables j j' : Job.
     Hypothesis H_sched : scheduled_at sched j' t.
 
-    (** Then the predicate "is there service inversion for job [j'] at
-        time [t]?" implies the predicate "is job [j] has lower
-        priority than job [j']?" *)
+    (** Then, if [j] incurs service inversion at [t], we know that [j'] has
+        lower priority than [j]. *)
     Lemma service_inversion_supply_sched :
       service_inversion arr_seq sched j t -> ~~ hep_job j' j.
     Proof.

@@ -49,7 +49,7 @@ Section TaskIntraInterferenceIsBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and a schedule of this arrival sequence ... *)
+  (** ... and a schedule of this arrival sequence. *)
   Variable sched : schedule PState.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
@@ -106,20 +106,14 @@ Section TaskIntraInterferenceIsBounded.
     rewrite /task_intra_IBF leq_add //; last first.
     { apply leq_trans with (cumulative_readiness_interference arr_seq sched j t1 (t1 + Δ));
         first by apply leq_sum_seq => ? ? ?; lia.
-      apply H_readiness_interference_bounded => //=.
-      by apply BUSY.
-    }
-    { rewrite leq_add //; last first.
-      { apply leq_trans with (cumulative_service_inversion arr_seq sched j t1 t2); last first.
-        { apply: H_service_inversion_is_bounded => //.
-          by apply BUSY. }
-        by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + Δ)) //= leq_addr. }
-    { erewrite cumulative_i_thep_eq_service_of_othep; eauto 2 => //; last first.
+      apply H_readiness_interference_bounded with (t2 := t2) => //=. }
+    { rewrite leq_add => //=.
+      erewrite cumulative_i_thep_eq_service_of_othep; eauto 2 => //; last first.
       { rewrite instantiated_quiet_time_equivalent_quiet_time => //; apply BUSY. }
       apply: leq_trans.
       { by apply service_of_jobs_le_workload => //; apply unit_supply_is_unit_service. }
       { by apply H_workload_is_bounded => //; apply: abstract_busy_interval_classic_quiet_time => //. }
-    } }
+    }
   Qed.
 
 End TaskIntraInterferenceIsBounded.

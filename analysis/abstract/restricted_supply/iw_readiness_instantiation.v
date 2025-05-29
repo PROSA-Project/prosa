@@ -7,12 +7,12 @@ Require Export prosa.analysis.facts.model.uniprocessor.
 Require Export prosa.model.schedule.work_conserving.
 
 
-(** * JLFP Instantiation of Interference and Interfering Workload for Restricted-Supply Uniprocessor*)
-(** Note that this version of Interference and Interfering Workload incorporates interference that may arise due to non-readiness. *)
+(** * JLFP Instantiation of Interference and Interfering Workload for Restricted-Supply Uniprocessors *)
+(** Note that this version of Interference and Interfering Workload is readiness aware. *)
 
 (** Here we instantiate functions Interference and Interfering Workload. *)
 Section IWInstantiation.
-  
+
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -67,7 +67,7 @@ Section IWInstantiation.
         is_blackout sched t
         || another_hep_job_interference arr_seq sched j t
         || service_inversion arr_seq sched j t
-        || ~~ is_blackout sched t && no_hep_ready arr_seq sched j t
+        || has_supply sched t && no_hep_ready arr_seq sched j t
     }.
 
   (** ** Instantiation of Interfering Workload *)
@@ -76,14 +76,14 @@ Section IWInstantiation.
       blackout predicate, interfering workload of jobs with higher or
       equal priority, service inversion predicate and interference due to
       non-readiness predicate. *)
-  
+
   #[local] Instance rs_readiness_jlfp_interfering_workload : InterferingWorkload Job :=
     {
       interfering_workload (j : Job) (t : instant) :=
         is_blackout sched t
         + other_hep_jobs_interfering_workload arr_seq j t
         + service_inversion arr_seq sched j t
-        + ~~ is_blackout sched t && no_hep_ready arr_seq sched j t
+        + has_supply sched t && no_hep_ready arr_seq sched j t
     }.
 
   (** We define the notion of [cumulative_readiness_interference] that is disjoint from blackout *)
@@ -91,7 +91,7 @@ Section IWInstantiation.
       mutually exclusive, there is no stated requirement that this needs to be done,
       but this would help us in simplifying the proofs. *)
   Let readiness_interference_during (j : Job) (t1 t2 : instant) :=
-    \sum_(t1 <= t < t2) ~~ is_blackout sched t && no_hep_ready arr_seq sched j t.
+    \sum_(t1 <= t < t2) has_supply sched t && no_hep_ready arr_seq sched j t.
 
   Section Equivalences.
 
@@ -109,8 +109,9 @@ Section IWInstantiation.
       move=> j t1 t2; rewrite -big_split //= -big_split -big_split //=.
       apply/eqP; rewrite eqn_leq; apply/andP; split; rewrite leq_sum//; move=> t _.
       { by case is_blackout, another_hep_job_interference, service_inversion, no_hep_ready. }
-      { have [BL|SUP] := blackout_or_supply sched t.
-        { rewrite BL //= addn0 -addnA addnC addn1 ltnS leqn0 addn_eq0.
+      { have [/negPf BL|SUP] := blackout_or_supply sched t.
+        { rewrite /is_blackout BL //= addn0 -addnA addnC addn1 ltnS leqn0 addn_eq0.
+          move: BL => /idPn BL.
           by apply/andP; split;
             [rewrite eqb0 no_hep_job_interference_without_supply
             | rewrite eqb0 blackout_implies_no_service_inversion]. }
@@ -119,13 +120,13 @@ Section IWInstantiation.
           { rewrite orbT //= addn1 ltnS leqn0 addn_eq0.
             by apply /andP; split;
               [rewrite eqb0 no_hep_ready_implies_no_another_hep_interference
-              | rewrite eqb0 no_hep_ready_implies_no_service_inversion]. } 
+              | rewrite eqb0 no_hep_ready_implies_no_service_inversion]. }
           { rewrite orbF addn0.
             have A: forall (a b : bool), (a -> ~~ b) -> a + b <= a || b by lia.
-            apply A => 
+            apply A =>
               /hasP [jhp /served_at_and_receives_service_consistent SERVjo /andP[HEPjo _]].
             have SCHEDjo : scheduled_at sched jhp t by apply service_at_implies_scheduled_at.
-            apply /negP => 
+            apply /negP =>
               /andP[_ /hasP[jlp /served_at_and_receives_service_consistent SERVjlp NOTHEPjlp]].
             have SCHEDjlp : scheduled_at sched jlp t by apply service_at_implies_scheduled_at.
             have NEQ : jlp != jhp by apply /negP => /eqP ?; subst jlp; lia.
@@ -176,14 +177,14 @@ Section IWInstantiation.
         have [IDLE | [j' SCHED]]:= scheduled_at_cases arr_seq ltac:(done) sched ltac:(done) ltac:(done) t.
         { rewrite_neg idle_implies_no_service_inversion;
           rewrite_neg no_hep_job_interference_when_idle;
-          rewrite_neg no_hep_task_interference_when_idle. 
+          rewrite_neg no_hep_task_interference_when_idle.
           by rewrite andbF. }
         { case SERVtsk : task_served_at => //=.
           case: service_inversion; try by lia.
           move: SERVtsk => /negbT.
           erewrite task_served_at_eq_job_of_task => //.
           erewrite interference_ahep_def => //.
-          erewrite interference_athep_def => //. 
+          erewrite interference_athep_def => //.
           rewrite /another_hep_job /another_task_hep_job.
           rewrite orbF addn0 /job_of_task => ->.
           by lia.
@@ -393,8 +394,7 @@ Section IWInstantiation.
         }
       Qed.
 
-      (** For the sake of proof automation, we note the frequently needed
-          special case of an abstract busy window implying the existence of a
+      (** Next, we prove that abstract busy window implies the existence of a
           classic quiet time. *)
       Fact abstract_busy_interval_classic_quiet_time :
         forall t1 t2,
@@ -463,7 +463,7 @@ Section IWInstantiation.
           hep_job jhp j.
       Proof.
       move: H_t_in_busy_interval => /andP [GE LT].
-      move: H_busy_interval_prefix => 
+      move: H_busy_interval_prefix =>
         /instantiated_busy_interval_prefix_equivalent_busy_interval_prefix BUSY_cl.
       move: (BUSY_cl H_arrives) => [_ [QTt [NQT REL]]].
       move: (ltngtP t1.+1 t2) => [GT|CONTR|EQ]; first last.
@@ -501,7 +501,7 @@ Section IWInstantiation.
             rewrite in_nil in SE2; feed SE2 => [|//]; clear SE2.
             by repeat split; auto; apply/andP; split; first apply ltnW.
         + move: (SE jhp)=> [SE1 _]; subst; clear SE.
-          by exists jhp; apply SE1; rewrite in_cons; apply/orP; left. 
+          by exists jhp; apply SE1; rewrite in_cons; apply/orP; left.
       Qed.
 
       (** We now prove that if interference is [false] at a time [t]
@@ -619,4 +619,4 @@ Section IWInstantiation.
 
   End I_IW_correctness.
 
-End IWInstantiation. 
+End IWInstantiation.

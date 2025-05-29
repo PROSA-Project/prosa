@@ -3,8 +3,7 @@ Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.facts.interference.
 Require Export prosa.analysis.definitions.service_inversion.readiness_aware.
 
-(** In this file, we establish some important results regarding interference
-    due to no higher or equal priority jobs being ready. *)
+(** In this file, we establish some important results regarding readiness interference. *)
 
 Section ReadinessInterference.
   (** Consider any kind of jobs. *)
@@ -27,13 +26,13 @@ Section ReadinessInterference.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
   (** Consider any JLFP priority policy. *)
-  Context {JLFP : JLFP_policy Job}. 
+  Context {JLFP : JLFP_policy Job}.
 
   (** We establish a few basic lemmas. *)
   Section BasicLemmas.
- 
-    (** We prove a trivial result that any higher-or-equal-priority job cannot
-        cause interference when no higher-or-equal-priority job is ready. *)
+
+    (** We prove a trivial result that readiness interference is exclusive of
+        the interference due other higher-or-equal-priority jobs. *)
     Lemma no_hep_ready_implies_no_another_hep_interference :
       forall j t,
         no_hep_ready arr_seq sched j t ->
@@ -46,13 +45,13 @@ Section ReadinessInterference.
       have PENDjo : pending sched jo t by apply scheduled_implies_pending.
       have READYjo : job_ready sched jo t by done.
       have IN : jo \in [seq j' <- arrivals_up_to arr_seq t | pending sched j' t && hep_job j' j].
-      { rewrite mem_filter. 
+      { rewrite mem_filter.
         by do 2! [apply /andP; split; eauto]. }
       by move: (NO_HEP_READY jo IN); rewrite READYjo.
     Qed.
 
-    (** Next, we prove that there cannot be any service inversion when no
-        higher-or-equal-priority job is ready. *)
+    (** Next, we prove that there readiness interference is exclusive of
+        service inversion. *)
     Lemma no_hep_ready_implies_no_service_inversion :
       forall j t,
         no_hep_ready arr_seq sched j t ->
@@ -63,15 +62,14 @@ Section ReadinessInterference.
       move: INjo; rewrite mem_filter => /andP[READYjo INjo].
       have PENDjo : pending sched jo t by done.
       have IN : jo \in [seq j' <- arrivals_up_to arr_seq t | pending sched j' t && hep_job j' j].
-      { rewrite mem_filter. 
+      { rewrite mem_filter.
         by do 2! [apply /andP; split; eauto]. }
       by move: (NO_HEP_READY jo IN); rewrite READYjo.
     Qed.
 
   End BasicLemmas.
 
-  (** In this section we establish some bounds on the interference due
-      to no higher-or-equal-priority jobs being ready. *)
+  (** In this section we establish some bounds on readiness interference. *)
   Section ReadinessInterferenceBound.
 
     (** Consider any job [j]. *)
@@ -84,7 +82,7 @@ Section ReadinessInterference.
       Variable t : instant.
 
       (** Now, consider some job [jo] that is part of the arrival sequence
-          and has a higher-or-equal-priority with respect to j. *)
+          and has a higher-or-equal-priority w.r.t j. *)
       Variable jo : Job.
       Hypothesis H_arrives : arrives_in arr_seq jo.
       Hypothesis H_hepj' : hep_job jo j.
@@ -110,7 +108,7 @@ Section ReadinessInterference.
     End Step1.
 
     (** In this section, we use the above result to prove a bound on the total
-        interference due to all higher-or-equal-priority jobs not being ready. *)
+        readiness interference. *)
     Section Bound1.
 
       (** Consider any interval <<[t1, t2)>>. *)
@@ -129,10 +127,8 @@ Section ReadinessInterference.
           pending sched jo t.
 
       (** This is a direct corollary of the result in the above section. We
-          show that the total interference on [j] due to all higher-or-equal-priority
-          jobs being not ready is bounded by the total duration some
-          higher-or-equal-priority job, that remains pending throughout the
-          interval becomes not ready. *)
+          show that the total interference incurred by [j] due to [readiness interference]
+          is bounded by the total duration [jo] remains not ready. *)
       Corollary readiness_interference_bounded_by_job_readiness_bound:
         cumulative_readiness_interference arr_seq sched j t1 t2
         <= \sum_(t1 <= t < t2) ~~ job_ready sched jo t.
@@ -159,8 +155,9 @@ Section ReadinessInterference.
           jo \in arrivals_up_to arr_seq t
           & (pending sched jo t && hep_job jo j)).
 
-      (** We show that the total interference on [j] due to all higher-or-equal-priority
-          jobs being not ready is bounded by the // complete this. *)
+      (** We show that the total interference incurred by [j] due to [readiness interference]
+          in an interval is bounded by the sum of the duration each of the
+          higher-or-equal-priority jobs remains not ready. *)
       Lemma readinesss_interference_bounded_by_total_readines_bound:
         \sum_(t1 <= t < t2) no_hep_ready arr_seq sched j t
         <= \sum_(t1 <= t < t2) \sum_(j' <- arrivals_up_to arr_seq t | pending sched j' t && hep_job j' j) ~~ job_ready sched j' t.

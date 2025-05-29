@@ -36,9 +36,9 @@ Section ServiceInversion.
   (** Consider a job [j]. *)
   Variable j : Job.
 
-  (** We say that the service inversion is taking place at some instant [t] if a
-      lower priority job is being served in spite of a higher-or-equal-priority
-      job being schedulable. Note that the priority relation is based on [j]. *)
+  (** We say that service inversion is taking place at some instant [t] if a
+      lower priority job (w.r.t [j]) is being served in spite of a higher-or-equal-priority
+      (w.r.t [j]) job being schedulable. *)
   Definition service_inversion (t : instant) :=
     has (hep_job ^~ j) [seq jhep <- arrivals_up_to arr_seq t | job_ready sched jhep t]
     && has (fun jlp => ~~ hep_job jlp j) (served_jobs_at arr_seq sched t).
@@ -66,10 +66,10 @@ Section TaskServiceInversionBound.
   (** Next, consider any kind of uniprocessor model. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uni : uniprocessor_model PState.
-  
+
   (** Consider any notion of job readiness ... *)
   Context `{!JobReady Job PState}.
-  
+
   (** ... any arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
 
@@ -78,23 +78,26 @@ Section TaskServiceInversionBound.
 
   (** Assume a given JLFP policy. *)
   Context `{JLFP_policy Job}.
- 
+
   (** Assume that we have some definition of interference and interfering workload. *)
   Context `{Interference Job}.
-  Context `{InterferingWorkload Job}. 
+  Context `{InterferingWorkload Job}.
 
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
 
-  (** Recall the notion of abstract busy interval prefix. *)
-  Let busy_interval_prefix_ab := busy_interval_prefix sched.
+  (** Recall the notion of abstract busy interval. *)
+  Let busy_interval_ab := busy_interval sched.
 
+  (** Now we say [B : duration] is a bound on service inversion if, for any job [j ∈ tsk],
+      and its busy interval <<[t1, t2]>>, let <<[t1, t1 + Δ)>> be any interval such that
+      <<[t1, t1 + Δ) ⊂ [t1, t2]>>, then [B : duration] is a bound on the total service inversion. *)
   Definition service_inversion_is_bounded (B : duration) :=
-    forall j t1 t2,
+    forall j t1 t2 Δ,
+      t1 + Δ < t2 ->
       arrives_in arr_seq j ->
       job_of_task tsk j ->
-      job_cost_positive j ->
-      busy_interval_prefix_ab j t1 t2 ->
-      cumulative_service_inversion arr_seq sched j t1 t2 <= B.
- 
+      busy_interval_ab j t1 t2 ->
+      cumulative_service_inversion arr_seq sched j t1 (t1 + Δ) <= B.
+
 End TaskServiceInversionBound.
