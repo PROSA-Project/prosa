@@ -490,3 +490,95 @@ Proof.
     by rewrite /(enum _) unlock //=.
   by rewrite big_seq1.
 Qed.
+
+(** We prove that, given an interval <<[t1, t2)>> and two predicates
+    [P1, P2], if [P1] is satisfied at least [n1] times and [P2] is
+    satisfied at least [n2] times, then their intersection [P1 ∧ P2]
+    is satisfied at least [(n1 + n2) - (t2 - t1)] times. *)
+Lemma pigeonhole_on_interval :
+  forall (P1 P2 : pred nat) (t1 t2 : nat) (n1 n2 : nat),
+    n1 <= \sum_(t1 <= t < t2) P1 t ->
+    n2 <= \sum_(t1 <= t < t2) P2 t ->
+    (n1 + n2) - (t2 - t1) <= \sum_(t1 <= t < t2) (P1 t && P2 t).
+Proof.
+  move=> P1 P2 t1 t2.
+  have [Z|LE] := leqP t1 t2; last by move=> n1 n2; rewrite !big_geq; lia.
+  interval_to_duration t1 t2 Δ.
+  have -> : t1 + Δ - t1 = Δ by lia.
+  induction Δ as [ | Δ IHΔ]; first by move=> n1 n2; rewrite !big_geq; lia.
+  move=> n1 n2 LE1 LE2.
+  rewrite addnS big_nat_recr //=; last by apply leq_addr.
+  specialize (IHΔ (n1 - P1 (t1 + Δ)) (n2 - P2 (t1 + Δ))).
+  feed_n 2 IHΔ.
+  { rewrite addnS big_nat_recr //= in LE1; last by apply leq_addr.
+    by lia. }
+  { rewrite addnS big_nat_recr //= in LE2; last by apply leq_addr.
+    by lia. }
+  by lia.
+Qed.
+
+(** If a function [p] (bounded by 1) sums to at least two over a list
+    of unique elements, then there must be two distinct elements in
+    the list for which [p] evaluates to [1]. *)
+Lemma sum_ge_2_seq :
+  forall {X : eqType} (xs : seq X) (p : X -> nat),
+    uniq xs ->
+    (forall x, x \in xs -> p x <= 1) ->
+    2 <= \sum_(x <- xs) p x ->
+    exists x1 x2,
+      x1 != x2
+      /\ (x1 \in xs)
+      /\ (x2 \in xs)
+      /\ p x1 == 1
+      /\ p x2 == 1.
+Proof.
+  intros X xs.
+  have [B EX]: exists B, size xs <= B by (exists (size xs)).
+  move: xs EX; induction B as [ | B IHB].
+  { intros xs SIZE p UNIQ LE TWO.
+    move: SIZE; rewrite leqn0 => /eqP SIZE; apply size0nil in SIZE; subst xs.
+    by rewrite big_nil in TWO.
+  }
+  { intros xs SIZE p UNIQ LE TWO.
+    destruct xs as [ | x xs]; first by rewrite big_nil in TWO.
+    rewrite big_cons in TWO.
+    move: (LE x (mem_head x xs)); rewrite leq_eqVlt => /orP [/eqP EQ | LT].
+    { exists x; rewrite EQ -addn1 leq_add2l in TWO.
+      move: TWO; rewrite sum_nat_gt0 => /hasP [x2]; rewrite mem_filter => /andP [_ IN] POS; exists x2.
+      split; first by apply/negP => /eqP EQT; subst; move: UNIQ; rewrite //= IN.
+      split; first by rewrite mem_head.
+      split; first by rewrite in_cons IN orbT.
+      split; first by rewrite EQ.
+      move: (LE x2 ltac:(rewrite in_cons IN orbT //)) => LE1. lia.
+    }
+    { edestruct IHB with (xs := xs) as [x1 [x2 [NEQ [IN1 [IN2 [EQ1 EQ2]]]]]]; eauto 1.
+      { by move: UNIQ; rewrite //= => /andP [_ UNIQ]. }
+      { by intros; apply LE; rewrite in_cons; apply/orP; right. }
+      { lia. }
+      { by exists x1, x2; rewrite NEQ !in_cons IN1 IN2 !orbT EQ1 EQ2. }
+    }
+  }
+Qed.
+
+(** Similarly to [sum_ge_2_seq], if a function [p] bounded by [1] sums
+    to at least two over a range of natural numbers, then there must
+    be two distinct numbers for which [p] evaluates to [1]. *)
+Lemma sum_ge_2_nat :
+  forall (t1 t2 : nat) (p : nat -> nat),
+    (forall t, p t <= 1) ->
+    2 <= \sum_(t1 <= t < t2) p t ->
+    exists to1 to2,
+      (t1 <= to1) /\ (to1 < to2) /\ (to2 < t2)
+      /\ p to1 == 1
+      /\ p to2 == 1.
+Proof.
+  intros t1 t2 p LE TWO.
+  edestruct @sum_ge_2_seq with (xs := index_iota t1 t2) (p := p) as [x1 [x2 [NEQ [IN1 [IN2 [EQ1 EQ2]]]]]].
+  { by apply iota_uniq. }
+  { by intros; apply LE. }
+  { by done. }
+  { move: NEQ; erewrite mem_index_iota in IN1, IN2; rewrite neq_ltn => /orP [LT|LT].
+    { exists x1, x2; repeat split; try done; lia. }
+    { exists x2, x1; repeat split; try done; lia. }
+  }
+Qed.
