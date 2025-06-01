@@ -757,6 +757,16 @@ Section IotaRange.
     by rewrite subSn //.
   Qed.
 
+  (** Splitting [index_iota t1 t2] at [t] yields two concatenated iotas. *)
+  Lemma index_iota_cat :
+    forall t t1 t2,
+      t1 <= t <= t2 ->
+      index_iota t1 t2 = index_iota t1 t ++ index_iota t t2.
+  Proof.
+    move=> t t1 t2 NEQ; rewrite /index_iota (iotaD_impl (t - t1)); last by lia.
+    by f_equal; f_equal; lia.
+  Qed.
+
   (** We prove that one can remove duplicating element from the
       head of a sequence by which [range] is filtered. *)
   Lemma range_filter_2cons :
