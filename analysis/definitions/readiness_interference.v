@@ -95,7 +95,7 @@ Section Bound.
 
   (** Now we define the required bound as, for any job [j ∈ tsk] and any interval <<[t1, t1 + Δ)>>
       that is inside the busy interval <<[t1, t2]>> of [j], [B : duration] is a bound
-      on the total inteference due to no higher-or-equal priority jobs being
+      on the total interference due to no higher-or-equal priority jobs being
       ready in the interval <<[t1, t1 + Δ)>>. *)
   Definition readiness_interference_is_bounded (B : duration -> duration -> duration) :=
     forall j t1 t2 Δ,
