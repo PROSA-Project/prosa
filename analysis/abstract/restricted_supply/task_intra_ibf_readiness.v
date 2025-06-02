@@ -85,13 +85,13 @@ Section TaskIntraInterferenceIsBounded.
 
   (** Assume that we have a bound on the interference due to all higher-or-equal-priority
       jobs becoming non-ready. *)
-  Variable readiness_interference_bound : duration.
+  Variable readiness_interference_bound : duration -> duration -> duration.
   Hypothesis H_readiness_interference_bounded :
     readiness_interference_is_bounded arr_seq sched tsk readiness_interference_bound.
 
   (** Finally, we define the interference-bound function ([task_intra_IBF]). *)
   Definition task_intra_IBF (A R : duration) :=
-   athep_workload_bound A R + service_inversion_bound + readiness_interference_bound.
+   athep_workload_bound A R + service_inversion_bound + readiness_interference_bound A R.
 
   (** Next, we prove that [task_intra_IBF] is indeed an interference bound. *)
   Lemma instantiated_task_intra_interference_is_bounded :
@@ -106,14 +106,18 @@ Section TaskIntraInterferenceIsBounded.
     rewrite /task_intra_IBF leq_add //; last first.
     { apply leq_trans with (cumulative_readiness_interference arr_seq sched j t1 (t1 + Δ));
         first by apply leq_sum_seq => ? ? ?; lia.
-      apply H_readiness_interference_bounded with (t2 := t2) => //=. }
-    { rewrite leq_add => //=.
-      erewrite cumulative_i_thep_eq_service_of_othep; eauto 2 => //; last first.
-      { rewrite instantiated_quiet_time_equivalent_quiet_time => //; apply BUSY. }
-      apply: leq_trans.
-      { by apply service_of_jobs_le_workload => //; apply unit_supply_is_unit_service. }
-      { by apply H_workload_is_bounded => //; apply: abstract_busy_interval_classic_quiet_time => //. }
-    }
+      apply: H_readiness_interference_bounded => //=.
+      by move: BUSY => [[? [? ?]] ?]. }
+    { rewrite leq_add //=.
+      { erewrite cumulative_i_thep_eq_service_of_othep; eauto 2 => //; last first.
+        { rewrite instantiated_quiet_time_equivalent_quiet_time => //; apply BUSY. }
+        apply: leq_trans.
+        { by apply service_of_jobs_le_workload => //; apply unit_supply_is_unit_service. }
+        { by apply H_workload_is_bounded => //; apply: abstract_busy_interval_classic_quiet_time => //. } }
+      { apply leq_trans with (cumulative_service_inversion arr_seq sched j t1 t2); last first.
+        { apply H_service_inversion_is_bounded => //=.
+          by move: BUSY => [? ?]. }
+        by rewrite [X in _ <= X](@big_cat_nat _ _ _ (t1 + Δ)) //= leq_addr. } }
   Qed.
 
 End TaskIntraInterferenceIsBounded.

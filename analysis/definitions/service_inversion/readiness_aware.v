@@ -86,18 +86,16 @@ Section TaskServiceInversionBound.
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
 
-  (** Recall the notion of abstract busy interval. *)
-  Let busy_interval_ab := busy_interval sched.
+  (** Recall the notion of abstract busy interval prefix. *)
+  Let busy_interval_prefix_ab := busy_interval_prefix sched.
 
   (** Now we say [B : duration] is a bound on service inversion if, for any job [j ∈ tsk],
-      and its busy interval <<[t1, t2]>>, let <<[t1, t1 + Δ)>> be any interval such that
-      <<[t1, t1 + Δ) ⊂ [t1, t2]>>, then [B : duration] is a bound on the total service inversion. *)
+      and its busy interval <<[t1, t2]>>, then [B : duration] is a bound on the total service inversion. *)
   Definition service_inversion_is_bounded (B : duration) :=
-    forall j t1 t2 Δ,
-      t1 + Δ < t2 ->
+    forall j t1 t2,
       arrives_in arr_seq j ->
       job_of_task tsk j ->
-      busy_interval_ab j t1 t2 ->
-      cumulative_service_inversion arr_seq sched j t1 (t1 + Δ) <= B.
+      busy_interval_prefix_ab j t1 t2 ->
+      cumulative_service_inversion arr_seq sched j t1 t2 <= B.
 
 End TaskServiceInversionBound.
