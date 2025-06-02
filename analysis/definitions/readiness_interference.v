@@ -1,5 +1,6 @@
 Require Export prosa.model.priority.definitions.
 Require Export prosa.analysis.abstract.definitions.
+Require Export prosa.analysis.definitions.job_properties.
 
 (** Readiness Interference *)
 
@@ -89,17 +90,20 @@ Section Bound.
   (** Now consider a task [tsk]. *)
   Variable tsk : Task.
 
-  (** Recall the notion of abstract quiet time. *)
-  Let quiet_time_ab := quiet_time sched.
+  (** Recall the notion of abstract busy interval prefix. *)
+  Let busy_interval_prefix_ab := busy_interval_prefix sched.
 
-  (** Now we define the required bound as, for any job [j ∈ tsk] and its busy interval
-      <<[t1, t2]>> of [j], [B : duration] is a bound on the total interference due to no
-      higher-or-equal priority jobs being ready in any interval <<[t1, t1 + Δ)>>. *)
+  (** Now we define the required bound as, for any job [j ∈ tsk] and any interval <<[t1, t1 + Δ)>>
+      that is inside the busy interval <<[t1, t2]>> of [j], [B : duration] is a bound
+      on the total inteference due to no higher-or-equal priority jobs being
+      ready in the interval <<[t1, t1 + Δ)>>. *)
   Definition readiness_interference_is_bounded (B : duration -> duration -> duration) :=
-    forall j t1 Δ,
+    forall j t1 t2 Δ,
+      t1 + Δ <= t2 ->
       arrives_in arr_seq j ->
       job_of_task tsk j ->
-      quiet_time_ab j t1 ->
+      job_cost_positive j ->
+      busy_interval_prefix_ab j t1 t2 ->
       cumulative_readiness_interference arr_seq sched j t1 (t1 + Δ) <= B (job_arrival j - t1) Δ.
 
 End Bound.

@@ -106,8 +106,8 @@ Section TaskIntraInterferenceIsBounded.
     rewrite /task_intra_IBF leq_add //; last first.
     { apply leq_trans with (cumulative_readiness_interference arr_seq sched j t1 (t1 + Δ));
         first by apply leq_sum_seq => ? ? ?; lia.
-      apply: H_readiness_interference_bounded => //=.
-      by move: BUSY => [[? [? ?]] ?]. }
+      apply H_readiness_interference_bounded with (t2 := t2) => //=.
+      by move: BUSY => [? ?]. }
     { rewrite leq_add //=.
       { erewrite cumulative_i_thep_eq_service_of_othep; eauto 2 => //; last first.
         { rewrite instantiated_quiet_time_equivalent_quiet_time => //; apply BUSY. }
