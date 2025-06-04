@@ -1,5 +1,5 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat.
-Require Import prosa.util.tactics prosa.util.notation.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat zify.zify.
+Require Import prosa.util.tactics prosa.util.notation prosa.util.rel.
 
 (** We say that a function [f] is a unit growth function iff for any
     time instant [t] it holds that [f (t + 1) <= f t + 1]. *)
@@ -12,6 +12,21 @@ Section Lemmas.
   (** Let [f] be any unit growth function over natural numbers. *)
   Variable f : nat -> nat.
   Hypothesis H_unit_growth_function : unit_growth_function f.
+
+  (** Since [f] is a unit-growth function, the value of [f] after [k]
+      steps is at most [k] greater than its value at the starting
+      point. *)
+  Lemma unit_growth_function_k_steps_bounded :
+    forall (x k : nat),
+      f (x + k) <= k + f x.
+  Proof.
+    intros x k; induction k.
+    { by rewrite addn0 add0n. }
+    { rewrite addnS; apply: leq_trans.
+      { by rewrite -addn1; apply H_unit_growth_function. }
+      { lia. }
+    }
+  Qed.
 
   (** In the following section, we prove a result similar to the
       intermediate value theorem for continuous functions. *)
@@ -104,8 +119,8 @@ Section Lemmas.
 
   (** In this section, we, again, prove an analogue of the
       intermediate value theorem, but for predicates over natural
-      numbers. *) 
-  Section ExistsIntermediateValuePredicates. 
+      numbers. *)
+  Section ExistsIntermediateValuePredicates.
 
     (** Let [P] be any predicate on natural numbers. *)
     Variable P : nat -> bool.
@@ -119,7 +134,7 @@ Section Lemmas.
 
     (** ... but holds for [t2]. *)
     Hypothesis H_P_at_t2 : P t2.
-    
+
     (** Then we prove that within time interval <<[t1,t2]>> there exists
         time instant [t] such that [t] is the first time instant when
         [P] holds. *)
@@ -131,22 +146,92 @@ Section Lemmas.
         apply/andP; split; first by done.
         apply/andP; split; last by done.
         move: H_t1_le_t2; rewrite leq_eqVlt; move => /orP [/eqP EQ | NEQ1]; last by done.
-        by exfalso; subst t2; move: H_not_P_at_t1 => /negP NPt1. 
+        by exfalso; subst t2; move: H_not_P_at_t1 => /negP NPt1.
       }
       have MIN := ex_minnP EX.
       move: MIN => [x /andP [Px /andP [LT1 LT2]] MIN]; clear EX.
       exists x; repeat split; [ apply/andP; split | | ]; try done.
       move => y /andP [NEQ1 NEQ2]; apply/negPn; intros Py.
-      feed (MIN y). 
+      feed (MIN y).
       { apply/andP; split; first by done.
         apply/andP; split.
         - move: NEQ1. rewrite leq_eqVlt; move => /orP [/eqP EQ | NEQ1]; last by done.
-          by exfalso; subst y; move: H_not_P_at_t1 => /negP NPt1. 
+          by exfalso; subst y; move: H_not_P_at_t1 => /negP NPt1.
         - by apply ltnW, leq_trans with x.
       }
       by move: NEQ2; rewrite ltnNge; move => /negP NEQ2.
     Qed.
-    
+
   End ExistsIntermediateValuePredicates.
 
 End Lemmas.
+
+
+(** * Slowing Functions to Unit-Step Growth
+
+    Next, we define and prove a few properties about a function that
+    converts any function into a unit-step function. This construction
+    will be used later to define Supply-Bound Functions (SBFs), which
+    must satisfy this growth constraint in some of the RTAs.  *)
+
+(** ** Slowed Function
+
+    Given a function [F : nat -> nat], we define a slowed version [slowed
+    F] such that [slowed F n] grows no faster than one unit per input
+    increment. Intuitively, [slowed F] matches [F] when [slowed F n =
+    F n], and otherwise "lags behind" [F] to enforce the unit-growth
+    constraint.
+
+    The definition is recursive: [slowed F n] is the minimum of [F n]
+    and [1 + slowed F (n-1)].  *)
+Fixpoint slowed (F : nat -> nat) (n : nat) : nat :=
+  match n with
+  | 0 => F 0
+  | n'.+1 => minn (F n'.+1) (slowed F n').+1
+  end.
+
+(** Given two functions [f] and [F], if [f] is a unit-growth function
+    and [f <= F] pointwise up to [Δ], then [f Δ <= slowed F Δ]. *)
+Lemma slowed_respects_pointwise_leq :
+  forall (f F : nat -> nat) (Δ : nat),
+    unit_growth_function f  ->
+    (forall x, x <= Δ -> f x <= F x) ->
+    f Δ <= slowed F Δ.
+Proof.
+  move => f F x SL LE; induction x as [|n IH]; first by apply: LE.
+  have [CLE|Hcase] := leqP (F n.+1) (slowed F n + 1).
+  { rewrite leq_min; apply/andP; split; first by apply LE.
+    apply: leq_trans; first by apply LE.
+    by rewrite addn1 in CLE.
+  }
+  { rewrite leq_min; apply/andP; split; first by apply LE.
+    apply: leq_trans; first by rewrite -addn1; apply SL.
+    by rewrite -[in leqRHS]addn1 leq_add2r; apply IH.
+  }
+Qed.
+
+(** The [slowed] function grows at most by 1 per step (i.e., it's unit-growth). *)
+Lemma slowed_is_unit_step :
+  forall (f : nat -> nat),
+    unit_growth_function (slowed f).
+Proof.
+  unfold unit_growth_function; intros f x; rewrite !addn1.
+  by induction x; simpl; lia.
+Qed.
+
+(** If [f] is monotone, then [slowed f] is also monotone. *)
+Lemma slowed_respects_monotone :
+  forall (f : nat -> nat),
+    monotone leq f ->
+    monotone leq (slowed f).
+Proof.
+  move => f MON x y NEQ.
+  interval_to_duration x y k; induction k as [ | k IHk].
+  { by rewrite addn0. }
+  { rewrite addnS //=; apply:leq_trans; first by apply IHk.
+    move: (MON (x + k) (x + k).+1 ltac:(done)) => MONS.
+    rewrite leq_min; apply/andP; split; last by done.
+    apply: leq_trans; last by apply MONS.
+    by clear; induction (x + k); [done | simpl; lia].
+  }
+Qed.
