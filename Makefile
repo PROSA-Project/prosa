@@ -75,8 +75,10 @@ html gallinahtml: $(COQ_MAKEFILE)
 
 vacuum: allCoqProject cleanall
 	@echo 'VACUUMING *.vo *.vok *.vos *.glob .*.aux <empty directories>'
-	@find . -depth \( -iname '*.vo' -or -iname "*.vok" -or -iname "*.vok" -or  -iname '*.glob' -or -iname '.*.aux' \)  ! -path './.git/*' -delete
+	@find . -depth \( -iname '*.vo' -or -iname "*.vok" -or -iname "*.vos" -or  -iname '*.glob' -or -iname '.*.aux' \)  ! -path './.git/*' -delete
 	@find . -depth -type d -empty ! -path './.git/*' -delete
+	@echo 'REMOVING ${COQ_MAKEFILE} ${COQ_PROJ}'
+	@rm -f ${COQ_MAKEFILE} ${COQ_PROJ}
 
 macos-clean:
 	@echo 'CLEAN .DS_Store'
