@@ -936,6 +936,36 @@ Section IotaRange.
 
 End IotaRange.
 
+(** Additional lemmas about count. *)
+Section Count.
+
+  (** If [f] implies [g] for all elements in [xs], then the number of
+      elements in [xs] satisfying [f] is less than or equal to the
+      number of elements satisfying [g]. *)
+  Lemma sub_count_seq :
+    forall {X : eqType} (f g : pred X) (xs : seq X),
+      {in xs, forall x, f x -> g x} ->
+      count f xs <= count g xs.
+  Proof.
+    move=> X f g xs LE; rewrite -!size_filter -!sum1_size !big_filter.
+    rewrite big_seq_cond [leqRHS]big_seq_cond big_mkcond [leqRHS]big_mkcond.
+    apply leq_sum => t _; destruct (_ \in _) eqn:IN, (f t) eqn:FT, (g t) eqn:GT => //.
+    by move: (LE _ IN); rewrite FT GT => FA.
+  Qed.
+
+  (** We adapt ssreflect’s [count_predUI] lemma for easier rewriting:
+      the count of elements satisfying [P1 ∪ P2] equals the sum of
+      counts for [P1] and [P2], minus the count of elements satisfying
+      both. *)
+  Lemma count_predUI' :
+    forall (P1 P2 : pred nat) (xs : seq nat),
+      count (predU P1 P2) xs = count P1 xs + count P2 xs - count (predI P1 P2) xs.
+  Proof.
+    by move=> P1 P2 xs; rewrite -(count_predUI P1 P2 xs) -addnBA // subnn addn0.
+  Qed.
+
+End Count.
+
 (** A sequence [xs] is a prefix of another sequence [ys] iff
     there exists a sequence [xs_tail] such that [ys] is a
     concatenation of [xs] and [xs_tail]. *)
