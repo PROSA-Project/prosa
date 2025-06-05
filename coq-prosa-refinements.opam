@@ -13,7 +13,7 @@ build: [
 install: [make "install"]
 depends: [
   "coq-prosa" { = version }
-  "coq-coqeal" {>= "1.1.0"}
+  "coq-coqeal" {>= "2.1.0"}
 ]
 
 tags: [

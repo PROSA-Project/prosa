@@ -3,9 +3,9 @@
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+    - if: "$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS"
       when: never
-    - if: '$CI_COMMIT_BRANCH'
+    - if: "$CI_COMMIT_BRANCH"
 
 stages:
   - build
@@ -29,7 +29,7 @@ stages:
     - opam install -y -v -j ${NJOBS} coq-prosa-refinements
 
 .preferred-stable-version:
-    image: registry.mpi-sws.org/mathcomp-for-prosa:2.3.0-coq-8.20
+  image: bbbrandenburg/mathcomp-for-prosa:2.4.0-rocq-prover-9.0
 
 .build:
   image: registry.mpi-sws.org/mathcomp-for-prosa:${CI_JOB_NAME}
@@ -53,7 +53,6 @@ stages:
         mkdir -p $CERT;
         time ./poet -v -o $CERT -j ${NJOBS} -s $WORKLOAD;
       done;
-      
 
 .make-html:
   script:
@@ -66,12 +65,7 @@ stages:
 
 ###################### The Jobs ######################
 
-2.2.0-coq-8.19:
-  extends:
-    - .build
-    - .not_in_wip_branches
-
-2.3.0-coq-8.20:
+2.4.0-rocq-prover-9.0:
   extends:
     - .build
     - .not_in_wip_branches
@@ -108,9 +102,9 @@ compile-and-doc-and-validate:
     - if grep -q Warning coqc-messages.txt; then (echo "Please fix all Coq warnings:"; echo "--"; grep -B1 Warning coqc-messages.txt; exit 1); fi
     - !reference [.make-html, script]
     - scripts/check-axiom-free.sh results
-##### `make validate` disabled because of https://github.com/LPCIC/coq-elpi/issues/677 and https://github.com/coq/coq/issues/17345
-#     - make validate 2>&1 | tee validation-results.txt
-#     - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
+  ##### `make validate` disabled because of https://github.com/LPCIC/coq-elpi/issues/677 and https://github.com/coq/coq/issues/17345
+  #     - make validate 2>&1 | tee validation-results.txt
+  #     - scripts/check-validation-output.sh --accept-proof-irrelevance validation-results.txt
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
     paths:
@@ -154,27 +148,11 @@ spell-check:
   script:
     - make spell
 
-# mathcomp-dev with stable Coq
-#coq-8.17:
-#  extends:
-#    - .build-dev
-#    - .not_in_wip_branches
-#  # it's ok to fail with an unreleased version of ssreflect
-#  allow_failure: true
-
-# mathcomp-dev with coq-dev
-#coq-dev:
-#  extends:
-#    - .build-dev
-#    - .not_in_wip_branches
-#  # it's ok to fail with an unreleased version of ssreflect and Coq
-#  allow_failure: true
-
 proof-state:
   extends:
-   - .not_in_wip_branches
+    - .not_in_wip_branches
   stage: build
-  image: registry.mpi-sws.org/alectryon-ci:2.3.0-coq-8.20
+  image: registry.mpi-sws.org/alectryon-ci:2.4.0-rocq-prover-9.0
   script:
     - eval $(opam env)
     - make -j ${NJOBS} all
