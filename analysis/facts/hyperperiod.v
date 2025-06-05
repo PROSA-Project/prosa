@@ -193,7 +193,7 @@ Section PeriodicLemmas.
     rewrite ltnS.
     apply leq_trans with (n := (job_arrival j2 - O_max) %/ HP * HP + O_max + HP); first by lia.
     rewrite leq_add2r.
-    have O_M : (job_arrival j2 - O_max) %/ HP * HP <= job_arrival j2 - O_max by apply leq_trunc_div.
+    have O_M : (job_arrival j2 - O_max) %/ HP * HP <= job_arrival j2 - O_max by apply leq_divM.
     have ARR_G : job_arrival j2 >= O_max by [].
     lia.
   Qed.
@@ -205,7 +205,7 @@ Section PeriodicLemmas.
     apply job_in_task_arrivals_between => //.
     apply /andP; split.
     + rewrite addnC -leq_subRL => //.
-      by apply leq_trunc_div.
+      by apply leq_divM.
     + specialize (div_floor_add_g (job_arrival j1 - O_max) HP) => AB.
       feed_n 1 AB; first by apply valid_periods_imply_pos_hp => //.
       rewrite ltn_subLR // in AB.

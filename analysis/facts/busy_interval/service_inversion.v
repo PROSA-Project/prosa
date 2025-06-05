@@ -105,8 +105,8 @@ Section ServiceInversion.
       move=> j al ar bl br LE1 LE2.
       rewrite /cumulative_service_inversion.
       have [NEQ1|NEQ1] := leqP al ar; last by rewrite big_geq //.
-      rewrite (big_cat_nat _ _ _ LE1) //=; last by lia.
-      by rewrite (big_cat_nat _ _ _ _ LE2) //= addnC -addnA leq_addr //=.
+      rewrite (big_cat_nat LE1) //=; last by lia.
+      by rewrite (big_cat_nat _ LE2) //= addnC -addnA leq_addr //=.
     Qed.
 
   End BasicLemmas.

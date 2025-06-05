@@ -236,7 +236,7 @@ End Theory.
 (** For convenience, we define a simple notation for declaring concrete tasks
     using numbers represented in binary, which is used in POET's certificates to
     improve readability. *)
-Require Export NArith.
+From Stdlib Require Export NArith.
 
 (** We declare a notation to declare a task instance of type [Task_T]. *)
 Notation "'[' 'TASK' 'id:' c1 'cost:' c2 'deadline:' c3 'arrival:' c4 'priority:' c5 ']'" :=

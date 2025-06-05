@@ -122,7 +122,7 @@ Section DivFloorCeil.
     destruct (d %| m) eqn:Mm; destruct (d %| n) eqn:Mn => //; first by lia.
     rewrite ltn_divRL //.
     apply: (leq_trans _ LEQ).
-    move: (leq_trunc_div m d) => LEQm.
+    move: (leq_divM m d) => LEQm.
     destruct (ltngtP (m %/ d * d) m) as [| |e] => //.
     move: e => /eqP EQ; rewrite -dvdn_eq in EQ.
     by rewrite EQ in Mm.

@@ -274,7 +274,7 @@ Section ArrivalSequencePrefix.
       case: (leqP t1 t) => LE1;
         last by rewrite [LHS]/arrivals_between big_geq; try lia; rewrite arrivals_between_filter_nil.
       rewrite /arrivals_between bigcat_nat_filter_eq_filter_bigcat_nat.
-      rewrite (big_cat_nat _ _ _ LE1 LE2) //=.
+      rewrite (big_cat_nat LE1 LE2) //=.
       rewrite !big_nat [X in _ ++ X]big1; last first.
       { move=> t' /andP[LO HI].
         rewrite filter_in_pred0 // => j IN.
@@ -449,7 +449,7 @@ Section ArrivalSequencePrefix.
         first by rewrite big_nil.
       case: (leqP t1 t2) => T1T2;
         last by rewrite big_geq.
-      rewrite (big_cat_nat _ _ _ T1T2 _) //=.
+      rewrite (big_cat_nat T1T2) //=.
       case A1: (\cat_(t1<=t<t2)arrivals_at arr_seq t) => [|j js];
         first by rewrite cat0s big_nat1; exact: arrivals_at_sorted.
       have CAT : path by_arrival_times j (\cat_(t1<=t<t2)arrivals_at arr_seq t ++ \cat_(t2<=i<t2.+1)arrivals_at arr_seq i).

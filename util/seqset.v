@@ -21,10 +21,10 @@ Section SeqSet.
   HB.instance Definition _  setSubType := [isSub for _set_seq].
   HB.instance Definition _ := [Equality of set by <:].
   Canonical Structure mem_set_predType := PredType (fun (l : set) => mem_seq (_set_seq l)).
-  Set Warnings "redundant-canonical-projection".
   Definition set_of of phant T := set.
 
 End SeqSet.
+Set Warnings "redundant-canonical-projection".
 
 Notation " {set R } " := (set_of (Phant R)).
 

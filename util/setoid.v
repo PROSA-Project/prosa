@@ -1,7 +1,7 @@
 (** Setoid Rewriting with boolean inequalities of ssreflect. Solution
     suggested by Georges Gonthier (ssreflect mailinglist @ 18.12.2016) *)
 
-From Coq Require Import Basics Setoid Morphisms.
+From Stdlib Require Import Basics Setoid Morphisms.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 
 (** This construction allows us to "rewrite" inequalities with ≤. *)
