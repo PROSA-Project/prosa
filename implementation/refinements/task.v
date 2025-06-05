@@ -223,8 +223,8 @@ Section Theory.
     rewrite refinesE => ts ts' UNI.
     have UNIT := unify_rel; last specialize (UNIT _ _ _ UNI); subst ts'; clear UNI.
     induction ts as [ | tsk ts].
-    - by simpl; apply list_R_nil_R.
-    - simpl; apply list_R_cons_R; last by done.
+    - by simpl; apply nil_R.
+    - simpl; apply cons_R; last by done.
       by unfold Rtask, fun_hrel.
   Qed.
 

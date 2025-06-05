@@ -138,7 +138,7 @@ Section Theory.
     - by refines_abstr; rewrite pred1E eq_sym ; refines_apply.
     - refines_abstr.
       rewrite refinesE; eapply has_R; last by apply refinesP; eassumption.
-      by intros; apply refinesP; refines_apply.
+      by intros; apply refinesP.
   Qed.
 
   (** Next, we prove a refinement for the arrival curve prefix validity. *)
@@ -177,9 +177,9 @@ Section Theory.
       inversion Rab as [(H0, H1)]; refines_apply.
       rewrite refinesE.
       move: H1; clear; elim: st st' => [|s st IHst] [|s' st'] //.
-      - by move=> _; apply: list_R_nil_R.
+      - by move=> _; apply: nil_R.
       - move=> H1; inversion H1 as [(H0, H2)].
-        apply: list_R_cons_R; last by apply IHst.
+        apply: cons_R; last by apply IHst.
         destruct s', s; unfold tb2tn, tmap; simpl.
         by apply refinesP; refines_apply. }
   Qed.
@@ -210,9 +210,9 @@ Section Theory.
         inversion Rab as [(H0, H1)]; refines_apply.
         move: H1; clear; move: st'.
         rewrite refinesE; elim: st => [|a st IHst] [ |s st'] //.
-        - by intros _; rewrite //=; apply list_R_nil_R.
+        - by intros _; rewrite //=; apply nil_R.
         - intros H1; inversion H1; rewrite //=.
-          apply list_R_cons_R; last by apply IHst.
+          apply cons_R; last by apply IHst.
           destruct s, a; unfold tb2tn, tmap; simpl.
           by apply refinesP; refines_apply. } }
   Qed.
@@ -252,9 +252,9 @@ Section Theory.
     inversion Rab as [(H0, H1)]; refines_apply.
     move: H1; clear; move: st'.
     rewrite refinesE; elim: st => [|a st IHst] [ |s st'] //.
-    - by intros _; rewrite //=; apply list_R_nil_R.
+    - by intros _; rewrite //=; apply nil_R.
     - intros H1; inversion H1; rewrite //=.
-      apply list_R_cons_R; last by apply IHst.
+      apply cons_R; last by apply IHst.
       destruct s, a; unfold tb2tn, tmap; simpl.
       by apply refinesP; refines_apply.
   Qed.
@@ -318,9 +318,9 @@ Section Theory.
     all: try (inversion Rab; subst; apply refinesP; refines_apply; fail).
     destruct e as [h?], eT as [? st];[apply refinesP; refines_apply; inversion Rab; tc].
     inversion Rab as [(H__, Hst)]; subst.
-    elim: st Rab Hst => [|a st IHst] Rab H1; first by rewrite //= refinesE; apply list_R_nil_R.
+    elim: st Rab Hst => [|a st IHst] Rab H1; first by rewrite //= refinesE; apply nil_R.
     destruct a; rewrite refinesE.
-    apply list_R_cons_R; first by apply refinesP; unfold tb2tn,tmap; refines_apply.
+    apply cons_R; first by apply refinesP; unfold tb2tn,tmap; refines_apply.
     by apply refinesP, IHst.
   Qed.
 
@@ -346,9 +346,9 @@ Section Theory.
     all: try (inversion Rab; subst; refines_apply; fail).
     destruct e as [h?], eT as [? st]; refines_apply; first by inversion Rab; subst; tc.
     inversion Rab; subst.
-    elim: st Rab => [|a st IHst] Rab; first by rewrite //= refinesE; apply list_R_nil_R.
+    elim: st Rab => [|a st IHst] Rab; first by rewrite //= refinesE; apply nil_R.
     destruct a; rewrite //= refinesE.
-    apply list_R_cons_R; first by apply refinesP; unfold tb2tn,tmap; refines_apply.
+    apply cons_R; first by apply refinesP; unfold tb2tn,tmap; refines_apply.
     by apply refinesP, IHst.
   Qed.
 

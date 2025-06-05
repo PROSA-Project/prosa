@@ -1,6 +1,6 @@
 Require Export prosa.implementation.definitions.task.
 Require Export prosa.implementation.facts.extrapolated_arrival_curve.
-Require Export NArith.
+From Stdlib Require Export NArith.
 From CoqEAL Require Export hrel param refinements binnat.
 Export Refinements.Op.
 
@@ -301,14 +301,14 @@ Qed.
 Global Instance refine_cons A C (rAC : A -> C -> Type) :
   refines (rAC ==> list_R rAC ==> list_R rAC)%rel cons cons.
 Proof.
-  by rewrite refinesE => h h' rh t t' rt; apply list_R_cons_R.
+  by rewrite refinesE => h h' rh t t' rt; apply cons_R.
 Qed.
 
 (** Next, we prove a refinement for the [nil] function. *)
 Global Instance refine_nil A C (rAC : A -> C -> Type) :
   refines (list_R rAC) nil nil.
 Proof.
-  by rewrite refinesE; apply list_R_nil_R.
+  by rewrite refinesE; apply nil_R.
 Qed.
 
 (** Next, we prove a refinement for the [last] function. *)
@@ -353,14 +353,14 @@ Global Instance refine_iota :
   refines (Rnat ==> Rnat ==> list_R Rnat)%rel iota iota_T.
 Proof.
   rewrite refinesE => a a' Ra b; move: a a' Ra; elim: b => [|b IHb] a a' Ra b' Rb.
-  { destruct b'; first  by rewrite //=; apply list_R_nil_R.
+  { destruct b'; first  by rewrite //=; apply nil_R.
     by compute in Rb; apply posBinNatNotZero in Rb. }
   { destruct b'; first  by compute in Rb; destruct b.
     have Rsa := Rnat_S.
     rewrite refinesE in Rsa; specialize (Rsa a a' Ra).
     specialize (IHb _ _ Rsa).
     rewrite //= -N.succ_pos_pred iotaTsuccN.
-    apply list_R_cons_R; first by done.
+    apply cons_R; first by done.
     apply IHb; clear Rsa Ra IHb.
     by apply eq_SnPos_to_nPred. }
 Qed.
@@ -395,9 +395,9 @@ Global Instance refine_abstract :
   forall xs,
     refines (list_R Rnat)%rel (map nat_of_bin xs) xs | 0.
 Proof.
-  elim=> [|a xs IHxs]; first by rewrite refinesE; simpl; apply list_R_nil_R.
+  elim=> [|a xs IHxs]; first by rewrite refinesE; simpl; apply nil_R.
   rewrite //= refinesE; rewrite refinesE in IHxs.
-  by apply list_R_cons_R; last by done.
+  by apply cons_R; last by done.
 Qed.
 
 (** ** Supporting Lemmas  *)

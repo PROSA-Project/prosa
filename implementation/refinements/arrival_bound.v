@@ -206,11 +206,11 @@ Section Refinements.
     rewrite refinesE => evec evec' Revec.
     unfold unify  in *; subst evec'.
     destruct evec as [h st].
-    apply prod_R_pair_R.
+    apply pair_R.
     - by compute.
     - simpl; clear h; elim: st => [|a st IHst].
-      + apply list_R_nil_R.
-      + simpl; apply list_R_cons_R; last by done.
+      + apply nil_R.
+      + simpl; apply cons_R; last by done.
         destruct a; unfold tb2tn, tmap; simpl.
         by apply refinesP; refines_apply.
   Qed.
