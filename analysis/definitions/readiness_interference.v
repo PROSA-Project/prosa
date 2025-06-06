@@ -27,9 +27,8 @@ Section Definitions.
 
   (** Consider any notion of readiness.
       Note that although any notion of readiness would work, it wouldn't make
-      sense to have this kind of interference in case of readiness model where
-      [work_bearing_readiness] is true, since this interference would always
-      be false in that case. *)
+      sense to have this kind of interference in case of a work-bearing notion of
+      readiness, since this interference would always be false in that case. *)
   Context `{!JobReady Job PState}.
 
   (** Consider any arrival sequence of jobs. *)

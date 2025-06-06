@@ -59,7 +59,7 @@ Section IWInstantiation.
       cannot execute due to (1) the lack of supply at time [t], (2)
       due to service inversion (i.e., a lower-priority job receiving
       service at [t]), or higher-or-equal-priority job receiving
-      service. (3) due to the [j] and other higher-or-equal-priority job
+      service. (3) due to the [j] and all other higher-or-equal-priority job
       becoming non-ready. *)
   #[local] Instance rs_readiness_jlfp_interference : Interference Job :=
     {

@@ -50,8 +50,7 @@ Section ServiceInversion.
 
 End ServiceInversion.
 
-(** In this section, we define a notion of the bounded service
-    inversion for tasks. *)
+(** In this section, we define a notion of a bound on service inversion. *)
 Section TaskServiceInversionBound.
 
   (** Consider any type of tasks ... *)

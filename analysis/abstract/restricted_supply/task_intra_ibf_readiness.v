@@ -7,7 +7,7 @@ Require Export prosa.analysis.definitions.workload.bounded.
 (** * Task Intra-Supply Interference is Bounded *)
 
 (** In this file, we define the task intra-supply IBF [task_intra_IBF]
-    assuming that we have two a bound on the interference factors. *)
+    assuming that we have a bound on the interference factors. *)
 Section TaskIntraInterferenceIsBounded.
 
   (** Consider any type of tasks ... *)
@@ -29,20 +29,11 @@ Section TaskIntraInterferenceIsBounded.
   Context `{!JobReady Job PState}.
 
   (** Consider a JLFP policy that indicates a higher-or-equal-priority
-      relation, and assume that the relation is reflexive.
-
-      Note that we do not relate the JLFP policy with the
-      scheduler. However, we define functions for Interference and
-      Interfering Workload that actively use the concept of
-      priorities. We require the JLFP policy to be reflexive, so a job
-      cannot cause lower-priority interference (i.e. priority
-      inversion) to itself. *)
+      relation, and assume that the relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
-  (** We also assume that the policy respects sequential tasks,
-      meaning that later-arrived jobs of a task don't have higher
-      priority than earlier-arrived jobs of the same task. *)
+  (** We also assume that the policy respects sequential tasks *)
   Hypothesis H_JLFP_respects_sequential_tasks : policy_respects_sequential_tasks JLFP.
 
   (** Consider any valid arrival sequence ... *)
@@ -63,14 +54,14 @@ Section TaskIntraInterferenceIsBounded.
 
   (** The interfering workload, in turn, is defined as the sum of the
       blackout predicate, interfering workload of jobs with higher or equal priority
-     service inversion predicate, and the interference due to non-readiness predicate . *)
+      service inversion predicate, and the interference due to non-readiness predicate . *)
   #[local] Instance rs_jlfp_interfering_workload : InterferingWorkload Job :=
     rs_readiness_jlfp_interfering_workload arr_seq sched.
 
   (** Let [tsk] be any task to be analyzed. *)
   Variable tsk : Task.
 
-  (** Assume that there exists a bound on the length of any service
+  (** Assume that there exists a bound on the length of service
       inversion experienced by any job of task [tsk]. *)
   Variable service_inversion_bound : duration.
   Hypothesis H_service_inversion_is_bounded :
