@@ -148,17 +148,19 @@ spell-check:
   script:
     - make spell
 
-proof-state:
-  extends:
-    - .not_in_wip_branches
-  stage: build
-  image: registry.mpi-sws.org/alectryon-ci:2.4.0-rocq-prover-9.0
-  script:
-    - eval $(opam env)
-    - make -j ${NJOBS} all
-    - make -j ${NJOBS} alectryon
-  artifacts:
-    name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
-    paths:
-      - "html-alectryon/"
-    expire_in: 1 week
+# Disabled until alectryon gains support for Rocq Prover 9.0
+# See https://github.com/cpitclaudel/alectryon/issues/104
+# proof-state:
+#   extends:
+#     - .not_in_wip_branches
+#   stage: build
+#   image: registry.mpi-sws.org/alectryon-ci:2.4.0-rocq-prover-9.0
+#   script:
+#     - eval $(opam env)
+#     - make -j ${NJOBS} all
+#     - make -j ${NJOBS} alectryon
+#   artifacts:
+#     name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
+#     paths:
+#       - "html-alectryon/"
+#     expire_in: 1 week
