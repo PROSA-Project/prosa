@@ -1,10 +1,12 @@
 # Prosa: Formally Proven Schedulability Analysis
 
-This repository contains the main Coq specification & proof development of the [Prosa open-source project](https://prosa.mpi-sws.org), which was launched in 2016.
+This repository contains the main specification & proof development of the [Prosa open-source project](https://prosa.mpi-sws.org). Technically, Prosa is a library for the [Rocq Prover](https://rocq-prover.org) (previously known as the [Coq Proof Assistant](https://rocq-prover.org/about#Name)).
 
-From 2018–201, Prosa was further developed in the context of the [RT-Proofs research project](https://rt-proofs.inria.fr/) (funded jointly by ANR and DFG, projects ANR-17-CE25-0016 and DFG-391919384, respectively).
+The Prosa project was launched in 2016. From 2018–2021, Prosa was refactored and enhanced in the context of the [RT-Proofs research project](https://rt-proofs.inria.fr/) (funded jointly by ANR and DFG, projects ANR-17-CE25-0016 and DFG-391919384, respectively).
 
 <center><img alt="RT-Proofs logo" src="http://prosa.mpi-sws.org/figures/rt-proofs-logo.png" width="300px"></center>
+
+Prosa was developed further in the context of the TOROS ERC project (2019–2023, grant agreement No 803111).
 
 Prosa continues to be maintained and developed by the MPI-SWS Real-Time Systems group and contributors. Patches and merge requests are very welcome!
 
@@ -48,18 +50,19 @@ Importing Prosa changes the behavior of ssreflect's `done` tactic by adding basi
 ```
 Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
 ```
-Prosa overwrites the default obligation tactic of Coq with `idtac`. Refer [`util.tactics`](util/tactics.v) for details.
+Prosa overwrites the default obligation tactic of Rocq's standard library with `idtac`. Refer to [`util.tactics`](util/tactics.v) for details.
 
 
 ## Installation
 
-### With the OCaml Package Manager (`opam`)
+The following methods are appropriate if you want to simply use some theorems from a stable, released version of Prosa, but don't plan on modifying Prosa itself. To work on Prosa, please instead follow the instructions for *manually compiling from sources* given further below.
+
+### Preferred Method: With `opam` (the OCaml Package Manager)
 
 Prosa can be installed using [`opam`](https://opam.ocaml.org/) (>= 2.0).
 
 ```bash
-opam repo add coq-released https://coq.inria.fr/opam/released
-# or for the dev version (git master): https://coq.inria.fr/opam/extra-dev
+opam repo add rocq-released https://rocq-prover.org/opam/released
 opam update
 opam install coq-prosa
 ```
@@ -69,7 +72,7 @@ opam install coq-prosa
 OPAM can also be used to install a local checkout. For example, this is done in the CI setup (see `.gitlab-ci.yaml`).
 
 ```bash
-opam repo add coq-released https://coq.inria.fr/opam/released
+opam repo add rocq-released https://rocq-prover.org/opam/released
 opam update
 opam pin add -n -y -k path coq-prosa .
 opam install coq-prosa
@@ -91,7 +94,7 @@ sudo npm install --global esy@latest
 
 #### Installing Prosa
 
-With `esy` in place, it is easy to compile Prosa in one go. To download and compile all of Prosa's dependencies (including Coq), and then to compile Prosa itself, simply issue the command:
+With `esy` in place, it is easy to compile Prosa in one go. To download and compile all of Prosa's dependencies (including the Rocq Prover), and then to compile Prosa itself, simply issue the command:
 
 ```bash
 esy
@@ -101,11 +104,17 @@ Note that `esy` uses an internal compilation environment, which is not exported 
 To work within this environment, prefix any command with `esy`: for instance `esy coqide` to run your system’s CoqIDE within the right environment.
 Alternatively, `esy shell` opens a shell within its environment.
 
-### Manually From Sources
+### Manual Compilation From Sources
+
+To compile Prosa from sources, in particular if you plan to modify it, we strongly suggest to set up an [`opam` *switch*](https://ocaml.org/docs/opam-switch-introduction) with all required dependencies installed.
+
+#### Quick Setup
+
+For convenience, the creation of a suitable `opam` switch is automated by the script [`mk-opam-switch.sh`](scripts/mk-opam-switch.sh) (which can be found in the `scripts/` folder of the Prosa repository). Assuming you have `opam` already configured (run [`opam init`](https://opam.ocaml.org/doc/Usage.html#opam-init) if not), simply run this script to create a new "switch" with all required dependencies already in place.
 
 #### Dependencies
 
-Besides on Coq itself, Prosa depends on
+Besides on the Rocq Prover itself, Prosa depends on
 
 1. the `ssreflect` library of the [Mathematical Components project](https://math-comp.github.io),
 2. the [Micromega support for the Mathematical Components library](https://github.com/math-comp/mczify) provided by `mczify`, and
@@ -114,10 +123,10 @@ Besides on Coq itself, Prosa depends on
 These dependencies can be easily installed with OPAM.
 
 ```bash
-opam install -y coq-mathcomp-ssreflect coq-mathcomp-zify coq-coqeal
+opam install -y rocq-prover rocq-mathcomp-ssreflect coq-mathcomp-zify coq-coqeal
 ```
 
-Prosa always tracks the latest stable versions of Coq and ssreflect. We do not maintain compatibility with older versions of either Coq or ssreflect.
+The Prosa team seeks to always track the latest stable versions of `rocq-prover` and `mathcomp`. Sometimes older versions may still work, but we do not explicitly maintain compatibility with older versions of any dependency due to limited engineering time.
 
 #### Compiling Prosa
 
@@ -151,7 +160,7 @@ make install
 
 Once the has been library compiled, the `coqdoc` documentation (as shown on the [web page](http://prosa.mpi-sws.org/documentation.html)) can be easily generated with:
 
-- `make htmlpretty -j`  --- pretty documentation based on CoqdocJS (can hide/show proofs),
+- `make htmlpretty -j`  --- pretty documentation based on [CoqdocJS](https://github.com/rocq-community/coqdocjs) (can hide/show proofs),
 - `make gallinahtml -j` --- just the specification, without proofs,
 - `make html -j`  --- full specification with all proofs.
 
@@ -166,7 +175,7 @@ To make things as smooth as possible, here are a couple of rules and guidelines 
 
 1. Always follow the project [coding and writing guidelines](doc/guidelines.md).
 
-2. Make sure the master branch "compiles" at each commit. This is not true for the early history of the repository, and during certain stretches of heavy refactoring, but going forward we should strive to keep it working at all times.
+2. Make sure the master branch "compiles" at each commit. This is not true for the early history of the repository, and during certain stretches of heavy refactoring, but going forward we  strive to keep it working at all times.
 
 3. It's okay (and even recommended) to develop in a (private) dirty branch, but please clean up and re-base your branch (i.e., `git-rebase -i`) on top of the current master branch before opening a merge request.
 

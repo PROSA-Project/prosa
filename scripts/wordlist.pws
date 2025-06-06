@@ -2,6 +2,9 @@ personal_ws-1.1 en 0
 Prosa
 Prosa's
 Coq
+Rocq
+Rocq's
+Prover
 OCaml
 OPAM
 CoqEAL
@@ -37,6 +40,8 @@ MPI
 SWS
 ANR
 DFG
+ERC
+TOROS
 EDF
 FP
 DM
