@@ -346,4 +346,66 @@ Section PreemptionFacts.
     lia.
   Qed.
 
+  (** Consider a JLFP-policy that indicates a higher-or-equal priority
+      relation, and assume that this relation is reflexive and
+      transitive. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
+
+  (** Assume that the scheduled is valid... *)
+  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+
+  (** ... and that the schedule respects the JLFP policy. *)
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
+
+  (** Consider an arbitrary job [j]... *)
+  Variable j : Job.
+
+  (** ... and assume that [j] is scheduled at time instants [t1] and [t2]. *)
+  Variables t1 t2 : instant.
+  Hypothesis H_sched_t1 : scheduled_at sched j t1.
+  Hypothesis H_sched_t2 : scheduled_at sched j t2.
+
+  (** In addition, we assume that job [j] remains ready throughout the
+      interval <<[t1, t2)>>. *)
+  Hypothesis H_j_is_ready :
+    forall t, t1 <= t < t2 -> job_ready sched j t.
+
+  (** We prove that if a job [jhp] is scheduled at some time [t]
+      within the interval <<[t1, t2)>>, then [jhp] must have higher or
+      equal priority than [j].
+
+      This follows from the fact that if a different job [jhp] were to
+      be scheduled while [j] is executing, it would require a
+      preemption time. Since [j] is ready throughout <<[t1, t2)>>, the
+      preemption must have been caused by a job with higher or equal
+      priority. *)
+  Corollary priority_higher_than_pending_job_priority :
+    forall (t : instant),
+      t1 <= t < t2 ->
+      forall (jhp : Job),
+        scheduled_at sched jhp t ->
+        hep_job jhp j.
+  Proof.
+    move=> t NEQ jhp SCHED.
+    move: NEQ => /andP [NEQ1 NEQ2]; move: NEQ1; rewrite leq_eqVlt => /orP [/eqP EQ| NEQ1].
+    { subst.
+      have EQ: jhp = j by apply: H_uniproc => //.
+      by subst; apply H_priority_is_reflexive.
+    }
+    have [/eqP EQ|E] := boolP (j == jhp).
+    { by subst; apply H_priority_is_reflexive. }
+    { have EX := neq_scheduled_at_pt_continuous_sched _ _ _ _ _ _ _ _ _ H_sched_t1 _ _ SCHED.
+      edestruct EX as [pt [PT [NEQ SCHEDpt]]] => //.
+      clear EX; apply H_respects_policy with (t := pt) => //.
+      apply/andP; split.
+      { by apply H_j_is_ready; lia. }
+      { apply/negP => SCHEDpt2; move: E => /negP; apply.
+        by apply/eqP; apply: H_uniproc => //.
+      }
+    }
+  Qed.
+
 End PreemptionFacts.
