@@ -81,7 +81,7 @@ Section SupplyBoundFunctionLemmas.
 
     (** We show that the total blackout time during an interval of
         length [Δ] is bounded by [Δ - SBF Δ]. *)
-    Lemma blackout_during_bound :
+    Lemma blackout_during_bound_SBF :
       blackout_during sched t1 (t1 + Δ) <= Δ - SBF Δ.
     Proof.
       rewrite blackout_during_complement // leq_sub => //.

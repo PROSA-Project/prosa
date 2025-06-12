@@ -203,7 +203,7 @@ Section AbstractRTARestrictedSupply.
         <= (Δ - SBF Δ) + cumul_intra_interference sched j t1 (t1 + Δ).
       Proof.
         rewrite -blackout_plus_local_is_interference_cumul leq_add2r.
-        by eapply blackout_during_bound with (t2 := t2) => //.
+        by eapply blackout_during_bound_SBF with (t2 := t2) => //.
       Qed.
 
       (** Next, consider a duration [F] such that [F <= Δ] and job [j]
@@ -308,7 +308,7 @@ Section AbstractRTARestrictedSupply.
         rewrite -/(cumulative_interference _ _ _).
         erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY. 
         rewrite addnC leq_add //; last first.
-        { by eapply blackout_during_bound with (t2 := t2) => //; split; [ | apply BUSY]. }
+        { by eapply blackout_during_bound_SBF with (t2 := t2) => //; split; [ | apply BUSY]. }
         rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
         rewrite -!/(cumul_intra_interference _ _ _ _).
         rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].

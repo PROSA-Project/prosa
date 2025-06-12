@@ -155,7 +155,7 @@ Section BoundedBusyIntervals.
         workload_of_job arr_seq j t1 (t1 + L) + cumulative_interfering_workload j t1 (t1 + L) <= L.
       Proof.
         rewrite (cumulative_interfering_workload_split _ _ _).
-        rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ (t1 + L) _ _ _)); (try apply H_valid_SBF) => //.
+        rewrite (leqRW (blackout_during_bound_SBF _ _ _ _ _ _ _ _ (t1 + L) _ _ _)); (try apply H_valid_SBF) => //.
         rewrite // addnC -!addnA.
         have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
         apply: E; first by lia.
@@ -216,7 +216,7 @@ Section BoundedBusyIntervals.
         eapply workload_exceeds_interval with (Δ := L) in PREFIX => //.
         { move_neq_down PREFIX.
           rewrite (cumulative_interfering_workload_split _ _ _).
-          rewrite (leqRW (blackout_during_bound _ _ _ _ _ _ _ _ (job_arrival j).+1 _ _ _)); (try apply H_valid_SBF) => //.
+          rewrite (leqRW (blackout_during_bound_SBF _ _ _ _ _ _ _ _ (job_arrival j).+1 _ _ _)); (try apply H_valid_SBF) => //.
           rewrite addnC -!addnA.
           have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
           apply: E; first by lia.
