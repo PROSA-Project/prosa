@@ -77,6 +77,24 @@ Section DivMod.
     by move: Z2 => /eqP; rewrite eqb0 -ltnNge => LT. 
   Qed.
 
+  (** We prove that if [x] lies in an interval <<[kT, (k+1)T)>>, then
+      [x %/ T] is equal to [k]. *)
+  Lemma divn_leq :
+    forall k T x,
+      k * T <= x < k.+1 * T ->
+      x %/ T = k.
+  Proof.
+    move => k T x NEQ.
+    have [Z|POS] := posnP T.
+    { subst; rewrite !muln0 in NEQ; lia. }
+    apply/eqP; rewrite -(eqn_pmul2r POS); apply/eqP.
+    move: x NEQ; induction k as [| k IHk] => x NEQ; first by rewrite divn_small; lia.
+    rewrite -addn1 mulnDl mul1n.
+    specialize (IHk (x - T)); feed IHk; first by lia.
+    rewrite -IHk {6}(divn_eq T T) modnn addn0.
+    by rewrite -mulnDl -divnDr ?dvdnn // subnK //; lia.
+  Qed.
+
 End DivMod.
 
 (** In this section, we define notions of [div_floor] and [div_ceil]
