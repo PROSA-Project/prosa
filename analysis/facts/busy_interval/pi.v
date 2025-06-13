@@ -150,6 +150,55 @@ Section PriorityInversionIsBounded.
 
   End LowerPriorityJobScheduled.
 
+  (** In this section, we identify sufficient conditions under which
+      lower-priority jobs are not scheduled during the busy interval
+      prefix of job [j]. *)
+  Section LowerPriorityJobNotScheduled.
+
+    (** Consider a lower-priority job [jlp]. *)
+    Variable jlp : Job.
+    Hypothesis H_jlp_lower_priority : ~~ hep_job jlp j.
+
+    (** If a lower-priority job [jlp] arrives during the busy interval
+        prefix <<[t1, t2)>>, then it is not scheduled at any earlier
+        time [t] within the prefix. *)
+    Corollary lp_job_should_arrive_early_for_pi :
+      forall t t_arr,
+        (jlp \in arrivals_between arr_seq t1 t_arr) ->
+        t_arr <= t2 ->
+        t1 <= t < t_arr ->
+        ~~ scheduled_at sched jlp t.
+    Proof.
+      move=> t t_arr IN LE NEQ.
+      apply/negP => SCHED.
+      eapply low_priority_job_arrives_before_busy_interval_prefix in SCHED => //; last lia.
+      apply in_arrivals_implies_arrived_between in IN => //.
+      move: IN => /andP [IN1 IN2].
+      by lia.
+    Qed.
+
+    (** If there is no priority inversion at the beginning of the busy
+        interval prefix, then no lower-priority job [jlp] is scheduled
+        at any time in <<[t1, t2)>>. *)
+    Corollary lower_priority_jobs_never_scheduled_if_no_inversion :
+      forall t,
+        t1 <= t < t2 ->
+        ~~ priority_inversion arr_seq sched j t1 ->
+        ~~ scheduled_at sched jlp t.
+    Proof.
+      move=> t NEQ NPI; apply/negP => SCHED; move: (SCHED) => SCHEDt1.
+      eapply lower_priority_job_continuously_scheduled with (t' := t1) in SCHEDt1 ; eauto 1; last by lia.
+      move: SCHED SCHEDt1 => _ SCHED; move: NPI => /negP NPI; apply: NPI.
+      apply/andP; split.
+      { rewrite mem_filter negb_and; apply/orP; left; apply/negP => SCHEDj.
+        have EQ: j = jlp by apply: H_uni => //.
+        by subst; move: H_jlp_lower_priority => /negP LP; apply LP, H_priority_is_reflexive.
+      }
+      apply/hasP; exists jlp; last by done.
+      by rewrite mem_filter SCHED //=; apply: arrivals_up_to_scheduled_at.
+    Qed.
+
+  End LowerPriorityJobNotScheduled.
 
   (** In this section, we prove that priority inversion only
       occurs at the start of the busy window and occurs due to only
