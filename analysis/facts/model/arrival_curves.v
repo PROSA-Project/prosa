@@ -1,9 +1,9 @@
 Require Export prosa.util.epsilon.
+Require Export prosa.model.priority.classes.
 Require Export prosa.model.task.arrival.curves.
 Require Export prosa.analysis.facts.model.task_arrivals.
 
 (** * Facts About Arrival Curves *)
-
 
 (** We observe that tasks that exhibit job arrivals must have non-pathological
     arrival curves. This allows excluding pathological cases in higher-level
@@ -50,3 +50,131 @@ End NonPathologicalCurve.
 
 (** We add the above lemma to the global hints database. *)
 Global Hint Resolve non_pathological_max_arrivals : basic_rt_facts.
+
+(** In the following section, we prove a bound on the number of
+    arrivals within a given interval under an arbitrary JLFP
+    policy. *)
+Section JLFPArrivalBounds.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{MaxArrivals Task}.
+
+  (** ... and the corresponding type of jobs. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{JLFP_policy Job}.
+
+  (** Consider any kind of processor state model... *)
+  Context {PState : ProcessorState Job}.
+
+  (** ... and arrival sequence. *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** We consider an arbitrary task set [ts] ... *)
+  Variable ts : seq Task.
+
+  (** ... and assume that all jobs stem from tasks in this task set. *)
+  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+  (** We assume that [max_arrivals] is a family of valid arrival
+      curves that constrains the arrival sequence [arr_seq], i.e., for
+      any task [tsk] in [ts], [max_arrival tsk] is an arrival bound of
+      [tsk]. *)
+  Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
+
+  (** We prove that the number of jobs that arrive in the interval
+      <<[t1, t1 + Δ)>> and have higher-or-equal priority than a given
+      job [j] is bounded by the sum of arrival curves for all tasks in
+      [ts]. *)
+  Lemma jlfp_hep_arrivals_bounded_by_sum_max_arrivals :
+    forall (j : Job) (t1 : instant) (Δ : duration),
+      size [seq jhp <- arrivals_between arr_seq t1 (t1 + Δ) | hep_job jhp j]
+      <= \sum_(tsk <- ts) max_arrivals tsk Δ.
+  Proof.
+    move=> j t1 Δ; rewrite -sum1_size big_filter.
+    apply leq_trans with (\sum_(i <- arrivals_between arr_seq t1 (t1 + Δ)) 1).
+    { by rewrite big_mkcond //=; apply leq_sum; move => i _ ; destruct hep_job. }
+    apply: leq_trans.
+    { apply sum_over_partitions_le with (x_to_y := job_task) (ys := ts) => s IN HEP.
+      by eapply H_all_jobs_from_taskset, in_arrivals_implies_arrived => //. }
+    { rewrite big_seq_cond [leqRHS]big_seq_cond; apply leq_sum => tsk /andP [IN _].
+      rewrite -big_filter sum1_size -{2}[Δ](addKn t1).
+      apply:leq_trans; last by apply H_is_arrival_curve => //; lia.
+      by rewrite /number_of_task_arrivals /task_arrivals_between -sum1_size big_filter. }
+  Qed.
+
+End JLFPArrivalBounds.
+
+(** In this section, we prove a bound on the number of arrivals within
+    a given interval under an FP policy. *)
+Section FPArrivalBounds.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{MaxArrivals Task}.
+
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+  Context `{FP_policy Task}.
+
+  (** Consider any kind of processor state model... *)
+  Context {PState : ProcessorState Job}.
+
+  (** ... and arrival sequence. *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** We consider an arbitrary task set [ts] ... *)
+  Variable ts : seq Task.
+
+  (** ... and assume that all jobs stem from tasks in this task set. *)
+  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+  (** We assume that [max_arrivals] is a family of valid arrival
+      curves that constrains the arrival sequence [arr_seq], i.e., for
+      any task [tsk] in [ts], [max_arrival tsk] is an arrival bound of
+      [tsk]. *)
+  Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
+
+  (** We prove that the number of jobs that arrive in the interval
+      <<[t1, t1 + Δ)>> and have higher-or-equal priority than a given
+      job [j] is bounded by the sum of arrival curves of all tasks in
+      [ts] whose priority is higher than or equal to that of [j]’s
+      task. *)
+  Lemma fp_hep_arrivals_bounded_by_sum_max_arrivals :
+    forall (j : Job) (t1 : instant) (Δ : duration),
+      size [seq jhp <- arrivals_between arr_seq t1 (t1 + Δ) | hep_job jhp j]
+      <= \sum_(tsk <- ts | hep_task tsk (job_task j)) max_arrivals tsk Δ.
+  Proof.
+    move=> j t1 Δ; rewrite -sum1_size big_filter.
+    apply leq_trans with (
+        \sum_(i <- arrivals_between arr_seq t1 (t1 + Δ) | hep_task (job_task i) (job_task j)) 1
+      ).
+    { by rewrite big_mkcond //=; apply leq_sum; move => i _ ; destruct hep_job. }
+    apply: leq_trans.
+    { apply sum_over_partitions_le with (x_to_y := job_task) (ys := ts) => s IN HEP.
+      by eapply H_all_jobs_from_taskset, in_arrivals_implies_arrived => //. }
+    { rewrite big_seq_cond [leqRHS]big_seq_cond.
+      rewrite big_mkcond [leqRHS]big_mkcond //=; apply leq_sum => tsk _.
+      destruct (tsk \in ts) eqn:IN; last by done.
+      rewrite //=; destruct (hep_task tsk (job_task j)) eqn:HEP.
+      { rewrite -big_filter sum1_size -{2}[Δ](addKn t1).
+        apply: leq_trans; last eapply H_is_arrival_curve.
+        { rewrite /number_of_task_arrivals /task_arrivals_between -!sum1_size !big_filter.
+          rewrite big_seq_cond [leqRHS]big_seq_cond.
+          rewrite big_mkcond [leqRHS]big_mkcond //=.
+          apply leq_sum => s _; rewrite /job_of_task.
+          by destruct (_ == _), (s \in _ ), (hep_task _ _), (hep_task _ _) => //.
+        }
+        { by done. }
+        { by lia. }
+      }
+      { rewrite big_seq_cond leqn0; apply/eqP; apply big1 => s /andP [INs /andP [HEPs /eqP EQs]].
+        by subst tsk; rewrite HEP in HEPs.
+      }
+    }
+  Qed.
+
+End FPArrivalBounds.
