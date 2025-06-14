@@ -105,6 +105,13 @@ Section ScheduleInspection.
     | Progress oj => Some oj
     end.
 
+  (** Indicates whether the scheduled job is making progress at time [t]. *)
+  Definition is_progress (t : instant) :=
+    match sched t with
+    | Progress _ => true
+    | _ => false
+    end.
+
   (** Indicates whether the processor is performing a context switch
       at time [t]. *)
   Definition is_context_switch (t : instant) :=
@@ -129,3 +136,34 @@ Section ScheduleInspection.
     end.
 
 End ScheduleInspection.
+
+(** In this section, we define cumulative versions of the previously
+    introduced predicates for dispatching, context-switching, and
+    CRPD. *)
+Section AdditionalDefinitions.
+
+  (** Consider any type of jobs... *)
+  Context {Job : JobType}.
+
+  (** ... and a schedule with overheads. *)
+  Variable sched : schedule (overheads.processor_state Job).
+
+  (** The function [total_time_in_dispatch t1 t2] returns the number
+      of time instants in <<[t1, t2)>> during which the processor is
+      in the dispatch state. *)
+  Definition total_time_in_dispatch (t1 t2 : instant) :=
+    \sum_(t1 <= t < t2) is_dispatch sched t.
+
+  (** The function [total_time_in_context_switch t1 t2] returns the
+      number of time instants in <<[t1, t2)>> during which the
+      processor is in a context-switch state. *)
+  Definition total_time_in_context_switch (t1 t2 : instant) :=
+    \sum_(t1 <= t < t2) is_context_switch sched t.
+
+  (** The function [total_time_in_CRPD t1 t2] returns the number of
+      time instants in <<[t1, t2)>> during which the processor is in
+      CRPD state. *)
+  Definition total_time_in_CRPD (t1 t2 : instant) :=
+    \sum_(t1 <= t < t2) is_CRPD sched t.
+
+End AdditionalDefinitions.
