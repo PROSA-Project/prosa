@@ -1,7 +1,7 @@
 Require Export prosa.analysis.definitions.interference.
 Require Export prosa.analysis.definitions.task_schedule.
 Require Export prosa.analysis.facts.priority.classes.
-Require Export prosa.analysis.abstract.restricted_supply.busy_prefix.
+Require Export prosa.analysis.abstract.definitions.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.model.service_of_jobs.
 
