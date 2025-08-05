@@ -111,6 +111,13 @@ Section Priorities.
         job_arrival j1 <= job_arrival j2 ->
         hep_job j1 j2.
 
+    (** A JLFP policy is FIFO if it assigns higher priority to
+        earlier-arriving jobs. That is, job [j1] has higher or equal
+        priority than job [j2] if and only if it arrives no later than [j2]. *)
+    Definition policy_is_FIFO :=
+      forall j1 j2,
+        hep_job j1 j2 = (job_arrival j1 <= job_arrival j2).
+
   End JLFP.
 
   (** Finally, we define properties of FP policies. *)
