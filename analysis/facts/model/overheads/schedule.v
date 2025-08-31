@@ -5,7 +5,7 @@ Require Export prosa.analysis.facts.busy_interval.pi.
     model with explicit overheads. *)
 Section OverheadsProceProperties.
 
-  Local Transparent scheduled_in scheduled_on.
+  Local Transparent scheduled_in scheduled_on service_in service_on.
 
   (** Consider any type of jobs. *)
   Context {Job: JobType}.
@@ -17,7 +17,7 @@ Section OverheadsProceProperties.
   Lemma overheads_proc_model_is_a_uniprocessor_model :
     uniprocessor_model (overheads.processor_state Job).
   Proof.
-    intros j1 j2 sched t; rewrite /scheduled_at /scheduled_in/scheduled_on/=.
+    intros j1 j2 sched t; rewrite /scheduled_at /scheduled_in/ scheduled_on/=.
     rewrite /overheads_scheduled_on; move => /existsP [[] OH1] /existsP [[] OH2].
     destruct (sched t) as [ | j3 j4 | j3 | j3 | ] eqn:EQ => //.
     { by destruct j3, j4 => //; move: OH1 OH2 => /eqP OH1 /eqP OH2; subst. }
@@ -32,6 +32,21 @@ Section OverheadsProceProperties.
   Proof.
     rewrite /unit_supply_proc_model /supply_in.
     by move => []; rewrite //= sum_unit1.
+  Qed.
+
+  (** We also show that the processor model is fully consuming. That
+      is, if a job is scheduled at time [t], then it receives the
+      entire supply produced at that time as service. *)
+  Lemma overheads_proc_model_fully_consuming :
+    fully_consuming_proc_model (overheads.processor_state Job).
+  Proof.
+    move=> j sched t.
+    rewrite /service_at /supply_at /service_in /supply_in.
+    rewrite /scheduled_at /scheduled_in /scheduled_on /=.
+    rewrite /overheads_scheduled_on; move => /existsP [[] /eqP OH1]; subst.
+    apply eq_big => // => [[]] _.
+    destruct (sched t) eqn:SCHED => //=.
+    by move: OH1 => /eqP; rewrite eq_sym => EQ; rewrite EQ.
   Qed.
 
 End OverheadsProceProperties.
