@@ -1,4 +1,4 @@
-Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.model.job.properties.
 Require Export prosa.analysis.facts.behavior.all.
 Require Export prosa.model.task.preemption.parameters.
 

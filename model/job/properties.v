@@ -13,4 +13,4 @@ Section PropertiesOfJob.
   (** The job cost must be positive. *)
   Definition job_cost_positive := job_cost j > 0.
 
-End PropertiesOfJob. 
+End PropertiesOfJob.

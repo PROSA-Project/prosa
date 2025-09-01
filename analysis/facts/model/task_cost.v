@@ -1,6 +1,6 @@
 Require Import prosa.behavior.all.
+Require Export prosa.model.job.properties.
 Require Import prosa.model.task.concept.
-Require Import prosa.analysis.definitions.job_properties.
 
 (** In this module, we state some general results about
     the [task_cost] parameter. *)

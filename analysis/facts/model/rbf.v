@@ -1,7 +1,7 @@
+Require Export prosa.model.job.properties.
 Require Export prosa.analysis.facts.model.workload.
 Require Export prosa.analysis.facts.model.arrival_curves.
 Require Export prosa.analysis.facts.model.task_cost.
-Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.tactics.

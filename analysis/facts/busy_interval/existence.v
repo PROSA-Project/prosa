@@ -1,5 +1,5 @@
+Require Export prosa.model.job.properties.
 Require Export prosa.model.schedule.work_conserving.
-Require Export prosa.analysis.definitions.job_properties.
 Require Export prosa.analysis.facts.model.service_of_jobs.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 Require Export prosa.analysis.facts.priority.inversion.

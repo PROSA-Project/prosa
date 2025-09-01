@@ -1,7 +1,7 @@
+Require Export prosa.model.job.properties.
 Require Export prosa.analysis.facts.behavior.service.
 Require Export prosa.analysis.facts.behavior.arrivals.
 Require Export prosa.analysis.definitions.schedule_prefix.
-Require Export prosa.analysis.definitions.job_properties.
 
 (** * Completion *)
 

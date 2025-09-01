@@ -1,7 +1,7 @@
-Require Export prosa.analysis.facts.behavior.all.
-Require Export prosa.analysis.definitions.job_properties.
+Require Export prosa.model.job.properties.
 Require Export prosa.model.schedule.nonpreemptive.
 Require Export prosa.model.preemption.fully_nonpreemptive.
+Require Export prosa.analysis.facts.behavior.all.
 
 (** * Platform for Fully Non-Preemptive model *)
 

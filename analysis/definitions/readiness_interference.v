@@ -1,6 +1,6 @@
+Require Export prosa.model.job.properties.
 Require Export prosa.model.priority.definitions.
 Require Export prosa.analysis.abstract.definitions.
-Require Export prosa.analysis.definitions.job_properties.
 
 (** * Readiness Interference *)
 
