@@ -40,14 +40,14 @@ Section CompletionFacts.
   Proof. move=> ? ? ?; exact/contra/completion_monotonic. Qed.
 
   (** We observe that being incomplete is the same as not having received
-     sufficient service yet... *)
+      sufficient service yet, ... *)
   Lemma less_service_than_cost_is_incomplete:
     forall t,
       service sched j t < job_cost j
       <-> ~~ completed_by sched j t.
   Proof. by move=> ?; rewrite -ltnNge. Qed.
 
-  (** ...which is also the same as having positive remaining cost. *)
+  (** ... which is also the same as having positive remaining cost. *)
   Lemma incomplete_is_positive_remaining_cost:
     forall t,
       ~~ completed_by sched j t
@@ -111,7 +111,7 @@ Section CompletionFacts.
     exact/service_lt_cost/service_at_implies_scheduled_at.
   Qed.
 
-  (** Consequently, if we have a have processor model where scheduled jobs
+  (** Consequently, if we have a processor model where scheduled jobs
       necessarily receive service, we can conclude that scheduled jobs have
       remaining positive cost. *)
 
@@ -135,13 +135,25 @@ Section CompletionFacts.
     exact/serviced_implies_positive_remaining_cost/scheduled_implies_serviced.
   Qed.
 
-  (** We also prove that a scheduled job cannot be completed... *)
+  (** We also prove that a scheduled job cannot be completed, ... *)
   Lemma scheduled_implies_not_completed :
     forall t,
       scheduled_at sched j t -> ~~ completed_by sched j t.
   Proof.
     move=> t sch.
     by rewrite -less_service_than_cost_is_incomplete service_lt_cost.
+  Qed.
+
+  (** ... that an incomplete job that is not scheduled remains incomplete, ... *)
+  Lemma not_scheduled_remains_incomplete :
+    forall t,
+      ~~ completed_by sched j t ->
+      ~~ scheduled_at sched j t ->
+      (~~ completed_by sched j t.+1).
+  Proof.
+    move=> t + NSCHED.
+    rewrite /completed_by/service -service_during_last_plus_before //.
+    by rewrite not_scheduled_implies_no_service // addn0.
   Qed.
 
   (** ... and that a completed job cannot be scheduled. *)
@@ -276,11 +288,11 @@ Section ServiceAndCompletionFacts.
 
 End ServiceAndCompletionFacts.
 
-(** In this section, we establish facts that on jobs with non-zero costs that
-    must arrive to execute. *)
+(** In this section, we establish facts about jobs with non-zero costs that must
+    arrive to execute. *)
 Section PositiveCost.
 
-  (** Consider any type of jobs with cost and arrival-time attributes,...*)
+  (** Consider any type of jobs with cost and arrival-time attributes, ...*)
   Context {Job: JobType}.
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
@@ -328,24 +340,24 @@ End PositiveCost.
 
 Section CompletedJobs.
 
-  (** Consider any kinds of jobs and any kind of processor state. *)
+  (** Consider any kind of jobs and any kind of processor state. *)
   Context {Job : JobType} {PState : ProcessorState Job}.
 
-  (** Consider any schedule... *)
+  (** Consider any schedule ... *)
   Variable sched : schedule PState.
 
-  (** ...and suppose that jobs have a cost, an arrival time, and a notion of
+  (** ... and suppose that jobs have a cost, an arrival time, and a notion of
      readiness. *)
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
   Context {jr : JobReady Job PState}.
 
-  (** We observe that a given job is ready only if it is also incomplete... *)
+  (** We observe that a given job is ready only if it is also incomplete ... *)
   Lemma ready_implies_incomplete:
     forall j t, job_ready sched j t -> ~~ completed_by sched j t.
   Proof. by move=> ? ? /any_ready_job_is_pending /andP[]. Qed.
 
-  (** ...and lift this observation also to the level of whole schedules. *)
+  (** ... and lift this observation also to the level of whole schedules. *)
   Lemma completed_jobs_are_not_ready:
     jobs_must_be_ready_to_execute sched ->
     completed_jobs_dont_execute sched.
