@@ -41,14 +41,29 @@ def comment_ranges(src):
 
 def process(opts, fname):
     src = open(fname, 'r').read()
-    out = sys.stdout
-    for (a, b) in comment_ranges(src):
-        txt = src[a:b]
+    if opts.merge_dots:
         if opts.keep_inline:
-            print(txt)
+            comments = [src[a:b].strip() for (a, b) in comment_ranges(src)]
         else:
-            print(INLINE_CODE_RE.sub('', txt))
-#     out.close()
+            comments = [INLINE_CODE_RE.sub('', src[a:b].strip()) for (a, b) in comment_ranges(src)]
+        merged_comments = []
+        for c in comments:
+            if not merged_comments:
+                merged_comments.append(c)
+            if merged_comments[-1].endswith('...') and c.startswith('...'):
+                merged_comments[-1] = f"{merged_comments[-1][:-3]}{c[3:]}"
+            else:
+               merged_comments.append(c)
+
+        for c in merged_comments:
+            print(c)
+    else:
+        for (a, b) in comment_ranges(src):
+            txt = src[a:b]
+            if opts.keep_inline:
+                print(txt)
+            else:
+                print(INLINE_CODE_RE.sub('', txt))
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -59,6 +74,9 @@ def parse_args():
         help='input Gallina files (*.v)')
     parser.add_argument('--keep-inline', action='store_true',
         help='Do not strip inline code from comments')
+    parser.add_argument('--merge-dots', action='store_true',
+        help='Merge continued comments follwing the "..." pattern.')
+
 
     return parser.parse_args()
 
