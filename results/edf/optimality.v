@@ -94,14 +94,14 @@ Section Optimality.
       reasons as [EDF_optimality] predates [EDF_WC_optimality] (in Prosa). *)
 
   (** Finally, we state the optimality theorem also in terms of a
-      policy-compliant schedule, which a more generic notion used in Prosa for
+      policy-compliant schedule, which is a more generic notion used in Prosa for
       scheduling policies (rather than the simpler, but ad-hoc
       [EDF_schedule] predicate used above).
 
       Given that we're considering the EDF priority policy and a fully
       preemptive job model, satisfying the [EDF_schedule] predicate is
       equivalent to satisfying the [respects_policy_at_preemption_point]
-      w.r.t. to the EDF policy predicate. The optimality of priority-compliant
+      w.r.t. the EDF policy predicate. The optimality of priority-compliant
       schedules that are work-conserving follows hence directly from the above
       [EDF_WC_optimality] theorem. *)
   Corollary EDF_priority_compliant_WC_optimality:

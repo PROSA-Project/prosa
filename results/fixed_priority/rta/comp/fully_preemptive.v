@@ -17,7 +17,7 @@ Require Export prosa.results.fixed_priority.rta.fully_preemptive.
     [prosa.results.fixed_priority.rta.fully_preemptive]. *)
 
 Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
-  (** We assume ideal uni-processor schedules. *)
+  (** We assume ideal uniprocessor schedules. *)
   #[local] Existing Instance ideal.processor_state.
 
   (** Consider any type of tasks characterized by WCETs ... *)
@@ -82,7 +82,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** ** Computation of the Fixpoints *)
 
   (** In the following, we introduce the bound on the maximum busy-window length
-      [L] and the response-time bound [R] and assume that they have been are
+      [L] and the response-time bound [R] and assume that they have been
       calculated using the tools provided by [util.fixpoint]. *)
 
   (** Let [h] denote the horizon for the fixpoint search, i.e., an upper bound

@@ -30,7 +30,7 @@ All results published prior to 2020 used the "classic" version of Prosa as first
 The directory and module structure is organized as follows. First, the main parts, of which there are currently six.
 
 - [`behavior`](behavior/): The `behavior` namespace collects basic definitions and properties of system behavior (i.e., it defines Prosa's **trace-based semantics**). There are *no* proofs here. This module is mandatory: *all* results in Prosa rely on the basic trace-based semantics defined in this module.
-- [`model`](model/): The `model` namespace collects all definitions and basic properties of various **system models** (e.g., sporadic tasks, arrival curves, various scheduling policies, etc.). There are only few proofs here. This module contains multiple, mutually exclusive alternatives (e.g., periodic vs. sporadic tasks, uni- vs. multiprocessor models, constrained vs. arbitrary deadlines, etc.), and higher-level results are expected "pick and choose" whatever definitions and assumptions are appropriate. These models are *axiomatic* in the sense that they are collections of hypotheses and not necessarily backed by concrete implementations (but see below).
+- [`model`](model/): The `model` namespace collects all definitions and basic properties of various **system models** (e.g., sporadic tasks, arrival curves, various scheduling policies, etc.). There are only a few proofs here. This module contains multiple, mutually exclusive alternatives (e.g., periodic vs. sporadic tasks, uni- vs. multiprocessor models, constrained vs. arbitrary deadlines, etc.), and higher-level results are expected to "pick and choose" whatever definitions and assumptions are appropriate. These models are *axiomatic* in the sense that they are collections of hypotheses and not necessarily backed by concrete implementations (but see below).
 - [`analysis`](analysis/): The `analysis` namespace collects all definitions and proof libraries needed to establish **system properties** (e.g., schedulability, response time, etc.). This includes a substantial library of *basic facts* that follow directly from the trace-based semantics or specific modelling assumptions. Virtually all intermediate steps and low-level proofs will be found here.
 - [`results`](results/): The `results` namespace contains all **high-level analysis results**.
 - [`implementation`](implementation/): This module collects concrete implementations of some of the axiomatic models and scheduling policies to which the results apply. These are used to instantiate  (i.e., apply) high-level results in an assumption-free environment for concrete job and task types, which establishes the absence of contradictions in the axiomatic models refined by the implementations.
@@ -114,11 +114,11 @@ For convenience, the creation of a suitable `opam` switch is automated by the sc
 
 #### Dependencies
 
-Besides on the Rocq Prover itself, Prosa depends on
+Besides Rocq itself, Prosa depends on
 
 1. the `ssreflect` library of the [Mathematical Components project](https://math-comp.github.io),
 2. the [Micromega support for the Mathematical Components library](https://github.com/math-comp/mczify) provided by `mczify`, and
-3. the [The Coq Effective Algebra Library](https://github.com/coq-community/coqeal) (optional, needed only for POET-related refinements).
+3. the [Coq Effective Algebra Library](https://github.com/coq-community/coqeal) (optional, needed only for POET-related refinements).
 
 These dependencies can be easily installed with OPAM.
 
@@ -158,7 +158,7 @@ make install
 
 ## Generating HTML Documentation
 
-Once the has been library compiled, the `coqdoc` documentation (as shown on the [web page](http://prosa.mpi-sws.org/documentation.html)) can be easily generated with:
+Once the library has been compiled, the `coqdoc` documentation (as shown on the [web page](http://prosa.mpi-sws.org/documentation.html)) can be easily generated with:
 
 - `make htmlpretty -j`  --- pretty documentation based on [CoqdocJS](https://github.com/rocq-community/coqdocjs) (can hide/show proofs),
 - `make gallinahtml -j` --- just the specification, without proofs,
@@ -177,7 +177,7 @@ To make things as smooth as possible, here are a couple of rules and guidelines 
 
 2. Make sure the master branch "compiles" at each commit. This is not true for the early history of the repository, and during certain stretches of heavy refactoring, but going forward we  strive to keep it working at all times.
 
-3. It's okay (and even recommended) to develop in a (private) dirty branch, but please clean up and re-base your branch (i.e., `git-rebase -i`) on top of the current master branch before opening a merge request.
+3. It's okay (and even recommended) to develop in a (private) dirty branch, but please clean up and rebase your branch (i.e., `git rebase -i`) on top of the current master branch before opening a merge request.
 
 4. Create merge requests liberally. No improvement is too small or too insignificant for a merge request. This applies to documentation fixes (e.g., typo fixes, grammar fixes, clarifications, etc.)  as well.
 

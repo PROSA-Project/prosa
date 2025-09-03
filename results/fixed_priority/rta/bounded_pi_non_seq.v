@@ -7,7 +7,7 @@ Require Export prosa.analysis.abstract.ideal.abstract_rta.
 
 (** * Abstract RTA Instantiation for FP-Schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the abstract response-time analysis
-    (aRTA) for FP-schedulers assuming the ideal uni-processor model and
+    (aRTA) for FP-schedulers assuming the ideal uniprocessor model and
     real-time tasks with arbitrary arrival models. *)
 
 (** The important feature of this instantiation is that

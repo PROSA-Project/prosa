@@ -64,7 +64,7 @@ Section RTAforFloatingModelwithArrivalCurves.
   #[local] Instance sequential_readiness : JobReady _ _ :=
     sequential_ready_instance arr_seq.
 
-  (** Next, consider any valid ideal uni-processor schedule with with
+  (** Next, consider any valid ideal uni-processor schedule with
       limited preemptions of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
@@ -124,8 +124,8 @@ Section RTAforFloatingModelwithArrivalCurves.
         R >= F.
 
   (** Now, we can reuse the results for the abstract model with
-      bounded nonpreemptive segments to establish a response-time
-      bound for the more concrete model with floating nonpreemptive
+      bounded non-preemptive segments to establish a response-time
+      bound for the more concrete model with floating non-preemptive
       regions.  *)
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.

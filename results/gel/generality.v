@@ -19,7 +19,7 @@ Require Export prosa.analysis.facts.priority.fifo.
 (** We begin with the general setup. *)
 Section GeneralityOfGEL.
 
-  (** Consider any type of tasks with relative priority points... *)
+  (** Consider any type of tasks with relative priority points, ... *)
   Context  {Task : TaskType} `{PriorityPoint Task}.
 
   (** ... jobs of these tasks, and ... *)
@@ -35,15 +35,15 @@ Section GeneralityOfGEL.
 
   (** ** GEL Generalizes EDF *)
 
-  (** First, let us consider EDF, the namesake of GEL, which by design it
-      trivially generalizes. *)
+  (** First, let us consider EDF, the namesake of GEL, which it
+      trivially generalizes by design. *)
 
   Section GELGeneralizesEDF.
 
     (** Suppose the tasks have relative deadlines. *)
     Context `{TaskDeadline Task}.
 
-    (** If each task's priority point is set to its relative deadline ... *)
+    (** If each task's priority point is set to its relative deadline, ... *)
     Hypothesis H_priority_point :
       forall tsk,
         task_priority_point tsk = task_deadline tsk.
@@ -69,7 +69,7 @@ Section GeneralityOfGEL.
   (** GEL similarly generalizes FIFO in a trivial manner. *)
   Section GELGeneralizesFIFO.
 
-    (** If each task's priority point is set to zero ... *)
+    (** If each task's priority point is set to zero, ... *)
     Hypothesis H_priority_point :
       forall tsk,
         task_priority_point tsk = 0.
@@ -99,7 +99,7 @@ Section GeneralityOfGEL.
   Section GELConditionallyGeneralizesFP.
 
     (** Consider any given fixed-priority policy that is both reflexive and
-        total... *)
+        total, ... *)
     Variable fp : FP_policy Task.
     Hypothesis H_reflexive : reflexive_task_priorities fp.
     Hypothesis H_total : total_task_priorities fp.

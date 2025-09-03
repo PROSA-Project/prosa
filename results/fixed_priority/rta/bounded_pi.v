@@ -6,19 +6,19 @@ Require Export prosa.analysis.facts.model.task_cost.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
-    (aRTA) to FP-schedulers for ideal uni-processor model of
+    (aRTA) to FP-schedulers for ideal uniprocessor model of
     real-time tasks with arbitrary arrival models. *)
 
-(** Given FP priority policy and an ideal uni-processor scheduler
+(** Given FP priority policy and an ideal uniprocessor scheduler
     model, we can explicitly specify [interference],
     [interfering_workload], and [interference_bound_function]. In this
-    settings, we can define natural notions of service, workload, busy
+    setting, we can define natural notions of service, workload, busy
     interval, etc. The important feature of this instantiation is that
     we can induce the meaningful notion of priority
     inversion. However, we do not specify the exact cause of priority
     inversion (as there may be different reasons for this, like
     execution of a non-preemptive segment or blocking due to resource
-    locking). We only assume that that a priority inversion is
+    locking). We only assume that a priority inversion is
     bounded. *)
 Section AbstractRTAforFPwithArrivalCurves.
 
@@ -47,7 +47,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
+  (** Next, consider any ideal uniprocessor schedule of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).
 
   (** ... allow for any work-bearing notion of job readiness, ... *)
@@ -81,7 +81,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       abstract work-conservation also holds. *)
   Hypothesis H_work_conserving : work_conserving_cl.
 
-  (** Assume we have sequential tasks, i.e, jobs from the
+  (** Assume we have sequential tasks, i.e., jobs from the
       same task execute in the order of their arrival. *)
   Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
@@ -107,11 +107,11 @@ Section AbstractRTAforFPwithArrivalCurves.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Consider a valid preemption model... *)
+  (** Consider a valid preemption model ... *)
   Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
 
-  (** ...and a valid task run-to-completion threshold function. That
+  (** ... and a valid task run-to-completion threshold function. That
       is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
       any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold :

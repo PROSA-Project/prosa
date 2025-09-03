@@ -18,13 +18,13 @@ Require Export prosa.analysis.facts.workload.edf_athep_bound.
 (** Given EDF priority policy and an ideal uni-processor scheduler
     model, we can explicitly specify [interference],
     [interfering_workload], and [interference_bound_function]. In this
-    settings, we can define natural notions of service, workload, busy
+    setting, we can define natural notions of service, workload, busy
     interval, etc. The important feature of this instantiation is that
     we can induce the meaningful notion of priority
     inversion. However, we do not specify the exact cause of priority
     inversion (as there may be different reasons for this, like
     execution of a non-preemptive segment or blocking due to resource
-    locking). We only assume that that a priority inversion is
+    locking). We only assume that a priority inversion is
     bounded. *)
 
 Section AbstractRTAforEDFwithArrivalCurves.
@@ -109,7 +109,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival bound
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound
       of [tsk], and (2) it is a monotonic function that equals 0 for
       the empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
@@ -120,11 +120,11 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Consider a valid preemption model... *)
+  (** Consider a valid preemption model ... *)
   Hypothesis H_valid_preemption_model:
     valid_preemption_model arr_seq sched.
 
-  (** ...and a valid task run-to-completion threshold function. That
+  (** ... and a valid task run-to-completion threshold function. That
       is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
       any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
@@ -301,7 +301,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
             - by rewrite eq_x. } }
       Qed.
 
-      (** Then, there exists solution for response-time recurrence (in the abstract sense). *)
+      (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
       Corollary correct_search_space:
         exists F,
           A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF A (A + F) /\

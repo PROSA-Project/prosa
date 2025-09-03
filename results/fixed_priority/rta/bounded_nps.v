@@ -8,7 +8,7 @@ Require Export prosa.analysis.definitions.blocking_bound.fp.
 
 (** In this section we instantiate the Abstract RTA for FP-schedulers
     with Bounded Priority Inversion to FP-schedulers for ideal
-    uni-processor model of real-time tasks with arbitrary
+    uniprocessor model of real-time tasks with arbitrary
     arrival models _and_ bounded non-preemptive segments. *)
 
 (** Recall that Abstract RTA for FP-schedulers with Bounded Priority
@@ -41,7 +41,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uni-processor schedule of this arrival sequence, ... *)
+  (** Next, consider any ideal uniprocessor schedule of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).
 
   (** ... allow for any work-bearing notion of job readiness, ... *)
@@ -66,7 +66,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** ... and the schedule respects the scheduling policy. *)
   Hypothesis H_respects_policy : respects_FP_policy_at_preemption_point arr_seq sched FP.
 
-  (** Assume we have sequential tasks, i.e, jobs from the
+  (** Assume we have sequential tasks, i.e., jobs from the
       same task execute in the order of their arrival. *)
   Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
@@ -92,11 +92,11 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Consider a valid preemption model... *)
+  (** Consider a valid preemption model ... *)
   Hypothesis H_valid_preemption_model:
     valid_preemption_model arr_seq sched.
 
-  (** ...and a valid task run-to-completion threshold function. That
+  (** ... and a valid task run-to-completion threshold function. That
      is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
      any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold:
@@ -115,7 +115,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
     (** First, we prove that the maximum length of a priority inversion of a job j is
        bounded by the maximum length of a non-preemptive section of a task with
-       lower-priority task (i.e., the blocking term). *)
+       lower priority (i.e., the blocking term). *)
     Lemma priority_inversion_is_bounded_by_blocking:
       forall j t1 t2,
         arrives_in arr_seq j ->
@@ -179,10 +179,10 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           F + (task_cost tsk - task_rtct tsk) <= R.
 
     (** Then, using the results for the general RTA for FP-schedulers, we establish a
-       response-time bound for the more concrete model of bounded nonpreemptive segments.
+       response-time bound for the more concrete model of bounded non-preemptive segments.
        Note that in case of the general RTA for FP-schedulers, we just _assume_ that
        the priority inversion is bounded. In this module we provide the preemption model
-       with bounded nonpreemptive segments and _prove_ that the priority inversion is
+       with bounded non-preemptive segments and _prove_ that the priority inversion is
        bounded. *)
     Theorem uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments:
       response_time_bounded_by tsk R.

@@ -36,6 +36,7 @@ nonpreemptive
 preemptive
 preemptable
 preemptions
+rebase
 MPI
 SWS
 ANR

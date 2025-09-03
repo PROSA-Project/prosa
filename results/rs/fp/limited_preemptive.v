@@ -51,7 +51,7 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
   (** ... and any type of jobs associated with these tasks, where each
       job has a task [job_task], a cost [job_cost], an arrival time
       [job_arrival], and a predicate indicating job's preemption
-      points [job_preemptive_points]. *)
+      points [job_preemption_points]. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobCost Job}.
@@ -71,7 +71,7 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
 
   (** We assume the sequential model of readiness without jitter or
       self-suspensions, wherein a pending job [j] is ready as soon as
-      all prior jobs from the same task completed. *)
+      all prior jobs of the same task are completed. *)
   #[local] Instance sequential_readiness : JobReady _ _ :=
     sequential_ready_instance arr_seq.
 

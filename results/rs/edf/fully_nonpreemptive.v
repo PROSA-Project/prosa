@@ -108,7 +108,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Consider any non-preemptive, work-conserving, valid
-      restricted-supply uni-processor schedule of the given arrival
+      restricted-supply uniprocessor schedule of the given arrival
       sequence [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
@@ -181,7 +181,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
       sound response-time bound for the concrete model of
-      fully-nonpreemptive EDF scheduling with arbitrary supply
+      fully non-preemptive EDF scheduling with arbitrary supply
       restrictions. *)
   Theorem uniprocessor_response_time_bound_fully_nonpreemptive_edf :
     forall (R : duration),

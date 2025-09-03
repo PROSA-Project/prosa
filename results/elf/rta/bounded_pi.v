@@ -104,7 +104,7 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   (** *** The Schedule *)
 
-  (** Finally, we consider any arbitrary, valid ideal uni-processor schedule of
+  (** Finally, we consider any arbitrary, valid ideal uniprocessor schedule of
       the given arrival sequence [arr_seq]. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
@@ -350,13 +350,13 @@ Section AbstractRTAforELFwithArrivalCurves.
     Variable Δ : duration.
     Hypothesis H_Δ_in_busy : t1 + Δ <= t2.
 
-    (** We define the service needed by jobs belongings to other equal-priority
-        tasks, that have higher-or-equal priority than [j]... *)
+    (** We define the service needed by jobs belonging to other equal-priority
+        tasks, that have higher-or-equal priority than [j] ... *)
     Definition service_of_hp_jobs_from_other_ep_tasks (j : Job) (t1 t2 : instant) :=
       service_of_jobs sched (fun jhp => other_ep_task_hep_job jhp j)
         (arrivals_between arr_seq t1 t2) t1 t2.
 
-    (** ...and show that it is equivalent to the cumulative interference
+    (** ... and show that it is equivalent to the cumulative interference
         incurred by [j] due to these jobs. *)
     Lemma cumulative_intf_ep_task_service_equiv :
       cumulative_interference_from_hep_jobs_from_other_ep_tasks arr_seq sched j t1 (t1 + Δ)
@@ -484,7 +484,7 @@ Section AbstractRTAforELFwithArrivalCurves.
 
     (** ... and that the cumulative interference incurred by [j] due to all
         higher-or-equal priority jobs from higher-priority tasks is bounded by
-        the [total_hp_rbf]]. *)
+        the [total_hp_rbf]. *)
     Lemma bound_on_hp_workload :
       cumulative_interference_from_hep_jobs_from_hp_tasks arr_seq sched j t1 (t1 + Δ)
         <= total_hp_rbf Δ.
@@ -634,7 +634,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         if [A] is in the concrete search space, then there exists an [R] that
         satisfies [H_R_is_maximum]. *)
 
-    (** Using these facts, here we prove that if, [A] is in the abstract search space, ... *)
+    (** Using these facts, here we prove that if [A] is in the abstract search space, ... *)
     Let is_in_search_space := search_space.is_in_search_space L total_interference_bound.
 
     (** ... then there exists a solution to the response-time equation as stated

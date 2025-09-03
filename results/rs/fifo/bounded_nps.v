@@ -43,7 +43,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
 
   (** Consider any type of tasks, each characterized by a WCET
       [task_cost], an arrival curve [max_arrivals], a
-      run-to-completion threshold [task_rtct], and a bound on the the
+      run-to-completion threshold [task_rtct], and a bound on the
       task's longest non-preemptive segment
       [task_max_nonpreemptive_segment] ... *)
   Context {Task : TaskType}.
@@ -88,7 +88,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
 
   (** We assume that [max_arrivals] is a family of valid arrival
       curves that constrains the arrival sequence [arr_seq], i.e., for
-      any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and ... *)
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 

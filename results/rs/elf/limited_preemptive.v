@@ -57,7 +57,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
   (** ... and any type of jobs associated with these tasks, where each
       job has a task [job_task], a cost [job_cost], an arrival time
       [job_arrival], and a predicate indicating job's preemption
-      points [job_preemptive_points]. *)
+      points [job_preemption_points]. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobCost Job}.
@@ -99,7 +99,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
 
   (** We assume that [max_arrivals] is a family of valid arrival
       curves that constrains the arrival sequence [arr_seq], i.e., for
-      any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and ... *)
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
@@ -115,7 +115,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Consider any work-conserving, valid restricted-supply
-      uni-processor schedule with limited preemptions of the given
+      uniprocessor schedule with limited preemptions of the given
       arrival sequence [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
@@ -187,7 +187,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
       sound response-time bound for the concrete model of ELF
-      scheduling with limited preemptions with arbitrary supply
+      scheduling with limited preemptions and arbitrary supply
       restrictions. *)
   Theorem uniprocessor_response_time_bound_limited_elf :
     forall (R : duration),

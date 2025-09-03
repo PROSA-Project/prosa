@@ -83,7 +83,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   (** Furthermore, we assume that [max_arrivals] is a family of valid arrival
       curves that constrains the arrival sequence [arr_seq], i.e., for any task
-      [tsk] in [ts], [max_arrival tsk] is (1) an arrival bound of [tsk], and ... *)
+      [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of [tsk], and ... *)
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
   (** ... (2) a monotonic function that equals 0 for the empty interval [delta = 0]. *)
@@ -106,7 +106,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   (** *** The Schedule *)
 
-  (** Finally, consider any arbitrary, valid ideal uni-processor schedule of the
+  (** Finally, consider any arbitrary, valid ideal uniprocessor schedule of the
       given arrival sequence [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
@@ -203,7 +203,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   Fact busy_windows_are_bounded : busy_windows_are_bounded_by L.
   Proof. exact: instantiated_busy_intervals_are_bounded. Qed.
 
-  (** The preceding fact [busy_windows_are_bounded] correspond to Lemma 2 in the
+  (** The preceding fact [busy_windows_are_bounded] corresponds to Lemma 2 in the
       paper. To clearly see the correspondence, refer to the definition of
       [busy_intervals_are_bounded_by] (by clicking on the link in the definition
       above). *)
@@ -277,7 +277,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
   (** We establish a bound on the interference produced by higher- and
       equal-priority jobs in a separate file. To see the result,
-      simply click on the link bellow. *)
+      simply click on the link below. *)
   Let bound_on_hep_workload :=
     @analysis.facts.priority.fifo_ahep_bound.bound_on_hep_workload.
 
@@ -316,7 +316,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   (** In this section, we define the concrete search space for [FIFO] and relate
       it to the abstract search space of aRTA. In the case of [FIFO], the concrete
       search space is the set of offsets less than [L] such that there exists a
-      task [tsk'] in [ts] such that [r bf tsk' (A) ≠ rbf tsk' (A + ε)]. *)
+      task [tsk'] in [ts] such that [rbf tsk' (A) ≠ rbf tsk' (A + ε)]. *)
   Definition is_in_concrete_search_space (A : duration) :=
     (A < L) && has (fun tsk' => task_request_bound_function tsk' (A) !=
                                task_request_bound_function tsk' ( A + ε )) ts.

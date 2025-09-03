@@ -168,7 +168,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Qed.
 
   (** With the above setup in place, we can show that the search space defined
-      above by [is_in_search_space] covers the the more abstract search space
+      above by [is_in_search_space] covers the more abstract search space
       defined by [bounded_pi.is_in_search_space]. *)
   Lemma search_space_inclusion :
      forall {A L},
@@ -218,10 +218,10 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
           R >= F + (task_cost tsk - task_rtct tsk).
 
     (** Then, using the results for the general RTA for EDF-schedulers, we establish a
-         response-time bound for the more concrete model of bounded nonpreemptive segments.
+         response-time bound for the more concrete model of bounded non-preemptive segments.
          Note that in case of the general RTA for EDF-schedulers, we just _assume_ that
          the priority inversion is bounded. In this module we provide the preemption model
-         with bounded nonpreemptive segments and _prove_ that the priority inversion is
+         with bounded non-preemptive segments and _prove_ that the priority inversion is
          bounded. *)
     Theorem uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments:
       response_time_bounded_by tsk R.

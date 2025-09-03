@@ -43,8 +43,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_valid_job_cost:
     arrivals_have_valid_job_costs arr_seq.
 
-  (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
+  (** Let [max_arrivals] be a family of valid arrival curves, i.e., for
+      any task [tsk] in ts [max_arrivals tsk] is (1) an arrival bound of
       [tsk], and (2) it is a monotonic function that equals 0 for the
       empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
@@ -104,11 +104,11 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** ** Response-Time Bound *)
 
-  (** To reduce the time complexity of the analysis, recall the notion of search space. *)
+  (** To reduce the time complexity of the analysis, recall the notion of the search space. *)
   Let is_in_search_space := is_in_search_space tsk L.
 
   (** Next, consider any value [R], and assume that for any given
-       arrival [A] from search space there is a solution of the
+       arrival [A] from the search space there is a solution of the
        response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum:

@@ -33,11 +33,11 @@ Section GeneralityOfELF.
 
   (** ** ELF Generalizes GEL *)
 
-  (** First, let us consider GEL scheduling, which by design ELF trivially
-      generalizes. *)
+  (** First, let us consider GEL scheduling, which it trivially
+      generalizes by design. *)
   Section ELFGeneralizesGEL.
 
-  (** If the [fp] fixed-priority policy assigns equal priority to all tasks... *)
+  (** If the [fp] fixed-priority policy assigns equal priority to all tasks, ... *)
   Hypothesis H_FP_policy_is_same:
     forall tsk1 tsk2, ep_task tsk1 tsk2.
 
@@ -63,7 +63,7 @@ Section GeneralityOfELF.
     (** Since (1) ELF uses GEL only to break ties in fixed task priority, and
         since (2) a fixed-priority policy says nothing about how jobs of
         equal-priority tasks should be ordered (i.e., "ties in priority are
-        broken arbitrarily"), an [ELF fp] schedule always is also a valid [fp]
+        broken arbitrarily"), an [ELF fp] schedule is always also a valid [fp]
         schedule. *)
     Remark elf_is_fixed_priority :
       forall sched arr_seq,
@@ -95,7 +95,7 @@ Section GeneralityOfELF.
     Variable sched : schedule PState.
     Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-    (** ... in which tasks execute sequentially ... *)
+    (** ... in which tasks execute sequentially, ... *)
     Hypothesis H_sequential : sequential_tasks arr_seq sched.
 
     (** ... the ELF policy and the underlying FP policy are equivalent. *)

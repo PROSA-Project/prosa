@@ -11,7 +11,7 @@ Require Export prosa.model.task.preemption.fully_nonpreemptive.
 
 Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
 
-  (** We assume ideal uni-processor schedules. *)
+  (** We assume ideal uniprocessor schedules. *)
   #[local] Existing Instance ideal.processor_state.
 
   (** Consider any type of tasks ... *)
@@ -24,7 +24,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** We assume that jobs and tasks are fully nonpreemptive. *)
+  (** We assume that jobs and tasks are fully non-preemptive. *)
   #[local] Existing Instance fully_nonpreemptive_job_model.
   #[local] Existing Instance fully_nonpreemptive_task_model.
   #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
@@ -44,7 +44,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
+      any task [tsk] in ts [max_arrivals tsk] is (1) an arrival bound of
       [tsk], and (2) it is a monotonic function that equals [0] for the
       empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
@@ -125,8 +125,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
         R >= F + (task_cost tsk - ε).
 
   (** Now, we can leverage the results for the abstract model with
-      bounded nonpreemptive segments to establish a response-time
-      bound for the more concrete model of fully nonpreemptive
+      bounded non-preemptive segments to establish a response-time
+      bound for the more concrete model of fully non-preemptive
       scheduling. *)
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.

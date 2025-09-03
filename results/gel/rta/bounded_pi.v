@@ -9,7 +9,7 @@ Require Export prosa.analysis.facts.model.task_cost.
 
 (** * Abstract RTA for GEL-Schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the abstract response-time analysis
-    (aRTA) for GEL-schedulers assuming the ideal uni-processor model and
+    (aRTA) for GEL-schedulers assuming the ideal uniprocessor model and
     real-time tasks with arbitrary arrival models. *)
 
 (** The important feature of this instantiation is that
@@ -35,7 +35,7 @@ Section AbstractRTAforGELwithArrivalCurves.
 
   (** We begin by defining the system model. First,
       we model arrivals using an arrival sequence. We assume
-      that the arrival is consistent and does not contain duplicates. *)
+      that the arrival sequence is consistent and does not contain duplicates. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
@@ -176,8 +176,8 @@ Section AbstractRTAforGELwithArrivalCurves.
 
         (** ... then the workload of jobs satisfying the predicate [GEL_from]
             in the interval <<[t1,t1 + Δ)>> is equal to the workload in
-            the interval <<[t1, t1 + interval [tsk_o] [A])>>.
-            Note that, we use the functions [Z.to_nat] to [Z.of_nat] to convert
+            the interval <<[t1, t1 + interval tsk_o A)>>.
+            Note that we use the functions [Z.to_nat] to [Z.of_nat] to convert
             integers to natural numbers and vice-versa. *)
         Lemma total_workload_shorten_range:
           workload_of_jobs (GEL_from tsk_o)
@@ -351,7 +351,7 @@ Section AbstractRTAforGELwithArrivalCurves.
     Let total_interference_bound (A Δ : duration) :=
           task_request_bound_function tsk (A + ε) - task_cost tsk + task_IBF A Δ.
 
-    (** We know that if [A] is in the abstract search then it is in the concrete search space.
+    (** We know that if [A] is in the abstract search space, then it is in the concrete search space.
         We also know that if [A] is in the concrete search space then there exists an [R] that
         satisfies [H_R_is_maximum]. Using these facts, here we prove that if [A]
         is in the abstract search space then, there exists a solution to the response-time

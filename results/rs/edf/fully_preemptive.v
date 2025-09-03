@@ -108,7 +108,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Consider any arbitrary, work-conserving, valid restricted-supply
-      uni-processor schedule of the given arrival sequence [arr_seq]
+      uniprocessor schedule of the given arrival sequence [arr_seq]
       (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.

@@ -46,7 +46,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
 
   (** Consider any type of tasks, each characterized by a WCET
       [task_cost], relative deadline [task_deadline], an arrival curve
-      [max_arrivals], and a bound on the the task's longest
+      [max_arrivals], and a bound on the task's longest
       non-preemptive segment [task_max_nonpreemptive_segment], ... *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
@@ -116,7 +116,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Consider any arbitrary, work-conserving, valid restricted-supply
-      uni-processor schedule with limited preemptions of the given
+      uniprocessor schedule with limited preemptions of the given
       arrival sequence [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.

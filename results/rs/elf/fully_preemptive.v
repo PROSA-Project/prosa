@@ -95,7 +95,7 @@ Section RTAforFullyPreemptiveELFModelwithArrivalCurves.
 
   (** We assume that [max_arrivals] is a family of valid arrival
       curves that constrains the arrival sequence [arr_seq], i.e., for
-      any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and ... *)
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
@@ -111,14 +111,14 @@ Section RTAforFullyPreemptiveELFModelwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Consider any work-conserving, valid restricted-supply
-      uni-processor schedule of the given arrival sequence [arr_seq]
+      uniprocessor schedule of the given arrival sequence [arr_seq]
       (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** Consider an FP policy that indicates a higher-or-equal priority
-      relation, and assume that the relation is reflexive, transitive.
+      relation, and assume that the relation is reflexive, transitive,
       and total. *)
   Context (FP : FP_policy Task).
   Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.

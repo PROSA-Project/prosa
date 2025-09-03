@@ -69,7 +69,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
 
   (** We assume the sequential model of readiness without jitter or
       self-suspensions, wherein a pending job [j] is ready as soon as
-      all prior jobs from the same task completed. *)
+      all prior jobs of the same task are complete. *)
   #[local] Instance sequential_readiness : JobReady _ _ :=
     sequential_ready_instance arr_seq.
 
@@ -102,7 +102,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Consider any non-preemptive, work-conserving, valid
-      restricted-supply uni-processor schedule of the given arrival
+      restricted-supply uniprocessor schedule of the given arrival
       sequence [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
@@ -186,7 +186,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
       sound response-time bound for the concrete model of
-      fully-nonpreemptive fixed-priority scheduling with arbitrary
+      fully non-preemptive fixed-priority scheduling with arbitrary
       supply restrictions. *)
   Theorem uniprocessor_response_time_bound_fully_nonpreemptive_fp :
     forall (R : duration),
