@@ -2,6 +2,7 @@ Require Export prosa.model.aggregate.workload.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.facts.busy_interval.quiet_time.
+Require Export prosa.analysis.facts.model.uniprocessor.
 
 (** * Lemmas about Service Received by Sets of Jobs *)
 (** In this file, we establish basic facts about the service received by _sets_ of jobs. *)
@@ -22,7 +23,7 @@ Section GenericModelLemmas.
   (** Consider any kind of processor state model, ... *)
   Context {PState : ProcessorState Job}.
 
-  (** ... any job arrival sequence with consistent arrivals, .... *)
+  (** ... any job arrival sequence with consistent arrivals, ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
@@ -98,8 +99,8 @@ Section GenericModelLemmas.
         satisfying a predicate [P] by [{jobs | P}]. *)
 
     (** First, we prove that the service received by [{jobs | P1}] can be split
-        into: (1) the service received by [{jobs | P1 ∧ P2}] and (2) the service
-        received by the a subset [{jobs | P1 ∧ ¬ P2}]. *)
+        into: (1) the service received by the subset [{jobs | P1 ∧ P2}] and
+        (2) the service received by the subset [{jobs | P1 ∧ ¬ P2}]. *)
     Lemma service_of_jobs_case_on_pred :
       service_of_jobs sched P1 jobs t1 t2
       = service_of_jobs sched (fun j => P1 j && P2 j) jobs t1 t2
@@ -190,7 +191,35 @@ Section GenericModelLemmas.
         by apply not_scheduled_implies_no_service.
     Qed.
 
+    (** The amount of service accrued in an empty interval is trivially zero. *)
+    Lemma service_of_jobs_geq :
+      t1 >= t2 ->
+      service_of_jobs sched P jobs t1 t2 = 0.
+    Proof.
+      move=> LEQ.
+      rewrite /service_of_jobs; apply/eqP.
+      rewrite sum_nat_seq_eq0; apply/allP => j IN.
+      apply/implyP => Pj.
+      by apply/eqP/big_geq.
+    Qed.
+
     End ArbitraryInterval.
+
+    (** When considering the service accumulated by bunch of jobs in an interval
+        <<[t1, t2]>>, the total amount of service can be split into the service
+        received during <<[t1, t2)>> and the service received at the last point in
+        time [t2]. *)
+    Lemma service_of_jobs_cat_last :
+      forall  js t1 t2,
+        t1 <= t2 ->
+        service_of_jobs sched P js t1 t2.+1
+        = service_of_jobs sched P js t1 t2
+          + service_of_jobs_at sched P js t2.
+    Proof.
+      move=> js t1 t2 LEQ.
+      rewrite !service_of_jobs_sum_over_time_interval.
+      by rewrite big_nat_recr.
+    Qed.
 
 End GenericModelLemmas.
 
@@ -206,7 +235,7 @@ Section HEPService.
   (** Consider any kind of processor state model, ... *)
   Context {PState : ProcessorState Job}.
 
-  (** ... any valid arrival sequence, .... *)
+  (** ... any valid arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
@@ -500,6 +529,71 @@ Section UnitServiceUniProcessorModelLemmas.
     Qed.
 
   End ServiceOfJobsIsBoundedByLength.
+
+
+  (** Let us consider the special case where the processor _also_ guarantees
+      ideal progress. *)
+  Section IdealProgress.
+
+    (** Suppose we have an ideal unit-speed processor. *)
+    Hypothesis H_ideal_progress_model : ideal_progress_proc_model PState.
+
+    (** Let [js] denote any set of jobs. *)
+    Variable js : seq Job.
+    Hypothesis H_no_duplicate_jobs : uniq js.
+
+    (** On a unit-speed processor, if we know that a job in the given set [js]
+        is scheduled, then the total service accrued by [js] at this point in
+        time increases by exactly one time unit. *)
+    Lemma service_of_jobs_at_scheduled1 :
+      forall t,
+        (exists j, j \in js /\ scheduled_at sched j t /\ P j) ->
+        service_of_jobs_at sched P js t = 1.
+    Proof.
+      move=>  t [j [IN [SCHED Pj]]].
+      have NSCHED: forall j', j' != j -> service_at sched j' t = 0.
+      { move=> j' /[1! eq_sym] NEQ.
+        rewrite -no_service_not_scheduled //.
+        by apply: scheduled_job_at_neq. }
+      rewrite /service_of_jobs_at (bigID (fun j' => j' == j )) /=.
+      have /eqP ->:  \sum_(i <- js | P i && (i != j)) service_at sched i t == 0.
+      { rewrite sum_nat_seq_eq0.
+        apply/allP => j' IN'.
+        apply/implyP => /andP[Pj' NEQ].
+        by apply/eqP/NSCHED. }
+      rewrite addn0.
+      have ->: \sum_(i <- js | P i && (i == j)) service_at sched i t
+               = \sum_(i <- [:: j] | P i && (i == j)) service_at sched i t.
+      { rewrite -[LHS]big_filter -[RHS]big_filter.
+        apply: congr_big => //.
+        rewrite !filter_predI !filter_pred1_uniq //.
+        exact: mem_head. }
+      rewrite big_mkcond big_seq1 Pj eq_refl //=.
+      exact: unit_service_at1.
+    Qed.
+
+
+    (** When considering the amount of service accrued by a set of jobs during
+        some interval, if we know that at each point some job from the set is
+        scheduled, then the total amount of service accrued (on a unit-speed
+        processor) in total by the set of jobs is equal to the length of the
+        interval. *)
+    Lemma service_of_jobs_always_scheduled :
+      forall  t1 t2,
+        (forall t, t1 <= t < t2 -> exists j, j \in js /\ scheduled_at sched j t /\ P j) ->
+        service_of_jobs sched P js t1 t2 = t2 - t1.
+    Proof.
+      move=>  t1 t2 SCHED.
+      elim: t2 SCHED => [|t2 IH SCHED];
+        first by rewrite service_of_jobs_geq; lia.
+      have [LEQ|LT] := leqP t1 t2;
+        last by rewrite service_of_jobs_geq; lia.
+      rewrite service_of_jobs_cat_last // IH;
+        last by move=> t /andP[LO HI]; apply: SCHED; lia.
+      by rewrite service_of_jobs_at_scheduled1 //; [|apply: SCHED]; lia.
+    Qed.
+
+  End IdealProgress.
 
   (** In this section, we prove a relation between a predicate defined
       on a set of jobs and the total service of these jobs. *)
