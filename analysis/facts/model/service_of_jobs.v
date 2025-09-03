@@ -42,46 +42,48 @@ Section GenericModelLemmas.
       (2) the total service of jobs released in time interval <<[t1, t)>> during time <<[t, t2)>>
       and (3) the total service of jobs released in time interval <<[t, t2)>> during time <<[t, t2)>>. *)
   Lemma service_of_jobs_cat_scheduling_interval :
-      forall t1 t2 t,
-        t1 <= t <= t2 ->
-        service_of_jobs sched P (arrivals_between arr_seq t1 t2) t1 t2
-        = service_of_jobs sched P (arrivals_between arr_seq t1 t) t1 t
-          + service_of_jobs sched P (arrivals_between arr_seq t1 t) t t2
-          + service_of_jobs sched P (arrivals_between arr_seq t t2) t t2.
-    Proof.
-      move => t1 t2 t /andP [GEt LEt].
-      rewrite (arrivals_between_cat _ _ t) //.
-      rewrite {1}/service_of_jobs big_cat //=.
-      rewrite exchange_big //= (@big_cat_nat _ _ _ t) //=;
-              rewrite [in X in X + _ + _]exchange_big //= [in X in _ + X + _]exchange_big //=.
-      apply/eqP; rewrite -!addnA eqn_add2l eqn_add2l.
-      rewrite exchange_big //= (@big_cat_nat _ _ _ t) //= [in X in _ + X]exchange_big //=.
-      rewrite -[service_of_jobs _ _ _ _ _]add0n /service_of_jobs eqn_add2r.
-      rewrite big_nat_cond big1 //.
-      move => x /andP [/andP [GEi LTi] _].
-      rewrite big_seq_cond big1 //.
-      move => j /andP [ARR Ps].
-      apply: service_before_job_arrival_zero => //.
-      eapply in_arrivals_implies_arrived_between in ARR; eauto 2.
-      by move: ARR => /andP [N1 N2]; apply leq_trans with t.
-    Qed.
+    forall t1 t2 t,
+      t1 <= t <= t2 ->
+      service_of_jobs sched P (arrivals_between arr_seq t1 t2) t1 t2
+      = service_of_jobs sched P (arrivals_between arr_seq t1 t) t1 t
+        + service_of_jobs sched P (arrivals_between arr_seq t1 t) t t2
+        + service_of_jobs sched P (arrivals_between arr_seq t t2) t t2.
+  Proof.
+    move => t1 t2 t /andP [GEt LEt].
+    rewrite (arrivals_between_cat _ _ t) //.
+    rewrite {1}/service_of_jobs big_cat //=.
+    rewrite exchange_big //= (@big_cat_nat _ _ _ t) //=;
+      rewrite [in X in X + _ + _]exchange_big //= [in X in _ + X + _]exchange_big //=.
+    apply/eqP; rewrite -!addnA eqn_add2l eqn_add2l.
+    rewrite exchange_big //= (@big_cat_nat _ _ _ t) //= [in X in _ + X]exchange_big //=.
+    rewrite -[service_of_jobs _ _ _ _ _]add0n /service_of_jobs eqn_add2r.
+    rewrite big_nat_cond big1 //.
+    move => x /andP [/andP [GEi LTi] _].
+    rewrite big_seq_cond big1 //.
+    move => j /andP [ARR Ps].
+    apply: service_before_job_arrival_zero => //.
+    eapply in_arrivals_implies_arrived_between in ARR; eauto 2.
+    by move: ARR => /andP [N1 N2]; apply leq_trans with t.
+  Qed.
 
-    (** We show that the total service of jobs released in a time interval <<[t1, t2)>>
-       during <<[t, t2)>> is equal to the sum of:
-       (1) the total service of jobs released in a time interval <<[t1, t)>> during <<[t, t2)>>
-       and (2) the total service of jobs released in a time interval <<[t, t2)>> during <<[t, t2)>>. *)
-    Lemma service_of_jobs_cat_arrival_interval :
-      forall t1 t2 t,
-        t1 <= t <= t2 ->
-        service_of_jobs sched P (arrivals_between arr_seq t1 t2) t t2 =
-        service_of_jobs sched P (arrivals_between arr_seq t1 t) t t2 +
-        service_of_jobs sched P (arrivals_between arr_seq t t2) t t2.
-    Proof.
-      move => t1 t2 t /andP [GEt LEt].
-      apply/eqP;rewrite eq_sym; apply/eqP.
-      rewrite [in X in _ = X](arrivals_between_cat _ _ t) //.
-      by rewrite {3}/service_of_jobs -big_cat //=.
-    Qed.
+  (** We show that the total service of jobs released in a time interval <<[t1, t2)>>
+      during <<[t, t2)>> is equal to the sum of:
+      (1) the total service of jobs released in a time interval <<[t1, t)>> during <<[t, t2)>>
+      and (2) the total service of jobs released in a time interval <<[t, t2)>> during <<[t, t2)>>. *)
+  Lemma service_of_jobs_cat_arrival_interval :
+    forall t1 t2 t,
+      t1 <= t <= t2 ->
+      service_of_jobs sched P (arrivals_between arr_seq t1 t2) t t2
+      = service_of_jobs sched P (arrivals_between arr_seq t1 t) t t2
+        + service_of_jobs sched P (arrivals_between arr_seq t t2) t t2.
+  Proof.
+    move => t1 t2 t /andP [GEt LEt].
+    apply/eqP;rewrite eq_sym; apply/eqP.
+    rewrite [in X in _ = X](arrivals_between_cat _ _ t) //.
+    by rewrite {3}/service_of_jobs -big_cat //=.
+  Qed.
+
+  Section ArbitraryInterval.
 
     (** In the following, we consider an arbitrary sequence of jobs [jobs]. *)
     Variable jobs : seq Job.
@@ -89,7 +91,7 @@ Section GenericModelLemmas.
     (** Also, consider an interval <<[t1, t2)>>... *)
     Variable t1 t2 : instant.
 
-    (** ...and two additional predicates [P1] and [P2]. *) 
+    (** ...and two additional predicates [P1] and [P2]. *)
     Variable P1 P2 : pred Job.
 
     (** For brevity, in the following comments we denote a subset of [jobs]
@@ -99,8 +101,8 @@ Section GenericModelLemmas.
         into: (1) the service received by [{jobs | P1 ∧ P2}] and (2) the service
         received by the a subset [{jobs | P1 ∧ ¬ P2}]. *)
     Lemma service_of_jobs_case_on_pred :
-      service_of_jobs sched P1 jobs t1 t2 =
-        service_of_jobs sched (fun j => P1 j && P2 j) jobs t1 t2
+      service_of_jobs sched P1 jobs t1 t2
+      = service_of_jobs sched (fun j => P1 j && P2 j) jobs t1 t2
         + service_of_jobs sched (fun j => P1 j && ~~ P2 j) jobs t1 t2.
     Proof.
       rewrite /service_of_jobs big_mkcond //=.
@@ -114,8 +116,9 @@ Section GenericModelLemmas.
         difference between the total service received by [jobs] and the service
         of [{jobs | ¬ P}]. *)
     Lemma service_of_jobs_negate_pred :
-      service_of_jobs sched P jobs t1 t2 =
-        total_service_of_jobs_in sched jobs t1 t2 - service_of_jobs sched (fun j => ~~ P j) jobs t1 t2.
+      service_of_jobs sched P jobs t1 t2
+      = total_service_of_jobs_in sched jobs t1 t2
+        - service_of_jobs sched (fun j => ~~ P j) jobs t1 t2.
     Proof.
       rewrite /total_service_of_jobs_in /service_of_jobs.
       rewrite big_mkcond [in X in _ = X - _]big_mkcond [in X in _ = _ - X]big_mkcond //=.
@@ -186,6 +189,8 @@ Section GenericModelLemmas.
         rewrite Pa Bool.andb_true_l in ALL.
         by apply not_scheduled_implies_no_service.
     Qed.
+
+    End ArbitraryInterval.
 
 End GenericModelLemmas.
 
