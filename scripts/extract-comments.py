@@ -44,7 +44,10 @@ def process(opts, fname):
     out = sys.stdout
     for (a, b) in comment_ranges(src):
         txt = src[a:b]
-        print(INLINE_CODE_RE.sub('', txt))
+        if opts.keep_inline:
+            print(txt)
+        else:
+            print(INLINE_CODE_RE.sub('', txt))
 #     out.close()
 
 def parse_args():
@@ -54,6 +57,8 @@ def parse_args():
     parser.add_argument('input_files', nargs='*',
         metavar='Gallina-file',
         help='input Gallina files (*.v)')
+    parser.add_argument('--keep-inline', action='store_true',
+        help='Do not strip inline code from comments')
 
     return parser.parse_args()
 
