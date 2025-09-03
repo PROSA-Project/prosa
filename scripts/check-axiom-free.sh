@@ -4,8 +4,8 @@ function check_one_file {
     FILE="$1"
     MOD="${FILE//\//.}"
     MOD="prosa.${MOD/.v/}"
-    
-    THEOREMS=$(grep -E '^ *Theorem [^ ]+ *:' "$FILE" | sed -e 's/^ *Theorem//' -e 's/ *:$//')
+
+    THEOREMS=$(grep -E '^ *Theorem [^ ]+ *:' "$FILE" | sed -e 's/^ *Theorem//' -e 's/ *:.*$//')
     for THM in $THEOREMS
     do
         OUTPUT=$(mktemp)
