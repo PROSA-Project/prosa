@@ -28,7 +28,10 @@ def comment_ranges(src):
         if cur_is(i, '(') and next_is(i, '*'):
             in_comment += 1
             if in_comment == 1:
-                comment_start = i + 2
+                if next_is(i + 1, '*'):
+                    comment_start = i + 3
+                else:
+                    comment_start = i + 2
         # comment ending?
         elif cur_is(i, '*') and next_is(i, ')'):
             in_comment -= 1
@@ -71,4 +74,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
