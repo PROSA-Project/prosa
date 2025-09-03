@@ -29,8 +29,7 @@ CLAIM_NAME_PATTERN = re.compile(
     re.VERBOSE,
 )
 
-COMMENT_START_PATTERN = re.compile(r"\(\*")
-COMMENT_END_PATTERN = re.compile(r"\*\)")
+COMMENT_SEPARATOR_PATTERN = re.compile(r"\(\*|\*\)")
 
 
 def banner(fname):
@@ -52,32 +51,55 @@ def process_file(fname, annotate=silent):
     in_proof = False
     in_comment = 0
     claim = "???"
+    discounted_lines = 0
+    start = -1
     with open(fname) as f:
         for i, line in enumerate(f):
-            # simplification: we assume comment start/end not on otherwise
-            # significant lines
-            in_comment += len(COMMENT_START_PATTERN.findall(line))
-            in_comment -= len(COMMENT_END_PATTERN.findall(line))
-            assert in_comment >= 0
-            name_match = CLAIM_NAME_PATTERN.search(line)
+            # strip comments
+            ranges = [(0, in_comment)]
+            for m in COMMENT_SEPARATOR_PATTERN.finditer(line):
+                if m.group(0) == "(*":
+                    in_comment += 1
+                    ranges.append((m.start(), in_comment))
+                elif m.group(0) == "*)":
+                    in_comment -= 1
+                    ranges.append((m.end(), in_comment))
+                    assert in_comment >= 0
+                else:
+                    assert False  # unreachable unless regex is wrong
+            ranges.append((len(line), in_comment))
+            filtered_line = ""
+            for s, e in zip(ranges, ranges[1:]):
+                if s[1] == 0:
+                    filtered_line += line[s[0] : e[0]]
+                else:
+                    filtered_line += " "
+            name_match = CLAIM_NAME_PATTERN.search(filtered_line)
             if name_match is not None:
                 claim = name_match.group(2)
             if in_proof:
-                if not in_comment and PROOF_END_PATTERN.search(line):
+                if PROOF_END_PATTERN.search(filtered_line):
                     annotate("###", i, line)
-                    proofs.append((fname, start + 1, claim, i - start - 1))
+                    proofs.append(
+                        (fname, start + 1, claim, i - start - 1 - discounted_lines)
+                    )
                     in_proof = False
                     claim = "???"
+                elif not filtered_line.strip():
+                    # empty line or only comment
+                    discounted_lines += 1
+                    annotate("   ", i, line)
                 else:
                     annotate(" P ", i, line)
-            elif not in_comment and SINGLE_LINE_PROOF_PATTERN.search(line):
+            elif SINGLE_LINE_PROOF_PATTERN.search(filtered_line):
                 annotate("*P*", i, line)
                 proofs.append((fname, i + 1, claim, 1))
                 claim = "???"
-            elif not in_comment and PROOF_START_PATTERN.search(line):
+            elif PROOF_START_PATTERN.search(filtered_line):
                 annotate("***", i, line)
                 in_proof = True
                 start = i
+                discounted_lines = 0
             else:
                 annotate("   ", i, line)
 
