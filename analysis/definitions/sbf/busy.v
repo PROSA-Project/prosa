@@ -4,7 +4,7 @@ Require Export prosa.analysis.definitions.busy_interval.classical.
 
 (** * SBF within Busy Interval *)
 
-(** In the following, we define a weak notion of a supply bound
+(** In the following, we define a weak notion of a supply-bound
     function, which is a valid SBF only within a busy interval of a
     task's job. *)
 Section BusySupplyBoundFunctions.

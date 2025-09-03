@@ -5,7 +5,7 @@ Require Export prosa.analysis.definitions.sbf.sbf.
 
 (** ** SBF Parameter Semantics *)
 
-(** In the following, we define the semantics of the supply bound
+(** In the following, we define the semantics of the supply-bound
     functions (SBF) parametrized by a predicate.
 
     In our development, we use several different types of SBF (such as

@@ -4,7 +4,7 @@ Require Export prosa.analysis.abstract.definitions.
 
 (** * SBF within Abstract Busy Interval *)
 
-(** In the following, we define a weak notion of a supply bound
+(** In the following, we define a weak notion of a supply-bound
     function, which is a valid SBF only within an abstract busy
     interval of a task's job. *)
 Section BusySupplyBoundFunctions.
