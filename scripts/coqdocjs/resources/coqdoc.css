@@ -17,6 +17,11 @@ a {
     font-weight: bold;
 }
 
+.doc a {
+    text-decoration: underline;
+    font-weight: normal;
+}
+
 #main .code a, #main .inlinecode a, #toc a {
     font-weight: inherit;
 }
@@ -194,4 +199,8 @@ ul.doclist {
 
 #toc a h2{
     display: inline;
+}
+
+.paragraph {
+    margin-top: 0.5em;
 }
