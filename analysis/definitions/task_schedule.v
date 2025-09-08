@@ -43,8 +43,7 @@ Section ScheduleAndServiceOfTask.
     \sum_(j <- scheduled_jobs_of_task_at t) service_at sched j t.
 
   (** Based on the notion of instantaneous service, we define the
-      cumulative service received by [tsk] during any interval <<[t1,
-      t2)>> ... *)
+      cumulative service received by [tsk] during any interval <<[t1, t2)>> ... *)
   Definition task_service_during (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) task_service_at t.
 

@@ -526,9 +526,8 @@ Section TaskIBFtoJobIBF.
 
       (** Finally, we show that the cumulative interference of job [j]
           in the interval <<[t1, t1 + x)>> is bounded by the sum of
-          the task workload in the interval [t1, t1 + A + ε) and the
-          cumulative interference of [j]'s task in the interval <<[t1,
-          t1 + x)>>. *)
+          the task workload in the interval <<[t1, t1 + A + ε)>> and the
+          cumulative interference of [j]'s task in the interval <<[t1, t1 + x)>>. *)
       Lemma cumulative_job_interference_le_task_interference_bound:
         cumulative_interference j t1 (t1 + x)
         <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)

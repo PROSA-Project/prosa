@@ -27,7 +27,7 @@ Section WorkloadOfJobs.
   (** Now consider an arbitrary job arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** We define a task's workload in a given interval [[t1, t2)]. *)
+  (** We define a task's workload in a given interval <<[t1, t2)>>. *)
   Definition task_workload_between (tsk : Task) (t1 t2 : instant) :=
     task_workload tsk (arrivals_between arr_seq t1 t2).
 
@@ -43,7 +43,7 @@ Section WorkloadOfJobs.
     (** We define the total workload as the sum of workloads of all incoming jobs. *)
     Definition total_workload (jobs : seq Job) := workload_of_jobs predT jobs.
 
-    (** We also define the total workload in a given interval [[t1, t2)]. *)
+    (** We also define the total workload in a given interval <<[t1, t2)>>. *)
     Definition total_workload_between (t1 t2 : instant) :=
       total_workload (arrivals_between arr_seq t1 t2).
 

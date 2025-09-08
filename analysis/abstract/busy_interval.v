@@ -272,8 +272,8 @@ Section AbstractBusyIntervalExists.
     Hypothesis H_iw_bounded :
       cumulative_interfering_workload j t1 (t1 + δ) <= cumulative_interference j t1 (t1 + δ).
 
-    (** Then the cumulative interfering workload within interval <<[0,
-        t1 + δ)>> is bounded by the cumulative interference in the
+    (** Then the cumulative interfering workload within interval <<[0, t1 + δ)>>
+        is bounded by the cumulative interference in the
         same interval. *)
       Local Lemma cumul_iw_bounded_by_cumul_i :
         cumulative_interfering_workload j 0 (t1 + δ) <= cumulative_interference j 0 (t1 + δ).

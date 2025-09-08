@@ -309,15 +309,14 @@ Section AbstractRTADefinitions.
         experience in an interval of length [Δ] _assuming_ that
         [ParamSem j X] holds. *)
     Definition cond_interference_is_bounded_by :=
-      (** Consider a job [j] of task [tsk], a busy interval <<[t1,
-          t2)>> of [j], and an arbitrary interval <<[t1, t1 + Δ) ⊆
-          [t1, t2)>>. *)
+      (** Consider a job [j] of task [tsk], a busy interval <<[t1, t2)>>
+          of [j], and an arbitrary interval <<[t1, t1 + Δ) ⊆ [t1, t2)>>. *)
       forall t1 t2 Δ j,
         arrives_in arr_seq j ->
         job_of_task tsk j ->
         busy_interval j t1 t2 ->
         (** We require the IBF to bound the interference only within
-           the interval [t1, t1 + Δ). *)
+           the interval <<[t1, t1 + Δ)>>. *)
         t1 + Δ < t2 ->
         (** Next, we require the [IBF] to bound the interference only
             until the job is completed, after which the function can

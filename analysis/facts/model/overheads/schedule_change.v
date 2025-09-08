@@ -96,8 +96,8 @@ Section ScheduleInterruptions.
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
   Hypothesis H_must_arrive : jobs_must_arrive_to_execute sched.
 
-  (** If the processor has the same scheduled state [oj1] in <<[t1,
-      t)>> and the same state [oj2] in <<[t, t2)>>, and there is no
+  (** If the processor has the same scheduled state [oj1] in <<[t1, t)>>
+      and the same state [oj2] in <<[t, t2)>>, and there is no
       schedule change at time [t], then both intervals must have the
       same scheduled state [oj1 = oj2]. *)
   Lemma same_scheduled_state_merge :
@@ -135,9 +135,8 @@ Section ScheduleInterruptions.
     by rewrite NEQ in IN.
   Qed.
 
-  (** If there are no schedule changes during the interval <<[t1,
-      t2)>>, then [scheduled_job] remains constant throughout the
-      interval. *)
+  (** If there are no schedule changes during the interval <<[t1, t2)>>,
+      then [scheduled_job] remains constant throughout the interval. *)
   Lemma no_changes_implies_same_scheduled_job :
     forall (t1 t2 t t' : instant) (oj : option Job),
       no_schedule_changes_during sched t1 t2 ->

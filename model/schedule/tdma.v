@@ -15,7 +15,8 @@ Require Export prosa.util.rel.
     | s1 |  s2  |s3| s1 |  s2  |s3|...
     --------------------------------------------->
     0                                            t
->> *)
+>>
+*)
 
 (** ** Task Parameter for TDMA Scheduling *)
 

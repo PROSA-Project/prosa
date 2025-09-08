@@ -176,8 +176,8 @@ Section WorkloadFacts.
     (** Assume there are no duplicates in the arrival sequence. *)
     Hypothesis H_arrival_sequence_is_a_set : arrival_sequence_uniq arr_seq.
 
-    (** We prove that the workload of a job in an interval <<[t1,
-        t2)>> is equal to the cost of the job if the job's arrival is
+    (** We prove that the workload of a job in an interval <<[t1, t2)>>
+        is equal to the cost of the job if the job's arrival is
         in the interval and [0] otherwise. *)
     Lemma workload_of_job_eq_job_arrival :
       forall (j : Job) (t1 t2 : instant),

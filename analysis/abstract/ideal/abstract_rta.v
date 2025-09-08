@@ -107,8 +107,8 @@ Section AbstractRTAIdeal.
       [task_rtct tsk + IBF_P tsk A F <= F], we know that by time
       instant [t1 + F] a job receives [task_rtct tsk] units of service
       and, hence, it becomes non-preemptive. Given this information,
-      how can we bound the job's interference in an interval <<[t1, t1
-      + R)>>? Note that this interval starts with the beginning of the
+      how can we bound the job's interference in an interval <<[t1, t1 + R)>>?
+      Note that this interval starts with the beginning of the
       busy interval. We know that the job receives [F - task_rtct tsk]
       units of interference, and there will no more
       interference. Hence, [IBF_NP tsk F Δ := F - task_rtct tsk]. *)

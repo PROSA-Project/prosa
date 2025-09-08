@@ -33,8 +33,8 @@ Section BusySupplyBoundFunctions.
   (** Consider a task [tsk]. *)
   Variable tsk : Task.
 
-  (** We define a predicate that determines whether an interval <<[t1,
-      t2)>> is a busy-interval prefix of a job [j] of task [tsk]. *)
+  (** We define a predicate that determines whether an interval <<[t1, t2)>>
+      is a busy-interval prefix of a job [j] of task [tsk]. *)
   Let bi_prefix_of_tsk j t1 t2 :=
     job_of_task tsk j /\ busy_interval_prefix arr_seq sched j t1 t2.
 

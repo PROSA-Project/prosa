@@ -115,7 +115,7 @@ Section IdealModelLemmas.
   Variable P : pred Job.
 
   (** We prove that if the total service within some time interval <<[t1,t2)>>
-      is smaller than <<[t2 - t1]>>, then there is an idle time instant [t ∈ [t1,t2)]. *)
+      is smaller than <<[t2 - t1]>>, then there is an idle time instant <<t ∈ [t1,t2)>>. *)
   Lemma low_service_implies_existence_of_idle_time :
     forall t1 t2,
       service_of_jobs sched predT (arrivals_between arr_seq 0 t2) t1 t2 < t2 - t1 ->

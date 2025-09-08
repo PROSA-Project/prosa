@@ -44,19 +44,19 @@ Qed.
 (** Next, we proceed to the function [search_arg]. *)
 Section ArgSearch.
   
-  (* Given a function [f] that maps the naturals to elements of type [T]... *)
+  (** Given a function [f] that maps the naturals to elements of type [T]... *)
   Context {T : Type}.
   Variable f: nat -> T.
 
-  (* ... a predicate [P] on [T] ... *)
+  (** ... a predicate [P] on [T] ... *)
   Variable P: pred T.
 
-  (* ... and an order [R] on [T] ... *)
+  (** ... and an order [R] on [T] ... *)
   Variable R: rel T.
 
-  (* ... we define the procedure [search_arg] to iterate a given search space
-     [a, b), while checking each element whether [f] satisfies [P] at that
-     point and returning the extremum as defined by [R]. *)
+  (** ... we define the procedure [search_arg] to iterate a given search
+      space <<[a, b)>>, while checking each element whether [f] satisfies [P] 
+      at that point and returning the extremum as defined by [R]. *)
   Fixpoint search_arg (a b : nat) : option nat :=
     if a < b then
       match b with
@@ -70,8 +70,8 @@ Section ArgSearch.
 
   (** In the following, we establish basic properties of [search_arg]. *)
 
-  (* To begin, we observe that the search yields [None] iff predicate [P] does
-     not hold for any of the points in the search interval. *)
+  (** To begin, we observe that the search yields [None] iff predicate [P] does
+      not hold for any of the points in the search interval. *)
   Lemma search_arg_none:
     forall a b,
       search_arg a b = None <-> forall x, a <= x < b -> ~~ P (f x).
@@ -114,8 +114,8 @@ Section ArgSearch.
     }
   Qed.
 
-  (* Conversely, if we know that [f] satisfies [P] for at least one point in
-     the search space, then [search_arg] yields some point. *)
+  (** Conversely, if we know that [f] satisfies [P] for at least one point in
+      the search space, then [search_arg] yields some point. *)
   Lemma search_arg_not_none:
     forall a b,
       (exists x, (a <= x < b) /\ P (f x)) ->
@@ -129,8 +129,8 @@ Section ArgSearch.
     by move: (NOT_exists x RANGE) => /negP not_Pfx.
   Qed.
 
-  (* Since [search_arg] considers only points at which [f] satisfies [P], if it
-     returns a point, then that point satisfies [P]. *)
+  (** Since [search_arg] considers only points at which [f] satisfies [P], if it
+      returns a point, then that point satisfies [P]. *)
   Lemma search_arg_pred:
     forall a b x,
       search_arg a b = Some x -> P (f x).
@@ -146,8 +146,8 @@ Section ArgSearch.
       by move=> x_is; injection x_is => <-.
   Qed.
 
-  (* Since [search_arg] considers only points within a given range, if it
-     returns a point, then that point lies within the given range. *)
+  (** Since [search_arg] considers only points within a given range, if it
+      returns a point, then that point lies within the given range. *)
   Lemma search_arg_in_range:
     forall a b x,
       search_arg a b = Some x -> a <= x < b.
@@ -170,14 +170,14 @@ Section ArgSearch.
       by injection x_is => <-; apply /andP; split.
   Qed.
 
-  (* Let us assume that [R] is a reflexive and transitive total order... *)
+  (** Let us assume that [R] is a reflexive and transitive total order... *)
   Hypothesis R_reflexive: reflexive R.
   Hypothesis R_transitive: transitive R.
   Hypothesis R_total: total R.
 
-  (* ...then [search_arg] yields an extremum w.r.t. to [a, b), that is, if
-     [search_arg] yields a point x, then [R (f x) (f y)] holds for any [y] in the
-     search range [a, b) that satisfies [P]. *)
+  (** ...then [search_arg] yields an extremum w.r.t. to <<[a, b)>>, that is, if
+      [search_arg] yields a point x, then [R (f x) (f y)] holds for any [y] in the
+      search range <<[a, b)>> that satisfies [P]. *)
   Lemma search_arg_extremum:
     forall a b x,
       search_arg a b = Some x ->
@@ -231,9 +231,9 @@ End ArgSearch.
 
 Section ExMinn.
 
-  (* We show that the fact that the minimal satisfying argument [ex_minn ex] of 
-     a predicate [pred] satisfies another predicate [P] implies the existence
-     of a minimal element that satisfies both [pred] and [P]. *) 
+  (** We show that the fact that the minimal satisfying argument [ex_minn ex] of 
+      a predicate [pred] satisfies another predicate [P] implies the existence
+      of a minimal element that satisfies both [pred] and [P]. *) 
   Lemma prop_on_ex_minn:
     forall (P : nat -> Prop) (pred : nat -> bool) (ex : exists n, pred n),
       P (ex_minn ex) ->
@@ -244,9 +244,9 @@ Section ExMinn.
     all: have MIN := ex_minnP ex; move: MIN => [n Pn MIN]; auto.
   Qed.
 
-  (* As a corollary, we show that if there is a constant [c] such 
-     that [P c], then the minimal satisfying argument [ex_minn ex] 
-     of a predicate [P] is less than or equal to [c]. *)
+  (** As a corollary, we show that if there is a constant [c] such 
+      that [P c], then the minimal satisfying argument [ex_minn ex] 
+      of a predicate [P] is less than or equal to [c]. *)
   Corollary ex_minn_le_ex:
     forall (P : nat -> bool) (exP : exists n, P n) (c : nat),
       P c -> 

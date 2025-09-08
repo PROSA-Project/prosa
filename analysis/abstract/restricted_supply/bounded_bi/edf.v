@@ -238,8 +238,8 @@ Section BoundedBusyIntervals.
         arrival time of job [j]. *)
     Section RelativeArrivalIsBounded.
 
-      (** Consider a time instant [t1] such that <<[t1, job_arrival
-          j]>> is a busy-interval prefix of [j]. *)
+      (** Consider a time instant [t1] such that <<[t1, job_arrival j]>>
+          is a busy-interval prefix of [j]. *)
       Variable t1 : instant.
       Hypothesis H_arrives : t1 <= job_arrival j.
       Hypothesis H_busy_prefix_arr : busy_interval_prefix arr_seq sched j t1 (job_arrival j).+1.
@@ -276,9 +276,8 @@ Section BoundedBusyIntervals.
         continues until time instant [t1 + L]. *)
     Section Case1.
 
-      (** Consider a time instant [t1] such that <<[t1, job_arrival
-          j]>> and <<[t1, t1 + L)>> are both busy-interval prefixes of
-          job [j]. *)
+      (** Consider a time instant [t1] such that <<[t1, job_arrival j]>>
+          and <<[t1, t1 + L)>> are both busy-interval prefixes of job [j]. *)
       Variable t1 : instant.
       Hypothesis H_busy_prefix_arr : busy_interval_prefix arr_seq sched j t1 (job_arrival j).+1.
       Hypothesis H_busy_prefix_L : busy_interval_prefix arr_seq sched j t1 (t1 + L).
@@ -332,9 +331,8 @@ Section BoundedBusyIntervals.
         is not a busy-interval prefix. *)
     Section Case2.
 
-      (** Consider a time instant [t1] such that <<[t1, job_arrival
-          j]>> is a busy-interval prefix of [j] and <<[t1, t1 + L)>>
-          is _not_. *)
+      (** Consider a time instant [t1] such that <<[t1, job_arrival j]>>
+          is a busy-interval prefix of [j] and <<[t1, t1 + L)>> is _not_. *)
       Variable t1 : instant.
       Hypothesis H_arrives : t1 <= job_arrival j.
       Hypothesis H_busy_prefix_arr : busy_interval_prefix arr_seq sched j t1 (job_arrival j).+1.

@@ -156,9 +156,9 @@ Section GenericModelLemmas.
         over an interval <<[t1,t2)>> is equal to the sum over individual time
         instances (in <<[t1,t2)>>) of [service_of_jobs_at].
 
-        In other words, we show that <<[∑_{j ∈ jobs} ∑_{t \in [t1,t2)} service
-        of j at t]>> is equal to <<[∑_{t \in [t1,t2)} ∑_{j ∈ jobs} service of j
-        at t]>>. *)
+        In other words, we show that
+        <<[∑_{j ∈ jobs} ∑_{t \in [t1,t2)} service of j at t]>> 
+        is equal to <<[∑_{t \in [t1,t2)} ∑_{j ∈ jobs} service of j at t]>>. *)
     Lemma service_of_jobs_sum_over_time_interval :
       service_of_jobs sched P jobs t1 t2
       = \sum_(t1 <= t < t2) service_of_jobs_at sched P jobs t.

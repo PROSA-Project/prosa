@@ -35,9 +35,8 @@ Section PreemptionTimes.
   (** Consider a valid preemption model. *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
-  (** We start with a trivial fact that, given a time interval <<[t1,
-      t2)>>, the interval either contains a preemption time [t] or it
-      does not.  *)
+  (** We start with a trivial fact that, given a time interval <<[t1, t2)>>,
+      the interval either contains a preemption time [t] or it does not.  *)
   Lemma preemption_time_interval_case :
     forall t1 t2,
       (forall t, t1 <= t < t2 -> ~~ preemption_time arr_seq sched t)

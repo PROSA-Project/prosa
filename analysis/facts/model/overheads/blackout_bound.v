@@ -200,8 +200,8 @@ Section TotalBlackoutDueToOverheadsBounded.
     { by eapply total_time_in_CRPD_is_bounded. }
   Qed.
 
-  (** If there is exactly one schedule change in the interval <<[t1,
-      t2)>>, and it occurs at the very beginning (i.e., at [t1]), then
+  (** If there is exactly one schedule change in the interval <<[t1, t2)>>,
+      and it occurs at the very beginning (i.e., at [t1]), then
       the processor schedules a job at [t1] and continues executing
       the same job (or stays idle) for the rest of the interval. *)
   Lemma sched_changes_start_busy_pref_bounded_overheads_blackout :
@@ -222,8 +222,8 @@ Section TotalBlackoutDueToOverheadsBounded.
     }
   Qed.
 
-  (** If there are exactly [k] schedule changes in the interval <<[t1,
-      t2)>>, and one of them occurs at the beginning (i.e., at [t1]),
+  (** If there are exactly [k] schedule changes in the interval <<[t1, t2)>>,
+      and one of them occurs at the beginning (i.e., at [t1]),
       then the blackout time over the interval is bounded by [(DB +
       CSB + CRPDB) × k]. *)
   Lemma fin_sched_changes_start_busy_pref_bounded_overheads_blackout :

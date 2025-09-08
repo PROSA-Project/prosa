@@ -81,8 +81,7 @@ Section ServiceInversion.
 
     (** We show that cumulative service inversion received during an
         interval <<[t1, t2)>> can be split into the sum of cumulative
-        service inversion <<[t1, t)>> and <<[t, t2)>> for any <<t2 \in
-        [t1, t3]>>.  *)
+        service inversion <<[t1, t)>> and <<[t, t2)>> for any <<t2 \in [t1, t3]>>.  *)
     Lemma service_inversion_cat :
       forall (j : Job) (t1 t2 t : instant),
         t1 <= t ->
@@ -265,7 +264,7 @@ Section ServiceInversionIsBounded.
     Hypothesis H_j_arrives : arrives_in arr_seq j.
     Hypothesis H_job_cost_positive : job_cost_positive j.
 
-    (** Let <[t1, t2)>> be a busy-interval prefix. *)
+    (** Let <<[t1, t2)>> be a busy-interval prefix. *)
     Variable t1 t2 : instant.
     Hypothesis H_busy_prefix : busy_interval_prefix arr_seq sched j t1 t2.
 
@@ -421,8 +420,8 @@ Section ServiceInversionIsBounded.
 
       (** Next, assume that [σ <= service sched jlp t]. In this case,
           we can show that [jlp] is preempted after it reaches [σ]
-          units of service and hence, again, the service during <<[t1,
-          t)>> is bounded by [job_max_nonpreemptive_segment jlp - ε]. *)
+          units of service and hence, again, the service during <<[t1, t)>>
+          is bounded by [job_max_nonpreemptive_segment jlp - ε]. *)
       Local Lemma big_service_implies_bounded_service :
         σ <= service sched jlp t ->
         service_during sched jlp t1 t <= job_max_nonpreemptive_segment jlp - ε.

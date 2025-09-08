@@ -647,8 +647,8 @@ Section PriorityInversionIsBounded.
 
   (** In this section we prove that if a preemption point [ppt] exists in a job's busy window,
       it suffers no priority inversion after [ppt]. Equivalently the [cumulative_priority_inversion]
-      of the job in the busy window [t1,t2] is bounded by the [cumulative_priority_inversion]
-      of the job in the time window [t1,[ppt]). *)
+      of the job in the busy window <<[t1,t2]>> is bounded by the [cumulative_priority_inversion]
+      of the job in the time window <<[t1, ppt)>>. *)
   Section NoPriorityInversionAfterPreemptionPoint.
 
     (** Consider the preemption point [ppt]. *)

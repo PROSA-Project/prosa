@@ -86,7 +86,7 @@ Section BoundedBusyIntervalsAux.
     by eexists; split; last by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix => //.
   Qed.
 
-  (** Let <[t1, t2)>> be a busy-interval prefix. *)
+  (** Let <<[t1, t2)>> be a busy-interval prefix. *)
   Variable t1 t2 : instant.
   Hypothesis H_busy_prefix : busy_interval_prefix arr_seq sched j t1 t2.
 
@@ -130,8 +130,8 @@ Section BoundedBusyIntervalsAux.
     by apply: workload_eq_service_impl_all_jobs_have_completed => //.
   Qed.
 
-  (** Consider a subinterval <<[t1, t1 + Δ)>> of the interval <<[t1,
-      t2)>>. We show that the sum of [j]'s workload and the cumulative
+  (** Consider a subinterval <<[t1, t1 + Δ)>> of the interval
+      <<[t1, t2)>>. We show that the sum of [j]'s workload and the cumulative
       workload in <<[t1, t1 + Δ)>> is strictly larger than [Δ]. *)
   Lemma workload_exceeds_interval :
     forall Δ,

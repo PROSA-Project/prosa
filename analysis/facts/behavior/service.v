@@ -59,8 +59,8 @@ Section Composition.
   Proof. by move=> ?; rewrite /service_during big_nat_recr// big_geq. Qed.
 
   (** Next, we observe that we can look at the service received during an
-     interval <<[t1, t3)>> as the sum of the service during [t1, t2) and [t2, t3)
-     for any t2 \in [t1, t3]. (The "_cat" suffix denotes the concatenation of
+     interval <<[t1, t3)>> as the sum of the service during <<[t1, t2)>> and <<[t2, t3)>>
+     for any <<t2 \in [t1, t3]>>. (The <<_cat>> suffix denotes the concatenation of
      the two intervals.) *)
   Lemma service_during_cat:
     forall t1 t2 t3,

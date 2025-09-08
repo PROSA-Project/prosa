@@ -116,8 +116,8 @@ Section AbstractRTARestrictedSupply.
       [task_rtct tsk + IBF_P A F <= F], we know that by time
       instant [t1 + F] a job receives [task_rtct tsk] units of service
       and, hence, it becomes non-preemptive. Knowing this information,
-      how can we bound the job's interference in an interval <<[t1, t1
-      + Δ)>>?  Note that this interval starts with the beginning of
+      how can we bound the job's interference in an interval
+      <<[t1, t1 + Δ)>>?  Note that this interval starts with the beginning of
       the busy interval. We know that the job receives [F - task_rtct
       tsk] units of interference. In the non-preemptive mode, a job
       under analysis can still experience some interference due to a
@@ -214,8 +214,8 @@ Section AbstractRTARestrictedSupply.
       Hypothesis H_enough_service : task_rtct tsk <= service sched j (t1 + F).
 
       (** Then, we show that job [j] does not experience any
-          intra-supply interference in the time interval <<[t1 + F, t1 +
-          Δ)>>. *)
+          intra-supply interference in the time interval
+          <<[t1 + F, t1 + Δ)>>. *)
       Lemma no_intra_interference_after_F :
         cumul_intra_interference sched j (t1 + F) (t1 + Δ) = 0.
       Proof.

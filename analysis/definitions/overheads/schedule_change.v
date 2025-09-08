@@ -20,7 +20,7 @@ Section ScheduleChanges.
     scheduled_job sched t.-1 != scheduled_job sched t.
 
   (** In addition, we define the number of schedule changes in the
-      interval <<[t1, t2)>. *)
+      interval <<[t1, t2)>>. *)
   Definition number_schedule_changes (t1 t2 : instant) :=
     count schedule_change (index_iota t1 t2).
 
