@@ -5,7 +5,7 @@ import sys
 import re
 
 INLINE_CODE_RE = re.compile(r"\[[^]]*?\]")
-
+INLINE_HTML_RE = re.compile(r"#[^#]*?#")
 
 def comment_ranges(src):
     "Identify comments in Coq .v files."
@@ -50,6 +50,7 @@ def process(opts, fname):
                 INLINE_CODE_RE.sub("", src[a:b].strip())
                 for (a, b) in comment_ranges(src)
             ]
+        comments = [INLINE_HTML_RE.sub("", c) for c in comments]
         merged_comments = []
         for c in comments:
             if not merged_comments:
@@ -65,9 +66,9 @@ def process(opts, fname):
         for a, b in comment_ranges(src):
             txt = src[a:b]
             if opts.keep_inline:
-                print(txt)
+                print(INLINE_HTML_RE.sub("", txt))
             else:
-                print(INLINE_CODE_RE.sub("", txt))
+                print(INLINE_HTML_RE.sub("", INLINE_CODE_RE.sub("", txt)))
 
 
 def parse_args():
