@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
-import sys
 import re
+import sys
 
 INLINE_CODE_RE = re.compile(r"\[[^]]*?\]")
 INLINE_HTML_RE = re.compile(r"#[^#]*?#")
+WHITESPACE_RE = re.compile(r"\s+")
+
 
 def comment_ranges(src):
     "Identify comments in Coq .v files."
@@ -51,6 +53,8 @@ def process(opts, fname):
                 for (a, b) in comment_ranges(src)
             ]
         comments = [INLINE_HTML_RE.sub("", c) for c in comments]
+        if opts.single_line:
+            comments = [WHITESPACE_RE.sub(" ", c) for c in comments]
         merged_comments = []
         for c in comments:
             if not merged_comments:
@@ -65,6 +69,8 @@ def process(opts, fname):
     else:
         for a, b in comment_ranges(src):
             txt = src[a:b]
+            if opts.single_line:
+                txt = WHITESPACE_RE.sub(" ", txt)
             if opts.keep_inline:
                 print(INLINE_HTML_RE.sub("", txt))
             else:
@@ -89,6 +95,11 @@ def parse_args():
         "--merge-dots",
         action="store_true",
         help='Merge continued comments follwing the "..." pattern.',
+    )
+    parser.add_argument(
+        "--single-line",
+        action="store_true",
+        help="Emit one comment per line",
     )
 
     return parser.parse_args()
