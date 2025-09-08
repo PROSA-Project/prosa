@@ -474,7 +474,7 @@ Section DegenerateTotalRBFs.
     rewrite mem_filter; apply /andP; split => //.
   Qed.
 
-  (** Thus we we can prove any response-time bound from such a pathological
+  (** Thus we can prove any response-time bound from such a pathological
       case, which is useful to eliminate this case in higher-level analyses. *)
   Corollary pathological_total_hep_rbf_any_bound :
     forall tsk,

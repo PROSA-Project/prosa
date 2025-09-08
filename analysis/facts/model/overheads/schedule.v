@@ -12,7 +12,7 @@ Section OverheadsProceProperties.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** First, we prove that that the processor model with overheads is
+  (** First, we prove that the processor model with overheads is
       a uni-processor model. *)
   Lemma overheads_proc_model_is_a_uniprocessor_model :
     uniprocessor_model (overheads.processor_state Job).

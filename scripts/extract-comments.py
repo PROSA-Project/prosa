@@ -7,6 +7,7 @@ import sys
 INLINE_CODE_RE = re.compile(r"\[[^]]*?\]")
 INLINE_HTML_RE = re.compile(r"#[^#]*?#")
 WHITESPACE_RE = re.compile(r"\s+")
+REPETITION_RE = re.compile(r"\W([a-zA-Z-]+)\s+\1\W")
 
 
 def comment_ranges(src):
@@ -44,37 +45,62 @@ def comment_ranges(src):
 
 def process(opts, fname):
     src = open(fname, "r").read()
+
+    comments = [src[a:b].strip() for (a, b) in comment_ranges(src)]
+
+    comments = [INLINE_HTML_RE.sub("", c) for c in comments]
+
+    if not opts.keep_inline:
+        count = 0
+
+        def code(_):
+            nonlocal count
+            count += 1
+            return f"CODE{count}"
+
+        replacement = "[…]" if opts.flag_repeated_words else ""
+        comments = [INLINE_CODE_RE.sub(replacement, c) for c in comments]
+
+    if opts.single_line:
+        comments = [WHITESPACE_RE.sub(" ", c) for c in comments]
+
     if opts.merge_dots:
-        if opts.keep_inline:
-            comments = [src[a:b].strip() for (a, b) in comment_ranges(src)]
-        else:
-            comments = [
-                INLINE_CODE_RE.sub("", src[a:b].strip())
-                for (a, b) in comment_ranges(src)
-            ]
-        comments = [INLINE_HTML_RE.sub("", c) for c in comments]
-        if opts.single_line:
-            comments = [WHITESPACE_RE.sub(" ", c) for c in comments]
         merged_comments = []
         for c in comments:
             if not merged_comments:
                 merged_comments.append(c)
             if merged_comments[-1].endswith("...") and c.startswith("..."):
-                merged_comments[-1] = f"{merged_comments[-1][:-3]}{c[3:]}"
+                if (
+                    len(merged_comments[-1]) > 3
+                    and not merged_comments[-1][-4].isspace()
+                    and len(c) > 3
+                    and not c[3].isspace()
+                ):
+                    sep = " "
+                else:
+                    sep = ""
+                merged_comments[-1] = f"{merged_comments[-1][:-3]}{sep}{c[3:]}"
             else:
                 merged_comments.append(c)
+        comments = merged_comments
 
-        for c in merged_comments:
-            print(c)
+    if opts.flag_repeated_words:
+        repetitions = []
+        for c in comments:
+            for m in REPETITION_RE.finditer(c):
+                repetitions.append((m.group(0), c))
+        if repetitions:
+            print(f"Repeated words in {fname}:")
+            for rep, comment in repetitions:
+                lines = [line.strip() for line in comment.split("\n")]
+                print(f"- {rep.strip()}\n  in: {lines[0]}")
+                for line in lines[1:]:
+                    print(f"      {line}")
+            print()
+            sys.exit(2)
     else:
-        for a, b in comment_ranges(src):
-            txt = src[a:b]
-            if opts.single_line:
-                txt = WHITESPACE_RE.sub(" ", txt)
-            if opts.keep_inline:
-                print(INLINE_HTML_RE.sub("", txt))
-            else:
-                print(INLINE_HTML_RE.sub("", INLINE_CODE_RE.sub("", txt)))
+        for c in comments:
+            print(c)
 
 
 def parse_args():
@@ -100,6 +126,11 @@ def parse_args():
         "--single-line",
         action="store_true",
         help="Emit one comment per line",
+    )
+    parser.add_argument(
+        "--flag-repeated-words",
+        action="store_true",
+        help="Raise an error when encountering repeated words.",
     )
 
     return parser.parse_args()

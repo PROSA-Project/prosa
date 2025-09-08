@@ -64,7 +64,7 @@ Section DeadlineFacts.
     Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
 
     (** We observe that if a job meets its deadline and is scheduled at time
-        [t], then then its deadline is at a time later than t. *)
+        [t], then its deadline is at a time later than t. *)
     Lemma scheduled_at_implies_later_deadline:
       forall j t,
         job_meets_deadline sched j ->

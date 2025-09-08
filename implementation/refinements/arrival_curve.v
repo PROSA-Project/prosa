@@ -56,7 +56,7 @@ Definition has_valid_arrival_curve_prefix (tsk: Task) :=
   exists ac_prefix_vec,  get_arrival_curve_prefix tsk = ac_prefix_vec /\
                     valid_arrival_curve_prefix ac_prefix_vec.
 
-(** Finally, we define define the notion of task set with
+(** Finally, we define the notion of task set with
       valid arrivals. *)
 Definition task_set_with_valid_arrivals (ts : seq Task) :=
   forall tsk,

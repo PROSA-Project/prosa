@@ -196,7 +196,7 @@ Section MaximalArrivalSequence.
       by destruct t.
     Qed.
 
-    (** Given a time instant [t] and and interval [Δ], we show that
+    (** Given a time instant [t] and interval [Δ], we show that
         [max_arrivals_at] applied at time [t] is always less-or-equal to
         [max_arrivals] applied to [Δ+1], even when each value of
         [max_arrivals_at] in the interval <<[t-Δ, t)>> is subtracted from it. *)

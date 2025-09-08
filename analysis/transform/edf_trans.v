@@ -15,7 +15,7 @@ Section EDFTransformation.
   Let SchedType := schedule (PState).
 
   (** We say that a state [s1] "has an earlier or equal deadline" than a state
-      [s2] if the job scheduled in state [s1] has has an earlier or equal
+      [s2] if the job scheduled in state [s1] has an earlier or equal
       deadline than the job scheduled in state [s2]. This function is never
       used on idle states, so the default values are irrelevant. *)
   Definition earlier_deadline (s1 s2: PState) :=

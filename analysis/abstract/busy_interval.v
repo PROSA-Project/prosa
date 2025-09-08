@@ -220,7 +220,7 @@ Section AbstractBusyIntervalExists.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider any kind of of unit-service processor model. *)
+  (** Consider any kind of unit-service processor model. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_unit_service_proc_model : unit_service_proc_model PState.
 

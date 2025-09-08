@@ -14,7 +14,7 @@ Section MaxNPSegmentIsBounded.
 
   (** Consider any type of tasks, each characterized by a WCET
       [task_cost], an arrival curve [max_arrivals], a relative
-      deadline [task_deadline], a bound on the the task's longest
+      deadline [task_deadline], a bound on the task's longest
       non-preemptive segment [task_max_nonpreemptive_segment] and
       relative priority points, ... *)
   Context {Task : TaskType}.

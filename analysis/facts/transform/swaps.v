@@ -319,7 +319,7 @@ Section SwappedScheduleProperties.
     }
   Qed.
 
-  (** From the above service bound, we conclude that, if if completed jobs don't
+  (** From the above service bound, we conclude that, if completed jobs don't
      execute in the original schedule, then that's still the case after the
      swap, assuming an ideal unit-service model (i.e., scheduled jobs receive
      exactly one unit of service). *)

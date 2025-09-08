@@ -87,7 +87,7 @@ Section NonIdleSwapWorkConservationLemmas.
     move=> _ EQ; rewrite EQ; by exists j2; rewrite swap_job_scheduled_t1.
   Qed.
 
-  (** Similarly, if [t] equals [t2] then then [swap_sched] maintains work conservation. *)
+  (** Similarly, if [t] equals [t2], then [swap_sched] maintains work conservation. *)
   Lemma non_idle_swap_maintains_work_conservation_t2 :
     work_conserving arr_seq sched ->
     t = t2 ->
@@ -96,7 +96,7 @@ Section NonIdleSwapWorkConservationLemmas.
     move=> _ EQ; rewrite EQ; by exists j1; rewrite swap_job_scheduled_t2.
   Qed.
 
-  (** If [t] is less than or equal to [t1] then then then [swap_sched] maintains work conservation. *)
+  (** If [t] is less than or equal to [t1], then [swap_sched] maintains work conservation. *)
   Lemma non_idle_swap_maintains_work_conservation_LEQ_t1 :
     work_conserving arr_seq sched ->
     t <= t1 ->
@@ -116,7 +116,7 @@ Section NonIdleSwapWorkConservationLemmas.
     exists j_other; by rewrite  (swap_job_scheduled_other_times) //; do 2! (apply /neqP; eauto).
   Qed.
 
-  (** Similarly, if [t] is greater than [t2] then then then [swap_sched] maintains work conservation. *)
+  (** Similarly, if [t] is greater than [t2], [swap_sched] maintains work conservation. *)
   Lemma non_idle_swap_maintains_work_conservation_GT_t2 :
     work_conserving arr_seq sched ->
     t2 < t ->

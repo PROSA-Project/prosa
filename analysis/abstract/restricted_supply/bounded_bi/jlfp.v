@@ -8,7 +8,7 @@ Require Export prosa.analysis.definitions.sbf.busy.
 (** * Sufficient Condition for Bounded Busy Intervals for RS JLFP *)
 
 (** In this section, we show that the existence of [L] such that [B +
-    total_rbf L <= SBF L], where where [B] is the blocking bound and
+    total_rbf L <= SBF L], where [B] is the blocking bound and
     [SBF] is a supply-bound function, is a sufficient condition for
     the existence of bounded busy intervals under JLFP scheduling with
     a restricted-supply processor model. Note that this is not the
