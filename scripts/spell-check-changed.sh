@@ -57,16 +57,6 @@ if [[ -z "$BASE_BRANCH" ]]; then
   fi
 fi
 
-# Verify scripts exist
-if [[ ! -f "$SCRIPT_DIR/extract-comments.py" ]]; then
-  echo "Error: scripts/extract-comments.py not found." >&2
-  exit 2
-fi
-if [[ ! -f "$SCRIPT_DIR/spell-check-llm.sh" ]]; then
-  echo "Error: scripts/spell-check-llm.sh not found." >&2
-  exit 2
-fi
-
 # Collect added or modified .v and .md files relative to merge-base of BASE_BRANCH...HEAD
 CHANGED_FILES=$(git diff --name-only --diff-filter=AM "${BASE_BRANCH}...HEAD" | grep -E '\.(v|md)$' || true)
 
@@ -75,28 +65,4 @@ if [[ -z "$CHANGED_FILES" ]]; then
   exit 0
 fi
 
-status=0
-for file in $CHANGED_FILES; do
-  if [[ ! -f "$file" ]]; then
-    echo "Skipping missing file: $file" >&2
-    continue
-  fi
-  case "$file" in
-    *.v)
-      echo "Checking Rocq file: $file"
-      if ! "$SCRIPT_DIR/extract-comments.py" --keep-inline --merge-dots "$file" | "$SCRIPT_DIR/spell-check-llm.sh"; then
-        echo "Command failed for: $file" >&2
-        status=1
-      fi
-      ;;
-    *.md)
-      echo "Checking Markdown file: $file"
-      if ! "$SCRIPT_DIR/spell-check-llm.sh" < "$file"; then
-        echo "Command failed for: $file" >&2
-        status=1
-      fi
-      ;;
-  esac
-done
-
-exit $status
+exec "$SCRIPT_DIR/spell-check-files.sh" $CHANGED_FILES

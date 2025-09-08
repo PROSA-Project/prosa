@@ -1,12 +1,23 @@
 #!/bin/bash
 
+function die {
+	echo "Error: $*"
+	exit 1
+}
+
 # see https://datasette.io/tools/llm
-LLM="llm"
+[ -z "$LLM" ] && LLM="llm"
 
-# requires ollama
-MODEL="gpt-oss"
+which "$LLM" > /dev/null || die "cannot find $LLM utility."
 
-PROMPT="Find and report all spelling and grammar mistakes.
+# by default, use an ollama model
+[ -z "$MODEL" ] && MODEL="gpt-oss"
+
+MODEL_AVAILABLE=$("$LLM" models | grep "$MODEL")
+
+[ -z "$MODEL_AVAILABLE" ] && die "model '$MODEL' not found"
+
+PROMPT="Find and report ALL spelling and grammar mistakes.
 Ignore spacing.
 Do NOT comment on stylistic issues.
 Say nothing if there are no serious mistakes."
