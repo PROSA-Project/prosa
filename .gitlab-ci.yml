@@ -60,7 +60,8 @@ stages:
     - mv html with-proofs
     - make gallinahtml -j ${NJOBS}
     - mv html without-proofs
-    - make htmlpretty -j ${NJOBS}
+    - make htmlpretty -j ${NJOBS} 2> /tmp/rocqdoc-warnings.txt
+    - '[ ! -s /tmp/rocqdoc-warnings.txt ] || (echo "Please fix all rocqdoc warnings:" && cat /tmp/rocqdoc-warnings.txt && false)'
     - mv html pretty
 
 ###################### The Jobs ######################
