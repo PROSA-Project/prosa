@@ -78,7 +78,7 @@ div:empty{ display: none;}
 
 #main .doc {
     margin: 0;
-    text-align: justify;
+    /* text-align: justify; */
 }
 
 .inlinecode, .code, #main pre {
