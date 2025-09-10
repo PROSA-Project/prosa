@@ -1,4 +1,5 @@
 @import url("fonts/open-sans/font.css");
+@import url("fonts/inconsolata/font.css");
 
 body{
     font-family: "Open Sans", serif;
@@ -82,7 +83,8 @@ div:empty{ display: none;}
 }
 
 .inlinecode, .code, #main pre {
-    font-family: monospace;
+    font-family: "Inconsolata", monospace;
+    font-size: 110%;
 }
 
 .code > br:first-child {
