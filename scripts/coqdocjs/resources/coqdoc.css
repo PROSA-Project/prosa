@@ -22,8 +22,17 @@ a {
     font-weight: normal;
 }
 
+.doc a:not(.idref) {
+    text-decoration: underline;
+    font-weight: normal;
+}
+
 #main .code a, #main .inlinecode a, #toc a {
     font-weight: inherit;
+}
+
+.inlinecode a {
+    text-decoration: none;
 }
 
 a[href]:hover, [clickable]:hover{
