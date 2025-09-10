@@ -63,6 +63,65 @@ function replNodes() {
   });
 }
 
+function mergeAdjacentAnchorTags() {
+  // Step 1: Select all <a> elements
+  const aElements = Array.from(document.querySelectorAll("a"));
+
+  // Step 2: Process in reverse order to avoid disrupting the order of elements
+  for (let i = aElements.length - 1; i >= 0; i--) {
+    const a = aElements[i];
+
+    // Step 3: Check if this <a> has exactly one <span> child
+    if (a.children.length !== 1 || a.children[0].tagName !== "SPAN") continue;
+
+    const nextSibling = a.nextSibling;
+
+    // Step 4: Ensure the next sibling is an <a> element
+    if (!nextSibling || nextSibling.tagName !== "A") continue;
+
+    const nextA = nextSibling;
+
+    // Step 5: Check if the next <a> also has exactly one <span> child
+    if (nextA.children.length !== 1 || nextA.children[0].tagName !== "SPAN")
+      continue;
+
+    // Step 6: Check if href and class match
+    if (a.href !== nextA.href || a.className !== nextA.className) continue;
+
+    // Step 7: Extract and compare span attributes
+    const span1 = a.children[0];
+    const span2 = nextA.children[0];
+
+    const spanAttrsMatch =
+      span1.getAttribute("class") === span2.getAttribute("class") &&
+      span1.getAttribute("title") === span2.getAttribute("title") &&
+      span1.getAttribute("type") === span2.getAttribute("type");
+
+    if (!spanAttrsMatch) continue;
+
+    // Step 8: Create the new <a> element
+    const newA = document.createElement("a");
+    newA.href = a.href;
+    newA.className = a.className;
+
+    // Step 9: Create the new <span> with combined content
+    const newSpan = document.createElement("span");
+    newSpan.setAttribute("class", span1.getAttribute("class") || "");
+    newSpan.setAttribute("title", span1.getAttribute("title") || "");
+    newSpan.setAttribute("type", span1.getAttribute("type") || "");
+    newSpan.textContent = span1.textContent + span2.textContent;
+
+    newA.appendChild(newSpan);
+
+    // Step 10: Remove the original elements and insert the new one
+    const parent = a.parentNode;
+    parent.insertBefore(newA, nextA.nextSibling);
+    parent.removeChild(a);
+    parent.removeChild(nextA);
+  }
+}
+
+
 function isVernacStart(l, t){
   t = t.trim();
   for(var s of l){
@@ -162,7 +221,7 @@ function repairDom(){
         ref.removeAttribute("href");
     });
   });
-
+  mergeAdjacentAnchorTags()
 }
 
 function fixTitle(){
