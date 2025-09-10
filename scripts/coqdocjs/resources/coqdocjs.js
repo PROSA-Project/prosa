@@ -1,14 +1,24 @@
 var coqdocjs = coqdocjs || {};
 (function(){
 
-function replace(s){
+function replace(s, letter_subscripts = true){
   var m;
   if (m = s.match(/^(.+)'$/)) {
     return replace(m[1])+"'";
-  } else if (m = s.match(/^([A-Za-z]+)_?(\d+)$/)) {
-    return replace(m[1])+m[2].replace(/\d/g, function(d){
+  } else if (m = s.match(/^([A-Za-z_]*[A-Za-z]+)_?(\d+)$/)) {
+    return replace(m[1], false)+m[2].replace(/(\d)/g, function(d){
       if (coqdocjs.subscr.hasOwnProperty(d)) {
         return coqdocjs.subscr[d];
+      } else {
+        return d;
+      }
+    });
+  } else if (letter_subscripts
+             && (m = s.match(/^([A-Za-z_]*[A-Za-z]+)(_[aehijklmnoprstuvx])$/))) {
+    return replace(m[1], false)+m[2].replace(/_([aehijklmnoprstuvx])/g, function(d){
+      last = d[d.length - 1];
+      if (coqdocjs.subscr.hasOwnProperty(last)) {
+        return coqdocjs.subscr[last];
       } else {
         return d;
       }
