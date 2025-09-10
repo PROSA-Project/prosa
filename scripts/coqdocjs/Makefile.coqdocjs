@@ -5,5 +5,4 @@ htmlpretty: $(GLOBFILES) $(VFILES)
 		-toc $(COQDOCFLAGS) \
 		--with-header scripts/coqdocjs/header.html --with-footer scripts/coqdocjs/footer.html \
 		-html $(GAL) $(COQDOCLIBS) -d html $(VFILES)
-	$(HIDE)cp scripts/coqdocjs/resources/* html
-
+	$(HIDE)cp -r scripts/coqdocjs/resources/* html

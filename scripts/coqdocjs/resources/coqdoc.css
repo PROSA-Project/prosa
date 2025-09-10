@@ -1,9 +1,10 @@
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
+@import url("fonts/open-sans/font.css");
 
 body{
-    font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
-    color: #2D2D2D
+    font-family: "Open Sans", serif;
+    font-size: 110%;
+    text-rendering: optimizeLegibility;
+    color: #2D2D2D;
 }
 
 a {
