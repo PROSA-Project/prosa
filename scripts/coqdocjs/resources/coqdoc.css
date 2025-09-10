@@ -82,7 +82,7 @@ div:empty{ display: none;}
     /* text-align: justify; */
 }
 
-.inlinecode, .code, #main pre {
+.inlinecode, .code, #main pre, #main code {
     font-family: "Inconsolata", monospace;
     font-size: 110%;
 }
