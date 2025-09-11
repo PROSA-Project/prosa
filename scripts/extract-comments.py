@@ -4,44 +4,13 @@ import argparse
 import re
 import sys
 
+from comments import comment_ranges
+
 INLINE_CODE_RE = re.compile(r"\[[^]]*?\]")
 INLINE_HTML_RE = re.compile(r"#[^#]*?#")
 WHITESPACE_RE = re.compile(r"\s+")
 REPETITION_RE = re.compile(r"\W([a-zA-Z-]+)\s+\1\W")
 BULLET_RE = re.compile(r"^\s*- ", re.MULTILINE)
-
-
-def comment_ranges(src):
-    "Identify comments in Coq .v files."
-
-    def cur_is(i, c):
-        return src[i] == c
-
-    def next_is(i, c):
-        if i + 1 < len(src):
-            return src[i + 1] == c
-        else:
-            return False
-
-    in_comment = 0
-    comment_start = None
-
-    # limitation: doesn't do anything smart about nested comments for now
-    for i in range(len(src)):
-        assert in_comment >= 0
-        # comment starting?
-        if cur_is(i, "(") and next_is(i, "*"):
-            in_comment += 1
-            if in_comment == 1:
-                if next_is(i + 1, "*"):
-                    comment_start = i + 3
-                else:
-                    comment_start = i + 2
-        # comment ending?
-        elif cur_is(i, "*") and next_is(i, ")"):
-            in_comment -= 1
-            if in_comment == 0:
-                yield (comment_start, i)
 
 
 def process(opts, fname):
