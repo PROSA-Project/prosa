@@ -10,10 +10,10 @@
 
 (** Transfer schedulability is a concept that allows mimicking the behavior of
     some reference schedule in an online schedule such that no job finishes
-    later in the online schedule than in the reference schedule.  In this
+    later in the online schedule than in the reference schedule. In this
     development, we define the exact transfer schedulability criterion and prove
-    two sufficient conditions and one necessary condition.  In particular, we
-    are concerned solely with _the conditions under which such a schedulability
+    two sufficient conditions and one necessary condition. In particular, we are
+    concerned solely with _the conditions under which such a schedulability
     transfer is guaranteed_. We do not concern ourselves with any particular
     mechanism for accomplishing such a transfer at runtime. *)
 
@@ -23,8 +23,7 @@
 
 Require Export prosa.util.all.
 
-(** We build on Prosa's central modeling definitions and many auxiliary
-    lemmas. *)
+(** We build on Prosa's central modeling definitions and many auxiliary lemmas. *)
 
 Require Export prosa.analysis.facts.model.service_of_jobs.
 Require Export prosa.analysis.definitions.schedulability.
@@ -51,9 +50,9 @@ Section TransferSchedulability.
   Context {Job : JobType} `{JobArrival Job} `{JobDeadline Job}.
 
   (** As already mentioned, we consider ideal uniprocessor schedules. To this
-      end, let us recall Prosa's existing definition of this common
-      assumption. (For convenience and to match Prosa convention, we will refer
-      to the ideal uniprocessor state simply as [PState].) *)
+      end, let us recall Prosa's existing definition of this common assumption.
+      (For convenience and to match Prosa convention, we will refer to the ideal
+      uniprocessor state simply as [PState].) *)
 
   #[local] Existing Instance ideal.processor_state.
   Let PState := ideal.processor_state Job.
@@ -64,8 +63,9 @@ Section TransferSchedulability.
 
   Variable ref_sched : schedule PState.
 
-  (** Second, we consider a second _online schedule_ called [online_sched], which is
-      the schedule to which schedulability is supposed to be transferred. *)
+  (** Second, we consider a second _online schedule_ called [online_sched],
+      which is the schedule to which schedulability is supposed to be
+      transferred. *)
 
   Variable online_sched : schedule PState.
 
@@ -76,10 +76,10 @@ Section TransferSchedulability.
   Variable ref_job_cost online_job_cost : JobCost Job.
 
   (** When we say that a job is complete in the reference schedule, it is a
-      statement w.r.t. the reference cost [job_cost_ref].  Conversely, when we
+      statement w.r.t. the reference cost [job_cost_ref]. Conversely, when we
       say that a job is complete in the online schedule, it is a statement
-      w.r.t. the online cost [job_cost_online].  For ease of reference, we
-      define respective local abbreviations.
+      w.r.t. the online cost [job_cost_online]. For ease of reference, we define
+      respective local abbreviations.
 
       Syntax hint: The "@" notation allows us to explicitly specify parameters
       that are usually implicitly inferred, such as the job-cost parameter in
@@ -351,8 +351,8 @@ Section TransferSchedulability.
     (** ** The Set of Critical Jobs *)
 
     (** The second major element in the proof is the notion of the set of
-        _critical jobs_ at a given time [t1] w.r.t. to a _reference time_
-        [t2]. Intuitively, the critical jobs are those that must be scheduled
+        _critical jobs_ at a given time [t1] w.r.t. to a _reference time_ [t2].
+        Intuitively, the critical jobs are those that must be scheduled
         immediately in order to avoid a deadline miss. *)
 
 
@@ -503,8 +503,7 @@ Section TransferSchedulability.
 
     (** The third and final major element of the proof is the concept of
         "slackless intervals," which we define next. Slackless intervals tie
-        together the remaining job-cost bound and the notion of critical
-        jobs. *)
+        together the remaining job-cost bound and the notion of critical jobs. *)
 
     (** In the definition of a "slackless interval," the "slack" is computed
         based on the generic job-cost bound, since the online job cost is
@@ -529,10 +528,11 @@ Section TransferSchedulability.
         - The notation ['I_(t2 - t1)] is MathComp's notation for a bounded
           natural number, i.e., for the set {0, 1, 2, ..., [t2 - t1 - 1]}.
 
-        - The notation [ [forall delta, some_predicate_on delta ] ] is conceptually
-          the same as the standard [(forall delta, some_property_on delta)], but
-          defined on a finite type and hence in [bool] and not [Prop], and therefore
-          computable (which we'll need).
+        - The notation [ [forall delta, some_predicate_on delta ] ] is
+          conceptually the same as the standard
+          [(forall delta, some_property_on delta)], but defined on a finite type
+          and hence in [bool] and not [Prop], and therefore computable (which
+          we'll need).
 
         Technical comment: the definition is slightly redundant, because the
         ∀-quantified part covers also <<[t1, t2)>>, but by requiring
@@ -545,8 +545,7 @@ Section TransferSchedulability.
 
     (** We are now ready to state the main property: To guarantee the transfer
         of schedulability, we define the following property, which forces
-        critical jobs to be scheduled at the beginning of slackless
-        intervals. *)
+        critical jobs to be scheduled at the beginning of slackless intervals. *)
 
     (** * The Schedulability Transfer Criterion *)
 
@@ -564,8 +563,9 @@ Section TransferSchedulability.
 
         In short, the criterion requires that a critical job is scheduled at the
         beginning of any slackless interval in the online schedule. Establishing
-        that this definition is indeed equivalent to [schedulability_transferred]
-        is the overall proof objective of this file. *)
+        that this definition is indeed equivalent to
+        [schedulability_transferred] is the overall proof objective of this
+        file. *)
 
     Definition transfer_schedulability_criterion :=
       forall t1 t2,
@@ -597,8 +597,8 @@ Section TransferSchedulability.
           schedule at the end of it, which contradicts the assumption that [j]
           is incomplete at time [t2]. *)
 
-    (** Of the three steps, the second step is by far the most challenging
-        one. We consider it next. *)
+    (** Of the three steps, the second step is by far the most challenging one.
+        We consider it next. *)
 
     (** * Existence of a Contiguously Slackless Interval *)
 
@@ -616,7 +616,7 @@ Section TransferSchedulability.
     (** ** Supporting Lemmas *)
 
     (** If a job is complete in the reference schedule and not complete in the
-        online schedule, it is by definition a critical job at the time.  *)
+        online schedule, it is by definition a critical job at the time. *)
 
     Lemma late_in_critical_jobs :
       forall j t,
@@ -638,7 +638,8 @@ Section TransferSchedulability.
         by apply: job_in_arrivals_between => //; lia. }
     Qed.
 
-    (** No job is late at the start of the schedule, which rules out some corner cases. *)
+    (** No job is late at the start of the schedule, which rules out some corner
+        cases. *)
 
     Lemma late_not_at_start :
       forall j t,
@@ -715,8 +716,8 @@ Section TransferSchedulability.
           /\ (t1 = 0 \/ ~~ nonpositive_slack t1.-1 t2).
     Proof.
       move=> j t2 COMP NCOMP.
-      (** As a starting point, we establish that <<[t2 -1, t2)>> has non-positive
-          slack. *)
+      (** As a starting point, we establish that <<[t2 -1, t2)>> has
+          non-positive slack. *)
       have NPS2 : nonpositive_slack t2.-1 t2.
       { apply: (@leq_trans (\sum_(j' <- [:: j]) _)); last first.
         - apply: leq_sum_subseq.
@@ -728,10 +729,10 @@ Section TransferSchedulability.
           apply: remaining_cost_positive.
           apply: (incompletion_monotonic _ _ _ _ _ NCOMP).
           by lia. }
-      (** We "upgrade" [NPS2] to a contiguously non-positive slack
-          interval. Since the interval contains only one point, this is
-          conceptually trivial, but we need it as a witness for the below search
-          via MathComp's [ex_minn] facility. *)
+      (** We "upgrade" [NPS2] to a contiguously non-positive slack interval.
+          Since the interval contains only one point, this is conceptually
+          trivial, but we need it as a witness for the below search via
+          MathComp's [ex_minn] facility. *)
       have CNPS2 : contiguously_nps t2.-1 t2.
       { rewrite /contiguously_nps.
         apply: contraT => /forallPn /= [d +].
@@ -779,8 +780,9 @@ Section TransferSchedulability.
 
     (** The first case is characterized by the following added assumptions:
 
-        -  there is a critical job [j] scheduled at time [t1] and
-        -  and [j] is _complete_ at time [t1 + 1].
+        - there is a critical job [j] scheduled at time [t1], and
+
+        - [j] is _complete_ at time [t1 + 1].
 
         To help establish [slackless_interval_step] in this case, we first
         observe that such a job's remaining cost bound is necessarily zero. *)
@@ -880,6 +882,7 @@ Section TransferSchedulability.
     (** The second case covers the complementary situation:
 
         - there is a critical job [j] scheduled at time [t1] but
+
         - [j] remains _incomplete_ at time [t1 + 1]. *)
 
     Lemma slackless_interval_step_case_incomplete_job :
@@ -944,7 +947,7 @@ Section TransferSchedulability.
     (** We first establish the main "upgrade lemma": if we have a slackless
         interval <<[t1, t2)>>, and know that <<[t1, t2)>> is also a contiguously
         non-positive slack interval, then we can conclude that <<[t1, t2)>> is
-        in fact also contiguously slackless.  *)
+        in fact also contiguously slackless. *)
 
     Lemma slackless_interval_continuation :
       forall t1 t2,
@@ -990,12 +993,12 @@ Section TransferSchedulability.
           complete in the reference schedule. *)
       move=> j t2 COMP NCOMP.
       (** A: Recall that a contiguously non-positive slack interval exists
-             before [t2]. *)
+          before [t2]. *)
       have [t1 [CNPS [LT START]]] :=
         contiguously_nps_existence j t2 COMP NCOMP.
       move: (CNPS) => /forallP /= CNPS'.
       (** B: We will show that <<[t1, t2)>> is a contiguously slackless
-             interval. *)
+          interval. *)
       exists t1; apply/andP; split;
         (** Showing that [j] is in [critical_jobs t1 t2] is trivial and done
             here. *)
@@ -1006,8 +1009,8 @@ Section TransferSchedulability.
         move: (CNPS' (Ordinal LT')) => //=.
         by rewrite addn0. }
       (** D: From the observation that <<[t1, t2)>> has non-positive slack, we
-             infer that <<[t1, t2)>> is in fact slackless. This step needs to
-             deal with a bunch of corner cases (e.g., at time zero). *)
+          infer that <<[t1, t2)>> is in fact slackless. This step needs to deal
+          with a bunch of corner cases (e.g., at time zero). *)
       have SL1 : slackless_interval t1 t2.
       { move: (NPS1); rewrite /nonpositive_slack leq_eqVlt => /orP [EQ|NEQ];
           first by repeat (apply/andP; split => //).
@@ -1023,8 +1026,8 @@ Section TransferSchedulability.
           by feed (critical_jobs_remaining_cost_monotonic t1.-1 t1 t2); lia. }
       apply/andP; split; first exact: SL1.
       (** E: Finally, the above "upgrade" lemma allows us to go from
-             <<[t1, t2)>> being slackless to <<[t1, t2)>> being _contiguously_
-             slackless. *)
+          <<[t1, t2)>> being slackless to <<[t1, t2)>> being _contiguously_
+          slackless. *)
       exact: slackless_interval_continuation.
     Qed.
 
@@ -1117,8 +1120,8 @@ Section TransferSchedulability.
    Qed.
 
   (** As a straightforward corollary, and for the sake of completeness, we lift
-     [online_transfer_schedulability_criterion_sufficiency] to the level of job
-     deadlines. *)
+      [online_transfer_schedulability_criterion_sufficiency] to the level of job
+      deadlines. *)
 
   Corollary online_transfer_schedulability_criterion_ensures_schedulability :
     transfer_schedulability_criterion online_job_cost ->
@@ -1138,8 +1141,8 @@ Section TransferSchedulability.
 
   (** As a stepping stone, we first establish a lemma that shows that, if there
       ever is a slackless interval in which none of the critical jobs is
-      scheduled at the start of the interval, then some job _must_ finish later in
-      the online schedule than in the reference schedule. *)
+      scheduled at the start of the interval, then some job _must_ finish later
+      in the online schedule than in the reference schedule. *)
 
   Lemma delay_if_no_critical_job_is_scheduled :
     forall t1 t2,
@@ -1183,12 +1186,12 @@ Section TransferSchedulability.
     rewrite !sumnB => [|j _|j _]; try exact: service_at_most_cost.
     move=> /eqP ZS.
     (** Next, split the service received into the service received up to (but
-        not including) time [t1] and the service received
-        during <<[t1 + 1,t2)>>.
+        not including) time [t1] and the service received during
+        <<[t1 + 1,t2)>>.
 
         Note this leaves out the service received _at_ time [t1], which we know
-        to be zero due to the assumption that no critical job is scheduled at time
-        [t1]. *)
+        to be zero due to the assumption that no critical job is scheduled at
+        time [t1]. *)
     rewrite [X in _ - X]big_seq_cond.
     under [X in _ - X]eq_bigr => j IN.
     { rewrite  -(service_cat _ j t1 t2) // -service_during_first_plus_later //.
@@ -1218,8 +1221,8 @@ Section TransferSchedulability.
   Qed.
 
   (** From the preceding stepping stone, we can easily prove that
-      [schedulability_transferred] implies [transfer_schedulability_criterion
-      online_job_cost]. *)
+      [schedulability_transferred] implies
+      [transfer_schedulability_criterion online_job_cost]. *)
 
   Theorem online_transfer_schedulability_criterion_necessity :
     schedulability_transferred -> transfer_schedulability_criterion online_job_cost.

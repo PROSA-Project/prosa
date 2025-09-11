@@ -2,7 +2,9 @@
 
 (** In the following, we instantiate the general transfer schedulability result
     for a system model that more closely resembles the system model defined in
-    the paper by Willemsen et al. (EMSOFT 2025#, <a
+    the paper by Willemsen et al. (EMSOFT
+
+    2025#, <a
     href="https://doi.org/10.1145/3763236">DOI: 10.1145/3763236</a>#).
     In particular, we explicitly introduce the notion of system evolutions,
     which are usually left implicit in Prosa. *)
@@ -19,7 +21,9 @@ Require Export prosa.results.transfer_schedulability.criterion.
     to the more abstract one in the main proof of transfer schedulability:
 
     - job precedence and delay constraints,
+
     - system evolutions, and
+
     - a notion of schedulers. *)
 
 (** ** Precedence and Delay *)
@@ -33,7 +37,7 @@ Require Export prosa.results.transfer_schedulability.criterion.
 (** We introduce two new job parameters that model, for each job, the set of
     predecessors and the associated delays. *)
 
-(** The list of a job [j]'s predecessors is given by [job_predecessors j].*)
+(** The list of a job [j]'s predecessors is given by [job_predecessors j]. *)
 
 Class JobPredecessors (Job : JobType) := { job_predecessors : Job -> seq Job }.
 
@@ -149,7 +153,7 @@ End SchedulerDef.
 
 Section EMSOFTModel.
 
-  (** ** The Set of Jobs **)
+  (** ** The Set of Jobs *)
 
   (** We consider jobs described by _evolution-independent_ arrival times and
       predecessor sets, ... *)
@@ -181,18 +185,18 @@ Section EMSOFTModel.
 
   Let job_cost omega := @job_cost _ (evo_costs omega).
 
-  (** - [job_delay omega j j'] denotes the delay between jobs [j] and its predecessor [j'] in
-        evolution [omega]. *)
+  (** - [job_delay omega j j'] denotes the delay between jobs [j] and its
+        predecessor [j'] in evolution [omega]. *)
 
   Let job_delay omega := @job_delay _ (evo_delays omega).
 
   (** - [job_ready omega] denotes the readiness model resulting from
-        [job_delay omega] and the evolution-invariant predecessor sets.  *)
+        [job_delay omega] and the evolution-invariant predecessor sets. *)
 
   Let job_ready (omega : Omega) : JobReady Job PState :=
     @delayed_precedence_ready_instance _ _ _  (evo_costs omega) _ (evo_delays omega).
 
-  (** Worst-Case Reference Evolution *)
+  (** ** Worst-Case Reference Evolution *)
 
   (** Let [omega_0] denote the system evolution with maximal parameters, ... *)
 
@@ -245,7 +249,7 @@ Section EMSOFTModel.
 
   Definition clairvoyant_criterion :=
 
-    (** For any evolution [omega], the criterion is assumed to hold ...  *)
+    (** For any evolution [omega], the criterion is assumed to hold ... *)
 
     (forall omega, transfer_schedulability_criterion
 
@@ -269,7 +273,7 @@ Section EMSOFTModel.
 
 
   (** The above clairvoyant criterion ensures that schedulability is transferred
-       in every evolution. *)
+      in every evolution. *)
 
   Theorem clairvoyant_sufficiency :
     clairvoyant_criterion ->
@@ -279,7 +283,7 @@ Section EMSOFTModel.
   Qed.
 
   (** Conversely, the fact that schedulability is transferred in every evolution
-      implies that the above criterion holds.  *)
+      implies that the above criterion holds. *)
 
   Theorem clairvoyant_necessity :
     (forall omega, schedulability_transferred_AB omega) ->
@@ -343,10 +347,12 @@ Section EMSOFTModel.
       non-starvation assumption in terms of the existence of _some_ finite
       response-time bound for every job in the arrival sequence.
 
-      First, we assume non-starvation only for the reference schedule [algA
-      omega_0]. The following notation means that there exists a bound [R] for
-      each job [j] in the arrival sequence such that [j] completes within [R]
-      time units of its arrival (in the reference schedule). *)
+      First, we assume non-starvation only for the reference schedule
+
+      [algA
+      omega_0]. The following notation means that there exists a
+      bound [R] for each job [j] in the arrival sequence such that [j] completes
+      within [R] time units of its arrival (in the reference schedule). *)
 
   Hypothesis H_non_starvation :
     forall j,
@@ -376,8 +382,8 @@ Section EMSOFTModel.
     Let R := proj1_sig (H_non_starvation jf H_arrives).
     Let ref_response_time_bound := proj2_sig (H_non_starvation jf H_arrives).
 
-    (** ... to define [jf]'s finish time in the reference
-        schedule [algA omega_0]. *)
+    (** ... to define [jf]'s finish time in the reference schedule
+        [algA omega_0]. *)
 
     Definition ref_finish_time : instant :=
       finish_time _ _ _ ref_response_time_bound.
@@ -474,7 +480,7 @@ Section EMSOFTModel.
   (** For the necessity case, we need to strengthen our non-starvation
       assumption to also cover any online schedule. We again express this
       assumption in terms of the existence of a finite response-time bound for
-      every job in all online schedules.  *)
+      every job in all online schedules. *)
 
   Hypothesis H_non_starvation' :
     forall j,
@@ -504,8 +510,7 @@ Section EMSOFTModel.
     Let online_response_time_bound :=
           proj2_sig (H_non_starvation' jf H_arrives omega).
 
-    (** ... to define [j]'s finish time in the online
-        schedule [algB omega]. *)
+    (** ... to define [j]'s finish time in the online schedule [algB omega]. *)
 
     Definition online_finish_time' : instant :=
       finish_time _ _ _ online_response_time_bound.
@@ -527,7 +532,7 @@ Section EMSOFTModel.
 
     (** Under the assumption that, for any job that arrives in the arrival
         sequence, the finish time in any online schedule is no later than in the
-        reference schedule, ...  *)
+        reference schedule, ... *)
 
     Hypothesis H_bounded :
       forall omega j in_arrival_sequence,
