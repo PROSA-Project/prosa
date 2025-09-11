@@ -8,6 +8,7 @@ INLINE_CODE_RE = re.compile(r"\[[^]]*?\]")
 INLINE_HTML_RE = re.compile(r"#[^#]*?#")
 WHITESPACE_RE = re.compile(r"\s+")
 REPETITION_RE = re.compile(r"\W([a-zA-Z-]+)\s+\1\W")
+BULLET_RE = re.compile(r"^\s*- ", re.MULTILINE)
 
 
 def comment_ranges(src):
@@ -60,6 +61,9 @@ def process(opts, fname):
 
         replacement = "[…]" if opts.flag_repeated_words else ""
         comments = [INLINE_CODE_RE.sub(replacement, c) for c in comments]
+
+    if not opts.keep_bullets:
+        comments = [BULLET_RE.sub(" ", c) for c in comments]
 
     if opts.single_line:
         comments = [WHITESPACE_RE.sub(" ", c) for c in comments]
@@ -115,7 +119,12 @@ def parse_args():
     parser.add_argument(
         "--keep-inline",
         action="store_true",
-        help="Do not strip inline code from comments",
+        help="Do not strip inline code from comments.",
+    )
+    parser.add_argument(
+        "--keep-bullets",
+        action="store_true",
+        help="Do not strip out bullets from bullet-point lists.",
     )
     parser.add_argument(
         "--merge-dots",
