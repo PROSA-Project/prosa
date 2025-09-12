@@ -2,8 +2,8 @@
 @import url("fonts/inconsolata/font.css");
 
 body{
-    font-family: "Open Sans", serif;
-    font-size: 110%;
+    font-family: "Open Sans", sans-serif;
+    font-size: 17px;
     text-rendering: optimizeLegibility;
     color: #2D2D2D;
 }
@@ -27,6 +27,17 @@ a {
 .doc a:not(.idref) {
     text-decoration: underline;
     font-weight: normal;
+}
+
+.doc-in-proof {
+    font-family: "Open Sans", sans-serif;
+    font-size: 17px;
+    padding-top: 0.5em;
+    margin-top: 0.5em;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border-top: 2px dashed #2874AE;
+    border-bottom: 2px dashed #2874AE;
 }
 
 #main .code a, #main .inlinecode a, #toc a {
@@ -84,7 +95,7 @@ div:empty{ display: none;}
 
 .inlinecode, .code, #main pre, #main code {
     font-family: "Inconsolata", monospace;
-    font-size: 110%;
+    font-size: 19px;
 }
 
 .code > br:first-child {

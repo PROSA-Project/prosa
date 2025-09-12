@@ -151,6 +151,49 @@ function isProofEnd(s){
   return isVernacStart(["Qed", "Admitted", "Defined", "Abort"], s);
 }
 
+function eventuallyProofStart(node) {
+  while (node && !isProofStart(node)) {
+    node = node.nextSibling;
+  }
+  return node !== null;
+}
+
+function eventuallyProofEnd(node) {
+  while (node && !isProofEnd(node.textContent)) {
+    node = node.nextSibling;
+  }
+  return node !== null;
+}
+
+function mergeNextSibling(node) {
+  ns = node.nextSibling;
+  while (ns && (ns.nodeType != Node.ELEMENT_NODE || ns.firstChild === null)) {
+    ns = ns.nextSibling;
+  }
+  if (ns === null) {
+    return false;
+  }
+  if (ns.getAttribute("class") == "doc") {
+    /* fold comments interspersed in the proof into the given node */
+    ns.setAttribute("class", "doc-in-proof");
+    // node.appendChild(document.createElement("hr"));
+    node.appendChild(ns);
+    // node.appendChild(document.createElement("hr"));
+  } else if (
+    !eventuallyProofEnd(ns.firstChild) &&
+    eventuallyProofStart(ns.firstChild)
+  ) {
+    /* this doesn't look right, another proof is starting already */
+    return false;
+  } else {
+    /* merge next code block into node */
+    while (ns.firstChild) {
+      node.appendChild(ns.firstChild);
+    }
+  }
+  return true;
+}
+
 function proofStatus(){
   var proofs = toArray(document.getElementsByClassName("proof"));
   if(proofs.length) {
@@ -186,6 +229,13 @@ function foldProofs() {
       node.parentNode.insertBefore(proof, node);
       if(proof.previousSibling.nodeType === Node.TEXT_NODE)
         proof.appendChild(proof.previousSibling);
+
+      /* check if there are any comments interspersed with the proof */
+      while (
+        !eventuallyProofEnd(node) &&
+        mergeNextSibling(node.parentNode)
+      ) {}
+
       while(node && !isProofEnd(node.textContent)) {
         proof.appendChild(node);
         node = proof.nextSibling;
