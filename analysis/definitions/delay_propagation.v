@@ -64,8 +64,8 @@ Section ArrivalCurvePropagation.
     else max_arrivals (task1_of tsk2) (delta + delay_bound tsk2).
 
   (** .. and register this definition with Coq as a type class instance. *)
-  #[local]
-  Instance propagated_arrival_curve : MaxArrivals Task2 := propagated_max_arrivals.
+  #[local] Instance propagated_arrival_curve : MaxArrivals Task2 :=
+    { max_arrivals := propagated_max_arrivals } .
 
   (** ** Derived Arrival Sequence *)
 

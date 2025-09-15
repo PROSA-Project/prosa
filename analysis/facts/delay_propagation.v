@@ -149,7 +149,7 @@ Section ACPropFacts.
       structural requirements for arrival curves. *)
   Lemma propagated_arrival_curve_valid :
     (forall tsk2, tsk2 \in ts2 -> monotone leq (@max_arrivals Task1 max_arrivals1 (task1_of tsk2))) ->
-    valid_taskset_arrival_curve ts2 max_arrivals2.
+    valid_taskset_arrival_curve ts2 max_arrivals2.(max_arrivals).
   Proof.
     move=> MONO tsk2 IN2.
     split => // delta1 delta2 LEQ.
@@ -177,7 +177,7 @@ Section ACPropFacts.
   (** Suppose the given type-one arrival sequence and arrival curve are
       valid. *)
   Hypothesis H_valid_arr_seq : valid_arrival_sequence arr_seq1.
-  Hypothesis H_valid_ac : valid_taskset_arrival_curve ts1 max_arrivals1.
+  Hypothesis H_valid_ac : valid_taskset_arrival_curve ts1 max_arrivals1.(max_arrivals).
 
   (** In preparation of the correctness argument, we next establish a couple of
       "stepping stone" lemmas that sketch the main thrust of the correctness

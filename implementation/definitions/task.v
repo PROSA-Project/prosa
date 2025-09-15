@@ -132,15 +132,19 @@ Section Parameters.
   (** First, we connect the above definition of tasks with the
       generic Prosa task-parameter interfaces. *)
   Let Task := concrete_task : eqType.
-  #[global,program] Instance TaskCost : TaskCost Task := task_cost.
-  #[global,program] Instance TaskPriority : TaskPriority Task := task_priority.
-  #[global,program] Instance TaskDeadline : TaskDeadline Task := task_deadline.
-  #[global,program] Instance ConcreteMaxArrivals : MaxArrivals Task := concrete_max_arrivals.
+  #[global,program] Instance TaskCost : TaskCost Task :=
+    { task_cost := task_cost }.
+  #[global,program] Instance TaskPriority : TaskPriority Task :=
+    {task_priority := task_priority }.
+  #[global,program] Instance TaskDeadline : TaskDeadline Task :=
+    { task_deadline := task_deadline }.
+  #[global,program] Instance ConcreteMaxArrivals : MaxArrivals Task :=
+    { max_arrivals := concrete_max_arrivals }.
 
   (** Second, we do the same for the above definition of job. *)
   Let Job := concrete_job : eqType.
-  #[global,program] Instance JobTask : JobTask Job Task := job_task.
-  #[global,program] Instance JobArrival : JobArrival Job := job_arrival.
-  #[global,program] Instance JobCost : JobCost Job := job_cost.
+  #[global,program] Instance JobTask : JobTask Job Task := {job_task := job_task}.
+  #[global,program] Instance JobArrival : JobArrival Job := {job_arrival := job_arrival}.
+  #[global,program] Instance JobCost : JobCost Job := {job_cost := job_cost}.
 
 End Parameters.
