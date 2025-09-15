@@ -14,34 +14,35 @@ ISSUES = [
     for msg, regex, adjust_edit_offset in [
         (
             "missing space before ':='",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(\S:=)[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>\S:=)[^.]*?\.",
             1,
         ),
         (
             "missing space after ':='",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(:=\S)[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>:=\S)[^.]*?\.",
             2,
         ),
         (
             "missing space before ':'",
-            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?(\S:)\s[^.]*?\.",
+            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?(?P<issue>\S:)\s[^.]*?\.",
             1,
         ),
         (
             "missing space after ':'",
-            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?([^. \n]:[^= \n])[^.]*?\.",
+            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?(?P<issue>[^. \n]:[^= \n])[^.]*?\.",
             2,
         ),
         (
             "missing space before ':'",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(\S:)\s[^.]*?(:=)?[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>\S:)\s[^.]*?(:=)?[^.]*?\.",
             1,
         ),
         (
             "missing space after ':'",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(:[^= \n])[^.]*?:=[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>:[^= \n])[^.]*?:=[^.]*?\.",
             1,
         ),
+        ("trailing whitespace", r"(?P<issue>[ \t]+)\n", 0),
     ]
 ]
 
@@ -56,13 +57,13 @@ EXCEPTIONS = [
 def is_excepted(m):
     for e in EXCEPTIONS:
         if isinstance(e, str):
-            if m[2] == e:
+            if m["issue"] == e:
                 return True
         elif isinstance(e, tuple):
             prefix, match, suffix = e
-            if m[2] != match:
+            if m["issue"] != match:
                 continue
-            s, e = m.span(2)
+            s, e = m.span("issue")
             if prefix != m.string[s - len(prefix) : s]:
                 continue
             if suffix == m.string[e : e + len(suffix)]:
@@ -90,8 +91,8 @@ def lint_file(opts, fpath):
             rule = f" [rule: {i + 1}]" if opts.show_rule_number else ""
             issues.append(
                 (
-                    m.span(2),
-                    f"{fpath}:{lineno[m.span(2)[0]]}: coding style{rule}: {msg}",
+                    m.span("issue"),
+                    f"{fpath}:{lineno[m.span('issue')[0]]}: coding style{rule}: {msg}",
                     shift,
                 )
             )
