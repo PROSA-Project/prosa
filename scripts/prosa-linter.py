@@ -72,6 +72,15 @@ def is_excepted(m):
     return False
 
 
+KEYWORDS_FOR_INDENTATION_CHECK = re.compile(
+    r"(?P<section>Section|End)\s+[a-zA-Z_]+.|^\s+(?P<kw>Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint|Hypothesis|"
+    r"Variable|Variables|Instance|Context|Global|Local|Proof|Qed|Defined|Aborted|Admitted)",
+    re.MULTILINE | re.DOTALL,
+)
+
+INDENT_SPACES = 2
+
+
 def lint_file(opts, fpath):
     issues = []
 
@@ -96,6 +105,30 @@ def lint_file(opts, fpath):
                     shift,
                 )
             )
+
+    expected_indent = 0
+    for m in KEYWORDS_FOR_INDENTATION_CHECK.finditer(src):
+        if m.span() in comments:
+            continue
+        s, e = m.span("section")
+        if s == -1:
+            s, e = m.span("kw")
+
+        if src[s:e] == "End":
+            expected_indent -= INDENT_SPACES
+
+        indentation = lineno.offset_within_line(s)
+        if indentation != expected_indent:
+            issues.append(
+                (
+                    (s, e),
+                    f"{fpath}:{lineno[s]}: bad indentation (expected {expected_indent}, found {indentation})",
+                    0,
+                )
+            )
+        if src[s:e] == "Section":
+            expected_indent += INDENT_SPACES
+        assert expected_indent >= 0
 
     for i, ((s, e), msg, offset_shift) in enumerate(sorted(issues)):
         print(msg, file=sys.stderr)
