@@ -8,7 +8,7 @@ Section BusyIntervalInequalities.
   (** Consider any kind of tasks and their jobs, each characterized by
       an arrival time, a cost, and an arbitrary notion of readiness. *)
   Context {Task : TaskType} {Job : JobType} `{JobTask Job Task}.
-  Context `{JobArrival Job} `{JobCost Job} {JR :JobReady Job (ideal.processor_state Job)}.
+  Context `{JobArrival Job} `{JobCost Job} {JR : JobReady Job (ideal.processor_state Job)}.
 
   (** Consider a JLFP policy that is reflexive and respects sequential tasks. *)
   Context {JLFP : JLFP_policy Job}.
@@ -35,7 +35,7 @@ Section BusyIntervalInequalities.
   Variable j : Job.
   Hypothesis H_j_arrives : arrives_in arr_seq j.
   Hypothesis H_job_of_tsk : job_of_task tsk j.
-  Hypothesis H_job_cost_positive: job_cost_positive j.
+  Hypothesis H_job_cost_positive : job_cost_positive j.
 
   (** Consider the ideal JLFP definitions of interference and
       interfering workload. *)
@@ -68,7 +68,7 @@ Section BusyIntervalInequalities.
 
     (** Then, the cumulative priority inversion in any interval
         is also bounded. *)
-    Lemma cumulative_priority_inversion_is_bounded:
+    Lemma cumulative_priority_inversion_is_bounded :
       cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ)
       <= priority_inversion_bound (job_arrival j - t1).
     Proof.
@@ -87,7 +87,7 @@ Section BusyIntervalInequalities.
   (** Next, we prove that the cumulative interference from higher priority
       jobs of other tasks in an interval is bounded by the total service
       received by the higher priority jobs of those tasks. *)
-  Lemma cumulative_interference_is_bounded_by_total_service:
+  Lemma cumulative_interference_is_bounded_by_total_service :
     cumulative_another_task_hep_job_interference arr_seq sched j t1 (t1 + Δ)
     <= service_of_jobs sched (fun jo => another_task_hep_job jo j) jobs t1 (t1 + Δ).
   Proof.

@@ -29,24 +29,24 @@ Section NonIdleSwapWorkConservationLemmas.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... and any valid job arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** ...consider an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved (i.e., in which jobs execute only after having
      arrived and only if they are not yet complete, and in which all jobs come
      from the arrival sequence). *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
-  Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
+  Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Suppose we are given two specific times [t1] and [t2],... *)
   Variables t1 t2 : instant.
 
   (** ...which we assume to be ordered (to avoid dealing with symmetric cases),... *)
-  Hypothesis H_well_ordered: t1 <= t2.
+  Hypothesis H_well_ordered : t1 <= t2.
 
   (** ...and two jobs [j1] and [j2]... *)
   Variables j1 j2 : Job.
@@ -177,31 +177,31 @@ Section FSCWorkConservationLemmas.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ...and any valid job arrival sequence,... *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** ...consider an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved (i.e., in which jobs execute only after having
       arrived and only if they are not yet complete)... *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** ...and in which all jobs come from the arrival sequence. *)
-  Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Suppose we are given a job [j1]... *)
-  Variable j1: Job.
+  Variable j1 : Job.
 
   (** ...and a point in time [t1]... *)
-  Variable t1: instant.
+  Variable t1 : instant.
 
   (** ...at which [j1] is scheduled... *)
-  Hypothesis H_not_idle: scheduled_at sched j1 t1.
+  Hypothesis H_not_idle : scheduled_at sched j1 t1.
 
   (** ...and that is before [j1]'s deadline. *)
-  Hypothesis H_deadline_not_missed: t1 < job_deadline j1.
+  Hypothesis H_deadline_not_missed : t1 < job_deadline j1.
 
  (** We now show that, if [t2] is a swap candidate returned by
      [find_swap_candidate] for [t1], then swapping the processor allocations at
@@ -245,25 +245,25 @@ Section MakeEDFWorkConservationLemmas.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... and any valid job arrival sequence, ... *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** ... consider an ideal uniprocessor schedule ... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ... in which all jobs come from the arrival sequence, ... *)
-  Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ...that is well-behaved,...  *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** ...and in which no scheduled job misses a deadline. *)
-  Hypothesis H_no_deadline_misses: all_deadlines_met sched.
+  Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** We analyze [make_edf_at] applied to an arbitrary point in time,
      which we denote [t_edf] in the following. *)
-  Variable t_edf: instant.
+  Variable t_edf : instant.
 
   (** For brevity, let [sched'] denote the schedule obtained from
       [make_edf_at] applied to [sched] at time [t_edf]. *)
@@ -302,14 +302,14 @@ Section EDFPrefixWorkConservationLemmas.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... and any valid job arrival sequence, ... *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** ... consider an ideal uniprocessor schedule,... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ... an arbitrary finite [horizon], and ... *)
-  Variable horizon: instant.
+  Variable horizon : instant.
 
   (** ...let [sched_trans] denote the schedule obtained by transforming
       [sched] up to the horizon. *)
@@ -331,7 +331,7 @@ Section EDFPrefixWorkConservationLemmas.
     scheduled_behavior_premises sched /\ work_conserving arr_seq sched.
 
   (** We show that if [sched] is work-conserving, then so is [sched_trans]. *)
-  Lemma edf_transform_prefix_maintains_work_conservation:
+  Lemma edf_transform_prefix_maintains_work_conservation :
     P sched -> P sched_trans.
   Proof.
     rewrite/sched_trans/edf_transform_prefix. apply (prefix_map_property_invariance ). rewrite /P.
@@ -364,15 +364,15 @@ Section EDFTransformWorkConservationLemmas.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... and any valid job arrival sequence, ... *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** ... consider a valid ideal uniprocessor schedule ... *)
-  Variable sched: schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid: valid_schedule sched arr_seq.
+  Variable sched : schedule (ideal.processor_state Job).
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** ...and in which no scheduled job misses a deadline. *)
-  Hypothesis H_no_deadline_misses: all_deadlines_met sched.
+  Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** We first note that [sched] satisfies [scheduled_behavior_premises]. *)
   Lemma sched_satisfies_behavior_premises : scheduled_behavior_premises arr_seq sched.

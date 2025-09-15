@@ -25,12 +25,12 @@ Section PeriodicTasksRespectMaxInterArrivalModel.
   
   (** ... we observe that for any task [tsk], 
       [task_max_inter_arrival_time tsk] is positive, ... *)
-  Remark valid_period_is_valid_max_inter_arrival_time:
+  Remark valid_period_is_valid_max_inter_arrival_time :
     forall tsk, valid_period tsk -> positive_task_max_inter_arrival_time tsk.
   Proof. trivial. Qed.
 
   (** ... and show that the periodic model respects the task max inter-arrival model. *)
-  Remark periodic_model_respects_max_inter_arrival_model:
+  Remark periodic_model_respects_max_inter_arrival_model :
     forall tsk,
       valid_period tsk -> 
       respects_periodic_task_model arr_seq tsk ->

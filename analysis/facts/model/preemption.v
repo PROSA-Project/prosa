@@ -28,9 +28,9 @@ Section PreemptionTimes.
 
   (** ... where jobs come from the arrival sequence and don't execute before
       their arrival time. *)
-  Hypothesis H_jobs_come_from_arrival_sequence:
+  Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
-  Hypothesis H_must_arrive: jobs_must_arrive_to_execute sched.
+  Hypothesis H_must_arrive : jobs_must_arrive_to_execute sched.
 
   (** Consider a valid preemption model. *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
@@ -54,7 +54,7 @@ Section PreemptionTimes.
   Proof. by move=> t; rewrite is_idle_iff /preemption_time => /eqP ->. Qed.
 
   (**  We show that time 0 is a preemption time. *)
-  Lemma zero_is_pt: preemption_time arr_seq sched 0.
+  Lemma zero_is_pt : preemption_time arr_seq sched 0.
   Proof.
     rewrite /preemption_time.
     case SCHED: (scheduled_job_at _ _  0) => [j|//].
@@ -66,7 +66,7 @@ Section PreemptionTimes.
   Qed.
 
   (** Also, we show that the first instant of execution is a preemption time. *)
-  Lemma first_moment_is_pt:
+  Lemma first_moment_is_pt :
     forall j prt,
       arrives_in arr_seq j ->
       ~~ scheduled_at sched j prt ->
@@ -276,7 +276,7 @@ Section PreemptionFacts.
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** We prove that every nonpreemptive segment always begins with a preemption time. *)
-  Lemma scheduling_of_any_segment_starts_with_preemption_time:
+  Lemma scheduling_of_any_segment_starts_with_preemption_time :
     forall j t,
       scheduled_at sched j t ->
       exists pt,

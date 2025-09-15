@@ -26,8 +26,8 @@ Section NPUniprocessorScheduler.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
   (** ... a non-clairvoyant readiness model, ... *)
-  Context {RM: JobReady Job (ideal.processor_state Job)}.
-  Hypothesis H_nonclairvoyant_job_readiness: nonclairvoyant_readiness RM.
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_nonclairvoyant_job_readiness : nonclairvoyant_readiness RM.
 
   (** ... and a preemption model. *)
   Context `{JobPreemptable Job}.
@@ -45,7 +45,7 @@ Section NPUniprocessorScheduler.
   Section WorkConservation.
 
     (** If [choose_job] does not voluntarily idle the processor, ... *)
-    Hypothesis H_non_idling:
+    Hypothesis H_non_idling :
       forall t s,
         choose_job t s = idle_state <-> s = [::].
 
@@ -53,7 +53,7 @@ Section NPUniprocessorScheduler.
 
     (** First, we observe that [allocation_at] yields [idle_state] only if there are
         no backlogged jobs. *)
-    Lemma allocation_at_idle:
+    Lemma allocation_at_idle :
       forall sched t,
         allocation_at arr_seq choose_job sched t = idle_state ->
         jobs_backlogged_at arr_seq sched t = [::].
@@ -69,7 +69,7 @@ Section NPUniprocessorScheduler.
 
     (** As a stepping stone, we observe that the generated schedule is idle at
         a time [t] only if there are no backlogged jobs. *)
-    Lemma idle_schedule_no_backlogged_jobs:
+    Lemma idle_schedule_no_backlogged_jobs :
       forall t,
         ideal_is_idle schedule t ->
         jobs_backlogged_at arr_seq schedule t = [::].
@@ -92,7 +92,7 @@ Section NPUniprocessorScheduler.
 
     (** From the preceding fact, we conclude that the generated schedule is
         indeed work-conserving. *)
-    Theorem np_schedule_work_conserving:
+    Theorem np_schedule_work_conserving :
       work_conserving arr_seq schedule.
     Proof.
       move=> j t ARRIVES BACKLOGGED.
@@ -113,15 +113,15 @@ Section NPUniprocessorScheduler.
     (** First, any reasonable job selection policy will not create jobs "out
         of thin air," i.e., if a job is selected, it was among those given
         to choose from. *)
-    Hypothesis H_chooses_from_set: forall t s j, choose_job t s = Some j -> j \in s.
+    Hypothesis H_chooses_from_set : forall t s j, choose_job t s = Some j -> j \in s.
 
     (** Second, for the schedule to be valid, we require the notion of readiness
         to be consistent with the preemption model: a non-preemptive job remains
         ready until (at least) the end of its current non-preemptive section. *)
-    Hypothesis H_valid_preemption_behavior: valid_nonpreemptive_readiness RM schedule.
+    Hypothesis H_valid_preemption_behavior : valid_nonpreemptive_readiness RM schedule.
 
     (** Finally, we assume the readiness model to be non-clairvoyant. *)
-    Hypothesis H_nonclairvoyant_readiness: nonclairvoyant_readiness RM.
+    Hypothesis H_nonclairvoyant_readiness : nonclairvoyant_readiness RM.
 
     (** For notational convenience, recall the definition of a prefix of the
         schedule based on which the next decision is made. *)
@@ -130,7 +130,7 @@ Section NPUniprocessorScheduler.
 
     (** We begin by showing that any job in the schedule must come from the arrival
         sequence used to generate it. *)
-    Lemma np_schedule_jobs_from_arrival_sequence:
+    Lemma np_schedule_jobs_from_arrival_sequence :
       jobs_come_from_arrival_sequence schedule arr_seq.
     Proof.
       move=> j t; rewrite scheduled_at_def /schedule /pmc_uni_schedule /generic_schedule.
@@ -147,7 +147,7 @@ Section NPUniprocessorScheduler.
 
     (** Next, we show that any job selected by the job selection policy must
         be ready. *)
-    Theorem chosen_job_is_ready:
+    Theorem chosen_job_is_ready :
       forall j t,
         choose_job t (jobs_backlogged_at arr_seq (sched_prefix t) t) == Some j ->
         job_ready schedule j t.
@@ -166,7 +166,7 @@ Section NPUniprocessorScheduler.
 
     (** Starting from the previous result we show that, at any instant, only
         a ready job can be scheduled. *)
-    Theorem jobs_must_be_ready:
+    Theorem jobs_must_be_ready :
       jobs_must_be_ready_to_execute schedule.
     Proof.
       move=> j t.
@@ -181,7 +181,7 @@ Section NPUniprocessorScheduler.
     Qed.
 
     (** Finally, we show that the generated schedule is valid. *)
-    Theorem np_schedule_valid:
+    Theorem np_schedule_valid :
       valid_schedule schedule arr_seq.
     Proof.
       split.
@@ -196,7 +196,7 @@ Section NPUniprocessorScheduler.
   Section PreemptionTimes.
 
     (** Again, we require that the job-selection policy is reasonable. *)
-    Hypothesis H_chooses_from_set: forall t s j, choose_job t s = Some j -> j \in s.
+    Hypothesis H_chooses_from_set : forall t s j, choose_job t s = Some j -> j \in s.
 
     (** For notational convenience, recall the definition of a prefix of the
         schedule based on which the next decision is made. *)
@@ -204,7 +204,7 @@ Section NPUniprocessorScheduler.
 
     (** First, we observe that non-preemptive jobs remain scheduled as long as
         they are non-preemptive. *)
-    Lemma np_job_remains_scheduled:
+    Lemma np_job_remains_scheduled :
       forall t,
         prev_job_nonpreemptive (prefix t) t ->
         schedule_up_to policy idle_state t t = schedule_up_to policy idle_state t t.-1.
@@ -219,7 +219,7 @@ Section NPUniprocessorScheduler.
         previously scheduled job is nonpreemptive in the computation of
         [np_uni_schedule] is consistent with the existing notion of a
         [preemption_time]. *)
-    Lemma np_consistent:
+    Lemma np_consistent :
       forall t,
         prev_job_nonpreemptive (prefix t) t ->
         ~~ preemption_time arr_seq schedule t.
@@ -259,7 +259,7 @@ Section NPUniprocessorScheduler.
     (** Second, for the schedule to be valid, we require the notion of readiness
         to be consistent with the preemption model: a non-preemptive job remains
         ready until (at least) the end of its current non-preemptive section. *)
-    Hypothesis H_valid_preemption_behavior: valid_nonpreemptive_readiness RM schedule.
+    Hypothesis H_valid_preemption_behavior : valid_nonpreemptive_readiness RM schedule.
 
     (** Given such a valid preemption model, we establish that the generated
         schedule indeed respects the preemption model semantics. *)

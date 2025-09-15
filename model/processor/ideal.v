@@ -14,7 +14,7 @@ Require Export prosa.behavior.all.
 Section State.
 
   (** Consider any type of jobs. *)
-  Variable Job: JobType.
+  Variable Job : JobType.
 
   (** We connect the notion of an ideal processor state with
       the generic interface for the processor-state abstraction in Prosa by

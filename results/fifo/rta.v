@@ -245,7 +245,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
     (** Assume that the job has a positive cost (as we later do not need to
         reason about zero-cost jobs). *)
-    Hypothesis H_job_cost_positive: job_cost_positive j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
 
     (** Assume the busy interval of the job [j] is given by <<[t1,t2)>>. *)
     Variable t1 t2 : duration.
@@ -258,7 +258,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
 
     (** We prove that the cumulative priority inversion in the interval <<[t1, t1 + Δ)>>
         is indeed [0]. *)
-    Lemma no_priority_inversion:
+    Lemma no_priority_inversion :
       cumulative_priority_inversion arr_seq sched j t1 (t1 + Δ) = 0.
     Proof.
       apply /eqP; rewrite -leqn0.
@@ -376,7 +376,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   (** Having established all necessary preliminaries, it is finally time to
       state the claimed response-time bound [R]. *)
   Variable R : duration.
-  Hypothesis H_R_max:
+  Hypothesis H_R_max :
     forall (A : duration),
       is_in_concrete_search_space A ->
       exists (F : nat),
@@ -444,7 +444,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   (** Finally, we are in a position to establish the soundness of the claimed
       response-time bound [R] by applying the main general aRTA theorem
       [uniprocessor_response_time_bound]. *)
-  Theorem uniprocessor_response_time_bound_FIFO:
+  Theorem uniprocessor_response_time_bound_FIFO :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
     move => js ARRs TSKs.

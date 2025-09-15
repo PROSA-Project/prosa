@@ -67,7 +67,7 @@ Section ATHEPWorkloadBoundIsValidForEDF.
     Variable j : Job.
     Hypothesis H_j_arrives : arrives_in arr_seq j.
     Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_job_cost_positive: job_cost_positive j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
 
     (** Consider the busy interval <<[t1, t2)>> of job [j]. *)
     Variable t1 t2 : duration.
@@ -94,8 +94,8 @@ Section ATHEPWorkloadBoundIsValidForEDF.
 
       (** Consider an arbitrary task [tsk_o ≠ tsk] from [ts]. *)
       Variable tsk_o : Task.
-      Hypothesis H_tsko_in_ts: tsk_o \in ts.
-      Hypothesis H_neq: tsk_o != tsk.
+      Hypothesis H_tsko_in_ts : tsk_o \in ts.
+      Hypothesis H_neq : tsk_o != tsk.
 
       (** And assume that [A + ε + D tsk - D tsk_o ≤ Δ]. *)
       Hypothesis H_Δ_ge : A + ε + D tsk - D tsk_o <= Δ.

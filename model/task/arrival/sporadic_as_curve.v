@@ -47,8 +47,8 @@ Section SporadicArrivalCurve.
 
     (** Let [tsk] denote any valid sporadic task to be analyzed. *)
     Variable tsk : Task.
-    Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
-    Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
+    Hypothesis H_sporadic_model : respects_sporadic_task_model arr_seq tsk.
+    Hypothesis H_valid_inter_min_arrival : valid_task_min_inter_arrival_time tsk.
 
     (** We observe that [max_sporadic_arrivals] is indeed an upper bound
         on the maximum number of arrivals. *)

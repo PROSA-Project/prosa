@@ -28,8 +28,8 @@ Section SporadicArrivalBound.
 
   (** ... and any valid sporadic task [tsk] to be analyzed. *)
   Variable tsk : Task.
-  Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
-  Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
+  Hypothesis H_sporadic_model : respects_sporadic_task_model arr_seq tsk.
+  Hypothesis H_valid_inter_min_arrival : valid_task_min_inter_arrival_time tsk.
 
   (** Before we can establish the bound, we require two auxiliary
       bounds, which we derive next. First, we consider minimum offset
@@ -96,7 +96,7 @@ Section SporadicArrivalBound.
       previous lemma to the last job in the interval. We consider only
       the case of "many" jobs, i.e., [n >= 2], which ensures that the
       interval <<[t1, t2)>> spans at least one inter-arrival time. *)
-  Lemma minimum_distance_for_n_sporadic_arrivals:
+  Lemma minimum_distance_for_n_sporadic_arrivals :
     forall t1 t2 n,
       number_of_task_arrivals arr_seq tsk t1 t2 = n ->
       n >= 2 ->
@@ -123,7 +123,7 @@ Section SporadicArrivalBound.
   (** Based on the above lemma, it is easy to see that
       [max_sporadic_arrivals] is indeed a correct upper bound on the
       maximum number of arrivals in a given interval. *)
-  Theorem sporadic_task_arrivals_bound:
+  Theorem sporadic_task_arrivals_bound :
     forall t1 t2,
       number_of_task_arrivals arr_seq tsk t1 t2 <= max_sporadic_arrivals tsk (t2 - t1).
   Proof.

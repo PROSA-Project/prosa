@@ -13,21 +13,21 @@ Require Export prosa.behavior.all.
 
 Section WorkConserving.
   (** Consider any type of jobs... *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
 
   (** ... with arrival times and costs ... *)
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor model. *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** Further, allow for any notion of job readiness. *)
   Context {jr : JobReady Job PState}.
 
   (** Given an arrival sequence and a schedule ... *)
   Variable arr_seq : arrival_sequence Job.
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** ... we say that a scheduler is _work-conserving_ iff whenever a job [j]
      is backlogged, the processor is always busy executing another job
@@ -42,7 +42,7 @@ Section WorkConserving.
   (** Related to this, we define the set of all jobs that are backlogged at a
       given time [t], i.e., the set of jobs that could be scheduled, and which
       a work-conserving scheduler must hence consider. *)
-  Definition jobs_backlogged_at (t : instant): seq Job :=
+  Definition jobs_backlogged_at (t : instant) : seq Job :=
     [seq j <- arrivals_up_to arr_seq t | backlogged sched j t].
 
 End WorkConserving.

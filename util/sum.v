@@ -67,7 +67,7 @@ Section SumsOverSequences.
     (** Next, we show that the sum of the elements in [r] respecting [P] can
         be obtained by removing from the total sum over [r] the sum of the elements
         in [r] not respecting [P]. *)
-    Lemma sum_pred_diff:
+    Lemma sum_pred_diff :
       \sum_(r <- r | P r) F r = \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
     Proof. by rewrite [X in X - _](bigID P)/= addnK. Qed.
 
@@ -89,7 +89,7 @@ Section SumsOverSequences.
     (** We also prove that the maximum value taken by a function over elements of
         a range [r] satisfying any predicate [P] is always smaller than the sum of the
         function over the elements. *)
-    Lemma bigmax_leq_sum:
+    Lemma bigmax_leq_sum :
       \max_(i <- r | P i) F i <= \sum_(i <- r | P i) F i.
     Proof.
       apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2.
@@ -134,7 +134,7 @@ Section SumsOverSequences.
 
     (** In the same way, if [E1] equals [E2] in all the points considered above, then also the two
         sums will be identical. *)
-    Lemma eq_sum_seq:
+    Lemma eq_sum_seq :
       (forall i, i \in r -> P i -> E1 i == E2 i) ->
       \sum_(i <- r | P i) E1 i = \sum_(i <- r | P i) E2 i.
     Proof.
@@ -146,7 +146,7 @@ Section SumsOverSequences.
         the set [r]. We prove that, if we sum both functions over those
         points, then the sum of [E] conditioned by [P2] will dominate
         the sum of [E] conditioned by [P1]. *)
-    Lemma leq_sum_seq_pred:
+    Lemma leq_sum_seq_pred :
       (forall i, i \in r -> P1 i -> P2 i) ->
       \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
     Proof.
@@ -254,14 +254,14 @@ End SumsOverSequences.
 Section SumsOverRanges.
 
   (** First, we prove that the sum of Δ ones is equal to Δ     . *)
-  Lemma sum_of_ones:
+  Lemma sum_of_ones :
     forall t Δ,
       \sum_(t <= x < t + Δ) 1 = Δ.
   Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
 
   (** Next, we show that a sum of natural numbers equals zero if and only
       if all terms are zero. *)
-  Lemma big_nat_eq0 m n F:
+  Lemma big_nat_eq0 m n F :
     \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
   Proof.
     split.
@@ -276,7 +276,7 @@ Section SumsOverRanges.
 
   (** Moreover, the fact that the sum is smaller than the range of the summation
       implies the existence of a zero element. *)
-  Lemma sum_le_summation_range:
+  Lemma sum_le_summation_range :
     forall f t Δ,
       \sum_(t <= x < t + Δ) f x < Δ ->
       exists x, t <= x < t + Δ /\ f x = 0.
@@ -321,11 +321,11 @@ Section SumOfTwoIntervals.
 
   (** Assume that the two functions match point-wise with each other, with the points taken
       in their respective interval. *)
-  Hypothesis equal_before_d: forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
+  Hypothesis equal_before_d : forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
 
   (** The then summations of [F1] over <<[t1, t1 + d)>> and [F2] over
       <<[t2, t2 + d)>> are equal. *)
-  Lemma big_sum_eq_in_eq_sized_intervals:
+  Lemma big_sum_eq_in_eq_sized_intervals :
     \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
   Proof.
     elim: d equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.

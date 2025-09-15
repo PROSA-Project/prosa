@@ -32,12 +32,12 @@ Section PeriodicTasksAsSporadicTasks.
 
   (** ... such that the model interpretation is valid, both w.r.t. the minimum
       inter-arrival time parameter ... *)
-  Remark valid_period_is_valid_inter_arrival_time:
+  Remark valid_period_is_valid_inter_arrival_time :
     forall tsk, valid_period tsk -> valid_task_min_inter_arrival_time tsk.
   Proof. trivial. Qed.
 
   (** ... and the separation of job arrivals. *)
-  Remark periodic_task_respects_sporadic_task_model:
+  Remark periodic_task_respects_sporadic_task_model :
     forall tsk, valid_period tsk ->
            respects_periodic_task_model arr_seq tsk ->
            respects_sporadic_task_model arr_seq tsk.

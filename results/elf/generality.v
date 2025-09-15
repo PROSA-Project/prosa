@@ -26,10 +26,10 @@ Section GeneralityOfELF.
   (** Suppose the jobs have arrival times and costs, and allow for any preemption
       and readiness models. *)
   Context {Arrival : JobArrival Job} {Cost : JobCost Job}
-    `{JobPreemptable Job} {JR: @JobReady Job PState Cost Arrival}.
+    `{JobPreemptable Job} {JR : @JobReady Job PState Cost Arrival}.
 
   (** Suppose [fp] is the fixed-priority policy that parameterizes the ELF policy. *)
-  Variable fp: FP_policy Task.
+  Variable fp : FP_policy Task.
 
   (** ** ELF Generalizes GEL *)
 
@@ -38,11 +38,11 @@ Section GeneralityOfELF.
   Section ELFGeneralizesGEL.
 
   (** If the [fp] fixed-priority policy assigns equal priority to all tasks, ... *)
-  Hypothesis H_FP_policy_is_same:
+  Hypothesis H_FP_policy_is_same :
     forall tsk1 tsk2, ep_task tsk1 tsk2.
 
   (** ... then the ELF policy reduces to GEL. *)
-  Remark elf_generalizes_gel:
+  Remark elf_generalizes_gel :
     forall sched arr_seq,
       respects_JLFP_policy_at_preemption_point arr_seq sched (ELF fp)
       <-> respects_JLFP_policy_at_preemption_point arr_seq sched (GEL Job Task).
@@ -84,7 +84,7 @@ Section GeneralityOfELF.
         assumptions. *)
 
     (** First, assume that task priorities are indeed distinct. *)
-    Hypothesis H_distinct_fixed_priorities:
+    Hypothesis H_distinct_fixed_priorities :
       forall tsk1 tsk2, tsk1 != tsk2 -> ~~ ep_task tsk1 tsk2.
 
     (** Second, consider any given valid arrival sequence.*)

@@ -22,7 +22,7 @@ Section Progress.
 
     (** ...and two ordered points in time... *)
     Variable t1 t2 : nat.
-    Hypothesis H_t1_before_t2: t1 <= t2.
+    Hypothesis H_t1_before_t2 : t1 <= t2.
 
     (** ... we say that the job has progressed between the two points iff its
         total received service has increased. *)
@@ -34,7 +34,7 @@ Section Progress.
 
     (** We note that the negation of the former is equivalent to the latter
         definition. *)
-    Lemma no_progress_equiv: ~~ job_has_progressed <-> no_progress.
+    Lemma no_progress_equiv : ~~ job_has_progressed <-> no_progress.
     Proof.
       rewrite /job_has_progressed /no_progress.
       split.

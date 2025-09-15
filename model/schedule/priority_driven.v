@@ -45,7 +45,7 @@ Section Priority.
       higher than or equal to the priority of any backlogged job.
       We define three separate notions of priority policy compliance
       based on the three types of scheduling policies : [JLDP]... *)
-  Definition respects_JLDP_policy_at_preemption_point (policy: JLDP_policy Job) :=
+  Definition respects_JLDP_policy_at_preemption_point (policy : JLDP_policy Job) :=
     forall j j_hp t,
       arrives_in arr_seq j ->
       preemption_time arr_seq sched t ->
@@ -54,11 +54,11 @@ Section Priority.
       hep_job_at t j_hp j.
 
    (** ... [JLFP], and... *)
-  Definition respects_JLFP_policy_at_preemption_point (policy: JLFP_policy Job) :=
+  Definition respects_JLFP_policy_at_preemption_point (policy : JLFP_policy Job) :=
     respects_JLDP_policy_at_preemption_point policy.
 
   (** [FP].  *)
-  Definition respects_FP_policy_at_preemption_point (policy: FP_policy Task) :=
+  Definition respects_FP_policy_at_preemption_point (policy : FP_policy Task) :=
     respects_JLDP_policy_at_preemption_point (FP_to_JLFP policy).
 
 End Priority.

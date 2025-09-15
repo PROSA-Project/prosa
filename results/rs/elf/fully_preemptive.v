@@ -179,7 +179,7 @@ Section RTAforFullyPreemptiveELFModelwithArrivalCurves.
       sound response-time bound for the concrete model of
       fully-preemptive ELF scheduling with arbitrary supply
       restrictions.  *)
-  Theorem uniprocessor_response_time_bound_fully_preemptive_elf:
+  Theorem uniprocessor_response_time_bound_fully_preemptive_elf :
     forall (R : duration),
       rta_recurrence_solution R ->
       task_response_time_bound arr_seq sched tsk R.

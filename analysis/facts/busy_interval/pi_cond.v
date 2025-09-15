@@ -27,8 +27,8 @@ Section CondPI.
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Consider a valid preemption model with known maximum non-preemptive
       segment lengths. *)
@@ -56,7 +56,7 @@ Section CondPI.
 
   (** Consider any busy interval prefix <<[t1, t2)>> of job j. *)
   Variable t1 t2 : instant.
-  Hypothesis H_busy_interval_prefix:
+  Hypothesis H_busy_interval_prefix :
     busy_interval_prefix arr_seq sched j t1 t2.
 
   (** We establish a technical rewriting lemma that allows us to replace

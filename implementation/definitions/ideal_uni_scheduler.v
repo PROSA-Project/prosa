@@ -23,11 +23,11 @@ Section UniprocessorScheduler.
 
   (** Suppose we are given a consistent arrival sequence of such jobs ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrival_times: consistent_arrival_times arr_seq.
+  Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
 
   (** ... and a non-clairvoyant readiness model. *)
-  Context {RM: JobReady Job (ideal.processor_state Job)}.
-  Hypothesis H_nonclairvoyant_job_readiness: nonclairvoyant_readiness RM.
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_nonclairvoyant_job_readiness : nonclairvoyant_readiness RM.
 
   (** ** Preemption-Aware Scheduler *)
 

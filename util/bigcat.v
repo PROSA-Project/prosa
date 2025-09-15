@@ -409,7 +409,7 @@ Section BigCatPartitionLemma.
   Let partitioned_seq (y : Y) := [seq x <- xs | P x && (x_to_y x == y)].
 
   (** We prove that any element in [xs] is also contained in the union of the partitions. *)
-  Lemma bigcat_partitions:
+  Lemma bigcat_partitions :
     forall j,
       (j \in [seq x <- xs | P x])
       = (j \in \cat_(y <- ys) partitioned_seq y).

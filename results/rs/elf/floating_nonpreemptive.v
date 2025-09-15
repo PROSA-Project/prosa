@@ -163,7 +163,7 @@ Section RTAforFloatingELFModelwithArrivalCurves.
       guarantee that all busy intervals are bounded by [L]. *)
   Variable L : duration.
   Hypothesis H_L_positive : 0 < L.
-  Hypothesis H_fixed_point:
+  Hypothesis H_fixed_point :
     forall (A : duration),
       blocking_bound ts tsk A + total_hep_request_bound_function_FP ts tsk L <= SBF L.
 

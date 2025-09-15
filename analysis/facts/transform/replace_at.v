@@ -9,16 +9,16 @@ Section ReplaceAtFacts.
   Context {Job : JobType}.
 
   (** ... and any given type of processor states, ... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ...consider any given reference schedule. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Suppose we are given a specific time [t'] ... *)
-  Variable t': instant.
+  Variable t' : instant.
 
   (** ...and a replacement state [state]. *)
-  Variable nstate: PState.
+  Variable nstate : PState.
 
   (** In the following, let [sched'] denote the schedule with replacement at time
      t'. *)
@@ -26,7 +26,7 @@ Section ReplaceAtFacts.
 
   (** We begin with the trivial observation that [replace_at sched t' nstate]
       indeed returns [nstate] at time [t']. *)
-  Lemma replace_at_def:
+  Lemma replace_at_def :
     sched' t' = nstate.
   Proof.
     rewrite /sched' /replace_at.
@@ -34,7 +34,7 @@ Section ReplaceAtFacts.
   Qed.
 
   (** Equally trivially, the schedule doesn't change at other times. *)
-  Lemma rest_of_schedule_invariant:
+  Lemma rest_of_schedule_invariant :
     forall t, t <> t' -> sched' t = sched t.
   Proof.
     move => t DIFF.
@@ -45,7 +45,7 @@ Section ReplaceAtFacts.
 
   (** As a result, the service in intervals that do not intersect with
       [t'] is invariant, too. *)
-  Lemma service_at_other_times_invariant:
+  Lemma service_at_other_times_invariant :
     forall t1 t2,
       t2 <= t' \/ t' < t1 ->
       forall j,
@@ -65,7 +65,7 @@ Section ReplaceAtFacts.
       that do span across the replacement point.  We can relate the
       service received in the original and the new schedules by adding
       the service in the respective "missing" state... *)
-  Lemma service_delta:
+  Lemma service_delta :
     forall t1 t2,
       t1 <= t' < t2 ->
       forall j,
@@ -80,7 +80,7 @@ Section ReplaceAtFacts.
   Qed.
 
   (** ...which we can also rewrite as follows. *)
-  Corollary service_in_replaced:
+  Corollary service_in_replaced :
     forall t1 t2,
       t1 <= t' < t2 ->
       forall j,
@@ -94,7 +94,7 @@ Section ReplaceAtFacts.
       in the new state, then at any time it receives exactly the same
       amount of service in the new schedule with replacements as in
       the original schedule. *)
-  Lemma service_at_of_others_invariant (j: Job):
+  Lemma service_at_of_others_invariant (j : Job) :
     ~~ scheduled_in j (sched' t') ->
     ~~ scheduled_in j (sched t') ->
     forall t,
@@ -111,7 +111,7 @@ Section ReplaceAtFacts.
       invariant that jobs not involved in the replacement receive
       equal service to the cumulative service received in any
       interval. *)
-  Corollary service_during_of_others_invariant (j: Job):
+  Corollary service_during_of_others_invariant (j : Job) :
     ~~ scheduled_in j (sched' t') ->
     ~~ scheduled_in j (sched t') ->
     forall t1 t2,

@@ -25,18 +25,18 @@ Section ValidJobCostsShifted.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Furthermore, assume that arrivals have valid job costs. *)
-  Hypothesis H_arrivals_have_valid_job_costs: arrivals_have_valid_job_costs arr_seq.
+  Hypothesis H_arrivals_have_valid_job_costs : arrivals_have_valid_job_costs arr_seq.
 
   (** Consider a periodic task set [ts] such that all tasks in
       [ts] have valid periods and offsets. *)
   Variable ts : TaskSet Task.
-  Hypothesis H_periodic_taskset: taskset_respects_periodic_task_model arr_seq ts.
-  Hypothesis H_valid_periods_in_taskset: valid_periods ts.
-  Hypothesis H_valid_offsets_in_taskset: valid_offsets arr_seq ts.
+  Hypothesis H_periodic_taskset : taskset_respects_periodic_task_model arr_seq ts.
+  Hypothesis H_valid_periods_in_taskset : valid_periods ts.
+  Hypothesis H_valid_offsets_in_taskset : valid_offsets arr_seq ts.
 
   (** Consider a job [j] that stems from the arrival sequence. *)
   Variable j : Job.
-  Hypothesis H_j_from_arrival_sequence: arrives_in arr_seq j.
+  Hypothesis H_j_from_arrival_sequence : arrives_in arr_seq j.
 
   (** Let [O_max] denote the maximum task offset of all tasks in [ts] ... *)
   Let O_max := max_task_offset ts.
@@ -54,18 +54,18 @@ Section ValidJobCostsShifted.
     else job_cost j'.
 
   (** Assume that we have an infinite sequence of jobs. *)
-  Hypothesis H_infinite_jobs: infinite_jobs arr_seq.
+  Hypothesis H_infinite_jobs : infinite_jobs arr_seq.
 
   (** Assume all jobs in the arrival sequence [arr_seq] belong to some task
    in [ts]. *)
-  Hypothesis H_jobs_from_taskset: all_jobs_from_taskset arr_seq ts.
+  Hypothesis H_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** We assign the job costs as defined by the [job_costs_shifted] function. *)
   Instance job_costs_in_oi : JobCost Job :=
     job_costs_shifted.
 
   (** We show that the [job_costs_shifted] function is valid. *)
-  Lemma job_costs_shifted_valid: arrivals_have_valid_job_costs arr_seq.
+  Lemma job_costs_shifted_valid : arrivals_have_valid_job_costs arr_seq.
   Proof.
     rewrite /arrivals_have_valid_job_costs /valid_job_cost.
     intros j' ARR.

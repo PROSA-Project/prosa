@@ -16,7 +16,7 @@ Section ProofDemandBoundDefinition.
 
   (** First, we establish a relation between a task's arrivals in a given interval and
       those arrivals that also have a deadline contained within the given interval. *)
-  Lemma task_arrivals_with_deadline_within_eq:
+  Lemma task_arrivals_with_deadline_within_eq :
     forall (tsk : Task) (t : instant) (delta : duration),
       task_arrivals_with_deadline_within arr_seq tsk t (t + delta)
       = task_arrivals_between arr_seq tsk t (t + (delta - (task_deadline tsk -1))).
@@ -49,7 +49,7 @@ Section ProofDemandBoundDefinition.
   Qed.
 
   (** As a corollary, we also show a much more useful result that arises when we count these jobs. *)
-  Corollary num_task_arrivals_with_deadline_within_eq:
+  Corollary num_task_arrivals_with_deadline_within_eq :
     forall (tsk : Task) (t : instant) (delta : duration),
       number_of_task_arrivals_with_deadline_within arr_seq tsk t (t + delta)
       = number_of_task_arrivals arr_seq tsk t (t + (delta - (task_deadline tsk - 1))).
@@ -80,7 +80,7 @@ Section ProofDemandBoundDefinition.
   Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
 
   (** The task's processor demand  [task_demand_within] is upper-bounded by the task's DBF [task_demand_bound_function]. *)
-  Lemma task_demand_within_le_task_dbf:
+  Lemma task_demand_within_le_task_dbf :
     forall (tsk : Task) t delta,
       tsk \in ts ->
       task_demand_within tsk t (t + delta) <= task_demand_bound_function tsk delta.
@@ -99,7 +99,7 @@ Section ProofDemandBoundDefinition.
   Qed.
 
   (** We also prove that [task_demand_within] is less than shifted RBF. *)
-  Corollary task_demand_within_le_task_rbf_shifted:
+  Corollary task_demand_within_le_task_rbf_shifted :
     forall (tsk : Task) t delta,
       tsk \in ts ->
       task_demand_within tsk t (t + delta) <= task_request_bound_function tsk (delta - (task_deadline tsk - 1)).
@@ -120,7 +120,7 @@ Section ProofDemandBoundDefinition.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** Finally we establish that [total_demand_within] is bounded by [total_demand_bound_function]. *)
-  Lemma total_demand_within_le_total_dbf:
+  Lemma total_demand_within_le_total_dbf :
     forall (t : instant) (delta : duration),
       total_demand_within t (t + delta) <= total_demand_bound_function ts delta.
   Proof.
@@ -135,7 +135,7 @@ Section ProofDemandBoundDefinition.
 
   (** As a corollary, we also note that [total_demand_within] is less than
       the sum of each task's shifted RBF. *)
-  Corollary total_demand_within_le_sum_task_rbf_shifted:
+  Corollary total_demand_within_le_sum_task_rbf_shifted :
     forall (t : instant ) (delta : instant),
       total_demand_within t (t + delta)
       <= \sum_(tsk <- ts) task_request_bound_function tsk (delta - (task_deadline tsk - 1)).

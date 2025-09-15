@@ -41,10 +41,10 @@ Section AlternativeDefinitionOfEDF.
       In other words, a schedule is locally EDF-compliant at time [t] if there
       is no witness of a priority inversion (= an already arrived job with an
       earlier deadline) at a later point in the schedule. *)
-  Definition EDF_at (sched: schedule PState) (t: instant) :=
-    forall (j: Job),
+  Definition EDF_at (sched : schedule PState) (t : instant) :=
+    forall (j : Job),
       scheduled_at sched j t ->
-      forall (t': instant) (j': Job),
+      forall (t' : instant) (j' : Job),
         t <= t' ->
         scheduled_at sched j' t' ->
         job_arrival j' <= t ->
@@ -54,6 +54,6 @@ Section AlternativeDefinitionOfEDF.
       [EDF_at], we say that a schedule is (globally) EDF-compliant
       schedule if it is locally EDF-compliant at every point in
       time. *)
-  Definition EDF_schedule (sched: schedule PState) := forall t, EDF_at sched t.
+  Definition EDF_schedule (sched : schedule PState) := forall t, EDF_at sched t.
 
 End AlternativeDefinitionOfEDF.

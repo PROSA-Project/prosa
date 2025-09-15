@@ -24,30 +24,30 @@ Section FindSwapCandidateFacts.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ...consider an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved (i.e., in which jobs execute only after
      having arrived and only if they are not yet complete). *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Suppose we are given a job [j1]... *)
-  Variable j1: Job.
+  Variable j1 : Job.
 
   (** ...and a point in time [t1]... *)
-  Variable t1: instant.
+  Variable t1 : instant.
 
   (** ...at which [j1] is scheduled... *)
-  Hypothesis H_not_idle: scheduled_at sched j1 t1.
+  Hypothesis H_not_idle : scheduled_at sched j1 t1.
 
   (** ...and that is before its deadline. *)
-  Hypothesis H_deadline_not_missed: t1 < job_deadline j1.
+  Hypothesis H_deadline_not_missed : t1 < job_deadline j1.
 
   (** First, we observe that under these assumptions the processor
      state at time [t1] is "relevant" according to the notion of
      relevance underlying the EDF transformation, namely
      [relevant_pstate]. *)
-  Lemma t1_relevant: relevant_pstate t1 (sched t1).
+  Lemma t1_relevant : relevant_pstate t1 (sched t1).
   Proof.
     move: H_not_idle. rewrite scheduled_at_def => /eqP ->.
     rewrite /relevant_pstate -/(has_arrived j1 t1).
@@ -57,7 +57,7 @@ Section FindSwapCandidateFacts.
 
   (** Since [t1] is relevant, we conclude that a search for a relevant
      state succeeds (if nothing else, it finds [t1]). *)
-  Lemma fsc_search_successful:
+  Lemma fsc_search_successful :
     exists t, search_arg sched (relevant_pstate t1) earlier_deadline t1 (job_deadline j1) = Some t.
   Proof.
     apply search_arg_not_none.
@@ -69,7 +69,7 @@ Section FindSwapCandidateFacts.
   (** For rewriting purposes, we observe that the [search_arg]
      operation within [find_swap_candidate] yields the final result of
      [find_swap_candidate]. *)
-  Corollary fsc_search_result:
+  Corollary fsc_search_result :
     search_arg sched (relevant_pstate t1) earlier_deadline t1 (job_deadline j1) = Some (find_swap_candidate sched t1 j1).
   Proof.
     move: fsc_search_successful => [t FOUND].
@@ -79,7 +79,7 @@ Section FindSwapCandidateFacts.
   (** There is a job that is scheduled at the time that
      [find_swap_candidate] returns, and that job arrives no later than
      at time [t1]. *)
-  Lemma fsc_not_idle:
+  Lemma fsc_not_idle :
     exists j', (scheduled_at sched j' (find_swap_candidate sched t1 j1))
                /\ job_arrival j' <= t1.
   Proof.
@@ -97,7 +97,7 @@ Section FindSwapCandidateFacts.
      scheduled at a time. Hence once we know that a job is scheduled
      at the time that [find_swap_candidate] returns, we can conclude
      that it arrives not later than at time t1. *)
-  Corollary fsc_found_job_arrival:
+  Corollary fsc_found_job_arrival :
     forall j2,
       scheduled_at sched j2 (find_swap_candidate sched t1 j1) ->
       job_arrival j2 <= t1.
@@ -109,13 +109,13 @@ Section FindSwapCandidateFacts.
 
   (** We observe that [find_swap_candidate] returns a value within a
      known finite interval. *)
-  Lemma fsc_range:
+  Lemma fsc_range :
     t1 <= find_swap_candidate sched t1 j1 < job_deadline j1.
   Proof. move: fsc_search_result. by apply search_arg_in_range. Qed.
 
   (** For convenience, since we often only require the lower bound on
      the interval, we re-state it as a corollary. *)
-  Corollary fsc_range1:
+  Corollary fsc_range1 :
     t1 <= find_swap_candidate sched t1 j1.
   Proof. by move: fsc_range => /andP [LE _]. Qed.
 
@@ -124,7 +124,7 @@ Section FindSwapCandidateFacts.
      property that it has a deadline that is no later than that of any
      other job in the window given by time [t1] and the deadline of
      the job scheduled at time [t1]. *)
-  Lemma fsc_found_job_deadline:
+  Lemma fsc_found_job_deadline :
     forall j2,
       scheduled_at sched j2 (find_swap_candidate sched t1 j1) ->
       forall j t,
@@ -155,7 +155,7 @@ Section FindSwapCandidateFacts.
      scheduled at the time given by [find_swap_candidate] in
      particular has a deadline no later than the job scheduled at time
      [t1]. *)
-  Corollary fsc_no_later_deadline:
+  Corollary fsc_no_later_deadline :
     forall j2,
       scheduled_at sched j2 (find_swap_candidate sched t1 j1) ->
       job_deadline j2 <= job_deadline j1.
@@ -176,20 +176,20 @@ Section MakeEDFAtFacts.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ...consider an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved...  *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** ...and in which no scheduled job misses a deadline. *)
-  Hypothesis H_no_deadline_misses: all_deadlines_met sched.
+  Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** Since we will require this fact repeatedly, we briefly observe
      that, since no scheduled job misses its deadline, if a job is
      scheduled at some time [t], then its deadline is later than
      [t]. *)
-  Fact scheduled_job_in_sched_has_later_deadline:
+  Fact scheduled_job_in_sched_has_later_deadline :
     forall j t,
       scheduled_at sched j t ->
       job_deadline j > t.
@@ -199,7 +199,7 @@ Section MakeEDFAtFacts.
 
   (** We analyze [make_edf_at] applied to an arbitrary point in time,
      which we denote [t_edf] in the following. *)
-  Variable t_edf: instant.
+  Variable t_edf : instant.
 
   (** For brevity, let [sched'] denote the schedule obtained from
      [make_edf_at] applied to [sched] at time [t_edf]. *)
@@ -207,7 +207,7 @@ Section MakeEDFAtFacts.
 
   (** First, we observe that in [sched'] jobs still don't execute past
      completion. *)
-  Lemma mea_completed_jobs:
+  Lemma mea_completed_jobs :
     completed_jobs_dont_execute sched'.
   Proof.
     have IDEAL := @ideal_proc_model_ensures_ideal_progress Job.
@@ -224,7 +224,7 @@ Section MakeEDFAtFacts.
   (** Importantly, [make_edf_at] does not introduce any deadline
      misses, which is a crucial step in the EDF optimality
      argument. *)
-  Lemma mea_no_deadline_misses:
+  Lemma mea_no_deadline_misses :
     all_deadlines_met sched'.
   Proof.
     move=> j t SCHED.
@@ -259,7 +259,7 @@ Section MakeEDFAtFacts.
   Qed.
 
   (** As a result, we may conclude that any job scheduled at a time t has a deadline later than t. *)
-  Corollary mea_scheduled_job_has_later_deadline:
+  Corollary mea_scheduled_job_has_later_deadline :
     forall j t,
       scheduled_at sched' j t ->
       job_deadline j > t.
@@ -280,14 +280,14 @@ Section MakeEDFAtFacts.
         [t_edf], let [j_edf] denote the job scheduled in [sched'] at
         time [t_edf], and let [j'] denote any job scheduled in
         [sched'] at some time [t'] after [t_edf]...  *)
-    Variable j_orig j_edf j': Job.
+    Variable j_orig j_edf j' : Job.
 
-    Variable t': instant.
+    Variable t' : instant.
     Hypothesis H_t_edf_le_t' : t_edf <= t'.
 
-    Hypothesis H_sched_orig: scheduled_at sched  j_orig t_edf.
-    Hypothesis H_sched_edf: scheduled_at sched' j_edf t_edf.
-    Hypothesis H_sched': scheduled_at sched' j' t'.
+    Hypothesis H_sched_orig : scheduled_at sched  j_orig t_edf.
+    Hypothesis H_sched_edf : scheduled_at sched' j_edf t_edf.
+    Hypothesis H_sched' : scheduled_at sched' j' t'.
 
     (** ... and that arrives before time [t_edf]. *)
     Hypothesis H_arrival_j' : job_arrival j' <= t_edf.
@@ -296,12 +296,12 @@ Section MakeEDFAtFacts.
         the case analysis. *)
 
     (** First, the deadline of [j_orig] is later than [t_edf]. *)
-    Fact mea_guarantee_dl_orig: t_edf < job_deadline j_orig.
+    Fact mea_guarantee_dl_orig : t_edf < job_deadline j_orig.
     Proof. by apply (scheduled_job_in_sched_has_later_deadline j_orig t_edf H_sched_orig). Qed.
 
     (** Second, by the definition of [sched'], [j_edf] is scheduled in
         [sched] at the time returned by [find_swap_candidate]. *)
-    Fact mea_guarantee_fsc_is_j_edf: sched (find_swap_candidate sched t_edf j_orig) = Some j_edf.
+    Fact mea_guarantee_fsc_is_j_edf : sched (find_swap_candidate sched t_edf j_orig) = Some j_edf.
     Proof.
       move: (H_sched_orig). rewrite scheduled_at_def => /eqP SCHED.
       move: (H_sched_edf). rewrite /sched' /make_edf_at /swapped /replace_at {1}SCHED //=.
@@ -313,7 +313,7 @@ Section MakeEDFAtFacts.
 
     (** Third, the deadline of [j_edf] is no later than the deadline
         of [j_orig]. *)
-    Fact mea_guarantee_deadlines: job_deadline j_edf <= job_deadline j_orig.
+    Fact mea_guarantee_deadlines : job_deadline j_edf <= job_deadline j_orig.
     Proof.
       apply: (fsc_no_later_deadline sched _ _ t_edf) => //.
       - by exact mea_guarantee_dl_orig.
@@ -328,7 +328,7 @@ Section MakeEDFAtFacts.
         [j'] has deadline no earlier than [j_orig] (since no scheduled
         job in [sched] misses a deadline), which in turn has a
         deadline no earlier than [j_edf].  *)
-    Lemma mea_guarantee_case_t'_past_deadline:
+    Lemma mea_guarantee_case_t'_past_deadline :
       job_deadline j_orig <= t' ->
       job_deadline j_edf <= job_deadline j'.
     Proof.
@@ -340,7 +340,7 @@ Section MakeEDFAtFacts.
 
     (** Next, we consider the more difficult case, where [t'] is
         before the deadline of [j_orig]. *)
-    Lemma mea_guarantee_case_t'_before_deadline:
+    Lemma mea_guarantee_case_t'_before_deadline :
       t' < job_deadline j_orig ->
       job_deadline j_edf <= job_deadline j'.
     Proof.
@@ -376,7 +376,7 @@ Section MakeEDFAtFacts.
   (** Finally, putting the preceding cases together, we obtain the
       result that [make_edf_at] establishes [EDF_at] at time
       [t_edf]. *)
-  Lemma make_edf_at_guarantee:
+  Lemma make_edf_at_guarantee :
     EDF_at sched' t_edf.
   Proof.
     move=> j_edf H_sched_edf t' j' t_edf_le_t' H_sched' H_arrival_j'.
@@ -392,7 +392,7 @@ Section MakeEDFAtFacts.
 
   (** We observe that [make_edf_at] maintains the property that jobs
       must arrive to execute. *)
-  Lemma mea_jobs_must_arrive:
+  Lemma mea_jobs_must_arrive :
     jobs_must_arrive_to_execute sched'.
   Proof.
     move=> j t.
@@ -420,7 +420,7 @@ Section MakeEDFAtFacts.
   (** We connect the fact that a job is scheduled in [sched'] to the
      fact that it must be scheduled somewhere in [sched], too, since
      [make_edf_at] does not introduce any new jobs.  *)
-  Lemma mea_job_scheduled:
+  Lemma mea_job_scheduled :
     forall j t,
       scheduled_at sched' j t ->
       exists t', scheduled_at sched j t'.
@@ -435,7 +435,7 @@ Section MakeEDFAtFacts.
   (** Conversely, if a job is scheduled in [sched], it is also
      scheduled somewhere in [sched'] since [make_edf_at] does not lose
      any jobs. *)
-  Lemma mea_job_scheduled':
+  Lemma mea_job_scheduled' :
     forall j t,
       scheduled_at sched j t ->
       exists t', scheduled_at sched' j t'.
@@ -453,13 +453,13 @@ Section MakeEDFAtFacts.
   Section ArrivalSequence.
 
     (** For given arrival sequence,... *)
-    Variable arr_seq: arrival_sequence Job.
+    Variable arr_seq : arrival_sequence Job.
 
     (** ...if all jobs in [sched] come from the arrival sequence,... *)
-    Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
+    Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
     (** ...then all jobs in [sched'] do, too. *)
-    Lemma mea_jobs_come_from_arrival_sequence:
+    Lemma mea_jobs_come_from_arrival_sequence :
       jobs_come_from_arrival_sequence sched' arr_seq.
     Proof.
       rewrite /sched' /make_edf_at.
@@ -472,13 +472,13 @@ Section MakeEDFAtFacts.
   (** For the final claim, assume that [EDF_at] already holds
      everywhere prior to time [t_edf], i.e., that [sched] consists of
      an EDF prefix. *)
-  Hypothesis H_EDF_prefix: forall t, t < t_edf -> EDF_at sched t.
+  Hypothesis H_EDF_prefix : forall t, t < t_edf -> EDF_at sched t.
 
   (** We establish a key property of [make_edf_at]: not only does it
      ensure [EDF_at] at time [t_edf], it also maintains the fact that
      the schedule has an EDF prefix prior to time [t_edf]. In other
      words, it grows the EDF prefix by one time unit. *)
-  Lemma mea_EDF_widen:
+  Lemma mea_EDF_widen :
     forall t, t <= t_edf -> EDF_at sched' t.
   Proof.
     move=> t.
@@ -517,17 +517,17 @@ Section EDFPrefixFacts.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ...consider an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved...  *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** ...and in which no scheduled job misses a deadline. *)
-  Hypothesis H_no_deadline_misses: all_deadlines_met sched.
+  Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** Consider any point in time, denoted [horizon], and... *)
-  Variable horizon: instant.
+  Variable horizon : instant.
 
   (** ...let [sched'] denote the schedule obtained by transforming
      [sched] up to the horizon. *)
@@ -535,7 +535,7 @@ Section EDFPrefixFacts.
 
   (** To start, we observe that [sched'] is still well-behaved and
      without deadline misses. *)
-  Lemma edf_prefix_well_formedness:
+  Lemma edf_prefix_well_formedness :
     completed_jobs_dont_execute sched'
     /\
     jobs_must_arrive_to_execute sched'
@@ -553,14 +553,14 @@ Section EDFPrefixFacts.
 
   (** Because it is needed frequently, we extract the second clause of
      the above conjunction as a corollary. *)
-  Corollary edf_prefix_jobs_must_arrive:
+  Corollary edf_prefix_jobs_must_arrive :
     jobs_must_arrive_to_execute sched'.
   Proof. by move: edf_prefix_well_formedness => [_ [ARR _]]. Qed.
 
   (** We similarly observe that the absence of deadline misses implies
      that any scheduled job must have a deadline at a time later then
      when it is scheduled. *)
-  Corollary edf_prefix_scheduled_job_has_later_deadline:
+  Corollary edf_prefix_scheduled_job_has_later_deadline :
     forall j t,
       scheduled_at sched' j t ->
       job_deadline j > t.
@@ -574,7 +574,7 @@ Section EDFPrefixFacts.
      [edf_transform_prefix], we if a job is scheduled in the
      transformed schedule, then it is also scheduled at some point in
      the original schedule. *)
-  Lemma edf_prefix_job_scheduled:
+  Lemma edf_prefix_job_scheduled :
     forall j t,
       scheduled_at sched' j t ->
       exists t', scheduled_at sched j t'.
@@ -590,7 +590,7 @@ Section EDFPrefixFacts.
 
   (** Conversely, if a job is scheduled in the original schedule, it is
      also scheduled at some point in the transformed schedule. *)
-  Lemma edf_prefix_job_scheduled':
+  Lemma edf_prefix_job_scheduled' :
     forall j t,
       scheduled_at sched j t ->
       exists t', scheduled_at sched' j t'.
@@ -608,14 +608,14 @@ Section EDFPrefixFacts.
   Section ArrivalSequence.
 
     (** For any arrival sequence,... *)
-    Variable arr_seq: arrival_sequence Job.
+    Variable arr_seq : arrival_sequence Job.
 
     (** ...if all jobs in the original schedule come from the arrival sequence,... *)
-    Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
+    Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
     (** ...then all jobs in the transformed schedule still come from
        the same arrival sequence. *)
-    Lemma edf_prefix_jobs_come_from_arrival_sequence:
+    Lemma edf_prefix_jobs_come_from_arrival_sequence :
       jobs_come_from_arrival_sequence sched' arr_seq.
     Proof.
       rewrite /sched' /edf_transform_prefix.
@@ -629,7 +629,7 @@ Section EDFPrefixFacts.
   (** We establish the key property of [edf_transform_prefix]: that it indeed
      ensures that the resulting schedule ensures the EDF invariant up to the
      given [horizon].  *)
-  Lemma edf_prefix_guarantee:
+  Lemma edf_prefix_guarantee :
     forall t,
       t < horizon ->
       EDF_at sched' t.
@@ -664,16 +664,16 @@ Section EDFPrefixInclusion.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ...consider an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved...  *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** ...and in which no scheduled job misses a deadline. *)
-  Hypothesis H_no_deadline_misses: all_deadlines_met sched.
+  Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
-  Lemma edf_prefix_inclusion:
+  Lemma edf_prefix_inclusion :
     forall h1 h2,
       h1 <= h2 ->
       identical_prefix (edf_transform_prefix sched h1) (edf_transform_prefix sched h2) h1.
@@ -705,14 +705,14 @@ Section EDFTransformFacts.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ...consider an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved...  *)
-  Hypothesis H_jobs_must_arrive_to_execute: jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** ...and in which no scheduled job misses a deadline. *)
-  Hypothesis H_no_deadline_misses: all_deadlines_met sched.
+  Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** In the following, let [sched_edf] denote the EDF schedule obtained by
      transforming the given reference schedule. *)
@@ -721,7 +721,7 @@ Section EDFTransformFacts.
   (** We begin with a simple lemma relating [sched_edf] to its definition that
       allows us to easily look at any finite prefix of the EDF-transformed
       scheduled. *)
-  Lemma edf_finite_prefix:
+  Lemma edf_finite_prefix :
     forall h,
       identical_prefix sched_edf (edf_transform_prefix sched h) h.
   Proof.
@@ -731,7 +731,7 @@ Section EDFTransformFacts.
 
   (** From this, we move on to the defining property of the transformation: the
       resulting schedule is actually an EDF schedule. *)
-  Theorem edf_transform_ensures_edf:
+  Theorem edf_transform_ensures_edf :
     EDF_schedule sched_edf.
   Proof.
     rewrite /EDF_schedule => t.
@@ -746,7 +746,7 @@ Section EDFTransformFacts.
   (** Next, we observe that completed jobs still don't execute in the resulting
       EDF schedule. This observation is needed to establish that the resulting
       EDF schedule is valid. *)
-  Lemma edf_transform_completed_jobs_dont_execute:
+  Lemma edf_transform_completed_jobs_dont_execute :
     completed_jobs_dont_execute sched_edf.
   Proof.
     move=> j t.
@@ -761,7 +761,7 @@ Section EDFTransformFacts.
   Qed.
 
   (** Similarly, we observe that no job is scheduled prior to its arrival. *)
-  Lemma edf_transform_jobs_must_arrive:
+  Lemma edf_transform_jobs_must_arrive :
     jobs_must_arrive_to_execute sched_edf.
   Proof.
     move=> j t.
@@ -772,7 +772,7 @@ Section EDFTransformFacts.
 
   (** We next establish the second key property: in the transformed EDF
      schedule, no scheduled job misses a deadline. *)
-  Theorem edf_transform_deadlines_met:
+  Theorem edf_transform_deadlines_met :
     all_deadlines_met sched_edf.
   Proof.
     move=> j t.
@@ -791,7 +791,7 @@ Section EDFTransformFacts.
 
   (** We observe that no new jobs are introduced: any job scheduled in the EDF
      schedule were also present in the reference schedule. *)
-  Lemma edf_transform_job_scheduled:
+  Lemma edf_transform_job_scheduled :
     forall j t, scheduled_at sched_edf j t -> exists t', scheduled_at sched j t'.
   Proof.
     move=> j t.
@@ -801,7 +801,7 @@ Section EDFTransformFacts.
 
   (** Conversely, we observe that no jobs are lost: any job scheduled in the
      reference schedule is also present in the EDF schedule. *)
-  Lemma edf_transform_job_scheduled':
+  Lemma edf_transform_job_scheduled' :
     forall j t, scheduled_at sched j t -> exists t', scheduled_at sched_edf j t'.
   Proof.
     move=> j t SCHED_j.
@@ -819,14 +819,14 @@ Section EDFTransformFacts.
   Section ArrivalSequence.
 
     (** For any arrival sequence,... *)
-    Variable arr_seq: arrival_sequence Job.
+    Variable arr_seq : arrival_sequence Job.
 
     (** ...if all jobs in the original schedule come from the arrival sequence,... *)
-    Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
+    Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
     (** ...then all jobs in the transformed EDF schedule still come from the
        same arrival sequence. *)
-    Lemma edf_transform_jobs_come_from_arrival_sequence:
+    Lemma edf_transform_jobs_come_from_arrival_sequence :
       jobs_come_from_arrival_sequence sched_edf arr_seq.
     Proof.
       rewrite /sched_edf /edf_transform.
@@ -851,14 +851,14 @@ Section Optimality.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... consider an arbitrary valid job arrival sequence ... *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** ... and an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ... that corresponds to the given arrival sequence. *)
-  Hypothesis H_sched_valid: valid_schedule sched arr_seq.
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In the following, let [equivalent_edf_schedule] denote the schedule that
      results from the EDF transformation. *)
@@ -867,11 +867,11 @@ Section Optimality.
   Section AllDeadlinesMet.
 
     (** Suppose no job scheduled in the given reference schedule misses a deadline. *)
-    Hypothesis H_no_deadline_misses: all_deadlines_met sched.
+    Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
     (** Then the resulting EDF schedule is a valid schedule for the given
        arrival sequence... *)
-    Theorem edf_schedule_is_valid:
+    Theorem edf_schedule_is_valid :
       valid_schedule equivalent_edf_schedule arr_seq.
     Proof.
       rewrite /valid_schedule; split;
@@ -882,7 +882,7 @@ Section Optimality.
     Qed.
 
     (** ...and no scheduled job misses its deadline. *)
-    Theorem edf_schedule_meets_all_deadlines:
+    Theorem edf_schedule_meets_all_deadlines :
       all_deadlines_met equivalent_edf_schedule.
     Proof. exact: edf_transform_deadlines_met. Qed.
 
@@ -895,11 +895,11 @@ Section Optimality.
 
     (** Suppose no job that's part of the arrival sequence misses a deadline in
        the given reference schedule. *)
-    Hypothesis H_no_deadline_misses_of_arrivals: all_deadlines_of_arrivals_met arr_seq sched.
+    Hypothesis H_no_deadline_misses_of_arrivals : all_deadlines_of_arrivals_met arr_seq sched.
 
     (** Then no job that's part of the arrival sequence misses a deadline in the
        EDF schedule, either. *)
-    Theorem edf_schedule_meets_all_deadlines_wrt_arrivals:
+    Theorem edf_schedule_meets_all_deadlines_wrt_arrivals :
       all_deadlines_of_arrivals_met arr_seq equivalent_edf_schedule.
     Proof.
       move=> j ARR_j.

@@ -28,8 +28,8 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** In addition, we assume the existence of a function mapping a job
       and its progress to a boolean value saying whether this job is
@@ -67,7 +67,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
 
   (** First note since [t] lies inside the busy interval,
       the processor cannot be idle at time [t]. *)
-  Lemma instant_t_is_not_idle:
+  Lemma instant_t_is_not_idle :
     ~ is_idle arr_seq sched t.
   Proof.
     by move => IDLE; apply: not_quiet_implies_not_idle => //.
@@ -83,7 +83,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       assumption that the schedule respects priority policy at
       preemption points implies that the scheduled job must have a
       higher-or-equal priority. *)
-  Lemma scheduled_at_preemption_time_implies_higher_or_equal_priority_lt:
+  Lemma scheduled_at_preemption_time_implies_higher_or_equal_priority_lt :
     t < t2.-1 ->
     forall jhp,
       scheduled_at sched jhp t ->
@@ -120,7 +120,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** In the case when [t = t2 - 1], we cannot use the same proof
       since [t+1 = t2], but [t2] is a quiet time. So we do a similar
       case analysis on the fact that [t1 = t ∨ t1 < t]. *)
-  Lemma scheduled_at_preemption_time_implies_higher_or_equal_priority_eq:
+  Lemma scheduled_at_preemption_time_implies_higher_or_equal_priority_eq :
     t = t2.-1 ->
     forall jhp,
       scheduled_at sched jhp t ->
@@ -170,7 +170,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
 
   (** By combining the above facts we conclude that a job that is
       scheduled at time [t] has higher-or-equal priority. *)
-  Corollary scheduled_at_preemption_time_implies_higher_or_equal_priority:
+  Corollary scheduled_at_preemption_time_implies_higher_or_equal_priority :
     forall jhp,
       scheduled_at sched jhp t ->
       hep_job jhp j.
@@ -185,7 +185,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** Since a job that is scheduled at time [t] has higher-or-equal
       priority, by properties of a busy interval it cannot arrive
       before time instant [t1]. *)
-  Lemma scheduled_at_preemption_time_implies_arrived_between_within_busy_interval:
+  Lemma scheduled_at_preemption_time_implies_arrived_between_within_busy_interval :
     forall jhp,
       scheduled_at sched jhp t ->
       arrived_between jhp t1 t2.
@@ -209,7 +209,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** From the above lemmas we prove that there is a job [jhp] that is
       (1) scheduled at time [t], (2) has higher-or-equal priority, and
       (3) arrived between [t1] and [t2].  *)
-  Corollary not_quiet_implies_exists_scheduled_hp_job_at_preemption_point:
+  Corollary not_quiet_implies_exists_scheduled_hp_job_at_preemption_point :
     exists j_hp,
       arrived_between j_hp t1 t2
       /\ hep_job j_hp j
@@ -253,8 +253,8 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Consider a valid preemption model with known maximum non-preemptive
       segment lengths. *)
@@ -292,7 +292,7 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
   (** We show that, at any time instant after a preemption point, the
       processor is always busy with a job with higher or equal
       priority. *)
-  Lemma not_quiet_implies_exists_scheduled_hp_job_after_preemption_point:
+  Lemma not_quiet_implies_exists_scheduled_hp_job_after_preemption_point :
     forall tp t,
       preemption_time arr_seq sched tp ->
       t1 <= tp < t2 ->
@@ -351,7 +351,7 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
 
   (** Then we prove that the processor is always busy with a job
       with higher-or-equal priority after time instant [t1 + K]. *)
-  Lemma not_quiet_implies_exists_scheduled_hp_job:
+  Lemma not_quiet_implies_exists_scheduled_hp_job :
     forall t,
       t1 + K <= t < t2 ->
       exists j_hp,

@@ -10,7 +10,7 @@ Section SchedulePrefixMap.
   Context {Job : JobType}.
 
   (** ... any given type of processor states ... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ... we define a procedure that applies a given function to every
      point in a given finite prefix of the schedule.
@@ -19,9 +19,9 @@ Section SchedulePrefixMap.
      to transform, and must yield a transformed schedule that is used
      in subsequent operations. *)
   Fixpoint prefix_map
-           (sched: schedule PState)
-           (f: schedule PState -> instant -> schedule PState)
-           (horizon: instant) :=
+           (sched : schedule PState)
+           (f : schedule PState -> instant -> schedule PState)
+           (horizon : instant) :=
     match horizon with
     | 0 => sched
     | S t =>
@@ -37,16 +37,16 @@ Section SchedulePrefixMap.
   Section PropertyPreservation.
 
     (** Given any property of schedules... *)
-    Variable P: schedule PState -> Prop.
+    Variable P : schedule PState -> Prop.
 
     (** ...and a point-wise transformation [f],... *)
-    Variable f: schedule PState -> instant -> schedule PState.
+    Variable f : schedule PState -> instant -> schedule PState.
 
     (** ...if [f] maintains property [P],... *)
-    Hypothesis H_f_maintains_P: forall sched t, P sched -> P (f sched t).
+    Hypothesis H_f_maintains_P : forall sched t, P sched -> P (f sched t).
 
     (** ...then so does a prefix map of [f]. *)
-    Lemma prefix_map_property_invariance:
+    Lemma prefix_map_property_invariance :
       forall sched h, P sched -> P (prefix_map sched f h).
     Proof.
       move=> sched h P_sched.
@@ -62,28 +62,28 @@ Section SchedulePrefixMap.
   Section PointwiseProperty.
 
     (** Given any property of schedules [P],... *)
-    Variable P: schedule PState -> Prop.
+    Variable P : schedule PState -> Prop.
 
     (** ...any point-wise property [Q],... *)
-    Variable Q: schedule PState -> instant -> Prop.
+    Variable Q : schedule PState -> instant -> Prop.
 
     (** ...and a point-wise transformation [f],... *)
-    Variable f: schedule PState -> instant -> schedule PState.
+    Variable f : schedule PState -> instant -> schedule PState.
 
     (** ...if [f] maintains [P]... *)
-    Hypothesis H_f_maintains_P:
+    Hypothesis H_f_maintains_P :
       forall sched t_ref,
         P sched -> P (f sched t_ref).
 
     (** ...and establishes [Q] (provided that [P] holds)... *)
-    Hypothesis H_f_grows_Q:
+    Hypothesis H_f_grows_Q :
       forall sched t_ref,
         P sched ->
         (forall t', t' <  t_ref -> Q sched t') ->
         forall t', t' <= t_ref -> Q (f sched t_ref) t'.
 
     (** ...then the prefix-map operation will "grow" [Q] up to the horizon. *)
-    Lemma prefix_map_pointwise_property:
+    Lemma prefix_map_pointwise_property :
       forall sched horizon,
         P sched ->
         forall t,

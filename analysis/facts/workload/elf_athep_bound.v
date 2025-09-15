@@ -68,7 +68,7 @@ Section ATHEPWorkloadBoundIsValidForELF.
     Variable j : Job.
     Hypothesis H_j_arrives : arrives_in arr_seq j.
     Hypothesis H_job_of_tsk : job_of_task tsk j.
-    Hypothesis H_job_cost_positive: job_cost_positive j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
 
     (** Consider the busy interval <<[t1, t2)>> of job [j]. *)
     Variable t1 t2 : duration.
@@ -93,8 +93,8 @@ Section ATHEPWorkloadBoundIsValidForELF.
 
       (** Consider an arbitrary task [tsk_o ≠ tsk] from [ts]. *)
       Variable tsk_o : Task.
-      Hypothesis H_tsko_in_ts: tsk_o \in ts.
-      Hypothesis H_neq: tsk_o != tsk.
+      Hypothesis H_tsko_in_ts : tsk_o \in ts.
+      Hypothesis H_neq : tsk_o != tsk.
 
       (** And assume that [ep_task_interfering_interval_length tsk tsk_o A] is bounded by delta. *)
       Hypothesis H_delta_ge : ((ep_task_interfering_interval_length tsk tsk_o A) <= delta%:R)%R.
@@ -213,7 +213,7 @@ Section ATHEPWorkloadBoundIsValidForELF.
 
   (** Finally, we establish that the workload of jobs with priority higher than or equal to
       [j] is at most [bound_on_athep_workload]. *)
-  Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload:
+  Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload :
     \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (hep_job_from_tsk tsk_o) jobs
     <= bound_on_athep_workload ts tsk A delta.
   Proof.

@@ -37,7 +37,7 @@ Section Definitions.
 
   (** Further, we define the equality for two generic tasks as the equality
         of each attribute. *)
-  Definition task_eqdef_T (t1 t2: task_T) :=
+  Definition task_eqdef_T (t1 t2 : task_T) :=
     (task_id_T t1 == task_id_T t2)%C &&
     (task_cost_T t1 == task_cost_T t2)%C &&
     (task_arrival_T t1 == task_arrival_T t2)%C &&
@@ -59,7 +59,7 @@ Section Definitions.
     end.
 
   (** With the previous definition in place, we define the workload bound... *)
-  Definition ConcreteMaxArrivals_T (tsk : task_T) (Δ : T): T :=
+  Definition ConcreteMaxArrivals_T (tsk : task_T) (Δ : T) : T :=
     extrapolated_arrival_curve_T (get_extrapolated_arrival_curve_T tsk) Δ.
 
   (** ... and the task request-bound function. *)
@@ -90,7 +90,7 @@ Section Definitions.
 
   (** ... and a generalization of the previous function that repeats the time
         steps for each given offset. *)
-  Definition repeat_steps_with_offset_T (tsk : task_T) (offsets : seq T): seq T :=
+  Definition repeat_steps_with_offset_T (tsk : task_T) (offsets : seq T) : seq T :=
     (flatten (map (time_steps_with_offset_T tsk) offsets))%C.
 End Definitions.
 
@@ -100,7 +100,7 @@ Section Translation.
 
   (** First, we define the function that maps a generic task to a natural-number
         task... *)
-  Definition taskT_to_task (tsk: @task_T N) : Task :=
+  Definition taskT_to_task (tsk : @task_T N) : Task :=
     match tsk with
     | {| task_id_T := id;
          task_cost_T := cost;
@@ -120,7 +120,7 @@ Section Translation.
 
   (** Finally, we define the converse function, mapping a natural-number
         task to a generic one. *)
-  Definition task_to_taskT (tsk: Task) : @task_T N :=
+  Definition task_to_taskT (tsk : Task) : @task_T N :=
     match tsk with
     | {| task.task_id := id;
          task.task_cost := cost;

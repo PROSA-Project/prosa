@@ -31,7 +31,7 @@ Section TaskRTCThresholdLimitedPreemptions.
   (** Next, consider any preemption-aware schedule of this arrival sequence... *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
-  Hypothesis H_schedule_respects_preemption_model:
+  Hypothesis H_schedule_respects_preemption_model :
     schedule_respects_preemption_model arr_seq sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -42,13 +42,13 @@ Section TaskRTCThresholdLimitedPreemptions.
   Variable ts : seq Task.
 
   (** Assume that a job cost cannot be larger than a task cost. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** Consider the model with fixed preemption points. I.e., each task
       is divided into a number of non-preemptive segments by inserting
       statically predefined preemption points. *)
-  Hypothesis H_valid_fixed_preemption_points_model:
+  Hypothesis H_valid_fixed_preemption_points_model :
     valid_fixed_preemption_points_model arr_seq ts.
 
   (** And consider any task from task set ts with positive cost. *)
@@ -59,7 +59,7 @@ Section TaskRTCThresholdLimitedPreemptions.
   (** We start by proving an auxiliary lemma. Note that since [tsk]
       has a positive cost, [task_preemption_points tsk] contains [0]
       and [task_cost tsk]. Thus, [2 <= size (task_preemption_points tsk)]. *)
-  Remark number_of_preemption_points_in_task_at_least_two: 2 <= size (task_preemption_points tsk).
+  Remark number_of_preemption_points_in_task_at_least_two : 2 <= size (task_preemption_points tsk).
   Proof.
     move: (H_valid_fixed_preemption_points_model) => [MLP [BEG [END [INCR [HYP1 [HYP2 HYP3]]]]]].
     have Fact2: 0 < size (task_preemption_points tsk).
@@ -94,7 +94,7 @@ Section TaskRTCThresholdLimitedPreemptions.
 
   (** Then, we prove that [task_rtct] function
       defines a valid task's run to completion threshold. *)
-  Lemma limited_valid_task_run_to_completion_threshold:
+  Lemma limited_valid_task_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
     split; first by rewrite /task_rtc_bounded_by_cost leq_subr.

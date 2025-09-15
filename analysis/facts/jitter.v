@@ -235,7 +235,7 @@ Section JitterPropagationFacts.
 
   (** Importantly, the schedule remains FP-policy compliant if it was so to
       begin with, despite the postponed arrival times. *)
-  Theorem jitter_FP_compliance `{FP : FP_policy Task} `{JobPreemptable Job}:
+  Theorem jitter_FP_compliance `{FP : FP_policy Task} `{JobPreemptable Job} :
     uniprocessor_model PState ->
     @respects_FP_policy_at_preemption_point
       _ _ _ original_arrival _ _ _ jitter_ready_instance arr_seq sched FP ->

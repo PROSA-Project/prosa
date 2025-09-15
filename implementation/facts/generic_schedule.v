@@ -24,21 +24,21 @@ Section GenericScheduleProperties.
   (** To begin with, we establish two simple rewriting lemmas for unrolling
       [schedule_up_to]. First, we observe that the allocation is indeed
       determined by the policy based on the preceding prefix. *)
-  Lemma schedule_up_to_def:
+  Lemma schedule_up_to_def :
     forall t,
       schedule_up_to policy idle_state t t = policy (prefix t) t.
   Proof. by elim=> [|n IH]; rewrite [LHS]/schedule_up_to -/(schedule_up_to _) /replace_at; apply ifT. Qed.
 
   (** Second, we note how to replace [schedule_up_to] in the general case with
       its definition. *)
-  Lemma schedule_up_to_unfold:
+  Lemma schedule_up_to_unfold :
     forall h t,
       schedule_up_to policy idle_state h t = replace_at (prefix h) h (policy (prefix h) h) t.
   Proof. by move=> h t; rewrite [LHS]/schedule_up_to /prefix; elim: h. Qed.
 
   (** Next, we observe that we can increase a prefix's horizon by one
         time unit without changing any allocations in the prefix. *)
-  Lemma schedule_up_to_widen:
+  Lemma schedule_up_to_widen :
     forall h t,
       t <= h ->
       schedule_up_to policy idle_state h t = schedule_up_to policy idle_state h.+1 t.
@@ -50,7 +50,7 @@ Section GenericScheduleProperties.
 
   (** After the horizon of a prefix, the schedule is still "empty", meaning
         that all instants are idle. *)
-  Lemma schedule_up_to_empty:
+  Lemma schedule_up_to_empty :
     forall h t,
       h < t ->
       schedule_up_to policy idle_state h t = idle_state.
@@ -67,7 +67,7 @@ Section GenericScheduleProperties.
 
   (** A crucial fact is that a prefix up to horizon [h1] is identical to a
       prefix up to a later horizon [h2] at times up to [h1]. *)
-  Lemma schedule_up_to_prefix_inclusion:
+  Lemma schedule_up_to_prefix_inclusion :
     forall h1 h2,
       h1 <= h2 ->
       forall t,
@@ -84,7 +84,7 @@ Section GenericScheduleProperties.
 
   (** It follows that [generic_schedule] and [schedule_up_to] for a given
       horizon [h] share an identical prefix. *)
-  Corollary schedule_up_to_identical_prefix:
+  Corollary schedule_up_to_identical_prefix :
     forall h t,
       t <= h.+1 ->
       identical_prefix (schedule_up_to policy idle_state h) (generic_schedule policy idle_state) t.

@@ -65,7 +65,7 @@ Section Subadditivity.
 
       (** Then, we prove that moving any non-zero factor [m] outside of the arguments
           of [f] leads to a bigger or equal number. *)
-      Lemma subadditive_leq_mul:
+      Lemma subadditive_leq_mul :
         forall n m,
           0 < m ->
           f (m * n) <= m * f n.

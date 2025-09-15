@@ -165,7 +165,7 @@ Qed.
     and not via the typeclass engine. *)
 
 (** First, we prove that negating a positive, binary number results in [0]. *)
-Lemma posBinNatNotZero:
+Lemma posBinNatNotZero :
   forall p, ~ (nat_of_bin (N.pos p)) = O.
 Proof.
   rewrite -[0]bin_of_natK.
@@ -181,7 +181,7 @@ Qed.
 (** Next, we prove that, if the successor of a unary number [b] corresponds to a
     positive binary number [p], then [b] corresponds to the predecessor of
     [p]. *)
-Lemma eq_SnPos_to_nPred:
+Lemma eq_SnPos_to_nPred :
   forall b p, Rnat b.+1 (N.pos p) -> Rnat b (Pos.pred_N p).
 Proof.
   move => b p.
@@ -230,14 +230,14 @@ Section Definitions.
       !div_of T, !mod_of T, !eq_of T, !leq_of T, !lt_of T}.
 
   (** We redefine the [iota] function, ... *)
-  Fixpoint iota_T (a : T) (b : nat): seq T :=
+  Fixpoint iota_T (a : T) (b : nat) : seq T :=
     match b with
     | 0 => [::]
     | S b' => a :: iota_T (a + 1)%C b'
     end.
 
   (** ... the size function, ... *)
-  Fixpoint size_T {X : Type} (s : seq X): T :=
+  Fixpoint size_T {X : Type} (s : seq X) : T :=
     match s with
     | [::] => 0%C
     | _ :: s' => (1 + size_T s')%C
@@ -260,7 +260,7 @@ End Definitions.
 
 (** First, we prove a refinement for the [map] function. *)
 Global Instance refine_map :
-  forall {A A' B B': Type}
+  forall {A A' B B' : Type}
     (F : A -> B) (F' : A' -> B')
     (rA : A -> A' -> Type) (rB : B -> B' -> Type) xs xs',
     refines (list_R rA) xs xs' ->
@@ -291,7 +291,7 @@ Qed.
 
 (** Next, we prove a refinement for the [flatten] function. *)
 Global Instance refine_flatten :
-  forall {A A': Type} (rA : A -> A' -> Type),
+  forall {A A' : Type} (rA : A -> A' -> Type),
     refines (list_R (list_R rA) ==> list_R rA)%rel flatten flatten.
 Proof.
   by intros; rewrite refinesE => xss xss' Rxss; eapply flatten_R.
@@ -366,7 +366,7 @@ Proof.
 Qed.
 
 (** Next, we prove a refinement for the [shift_points_pos] function. *)
-Global Instance refine_shift_points_pos:
+Global Instance refine_shift_points_pos :
   refines (list_R Rnat ==> Rnat ==> list_R Rnat)%rel shift_points_pos shift_points_pos_T.
 Proof.
   rewrite refinesE => xs xs' Rxs s s' Rs.
@@ -377,7 +377,7 @@ Proof.
 Qed.
 
 (** Next, we prove a refinement for the [shift_points_neg] function. *)
-Global Instance refine_shift_points_neg:
+Global Instance refine_shift_points_neg :
   refines (list_R Rnat ==> Rnat ==> list_R Rnat)%rel shift_points_neg shift_points_neg_T.
 Proof.
   rewrite refinesE => xs xs' Rxs s s' Rs.
@@ -426,7 +426,7 @@ Section GenericLists.
 
   (** We prove a refinement for the [foldr] function when applied to a [map] and
       [filter] operation.  *)
-  Lemma refine_foldr:
+  Lemma refine_foldr :
     forall (R : T1 -> bool) (R' : T2 -> bool) (F : T1 -> nat) (F' : T2 -> N),
     forall (rT : T1 -> T2 -> Type),
       refines ( list_R rT )%rel xs xs' ->

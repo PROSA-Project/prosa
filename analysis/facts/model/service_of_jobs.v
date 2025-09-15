@@ -310,7 +310,7 @@ Section UnitServiceModelLemmas.
 
   (** Next, consider any unit-service schedule of this arrival sequence ... *)
   Variable sched : schedule PState.
-  Hypothesis H_jobs_come_from_arrival_sequence:
+  Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -322,7 +322,7 @@ Section UnitServiceModelLemmas.
 
   (** First, we prove that the service received by any set of jobs is
       upper-bounded by the corresponding workload. *) 
-  Lemma service_of_jobs_le_workload:
+  Lemma service_of_jobs_le_workload :
     forall (jobs : seq Job) (t1 t2 : instant),
       service_of_jobs sched P jobs t1 t2 <= workload_of_jobs P jobs.
   Proof.
@@ -472,7 +472,7 @@ Section UnitServiceUniProcessorModelLemmas.
     Hypothesis H_no_duplicate_jobs : uniq jobs.
 
     (** We prove that the overall service of [jobs] at a single time instant is at most [1]. *)
-    Lemma service_of_jobs_le_1:
+    Lemma service_of_jobs_le_1 :
       forall t, service_of_jobs_at sched P jobs t <= 1.
     Proof.
       intros t.
@@ -498,7 +498,7 @@ Section UnitServiceUniProcessorModelLemmas.
 
     (** Next, we prove that the service received by those jobs is no larger 
         than their workload. *)
-    Corollary service_of_jobs_le_length_of_interval:
+    Corollary service_of_jobs_le_length_of_interval :
       forall (t : instant) (Δ : duration),
         service_of_jobs sched P jobs t (t + Δ) <= Δ.
     Proof.
@@ -513,7 +513,7 @@ Section UnitServiceUniProcessorModelLemmas.
     Qed.
 
     (** The same holds for two time instants. *)
-    Corollary service_of_jobs_le_length_of_interval':
+    Corollary service_of_jobs_le_length_of_interval' :
       forall (t1 t2 : instant),
         service_of_jobs sched P jobs t1 t2 <= t2 - t1.
     Proof.

@@ -13,7 +13,7 @@ Require Export prosa.util.minmax.
 
 (** Finds the least fixpoint of a monotonic function, between a start point [s]
     and a horizon [h], given an amount of [fuel]. *)
-Fixpoint find_fixpoint_from (f : nat -> nat) (x h fuel: nat): option nat :=
+Fixpoint find_fixpoint_from (f : nat -> nat) (x h fuel : nat) : option nat :=
   if fuel is S fuel' then
     if f x == x then
       Some x
@@ -39,7 +39,7 @@ Section FixpointSearch.
 
   (** We show that the result of [find_fixpoint_from] is indeed a fixpoint. *)
   Lemma ffpf_finds_fixpoint :
-    forall s x fuel: nat,
+    forall s x fuel : nat,
       find_fixpoint_from f s h fuel = Some x ->
       x = f x.
   Proof.
@@ -64,10 +64,10 @@ Section FixpointSearch.
   Section MonotonicFunction.
 
     (** Suppose [f] is monotonically increasing ... *)
-    Hypothesis H_f_mono: monotone leq f.
+    Hypothesis H_f_mono : monotone leq f.
 
     (** ... and not zero at 1. *)
-    Hypothesis F1: f 1 > 0.
+    Hypothesis F1 : f 1 > 0.
 
     (** Assuming the function is monotonic, there is no fixpoint between [a] and
         [c], if [f a = c]. *)
@@ -236,7 +236,7 @@ Qed.
 (** Furthermore, we show that the result is the maximum of all fixpoints, with
     regard to the search space.*)
 Lemma fmfs_is_maximum :
-  forall (f : nat -> nat -> nat) (sp : seq nat) (h s r: nat),
+  forall (f : nat -> nat -> nat) (sp : seq nat) (h s r : nat),
     Some r = find_max_fixpoint_of_seq f sp h ->
     s \in sp ->
     exists2 v,
@@ -285,7 +285,7 @@ Section PredicateSearchSpace.
   (** The result of [find_max_fixpoint] is a fixpoint of the function [f] for a
       an element of the search space. *)
   Corollary fmf_finds_fixpoint :
-    forall (f : nat -> nat -> nat) (h x: nat),
+    forall (f : nat -> nat -> nat) (h x : nat),
       find_max_fixpoint f h = Some x ->
       exists2 a, is_in_search_space a & x = f a x.
   Proof.
@@ -309,7 +309,7 @@ Section PredicateSearchSpace.
   (** Finally, we observe that there is no fixpoint in the search space larger
       than the result of [find_maximum_fixpoint]. *)
   Corollary fmf_is_maximum :
-    forall {f : nat -> nat -> nat} {h s r: nat},
+    forall {f : nat -> nat -> nat} {h s r : nat},
       Some r = find_max_fixpoint f h ->
       is_in_search_space s ->
         exists2 v, Some v = find_fixpoint (f s) h & r >= v.

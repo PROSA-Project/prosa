@@ -57,7 +57,7 @@ Section GELBasicFacts.
   End HEPJobArrival.
 
   (** Next, we prove that the GEL policy respects sequential tasks. *)
-  Lemma GEL_respects_sequential_tasks:
+  Lemma GEL_respects_sequential_tasks :
     policy_respects_sequential_tasks (GEL Job Task).
   Proof. by move =>  j1 j2 TSK ARR; rewrite hep_job_arrival_gel. Qed.
 
@@ -90,7 +90,7 @@ Section GELBasicFacts.
     Context `{JobPreemptable Job}.
 
     (** ... and assume that it defines a valid preemption model. *)
-    Hypothesis H_valid_preemption_model:
+    Hypothesis H_valid_preemption_model :
       valid_preemption_model arr_seq sched.
 
     (** Next, we assume that the schedule respects the scheduling policy at every preemption point. *)
@@ -103,7 +103,7 @@ Section GELBasicFacts.
         arrives earlier than [j2], then [j1] always has a higher
         priority than job [j2], and hence completes before [j2]);
         therefore GEL implies the [sequential_tasks] property. *)
-    Lemma GEL_implies_sequential_tasks:
+    Lemma GEL_implies_sequential_tasks :
       sequential_tasks arr_seq sched.
     Proof.
       move => j1 j2 t ARR1 ARR2 SAME LT.

@@ -79,15 +79,15 @@ Section AbstractRTAforFPwithArrivalCurves.
       we require that any preemption model under consideration
       is valid. We also assume that the run-to-completion-threshold
       of the task [tsk] is valid. *)
-  Hypothesis H_valid_preemption_model:
+  Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
-  Hypothesis H_valid_run_to_completion_threshold:
+  Hypothesis H_valid_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** As mentioned, we assume that the duration of priority inversion
       incurred by the task [tsk] is bounded by [priority_inversion_bound]. *)
   Variable priority_inversion_bound : duration.
-  Hypothesis H_priority_inversion_is_bounded:
+  Hypothesis H_priority_inversion_is_bounded :
     priority_inversion_is_bounded_by arr_seq sched tsk (constant priority_inversion_bound).
 
   (** ** B. Encoding the Scheduling Policy and Preemption Model *)
@@ -145,7 +145,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       is required to avoid the case in which the interval under consideration is
       shorter than [A]. While intuitively it might seem that this case
       is irrelevant, aRTA does not allow for this case to be ignored. *)
-  Definition IBF (A: instant) (Δ : duration) :=
+  Definition IBF (A : instant) (Δ : duration) :=
     priority_inversion_bound
     + (task_rbf (maxn (A + ε) Δ) - task_cost tsk)
     + total_ohep_rbf (Δ).
@@ -180,7 +180,7 @@ Section AbstractRTAforFPwithArrivalCurves.
           interval (given by the RBF). However, we do not want to account for the job under
           consideration itself as interference and hence we subtract the cost
           of the task. *)
-      Lemma self_intf_bound_case1:
+      Lemma self_intf_bound_case1 :
         workload_of_jobs
           (another_hep_job_of_same_task^~ j)
           (arrivals_between arr_seq t1 (t1 + Δ))
@@ -369,7 +369,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       not needed in the RTAs for sequential tasks, it is required here to ensure
       that we consider the least _positive_ fix point. *)
   Variable R : duration.
-  Hypothesis H_R_is_maximum:
+  Hypothesis H_R_is_maximum :
     forall (A : duration),
       is_in_concrete_search_space A ->
       exists (F : duration),

@@ -181,8 +181,8 @@ Section AbstractRTAforELFwithArrivalCurves.
 
   (** We then define the priority inversion bound as a maximum of the bounds on the two categories. *)
   (** Note that this definition is only applicable when all tasks have bounded nonpreemptive segments. *)
-  Definition priority_inversion_bound (A: duration) := maxn priority_inversion_lp_tasks_bound
-                                                            (priority_inversion_ep_tasks_bound A).
+  Definition priority_inversion_bound (A : duration) := maxn priority_inversion_lp_tasks_bound
+                                                             (priority_inversion_ep_tasks_bound A).
 
   (** Now, we define the following predicate to identify tasks that can release jobs. *)
   Let blocking_relevant (tsk_o : Task) :=

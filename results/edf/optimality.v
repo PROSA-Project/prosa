@@ -21,8 +21,8 @@ Section Optimality.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... and any valid arrival sequence of such jobs. *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
@@ -35,7 +35,7 @@ Section Optimality.
   (** Under these assumptions, EDF is optimal in the sense that, if there
       exists any schedule in which all jobs of [arr_seq] meet their deadline,
       then there also exists an EDF schedule in which all deadlines are met. *)
-  Theorem EDF_optimality:
+  Theorem EDF_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
         valid_schedule any_sched arr_seq /\
         all_deadlines_of_arrivals_met arr_seq any_sched) ->
@@ -104,7 +104,7 @@ Section Optimality.
       w.r.t. the EDF policy predicate. The optimality of priority-compliant
       schedules that are work-conserving follows hence directly from the above
       [EDF_WC_optimality] theorem. *)
-  Corollary EDF_priority_compliant_WC_optimality:
+  Corollary EDF_priority_compliant_WC_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
         valid_schedule any_sched arr_seq /\
         all_deadlines_of_arrivals_met arr_seq any_sched) ->
@@ -136,17 +136,17 @@ Section WeakOptimality.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ... if we have a well-behaved reference schedule ... *)
-  Variable any_sched: schedule (ideal.processor_state Job).
-  Hypothesis H_must_arrive: jobs_must_arrive_to_execute any_sched.
-  Hypothesis H_completed_dont_execute: completed_jobs_dont_execute any_sched.
+  Variable any_sched : schedule (ideal.processor_state Job).
+  Hypothesis H_must_arrive : jobs_must_arrive_to_execute any_sched.
+  Hypothesis H_completed_dont_execute : completed_jobs_dont_execute any_sched.
 
   (**  ... in which no deadlines are missed, ... *)
-  Hypothesis H_all_deadlines_met: all_deadlines_met any_sched.
+  Hypothesis H_all_deadlines_met : all_deadlines_met any_sched.
 
   (** ...then there also exists an EDF schedule in which no deadlines
       are missed (and in which exactly the same set of jobs is
       scheduled, as ensured by the last clause). *)
-  Theorem weak_EDF_optimality:
+  Theorem weak_EDF_optimality :
     exists edf_sched : schedule (ideal.processor_state Job),
       jobs_must_arrive_to_execute edf_sched /\
       completed_jobs_dont_execute edf_sched /\

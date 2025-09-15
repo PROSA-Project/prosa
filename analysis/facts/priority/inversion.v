@@ -141,7 +141,7 @@ Section PI.
       [j] incurs in an interval <<[t1, t2)>> can be split arbitrarily: is equal
       to the sum of CPI in an interval <<[t1, t_mid)>> and CPI in an interval
       <<[t_mid, t2)>>. *)
-  Lemma cumulative_priority_inversion_cat:
+  Lemma cumulative_priority_inversion_cat :
     forall (t_mid t1 t2 : instant),
       t1 <= t_mid ->
       t_mid <= t2 ->

@@ -142,7 +142,7 @@ End Translation.
 Section Lemmas.
 
   (** We prove that [leq_steps_T] is transitive... *)
-  Lemma leq_stepsT_is_transitive:
+  Lemma leq_stepsT_is_transitive :
     transitive (@leq_steps_T N leq_N).
   Proof.
     move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
@@ -158,7 +158,7 @@ Section Lemmas.
   Qed.
 
   (** ... and so is [ltn_steps_T]. *)
-  Lemma ltn_stepsT_is_transitive:
+  Lemma ltn_stepsT_is_transitive :
     transitive (@ltn_steps_T N lt_N).
   Proof.
     move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
@@ -293,7 +293,7 @@ Section Refinements.
   Qed.
 
   (** Next, we prove the refinement for the [ArrivalCurvePrefix] function. *)
-  Global Instance refine_ArrivalPrefix:
+  Global Instance refine_ArrivalPrefix :
     refines (prod_R Rnat (list_R (prod_R Rnat Rnat)) ==> Rtask_ab)%rel ArrivalPrefix ArrivalPrefix_T.
   Proof.
     rewrite refinesE => arrival_curve_prefix arrival_curve_prefix' Rarrival_curve_prefix.

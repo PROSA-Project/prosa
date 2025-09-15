@@ -89,13 +89,13 @@ Section ArrivalCurves.
         bound iff, for any number of jobs of task [tsk], [min_separation]
         lower-bounds the minimum interval length in which that many jobs can
         arrive. *)
-    Definition respects_min_separation (tsk : Task) (min_separation: nat -> duration) :=
+    Definition respects_min_separation (tsk : Task) (min_separation : nat -> duration) :=
       forall t1 t2,
           t1 <= t2 ->
           min_separation (number_of_task_arrivals arr_seq tsk t1 t2) <= t2 - t1.
 
     (** We analogously define in upper separation bounds. *)
-    Definition respects_max_separation (tsk : Task) (max_separation: nat -> duration):=
+    Definition respects_max_separation (tsk : Task) (max_separation : nat -> duration) :=
       forall t1 t2,
         t1 <= t2 ->
         t2 - t1 <= max_separation (number_of_task_arrivals arr_seq tsk t1 t2).

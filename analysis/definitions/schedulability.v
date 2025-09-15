@@ -11,7 +11,7 @@ Section Task.
   Context {Task : TaskType}.
 
   (** ... any type of jobs associated with these tasks, ... *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobDeadline Job}.
@@ -21,16 +21,16 @@ Section Task.
   Context {PState : ProcessorState Job}.
 
   (** Consider any job arrival sequence... *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** ...and any schedule of these jobs. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Let [tsk] be any task that is to be analyzed. *)
-  Variable tsk: Task.
+  Variable tsk : Task.
 
   (** Then, we say that R is a response-time bound of [tsk] in this schedule ... *)
-  Variable R: duration.
+  Variable R : duration.
 
   (** ... iff any job [j] of [tsk] in this arrival sequence has
          completed by [job_arrival j + R]. *)
@@ -58,7 +58,7 @@ Section Schedulability.
   Context `{TaskDeadline Task}.
 
   (** ... any type of jobs associated with these tasks, ... *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobTask Job Task}.
@@ -67,25 +67,25 @@ Section Schedulability.
   Context {PState : ProcessorState Job}.
   
   (** Consider any job arrival sequence... *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** ...and any schedule of these jobs. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Assume that jobs don't execute after completion. *)
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Let [tsk] be any task that is to be analyzed. *)
-  Variable tsk: Task.
+  Variable tsk : Task.
 
   (** Given  a response-time bound of [tsk] in this schedule no larger than its deadline, ... *)
-  Variable R: duration.
+  Variable R : duration.
 
-  Hypothesis H_R_le_deadline: R <= task_deadline tsk.
-  Hypothesis H_response_time_bounded: task_response_time_bound arr_seq sched tsk R.
+  Hypothesis H_R_le_deadline : R <= task_deadline tsk.
+  Hypothesis H_response_time_bounded : task_response_time_bound arr_seq sched tsk R.
 
   (** ...then [tsk] is schedulable. *)
-  Lemma schedulability_from_response_time_bound:
+  Lemma schedulability_from_response_time_bound :
     schedulable_task arr_seq sched tsk.
   Proof.
     intros j ARRj JOBtsk.
@@ -113,14 +113,14 @@ Section AllDeadlinesMet.
   Context `{JobDeadline Job}.
 
   (** ... any given type of processor states. *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** We say that all deadlines are met if every job scheduled at some
      point in the schedule meets its deadline. Note that this is a
      relatively weak definition since an "empty" schedule that is idle
      at all times trivially satisfies it (since the definition does
      not require any kind of work conservation). *)
-  Definition all_deadlines_met (sched: schedule PState) :=
+  Definition all_deadlines_met (sched : schedule PState) :=
     forall j t,
       scheduled_at sched j t ->
       job_meets_deadline sched j.
@@ -131,14 +131,14 @@ Section AllDeadlinesMet.
   Section DeadlinesOfArrivals.
 
     (** Given an arbitrary job arrival sequence ... *)
-    Variable arr_seq: arrival_sequence Job.  
+    Variable arr_seq : arrival_sequence Job.  
 
     (** ... we say that all arrivals meet their deadline if every job
        that arrives at some point in time meets its deadline. Note
        that this definition does not preclude the existence of jobs in
        a schedule that miss their deadline (e.g., if they stem from
        another arrival sequence). *)
-    Definition all_deadlines_of_arrivals_met (sched: schedule PState) :=
+    Definition all_deadlines_of_arrivals_met (sched : schedule PState) :=
       forall j,
         arrives_in arr_seq j ->
         job_meets_deadline sched j.
@@ -148,7 +148,7 @@ Section AllDeadlinesMet.
   (** We observe that the latter definition, assuming a schedule in
       which all jobs come from the arrival sequence, implies the
       former definition. *)
-  Lemma all_deadlines_met_in_valid_schedule:
+  Lemma all_deadlines_met_in_valid_schedule :
     forall arr_seq sched,
       jobs_come_from_arrival_sequence sched arr_seq ->
       all_deadlines_of_arrivals_met arr_seq sched ->

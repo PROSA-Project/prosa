@@ -43,7 +43,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** ... and that the cost of a job does not exceed the task's WCET . *)
-  Hypothesis H_valid_job_cost: arrivals_have_valid_job_costs arr_seq.
+  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e., for any task
       [tsk] in [ts], [max_arrival tsk] is (1) an arrival bound for [tsk], and
@@ -65,7 +65,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_jobs_come_from_arrival_sequence:
+  Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Finally, we assume that the schedule is work-conserving ... *)

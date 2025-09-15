@@ -32,8 +32,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
   Context `{JobDeadline Job}.
 
   (** ...and an arbitrary arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** We introduce the notion of work-conservation at a
       given time [t]. The definition is based on the concept of readiness
@@ -49,13 +49,13 @@ Section AuxiliaryLemmasWorkConservingTransformation.
   Section JobsMustBeReadyFindSwapCandidate.
 
     (** Consider an ideal uniprocessor schedule... *)
-    Variable sched: schedule (ideal.processor_state Job).
+    Variable sched : schedule (ideal.processor_state Job).
 
     (** ...in which jobs must be ready to execute. *)
-    Hypothesis H_jobs_must_be_ready: jobs_must_be_ready_to_execute sched.
+    Hypothesis H_jobs_must_be_ready : jobs_must_be_ready_to_execute sched.
 
     (** Consider an arbitrary time instant [t1]. *)
-    Variable t1: instant.
+    Variable t1 : instant.
 
     (** Let us define [fsc] as the result of the search for a swap candidate
         starting from [t1]... *)
@@ -66,7 +66,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** First, we show that, in any case, the result of the search will yield an
         instant that is in the future (or, in case of failure, equal to [t1]). *)
-    Lemma swap_candidate_is_in_future:
+    Lemma swap_candidate_is_in_future :
       t1 <= fsc.
     Proof.
       rewrite /fsc /find_swap_candidate.
@@ -77,7 +77,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Also, we show that the search will not yield jobs that arrive later than the
         given reference time. *)
-    Lemma fsc_respects_has_arrived:
+    Lemma fsc_respects_has_arrived :
       forall j t,
         sched (find_swap_candidate arr_seq sched t) == Some j ->
         has_arrived j t.
@@ -95,7 +95,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Next, we extend the previous lemma by stating that no job in the transformed
         schedule is scheduled before its arrival. *)
-    Lemma swap_jobs_must_arrive_to_execute:
+    Lemma swap_jobs_must_arrive_to_execute :
         jobs_must_arrive_to_execute sched'.
     Proof.
       move=> j t SCHED_AT.
@@ -123,7 +123,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Finally we show that, in the transformed schedule, jobs are scheduled
         only if they are ready. *)
-    Lemma fsc_jobs_must_be_ready_to_execute:
+    Lemma fsc_jobs_must_be_ready_to_execute :
       jobs_must_be_ready_to_execute sched'.
     Proof.
       move=> j t SCHED_AT.
@@ -144,10 +144,10 @@ Section AuxiliaryLemmasWorkConservingTransformation.
   Section MakeWCAtFacts.
 
     (** Consider an ideal uniprocessor schedule... *)
-    Variable sched: schedule (ideal.processor_state Job).
+    Variable sched : schedule (ideal.processor_state Job).
 
     (** ...and take an arbitrary point in time... *)
-    Variable t: instant.
+    Variable t : instant.
 
     (** ...we define [sched'] as the resulting schedule after one point-wise transformation. *)
     Let sched' := make_wc_at arr_seq sched t.
@@ -155,7 +155,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     (** We start by proving that the point-wise transformation can only lead
         to higher service for a job at a given time. This is true because we
         swap only idle processor states with ones in which a job is scheduled. *)
-    Lemma mwa_service_bound:
+    Lemma mwa_service_bound :
       forall j t, service sched j t <= service sched' j t.
     Proof.
       intros j t'.
@@ -180,7 +180,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Next, we show that any ready job in the transformed schedule must be ready also in
         the original one, since the transformation can only lead to higher service. *)
-    Lemma mwa_ready_job_also_ready_in_original_schedule:
+    Lemma mwa_ready_job_also_ready_in_original_schedule :
       forall j t, job_ready sched' j t -> job_ready sched j t.
     Proof.
       intros j t'.
@@ -197,7 +197,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     (** Since the search for a swap candidate is performed until the latest deadline
         among all the jobs arrived before the reference time, we need to show that the computed
         deadline is indeed the latest. *)
-    Lemma max_dl_is_greatest_dl:
+    Lemma max_dl_is_greatest_dl :
       forall j t,
         arrives_in arr_seq j ->
         job_arrival j <= t ->
@@ -220,7 +220,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       (** We need to assume that, in the original schedule, all the deadlines of
           the jobs coming from the arrival sequence are met, in order to be sure that
           a ready job will be eventually scheduled. *)
-      Hypothesis H_all_deadlines_of_arrivals_met: all_deadlines_of_arrivals_met arr_seq sched.
+      Hypothesis H_all_deadlines_of_arrivals_met : all_deadlines_of_arrivals_met arr_seq sched.
 
       (** We define [max_dl] as the maximum deadline for all jobs arrived before [t]. *)
       Let max_dl := max_deadline_for_jobs_arrived_before arr_seq t.
@@ -235,15 +235,15 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       Section MakeWCAtFindsReadyJobs_CaseResultFound.
 
         (** Assuming that the processor is idle at time t... *)
-        Hypothesis H_sched_t_idle: ideal_is_idle sched t.
+        Hypothesis H_sched_t_idle : ideal_is_idle sched t.
 
         (** ...let [t_swap] be a time instant found by the search procedure. *)
-        Variable t_swap: instant.
-        Hypothesis search_result_found: search_result = Some t_swap.
+        Variable t_swap : instant.
+        Hypothesis search_result_found : search_result = Some t_swap.
 
         (** We show that, since the search only yields relevant processor states, a job is found. *)
-        Lemma make_wc_at_case_result_found:
-          exists j: Job,
+        Lemma make_wc_at_case_result_found :
+          exists j : Job,
             swapped sched t t_swap t = Some j.
         Proof.
           apply search_arg_pred in search_result_found.
@@ -265,16 +265,16 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
         (** Consider a job that arrives in the arrival sequence, and assume that
             it is ready at time [t] in the transformed schedule. *)
-        Variable j: Job.
-        Hypothesis H_arrives_in: arrives_in arr_seq j.
-        Hypothesis H_job_ready_sched': job_ready sched' j t.
+        Variable j : Job.
+        Hypothesis H_arrives_in : arrives_in arr_seq j.
+        Hypothesis H_job_ready_sched' : job_ready sched' j t.
 
         (** Moreover, assume the search for a swap candidate yields nothing. *)
-        Hypothesis H_search_result_none: search_result = None.
+        Hypothesis H_search_result_none : search_result = None.
 
         (** First, note that, since nothing was found, it means there is no relevant
            processor state between [t] and [max_dl]. *)
-        Lemma no_relevant_state_in_range:
+        Lemma no_relevant_state_in_range :
           forall t',
             t <= t' < max_dl ->
             ~~ (relevant_pstate t) (sched t').
@@ -283,7 +283,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         Qed.
 
         (** Since [j] is ready at time [t], then it must be incomplete. *)
-        Lemma service_of_j_is_less_than_cost: service sched j t < job_cost j.
+        Lemma service_of_j_is_less_than_cost : service sched j t < job_cost j.
         Proof.
           have READY_ORIG: job_ready sched j t
             by apply (mwa_ready_job_also_ready_in_original_schedule _ _); apply H_job_ready_sched'.
@@ -295,7 +295,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
         (** And since [j] is incomplete and meets its deadline, the deadline of [j]
             is in the future. *)
-        Lemma t_is_less_than_deadline_of_j: t <= job_deadline j.
+        Lemma t_is_less_than_deadline_of_j : t <= job_deadline j.
         Proof.
           move: (H_all_deadlines_of_arrivals_met j H_arrives_in)=> MEETS_DL_j.
           move_neq_up LEQ_t1.
@@ -307,7 +307,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         (** On the other hand, since we know that there is no relevant state between [t] and [max_dl],
             then it must be the case that [j] is never scheduled in this period, and hence gets no
             service. *)
-        Lemma equal_service_t_max_dl: service sched j t = service sched j max_dl.
+        Lemma equal_service_t_max_dl : service sched j t = service sched j max_dl.
         Proof.
           move:(H_job_ready_sched') => /andP [ARR NOT_COMPL_sched'].
           rewrite -(service_cat sched j t max_dl);
@@ -324,7 +324,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         Qed.
 
         (** Combining the previous lemmas, we can deduce that [j] misses its deadline. *)
-        Lemma j_misses_deadline: service sched j (job_deadline j) < job_cost j.
+        Lemma j_misses_deadline : service sched j (job_deadline j) < job_cost j.
         Proof.
           move:(H_job_ready_sched') => /andP [ARR NOT_COMPL_sched'].
           have J_LESS := service_of_j_is_less_than_cost.
@@ -338,7 +338,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
         (** The fact that [j] misses its deadline contradicts the fact that all deadlines
             of jobs coming from the arrival sequence are met. We have a contradiction. *)
-        Lemma make_wc_at_case_result_none: False.
+        Lemma make_wc_at_case_result_none : False.
         Proof.
           move: (H_all_deadlines_of_arrivals_met j H_arrives_in) => NEQ.
           unfold job_meets_deadline, completed_by in NEQ.
@@ -351,7 +351,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       (** Next, we show that [make_wc_at] always manages to establish the work-conservation property
           at the given time. Using the above case analysis, we can conclude that the presence of a
           ready job always leads to a valid swap. *)
-      Lemma mwa_finds_ready_jobs:
+      Lemma mwa_finds_ready_jobs :
         all_deadlines_of_arrivals_met arr_seq sched ->
         is_work_conserving_at sched' t.
       Proof.
@@ -370,7 +370,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Next we prove that, given a schedule that respects the work-conservation property until [t-1],
         applying the point-wise transformation at time [t] will extend the property until [t]. *)
-    Lemma mwa_establishes_wc:
+    Lemma mwa_establishes_wc :
       all_deadlines_of_arrivals_met arr_seq sched ->
       (forall t_l, t_l < t -> is_work_conserving_at sched t_l) ->
       forall t_l, t_l <= t -> is_work_conserving_at sched' t_l.
@@ -396,7 +396,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** We now show that the point-wise transformation does not introduce any new job
         that does not come from the arrival sequence. *)
-    Lemma mwa_jobs_come_from_arrival_sequence:
+    Lemma mwa_jobs_come_from_arrival_sequence :
       jobs_come_from_arrival_sequence sched arr_seq ->
       jobs_come_from_arrival_sequence sched' arr_seq.
     Proof.
@@ -407,7 +407,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** We also show that the point-wise transformation does not schedule jobs in instants
         in which they are not ready. *)
-    Lemma mwa_jobs_must_be_ready_to_execute:
+    Lemma mwa_jobs_must_be_ready_to_execute :
       jobs_must_be_ready_to_execute sched ->
       jobs_must_be_ready_to_execute sched'.
     Proof.
@@ -418,7 +418,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Qed.
 
     (** Finally, we show that the point-wise transformation does not introduce deadline misses. *)
-    Lemma mwa_all_deadlines_of_arrivals_met:
+    Lemma mwa_all_deadlines_of_arrivals_met :
       all_deadlines_of_arrivals_met arr_seq sched ->
       all_deadlines_of_arrivals_met arr_seq sched'.
     Proof.
@@ -436,17 +436,17 @@ Section AuxiliaryLemmasWorkConservingTransformation.
   Section PrefixFacts.
 
     (** Consider an ideal uniprocessor schedule. *)
-    Variable sched: schedule (ideal.processor_state Job).
+    Variable sched : schedule (ideal.processor_state Job).
 
     (** We start by proving that the transformation performed with two different horizons
         will yield two schedules that are identical until the earlier horizon. *)
     Section PrefixInclusion.
 
       (** Consider two horizons... *)
-      Variable h1 h2: instant.
+      Variable h1 h2 : instant.
 
       (** ...and assume w.l.o.g. that they are ordered... *)
-      Hypothesis H_horizon_order: h1 <= h2.
+      Hypothesis H_horizon_order : h1 <= h2.
 
       (** ...we define two schedules, resulting from the transformation
           performed, respectively, until the first and the second horizon. *)
@@ -455,7 +455,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
       (** Then, we show that the two schedules are guaranteed to be equal until the
           earlier horizon. *)
-      Lemma wc_transform_prefix_inclusion:
+      Lemma wc_transform_prefix_inclusion :
         forall t, t < h1 -> sched1 t = sched2 t.
       Proof.
         move=> t before_horizon.
@@ -480,7 +480,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Section JobsMeetDeadlinePrefix.
 
       (** Assuming that all deadlines of jobs coming from the arrival sequence are met... *)
-      Hypothesis H_all_deadlines_of_arrivals_met: all_deadlines_of_arrivals_met arr_seq sched.
+      Hypothesis H_all_deadlines_of_arrivals_met : all_deadlines_of_arrivals_met arr_seq sched.
 
       (** ...let us define [sched'] as the schedule resulting from the
           full work-conservation transformation. Note that, if the schedule is sampled at time
@@ -488,12 +488,12 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       Let sched' := wc_transform arr_seq sched.
 
       (** Consider a job from the arrival sequence. *)
-      Variable j: Job.
-      Hypothesis H_arrives_in: arrives_in arr_seq j.
+      Variable j : Job.
+      Hypothesis H_arrives_in : arrives_in arr_seq j.
 
       (** We show that, in the transformed schedule, the service of the job
           is always greater or equal than in the original one, at any given time. *)
-      Lemma wc_prefix_service_bound:
+      Lemma wc_prefix_service_bound :
         forall t, service sched j t <= service sched' j t.
       Proof.
         move=> t.
@@ -514,7 +514,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
       (** Finally, it follows directly that the transformed schedule cannot introduce
           a deadline miss for any job from the arrival sequence. *)
-      Lemma wc_prefix_job_meets_deadline:
+      Lemma wc_prefix_job_meets_deadline :
         job_meets_deadline sched' j.
       Proof.
         rewrite /job_meets_deadline /completed_by /sched'.
@@ -526,7 +526,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     End JobsMeetDeadlinePrefix.
 
     (** Next, consider a given time, used as horizon for the transformation... *)
-    Variable h: instant.
+    Variable h : instant.
 
     (** ...and let us call [sched'] the schedule resulting from the transformation
         performed until [h]. *)
@@ -534,7 +534,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** We prove that [sched'] will never introduce jobs not coming from the
         arrival sequence. *)
-    Lemma wc_prefix_jobs_come_from_arrival_sequence:
+    Lemma wc_prefix_jobs_come_from_arrival_sequence :
       jobs_come_from_arrival_sequence sched arr_seq ->
       jobs_come_from_arrival_sequence sched' arr_seq.
     Proof.
@@ -547,7 +547,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Similarly, we can show that [sched'] will only schedule jobs if they are
         ready. *)
-    Lemma wc_prefix_jobs_must_be_ready_to_execute:
+    Lemma wc_prefix_jobs_must_be_ready_to_execute :
       jobs_must_be_ready_to_execute sched ->
       jobs_must_be_ready_to_execute sched'.
     Proof.
@@ -577,23 +577,23 @@ Section WorkConservingTransformation.
   Context `{JobDeadline Job}.
 
   (** ...an arbitrary valid arrival sequence... *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
   (** ...and an ideal uniprocessor schedule... *)
-  Variable sched: schedule (ideal.processor_state Job).
+  Variable sched : schedule (ideal.processor_state Job).
 
   (** ...in which jobs come from the arrival sequence, and must be ready to execute...  *)
-  Hypothesis H_sched_valid: valid_schedule sched arr_seq.
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** ...and in which no job misses a deadline. *)
-  Hypothesis H_all_deadlines_of_arrivals_met: all_deadlines_of_arrivals_met arr_seq sched.
+  Hypothesis H_all_deadlines_of_arrivals_met : all_deadlines_of_arrivals_met arr_seq sched.
 
   (** Let us call [sched_wc] the schedule obtained after applying the work-conservation transformation. *)
   Let sched_wc := wc_transform arr_seq sched.
 
   (** First, we show that any scheduled job still comes from the arrival sequence. *)
-  Lemma wc_jobs_come_from_arrival_sequence:
+  Lemma wc_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched_wc arr_seq.
   Proof.
     move=> j t.
@@ -602,7 +602,7 @@ Section WorkConservingTransformation.
   Qed.
 
   (** Similarly, jobs are only scheduled if they are ready. *)
-  Lemma wc_jobs_must_be_ready_to_execute:
+  Lemma wc_jobs_must_be_ready_to_execute :
     jobs_must_be_ready_to_execute sched_wc.
   Proof.
     move=> j t.
@@ -619,7 +619,7 @@ Section WorkConservingTransformation.
   Qed.
 
   (** Also, no deadline misses are introduced. *)
-  Lemma wc_all_deadlines_of_arrivals_met:
+  Lemma wc_all_deadlines_of_arrivals_met :
     all_deadlines_of_arrivals_met arr_seq sched_wc.
   Proof.
     move=> j ARR_IN.
@@ -629,7 +629,7 @@ Section WorkConservingTransformation.
 
   (** Finally, we can show that the transformation leads to a schedule in which
       the processor is not idle if a job is ready. *)
-  Lemma wc_is_work_conserving_at:
+  Lemma wc_is_work_conserving_at :
     forall j t,
       job_ready sched_wc j t ->
       arrives_in arr_seq j ->
@@ -662,7 +662,7 @@ Section WorkConservingTransformation.
 
   (** We can easily extend the previous lemma to obtain the definition
       of a work-conserving schedule. *)
-  Lemma wc_is_work_conserving:
+  Lemma wc_is_work_conserving :
     work_conserving arr_seq sched_wc.
   Proof.
     move=> j t ARR_IN.
@@ -674,7 +674,7 @@ Section WorkConservingTransformation.
   (** Ultimately, we can show that the work-conservation transformation maintains
       all the properties of validity, does not introduce new deadline misses, and
       establishes the work-conservation property. *)
-  Theorem wc_transform_correctness:
+  Theorem wc_transform_correctness :
     valid_schedule sched_wc arr_seq /\
     all_deadlines_of_arrivals_met arr_seq sched_wc /\
     work_conserving arr_seq sched_wc.

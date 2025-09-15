@@ -9,7 +9,7 @@ Section PrefixDefinition.
   Context {Job : JobType}.
 
   (** ... and any kind of processor model, ... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ... two schedules share an identical prefix if they are pointwise
           identical (at least) up to a fixed horizon. *)

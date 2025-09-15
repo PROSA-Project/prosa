@@ -9,16 +9,16 @@ Section ReplaceAt.
   (** For any given type of jobs... *)
   Context {Job : JobType}.
   (** ... any given type of processor states, ... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ...consider any given reference schedule. *)
-  Variable original_sched: schedule PState.
+  Variable original_sched : schedule PState.
 
   (** Suppose we are given a specific time [t'] ... *)
-  Variable t': instant.
+  Variable t' : instant.
 
   (** ...and a replacement state [new_state]. *)
-  Variable new_state: PState.
+  Variable new_state : PState.
 
   (** Then the schedule with replacement is simply one that returns the given
      [new_state] at [t'], and the original allocation at all other times. *)
@@ -33,13 +33,13 @@ Section Swapped.
   (** For any given type of jobs... *)
   Context {Job : JobType}.
   (** ... any given type of processor states, ... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ...consider any given reference schedule. *)
-  Variable original_sched: schedule PState.
+  Variable original_sched : schedule PState.
 
   (** Given two specific times [t1] and [t2]... *)
-  Variable t1 t2: instant.
+  Variable t1 t2 : instant.
 
   (** ...we define the notion of a schedule in which the two allocations at [t1]
      and [t2] have been swapped. *)

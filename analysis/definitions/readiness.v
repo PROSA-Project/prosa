@@ -13,7 +13,7 @@ Section ReadinessModelProperties.
   Context {Job : JobType} `{JobCost Job} `{JobArrival Job}.
 
   (** ... and any kind of processor model, ... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ... consider a  notion of job readiness. *)
   Variable ReadinessModel : JobReady Job PState.

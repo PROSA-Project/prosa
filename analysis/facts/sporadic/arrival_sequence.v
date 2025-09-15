@@ -21,20 +21,20 @@ Section SporadicArrivals.
 
   (** Assume all tasks have valid minimum inter-arrival times, valid offsets, and respect the
       sporadic task model. *)
-  Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
-  Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
+  Hypothesis H_sporadic_model : respects_sporadic_task_model arr_seq tsk.
+  Hypothesis H_valid_inter_min_arrival : valid_task_min_inter_arrival_time tsk.
 
   (** Consider any two jobs from the arrival sequence that stem
       from task [tsk]. *)
   Variable j1 j2 : Job.
-  Hypothesis H_j1_from_arrival_sequence: arrives_in arr_seq j1.
-  Hypothesis H_j2_from_arrival_sequence: arrives_in arr_seq j2.
-  Hypothesis H_j1_task: job_task j1 = tsk.
-  Hypothesis H_j2_task: job_task j2 = tsk.
+  Hypothesis H_j1_from_arrival_sequence : arrives_in arr_seq j1.
+  Hypothesis H_j2_from_arrival_sequence : arrives_in arr_seq j2.
+  Hypothesis H_j1_task : job_task j1 = tsk.
+  Hypothesis H_j2_task : job_task j2 = tsk.
 
   (** We show that a sporadic task with valid min inter-arrival time cannot
       have more than one job arriving at any time. *)
-  Lemma size_task_arrivals_at_leq_one:
+  Lemma size_task_arrivals_at_leq_one :
     (exists j,
         size (task_arrivals_at_job_arrival arr_seq j) > 1 /\
         respects_sporadic_task_model arr_seq (job_task j) /\
@@ -58,7 +58,7 @@ Section SporadicArrivals.
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
       the same time as [j1], and thus the task arrivals at [job arrival j1]
       consists only of job [j1]. *)
-  Lemma only_j_in_task_arrivals_at_j:
+  Lemma only_j_in_task_arrivals_at_j :
     task_arrivals_at_job_arrival arr_seq j1 = [::j1].
   Proof.
     set (task_arrivals_at_job_arrival arr_seq j1) as seq in *.
@@ -79,7 +79,7 @@ Section SporadicArrivals.
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
       the same time as [j1], and thus the task arrivals at [job arrival j1]
       consists only of job [j1]. *)
-  Lemma only_j_at_job_arrival_j:
+  Lemma only_j_at_job_arrival_j :
     forall t,
       job_arrival j1 = t ->
       task_arrivals_at arr_seq tsk t = [::j1].
@@ -93,7 +93,7 @@ Section SporadicArrivals.
   (** We show that a job [j1] is the first job that arrives
       in task arrivals at [job_arrival j1] by showing that the
       index of job [j1] in [task_arrivals_at_job_arrival arr_seq j1] is 0. *)
-  Lemma index_j_in_task_arrivals_at:
+  Lemma index_j_in_task_arrivals_at :
     index j1 (task_arrivals_at_job_arrival arr_seq j1) = 0.
   Proof.
     by rewrite only_j_in_task_arrivals_at_j //= eq_refl.
@@ -101,7 +101,7 @@ Section SporadicArrivals.
 
   (** We observe that for any job [j] the arrival time of [prev_job j] is
       strictly less than the arrival time of [j] in context of periodic tasks. *)
-  Lemma prev_job_arr_lt:
+  Lemma prev_job_arr_lt :
     job_index arr_seq j1 > 0 ->
     job_arrival (prev_job arr_seq j1) < job_arrival j1.
   Proof.
@@ -120,7 +120,7 @@ Section SporadicArrivals.
   (** We show that task arrivals at [job_arrival j1] is the
       same as task arrivals that arrive between [job_arrival j1]
       and [job_arrival j1 + 1]. *)
-  Lemma task_arrivals_at_as_task_arrivals_between:
+  Lemma task_arrivals_at_as_task_arrivals_between :
     task_arrivals_at_job_arrival arr_seq j1 = task_arrivals_between arr_seq tsk (job_arrival j1) (job_arrival j1).+1.
   Proof.
     rewrite /task_arrivals_at_job_arrival /task_arrivals_at /task_arrivals_between /arrivals_between.
@@ -130,7 +130,7 @@ Section SporadicArrivals.
   (** We show that the task arrivals up to the previous job [j1] concatenated with
       the sequence [::j1] (the sequence containing only the job [j1]) is same as
       task arrivals up to [job_arrival j1]. *)
-  Lemma prev_job_cat:
+  Lemma prev_job_cat :
     job_index arr_seq j1 > 0 ->
     task_arrivals_up_to_job_arrival arr_seq (prev_job arr_seq j1) ++ [::j1] = task_arrivals_up_to_job_arrival arr_seq j1.
   Proof.

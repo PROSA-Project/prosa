@@ -32,7 +32,7 @@ Section SelectSupremum.
       end, we first establish a few simple helper lemmas. *)
 
   (** We start with observing how [supremum] can be unrolled one step. *)
-  Lemma supremum_unfold:
+  Lemma supremum_unfold :
     forall head tail,
       supremum (head :: tail) = choose_superior head (supremum tail).
   Proof.
@@ -42,7 +42,7 @@ Section SelectSupremum.
 
   (** Next, we observe that [supremum] returns a result for any non-empty
       list. *)
-  Lemma supremum_exists: forall x s, x \in s -> supremum s != None.
+  Lemma supremum_exists : forall x s, x \in s -> supremum s != None.
   Proof.
     move=> x s IN.
     elim: s IN; first by done.
@@ -53,7 +53,7 @@ Section SelectSupremum.
   Qed.
 
   (** Conversely, if [supremum] finds nothing, then the list is empty. *)
-  Lemma supremum_none: forall s, supremum s = None -> s = nil.
+  Lemma supremum_none : forall s, supremum s = None -> s = nil.
   Proof.
     move=> s.
     elim: s; first by done.
@@ -64,7 +64,7 @@ Section SelectSupremum.
 
   (** Next, we observe that the value found by [supremum] comes indeed from the
       list that it was given. *)
-  Lemma supremum_in:
+  Lemma supremum_in :
     forall x s,
       supremum s = Some x ->
       x \in s.
@@ -86,15 +86,15 @@ Section SelectSupremum.
       we need to make additional assumptions on [R]. *)
 
   (** (1) [R] is reflexive. *)
-  Hypothesis H_R_reflexive: reflexive R.
+  Hypothesis H_R_reflexive : reflexive R.
   (** (2) [R] is total. *)
-  Hypothesis H_R_total: total R.
+  Hypothesis H_R_total : total R.
   (** (3) [R] is transitive. *)
-  Hypothesis H_R_transitive: transitive R.
+  Hypothesis H_R_transitive : transitive R.
 
   (** Based on these assumptions, we show that the function [supremum] indeed
       computes an upper bound on all elements in the given sequence. *)
-  Lemma supremum_spec:
+  Lemma supremum_spec :
     forall x s,
       supremum s = Some x ->
       forall y,

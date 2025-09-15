@@ -41,7 +41,7 @@ Section AbstractRTAIdeal.
 
   (** Next, consider any schedule of this arrival sequence... *)
   Variable sched : schedule PState.
-  Hypothesis H_jobs_come_from_arrival_sequence:
+  Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ... where jobs do not execute before their arrival nor after completion. *)

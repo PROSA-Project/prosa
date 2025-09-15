@@ -39,7 +39,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** ... and the cost of a job cannot be larger than the task cost. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** First, we assume we have the model with fixed preemption points.
@@ -47,7 +47,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       by inserting statically predefined preemption points. *)
   Context `{JobPreemptionPoints Job}
           `{TaskPreemptionPoints Task}.
-  Hypothesis H_valid_model_with_fixed_preemption_points:
+  Hypothesis H_valid_model_with_fixed_preemption_points :
     valid_fixed_preemption_points_model arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for any task [tsk] in ts
@@ -68,7 +68,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   (** Next, consider any valid ideal uni-processor schedule  with limited preemptions of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_schedule_respects_preemption_model:
+  Hypothesis H_schedule_respects_preemption_model :
     schedule_respects_preemption_model arr_seq sched.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
@@ -116,8 +116,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   (** Next, consider any value [R], and assume that for any given
       arrival [A] from search space there is a solution of the
       response-time bound recurrence which is bounded by [R]. *)
-  Variable R: nat.
-  Hypothesis H_R_is_maximum:
+  Variable R : nat.
+  Hypothesis H_R_is_maximum :
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
@@ -132,7 +132,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
-  Theorem uniprocessor_response_time_bound_fp_with_fixed_preemption_points:
+  Theorem uniprocessor_response_time_bound_fp_with_fixed_preemption_points :
     response_time_bounded_by tsk R.
   Proof.
     move: (H_valid_model_with_fixed_preemption_points) => [MLP [BEG [END [INCR [HYP1 [HYP2 HYP3]]]]]].

@@ -33,7 +33,7 @@ Section GenericSchedule.
 
   (** We construct the schedule step by step starting from an "empty" schedule
       that is idle at all times as a base case. *)
-  Definition empty_schedule: schedule PState := fun _ => idle_state.
+  Definition empty_schedule : schedule PState := fun _ => idle_state.
 
   (** Next, we define a function that computes a schedule prefix up to a given
       time horizon [h]. *)

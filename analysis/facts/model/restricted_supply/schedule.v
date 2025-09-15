@@ -11,7 +11,7 @@ Section ScheduleClass.
   #[local] Existing Instance rs_processor_state.
 
   (** Consider any job type and the ideal processor model. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 

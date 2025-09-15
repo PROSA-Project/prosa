@@ -13,7 +13,7 @@ Section CompletionSequence.
   Context {Job : JobType} `{JobCost Job} {PState : ProcessorState Job}.
 
   (** Consider any job arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** Consider any schedule. *)
   Variable sched : schedule PState.

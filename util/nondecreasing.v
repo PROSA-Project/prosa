@@ -43,7 +43,7 @@ Section NondecreasingSequence.
   Section IncreasingSequence.
 
     (** Note that a filtered iota sequence is an increasing sequence. *)
-    Lemma iota_is_increasing_sequence:
+    Lemma iota_is_increasing_sequence :
       forall a b P,
         increasing_sequence [seq x <- index_iota a b | P x].
     Proof.
@@ -76,7 +76,7 @@ Section NondecreasingSequence.
 
     (** We prove that any increasing sequence is also a non-decreasing
         sequence. *)
-    Lemma increasing_implies_nondecreasing:
+    Lemma increasing_implies_nondecreasing :
       forall xs,
         increasing_sequence xs ->
         nondecreasing_sequence xs.
@@ -95,7 +95,7 @@ Section NondecreasingSequence.
 
     (** First we prove that if [0 ∈ xs], then
         [0] is the first element of [xs]. *)
-    Lemma nondec_seq_zero_first:
+    Lemma nondec_seq_zero_first :
       forall xs,
         (0 \in xs) ->
         nondecreasing_sequence xs ->
@@ -116,7 +116,7 @@ Section NondecreasingSequence.
 
     (** If [x1::x2::xs] is a non-decreasing sequence, then either
         [x1 = x2] or [x1 < x2]. *)
-    Lemma nondecreasing_sequence_2cons_leVeq:
+    Lemma nondecreasing_sequence_2cons_leVeq :
       forall x1 x2 xs,
         nondecreasing_sequence (x1 :: x2 :: xs) ->
         x1 = x2 \/ x1 < x2.
@@ -129,7 +129,7 @@ Section NondecreasingSequence.
 
     (** We prove that if [x::xs] is a non-decreasing sequence,
         then [xs] also is a non-decreasing sequence. *)
-    Lemma nondecreasing_sequence_cons:
+    Lemma nondecreasing_sequence_cons :
       forall x xs,
         nondecreasing_sequence (x :: xs) ->
         nondecreasing_sequence xs.
@@ -146,7 +146,7 @@ Section NondecreasingSequence.
     (** Let [xs] be a non-decreasing sequence,
         then for [x] s.t. [∀ y ∈ xs, x ≤ y]
         [x::xs] is a non-decreasing sequence. *)
-    Lemma nondecreasing_sequence_add_min:
+    Lemma nondecreasing_sequence_add_min :
       forall x xs,
         (forall y, y \in xs -> x <= y) ->
         nondecreasing_sequence xs ->
@@ -163,7 +163,7 @@ Section NondecreasingSequence.
 
     (** We prove that if [x::xs] is a non-decreasing sequence,
         then [x::x::xs] also is a non-decreasing sequence. *)
-    Lemma nondecreasing_sequence_cons_double:
+    Lemma nondecreasing_sequence_cons_double :
       forall x xs,
         nondecreasing_sequence (x :: xs) ->
         nondecreasing_sequence (x :: x :: xs).
@@ -180,7 +180,7 @@ Section NondecreasingSequence.
 
     (** We prove that if [x::xs] is a non-decreasing sequence,
         then [x] is a minimal element of [xs]. *)
-    Lemma nondecreasing_sequence_cons_min:
+    Lemma nondecreasing_sequence_cons_min :
       forall x xs,
         nondecreasing_sequence (x :: xs) ->
         (forall y, y \in xs -> x <= y).
@@ -196,7 +196,7 @@ Section NondecreasingSequence.
     Qed.
 
     (** We also prove a similar lemma for strict minimum. *)
-    Corollary nondecreasing_sequence_cons_smin:
+    Corollary nondecreasing_sequence_cons_smin :
       forall x1 x2 xs,
         x1 < x2 ->
         nondecreasing_sequence (x1 :: x2 :: xs) ->
@@ -211,7 +211,7 @@ Section NondecreasingSequence.
 
     (** Next, we prove that no element can lie strictly between two
         neighboring elements and still belong to the list. *)
-    Lemma antidensity_of_nondecreasing_seq:
+    Lemma antidensity_of_nondecreasing_seq :
       forall (xs : seq nat) (x : nat) (n : nat),
         nondecreasing_sequence xs ->
         xs[|n|] < x < xs[|n.+1|] ->
@@ -250,7 +250,7 @@ Section NondecreasingSequence.
     (** Alternatively, consider an arbitrary natural number x that is
         bounded by the first and the last element of a sequence
         [xs]. Then there is an index n such that [xs[n] <= x < x[n+1]]. *)
-    Lemma belonging_to_segment_of_seq_is_total:
+    Lemma belonging_to_segment_of_seq_is_total :
       forall (xs : seq nat) (x : nat),
         2 <= size xs ->
         first0 xs <= x < last0 xs ->
@@ -288,7 +288,7 @@ Section NondecreasingSequence.
     Qed.
 
     (** Note that the last element of a non-decreasing sequence is the max element. *)
-    Lemma last_is_max_in_nondecreasing_seq:
+    Lemma last_is_max_in_nondecreasing_seq :
       forall (xs : seq nat) (x : nat),
         nondecreasing_sequence xs ->
         (x \in xs) ->
@@ -324,7 +324,7 @@ Section NondecreasingSequence.
   Section Undup.
 
     (** First we prove that [undup x::x::xs] is equal to [undup x::xs]. *)
-    Remark nodup_sort_2cons_eq:
+    Remark nodup_sort_2cons_eq :
       forall {X : eqType} (x : X) (xs : seq X),
         undup (x::x::xs) = undup (x::xs).
     Proof.
@@ -335,7 +335,7 @@ Section NondecreasingSequence.
 
     (** For non-decreasing sequences we show that the fact that
         [x1 < x2] implies that [undup x1::x2::xs = x1::undup x2::xs]. *)
-    Lemma nodup_sort_2cons_lt:
+    Lemma nodup_sort_2cons_lt :
       forall x1 x2 xs,
         x1 < x2 ->
         nondecreasing_sequence (x1::x2::xs) ->
@@ -355,7 +355,7 @@ Section NondecreasingSequence.
 
     (** Next we show that function [undup] doesn't change
         the last element of a sequence. *)
-    Lemma last0_undup:
+    Lemma last0_undup :
       forall xs,
         nondecreasing_sequence xs ->
         last0 (undup xs) = last0 xs.
@@ -372,7 +372,7 @@ Section NondecreasingSequence.
     Qed.
 
     (** Non-decreasing sequence remains non-decreasing after application of [undup]. *)
-    Lemma nondecreasing_sequence_undup:
+    Lemma nondecreasing_sequence_undup :
       forall xs,
         nondecreasing_sequence xs ->
         nondecreasing_sequence (undup xs).
@@ -396,7 +396,7 @@ Section NondecreasingSequence.
 
     (** We also show that the penultimate element of a sequence [undup xs]
         is bounded by the penultimate element of sequence [xs]. *)
-    Lemma undup_nth_le:
+    Lemma undup_nth_le :
       forall xs,
         nondecreasing_sequence xs ->
         undup xs [| (size (undup xs)).-2 |] <= xs [| (size xs).-2 |].
@@ -434,7 +434,7 @@ Section NondecreasingSequence.
 
     (** We begin with a simple lemma that helps us unfold [distances]
         of lists with two consecutive cons [x0::x1::xs]. *)
-    Lemma distances_unfold_2cons:
+    Lemma distances_unfold_2cons :
       forall x0 x1 xs,
         distances (x0::x1::xs) = (x1 - x0) :: distances (x1::xs).
     Proof. by intros; rewrite /distances //= drop0. Qed.
@@ -443,7 +443,7 @@ Section NondecreasingSequence.
         appends to a sequence in [distances] function ([distances(xs
         ++ [:: a; b])]) can be rewritten as [distances(xs ++ [:: a])
         ++ [:: b - a]]. *)
-    Lemma distances_unfold_2app_last:
+    Lemma distances_unfold_2app_last :
       forall (a b : nat) (xs : seq nat),
         distances (xs ++ [:: a; b])
         = distances (xs ++ [:: a]) ++ [:: b - a].
@@ -465,7 +465,7 @@ Section NondecreasingSequence.
     (** We also prove a lemma stating that _one_ append to a sequence
         in the [distances] function (i.e., [distances(xs ++ [:: x])])
         can be rewritten as [distances xs ++ [:: x - last0 xs]]. *)
-    Lemma distances_unfold_1app_last:
+    Lemma distances_unfold_1app_last :
       forall x xs,
         size xs >= 1 ->
         distances (xs ++ [:: x]) = distances xs ++ [:: x - last0 xs].
@@ -487,7 +487,7 @@ Section NondecreasingSequence.
 
     (** We prove that the difference between any two neighboring elements is
         bounded by the max element of the distances-sequence. *)
-    Lemma distance_between_neighboring_elements_le_max_distance_in_seq:
+    Lemma distance_between_neighboring_elements_le_max_distance_in_seq :
       forall (xs : seq nat) (n : nat),
         xs[|n.+1|] - xs[|n|] <= max0 (distances xs).
     Proof.
@@ -527,7 +527,7 @@ Section NondecreasingSequence.
     (** Note that the distances-function has the expected behavior indeed. I.e. an element
         on the position [n] of the distance-sequence is equal to the difference between
         elements on positions [n+1] and [n]. *)
-    Lemma function_of_distances_is_correct:
+    Lemma function_of_distances_is_correct :
       forall (xs : seq nat) (n : nat),
         (distances xs)[|n|] = xs[|n.+1|] - xs[|n|].
     Proof.
@@ -551,7 +551,7 @@ Section NondecreasingSequence.
 
     (** We show that the size of a distances-sequence is one less
         than the size of the original sequence. *)
-    Lemma size_of_seq_of_distances:
+    Lemma size_of_seq_of_distances :
       forall (xs : seq nat),
         2 <= size xs ->
         size xs = size (distances xs) + 1.
@@ -576,7 +576,7 @@ Section NondecreasingSequence.
 
     (** We prove that [index_iota 0 n] produces a sequence of numbers
         which are always one unit apart from each other. *)
-    Lemma distances_of_iota_ε:
+    Lemma distances_of_iota_ε :
       forall n x, x \in distances (index_iota 0 n) -> x = ε.
     Proof.
       move=> n x; elim: n => [ |n IHn] IN.
@@ -599,7 +599,7 @@ Section NondecreasingSequence.
 
     (** First we show that the max distance between elements of any nontrivial sequence
        (i.e. a sequence that contains at leas two distinct elements) is positive. *)
-    Lemma max_distance_in_nontrivial_seq_is_positive:
+    Lemma max_distance_in_nontrivial_seq_is_positive :
       forall (xs : seq nat),
         nondecreasing_sequence xs ->
         (exists x y, x \in xs /\ y \in xs /\ x <> y) ->
@@ -650,7 +650,7 @@ Section NondecreasingSequence.
     (** Given a non-decreasing sequence [xs] with length [n], we show that the difference
         between the last element of [xs] and the last element of the distances-sequence
         of [xs] is equal to [xs[n-2]]. *)
-    Lemma last_seq_minus_last_distance_seq:
+    Lemma last_seq_minus_last_distance_seq :
       forall (xs : seq nat),
         nondecreasing_sequence xs ->
         last0 xs - last0 (distances xs) = xs [| (size xs).-2 |].
@@ -670,7 +670,7 @@ Section NondecreasingSequence.
     (** The max element of the distances-sequence of a sequence [xs]
         is bounded by the last element of [xs]. Since all elements of
         [xs] are non-negative, they all lie within the interval [0, last xs]. *)
-    Lemma max_distance_in_seq_le_last_element_of_seq:
+    Lemma max_distance_in_seq_le_last_element_of_seq :
       forall (xs : seq nat),
         nondecreasing_sequence xs ->
         max0 (distances xs) <= last0 xs.
@@ -714,7 +714,7 @@ Section NondecreasingSequence.
     (** Let [xs] be a non-decreasing sequence. We prove that
         distances of sequence [[seq ρ <- index_iota 0 k.+1 | ρ \in xs]]
         coincide with sequence [[seq x <- distances xs | 0 < x]]]. *)
-    Lemma distances_iota_filtered:
+    Lemma distances_iota_filtered :
       forall xs k,
         (forall x, x \in xs -> x <= k) ->
         nondecreasing_sequence xs ->
@@ -756,7 +756,7 @@ Section NondecreasingSequence.
     (** Let [xs] again be a non-decreasing sequence. We prove that
         distances of sequence [undup xs] coincide with
         sequence of positive distances of [xs]. *)
-    Lemma distances_positive_undup:
+    Lemma distances_positive_undup :
       forall xs,
         nondecreasing_sequence xs ->
         [seq d <- distances xs | 0 < d] = distances (undup xs).
@@ -791,7 +791,7 @@ Section NondecreasingSequence.
         (1) first element of [xs] is at most the first element of [ys] and
         (2) distances-sequences of [xs] is dominated by distances-sequence of
         [ys]. Then [xs] is dominated by [ys].  *)
-    Lemma domination_of_distances_implies_domination_of_seq:
+    Lemma domination_of_distances_implies_domination_of_seq :
       forall (xs ys : seq nat),
         first0 xs <= first0 ys ->
         2 <= size xs ->

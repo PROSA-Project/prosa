@@ -45,7 +45,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** ... and the cost of a job cannot be larger than the task cost. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
@@ -62,7 +62,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
 
   (** Next, consider any valid ideal non-preemptive uniprocessor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid: valid_schedule sched arr_seq.
+  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
@@ -104,8 +104,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   (** Consider any value [R], and assume that for any given arrival
       offset [A] in the search space, there is a solution of the
       response-time bound recurrence which is bounded by [R]. *)
-  Variable R: nat.
-  Hypothesis H_R_is_maximum:
+  Variable R : nat.
+  Hypothesis H_R_is_maximum :
     forall A,
       is_in_search_space A ->
       exists F,
@@ -118,7 +118,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
 
   Let response_time_bounded_by := task_response_time_bound arr_seq sched.
 
-  Theorem uniprocessor_response_time_bound_fully_nonpreemptive_edf:
+  Theorem uniprocessor_response_time_bound_fully_nonpreemptive_edf :
     response_time_bounded_by tsk R.
   Proof.
     case: (posnP (task_cost tsk)) => [ZERO|POS].

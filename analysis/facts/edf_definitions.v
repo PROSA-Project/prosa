@@ -42,8 +42,8 @@ Section Equivalence.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
   (** ...consider a given valid job arrival sequence ... *)
-  Variable arr_seq: arrival_sequence Job.
-  Hypothesis H_arr_seq_valid: valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
   (** ...and a corresponding ideal uniprocessor schedule. *)
@@ -52,13 +52,13 @@ Section Equivalence.
   (** Suppose jobs don't execute before their arrival nor after their
       completion, ... *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** ...all jobs come from the arrival sequence [arr_seq], ...*)
-  Hypothesis H_from_arr_seq: jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ...and jobs from [arr_seq] don't miss their deadlines. *)
-  Hypothesis H_no_deadline_misses: all_deadlines_of_arrivals_met arr_seq sched.
+  Hypothesis H_no_deadline_misses : all_deadlines_of_arrivals_met arr_seq sched.
 
   (** We first show that a schedule that satisfies the standalone
       [EDF_schedule] predicate is also compliant with the generic notion of EDF
@@ -101,7 +101,7 @@ Section Equivalence.
   (** From the two preceding lemmas, it follows immediately that the two EDF
       definitions are indeed equivalent, which we note with the following
       corollary. *)
-  Corollary EDF_schedule_equiv:
+  Corollary EDF_schedule_equiv :
     EDF_schedule sched <-> respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
   Proof.
     split.

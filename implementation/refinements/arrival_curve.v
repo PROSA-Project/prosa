@@ -20,7 +20,7 @@ Definition time_steps_with_offset tsk δ := [seq t + δ | t <- get_time_steps_of
 
 (** ... and a generalization of the previous function that repeats the time
       steps for each given offset. *)
-Definition repeat_steps_with_offset (tsk : Task) (offsets : seq nat): seq nat :=
+Definition repeat_steps_with_offset (tsk : Task) (offsets : seq nat) : seq nat :=
   flatten (map (time_steps_with_offset tsk) offsets).
 
 (** For convenience, we provide a short form to indicate the request-bound
@@ -52,7 +52,7 @@ Definition is_etamax_arrivals (tsk : Task) : Prop :=
 
 (** Further, for convenience, we define the notion of task
       having a valid arrival curve. *)
-Definition has_valid_arrival_curve_prefix (tsk: Task) :=
+Definition has_valid_arrival_curve_prefix (tsk : Task) :=
   exists ac_prefix_vec,  get_arrival_curve_prefix tsk = ac_prefix_vec /\
                     valid_arrival_curve_prefix ac_prefix_vec.
 

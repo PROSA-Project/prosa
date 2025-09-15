@@ -56,7 +56,7 @@ Section Schedule.
   (** Next, we show that an unfinished job scheduled at time [t] is
       always scheduled at time [t+1] as well. Note that the validity of
       this fact also depends on which readiness model is used. *)
-  Lemma sched_nonpreemptive_next:
+  Lemma sched_nonpreemptive_next :
     forall j t,
       scheduled_at sched j t ->
       ~~ completed_by sched j t.+1 ->

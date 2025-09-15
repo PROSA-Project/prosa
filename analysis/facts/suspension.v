@@ -137,7 +137,7 @@ Section Suspensions.
           ~~ (suspended sched j to && (service sched j to == ρ)).
 
       (** First, we prove a trivial result that the total suspension before [tf] is zero. *)
-      Local Lemma suspension_zero_before:
+      Local Lemma suspension_zero_before :
         \sum_(t1 <= t < tf | service sched j t == ρ) suspended sched j t = 0.
       Proof.
         apply /eqP; rewrite sum_nat_eq0_nat.
@@ -150,7 +150,7 @@ Section Suspensions.
       Section TrivialCase.
         Hypothesis H_LEQ : t2 - tf <= job_suspension j ρ.
 
-        Lemma suspension_bounded_trivial:
+        Lemma suspension_bounded_trivial :
           \sum_(tf <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
         Proof.
           apply: leq_trans; 
@@ -166,7 +166,7 @@ Section Suspensions.
       Section IntervalLengthLonger.
         Hypothesis H_GT : t2 - tf > job_suspension j ρ.
 
-        Lemma suspension_bounded_longer_interval:
+        Lemma suspension_bounded_longer_interval :
           \sum_(tf <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
         Proof.
         have ARRj : job_arrival j <= tf by apply suspended_implies_arrived.

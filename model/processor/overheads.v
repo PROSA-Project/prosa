@@ -10,7 +10,7 @@ Require Export prosa.behavior.all.
 Section State.
 
   (** Consider any type of jobs. *)
-  Variable Job: JobType.
+  Variable Job : JobType.
 
   (** The [proc_state] type represents the current activity of
       the processor, including various overheads and job

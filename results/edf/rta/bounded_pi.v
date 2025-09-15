@@ -121,13 +121,13 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Consider a valid preemption model ... *)
-  Hypothesis H_valid_preemption_model:
+  Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
 
   (** ... and a valid task run-to-completion threshold function. That
       is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
       any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
-  Hypothesis H_valid_run_to_completion_threshold:
+  Hypothesis H_valid_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** We introduce [rbf] as an abbreviation of the task request bound
@@ -273,7 +273,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         search_space.is_in_search_space L total_interference_bound A.
 
       (** We prove that A is also in the concrete search space. *)
-      Lemma A_is_in_concrete_search_space:
+      Lemma A_is_in_concrete_search_space :
         is_in_search_space A.
       Proof.
         move: H_A_is_in_abstract_search_space => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]; apply/andP; split => //.
@@ -302,7 +302,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
       Qed.
 
       (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
-      Corollary correct_search_space:
+      Corollary correct_search_space :
         exists F,
           A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF A (A + F) /\
           R >= F + (task_cost tsk - task_rtct tsk).
@@ -321,7 +321,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** Based on the properties established above, we apply the abstract
       analysis framework to infer that [R] is a response-time bound for
       [tsk]. *)
-  Theorem uniprocessor_response_time_bound_edf:
+  Theorem uniprocessor_response_time_bound_edf :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
     move => js ARRs TSKs.

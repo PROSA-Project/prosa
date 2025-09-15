@@ -24,7 +24,7 @@ Section ExceedanceProcStateProperties.
   (** A job [j] is said to be [scheduled_at] some time [t] if and only if the
       processor state at that time is [NominalExecution j] or
       [ExceedanceExecution j]. *)
-   Lemma scheduled_at_procstate (sched : schedule (exceedance_proc_state Job)) j t:
+   Lemma scheduled_at_procstate (sched : schedule (exceedance_proc_state Job)) j t :
     scheduled_at sched j t <->
       sched t = NominalExecution j \/ sched t = ExceedanceExecution j.
   Proof.

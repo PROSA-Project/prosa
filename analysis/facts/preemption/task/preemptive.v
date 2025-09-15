@@ -35,7 +35,7 @@ Section FullyPreemptiveModel.
 
   (** We prove that the [fully_preemptive_model] function
       defines a model with bounded non-preemptive regions.*)
-  Lemma fully_preemptive_model_is_model_with_bounded_nonpreemptive_regions:
+  Lemma fully_preemptive_model_is_model_with_bounded_nonpreemptive_regions :
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof.
     intros j ARR; split.
@@ -49,7 +49,7 @@ Section FullyPreemptiveModel.
   (** Which together with lemma [valid_fully_preemptive_model] gives
       us the fact that [fully_preemptive_model] defined a valid
       preemption model with bounded non-preemptive regions. *)
-  Corollary fully_preemptive_model_is_valid_model_with_bounded_nonpreemptive_segments:
+  Corollary fully_preemptive_model_is_valid_model_with_bounded_nonpreemptive_segments :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
   Proof.
     split.

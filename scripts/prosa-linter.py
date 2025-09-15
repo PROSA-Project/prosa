@@ -100,13 +100,11 @@ def lint_file(opts, fpath):
         print(msg, file=sys.stderr)
         if opts.explain:
             line = lineno.line_for_offset(s)
-            print()
             indent = "  "
-            print(f"{indent}{line}", end="")
+            print(f"\n{indent}{line}", end="", file=sys.stderr)
             space = " " * lineno.offset_within_line(s)
             marker = "^" * (e - s)
-            print(f"{indent}{space}{marker}")
-            print()
+            print(f"{indent}{space}{marker}\n", file=sys.stderr)
 
         if opts.open_editor:
             cmd = (

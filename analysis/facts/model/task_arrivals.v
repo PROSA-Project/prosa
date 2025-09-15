@@ -13,10 +13,10 @@ Section TaskArrivals.
 
   (** Consider any job arrival sequence with consistent arrivals. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_consistent_arrivals: consistent_arrival_times arr_seq.
+  Hypothesis H_consistent_arrivals : consistent_arrival_times arr_seq.
 
   (** We show that the number of arrivals of task can be split into disjoint intervals. *)
-  Lemma num_arrivals_of_task_cat:
+  Lemma num_arrivals_of_task_cat :
     forall tsk t t1 t2,
       t1 <= t <= t2 ->
       number_of_task_arrivals arr_seq tsk t1 t2 =
@@ -29,7 +29,7 @@ Section TaskArrivals.
 
   (** To simplify subsequent proofs, we further lift [arrivals_between_cat] to
       the filtered version [task_arrivals_between]. *)
-  Lemma task_arrivals_between_cat:
+  Lemma task_arrivals_between_cat :
     forall tsk t1 t t2,
       t1 <= t ->
       t <= t2 ->
@@ -43,7 +43,7 @@ Section TaskArrivals.
   (** We show that [task_arrivals_up_to_job_arrival j1] is a prefix 
    of [task_arrivals_up_to_job_arrival j2] if [j2] arrives at the same time 
    or after [j1]. *)
-  Lemma task_arrivals_up_to_prefix_cat: 
+  Lemma task_arrivals_up_to_prefix_cat : 
     forall j1 j2,
       arrives_in arr_seq j1 ->
       arrives_in arr_seq j2 ->
@@ -61,7 +61,7 @@ Section TaskArrivals.
   
   (** Any job [j] from the arrival sequence is contained in 
    [task_arrivals_up_to_job_arrival j]. *)
-  Lemma arrives_in_task_arrivals_up_to:
+  Lemma arrives_in_task_arrivals_up_to :
     forall j,
       arrives_in arr_seq j ->
       j \in task_arrivals_up_to_job_arrival arr_seq j.
@@ -77,7 +77,7 @@ Section TaskArrivals.
 
   (** Also, any job [j] from the arrival sequence is contained in 
    [task_arrivals_at_job_arrival j]. *)
-  Lemma arrives_in_task_arrivals_at:
+  Lemma arrives_in_task_arrivals_at :
     forall j,
       arrives_in arr_seq j ->
       j \in task_arrivals_at_job_arrival arr_seq j.
@@ -92,7 +92,7 @@ Section TaskArrivals.
 
   (** We show that for any time [t_m] less than or equal to [t], 
       task arrivals up to [t_m] forms a prefix of task arrivals up to [t]. *)
-  Lemma task_arrivals_cat:
+  Lemma task_arrivals_cat :
     forall t_m t,
       t_m <= t ->
       task_arrivals_up_to arr_seq tsk t =
@@ -105,7 +105,7 @@ Section TaskArrivals.
   (** We observe that for any job [j], task arrivals up to [job_arrival j] is a 
       concatenation of task arrivals before [job_arrival j] and task arrivals 
       at [job_arrival j]. *)
-  Lemma task_arrivals_up_to_cat:
+  Lemma task_arrivals_up_to_cat :
     forall j,
       arrives_in arr_seq j ->
       task_arrivals_up_to_job_arrival arr_seq j =
@@ -120,7 +120,7 @@ Section TaskArrivals.
 
   (** We show that any job [j] in the arrival sequence is also contained in task arrivals 
       between time instants [t1] and [t2], if [job_arrival j] lies in the interval <<[t1,t2)>>. *)
-  Lemma job_in_task_arrivals_between:
+  Lemma job_in_task_arrivals_between :
     forall j t1 t2,
       arrives_in arr_seq j ->
       job_task j = tsk ->
@@ -135,7 +135,7 @@ Section TaskArrivals.
 
   (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] is also
       contained in [arrivals_between arr_seq t1 t2]. *)
-  Lemma task_arrivals_between_subset:
+  Lemma task_arrivals_between_subset :
     forall t1 t2 j,
       j \in task_arrivals_between arr_seq tsk t1 t2 ->
       j \in arrivals_between arr_seq t1 t2.
@@ -143,7 +143,7 @@ Section TaskArrivals.
 
   (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] arrives 
       in the arrival sequence [arr_seq]. *)
-  Corollary arrives_in_task_arrivals_implies_arrived:
+  Corollary arrives_in_task_arrivals_implies_arrived :
     forall t1 t2 j,
       j \in task_arrivals_between arr_seq tsk t1 t2 ->
       arrives_in arr_seq j.
@@ -200,7 +200,7 @@ Section TaskArrivals.
 
   (** An arrival sequence with non-duplicate arrivals implies that the 
       task arrivals also contain non-duplicate arrivals. *)
-  Lemma uniq_task_arrivals:
+  Lemma uniq_task_arrivals :
     forall t,
       arrival_sequence_uniq arr_seq ->
       uniq (task_arrivals_up_to arr_seq tsk t).
@@ -233,7 +233,7 @@ Section TaskArrivals.
 
   (** We show that for any two jobs [j1] and [j2], task arrivals up to arrival of job [j1] form a 
       strict prefix of task arrivals up to arrival of job [j2]. *)
-  Lemma arrival_lt_implies_strict_prefix:
+  Lemma arrival_lt_implies_strict_prefix :
     forall j1 j2,
       job_task j1 = tsk ->
       job_task j2 = tsk ->
@@ -257,7 +257,7 @@ Section TaskArrivals.
    [t] is not less than [job_arrival j2]. *)
   (** Note that [j_def] is used as a default job for the access function and
    has nothing to do with the lemma. *)
-  Lemma nth_job_of_task_arrivals:
+  Lemma nth_job_of_task_arrivals :
     forall n j_def j t,
       arrives_in arr_seq j ->
       job_task j = tsk ->
@@ -284,7 +284,7 @@ Section TaskArrivals.
 
   (** We show that task arrivals in the interval <<[t1, t2)>> 
    is the same as concatenation of task arrivals at each instant in <<[t1, t2)>>. *)
-  Lemma task_arrivals_between_is_cat_of_task_arrivals_at:
+  Lemma task_arrivals_between_is_cat_of_task_arrivals_at :
     forall t1 t2,
       task_arrivals_between arr_seq tsk t1 t2 = \cat_(t1 <= t < t2) task_arrivals_at arr_seq tsk t.
   Proof.
@@ -295,7 +295,7 @@ Section TaskArrivals.
 
   (** The number of jobs of a task [tsk] in the interval <<[t1, t2)>> is the same 
    as sum of the number of jobs of the task [tsk] at each instant in <<[t1, t2)>>. *)
-  Lemma size_of_task_arrivals_between:
+  Lemma size_of_task_arrivals_between :
     forall t1 t2,
       size (task_arrivals_between arr_seq tsk t1 t2)
       = \sum_(t1 <= t < t2) size (task_arrivals_at arr_seq tsk t). 

@@ -15,13 +15,13 @@ Section ScheduleClass.
 
   Local Transparent scheduled_in scheduled_on.
   (** Consider any job type and the ideal processor model. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
   (** We note that the ideal processor model is indeed a uni-processor
      model. *)
-  Lemma ideal_proc_model_is_a_uniprocessor_model:
+  Lemma ideal_proc_model_is_a_uniprocessor_model :
     uniprocessor_model (processor_state Job).
   Proof.
     move=> j1 j2 sched t /existsP[[]/eqP E1] /existsP[[]/eqP E2].
@@ -54,7 +54,7 @@ Section ScheduleClass.
   (** We observe that the ideal processor model falls into the category
      of ideal-progress models, i.e., a scheduled job always receives
      service. *)
-  Lemma ideal_proc_model_ensures_ideal_progress:
+  Lemma ideal_proc_model_ensures_ideal_progress :
     ideal_progress_proc_model (processor_state Job).
   Proof.
     move=> j s /existsP[[]/eqP->] /=.
@@ -62,7 +62,7 @@ Section ScheduleClass.
   Qed.
 
   (** The ideal processor model is a unit-service model. *)
-  Lemma ideal_proc_model_provides_unit_service:
+  Lemma ideal_proc_model_provides_unit_service :
     unit_service_proc_model (processor_state Job).
   Proof.
     move=> j s.
@@ -136,7 +136,7 @@ Section ScheduleClass.
 
   (** Next we prove a lemma which helps us to do a case analysis on
       the state of an ideal schedule. *)
-  Lemma ideal_proc_model_sched_case_analysis:
+  Lemma ideal_proc_model_sched_case_analysis :
     forall (sched : schedule (ideal.processor_state Job)) (t : instant),
       ideal_is_idle sched t \/ exists j, scheduled_at sched j t.
   Proof.

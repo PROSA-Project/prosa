@@ -175,7 +175,7 @@ Section Sequential_Abstract_RTA.
       is_in_search_space L total_interference_bound A.
 
     (** We prove that [H_R_is_maximum] holds. *)
-    Lemma max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis:
+    Lemma max_in_seq_hypothesis_implies_max_in_nonseq_hypothesis :
       forall (A : duration),
         is_in_search_space A ->
         exists (F : duration),

@@ -60,7 +60,7 @@ Section Superadditivity.
 
     (** First, we show that if [f] is superadditive in zero, then its value in zero must 
         also be zero. *)
-    Lemma superadditive_first_zero:
+    Lemma superadditive_first_zero :
       superadditive_at f 0 ->
       f 0 = 0.
     Proof.
@@ -79,7 +79,7 @@ Section Superadditivity.
       Hypothesis h_superadditive : superadditive f.
 
       (** First, we show that [f] must also be monotone. *)
-      Lemma superadditive_monotone:
+      Lemma superadditive_monotone :
         monotone leq f.
       Proof.
         move=> x y LEQ.
@@ -91,7 +91,7 @@ Section Superadditivity.
       
       (** Next, we prove that moving any factor [m] outside of the arguments
           of [f] leads to a smaller or equal number. *)
-      Lemma superadditive_leq_mul:
+      Lemma superadditive_leq_mul :
         forall n m,
           m * f n <= f (m * n).
       Proof.
@@ -109,10 +109,10 @@ Section Superadditivity.
       Section NonZeroSuperadditiveFunctions.
 
         (** Assume that [f] is not the zero constant function ... *)
-        Hypothesis h_non_zero: exists n, f n > 0.
+        Hypothesis h_non_zero : exists n, f n > 0.
 
         (** ... then, [f] will eventually grow larger than any number. *)
-        Lemma superadditive_unbounded:
+        Lemma superadditive_unbounded :
           forall t, exists n', t <= f n'.
         Proof. 
           move=> t.

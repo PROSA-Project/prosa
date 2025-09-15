@@ -33,12 +33,12 @@ Section PriorityInversionIsBounded.
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** And assume that they define a valid preemption model with
       bounded nonpreemptive segments. *)
-  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
+  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
@@ -70,7 +70,7 @@ Section PriorityInversionIsBounded.
 
   (** Let [blocking_bound] be a bound on the priority inversion caused by jobs
       with lower priority. *)
-  Variable blocking_bound: duration -> duration.
+  Variable blocking_bound : duration -> duration.
 
   (** The following argument assumes an ideal uniprocessor. *)
   Hypothesis H_uni : uniprocessor_model PState.
@@ -79,7 +79,7 @@ Section PriorityInversionIsBounded.
 
   (** We show that, if the maximum length of a priority inversion of a given job [j]
       is bounded by the blocking bound,... *)
-  Hypothesis H_priority_inversion_is_bounded_by_blocking:
+  Hypothesis H_priority_inversion_is_bounded_by_blocking :
     forall j t1 t2,
       arrives_in arr_seq j ->
       job_of_task tsk j ->

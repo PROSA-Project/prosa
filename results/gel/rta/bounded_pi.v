@@ -47,7 +47,7 @@ Section AbstractRTAforGELwithArrivalCurves.
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (GEL Job Task).
 
   (** We assume that all arrivals have valid job costs. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** We model the tasks in the system using a task set [ts].
@@ -68,15 +68,15 @@ Section AbstractRTAforGELwithArrivalCurves.
       we assume that any preemption model under consideration
       is valid. We also assume that the run-to-completion-threshold
       of the task [tsk] is valid. *)
-  Hypothesis H_valid_preemption_model:
+  Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
-  Hypothesis H_valid_run_to_completion_threshold:
+  Hypothesis H_valid_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** As mentioned, we assume that the priority inversion for the task
       [tsk] is bound by [priority_inversion_bound]. *)
-  Variable priority_inversion_bound: duration -> duration.
-  Hypothesis H_priority_inversion_is_bounded:
+  Variable priority_inversion_bound : duration -> duration.
+  Hypothesis H_priority_inversion_is_bounded :
     priority_inversion_is_bounded_by arr_seq sched tsk priority_inversion_bound.
 
   (** ** B. Encoding the Scheduling Policy and Preemption Model *)
@@ -142,7 +142,7 @@ Section AbstractRTAforGELwithArrivalCurves.
       Variable j : Job.
       Hypothesis H_j_arrives : arrives_in arr_seq j.
       Hypothesis H_job_of_tsk : job_of_task tsk j.
-      Hypothesis H_job_cost_positive: job_cost_positive j.
+      Hypothesis H_job_cost_positive : job_cost_positive j.
 
       (** Assume the busy interval of [j] is given by <<[t1,t2)>>. *)
       Variable t1 t2 : duration.
@@ -168,18 +168,18 @@ Section AbstractRTAforGELwithArrivalCurves.
         (** Consider any task [tsk_o] distinct from [tsk].
             Assume [tsk_o] is in [ts]. *)
         Variable tsk_o : Task.
-        Hypothesis H_tsko_in_ts: tsk_o \in ts.
-        Hypothesis H_neq: tsk_o != tsk.
+        Hypothesis H_tsko_in_ts : tsk_o \in ts.
+        Hypothesis H_neq : tsk_o != tsk.
 
         (** If [Δ] is greater than [interval] for [tsk_o] and [A], ... *)
-        Hypothesis H_Δ_ge: (interval tsk_o A <= Δ%:R)%R.
+        Hypothesis H_Δ_ge : (interval tsk_o A <= Δ%:R)%R.
 
         (** ... then the workload of jobs satisfying the predicate [GEL_from]
             in the interval <<[t1,t1 + Δ)>> is equal to the workload in
             the interval <<[t1, t1 + interval tsk_o A)>>.
             Note that we use the functions [Z.to_nat] to [Z.of_nat] to convert
             integers to natural numbers and vice-versa. *)
-        Lemma total_workload_shorten_range:
+        Lemma total_workload_shorten_range :
           workload_of_jobs (GEL_from tsk_o)
             (arrivals_between arr_seq t1 (t1 + Δ))
           <= workload_of_jobs (GEL_from tsk_o)
@@ -292,11 +292,11 @@ Section AbstractRTAforGELwithArrivalCurves.
 
     (** Consider any point [A] in the abstract search space. *)
     Variable A : duration.
-    Hypothesis H_A_is_in_abstract_search_space:
+    Hypothesis H_A_is_in_abstract_search_space :
       search_space.is_in_search_space L total_interference_bound A.
 
     (** Then, [A] is also in the concrete search space. *)
-    Lemma A_is_in_concrete_search_space:
+    Lemma A_is_in_concrete_search_space :
       is_in_search_space A.
     Proof.
       move: H_A_is_in_abstract_search_space  => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]];
@@ -326,7 +326,7 @@ Section AbstractRTAforGELwithArrivalCurves.
 
   (** Finally, we define the response-time bound [R] as follows. *)
   Variable R : duration.
-  Hypothesis H_R_is_maximum:
+  Hypothesis H_R_is_maximum :
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
@@ -356,7 +356,7 @@ Section AbstractRTAforGELwithArrivalCurves.
         satisfies [H_R_is_maximum]. Using these facts, here we prove that if [A]
         is in the abstract search space then, there exists a solution to the response-time
         equation as stated in the aRTA. *)
-    Corollary correct_search_space:
+    Corollary correct_search_space :
       forall A,
         search_space.is_in_search_space L total_interference_bound A ->
         exists F,
@@ -377,7 +377,7 @@ Section AbstractRTAforGELwithArrivalCurves.
 
   (** Finally, we prove that [R] is a bound on the response time of the
       task [tsk]. *)
-  Theorem uniprocessor_response_time_bound_edf:
+  Theorem uniprocessor_response_time_bound_edf :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
     move => js ARRs TSKs.

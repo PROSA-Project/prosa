@@ -33,15 +33,15 @@ Section ModelWithLimitedPreemptions.
   (** Next, consider any limited-preemptive schedule of this arrival sequence ... *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
-  Hypothesis H_schedule_respects_preemption_model:
+  Hypothesis H_schedule_respects_preemption_model :
     schedule_respects_preemption_model arr_seq sched.
 
   (** ...where jobs do not execute after their completion. *)
-  Hypothesis H_completed_jobs_dont_execute: completed_jobs_dont_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Next, we assume that preemption points are defined by the
       job-level model with limited preemptions. *)
-  Hypothesis H_valid_limited_preemptions_job_model:
+  Hypothesis H_valid_limited_preemptions_job_model :
     valid_limited_preemptions_job_model arr_seq.
 
   (** First, we prove a few auxiliary lemmas. *)
@@ -52,13 +52,13 @@ Section ModelWithLimitedPreemptions.
     Hypothesis H_j_arrives : arrives_in arr_seq j.
 
     (** Recall that 0 is a preemption point. *)
-    Remark zero_in_preemption_points: 0 \in job_preemptive_points j.
+    Remark zero_in_preemption_points : 0 \in job_preemptive_points j.
     Proof. by apply H_valid_limited_preemptions_job_model. Qed.
 
     (** Using the fact that [job_preemptive_points] is a
         non-decreasing sequence, we prove that the first element of
         [job_preemptive_points] is 0. *)
-    Lemma zero_is_first_element: first0 (job_preemptive_points j) = 0.
+    Lemma zero_is_first_element : first0 (job_preemptive_points j) = 0.
     Proof.
       have F := zero_in_preemption_points.
       destruct H_valid_limited_preemptions_job_model as [_ [_ C]]; specialize (C j H_j_arrives).
@@ -66,7 +66,7 @@ Section ModelWithLimitedPreemptions.
     Qed.
 
     (** We prove that the list of preemption points is not empty. *)
-    Lemma list_of_preemption_point_is_not_empty:
+    Lemma list_of_preemption_point_is_not_empty :
       0 < size (job_preemptive_points j).
     Proof.
       move: H_valid_limited_preemptions_job_model => [BEG [END _]].
@@ -76,7 +76,7 @@ Section ModelWithLimitedPreemptions.
     Qed.
 
     (** Next, we prove that the cost of a job is a preemption point. *)
-    Lemma job_cost_in_nonpreemptive_points: job_cost j \in job_preemptive_points j.
+    Lemma job_cost_in_nonpreemptive_points : job_cost j \in job_preemptive_points j.
     Proof.
       move: H_valid_limited_preemptions_job_model => [BEG [END _]].
       move: (END _ H_j_arrives) => EQ.
@@ -91,7 +91,7 @@ Section ModelWithLimitedPreemptions.
     (** As a corollary, we prove that the sequence of non-preemptive
         points of a job with positive cost contains at least 2
         points. *)
-    Corollary number_of_preemption_points_at_least_two:
+    Corollary number_of_preemption_points_at_least_two :
       job_cost_positive j ->
       2 <= size (job_preemptive_points j).
     Proof.
@@ -113,7 +113,7 @@ Section ModelWithLimitedPreemptions.
 
     (** Next we prove that "anti-density" property (from
         [preemption.util] file) holds for [job_preemption_point j]. *)
-    Lemma antidensity_of_preemption_points:
+    Lemma antidensity_of_preemption_points :
       forall (ρ : work),
         ρ <= job_cost j ->
         ~~ (ρ \in job_preemptive_points j) ->
@@ -134,7 +134,7 @@ Section ModelWithLimitedPreemptions.
     (** We also prove that any work that doesn't belong to
         preemption points of job j is placed strictly between two
         neighboring preemption points. *)
-    Lemma work_belongs_to_some_nonpreemptive_segment:
+    Lemma work_belongs_to_some_nonpreemptive_segment :
       forall (ρ : work),
         ρ <= job_cost j ->
         ~~ (ρ \in job_preemptive_points j) ->
@@ -167,7 +167,7 @@ Section ModelWithLimitedPreemptions.
     (** First we show that the length of the last non-preemptive segment in
         [job_preemption_points] is equal to the length of the last non-empty
         non-preemptive segment of [job_preemptive_points]. *)
-    Lemma job_parameters_last_np_to_job_limited:
+    Lemma job_parameters_last_np_to_job_limited :
         last0 (distances (job_preemption_points j)) =
         last0 (filter (fun x => 0 < x) (distances (job_preemptive_points j))).
     Proof.
@@ -181,7 +181,7 @@ Section ModelWithLimitedPreemptions.
     (** Next we show that the length of the max non-preemptive segment of
         [job_preemption_points] is equal to the length of the max non-preemptive
         segment of [job_preemptive_points]. *)
-    Lemma job_parameters_max_np_to_job_limited:
+    Lemma job_parameters_max_np_to_job_limited :
       max0 (distances (job_preemption_points j)) =
       max0 (distances (job_preemptive_points j)).
     Proof.
@@ -197,7 +197,7 @@ Section ModelWithLimitedPreemptions.
 
   (** We prove that the [fixed_preemption_point_model] function
       defines a valid preemption model. *)
-  Lemma valid_fixed_preemption_points_model_lemma:
+  Lemma valid_fixed_preemption_points_model_lemma :
     valid_preemption_model arr_seq sched.
   Proof.
     intros j ARR; repeat split.

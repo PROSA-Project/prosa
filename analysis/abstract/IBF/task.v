@@ -333,7 +333,7 @@ Section TaskIBFtoJobIBF.
               since interference doesn't come from a job of task [tsk]
               [task_interference tsk = 1]. Which reduces to [1 ≤
               1]. *)
-          Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_task:
+          Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_task :
             interference j t + service_at sched j t
             <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
               + task_interference arr_seq sched j t.
@@ -464,7 +464,7 @@ Section TaskIBFtoJobIBF.
             and [scheduled_at j t] is no larger than the sum of [the
             service received by jobs of task tsk at time t] and
             [task_iterference tsk t]. *)
-        Lemma interference_plus_sched_le_serv_of_task_plus_task_interference:
+        Lemma interference_plus_sched_le_serv_of_task_plus_task_interference :
           interference j t + service_at sched j t
           <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
             + task_interference arr_seq sched j t.
@@ -486,7 +486,7 @@ Section TaskIBFtoJobIBF.
       End CaseAnalysis.
 
       (** Next we prove cumulative version of the lemma above. *)
-      Lemma cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference:
+      Lemma cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference :
         cumulative_interference j t1 (t1 + x)
         <= (task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
            - service_during sched j t1 (t1 + x)) + cumul_task_interference arr_seq sched j t1 (t1 + x).
@@ -507,7 +507,7 @@ Section TaskIBFtoJobIBF.
 
       (** As the next step, the service terms in the inequality above
           can be upper-bound by the workload terms. *)
-      Lemma serv_of_task_le_workload_of_task_plus:
+      Lemma serv_of_task_le_workload_of_task_plus :
         task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
         - service_during sched j t1 (t1 + x) + cumul_task_interference arr_seq sched j t1 (t1 + x)
         <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)
@@ -528,7 +528,7 @@ Section TaskIBFtoJobIBF.
           in the interval <<[t1, t1 + x)>> is bounded by the sum of
           the task workload in the interval <<[t1, t1 + A + ε)>> and the
           cumulative interference of [j]'s task in the interval <<[t1, t1 + x)>>. *)
-      Lemma cumulative_job_interference_le_task_interference_bound:
+      Lemma cumulative_job_interference_le_task_interference_bound :
         cumulative_interference j t1 (t1 + x)
         <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)
           + cumul_task_interference arr_seq sched j t1 (t1 + x).

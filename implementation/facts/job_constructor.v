@@ -12,7 +12,7 @@ Section JobConstructor.
   Hypothesis H_ts_uniq : uniq ts.
 
   (** First, we show that [generate_jobs_at tsk n t] generates n jobs ... *)
-  Lemma job_generation_valid_number:
+  Lemma job_generation_valid_number :
     forall tsk n t,
       tsk \in ts -> size (generate_jobs_at tsk n t) = n.
   Proof.
@@ -21,7 +21,7 @@ Section JobConstructor.
   Qed.
 
   (** ... and that each generated job is unique. *)
-  Lemma generate_jobs_at_unique:
+  Lemma generate_jobs_at_unique :
     forall tsk n t,
       uniq (generate_jobs_at tsk n t).
   Proof.
@@ -37,13 +37,13 @@ Section JobConstructor.
 
   (** We start by proving that the arrival time of a job is consistent with its
       positioning inside the arrival sequence. *)
-  Lemma job_arrival_consistent:
+  Lemma job_arrival_consistent :
     forall j t,
       j \in arrivals_at arr_seq t -> job_arrival j = t.
   Proof. by move=> j t /mem_bigcat_exists [tsk [TSK_IN /mapP [i INi] ->]]. Qed.
 
   (** Next, we show that the list of arrivals at any time [t] is unique ... *)
-  Lemma arrivals_at_unique:
+  Lemma arrivals_at_unique :
     forall t,
       uniq (arrivals_at arr_seq t).
   Proof.
@@ -55,7 +55,7 @@ Section JobConstructor.
   Qed.
 
   (** ... and generalize the above result to arbitrary time intervals. *)
-  Lemma arrivals_between_unique:
+  Lemma arrivals_between_unique :
     forall t1 t2,
       uniq (arrivals_between arr_seq t1 t2).
   Proof.
@@ -70,7 +70,7 @@ Section JobConstructor.
 
   (** Finally, we observe that [generate_jobs_at tsk n t] indeed generates jobs
       of task [tsk] that arrive at [t] *)
-  Corollary job_generation_valid_jobs:
+  Corollary job_generation_valid_jobs :
     forall tsk n t j,
       j \in generate_jobs_at tsk n t ->
             job_task j = tsk

@@ -34,11 +34,11 @@ Section SearchSpaceDefinition.
   Definition Task := concrete_task : eqType.
   Definition Job := concrete_job : eqType.
 
-  Context (TMNSP: TaskMaxNonpreemptiveSegment Task).
+  Context (TMNSP : TaskMaxNonpreemptiveSegment Task).
 
   (** First, we recall the notion of correct search space as defined by
     abstract RTA. *)
-  Definition correct_search_space ts (tsk:Task) L :=
+  Definition correct_search_space ts (tsk : Task) L :=
     [seq A <- iota 0 L | is_in_search_space ts tsk L A].
 
   (** Next, we provide a computation-oriented way to compute abstract RTA's search space for

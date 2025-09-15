@@ -8,7 +8,7 @@ Section OverheadsProceProperties.
   Local Transparent scheduled_in scheduled_on service_in service_on.
 
   (** Consider any type of jobs. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
@@ -65,7 +65,7 @@ Section OverheadScheduleProperties.
   Local Transparent scheduled_in scheduled_on.
 
   (** Consider any type of jobs. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
@@ -116,7 +116,7 @@ End OverheadScheduleProperties.
 Section ScheduledInBusyPrefix.
 
   (** Consider any type of jobs. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 

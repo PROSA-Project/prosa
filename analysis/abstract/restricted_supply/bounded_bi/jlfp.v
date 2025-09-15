@@ -248,7 +248,7 @@ Section BoundedBusyIntervals.
           (1) [j]'s arrival is bounded by [t2], (2) [t2] is bounded by
           [t1 + L], and (3) <<[t1, t2)>> is busy interval of job
           [j]. *)
-      Local Lemma busy_prefix_is_bounded_case2:
+      Local Lemma busy_prefix_is_bounded_case2 :
         exists t2, job_arrival j < t2 /\ t2 <= t1 + L /\ busy_interval arr_seq sched j t1 t2.
       Proof.
         have LE: job_arrival j < t1 + L

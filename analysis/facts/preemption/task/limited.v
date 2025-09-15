@@ -31,7 +31,7 @@ Section LimitedPreemptionsModel.
   (** Next, consider any preemption-aware schedule of this arrival sequence... *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
-  Hypothesis H_schedule_respects_preemption_model:
+  Hypothesis H_schedule_respects_preemption_model :
     schedule_respects_preemption_model arr_seq sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -43,13 +43,13 @@ Section LimitedPreemptionsModel.
 
   (** Next, we assume that preemption points are defined by the model
       with fixed preemption points. *)
-  Hypothesis H_valid_fixed_preemption_points_model:
+  Hypothesis H_valid_fixed_preemption_points_model :
     valid_fixed_preemption_points_model arr_seq ts.
 
   (** Then we prove that functions [job_preemptable and
       task_preemption_points] define a model with bounded non-preemptive
       regions. *)
-  Lemma fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions:
+  Lemma fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions :
     model_with_bounded_nonpreemptive_segments arr_seq .
   Proof.
     intros j ARR.
@@ -97,7 +97,7 @@ Section LimitedPreemptionsModel.
       gives us the fact that functions [job_preemptable and
       task_preemption_points] defines a valid preemption model with
       bounded non-preemptive regions. *)
-  Corollary fixed_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions:
+  Corollary fixed_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
   Proof.
     split.

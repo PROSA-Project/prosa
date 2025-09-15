@@ -9,21 +9,21 @@ Require Export prosa.analysis.definitions.schedule_prefix.
 Section CompletionFacts.
 
   (** Consider any job type,...*)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
 
   (** ...any kind of processor model,... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ...and a given schedule. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Let [j] be any job that is to be scheduled. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (** We prove that after job [j] completes, it remains completed. *)
-  Lemma completion_monotonic:
+  Lemma completion_monotonic :
     forall t t',
       t <= t' ->
       completed_by sched j t ->
@@ -32,7 +32,7 @@ Section CompletionFacts.
 
   (** We prove that if [j] is not completed by [t'], then it's also not
       completed by any earlier instant. *)
-  Lemma incompletion_monotonic:
+  Lemma incompletion_monotonic :
     forall t t',
       t <= t' ->
       ~~ completed_by sched j t' ->
@@ -41,14 +41,14 @@ Section CompletionFacts.
 
   (** We observe that being incomplete is the same as not having received
       sufficient service yet, ... *)
-  Lemma less_service_than_cost_is_incomplete:
+  Lemma less_service_than_cost_is_incomplete :
     forall t,
       service sched j t < job_cost j
       <-> ~~ completed_by sched j t.
   Proof. by move=> ?; rewrite -ltnNge. Qed.
 
   (** ... which is also the same as having positive remaining cost. *)
-  Lemma incomplete_is_positive_remaining_cost:
+  Lemma incomplete_is_positive_remaining_cost :
     forall t,
       ~~ completed_by sched j t
       <-> remaining_cost sched j t > 0.
@@ -57,7 +57,7 @@ Section CompletionFacts.
   Qed.
 
   (** Trivially, it follows that an incomplete job has a positive cost. *)
-  Corollary incomplete_implies_positive_cost:
+  Corollary incomplete_implies_positive_cost :
     forall t,
       ~~ completed_by sched j t ->
       job_cost_positive j.
@@ -100,7 +100,7 @@ Section CompletionFacts.
 
   (** Further, we note that if a job receives service at some time t, then its
       remaining cost at this time is positive. *)
-  Lemma serviced_implies_positive_remaining_cost:
+  Lemma serviced_implies_positive_remaining_cost :
     forall t,
       service_at sched j t > 0 ->
       remaining_cost sched j t > 0.
@@ -116,7 +116,7 @@ Section CompletionFacts.
       remaining positive cost. *)
 
   (** Assume a scheduled job always receives some positive service. *)
-  Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
+  Hypothesis H_scheduled_implies_serviced : ideal_progress_proc_model PState.
 
   (** To simplify subsequent proofs, we restate the assumption
       [H_scheduled_implies_serviced] as a trivial corollary. *)
@@ -126,7 +126,7 @@ Section CompletionFacts.
   Proof. exact: H_scheduled_implies_serviced. Qed.
 
   (** Then a scheduled job has positive remaining cost. *)
-  Corollary scheduled_implies_positive_remaining_cost:
+  Corollary scheduled_implies_positive_remaining_cost :
     forall t,
       scheduled_at sched j t ->
       remaining_cost sched j t > 0.
@@ -178,24 +178,24 @@ End CompletionFacts.
 Section ServiceAndCompletionFacts.
 
   (** Consider any job type,...*)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobCost Job}.
 
   (** ...any kind of processor model,... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ...and a given schedule. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Assume that completed jobs do not execute. *)
-  Hypothesis H_completed_jobs:
+  Hypothesis H_completed_jobs :
     completed_jobs_dont_execute sched.
 
   (** Let [j] be any job that is to be scheduled. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (** Assume that a scheduled job receives exactly one time unit of service. *)
-  Hypothesis H_unit_service: unit_service_proc_model PState.
+  Hypothesis H_unit_service : unit_service_proc_model PState.
 
   (** To simplify subsequent proofs, we restate the assumption
       [H_unit_service] as a trivial corollary. *)
@@ -207,7 +207,7 @@ Section ServiceAndCompletionFacts.
   (** To begin with, we establish that the cumulative service never exceeds a
      job's total cost if service increases only by one at each step since
      completed jobs don't execute. *)
-  Lemma service_at_most_cost:
+  Lemma service_at_most_cost :
     forall t,
       service sched j t <= job_cost j.
   Proof.
@@ -224,14 +224,14 @@ Section ServiceAndCompletionFacts.
 
   (** This lets us conclude that [service] and [remaining_cost] are complements
      of one another. *)
-  Lemma service_cost_invariant:
+  Lemma service_cost_invariant :
     forall t,
       (service sched j t) + (remaining_cost sched j t) = job_cost j.
   Proof. by move=> ?; rewrite subnKC// service_at_most_cost. Qed.
 
   (** We show that the service received by job [j] in any interval is no larger
      than its cost. *)
-  Lemma cumulative_service_le_job_cost:
+  Lemma cumulative_service_le_job_cost :
     forall t t',
       service_during sched j t t' <= job_cost j.
   Proof.
@@ -243,7 +243,7 @@ Section ServiceAndCompletionFacts.
 
   (** If a job isn't complete at time [t], it can't be completed at time [t +
      remaining_cost j t - 1]. *)
-  Lemma job_doesnt_complete_before_remaining_cost:
+  Lemma job_doesnt_complete_before_remaining_cost :
     forall t,
       ~~ completed_by sched j t ->
       ~~ completed_by sched j (t + remaining_cost sched j t - 1).
@@ -261,11 +261,11 @@ Section ServiceAndCompletionFacts.
   Section GuaranteedService.
 
     (** Assume a scheduled job always receives some positive service. *)
-    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
+    Hypothesis H_scheduled_implies_serviced : ideal_progress_proc_model PState.
 
     (** Assume that jobs are not released early. *)
     Context `{JobArrival Job}.
-    Hypothesis H_jobs_must_arrive: jobs_must_arrive_to_execute sched.
+    Hypothesis H_jobs_must_arrive : jobs_must_arrive_to_execute sched.
 
     (** To simplify subsequent proofs, we restate the assumption
         [H_jobs_must_arrive] as a trivial corollary. *)
@@ -275,7 +275,7 @@ Section ServiceAndCompletionFacts.
     Proof. exact: H_jobs_must_arrive. Qed.
 
     (** We show that if job j is scheduled, then it must be pending. *)
-    Lemma scheduled_implies_pending:
+    Lemma scheduled_implies_pending :
       forall t,
         scheduled_at sched j t ->
         pending sched j t.
@@ -293,30 +293,30 @@ End ServiceAndCompletionFacts.
 Section PositiveCost.
 
   (** Consider any type of jobs with cost and arrival-time attributes, ...*)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
 
   (** ...any kind of processor model,... *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** ...and a given schedule. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Let [j] be any job that is to be scheduled. *)
-  Variable j: Job.
+  Variable j : Job.
 
   (** We assume that job [j] has positive cost, from which we can
      infer that there always is a time in which [j] is pending, ... *)
-  Hypothesis H_positive_cost: job_cost j > 0.
+  Hypothesis H_positive_cost : job_cost j > 0.
 
   (** ...and that jobs must arrive to execute. *)
-  Hypothesis H_jobs_must_arrive:
+  Hypothesis H_jobs_must_arrive :
     jobs_must_arrive_to_execute sched.
 
   (** Then, we prove that the job with a positive cost
      must be scheduled to be completed. *)
-  Lemma completed_implies_scheduled_before:
+  Lemma completed_implies_scheduled_before :
     forall t,
       completed_by sched j t ->
       exists t',
@@ -329,7 +329,7 @@ Section PositiveCost.
   Qed.
 
   (** We also prove that the job is pending at the moment of its arrival. *)
-  Lemma job_pending_at_arrival:
+  Lemma job_pending_at_arrival :
     pending sched j (job_arrival j).
   Proof.
     apply/andP; split; first by rewrite /has_arrived.
@@ -353,12 +353,12 @@ Section CompletedJobs.
   Context {jr : JobReady Job PState}.
 
   (** We observe that a given job is ready only if it is also incomplete ... *)
-  Lemma ready_implies_incomplete:
+  Lemma ready_implies_incomplete :
     forall j t, job_ready sched j t -> ~~ completed_by sched j t.
   Proof. by move=> ? ? /any_ready_job_is_pending /andP[]. Qed.
 
   (** ... and lift this observation also to the level of whole schedules. *)
-  Lemma completed_jobs_are_not_ready:
+  Lemma completed_jobs_are_not_ready :
     jobs_must_be_ready_to_execute sched ->
     completed_jobs_dont_execute sched.
   Proof.
@@ -367,7 +367,7 @@ Section CompletedJobs.
   Qed.
 
   (** Furthermore, in a valid schedule, completed jobs don't execute. *)
-  Corollary valid_schedule_implies_completed_jobs_dont_execute:
+  Corollary valid_schedule_implies_completed_jobs_dont_execute :
     forall arr_seq, 
     valid_schedule sched arr_seq ->
     completed_jobs_dont_execute sched.
@@ -376,7 +376,7 @@ Section CompletedJobs.
   (** We further observe that completed jobs don't execute if scheduled jobs
      always receive non-zero service and cumulative service never exceeds job
      costs. *)
-  Lemma ideal_progress_completed_jobs:
+  Lemma ideal_progress_completed_jobs :
     ideal_progress_proc_model PState ->
     (forall j t, service sched j t <= job_cost j) ->
     completed_jobs_dont_execute sched.
@@ -395,12 +395,12 @@ Global Hint Resolve valid_schedule_implies_completed_jobs_dont_execute : basic_r
 (** Next, we relate the completion of jobs in schedules with identical prefixes. *)
 Section CompletionInTwoSchedules.
   (** Consider any processor model and any type of jobs with costs, arrival times, and a notion of readiness. *)
-  Context {Job: JobType} {PState: ProcessorState Job}.
+  Context {Job : JobType} {PState : ProcessorState Job}.
   Context {jc : JobCost Job} {ja : JobArrival Job} {jr : JobReady Job PState}.
 
   (** If two schedules share a common prefix, then (in the prefix) jobs
       complete in one schedule iff they complete in the other. *)
-  Lemma identical_prefix_completed_by:
+  Lemma identical_prefix_completed_by :
     forall sched1 sched2 h,
       identical_prefix sched1 sched2 h ->
       forall j t,
@@ -413,7 +413,7 @@ Section CompletionInTwoSchedules.
   Qed.
 
   (** For convenience, we restate the previous lemma in terms of [pending]. *)
-  Corollary identical_prefix_pending:
+  Corollary identical_prefix_pending :
     forall sched1 sched2 h,
       identical_prefix sched1 sched2 h ->
       forall j t,

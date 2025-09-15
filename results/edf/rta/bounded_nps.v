@@ -63,7 +63,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
   (** ... and assume that it defines a valid preemption model with
       bounded non-preemptive segments. *)
-  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
+  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
@@ -79,7 +79,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** ... and the cost of a job cannot be larger than the task cost. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
@@ -95,13 +95,13 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Consider a valid preemption model... *)
-  Hypothesis H_valid_preemption_model:
+  Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
 
   (** ...and a valid task run-to-completion threshold function. That
      is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
      any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
-  Hypothesis H_valid_run_to_completion_threshold:
+  Hypothesis H_valid_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** We introduce as an abbreviation [rbf] for the task request bound function,
@@ -208,7 +208,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         offset [A] in the search space, there is a solution of the
         response-time bound recurrence which is bounded by [R]. *)
     Variable R : duration.
-    Hypothesis H_R_is_maximum:
+    Hypothesis H_R_is_maximum :
       forall (A : duration),
         is_in_search_space L A ->
         exists (F : duration),
@@ -223,7 +223,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
          the priority inversion is bounded. In this module we provide the preemption model
          with bounded non-preemptive segments and _prove_ that the priority inversion is
          bounded. *)
-    Theorem uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments:
+    Theorem uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments :
       response_time_bounded_by tsk R.
     Proof.
       apply: uniprocessor_response_time_bound_edf; eauto 4 with basic_rt_facts.

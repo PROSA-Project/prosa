@@ -654,7 +654,7 @@ Section JLFPInstantiation.
       Hypothesis H_arrivals_have_valid_job_costs : arrivals_have_valid_job_costs arr_seq.
 
       (** Then, we prove that [L] is a bound on the length of the busy window. *)
-      Lemma instantiated_busy_intervals_are_bounded:
+      Lemma instantiated_busy_intervals_are_bounded :
         busy_intervals_are_bounded_by arr_seq sched tsk L.
       Proof.
         move => j ARR TSK POS.

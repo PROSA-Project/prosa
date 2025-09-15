@@ -78,7 +78,7 @@ Section AbstractRTAReduction.
        equal to [interference_bound_function(A, x)] and (c) [A_sp] is in the search space.
        In other words, either [A] is already inside the search space, or we can go 
        to the "left" until we reach [A_sp], which will be inside the search space. *)
-    Lemma representative_exists:
+    Lemma representative_exists :
       exists A_sp, 
         A_sp <= A /\
         are_equivalent_at_values_less_than (interference_bound_function A)
@@ -143,7 +143,7 @@ Section AbstractRTAReduction.
 
     (** We prove that there exists a constant [F] such that [A + F] is equal to [A_sp + F_sp]
        and [A + F] is a solution for the response-time recurrence for [A]. *)
-    Lemma solution_for_A_exists:
+    Lemma solution_for_A_exists :
       exists F,
         A_sp + F_sp = A + F /\
         F <= F_sp /\

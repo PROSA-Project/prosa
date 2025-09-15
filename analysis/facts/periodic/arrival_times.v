@@ -21,13 +21,13 @@ Section PeriodicArrivalTimes.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
   (** ... and any periodic task [tsk] with a valid offset and period. *)
     Variable tsk : Task.
-    Hypothesis H_valid_offset: valid_offset arr_seq tsk.
-    Hypothesis H_valid_period: valid_period tsk.
-    Hypothesis H_task_respects_periodic_model: respects_periodic_task_model arr_seq tsk.
+    Hypothesis H_valid_offset : valid_offset arr_seq tsk.
+    Hypothesis H_valid_period : valid_period tsk.
+    Hypothesis H_task_respects_periodic_model : respects_periodic_task_model arr_seq tsk.
 
   (** We show that the nth job [j] of task [tsk]
       arrives at the instant [task_offset tsk + n * task_period tsk]. *)
-  Lemma periodic_arrival_times:
+  Lemma periodic_arrival_times :
     forall n (j : Job),
       arrives_in arr_seq j ->
       job_task j = tsk ->
@@ -50,7 +50,7 @@ Section PeriodicArrivalTimes.
 
   (** We show that for every job [j] of task [tsk] there exists a number
    [n] such that [j] arrives at the instant [task_offset tsk + n * task_period tsk]. *)
-  Lemma job_arrival_times:
+  Lemma job_arrival_times :
     forall j,
       arrives_in arr_seq j ->
       job_task j = tsk ->
@@ -64,7 +64,7 @@ Section PeriodicArrivalTimes.
 
   (** If a job [j] of task [tsk] arrives at [task_offset tsk + n * task_period tsk]
    then the [job_index] of [j] is equal to [n]. *)
-  Lemma job_arr_index:
+  Lemma job_arr_index :
     forall n j,
       arrives_in arr_seq j ->
       job_task j = tsk ->

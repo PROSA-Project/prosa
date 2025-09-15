@@ -24,7 +24,7 @@ Section FullyNonPreemptiveModel.
 
   (** Next, consider any non-preemptive unit-service schedule of the arrival sequence ... *)
   Context {PState : ProcessorState Job}.
-  Hypothesis H_unit_service: unit_service_proc_model PState.
+  Hypothesis H_unit_service : unit_service_proc_model PState.
   Variable sched : schedule PState.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
@@ -34,7 +34,7 @@ Section FullyNonPreemptiveModel.
 
 
   (** Then, we prove that fully_nonpreemptive_model is a valid preemption model. *)
-  Lemma valid_fully_nonpreemptive_model:
+  Lemma valid_fully_nonpreemptive_model :
     valid_preemption_model arr_seq sched.
   Proof.
     move=> j _; split; [by apply/orP; left | split; [by apply/orP; right | split]].
@@ -64,7 +64,7 @@ Section FullyNonPreemptiveModel.
 
   (** We also prove that under the fully non-preemptive model
       [job_max_nonpreemptive_segment j] is equal to [job_cost j] ... *)
-  Lemma job_max_nps_is_job_cost:
+  Lemma job_max_nps_is_job_cost :
     forall j, job_max_nonpreemptive_segment j = job_cost j.
   Proof.
     move=> j.
@@ -91,7 +91,7 @@ Section FullyNonPreemptiveModel.
   Qed.
 
   (** ... and [job_last_nonpreemptive_segment j] is equal to [job_cost j]. *)
-  Lemma job_last_nps_is_job_cost:
+  Lemma job_last_nps_is_job_cost :
     forall j, job_last_nonpreemptive_segment j = job_cost j.
   Proof.
     move=> j.

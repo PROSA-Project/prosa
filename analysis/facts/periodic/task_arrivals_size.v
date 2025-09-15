@@ -28,7 +28,7 @@ Section TaskArrivalsSize.
 
   (** We show that if an instant [t] is not an "arrival time" for
       task [tsk] then [task_arrivals_at arr_seq tsk t] is an empty sequence. *)
-  Lemma task_arrivals_size_at_non_arrival:
+  Lemma task_arrivals_size_at_non_arrival :
     forall t,
       (forall n, t <> task_offset tsk + n * task_period tsk) ->
       task_arrivals_at arr_seq tsk t = [::].
@@ -53,7 +53,7 @@ Section TaskArrivalsSize.
 
   (** We show that at any instant [t], at most one job of task [tsk]
       can arrive (i.e. size of [task_arrivals_at arr_seq tsk t] is at most one). *)
-  Lemma task_arrivals_at_size_cases:
+  Lemma task_arrivals_at_size_cases :
     forall t,
       size (task_arrivals_at arr_seq tsk t) = 0 \/
         size (task_arrivals_at arr_seq tsk t) = 1.
@@ -80,7 +80,7 @@ Section TaskArrivalsSize.
 
   (** We show that the size of task arrivals (strictly) between two consecutive arrival
       times is zero. *)
-  Lemma size_task_arrivals_between_eq0:
+  Lemma size_task_arrivals_between_eq0 :
     forall n,
       let l := (task_offset tsk + n * task_period tsk).+1 in
       let r := (task_offset tsk + n.+1 * task_period tsk) in
@@ -106,7 +106,7 @@ Section TaskArrivalsSize.
     (** We show that for any number [n], there exists a job [j] of task [tsk]
         such that [job_index] of [j] is equal to [n] and [j] arrives
         at [task_offset tsk + n * task_period tsk]. *)
-    Lemma jobs_exists_later:
+    Lemma jobs_exists_later :
       forall n,
       exists j,
         arrives_in arr_seq j /\
@@ -121,7 +121,7 @@ Section TaskArrivalsSize.
     Qed.
 
     (** We show that the size of task arrivals at any arrival time is equal to one. *)
-    Lemma task_arrivals_at_size:
+    Lemma task_arrivals_at_size :
       forall n,
         let l := (task_offset tsk + n * task_period tsk) in
         size (task_arrivals_at arr_seq tsk l) = 1.
@@ -135,7 +135,7 @@ Section TaskArrivalsSize.
     Qed.
 
     (** We show that the size of task arrivals up to [task_offset tsk] is equal to one. *)
-    Lemma size_task_arrivals_up_to_offset:
+    Lemma size_task_arrivals_up_to_offset :
       size (task_arrivals_up_to arr_seq tsk (task_offset tsk)) = 1.
     Proof.
       rewrite /task_arrivals_up_to.
@@ -153,7 +153,7 @@ Section TaskArrivalsSize.
 
     (** We show that for any number [n], the number of jobs released by task [tsk] up to
         [task_offset tsk + n * task_period tsk] is equal to [n + 1]. *)
-    Lemma task_arrivals_up_to_size:
+    Lemma task_arrivals_up_to_size :
       forall n,
         let l := (task_offset tsk + n * task_period tsk) in
         let r := (task_offset tsk + n.+1 * task_period tsk) in
@@ -180,7 +180,7 @@ Section TaskArrivalsSize.
 
     (** We show that the number of jobs released by task [tsk] at any instant [t]
         and [t + n * task_period tsk] is the same for any number [n]. *)
-    Lemma eq_size_of_task_arrivals_seperated_by_period:
+    Lemma eq_size_of_task_arrivals_seperated_by_period :
       forall n t,
         t >= task_offset tsk ->
         size (task_arrivals_at arr_seq tsk t) =

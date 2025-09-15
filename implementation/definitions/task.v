@@ -27,7 +27,7 @@ Structure concrete_task :=
 
 (** To make it compatible with ssreflect, we define a decidable
     equality for concrete tasks. *)
-Definition task_eqdef (t1 t2: concrete_task) :=
+Definition task_eqdef (t1 t2 : concrete_task) :=
   (task_id t1 == task_id t2)
   && (task_cost t1 == task_cost t2)
   && (task_arrival t1 == task_arrival t2)
@@ -87,7 +87,7 @@ Definition concrete_max_arrivals tsk Δ :=
 
 (** To make it compatible with ssreflect, we define a decidable
     equality for concrete jobs. *)
-Definition job_eqdef (j1 j2: concrete_job) :=
+Definition job_eqdef (j1 j2 : concrete_job) :=
   (job_id j1 == job_id j2)
   && (job_arrival j1 == job_arrival j2)
   && (job_cost j1 == job_cost j2)

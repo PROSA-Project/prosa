@@ -23,7 +23,7 @@ Require Export prosa.util.rel.
 (** We define the TDMA policy as follows.*)
 Section TDMAPolicy.
 
-  Variable Task: eqType.
+  Variable Task : eqType.
   (** With each task, we associate the duration of the corresponding TDMA slot. *)
   Definition TDMA_slot := Task -> duration.
 
@@ -88,7 +88,7 @@ Section TDMADefinitions.
   Context `{TDMAPolicy Task}.
 
   (** We define the TDMA cycle as the sum of all the tasks' time slots *)
-  Definition TDMA_cycle:=
+  Definition TDMA_cycle :=
     \sum_(tsk <- ts) task_time_slot tsk.
 
   (** We define the function returning the slot offset for each task: i.e., the
@@ -99,7 +99,7 @@ Section TDMADefinitions.
 
   (** The following function tests whether a task is in its time slot at
       instant [t]. *)
-  Definition task_in_time_slot (tsk : Task) (t:instant):=
+  Definition task_in_time_slot (tsk : Task) (t : instant) :=
     ((t + TDMA_cycle - (task_slot_offset tsk)%% TDMA_cycle) %% TDMA_cycle)
     < (task_time_slot tsk).
 
@@ -122,23 +122,23 @@ Section TDMASchedule.
   Variable sched : schedule PState.
 
   (** ... and any sporadic task set. *)
-  Variable ts: {set Task}.
+  Variable ts : {set Task}.
 
   Context `{TDMAPolicy Task}.
 
   (** In order to characterize a TDMA policy, we first define whether a job is executing its TDMA slot at time [t]. *)
-  Definition job_in_time_slot (job:Job) (t:instant):=
+  Definition job_in_time_slot (job : Job) (t : instant) :=
     task_in_time_slot ts (job_task job) t.
 
   (** We say that a TDMA policy is respected by the schedule iff
        1. when a job is scheduled at time [t], then the corresponding task
           is also in its own time slot... *)
-  Definition sched_implies_in_slot j t:=
+  Definition sched_implies_in_slot j t :=
     scheduled_at sched j t -> job_in_time_slot j t.
 
   (** 2. when a job is backlogged at time [t], the corresponding task
           isn't in its own time slot or another previous job of the same task is scheduled *)
-  Definition backlogged_implies_not_in_slot_or_other_job_sched j t:=
+  Definition backlogged_implies_not_in_slot_or_other_job_sched j t :=
     backlogged sched j t ->
     ~ job_in_time_slot j t \/
     exists j_other, arrives_in arr_seq j_other/\
@@ -146,7 +146,7 @@ Section TDMASchedule.
                     job_task j = job_task j_other/\
                     scheduled_at sched j_other t.
 
-  Definition respects_TDMA_policy:=
+  Definition respects_TDMA_policy :=
     forall (j:Job) (t:instant),
       arrives_in arr_seq j ->
       sched_implies_in_slot j t /\

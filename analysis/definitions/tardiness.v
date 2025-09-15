@@ -12,7 +12,7 @@ Section Tardiness.
   Context `{TaskDeadline Task}.
 
   (** ... any type of jobs associated with these tasks, ... *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobTask Job Task}.
@@ -21,16 +21,16 @@ Section Tardiness.
   Context {PState : ProcessorState Job}.
 
   (** Further, consider any job arrival sequence... *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** ...and any schedule of these jobs. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** Let [tsk] be any task that is to be analyzed. *)
-  Variable tsk: Task.
+  Variable tsk : Task.
 
   (** Then, we say that B is a tardiness bound of [tsk] in this schedule ... *)
-  Variable B: duration.
+  Variable B : duration.
 
   (** ... iff any job [j] of [tsk] in the arrival sequence has
          completed no more that [B] time units after its deadline. *)

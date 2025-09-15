@@ -122,7 +122,7 @@ Section BoundedBusyIntervals.
   Variable L : duration.
   Hypothesis H_L_positive : 0 < L.
 
-  Hypothesis H_fixed_point:
+  Hypothesis H_fixed_point :
     forall (A : duration),
       blocking_bound ts tsk A + total_hep_request_bound_function_FP ts tsk L <= SBF L.
 
@@ -257,7 +257,7 @@ Section BoundedBusyIntervals.
           (1) [j]'s arrival is bounded by [t2], (2) [t2] is bounded by
           [t1 + L], and (3) <<[t1, t2)>> is the busy interval of job
           [j]. *)
-      Local Lemma busy_prefix_is_bounded_case2:
+      Local Lemma busy_prefix_is_bounded_case2 :
         exists t2, job_arrival j < t2 /\ t2 <= t1 + L /\ busy_interval arr_seq sched j t1 t2.
       Proof.
         have LE: job_arrival j < t1 + L

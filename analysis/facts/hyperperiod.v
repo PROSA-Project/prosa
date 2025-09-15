@@ -14,11 +14,11 @@ Section Hyperperiod.
 
   (** ... and any task [tsk] that belongs to this task set. *)
   Variable tsk : Task.
-  Hypothesis H_tsk_in_ts: tsk \in ts.
+  Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** A task set's hyperperiod is an integral multiple
       of each task's period in the task set. **)
-  Lemma hyperperiod_int_mult_of_any_task:
+  Lemma hyperperiod_int_mult_of_any_task :
     exists (k : nat),
       hyperperiod ts = k * task_period tsk.
   Proof. by apply/dvdnP; apply lcm_seq_is_mult_of_all_ints, map_f, H_tsk_in_ts. Qed.
@@ -36,11 +36,11 @@ Section ValidPeriodsImplyPositiveHP.
   Variable ts : TaskSet Task.
 
   (** ... such that all tasks in [ts] have valid periods. *)
-  Hypothesis H_valid_periods: valid_periods ts.
+  Hypothesis H_valid_periods : valid_periods ts.
 
   (** We show that the hyperperiod of task set [ts]
    is positive. *)
-  Lemma valid_periods_imply_pos_hp:
+  Lemma valid_periods_imply_pos_hp :
     hyperperiod ts > 0.
   Proof.
     apply all_pos_implies_lcml_pos.
@@ -71,17 +71,17 @@ Section PeriodicLemmas.
   (** Consider a task set [ts] such that all tasks in
       [ts] have valid periods. *)
   Variable ts : TaskSet Task.
-  Hypothesis H_valid_periods: valid_periods ts.
+  Hypothesis H_valid_periods : valid_periods ts.
 
   (** Let [tsk] be any periodic task in [ts] with a valid offset and period. *)
   Variable tsk : Task.
-  Hypothesis H_task_in_ts: tsk \in ts.
-  Hypothesis H_valid_offset: valid_offset arr_seq tsk.
-  Hypothesis H_valid_period: valid_period tsk.
-  Hypothesis H_periodic_task: respects_periodic_task_model arr_seq tsk.
+  Hypothesis H_task_in_ts : tsk \in ts.
+  Hypothesis H_valid_offset : valid_offset arr_seq tsk.
+  Hypothesis H_valid_period : valid_period tsk.
+  Hypothesis H_periodic_task : respects_periodic_task_model arr_seq tsk.
 
   (** Assume we have an infinite sequence of jobs in the arrival sequence. *)
-  Hypothesis H_infinite_jobs: infinite_jobs arr_seq.
+  Hypothesis H_infinite_jobs : infinite_jobs arr_seq.
 
   (** Let [O_max] denote the maximum task offset in [ts] and let
    [HP] denote the hyperperiod of all tasks in [ts]. *)
@@ -90,7 +90,7 @@ Section PeriodicLemmas.
 
   (** We show that the job corresponding to any job [j1] in any other
       hyperperiod is of the same task as [j1]. *)
-  Lemma corresponding_jobs_have_same_task:
+  Lemma corresponding_jobs_have_same_task :
     forall j1 j2,
       job_task (corresponding_job_in_hyperperiod ts arr_seq j1
                (starting_instant_of_corresponding_hyperperiod ts j2) (job_task j1)) = job_task j1.
@@ -111,7 +111,7 @@ Section PeriodicLemmas.
 
   (** We show that if a job [j] lies in the hyperperiod starting
    at instant [t] then [j] arrives in the interval <<[t, t + HP)>>. *)
-  Lemma all_jobs_arrive_within_hyperperiod:
+  Lemma all_jobs_arrive_within_hyperperiod :
     forall j t,
       j \in jobs_in_hyperperiod ts arr_seq t tsk->
       t <= job_arrival j < t + HP.
@@ -127,7 +127,7 @@ Section PeriodicLemmas.
   (** We show that the number of jobs in a hyperperiod starting at [n1 * HP + O_max]
    is the same as the number of jobs in a hyperperiod starting at [n2 * HP + O_max] given
    that [n1] is less than or equal to [n2]. *)
-  Lemma eq_size_hyp_lt:
+  Lemma eq_size_hyp_lt :
     forall n1 n2,
       n1 <= n2 ->
       size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk) =
@@ -148,7 +148,7 @@ Section PeriodicLemmas.
 
   (** We generalize the above lemma by lifting the condition on
    [n1] and [n2]. *)
-  Lemma eq_size_of_arrivals_in_hyperperiod:
+  Lemma eq_size_of_arrivals_in_hyperperiod :
     forall n1 n2,
       size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk) =
       size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
@@ -165,17 +165,17 @@ Section PeriodicLemmas.
    [arr_seq] such that [j1] is of task [tsk]. *)
   Variable j1 : Job.
   Variable j2 : Job.
-  Hypothesis H_j1_from_arr_seq: arrives_in arr_seq j1.
-  Hypothesis H_j2_from_arr_seq: arrives_in arr_seq j2.
-  Hypothesis H_j1_task: job_task j1 = tsk.
+  Hypothesis H_j1_from_arr_seq : arrives_in arr_seq j1.
+  Hypothesis H_j2_from_arr_seq : arrives_in arr_seq j2.
+  Hypothesis H_j1_task : job_task j1 = tsk.
 
   (** Assume that both [j1] and [j2] arrive after [O_max]. *)
-  Hypothesis H_j1_arr_after_O_max: O_max <= job_arrival j1.
-  Hypothesis H_j2_arr_after_O_max: O_max <= job_arrival j2.
+  Hypothesis H_j1_arr_after_O_max : O_max <= job_arrival j1.
+  Hypothesis H_j2_arr_after_O_max : O_max <= job_arrival j2.
 
   (** We show that any job [j] that arrives in task arrivals in the same
       hyperperiod as [j2] also arrives in task arrivals up to [job_arrival j2 + HP]. *)
-  Lemma job_in_hp_arrives_in_task_arrivals_up_to:
+  Lemma job_in_hp_arrives_in_task_arrivals_up_to :
     forall j,
       j \in jobs_in_hyperperiod ts arr_seq ((job_arrival j2 - O_max) %/ HP * HP + O_max) tsk ->
       j \in task_arrivals_up_to arr_seq tsk (job_arrival j2 + HP).
@@ -199,7 +199,7 @@ Section PeriodicLemmas.
   Qed.
 
   (** We show that job [j1] arrives in its own hyperperiod. *)
-  Lemma job_in_own_hp:
+  Lemma job_in_own_hp :
     j1 \in jobs_in_hyperperiod ts arr_seq ((job_arrival j1 - O_max) %/ HP * HP + O_max) tsk.
   Proof.
     apply job_in_task_arrivals_between => //.
@@ -214,7 +214,7 @@ Section PeriodicLemmas.
 
   (** We show that the [corresponding_job_in_hyperperiod] of [j1] in [j2]'s hyperperiod
    arrives in task arrivals up to [job_arrival j2 + HP]. *)
-  Lemma corr_job_in_task_arrivals_up_to:
+  Lemma corr_job_in_task_arrivals_up_to :
     corresponding_job_in_hyperperiod ts arr_seq j1 (starting_instant_of_corresponding_hyperperiod ts j2) tsk \in
       task_arrivals_up_to arr_seq tsk (job_arrival j2 + HP).
   Proof.
@@ -232,7 +232,7 @@ Section PeriodicLemmas.
 
   (** Finally, we show that the [corresponding_job_in_hyperperiod] of [j1] in [j2]'s hyperperiod
    arrives in the arrival sequence [arr_seq]. *)
-  Lemma corresponding_job_arrives:
+  Lemma corresponding_job_arrives :
       arrives_in arr_seq (corresponding_job_in_hyperperiod ts arr_seq j1 (starting_instant_of_corresponding_hyperperiod ts j2) tsk).
   Proof.
     move : (corr_job_in_task_arrivals_up_to) => ARR_G.

@@ -12,7 +12,7 @@ Section ArrivalPredicates.
 
   (** A job that arrives in some interval <<[t1, t2)>> certainly arrives before
       time [t2]. *)
-  Lemma arrived_between_before:
+  Lemma arrived_between_before :
     forall j t1 t2,
       arrived_between j t1 t2 ->
       arrived_before j t2.
@@ -20,7 +20,7 @@ Section ArrivalPredicates.
 
   (** A job that arrives before a time [t] certainly has arrived by time
       [t]. *)
-  Lemma arrived_before_has_arrived:
+  Lemma arrived_before_has_arrived :
     forall j t,
       arrived_before j t ->
       has_arrived j t.
@@ -59,7 +59,7 @@ Section Arrived.
 
   (** First, we note that readiness models are by definition consistent
       w.r.t. [pending]. *)
-  Lemma any_ready_job_is_pending:
+  Lemma any_ready_job_is_pending :
     forall j t,
       job_ready sched j t -> pending sched j t.
   Proof. move: jr => [? +] /= ?; exact. Qed.
@@ -70,7 +70,7 @@ Section Arrived.
   Proof. by move=> ? ? /any_ready_job_is_pending => /andP[]. Qed.
 
   (** ...and lift this observation also to the level of whole schedules. *)
-  Lemma jobs_must_arrive_to_be_ready:
+  Lemma jobs_must_arrive_to_be_ready :
     jobs_must_be_ready_to_execute sched -> jobs_must_arrive_to_execute sched.
   Proof. move=> READY ? ? ?; exact/ready_implies_arrived/READY. Qed.
 
@@ -81,14 +81,14 @@ Section Arrived.
   Proof. move=> ? [? ?]; exact: jobs_must_arrive_to_be_ready. Qed.
 
   (** Since backlogged jobs are by definition ready, any backlogged job must have arrived. *)
-  Corollary backlogged_implies_arrived:
+  Corollary backlogged_implies_arrived :
     forall j t,
       backlogged sched j t -> has_arrived j t.
   Proof. move=> ? ? /andP[? ?]; exact: ready_implies_arrived. Qed.
 
   (** Similarly, since backlogged jobs are by definition pending, any
       backlogged job must be incomplete. *)
-  Lemma backlogged_implies_incomplete:
+  Lemma backlogged_implies_incomplete :
     forall j t,
       backlogged sched j t -> ~~ completed_by sched j t.
   Proof. by move=> ? ? /andP[/any_ready_job_is_pending /andP[]]. Qed.
@@ -121,20 +121,20 @@ End Arrived.
 Section ArrivalSequencePrefix.
 
   (** Consider any kind of tasks and jobs. *)
-  Context {Job: JobType}.
+  Context {Job : JobType}.
   Context {Task : TaskType}.
   Context `{JobArrival Job}.
   Context `{JobTask Job Task}.
 
   (** Consider any job arrival sequence. *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** We begin with basic lemmas for manipulating the sequences. *)
   Section Composition.
 
     (** We show that the set of arriving jobs can be split
          into disjoint intervals. *)
-    Lemma arrivals_between_cat:
+    Lemma arrivals_between_cat :
       forall t1 t t2,
         t1 <= t ->
         t <= t2 ->
@@ -144,7 +144,7 @@ Section ArrivalSequencePrefix.
 
     (** We also prove a stronger version of the above lemma
      in the case of arrivals that satisfy a predicate [P]. *)
-    Lemma arrivals_P_cat:
+    Lemma arrivals_P_cat :
       forall P t t1 t2,
         t1 <= t < t2 ->
         arrivals_between_P arr_seq P t1 t2 =
@@ -156,7 +156,7 @@ Section ArrivalSequencePrefix.
 
     (** The same observation applies to membership in the set of
          arrived jobs. *)
-    Lemma arrivals_between_mem_cat:
+    Lemma arrivals_between_mem_cat :
       forall j t1 t t2,
         t1 <= t ->
         t <= t2 ->
@@ -292,14 +292,14 @@ Section ArrivalSequencePrefix.
     (** Next, we prove that if a job belongs to the prefix
         (jobs_arrived_before t), then it arrives in the arrival
         sequence. *)
-    Lemma in_arrivals_implies_arrived:
+    Lemma in_arrivals_implies_arrived :
       forall j t1 t2,
         j \in arrivals_between arr_seq t1 t2 ->
         arrives_in arr_seq j.
     Proof. by move=> ? ? ? /mem_bigcat_nat_exists[arr [? _]]; exists arr. Qed.
 
     (** We also prove a weaker version of the above lemma. *)
-    Lemma in_arrseq_implies_arrives:
+    Lemma in_arrseq_implies_arrives :
       forall t j,
         j \in arr_seq t ->
         arrives_in arr_seq j.
@@ -308,7 +308,7 @@ Section ArrivalSequencePrefix.
     (** Next, we prove that if a job belongs to the prefix
          (jobs_arrived_between t1 t2), then it indeed arrives between t1 and
          t2. *)
-    Lemma in_arrivals_implies_arrived_between:
+    Lemma in_arrivals_implies_arrived_between :
       forall j t1 t2,
         j \in arrivals_between arr_seq t1 t2 ->
         arrived_between j t1 t2.
@@ -316,7 +316,7 @@ Section ArrivalSequencePrefix.
 
     (** Similarly, if a job belongs to the prefix (jobs_arrived_before t),
            then it indeed arrives before time t. *)
-    Lemma in_arrivals_implies_arrived_before:
+    Lemma in_arrivals_implies_arrived_before :
       forall j t,
         j \in arrivals_before arr_seq t ->
         arrived_before j t.
@@ -324,7 +324,7 @@ Section ArrivalSequencePrefix.
 
     (** Similarly, we prove that if a job from the arrival sequence arrives
         before t, then it belongs to the sequence (jobs_arrived_before t). *)
-    Lemma arrived_between_implies_in_arrivals:
+    Lemma arrived_between_implies_in_arrivals :
       forall j t1 t2,
         arrives_in arr_seq j ->
         arrived_between j t1 t2 ->
@@ -336,7 +336,7 @@ Section ArrivalSequencePrefix.
 
     (** Any job in arrivals between time instants [t1] and [t2] must arrive
        in the interval <<[t1,t2)>>. *)
-    Lemma job_arrival_between_P:
+    Lemma job_arrival_between_P :
       forall j P t1 t2,
         j \in arrivals_between_P arr_seq P t1 t2 ->
         t1 <= job_arrival j < t2.
@@ -348,7 +348,7 @@ Section ArrivalSequencePrefix.
 
     (** Any job [j] is in the sequence [arrivals_between t1 t2] given
      that [j] arrives in the interval <<[t1,t2)>>. *)
-    Lemma job_in_arrivals_between:
+    Lemma job_in_arrivals_between :
       forall j t1 t2,
         arrives_in arr_seq j ->
         t1 <= job_arrival j ->
@@ -362,7 +362,7 @@ Section ArrivalSequencePrefix.
 
     (** Next, we prove that if the arrival sequence doesn't contain duplicate
         jobs, the same applies for any of its prefixes. *)
-    Lemma arrivals_uniq:
+    Lemma arrivals_uniq :
       arrival_sequence_uniq arr_seq ->
       forall t1 t2, uniq (arrivals_between arr_seq t1 t2).
     Proof.
@@ -371,7 +371,7 @@ Section ArrivalSequencePrefix.
     Qed.
 
     (** Also note that there can't by any arrivals in an empty time interval. *)
-    Lemma arrivals_between_geq:
+    Lemma arrivals_between_geq :
       forall t1 t2,
         t1 >= t2 ->
         arrivals_between arr_seq t1 t2  = [::].
@@ -485,7 +485,7 @@ Section ArrivalSequencePrefix.
     Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
     (** ... then we can partition the arrival sequence by task. *)
-    Lemma arrivals_between_partitioned_by_task:
+    Lemma arrivals_between_partitioned_by_task :
       forall t1 t2 j,
         (j \in arrivals_between arr_seq t1 t2)
         = (j \in \cat_(tsk <- ts) task_arrivals_between arr_seq tsk t1 t2).

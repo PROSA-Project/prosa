@@ -64,21 +64,21 @@ Section PriorityRelationsConversion.
   (** We observe that lifting an [FP_policy] to a [JLFP_policy] trivially maintains
       reflexivity,... *)
   Lemma reflexive_priorities_FP_implies_JLFP :
-    forall (fp: FP_policy  Task),
+    forall (fp : FP_policy  Task),
       reflexive_task_priorities fp ->
         reflexive_job_priorities (FP_to_JLFP fp).
   Proof. by move=> ? refl_fp ?; apply: refl_fp. Qed.
 
   (** ...transitivity,... *)
   Lemma transitive_priorities_FP_implies_JLFP :
-    forall (fp: FP_policy  Task),
+    forall (fp : FP_policy  Task),
       transitive_task_priorities fp ->
         transitive_job_priorities (FP_to_JLFP fp).
   Proof. by move=> ? tran_jlfp ? ? ?; apply: tran_jlfp. Qed.
 
   (** ...and totality of priorities. *)
   Lemma total_priorities_FP_implies_JLFP :
-    forall (fp: FP_policy  Task),
+    forall (fp : FP_policy  Task),
       total_task_priorities fp ->
         total_job_priorities (FP_to_JLFP fp).
   Proof. by move=> ? tran_fp ? ?; apply: tran_fp. Qed.
@@ -86,7 +86,7 @@ Section PriorityRelationsConversion.
   (** Analogously, lifting a [JLFP_policy] to a [JLDP_policy] also maintains
       reflexivity,... *)
   Lemma reflexive_priorities_JLFP_implies_JLDP :
-    forall (jlfp: JLFP_policy Job),
+    forall (jlfp : JLFP_policy Job),
       reflexive_job_priorities jlfp ->
         reflexive_priorities (JLFP_to_JLDP jlfp).
   Proof. by move=> ? refl_fp ?; apply: refl_fp. Qed.

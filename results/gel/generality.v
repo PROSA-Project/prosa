@@ -31,7 +31,7 @@ Section GeneralityOfGEL.
   (** Suppose the jobs have arrival times and costs, and allow for any preemption
       and readiness models. *)
   Context {Arrival : JobArrival Job} {Cost : JobCost Job}
-    `{JobPreemptable Job} {JR: @JobReady Job PState Cost Arrival}.
+    `{JobPreemptable Job} {JR : @JobReady Job PState Cost Arrival}.
 
   (** ** GEL Generalizes EDF *)
 

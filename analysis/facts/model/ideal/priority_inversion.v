@@ -25,7 +25,7 @@ Section PIIdealProcessorModelLemmas.
 
   (** Next, consider any ideal uni-processor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_jobs_come_from_arrival_sequence:
+  Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ... where jobs do not execute before their arrival or after completion. *)

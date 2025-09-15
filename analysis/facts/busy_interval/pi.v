@@ -29,8 +29,8 @@ Section PriorityInversionIsBounded.
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Consider a valid preemption model with known maximum non-preemptive
       segment lengths. *)
@@ -95,7 +95,7 @@ Section PriorityInversionIsBounded.
 
     (** Then it follows that the job must have been continuously scheduled from
         [t1] up to [t]. *)
-    Lemma lower_priority_job_continuously_scheduled:
+    Lemma lower_priority_job_continuously_scheduled :
       forall t',
         t1 <= t' <= t ->
         scheduled_at sched jlp t'.
@@ -110,7 +110,7 @@ Section PriorityInversionIsBounded.
 
     (** Any lower-priority jobs that are scheduled inside the
         busy-interval prefix <<[t1,t2)>> must arrive before that interval. *)
-    Lemma low_priority_job_arrives_before_busy_interval_prefix:
+    Lemma low_priority_job_arrives_before_busy_interval_prefix :
       job_arrival jlp < t1.
     Proof.
       have SCHED1 : scheduled_at sched jlp t1.
@@ -133,7 +133,7 @@ Section PriorityInversionIsBounded.
     (** Finally, we show that lower-priority jobs that are scheduled
         inside the busy-interval prefix <<[t1,t2)>> must also be scheduled
         before the interval. *)
-    Lemma low_priority_job_scheduled_before_busy_interval_prefix:
+    Lemma low_priority_job_scheduled_before_busy_interval_prefix :
       exists t', t' < t1 /\ scheduled_at sched jlp t'.
     Proof.
       move: H_t_in_busy => /andP [GE LT].
@@ -401,7 +401,7 @@ Section PriorityInversionIsBounded.
         Hypothesis H_is_idle : is_idle arr_seq sched t1.
 
         (** Then time instant [t1] is a preemption time. *)
-        Lemma preemption_time_exists_case1:
+        Lemma preemption_time_exists_case1 :
           exists pr_t,
             preemption_time arr_seq sched pr_t 
             /\ t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
@@ -425,7 +425,7 @@ Section PriorityInversionIsBounded.
         Hypothesis H_jhp_hep_priority : hep_job jhp j.
 
         (** Then time instant [t1] is a preemption time. *)
-        Lemma preemption_time_exists_case2:
+        Lemma preemption_time_exists_case2 :
           exists pr_t,
             preemption_time arr_seq sched pr_t /\
             t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
@@ -477,7 +477,7 @@ Section PriorityInversionIsBounded.
             fpt <= job_max_nonpreemptive_segment jlp - ε.
 
           (** First we show that [fpt] is indeed the first preemption point after [progr_t1]. *)
-          Lemma no_intermediate_preemption_point:
+          Lemma no_intermediate_preemption_point :
             forall ρ,
               progr_t1 <= ρ < progr_t1 + fpt ->
               ~~ job_preemptable jlp ρ.
@@ -495,7 +495,7 @@ Section PriorityInversionIsBounded.
 
           (** Thanks to the fact that the scheduler respects the notion of preemption points
               we show that [jlp] is continuously scheduled in time interval <<[t1, t1 + fpt)>>. *)
-          Lemma continuously_scheduled_between_preemption_points:
+          Lemma continuously_scheduled_between_preemption_points :
             forall t',
               t1 <= t' < t1 + fpt ->
               scheduled_at sched jlp t'.
@@ -583,7 +583,7 @@ Section PriorityInversionIsBounded.
         Hypothesis H_progress : ideal_progress_proc_model PState.
 
         (** Next, we combine the above facts to conclude the lemma. *)
-        Lemma preemption_time_exists_case3:
+        Lemma preemption_time_exists_case3 :
           exists pr_t,
             preemption_time arr_seq sched pr_t /\
             t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
@@ -652,7 +652,7 @@ Section PriorityInversionIsBounded.
   Section NoPriorityInversionAfterPreemptionPoint.
 
     (** Consider the preemption point [ppt]. *)
-    Variable ppt: instant.
+    Variable ppt : instant.
     Hypothesis H_preemption_point : preemption_time arr_seq sched ppt.
     Hypothesis H_after_t1 : t1 <= ppt.
 

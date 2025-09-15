@@ -18,10 +18,10 @@ Require Import prosa.analysis.facts.behavior.service.
 Section Schedule.
 
   (** Consider any types of jobs... *)
-  Variable Job: JobType.
+  Variable Job : JobType.
 
   (** ... and consider any type of per-processor state. *)
-  Variable processor_state: ProcessorState Job.
+  Variable processor_state : ProcessorState Job.
 
   (** Given a desired number of processors [num_cpus], we define a finite type
       of integers from [0] to [num_cpus - 1]. The purpose of this definition is
@@ -30,7 +30,7 @@ Section Schedule.
 
       Syntax hint: the ['I_] before [num_cpus] is ssreflect syntax for the
       finite set of integers from zero to [num_cpus - 1]. *)
-  Definition processor (num_cpus: nat) := 'I_num_cpus.
+  Definition processor (num_cpus : nat) := 'I_num_cpus.
 
   (** Next, for any given number of processors [num_cpus]... *)
   Variable num_cpus : nat.

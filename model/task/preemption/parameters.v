@@ -89,7 +89,7 @@ Section ValidPreemptionModel.
 
   (** First we require that [task_max_nonpreemptive_segment] gives an upper
       bound on values of the function [job_max_nonpreemptive_segment]. *)
-  Definition job_respects_max_nonpreemptive_segment (j: Job) :=
+  Definition job_respects_max_nonpreemptive_segment (j : Job) :=
     job_max_nonpreemptive_segment j <= task_max_nonpreemptive_segment (job_task j).
 
   (** Next, we require that all segments of a job [j] have bounded length. That
@@ -153,10 +153,10 @@ Section ValidTaskRunToCompletionThreshold.
   Context {PState : ProcessorState Job}.
 
   (** ... any job arrival sequence, ... *)
-  Variable arr_seq: arrival_sequence Job.
+  Variable arr_seq : arrival_sequence Job.
 
   (** ... and any given schedule. *)
-  Variable sched: schedule PState.
+  Variable sched : schedule PState.
 
   (** A task's run-to-completion threshold must not exceed the WCET of the
       task. *)

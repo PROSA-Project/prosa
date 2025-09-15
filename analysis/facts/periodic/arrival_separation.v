@@ -23,8 +23,8 @@ Section JobArrivalSeparation.
   Variable tsk : Task.
 
   (** Assume all tasks have a valid period and respect the periodic task model. *)
-  Hypothesis H_periodic_model: respects_periodic_task_model arr_seq tsk.
-  Hypothesis H_valid_period: valid_period tsk.
+  Hypothesis H_periodic_model : respects_periodic_task_model arr_seq tsk.
+  Hypothesis H_valid_period : valid_period tsk.
 
   (** In this section we show that two consecutive jobs of a periodic
       task have their arrival times separated by their task's
@@ -34,16 +34,16 @@ Section JobArrivalSeparation.
     (** Consider any two _consecutive_ jobs [j1] and [j2] of task [tsk]. *)
     Variable j1 : Job.
     Variable j2 : Job.
-    Hypothesis H_j1_from_arr_seq: arrives_in arr_seq j1.
-    Hypothesis H_j2_from_arr_seq: arrives_in arr_seq j2.
-    Hypothesis H_j1_of_task: job_task j1 = tsk.
-    Hypothesis H_j2_of_task: job_task j2 = tsk.
-    Hypothesis H_consecutive_jobs: job_index arr_seq j2 = job_index arr_seq j1 + 1.
+    Hypothesis H_j1_from_arr_seq : arrives_in arr_seq j1.
+    Hypothesis H_j2_from_arr_seq : arrives_in arr_seq j2.
+    Hypothesis H_j1_of_task : job_task j1 = tsk.
+    Hypothesis H_j2_of_task : job_task j2 = tsk.
+    Hypothesis H_consecutive_jobs : job_index arr_seq j2 = job_index arr_seq j1 + 1.
 
     (** We show that if job [j1] and [j2] are consecutive jobs with [j2]
         arriving after [j1], then their arrival times are separated by
         their task's period. *)
-    Lemma consecutive_job_separation:
+    Lemma consecutive_job_separation :
       job_arrival j2 = job_arrival j1 + task_period tsk.
     Proof.
       move : (H_periodic_model j2) => PERIODIC.
@@ -64,21 +64,21 @@ Section JobArrivalSeparation.
     (** Consider any two _consecutive_ jobs [j1] and [j2] of task [tsk]
         that stem from the arrival sequence. *)
     Variable j1 j2 : Job.
-    Hypothesis H_j1_from_arr_seq: arrives_in arr_seq j1.
-    Hypothesis H_j2_from_arr_seq: arrives_in arr_seq j2.
-    Hypothesis H_j1_of_task: job_task j1 = tsk.
-    Hypothesis H_j2_of_task: job_task j2 = tsk.
+    Hypothesis H_j1_from_arr_seq : arrives_in arr_seq j1.
+    Hypothesis H_j2_from_arr_seq : arrives_in arr_seq j2.
+    Hypothesis H_j1_of_task : job_task j1 = tsk.
+    Hypothesis H_j2_of_task : job_task j2 = tsk.
 
     (** We'll assume that job [j1] arrives before [j2] and that
      their indices differ by an integer [k]. *)
     Variable k : nat.
-    Hypothesis H_index_difference_k:  job_index arr_seq j1 + k = job_index arr_seq j2 .
-    Hypothesis H_job_arrival_lt: job_arrival j1 < job_arrival j2.
+    Hypothesis H_index_difference_k : job_index arr_seq j1 + k = job_index arr_seq j2 .
+    Hypothesis H_job_arrival_lt : job_arrival j1 < job_arrival j2.
 
     (** We prove that arrival of unequal jobs of a task [tsk] are
         separated by a non-zero multiple of [task_period tsk] provided
         their index differs by a number [k]. *)
-    Lemma job_arrival_separation_when_index_diff_is_k:
+    Lemma job_arrival_separation_when_index_diff_is_k :
       exists n,
         n > 0 /\
         job_arrival j2 = job_arrival j1 + n * task_period tsk.
@@ -120,20 +120,20 @@ Section JobArrivalSeparation.
   (** Consider any two _distinct_ jobs [j1] and [j2] of task [tsk]
       that stem from the arrival sequence. *)
   Variable j1 j2 : Job.
-  Hypothesis H_j1_neq_j2: j1 <> j2.
-  Hypothesis H_j1_from_arr_seq: arrives_in arr_seq j1.
-  Hypothesis H_j2_from_arr_seq: arrives_in arr_seq j2.
-  Hypothesis H_j1_of_task: job_task j1 = tsk.
-  Hypothesis H_j2_of_task: job_task j2 = tsk.
+  Hypothesis H_j1_neq_j2 : j1 <> j2.
+  Hypothesis H_j1_from_arr_seq : arrives_in arr_seq j1.
+  Hypothesis H_j2_from_arr_seq : arrives_in arr_seq j2.
+  Hypothesis H_j1_of_task : job_task j1 = tsk.
+  Hypothesis H_j2_of_task : job_task j2 = tsk.
 
   (** Without loss of generality, we assume that
       job [j1] arrives before job [j2]. *)
-  Hypothesis H_j1_before_j2: job_arrival j1 <= job_arrival j2.
+  Hypothesis H_j1_before_j2 : job_arrival j1 <= job_arrival j2.
 
   (** We generalize the above lemma to show that any two unequal
       jobs of task [tsk] are separated by a non-zero multiple
       of [task_period tsk]. *)
-  Lemma job_sep_periodic:
+  Lemma job_sep_periodic :
     exists n,
       n > 0 /\
       job_arrival j2 = job_arrival j1 + n * task_period tsk.

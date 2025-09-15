@@ -147,7 +147,7 @@ Section Abstract_RTA.
       can use information about the relative time when any given job of task
       [tsk] receives at least [task_rtc tsk] units of service. *)
   Variable IBF_NP : (* F *) duration -> (* Δ *) duration -> duration.
-  Hypothesis H_job_interference_is_bounded_IBFNP:
+  Hypothesis H_job_interference_is_bounded_IBFNP :
     job_interference_is_bounded_by
       arr_seq sched tsk IBF_NP relative_time_to_reach_rtct.
 
@@ -459,7 +459,7 @@ Section Abstract_RTA.
   (** * Response-Time Bound *)
 
   (** Using the lemmas above, we prove that [R] is a response-time bound. *)
-  Theorem uniprocessor_response_time_bound:
+  Theorem uniprocessor_response_time_bound :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
     move => j ARR JOBtsk; unfold job_response_time_bound.

@@ -36,7 +36,7 @@ Section FloatingNonPreemptiveRegionsModel.
   (** Next, consider any preemption-aware schedule of this arrival sequence... *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
-  Hypothesis H_preemption_aware_schedule:
+  Hypothesis H_preemption_aware_schedule :
     schedule_respects_preemption_model arr_seq sched.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -45,13 +45,13 @@ Section FloatingNonPreemptiveRegionsModel.
 
   (** Next, we assume that preemption points are defined by the model
       with floating non-preemptive regions. *)
-  Hypothesis H_valid_model_with_floating_nonpreemptive_regions:
+  Hypothesis H_valid_model_with_floating_nonpreemptive_regions :
     valid_model_with_floating_nonpreemptive_regions arr_seq.
 
   (** Then, we prove that the [job_preemptable and
       task_max_nonpreemptive_segment] functions define
       a model with bounded non-preemptive regions. *)
-  Lemma floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions:
+  Lemma floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions :
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof.
     intros j ARR.
@@ -96,7 +96,7 @@ Section FloatingNonPreemptiveRegionsModel.
       gives us the fact that functions [job_preemptable and
       task_max_nonpreemptive_segment] define a valid preemption model
       with bounded non-preemptive regions. *)
-  Corollary floating_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions:
+  Corollary floating_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
   Proof.
     split.

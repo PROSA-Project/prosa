@@ -108,7 +108,7 @@ Section DivFloorCeil.
 
   (** We start with an observation that [div_ceil 0 b] is equal to [0]
       for any [b]. *) 
-  Lemma div_ceil0:
+  Lemma div_ceil0 :
     forall b, div_ceil 0 b = 0.
   Proof.
     intros b; unfold div_ceil.
@@ -117,7 +117,7 @@ Section DivFloorCeil.
   
   (** Next, we show that, given two positive integers [a] and [b],
       [div_ceil a b] is also positive. *)
-  Lemma div_ceil_gt0:
+  Lemma div_ceil_gt0 :
     forall a b,
       a > 0 -> b > 0 ->
       div_ceil a b > 0.
@@ -130,7 +130,7 @@ Section DivFloorCeil.
   
   (** We show that [div_ceil] is monotone with respect to the first
       argument. *)
-  Lemma div_ceil_monotone1:
+  Lemma div_ceil_monotone1 :
     forall d m n,
       m <= n -> div_ceil m d <= div_ceil n d.
   Proof.
@@ -148,7 +148,7 @@ Section DivFloorCeil.
 
   (** Given [T] and [Δ] such that [Δ >= T > 0], we show that [div_ceil Δ T] 
       is strictly greater than [div_ceil (Δ - T) T]. *)
-  Lemma leq_div_ceil_add1:
+  Lemma leq_div_ceil_add1 :
     forall Δ T,
       T > 0 -> Δ >= T ->
       div_ceil (Δ - T) T < div_ceil Δ T.
@@ -168,7 +168,7 @@ Section DivFloorCeil.
   Qed.
 
   (** We show that the division with ceiling by a constant [T] is a subadditive function. *)
-  Lemma div_ceil_subadditive:
+  Lemma div_ceil_subadditive :
     forall T, subadditive (div_ceil^~T).
   Proof.
     move=> T ab a b SUM.
@@ -207,7 +207,7 @@ Section DivFloorCeil.
 
   (** We show that for any two integers [a] and [b], 
       [a] is less than [a %/ b * b + b] given that [b] is positive. *)
-  Lemma div_floor_add_g:
+  Lemma div_floor_add_g :
     forall a b,
       b > 0 ->
       a < a %/ b * b + b.
@@ -222,7 +222,7 @@ Section DivFloorCeil.
   (** We prove a technical lemma stating that for any three integers [a, b, c] 
       such that [c > b], [mod] can be swapped with subtraction in
       the expression [(a + c - b) %% c]. *) 
-  Lemma mod_elim:
+  Lemma mod_elim :
     forall a b c,
       c > b ->
       (a + c - b) %% c = if a %% c >= b then (a %% c - b) else (a %% c + c - b).

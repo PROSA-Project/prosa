@@ -31,7 +31,7 @@ Section FullyNonPreemptiveModel.
 
   (** Next, consider any non-preemptive unit-service schedule of the arrival sequence ... *)
   Context {PState : ProcessorState Job}.
-  Hypothesis H_unit_service: unit_service_proc_model PState.
+  Hypothesis H_unit_service : unit_service_proc_model PState.
   Variable sched : schedule PState.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
@@ -40,12 +40,12 @@ Section FullyNonPreemptiveModel.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Assume that a job cost cannot be larger than a task cost. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** Then we prove that the [fully_nonpreemptive_model] function
       defines a model with bounded non-preemptive regions.*)
-  Lemma fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions:
+  Lemma fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions :
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof.
     have F: forall n, n = 0 \/ n > 0  by intros n; destruct n; [left | right].
@@ -81,7 +81,7 @@ Section FullyNonPreemptiveModel.
   (** Which together with lemma [valid_fully_nonpreemptive_model]
       gives us the fact that [fully_nonpreemptive_model] defined a valid
       preemption model with bounded non-preemptive regions. *)
-  Corollary fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions:
+  Corollary fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
   Proof.
     split.

@@ -35,7 +35,7 @@ Section BusyIntervalExistence.
 
   (** Next, consider any schedule of the arrival sequence ... *)
   Variable sched : schedule PState.
-  Hypothesis H_jobs_come_from_arrival_sequence:
+  Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -44,7 +44,7 @@ Section BusyIntervalExistence.
 
   (** Assume a given reflexive JLFP policy. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
+  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
   (** Further, allow for any work-bearing notion of job readiness ... *)
   Context `{!JobReady Job PState}.

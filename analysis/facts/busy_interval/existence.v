@@ -16,7 +16,7 @@ Section ExistsBusyIntervalJLFP.
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
   Context {JobTask : JobTask Job Task}.
-  Context {Arrival: JobArrival Job}.
+  Context {Arrival : JobArrival Job}.
   Context {Cost : JobCost Job}.
 
   (** Consider any valid arrival sequence. *)
@@ -26,7 +26,7 @@ Section ExistsBusyIntervalJLFP.
   (** Next, consider any schedule of this arrival sequence ... *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
-  Hypothesis H_jobs_come_from_arrival_sequence:
+  Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
 
   (** ... where jobs do not execute before their arrival or after completion. *)
@@ -71,7 +71,7 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_busy_interval : busy_interval t1 t2.
 
     (** We prove that job [j] completes by the end of the busy interval. *)
-    Lemma job_completes_within_busy_interval:
+    Lemma job_completes_within_busy_interval :
       job_completed_by j t2.
     Proof.
       rename H_priority_is_reflexive into REFL, H_busy_interval into BUSY.
@@ -93,7 +93,7 @@ Section ExistsBusyIntervalJLFP.
 
     (** Then, we prove that there is a job pending at time [t2]
         that has higher or equal priority (with respect to [tsk]). *)
-    Lemma not_quiet_implies_exists_pending_job:
+    Lemma not_quiet_implies_exists_pending_job :
       exists j_hp,
         arrives_in arr_seq j_hp /\
         arrived_between j_hp t1 t2 /\
@@ -140,7 +140,7 @@ Section ExistsBusyIntervalJLFP.
 
     (** We prove that if the processor is idle at a time instant [t],
         then the next time instant [t+1] will be a quiet time. *)
-    Lemma idle_time_implies_quiet_time_at_the_next_time_instant:
+    Lemma idle_time_implies_quiet_time_at_the_next_time_instant :
       forall (t : instant),
         is_idle arr_seq sched t ->
         quiet_time t.+1.
@@ -162,7 +162,7 @@ Section ExistsBusyIntervalJLFP.
     (** Next, we prove that at any time instant [t] within the busy interval there exists a job
         [jhp] such that (1) job [jhp] is pending at time [t] and (2) job [jhp] has higher-or-equal
         priority than task [tsk]. *)
-    Lemma pending_hp_job_exists:
+    Lemma pending_hp_job_exists :
       forall t,
         t1 <= t < t2 ->
         exists jhp,
@@ -211,7 +211,7 @@ Section ExistsBusyIntervalJLFP.
     Qed.
 
     (** We prove that at any time instant [t] within <<[t1, t2)>> the processor is not idle. *)
-    Lemma not_quiet_implies_not_idle:
+    Lemma not_quiet_implies_not_idle :
       forall t,
         t1 <= t < t2 ->
         ~ is_idle arr_seq sched t.
@@ -235,7 +235,7 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
     (** ... and there are no duplicate job arrivals. *)
-    Hypothesis H_arrival_sequence_is_a_set:
+    Hypothesis H_arrival_sequence_is_a_set :
       arrival_sequence_uniq arr_seq.
 
     (** Let [t1] be a quiet time. *)
@@ -256,7 +256,7 @@ Section ExistsBusyIntervalJLFP.
     (** We prove that jobs with higher-than-or-equal priority that
         released before time instant [t1] receive no service after time
         instant [t1]. *)
-    Lemma hep_jobs_receive_no_service_before_quiet_time:
+    Lemma hep_jobs_receive_no_service_before_quiet_time :
       service_received_by_hep_jobs_released_during t1 (t1 + Δ) =
       service_received_by_hep_jobs_released_during 0 (t1 + Δ).
     Proof.
@@ -288,7 +288,7 @@ Section ExistsBusyIntervalJLFP.
 
     (** Under this assumption, we prove that the total service within a
         "non-quiet" time interval <<[t1, t1 + Δ)>> is exactly [Δ]. *)
-    Lemma no_idle_time_within_non_quiet_time_interval:
+    Lemma no_idle_time_within_non_quiet_time_interval :
       total_service_of_jobs_in sched (arrivals_between arr_seq 0 (t1 + Δ)) t1 (t1 + Δ) = Δ.
     Proof.
       intros; unfold total_service_of_jobs_in, service_of_jobs, service_of_higher_or_equal_priority_jobs.
@@ -337,12 +337,12 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
     (** ... and there are no duplicate job arrivals, ... *)
-    Hypothesis H_arrival_sequence_is_a_set:
+    Hypothesis H_arrival_sequence_is_a_set :
       arrival_sequence_uniq arr_seq.
 
     (** ... and the priority relation is reflexive and transitive. *)
-    Hypothesis H_priority_is_reflexive: reflexive_job_priorities JLFP.
-    Hypothesis H_priority_is_transitive: transitive_job_priorities JLFP.
+    Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+    Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
     (** Next, we recall the notion of workload of all jobs released in
         a given interval <<[t1, t2)>> that have higher-or-equal
@@ -369,7 +369,7 @@ Section ExistsBusyIntervalJLFP.
 
         (** Since job [j] is pending, there is a (potentially unbounded)
             busy interval that starts no later than with the arrival of [j]. *)
-        Lemma exists_busy_interval_prefix:
+        Lemma exists_busy_interval_prefix :
           exists t1,
             busy_interval_prefix t1 t_busy.+1 /\
             t1 <= job_arrival j <= t_busy.
@@ -452,7 +452,7 @@ Section ExistsBusyIntervalJLFP.
         Section CannotBeBusyForSoLong.
 
           (** Assume that there is no quiet time in the interval <<(t1, t1 + delta]>>. *)
-          Hypothesis H_no_quiet_time:
+          Hypothesis H_no_quiet_time :
             forall t, t1 < t <= t1 + delta -> ~ quiet_time t.
 
           (** Since the interval is always non-quiet, the processor is
@@ -461,7 +461,7 @@ Section ExistsBusyIntervalJLFP.
               sum of service done by jobs with actual arrival time in
               <<[t1, t1 + delta)>> and priority inversion equals
               [delta]. *)
-          Lemma busy_interval_has_uninterrupted_service:
+          Lemma busy_interval_has_uninterrupted_service :
             delta <= priority_inversion_bound A + hp_service t1 (t1 + delta).
           Proof.
             move: H_is_busy_prefix => [H_strictly_larger [H_quiet [_ EXj]]].
@@ -507,7 +507,7 @@ Section ExistsBusyIntervalJLFP.
           (** Moreover, the fact that the interval is not quiet also
               implies that there's more workload requested than
               service received. *)
-          Lemma busy_interval_too_much_workload:
+          Lemma busy_interval_too_much_workload :
             hp_workload t1 (t1 + delta) > hp_service t1 (t1 + delta).
           Proof.
             have PEND := not_quiet_implies_exists_pending_job.
@@ -543,7 +543,7 @@ Section ExistsBusyIntervalJLFP.
           (** Using the two lemmas above, we infer that the workload
               is larger than the interval length. However, this
               contradicts the assumption [H_workload_is_bounded]. *)
-          Corollary busy_interval_workload_larger_than_interval:
+          Corollary busy_interval_workload_larger_than_interval :
             priority_inversion_bound A + hp_workload t1 (t1 + delta) > delta.
           Proof.
             apply leq_ltn_trans with (priority_inversion_bound A + hp_service t1 (t1 + delta)).
@@ -557,7 +557,7 @@ Section ExistsBusyIntervalJLFP.
         (** Since the interval cannot remain busy for so long, we
             prove that the busy interval finishes at some point [t2 <=
             t1 + delta]. *)
-        Lemma busy_interval_is_bounded:
+        Lemma busy_interval_is_bounded :
           exists t2,
             t2 <= t1 + delta /\
             busy_interval t1 t2.
@@ -629,7 +629,7 @@ Section ExistsBusyIntervalJLFP.
       Hypothesis H_positive_cost : job_cost j > 0.
 
       (** Therefore there must exists a busy interval <<[t1, t2)>> that contains the arrival time of [j]. *)
-      Corollary exists_busy_interval:
+      Corollary exists_busy_interval :
         exists t1 t2,
           t1 <= job_arrival j < t2 /\
           t2 <= t1 + delta /\
@@ -668,19 +668,19 @@ Section ExistsBusyIntervalJLFP.
     Section ResponseTimeBoundFromBusyInterval.
 
       (** Let priority_inversion_bound be a constant that bounds the length of a priority inversion. *)
-      Variable priority_inversion_bound: duration -> duration.
-      Hypothesis H_priority_inversion_is_bounded:
+      Variable priority_inversion_bound : duration -> duration.
+      Hypothesis H_priority_inversion_is_bounded :
         is_priority_inversion_bounded_by priority_inversion_bound.
 
       (** Assume that for some positive delta, the sum of requested workload at
           time [t1 + delta] and priority inversion is bounded by delta (i.e., the supply). *)
-      Variable delta: duration.
-      Hypothesis H_delta_positive: delta > 0.
-      Hypothesis H_workload_is_bounded:
+      Variable delta : duration.
+      Hypothesis H_delta_positive : delta > 0.
+      Hypothesis H_workload_is_bounded :
         forall t, priority_inversion_bound (job_arrival j - t) + hp_workload t (t + delta) <= delta.
 
       (** Then, job [j] must complete by [job_arrival j + delta]. *)
-      Lemma busy_interval_bounds_response_time:
+      Lemma busy_interval_bounds_response_time :
         job_completed_by j (job_arrival j + delta).
       Proof.
         have BUSY := exists_busy_interval priority_inversion_bound _ delta.

@@ -10,18 +10,18 @@ Section DeadlineFacts.
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job}.
 
   (** ... any given type of processor states. *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** First, we derive two properties from the fact that a job is incomplete at
       some point in time. *)
   Section Incompletion.
 
     (** Consider any given schedule. *)
-    Variable sched: schedule PState.
+    Variable sched : schedule PState.
 
     (** Trivially, a job that both meets its deadline and is incomplete at a
         time [t] must have a deadline later than [t]. *)
-    Lemma incomplete_implies_later_deadline:
+    Lemma incomplete_implies_later_deadline :
       forall j t,
         job_meets_deadline sched j ->
         ~~ completed_by sched j t ->
@@ -35,7 +35,7 @@ Section DeadlineFacts.
     (** Furthermore, a job that both meets its deadline and is incomplete at a
         time [t] must be scheduled at some point between [t] and its
         deadline. *)
-    Lemma incomplete_implies_scheduled_later:
+    Lemma incomplete_implies_scheduled_later :
       forall j t,
         job_meets_deadline sched j ->
         ~~ completed_by sched j t ->
@@ -55,17 +55,17 @@ Section DeadlineFacts.
   Section IdealProgressSchedules.
 
     (** Consider a given reference schedule... *)
-    Variable sched: schedule PState.
+    Variable sched : schedule PState.
 
     (** ...in which complete jobs don't execute... *)
-    Hypothesis H_completed_jobs: completed_jobs_dont_execute sched.
+    Hypothesis H_completed_jobs : completed_jobs_dont_execute sched.
 
     (** ...and scheduled jobs always receive service. *)
-    Hypothesis H_scheduled_implies_serviced: ideal_progress_proc_model PState.
+    Hypothesis H_scheduled_implies_serviced : ideal_progress_proc_model PState.
 
     (** We observe that if a job meets its deadline and is scheduled at time
         [t], then its deadline is at a time later than t. *)
-    Lemma scheduled_at_implies_later_deadline:
+    Lemma scheduled_at_implies_later_deadline :
       forall j t,
         job_meets_deadline sched j ->
         scheduled_at sched j t ->
@@ -85,12 +85,12 @@ Section DeadlineFacts.
   Section EqualProgress.
 
     (** Consider any two schedules [sched] and [sched']. *)
-    Variable sched sched': schedule PState.
+    Variable sched sched' : schedule PState.
 
     (** We observe that, if the service is invariant at the time of a
        job's absolute deadline, and if the job meets its deadline in one of the schedules, 
        then it meets its deadline also in the other schedule. *)
-    Lemma service_invariant_implies_deadline_met:
+    Lemma service_invariant_implies_deadline_met :
       forall j,
         service sched j (job_deadline j) = service sched' j (job_deadline j) ->
         (job_meets_deadline sched j <-> job_meets_deadline sched' j).

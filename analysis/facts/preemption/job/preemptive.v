@@ -25,7 +25,7 @@ Section FullyPreemptiveModel.
   Variable sched : schedule PState.
 
   (** Then, we prove that fully_preemptive_model is a valid preemption model. *)
-  Lemma valid_fully_preemptive_model:
+  Lemma valid_fully_preemptive_model :
     valid_preemption_model arr_seq sched.
   Proof.
       by intros j ARR; repeat split; intros t CONTR.
@@ -34,7 +34,7 @@ Section FullyPreemptiveModel.
   (** We also prove that under the fully preemptive model
       [job_max_nonpreemptive_segment j] is equal to 0, when [job_cost
       j = 0] ... *)
-  Lemma job_max_nps_is_0:
+  Lemma job_max_nps_is_0 :
     forall j,
       job_cost j = 0 -> 
       job_max_nonpreemptive_segment j = 0.
@@ -46,7 +46,7 @@ Section FullyPreemptiveModel.
   Qed.
 
   (** ... or ε when [job_cost j > 0]. *)  
-  Lemma job_max_nps_is_ε:
+  Lemma job_max_nps_is_ε :
     forall j,
       job_cost j > 0 -> 
       job_max_nonpreemptive_segment j = ε.

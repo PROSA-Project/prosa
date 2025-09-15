@@ -126,7 +126,7 @@ Section TaskPriorityInversionBound.
       priority inversion from jobs satisfying a predicate [P] if all its
       jobs have bounded cumulative priority inversion that depends on its
       relative arrival time w.r.t. the beginning of the busy interval. *)
-  Definition priority_inversion_cond_is_bounded_by (P: pred Job) (B : duration -> duration) :=
+  Definition priority_inversion_cond_is_bounded_by (P : pred Job) (B : duration -> duration) :=
     forall (j : Job),
       arrives_in arr_seq j ->
       job_of_task tsk j ->

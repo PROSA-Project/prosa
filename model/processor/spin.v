@@ -8,7 +8,7 @@ Require Export prosa.behavior.all.
 Section State.
 
   (** Consider any type of jobs. *)
-  Variable Job: JobType.
+  Variable Job : JobType.
 
   (** We define the state of a processor at a given time to be one of three
       possible cases: either a specific job is scheduled and makes progress

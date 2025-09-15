@@ -28,7 +28,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
 
   (** Next, consider any non-preemptive unit-service schedule of the arrival sequence ... *)
   Context {PState : ProcessorState Job}.
-  Hypothesis H_unit_service: unit_service_proc_model PState.
+  Hypothesis H_unit_service : unit_service_proc_model PState.
   Variable sched : schedule PState.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
 
@@ -37,7 +37,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** First we prove that if the cost of a job j is equal to 0, then [job_rtct j = 0] ...  *)
-  Fact job_rtc_threshold_is_0:
+  Fact job_rtc_threshold_is_0 :
     forall j,
       job_cost j = 0 ->
       job_rtct j = 0.
@@ -48,7 +48,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
   Qed.
 
   (** ... and ε otherwise. *)
-  Fact job_rtc_threshold_is_ε:
+  Fact job_rtc_threshold_is_ε :
     forall j,
       job_cost j > 0 ->
       arrives_in arr_seq j ->
@@ -66,7 +66,7 @@ Section TaskRTCThresholdFullyNonPreemptive.
 
   (** Then, we prove that [task_rtct] function defines a valid task's
       run to completion threshold. *)
-  Lemma fully_nonpreemptive_valid_task_run_to_completion_threshold:
+  Lemma fully_nonpreemptive_valid_task_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
     intros; split.

@@ -45,7 +45,7 @@ Section ValidSporadicTaskModel.
   (** We say that a task respects the sporadic task model if the arrivals of
       its jobs in the arrival sequence are appropriately spaced in time. *)
   Definition respects_sporadic_task_model (tsk : Task) :=
-    forall (j j': Job),
+    forall (j j' : Job),
       (** Given two different jobs j and j' ... *)
       j <> j' ->
       (** ...that belong to the arrival sequence... *)

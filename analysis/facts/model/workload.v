@@ -252,7 +252,7 @@ Section WorkloadFacts.
 
   (** We observe that the cumulative workload of all jobs arriving in a time
       interval <<[t1, t2)>> and respecting a predicate [P] can be split into two parts. *)
-   Lemma workload_of_jobs_cat:
+   Lemma workload_of_jobs_cat :
     forall t t1 t2 P,
       t1 <= t <= t2 ->
       workload_of_jobs P (arrivals_between arr_seq t1 t2) =

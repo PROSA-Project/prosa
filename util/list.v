@@ -160,7 +160,7 @@ Section Max0.
   Qed.
 
   (** Note that the last element is at most the max element. *)
-  Lemma last_of_seq_le_max_of_seq:
+  Lemma last_of_seq_le_max_of_seq :
     forall xs, last0 xs <= max0 xs.
   Proof.
     intros xs.
@@ -377,7 +377,7 @@ Section AdditionalLemmas.
   (** We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence
      of [ys] implies that the size of [xs] is at most the size of [ys]. *)
   Lemma subseq_leq_size :
-    forall {X : eqType} (xs ys: seq X),
+    forall {X : eqType} (xs ys : seq X),
       uniq xs ->
       (forall x, x \in xs -> x \in ys) ->
       size xs <= size ys.
@@ -441,7 +441,7 @@ Section AdditionalLemmas.
   (** This lemma allows us to check proposition of the form
       [forall x ∈ xs, exists y ∈ ys, P x y] using a boolean expression
       [all P (zip xs ys)]. *)
-  Lemma forall_exists_implied_by_forall_in_zip:
+  Lemma forall_exists_implied_by_forall_in_zip :
     forall {X Y : eqType} (P_bool : X * Y -> bool) (P_prop : X -> Y -> Prop) (xs : seq X),
       (forall x y, P_bool (x, y) <-> P_prop x y) ->
       (exists ys, size xs = size ys /\ all P_bool (zip xs ys) == true) ->
@@ -463,7 +463,7 @@ Section AdditionalLemmas.
 
   (** Given two sequences [xs] and [ys] of equal size and without
       duplicates, the fact that [xs ⊆ ys] implies that [ys ⊆ xs]. *)
-  Lemma subseq_eq:
+  Lemma subseq_eq :
     forall {X : eqType} (xs ys : seq X),
       uniq xs ->
       uniq ys ->
@@ -569,7 +569,7 @@ Section AdditionalLemmas.
 
 
   (** The predicate [all] implies the predicate [has], if the sequence is not empty. *)
-  Lemma has_all_nilp {T : eqType}:
+  Lemma has_all_nilp {T : eqType} :
     forall (s : seq T) (P : pred T),
       all P s ->
       ~~ nilp s ->
@@ -611,7 +611,7 @@ Section Sorted.
 
   (** We show that if a sequence [xs1 ++ xs2] is sorted, then both
       subsequences [xs1] and [xs2] are sorted as well. *)
-  Lemma sorted_cat:
+  Lemma sorted_cat :
     forall {X : eqType} {R : rel X} (xs1 xs2 : seq X),
       transitive R ->
       sorted R (xs1 ++ xs2) -> sorted R xs1 /\ sorted R xs2.
@@ -895,7 +895,7 @@ Section IotaRange.
 
   (** For convenience, we define a special case of
       lemma [index_iota_filter_step] for [a = 0] and [b = k.+1]. *)
-  Corollary range_iota_filter_step:
+  Corollary range_iota_filter_step :
     forall x xs k,
       x <= k ->
       (forall y, y \in xs -> x <= y) ->
@@ -908,7 +908,7 @@ Section IotaRange.
 
   (** We prove that if [x < a], then [x < (filter P (index_iota a
       b))[idx]] for any predicate [P]. *)
-  Lemma iota_filter_gt:
+  Lemma iota_filter_gt :
     forall x a b idx P,
       x < a ->
       idx < size ([seq x <- index_iota a b | P x]) ->

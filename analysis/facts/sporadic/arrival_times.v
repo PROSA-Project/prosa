@@ -19,12 +19,12 @@ Section ArrivalTimes.
 
   (** ... and any sporadic task [tsk] that is to be analyzed. *)
   Variable tsk : Task.
-  Hypothesis H_sporadic_model: respects_sporadic_task_model arr_seq tsk.
-  Hypothesis H_valid_inter_min_arrival: valid_task_min_inter_arrival_time tsk.
+  Hypothesis H_sporadic_model : respects_sporadic_task_model arr_seq tsk.
+  Hypothesis H_valid_inter_min_arrival : valid_task_min_inter_arrival_time tsk.
 
   (** We first show that for any two jobs [j1] and [j2], [j2] arrives after [j1]
       provided [job_index] of [j2] strictly exceeds the [job_index] of [j1]. *)
-  Lemma lower_index_implies_earlier_arrival:
+  Lemma lower_index_implies_earlier_arrival :
     forall j1 j2,
       arrives_in arr_seq j1 ->
       arrives_in arr_seq j2 ->
@@ -53,14 +53,14 @@ Section ArrivalTimes.
           the next proof. *)
   Variable j1 : Job.
   Variable j2 : Job.
-  Hypothesis H_j1_from_arrseq: arrives_in arr_seq j1.
-  Hypothesis H_j2_from_arrseq: arrives_in arr_seq j2.
-  Hypothesis H_j1_task: job_task j1 = tsk.
-  Hypothesis H_j2_task: job_task j2 = tsk.
+  Hypothesis H_j1_from_arrseq : arrives_in arr_seq j1.
+  Hypothesis H_j2_from_arrseq : arrives_in arr_seq j2.
+  Hypothesis H_j1_task : job_task j1 = tsk.
+  Hypothesis H_j2_task : job_task j2 = tsk.
 
   (** We prove that jobs [j1] and [j2] are equal if and only if they
       arrive at the same time. *)
-  Lemma same_jobs_iff_same_arr:
+  Lemma same_jobs_iff_same_arr :
     j1 = j2 <->
     job_arrival j1 = job_arrival j2.
   Proof.
@@ -73,7 +73,7 @@ Section ArrivalTimes.
   Qed.
 
   (** As a corollary, we observe that distinct jobs cannot have equal arrival times. *)
-  Corollary uneq_job_uneq_arr:
+  Corollary uneq_job_uneq_arr :
       j1 <> j2 ->
       job_arrival j1 <> job_arrival j2.
   Proof. by rewrite -same_jobs_iff_same_arr. Qed.

@@ -9,7 +9,7 @@ Require Export prosa.behavior.all.
 Section State.
 
   (** Consider any type of jobs. *)
-  Variable Job: JobType.
+  Variable Job : JobType.
 
   (** We define the state of a variable-speed processor at a given
       time to be one of two possible cases: either a specific job is

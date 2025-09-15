@@ -57,7 +57,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
   (** ... and assume that it defines a valid preemption
       model with bounded non-preemptive segments. *)
-  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments:
+  Hypothesis H_valid_model_with_bounded_nonpreemptive_segments :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
@@ -77,7 +77,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** ... and the cost of a job cannot be larger than the task cost. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
@@ -93,13 +93,13 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Consider a valid preemption model ... *)
-  Hypothesis H_valid_preemption_model:
+  Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
 
   (** ... and a valid task run-to-completion threshold function. That
      is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
      any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
-  Hypothesis H_valid_run_to_completion_threshold:
+  Hypothesis H_valid_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** Let's define some local names for clarity. *)
@@ -116,7 +116,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     (** First, we prove that the maximum length of a priority inversion of a job j is
        bounded by the maximum length of a non-preemptive section of a task with
        lower priority (i.e., the blocking term). *)
-    Lemma priority_inversion_is_bounded_by_blocking:
+    Lemma priority_inversion_is_bounded_by_blocking :
       forall j t1 t2,
         arrives_in arr_seq j ->
         job_of_task tsk j ->
@@ -142,7 +142,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
 
     (** Using the above lemma, we prove that the priority inversion of the task
         is bounded by the blocking_bound. *)
-    Lemma priority_inversion_is_bounded:
+    Lemma priority_inversion_is_bounded :
       priority_inversion_is_bounded_by
         arr_seq sched tsk (constant (blocking_bound ts tsk)).
     Proof.
@@ -169,7 +169,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     (** Next, consider any value R, and assume that for any given arrival offset A from the search
        space there is a solution of the response-time bound recurrence that is bounded by R. *)
     Variable R : duration.
-    Hypothesis H_R_is_maximum:
+    Hypothesis H_R_is_maximum :
       forall (A : duration),
         is_in_search_space A ->
         exists (F : duration),
@@ -184,7 +184,7 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
        the priority inversion is bounded. In this module we provide the preemption model
        with bounded non-preemptive segments and _prove_ that the priority inversion is
        bounded. *)
-    Theorem uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments:
+    Theorem uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments :
       response_time_bounded_by tsk R.
     Proof.
       eapply uniprocessor_response_time_bound_fp;

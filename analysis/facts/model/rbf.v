@@ -276,7 +276,7 @@ Section RequestBoundFunctions.
 
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent:
+  Hypothesis H_arrival_times_are_consistent :
     consistent_arrival_times arr_seq.
 
   (** Let [tsk] be any task. *)
@@ -291,7 +291,7 @@ Section RequestBoundFunctions.
   Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
 
   (** We prove that [task_request_bound_function 0] is equal to [0]. *)
-  Lemma task_rbf_0_zero:
+  Lemma task_rbf_0_zero :
     task_request_bound_function tsk 0 = 0.
   Proof.
     rewrite /task_request_bound_function.
@@ -300,7 +300,7 @@ Section RequestBoundFunctions.
   Qed.
 
   (** We prove that [task_request_bound_function] is monotone. *)
-  Lemma task_rbf_monotone:
+  Lemma task_rbf_monotone :
     monotone leq (task_request_bound_function tsk).
   Proof.
     rewrite /monotone => ? ? LE.
@@ -317,7 +317,7 @@ Section RequestBoundFunctions.
   Hypothesis H_arrival_curve_positive : max_arrivals tsk ε > 0.
 
   (** Then we prove that [task_request_bound_function] at [ε] is greater than or equal to the task's WCET. *)
-  Lemma task_rbf_1_ge_task_cost:
+  Lemma task_rbf_1_ge_task_cost :
     task_request_bound_function tsk ε >= task_cost tsk.
   Proof.
     have ALT: forall n, n = 0 \/ n > 0 by clear; intros n; destruct n; [left | right].
@@ -328,7 +328,7 @@ Section RequestBoundFunctions.
 
   (** As a corollary, we prove that the [task_request_bound_function] at any point [A] greater than
       [0] is no less than the task's WCET. *)
-  Lemma task_rbf_ge_task_cost:
+  Lemma task_rbf_ge_task_cost :
     forall A,
       A > 0 ->
       task_request_bound_function tsk A >= task_cost tsk.
@@ -421,8 +421,8 @@ Section DegenerateTotalRBFs.
   (** ... and any consistent arrival sequence of valid jobs of these tasks. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job} `{JobCost Job}.
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent: consistent_arrival_times arr_seq.
-  Hypothesis H_valid_job_cost: arrivals_have_valid_job_costs arr_seq.
+  Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
+  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
   (** Suppose the arrival curves are correct. *)
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
@@ -567,7 +567,7 @@ Section FP_RBF_partitioning.
   (** If the task set may contain duplicates, then the we can only say that
       the sum of other higher-or-equal-priority [RBF] and task [tsk]'s [RBF]
       is at most the total higher-or-equal-priority workload. *)
-  Lemma split_hep_rbf_weaken:
+  Lemma split_hep_rbf_weaken :
     forall Δ,
       tsk \in ts ->
       total_ohep_request_bound_function_FP ts tsk Δ + task_request_bound_function tsk Δ
@@ -690,7 +690,7 @@ Section TaskWorkload.
 
   (** Consider any arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent:
+  Hypothesis H_arrival_times_are_consistent :
     consistent_arrival_times arr_seq.
 
   (** ... and assume that WCETs are respected. *)

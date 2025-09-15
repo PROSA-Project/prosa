@@ -47,7 +47,7 @@ Section ModelValidity.
   Section ValidCost.
 
     (** Consider an arbitrary task. *)
-    Variable tsk: Task.
+    Variable tsk : Task.
 
     (** The WCET of the task should be positive. *)
     Definition task_cost_positive := task_cost tsk > 0.

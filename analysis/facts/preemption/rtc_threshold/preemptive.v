@@ -26,12 +26,12 @@ Section TaskRTCThresholdFullyPreemptiveModel.
   Variable arr_seq : arrival_sequence Job.
 
   (** ... and assume that a job cost cannot be larger than a task cost. *)
-  Hypothesis H_valid_job_cost:
+  Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
   (** Then, we prove that [task_rtct] function
       defines a valid task's run to completion threshold. *)     
-  Lemma fully_preemptive_valid_task_run_to_completion_threshold:
+  Lemma fully_preemptive_valid_task_run_to_completion_threshold :
     forall tsk, valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
     intros; split.

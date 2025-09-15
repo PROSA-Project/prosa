@@ -120,7 +120,7 @@ Section RTAforLimitedPreemptiveEDFModelwithArrivalCurves.
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-  Hypothesis H_schedule_with_limited_preemptions:
+  Hypothesis H_schedule_with_limited_preemptions :
     schedule_respects_preemption_model arr_seq sched.
 
   (** Assume that the schedule respects the EDF policy. *)

@@ -16,7 +16,7 @@ Section DemandBoundFunction.
       task_request_bound_function tsk delta'.
 
   (** A task set's total demand bound function is simply the sum of each task's DBF.*)
-  Definition total_demand_bound_function (ts: seq Task) (delta : duration) :=
+  Definition total_demand_bound_function (ts : seq Task) (delta : duration) :=
     \sum_(tsk <- ts) task_demand_bound_function tsk delta.
 
 End DemandBoundFunction.

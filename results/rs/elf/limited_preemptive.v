@@ -120,7 +120,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
   Variable sched : schedule (rs_processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
-  Hypothesis H_schedule_with_limited_preemptions:
+  Hypothesis H_schedule_with_limited_preemptions :
     schedule_respects_preemption_model arr_seq sched.
 
   (** Consider an FP policy that indicates a higher-or-equal priority
@@ -161,7 +161,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
       guarantee that all busy intervals are bounded by [L]. *)
   Variable L : duration.
   Hypothesis H_L_positive : 0 < L.
-  Hypothesis H_fixed_point:
+  Hypothesis H_fixed_point :
     forall (A : duration),
       blocking_bound ts tsk A + total_hep_request_bound_function_FP ts tsk L <= SBF L.
 

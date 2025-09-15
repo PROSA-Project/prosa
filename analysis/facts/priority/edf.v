@@ -116,7 +116,7 @@ Section SequentialEDF.
 
   (** ... and assume that it defines a valid preemption model with
       bounded non-preemptive segments. *)
-  Hypothesis H_valid_preemption_model:
+  Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
 
   (** Assume an EDF schedule. *)

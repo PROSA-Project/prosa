@@ -3,26 +3,26 @@ Require Import prosa.util.all.
 
 (** In this section, we define the properties of TDMA and prove some basic lemmas. *)
 Section TDMAFacts.
-  Context {Task:eqType}.
+  Context {Task : eqType}.
 
   (** Consider any task set ts... *)
-  Variable ts: {set Task}.
+  Variable ts : {set Task}.
 
   (** ... with a TDMA policy *)
   Context `{TDMAPolicy Task}.
 
   Section TimeSlotFacts.
     (** Consider any task in ts*)
-    Variable task: Task.
-    Hypothesis H_task_in_ts: task \in ts.
+    Variable task : Task.
+    Hypothesis H_task_in_ts : task \in ts.
 
     (** Assume task_time_slot is valid time slot*)
-    Hypothesis time_slot_positive:
+    Hypothesis time_slot_positive :
       valid_time_slot ts.
 
     (** Obviously, the TDMA cycle is greater or equal than any task time slot which is
           in TDMA cycle *)
-    Lemma TDMA_cycle_ge_each_time_slot:
+    Lemma TDMA_cycle_ge_each_time_slot :
       TDMA_cycle ts >= task_time_slot task.
     Proof.
       rewrite /TDMA_cycle (big_rem task) //.
@@ -31,14 +31,14 @@ Section TDMAFacts.
     Qed.
 
     (** Thus, a TDMA cycle is always positive *)
-    Lemma TDMA_cycle_positive:
+    Lemma TDMA_cycle_positive :
       TDMA_cycle ts > 0.
     Proof.
       move:time_slot_positive=>/(_ task H_task_in_ts)/leq_trans;apply;apply TDMA_cycle_ge_each_time_slot.
     Qed.
 
     (** Slot offset is less then cycle *)
-    Lemma Offset_lt_cycle:
+    Lemma Offset_lt_cycle :
       task_slot_offset ts task < TDMA_cycle ts.
     Proof.
       rewrite /task_slot_offset /TDMA_cycle big_mkcond.
@@ -50,7 +50,7 @@ Section TDMAFacts.
 
     (** For a task, the sum of its slot offset and its time slot is
           less then or equal to cycle. *)
-    Lemma Offset_add_slot_leq_cycle:
+    Lemma Offset_add_slot_leq_cycle :
       task_slot_offset ts task + task_time_slot task <= TDMA_cycle ts.
     Proof.
       rewrite /task_slot_offset /TDMA_cycle.
@@ -66,28 +66,28 @@ Section TDMAFacts.
   (** Now we prove that no two tasks share the same time slot at any time. *)
   Section TimeSlotOrderFacts.
     (** Consider any task in ts*)
-    Variable task: Task.
-    Hypothesis H_task_in_ts: task \in ts.
+    Variable task : Task.
+    Hypothesis H_task_in_ts : task \in ts.
 
     (** Assume task_time_slot is valid time slot*)
-    Hypothesis time_slot_positive:
+    Hypothesis time_slot_positive :
       valid_time_slot ts.
 
     (** Assume that slot order is total... *)
-    Hypothesis slot_order_total:
+    Hypothesis slot_order_total :
       total_slot_order ts.
 
     (*..., antisymmetric... *)
-    Hypothesis slot_order_antisymmetric:
+    Hypothesis slot_order_antisymmetric :
       antisymmetric_slot_order ts.
 
     (*... and transitive. *)
-    Hypothesis slot_order_transitive:
+    Hypothesis slot_order_transitive :
       transitive_slot_order.
 
     (** Then, we can prove that the difference value between two offsets is
         at least a slot *)
-    Lemma relation_offset:
+    Lemma relation_offset :
       forall tsk1 tsk2, tsk1 \in ts ->
                                  tsk2 \in ts ->
                                           slot_order tsk1 tsk2 ->
@@ -117,7 +117,7 @@ Section TDMAFacts.
     Qed.
 
     (** Then, we proved that no two tasks share the same time slot at any time. *)
-    Lemma task_in_time_slot_uniq:
+    Lemma task_in_time_slot_uniq :
       forall tsk1 tsk2 t,
         tsk1 \in ts -> task_time_slot tsk1 > 0 ->
         tsk2 \in ts -> task_time_slot tsk2 > 0 ->

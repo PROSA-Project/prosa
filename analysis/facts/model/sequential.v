@@ -6,8 +6,8 @@ Require Export prosa.analysis.facts.model.task_arrivals.
 Section ExecutionOrder.
 
   (** Consider any type of job associated with any type of tasks... *)
-  Context {Job: JobType}.
-  Context {Task: TaskType}.
+  Context {Job : JobType}.
+  Context {Task : TaskType}.
   Context `{JobTask Job Task}.
 
   (** ... with arrival times and costs ... *)
@@ -15,7 +15,7 @@ Section ExecutionOrder.
   Context `{JobCost Job}.
 
   (** ... and any kind of processor state model. *)
-  Context {PState: ProcessorState Job}.
+  Context {PState : ProcessorState Job}.
 
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
@@ -24,11 +24,11 @@ Section ExecutionOrder.
   Variable sched : schedule PState.
 
   (** ... in which the sequential tasks hypothesis holds. *)
-  Hypothesis H_sequential_tasks: sequential_tasks arr_seq sched.
+  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
 
   (** A simple corollary of this hypothesis is that the scheduler
       executes a job with the earliest arrival time. *)
-  Corollary scheduler_executes_job_with_earliest_arrival:
+  Corollary scheduler_executes_job_with_earliest_arrival :
     forall j1 j2 t,
       arrives_in arr_seq j1 ->
       arrives_in arr_seq j2 ->
