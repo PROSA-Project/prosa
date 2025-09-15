@@ -81,7 +81,8 @@ Section Schedule.
       The service received by a given job [j] in a given multiprocessor state
       [mps] is given by the sum of the service received across all individual
       processors of the multiprocessor. *)
-  Lemma multiproc_service_in_eq : forall (j : Job) (mps : multiprocessor_state),
+  Lemma multiproc_service_in_eq :
+    forall (j : Job) (mps : multiprocessor_state),
       service_in j mps = \sum_(cpu < num_cpus) service_in j (mps cpu).
   Proof. reflexivity. Qed.
 

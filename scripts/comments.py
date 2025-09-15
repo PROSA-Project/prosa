@@ -125,9 +125,11 @@ class LineNumbers:
         where = self.line_containing(pos)
         return self.src[where[1][0] : where[1][1]]
 
+    def line_start_for_offset(self, pos: int) -> int:
+        return self.line_containing(pos)[1][0]
+
     def offset_within_line(self, pos: int) -> int:
-        where = self.line_containing(pos)
-        return pos - where[1][0]
+        return pos - self.line_start_for_offset(pos)
 
     def __getitem__(self, pos: int) -> int:
         return self.line_number_for_offset(pos)

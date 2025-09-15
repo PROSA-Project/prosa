@@ -303,7 +303,7 @@ Section TransferSchedulability.
 
     Lemma online_remaining_cost_bounded :
       forall j t,
-          online_remaining_cost j t <= remaining_cost_bound j t.
+        online_remaining_cost j t <= remaining_cost_bound j t.
     Proof.
       move=> j t.
       rewrite leq_sub2rE //.

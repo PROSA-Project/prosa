@@ -86,7 +86,8 @@ Section PriorityInversionIsBounded.
       move => t' /andP[LE1 GT1].
       apply /negP => PT.
       move: H_jlp_lp => /negP LP; apply: LP.
-      have [ptst [IN1 [PTT STT]]] : exists ptst : nat,
+      have [ptst [IN1 [PTT STT]]] :
+        exists ptst : nat,
           t' <= ptst <= t /\ preemption_time arr_seq sched ptst /\ scheduled_at sched jlp ptst.
       { by apply: scheduling_of_any_segment_starts_with_preemption_time_continuously_sched => //=. }
       apply: (scheduled_at_preemption_time_implies_higher_or_equal_priority arr_seq _ sched _ _ _ _ j _ _ t1 t2 _ ptst)  => //.
@@ -589,8 +590,10 @@ Section PriorityInversionIsBounded.
             t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).
-          have EX: exists pt,
-              ((service jlp t1) <= pt <= (service jlp t1) + (job_max_nonpreemptive_segment jlp - 1)) && job_preemptable jlp pt.
+          have EX:
+            exists pt,
+              ((service jlp t1) <= pt <= (service jlp t1) + (job_max_nonpreemptive_segment jlp - 1))
+              && job_preemptable jlp pt.
           { have ARRs: arrives_in arr_seq jlp by [].
             move: (proj2 (H_valid_model_with_bounded_nonpreemptive_segments) jlp ARRs) =>[_ EXPP].
             destruct H_sched_valid as [A B].
@@ -674,7 +677,8 @@ Section PriorityInversionIsBounded.
       replace j' with jlp in *; clear HJLP.
       move : SCHED2 => /eqP SCHED2.
       rewrite scheduled_jobs_at_scheduled_at in SCHED2 => //=.
-      have [ptst [IN1 [PTT STT]]] : exists ptst : nat,
+      have [ptst [IN1 [PTT STT]]] :
+        exists ptst : nat,
           ppt <= ptst <= t /\ preemption_time arr_seq sched ptst /\ scheduled_at sched jlp ptst.
       { by apply: scheduling_of_any_segment_starts_with_preemption_time_continuously_sched. }
        contradict nHEPj.

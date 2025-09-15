@@ -201,7 +201,7 @@ Section BigCatLemmas.
       i.e. any element contained in one of the sequences will also be an element of the
       result of the concatenation. *)
   Lemma mem_bigcat :
-      forall x y s,
+    forall x y s,
       x \in s ->
       y \in f x ->
       y \in \cat_(x <- s) f x.

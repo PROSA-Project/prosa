@@ -179,8 +179,9 @@ Section ExistsBusyIntervalJLFP.
         + move: REL; rewrite ltnS -eqn_leq eq_sym; move => /eqP REL.
             by rewrite -REL; eapply job_pending_at_arrival; eauto 2.
       - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
-      - have EX: exists hp__seq: seq Job,
-        forall j__hp, j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ job_pending_at j__hp t /\ hep_job j__hp j.
+      - have EX:
+          exists hp__seq: seq Job, forall j__hp,
+            j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ job_pending_at j__hp t /\ hep_job j__hp j.
         { exists (filter (fun jo => (job_pending_at jo t) && (hep_job jo j)) (arrivals_between arr_seq 0 t.+1)).
           intros; split; intros T.
           - move: T; rewrite mem_filter; move => /andP [/andP [PEN HP] IN].

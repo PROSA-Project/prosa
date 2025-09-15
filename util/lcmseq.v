@@ -18,7 +18,7 @@ Qed.
 (** Similarly, [lcml xs] divides [lcml (x :: xs)] for any [x] and [xs]. *)
 Lemma lcm_seq_divides_lcm_super :
   forall (x : nat) (xs : seq nat),
-  lcml xs %| lcml (x :: xs).
+    lcml xs %| lcml (x :: xs).
 Proof.
   move=> x xs; induction xs; first by auto.
   rewrite /lcml -cat1s foldr_cat /foldr.

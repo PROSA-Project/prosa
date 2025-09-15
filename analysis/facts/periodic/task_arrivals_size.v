@@ -107,8 +107,7 @@ Section TaskArrivalsSize.
         such that [job_index] of [j] is equal to [n] and [j] arrives
         at [task_offset tsk + n * task_period tsk]. *)
     Lemma jobs_exists_later :
-      forall n,
-      exists j,
+      forall n, exists j,
         arrives_in arr_seq j /\
         job_task j = tsk /\
         job_arrival j = task_offset tsk + n * task_period tsk /\

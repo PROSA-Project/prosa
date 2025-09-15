@@ -74,9 +74,9 @@ Section InterferenceProperties.
       jobs belonging to equal-priority tasks (GEL). *)
   Lemma cumulative_hep_interference_split_tasks_new :
     forall j t1 Δ,
-    cumulative_another_task_hep_job_interference arr_seq  sched j t1 (t1 + Δ)
-    = cumulative_interference_from_hep_jobs_from_hp_tasks arr_seq sched j t1 (t1 + Δ)
-      + cumulative_interference_from_hep_jobs_from_other_ep_tasks arr_seq sched j t1 (t1 + Δ).
+      cumulative_another_task_hep_job_interference arr_seq  sched j t1 (t1 + Δ)
+      = cumulative_interference_from_hep_jobs_from_hp_tasks arr_seq sched j t1 (t1 + Δ)
+        + cumulative_interference_from_hep_jobs_from_other_ep_tasks arr_seq sched j t1 (t1 + Δ).
   Proof.
     move => j t1 Δ.
     rewrite -big_split //=; apply: eq_big_seq => t IN.

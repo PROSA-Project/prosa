@@ -597,54 +597,54 @@ Section NondecreasingSequence.
   (** In this section, we prove a few basic lemmas about distances of non-decreasing sequences. *)
   Section DistancesOfNonDecreasingSequence.
 
-    (** First we show that the max distance between elements of any nontrivial sequence
-       (i.e. a sequence that contains at leas two distinct elements) is positive. *)
+    (** First we show that the max distance between elements of any nontrivial
+        sequence (i.e., a sequence that contains at least two distinct elements)
+        is positive. *)
     Lemma max_distance_in_nontrivial_seq_is_positive :
       forall (xs : seq nat),
         nondecreasing_sequence xs ->
         (exists x y, x \in xs /\ y \in xs /\ x <> y) ->
         0 < max0 (distances xs).
     Proof.
-      move => xs SIZE [x [y [INx [INy NEQ]]]].
-      move: INx INy => /nthP INx /nthP INy; specialize (INx 0); specialize (INy 0).
-      move: INx INy => [indx SIZEx EQx] [indy SIZEy EQy].
-      have L: forall (x y indx indy : nat),
+      move => xs SIZE [x [y [/nthP INx [/nthP INy /eqP NEQ]]]].
+      move: (INx 0) (INy 0) => [indx SIZEx EQx] [indy SIZEy EQy].
+      suff L:
+        forall (x y indx indy : nat),
           indx < size xs -> indy < size xs ->
           nondecreasing_sequence xs ->
           x < y -> xs [|indx|] = x -> xs [|indy|] = y ->
           0 < max0 (distances xs).
-      { clear; intros x y indx indy SIZEx SIZEy SIZE LT EQx EQy.
-        have LTind: indx < indy.
-        { rewrite ltnNge; apply/negP; intros CONTR.
-          subst x y; move: LT; rewrite ltnNge; move => /negP T; apply: T.
-          by apply SIZE; apply/andP. }
-        have EQ: exists Δ, indy = indx + Δ; [by exists (indy - indx); lia | move: EQ => [Δ EQ]; subst indy].
-        have F: exists ind, indx <= ind < indx + Δ /\ xs[|ind|] < xs[|ind.+1|].
-        { subst x y; clear SIZEx SIZEy; revert xs indx LTind SIZE LT.
-          elim: Δ => [ |Δ IHΔ] xs indx LTind SIZE LT; first by lia.
-          destruct (posnP Δ) as [ZERO|POS].
-          { by subst Δ; exists indx; split; [rewrite addn1; apply/andP | rewrite addn1 in LT]; auto. }
-          have ALT: xs[|indx + Δ|] == xs[|indx + Δ.+1|] \/ xs[|indx + Δ|] < xs[|indx + Δ.+1|].
-          { apply/orP; rewrite -leq_eqVlt addnS.
-            apply SIZE; apply/andP; split; first by done.
-            rewrite ltnNge; apply/negP; intros CONTR.
-            move: LT; rewrite ltnNge; move => /negP LT; apply: LT.
-            by rewrite nth_default ?addnS. }
-          move: ALT => [/eqP EQ|LT'].
-          - edestruct (IHΔ) as [ind [B UP]]; eauto 5 using addn1, leq_add2l.
-            exists ind; split; last by done.
-            move: B => /andP [B1 B2]; apply/andP; split; first by done.
-            by rewrite addnS ltnS ltnW.
-          - exists (indx + Δ); split; last by rewrite -addnS.
-            by apply/andP; split; [rewrite leq_addr | rewrite addnS].  }
-        move: F => [ind [/andP [B1 B2] UP]].
-        apply leq_trans with (xs [|ind.+1|] - xs [|ind|]).
-        - by rewrite subn_gt0.
-        - by apply distance_between_neighboring_elements_le_max_distance_in_seq.
-      }
-      move: NEQ => /eqP; rewrite neq_ltn; move => /orP [LT|LT].
-      - by eapply L with (indx := indx) (x := x) (y := y); eauto.
-      - by eapply L with (indx := indy) (indy := indx) (x := y) (y := x); eauto.
+      {  move: NEQ; rewrite neq_ltn => /orP [LT|LT].
+         - by apply: (L x y indx indy).
+         - by apply: (L y x indy indx). }
+      clear; intros x y indx indy SIZEx SIZEy SIZE LT EQx EQy.
+      have LTind: indx < indy.
+      { rewrite ltnNge; apply/negP; intros CONTR.
+        subst x y; move: LT; rewrite ltnNge => /negP; apply.
+        by apply SIZE; apply/andP. }
+      have EQ: exists Δ, indy = indx + Δ; [by exists (indy - indx); lia | move: EQ => [Δ EQ]; subst indy].
+      have F: exists ind, indx <= ind < indx + Δ /\ xs[|ind|] < xs[|ind.+1|].
+      { subst x y; clear SIZEx SIZEy; revert xs indx LTind SIZE LT.
+        elim: Δ => [ |Δ IHΔ] xs indx LTind SIZE LT; first by lia.
+        destruct (posnP Δ) as [ZERO|POS].
+        { by subst Δ; exists indx; split; [rewrite addn1; apply/andP | rewrite addn1 in LT]; auto. }
+        have ALT: xs[|indx + Δ|] == xs[|indx + Δ.+1|] \/ xs[|indx + Δ|] < xs[|indx + Δ.+1|].
+        { apply/orP; rewrite -leq_eqVlt addnS.
+          apply SIZE; apply/andP; split; first by done.
+          rewrite ltnNge; apply/negP; intros CONTR.
+          move: LT; rewrite ltnNge; move => /negP LT; apply: LT.
+          by rewrite nth_default ?addnS. }
+        move: ALT => [/eqP EQ|LT'].
+        - edestruct (IHΔ) as [ind [B UP]]; eauto 5 using addn1, leq_add2l.
+          exists ind; split; last by done.
+          move: B => /andP [B1 B2]; apply/andP; split; first by done.
+          by rewrite addnS ltnS ltnW.
+        - exists (indx + Δ); split; last by rewrite -addnS.
+          by apply/andP; split; [rewrite leq_addr | rewrite addnS].  }
+      move: F => [ind [/andP [B1 B2] UP]].
+      apply leq_trans with (xs [|ind.+1|] - xs [|ind|]).
+      - by rewrite subn_gt0.
+      - by apply distance_between_neighboring_elements_le_max_distance_in_seq.
     Qed.
 
     (** Given a non-decreasing sequence [xs] with length [n], we show that the difference

@@ -49,8 +49,8 @@ Section ArrivalCurveToRBF.
           converted, is a valid request-bound function. *)
       Theorem valid_arrival_curve_to_max_rbf :
         forall (arrivals : Task -> duration -> nat),
-        valid_arrival_curve (arrivals tsk) ->
-        valid_request_bound_function ((task_max_rbf arrivals) tsk).
+          valid_arrival_curve (arrivals tsk) ->
+          valid_request_bound_function ((task_max_rbf arrivals) tsk).
       Proof.
         move => ARR [ZERO MONO].
         split.

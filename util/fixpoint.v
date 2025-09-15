@@ -178,8 +178,8 @@ Section FixpointSearch.
     Lemma ffp_finds_none :
       find_fixpoint f h = None ->
         forall x,
-        0 < x < h ->
-        x != f x.
+          0 < x < h ->
+          x != f x.
     Proof.
       move=> FFP x /andP [POS LT].
       apply: (ffpf_finds_none 1 h).

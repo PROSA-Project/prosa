@@ -79,7 +79,7 @@ KEYWORDS_FOR_INDENTATION_CHECK = re.compile(
 )
 
 QUANTIFIER_FOR_INDENTATION_CHECK = re.compile(
-    r"\s+(forall|exists)[^,\n]+,\n\s*([^ \n]+)",
+    r"\s+(?P<quantifier>forall|exists)[^,\n]+,(?P<stacked>[ ]*(forall|exists)[^,\n]+,)*\n\s*(?P<nline>[^ \n]+)",
     re.MULTILINE | re.DOTALL,
 )
 
@@ -136,14 +136,14 @@ def lint_file(opts, fpath):
         assert expected_indent >= 0
 
     for m in matches_of(QUANTIFIER_FOR_INDENTATION_CHECK):
-        quantifier_indentation = lineno.offset_within_line(m.span(1)[0])
-        expression_indentation = lineno.offset_within_line(m.span(2)[0])
+        quantifier_indentation = lineno.offset_within_line(m.span("quantifier")[0])
+        expression_indentation = lineno.offset_within_line(m.span("nline")[0])
         if quantifier_indentation + INDENT_SPACES != expression_indentation:
             issues.append(
                 (
-                    m.span(2),
-                    f"{fpath}:{lineno[m.span(2)[0]]}: bad indentation after "
-                    f"{m.group(1)} (expected {quantifier_indentation + INDENT_SPACES}, "
+                    m.span("nline"),
+                    f"{fpath}:{lineno[m.span('nline')[0]]}: bad indentation after "
+                    f"{m.group('quantifier')} (expected {quantifier_indentation + INDENT_SPACES}, "
                     f"found {expression_indentation})",
                     0,
                     1,

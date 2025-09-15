@@ -44,7 +44,8 @@ Section ReadinessModelProperties.
       nonpreemptive section. *)
   Definition valid_nonpreemptive_readiness sched :=
      forall j t,
-        ~~ job_preemptable j (service sched j t) -> job_ready sched j t.
+       ~~ job_preemptable j (service sched j t)
+       -> job_ready sched j t.
 
   (** For the next definition, consider the tasks from which the jobs stem. *)
   Context {Task : TaskType}.

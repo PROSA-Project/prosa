@@ -19,8 +19,7 @@ Section InfiniteJobs.
       if for every integer [n] there exists a job [j] of task [tsk]
       such that [job_index] of [j] is equal to [n]. *)
   Definition infinite_jobs :=
-    forall tsk n,
-    exists j,
+    forall tsk n, exists j,
       arrives_in arr_seq j /\
       job_task j = tsk /\
       job_index arr_seq j = n.

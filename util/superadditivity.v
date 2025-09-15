@@ -174,11 +174,11 @@ Section Superadditivity.
           [f] in all of its points except for [h], in which its value is exactly
           the superadditive extension of [f] in [h]. *)
       Variable f' : nat -> nat.
-      Hypothesis h_f'_min_extension : forall t,
-          f' t =
-          if t == h
-          then minimal_superadditive_extension h
-          else f t.
+      Hypothesis h_f'_min_extension :
+        forall t,
+          f' t = if t == h
+                 then minimal_superadditive_extension h
+                 else f t.
 
       (** First, we prove that [f'] is superadditive also in [h]. *)
       Theorem minimal_extension_superadditive_at_horizon :

@@ -75,8 +75,8 @@ Section ExtraLemmas.
       not empty. *)
   Lemma bigmax_ltn_ord :
     forall (n : nat) (P : pred nat) (i0 : 'I_n),
-    P i0 ->
-    \max_(i < n | P i) i < n.
+      P i0 ->
+      \max_(i < n | P i) i < n.
   Proof.
     intros n P i0 Pi.
     destruct n as [|n]; first by destruct i0 as [i0 P0]; move: (P0) => P0'; rewrite ltn0 in P0'.

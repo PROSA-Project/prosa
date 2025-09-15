@@ -427,8 +427,7 @@ Section GenericLists.
   (** We prove a refinement for the [foldr] function when applied to a [map] and
       [filter] operation.  *)
   Lemma refine_foldr :
-    forall (R : T1 -> bool) (R' : T2 -> bool) (F : T1 -> nat) (F' : T2 -> N),
-    forall (rT : T1 -> T2 -> Type),
+    forall (R : T1 -> bool) (R' : T2 -> bool) (F : T1 -> nat) (F' : T2 -> N) (rT : T1 -> T2 -> Type),
       refines ( list_R rT )%rel xs xs' ->
       refines ( rT ==> Rnat )%rel F F' ->
       refines ( rT ==> bool_R )%rel R R' ->
@@ -447,8 +446,7 @@ Section GenericLists.
   (** Next, we prove a refinement for the [foldr] function when applied to a
       [map] operation. *)
   Lemma refine_uncond_foldr :
-    forall (F : T1 -> nat) (F' : T2 -> N),
-    forall (rT : T1 -> T2 -> Type),
+    forall (F : T1 -> nat) (F' : T2 -> N) (rT : T1 -> T2 -> Type),
       refines ( list_R rT )%rel xs xs' ->
       refines ( rT ==> Rnat )%rel F F' ->
       refines Rnat (\sum_(x <- xs) F x) (foldr +%C 0%C [seq F' x' | x' <- xs']).

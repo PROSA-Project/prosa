@@ -304,11 +304,11 @@ Section EMSOFTModel.
 
   Definition nonclairvoyant_criterion :=
     forall omega,
-        transfer_schedulability_criterion
-          (algA omega_0)     (algB omega)
-          (job_cost omega_0) (job_cost omega)
-          arr_seq
-          (job_cost omega_0).
+      transfer_schedulability_criterion
+        (algA omega_0)     (algB omega)
+        (job_cost omega_0) (job_cost omega)
+        arr_seq
+        (job_cost omega_0).
 
   (** Assuming the above criterion holds, schedulability is transferred in all
       evolutions. *)

@@ -37,12 +37,12 @@ Section Optimality.
       then there also exists an EDF schedule in which all deadlines are met. *)
   Theorem EDF_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
-        valid_schedule any_sched arr_seq /\
-        all_deadlines_of_arrivals_met arr_seq any_sched) ->
+       valid_schedule any_sched arr_seq
+       /\ all_deadlines_of_arrivals_met arr_seq any_sched) ->
     exists edf_sched : schedule (ideal.processor_state Job),
-        valid_schedule edf_sched arr_seq /\
-        all_deadlines_of_arrivals_met arr_seq edf_sched /\
-        EDF_schedule edf_sched.
+      valid_schedule edf_sched arr_seq
+      /\ all_deadlines_of_arrivals_met arr_seq edf_sched
+      /\ EDF_schedule edf_sched.
   Proof.
     move=> [sched [[COME READY] DL_ARR_MET]].
     have ARR  := jobs_must_arrive_to_be_ready sched READY.
@@ -109,7 +109,7 @@ Section Optimality.
         valid_schedule any_sched arr_seq /\
         all_deadlines_of_arrivals_met arr_seq any_sched) ->
     exists priority_compliant_sched : schedule (ideal.processor_state Job),
-        valid_schedule priority_compliant_sched arr_seq /\
+      valid_schedule priority_compliant_sched arr_seq /\
         all_deadlines_of_arrivals_met arr_seq priority_compliant_sched /\
         work_conserving arr_seq priority_compliant_sched /\
         respects_JLFP_policy_at_preemption_point arr_seq priority_compliant_sched (EDF Job).
@@ -149,12 +149,12 @@ Section WeakOptimality.
   Theorem weak_EDF_optimality :
     exists edf_sched : schedule (ideal.processor_state Job),
       jobs_must_arrive_to_execute edf_sched /\
-      completed_jobs_dont_execute edf_sched /\
-      all_deadlines_met edf_sched /\
-      EDF_schedule edf_sched /\
-      forall j,
+        completed_jobs_dont_execute edf_sched /\
+        all_deadlines_met edf_sched /\
+        EDF_schedule edf_sched /\
+        forall j,
           (exists t,  scheduled_at any_sched j t) <->
-          (exists t', scheduled_at edf_sched j t').
+            (exists t', scheduled_at edf_sched j t').
   Proof.
     set sched' := edf_transform any_sched.
     exists sched'. repeat split.

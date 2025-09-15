@@ -170,9 +170,10 @@ Section ACPropFacts.
       restriction. *)
   Hypothesis H_job2_of_singleton :
     (forall tsk1,
-        tsk1 \in ts1 -> forall j1,
-            job_task j1 = tsk1 ->
-            size (job2_of j1) <= 1).
+        tsk1 \in ts1 ->
+        forall j1,
+          job_task j1 = tsk1 ->
+          size (job2_of j1) <= 1).
 
   (** Suppose the given type-one arrival sequence and arrival curve are
       valid. *)

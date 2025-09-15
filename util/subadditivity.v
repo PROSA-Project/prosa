@@ -34,7 +34,7 @@ Section Subadditivity.
     (** First, we give a standard definition of subadditivity. *)
     Definition subadditive_standard f :=
       forall a b,
-         f (a + b) <= f a + f b.
+        f (a + b) <= f a + f b.
 
     (** Then, we prove that the two definitions are implied by each other. *)
     Lemma subadditive_standard_equivalence :

@@ -369,8 +369,8 @@ Section CompletedJobs.
   (** Furthermore, in a valid schedule, completed jobs don't execute. *)
   Corollary valid_schedule_implies_completed_jobs_dont_execute :
     forall arr_seq,
-    valid_schedule sched arr_seq ->
-    completed_jobs_dont_execute sched.
+      valid_schedule sched arr_seq ->
+      completed_jobs_dont_execute sched.
   Proof. move=> ? [? ?]; exact: completed_jobs_are_not_ready. Qed.
 
   (** We further observe that completed jobs don't execute if scheduled jobs

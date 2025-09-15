@@ -255,7 +255,8 @@ Section ExtrapolatedArrivalCurve.
     clear NEQ; simpl in LT.
     unfold extrapolated_arrival_curve in LT.
     replace (horizon_of _) with h in LT => [|//].
-    have AF : forall s1 s2 m x y,
+    have AF :
+      forall s1 s2 m x y,
         s1 <= s2 ->
         m * s1 + x < m * s2 + y ->
         s1 < s2 \/ s1 = s2 /\ x < y.
