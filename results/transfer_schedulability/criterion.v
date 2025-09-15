@@ -1117,7 +1117,7 @@ Section TransferSchedulability.
         initial assumption that [j] is incomplete at time [t2]. *)
     suff: online_completed_by j t2 by move: NCOMP => /negP.
     by apply: (slackless_interval_completion _ BOUNDED CRIT j t1).
-   Qed.
+  Qed.
 
   (** As a straightforward corollary, and for the sake of completeness, we lift
       [online_transfer_schedulability_criterion_sufficiency] to the level of job
@@ -1270,7 +1270,7 @@ Section TransferSchedulability.
         initial assumption that [j] is incomplete at time [t2]. *)
     suff: online_completed_by j t2 by move: NCOMP => /negP.
     by apply: (slackless_interval_completion _ H_bounded_job_costs CRIT j t1).
-   Qed.
+  Qed.
 
   (** For completeness' sake, we once more lift the sufficient condition to the
       level of job deadlines. *)

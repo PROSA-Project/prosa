@@ -35,20 +35,20 @@ Section PeriodicTasksRespectMaxInterArrivalModel.
       valid_period tsk ->
       respects_periodic_task_model arr_seq tsk ->
       valid_task_max_inter_arrival_time arr_seq tsk.
-    Proof.
-      intros tsk VALID_PERIOD PERIODIC.
-      split; first by apply VALID_PERIOD => //.
-      intros j ARR TSK IND.
-      specialize (PERIODIC j); feed_n 3 PERIODIC => //.
-      move : PERIODIC => [j' [ARR' [IND' [TSK' ARRJ']]]].
-      exists j'; repeat split => //.
-      { case: (boolP (j == j')) => [/eqP EQ|NEQ].
-        - have EQ_IND : (job_index arr_seq j' = job_index arr_seq j) by apply f_equal => //.
-          now exfalso; lia.
-        - now apply /eqP. }
-      { have NZ_PERIOD : (task_period tsk > 0) by apply VALID_PERIOD.
-        rewrite /max_inter_eq_period /task_max_inter_arrival_time ARRJ'.
-        now lia. }
-    Qed.
+  Proof.
+    intros tsk VALID_PERIOD PERIODIC.
+    split; first by apply VALID_PERIOD => //.
+    intros j ARR TSK IND.
+    specialize (PERIODIC j); feed_n 3 PERIODIC => //.
+    move : PERIODIC => [j' [ARR' [IND' [TSK' ARRJ']]]].
+    exists j'; repeat split => //.
+    { case: (boolP (j == j')) => [/eqP EQ|NEQ].
+      - have EQ_IND : (job_index arr_seq j' = job_index arr_seq j) by apply f_equal => //.
+        now exfalso; lia.
+      - now apply /eqP. }
+    { have NZ_PERIOD : (task_period tsk > 0) by apply VALID_PERIOD.
+      rewrite /max_inter_eq_period /task_max_inter_arrival_time ARRJ'.
+      now lia. }
+  Qed.
 
 End PeriodicTasksRespectMaxInterArrivalModel.

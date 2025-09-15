@@ -37,21 +37,23 @@ Section GeneralityOfELF.
       generalizes by design. *)
   Section ELFGeneralizesGEL.
 
-  (** If the [fp] fixed-priority policy assigns equal priority to all tasks, ... *)
-  Hypothesis H_FP_policy_is_same :
-    forall tsk1 tsk2, ep_task tsk1 tsk2.
+    (** If the [fp] fixed-priority policy assigns equal priority to all tasks, ... *)
+    Hypothesis H_FP_policy_is_same :
+      forall tsk1 tsk2, ep_task tsk1 tsk2.
 
-  (** ... then the ELF policy reduces to GEL. *)
-  Remark elf_generalizes_gel :
-    forall sched arr_seq,
-      respects_JLFP_policy_at_preemption_point arr_seq sched (ELF fp)
-      <-> respects_JLFP_policy_at_preemption_point arr_seq sched (GEL Job Task).
-  Proof.
-    by move=> sched arr_seq
-       ; split=> RESPECTED j j' t ARR PT BL SCHED
-       ; move: (RESPECTED j j' t ARR PT BL SCHED)
-       ; rewrite !hep_job_at_jlfp hep_job_elf_gel.
-  Qed.
+    (** ... then the ELF policy reduces to GEL. *)
+    Remark elf_generalizes_gel :
+      forall sched arr_seq,
+        respects_JLFP_policy_at_preemption_point arr_seq sched (ELF fp)
+        <-> respects_JLFP_policy_at_preemption_point arr_seq sched (GEL Job Task).
+    Proof.
+      by move=> sched arr_seq
+         ; split=> RESPECTED j j' t ARR PT BL SCHED
+         ; move: (RESPECTED j j' t ARR PT BL SCHED)
+         ; rewrite !hep_job_at_jlfp hep_job_elf_gel.
+    Qed.
+
+  End ELFGeneralizesGEL.
 
   (** ** ELF Generalizes Fixed-Priority Scheduling *)
 
@@ -125,6 +127,5 @@ Section GeneralityOfELF.
 
   End ELFGeneralizesFixedPriority.
 
-End ELFGeneralizesGEL.
 
 End GeneralityOfELF.

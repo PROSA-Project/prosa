@@ -110,24 +110,24 @@ Section ATHEPWorkloadBoundIsValidForELF.
         workload_of_jobs (hep_job_from_tsk tsk_o) (arrivals_between arr_seq t1 (t1 + delta))
         <= workload_of_jobs (hep_job_from_tsk tsk_o)
           (arrivals_between arr_seq t1 `|Num.max 0%R (t1%:R + ep_task_interfering_interval_length tsk tsk_o A)%R|).
-        Proof.
-          move => EP_tsk.
-          have BOUNDED: `|Num.max 0%R (t1%:R + (ep_task_interfering_interval_length tsk tsk_o A))%R| <= t1 + delta
-            by clear - H_delta_ge; lia.
-          rewrite /hep_job_from_tsk /hep_job /ELF.
-          rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) //.
-          move => j' IN' ARR'.
-          apply /contraT => /negPn /andP [/orP [/negP+ | /andP [_ HEP]] /eqP TSKo].
-          { rewrite /ep_task in EP_tsk.
-            rewrite /hp_task TSKo.
-            move: H_job_of_tsk.
-            rewrite /job_of_task => /eqP ->.
-            by move: EP_tsk => /andP [-> ->]. }
-          move: ARR'; rewrite /ep_task_interfering_interval_length -TSKo.
-          move: H_job_of_tsk => /eqP <-.
-          move: HEP; rewrite /hep_job /GEL /job_priority_point.
-          by clear; lia.
-        Qed.
+      Proof.
+        move => EP_tsk.
+        have BOUNDED: `|Num.max 0%R (t1%:R + (ep_task_interfering_interval_length tsk tsk_o A))%R| <= t1 + delta
+          by clear - H_delta_ge; lia.
+        rewrite /hep_job_from_tsk /hep_job /ELF.
+        rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) //.
+        move => j' IN' ARR'.
+        apply /contraT => /negPn /andP [/orP [/negP+ | /andP [_ HEP]] /eqP TSKo].
+        { rewrite /ep_task in EP_tsk.
+          rewrite /hp_task TSKo.
+          move: H_job_of_tsk.
+          rewrite /job_of_task => /eqP ->.
+          by move: EP_tsk => /andP [-> ->]. }
+        move: ARR'; rewrite /ep_task_interfering_interval_length -TSKo.
+        move: H_job_of_tsk => /eqP <-.
+        move: HEP; rewrite /hep_job /GEL /job_priority_point.
+        by clear; lia.
+      Qed.
 
     End ShortenRange.
 
@@ -209,20 +209,20 @@ Section ATHEPWorkloadBoundIsValidForELF.
       move: NEQ => /idP /idP /eqP NEQ.
       rewrite NEQ.
       by rewrite andbN.
-  Qed.
+    Qed.
 
   (** Finally, we establish that the workload of jobs with priority higher than or equal to
       [j] is at most [bound_on_athep_workload]. *)
-  Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload :
-    \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (hep_job_from_tsk tsk_o) jobs
-    <= bound_on_athep_workload ts tsk A delta.
-  Proof.
-    rewrite sum_of_hep_workloads_partitioned.
-    rewrite /bound_on_athep_workload.
-    move: sum_of_hp_tsk_workloads_is_at_most_bound_on_hp_task_workload => LT_HP.
-    move: sum_of_ep_tsk_workloads_is_at_most_bound_on_ep_task_workload => LT_EP.
-    by lia.
-  Qed.
+    Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload :
+      \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (hep_job_from_tsk tsk_o) jobs
+      <= bound_on_athep_workload ts tsk A delta.
+    Proof.
+      rewrite sum_of_hep_workloads_partitioned.
+      rewrite /bound_on_athep_workload.
+      move: sum_of_hp_tsk_workloads_is_at_most_bound_on_hp_task_workload => LT_HP.
+      move: sum_of_ep_tsk_workloads_is_at_most_bound_on_ep_task_workload => LT_EP.
+      by lia.
+    Qed.
 
   End HepWorkloadBound.
 

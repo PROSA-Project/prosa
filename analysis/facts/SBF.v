@@ -90,7 +90,7 @@ Section SupplyBoundFunctionLemmas.
       { by apply H_arrives_in. }
       { by eapply H_P_interval. }
       { lia. }
-     Qed.
+    Qed.
 
   End BlackoutBound.
 

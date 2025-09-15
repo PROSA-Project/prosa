@@ -134,117 +134,117 @@ Section AbstractRTAforGELwithArrivalCurves.
 
   (** In this section, we prove the soundness of [task_IBF]. We start
       by establishing a bound on the HEP workload.*)
-    Section HepWorkloadBound.
+  Section HepWorkloadBound.
 
-      (** Consider any job [j] of task [tsk] that
-          has a positive job cost and is in the arrival
-          sequence. *)
-      Variable j : Job.
-      Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_of_tsk : job_of_task tsk j.
-      Hypothesis H_job_cost_positive : job_cost_positive j.
+    (** Consider any job [j] of task [tsk] that
+        has a positive job cost and is in the arrival
+        sequence. *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+    Hypothesis H_job_of_tsk : job_of_task tsk j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
 
-      (** Assume the busy interval of [j] is given by <<[t1,t2)>>. *)
-      Variable t1 t2 : duration.
-      Hypothesis H_busy_interval : definitions.busy_interval sched j t1 t2.
+    (** Assume the busy interval of [j] is given by <<[t1,t2)>>. *)
+    Variable t1 t2 : duration.
+    Hypothesis H_busy_interval : definitions.busy_interval sched j t1 t2.
 
-      (** Assume the relative arrival time of [j] is given by [A]. *)
-      Let A := job_arrival j - t1.
+    (** Assume the relative arrival time of [j] is given by [A]. *)
+    Let A := job_arrival j - t1.
 
-      (** Consider any arbitrary interval [Δ] within the busy window. *)
-      Variable Δ : duration.
-      Hypothesis H_Δ_in_busy : t1 + Δ < t2.
+    (** Consider any arbitrary interval [Δ] within the busy window. *)
+    Variable Δ : duration.
+    Hypothesis H_Δ_in_busy : t1 + Δ < t2.
 
-      (** Consider the set of jobs arriving in <<[t1, t1 + Δ)>>. *)
-      Let jobs := arrivals_between arr_seq t1 (t1 + Δ).
+    (** Consider the set of jobs arriving in <<[t1, t1 + Δ)>>. *)
+    Let jobs := arrivals_between arr_seq t1 (t1 + Δ).
 
-      (** We define a predicate to identify higher priority jobs coming from the task [tsk]. *)
-      Let GEL_from (tsk : Task) := fun (jo : Job) => hep_job jo j && (job_task jo == tsk).
+    (** We define a predicate to identify higher priority jobs coming from the task [tsk]. *)
+    Let GEL_from (tsk : Task) := fun (jo : Job) => hep_job jo j && (job_task jo == tsk).
 
-      (** First, consider the case where [interval ≤ Δ]. *)
-      Section ShortenRange.
+    (** First, consider the case where [interval ≤ Δ]. *)
+    Section ShortenRange.
 
 
-        (** Consider any task [tsk_o] distinct from [tsk].
-            Assume [tsk_o] is in [ts]. *)
-        Variable tsk_o : Task.
-        Hypothesis H_tsko_in_ts : tsk_o \in ts.
-        Hypothesis H_neq : tsk_o != tsk.
+      (** Consider any task [tsk_o] distinct from [tsk].
+          Assume [tsk_o] is in [ts]. *)
+      Variable tsk_o : Task.
+      Hypothesis H_tsko_in_ts : tsk_o \in ts.
+      Hypothesis H_neq : tsk_o != tsk.
 
-        (** If [Δ] is greater than [interval] for [tsk_o] and [A], ... *)
-        Hypothesis H_Δ_ge : (interval tsk_o A <= Δ%:R)%R.
+      (** If [Δ] is greater than [interval] for [tsk_o] and [A], ... *)
+      Hypothesis H_Δ_ge : (interval tsk_o A <= Δ%:R)%R.
 
-        (** ... then the workload of jobs satisfying the predicate [GEL_from]
-            in the interval <<[t1,t1 + Δ)>> is equal to the workload in
-            the interval <<[t1, t1 + interval tsk_o A)>>.
-            Note that we use the functions [Z.to_nat] to [Z.of_nat] to convert
-            integers to natural numbers and vice-versa. *)
-        Lemma total_workload_shorten_range :
-          workload_of_jobs (GEL_from tsk_o)
-            (arrivals_between arr_seq t1 (t1 + Δ))
-          <= workload_of_jobs (GEL_from tsk_o)
-              (arrivals_between arr_seq t1
-                 `|Num.max 0%R (t1%:R + interval tsk_o A)%R|).
-        Proof.
-          have BOUNDED: `|Num.max 0%R (t1%:R + interval tsk_o A)%R| <= t1 + Δ by lia.
-          rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
-          rewrite /GEL_from.
-          case: (eqVneq (job_task j') tsk_o) => TSK'; last by rewrite andbF.
-          rewrite andbT; apply: contraT  => /negPn HEP.
-          move: (hep_job_arrives_after_zero _ j' HEP) => GT0.
-          move: (hep_job_arrives_before _ j' HEP) => EARLIEST.
-          move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
-          move: ARR'; rewrite /interval  => LATEST.
-          have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk -
-                      task_priority_point tsk_o <= (job_arrival j')%:R)%R by lia.
-          by move: LATEST'; rewrite -TSK -TSK' => LATEST'; lia.
-        Qed.
-
-      End ShortenRange.
-
-      (** Using the above lemma, we prove that [bound_on_total_hep_workload]
-          bounds the sum of higher-priority workload over all tasks in [ts]. *)
-      Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload :
-        \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (GEL_from tsk_o) jobs
-        <= bound_on_total_hep_workload A Δ.
+      (** ... then the workload of jobs satisfying the predicate [GEL_from]
+          in the interval <<[t1,t1 + Δ)>> is equal to the workload in
+          the interval <<[t1, t1 + interval tsk_o A)>>.
+          Note that we use the functions [Z.to_nat] to [Z.of_nat] to convert
+          integers to natural numbers and vice-versa. *)
+      Lemma total_workload_shorten_range :
+        workload_of_jobs (GEL_from tsk_o)
+          (arrivals_between arr_seq t1 (t1 + Δ))
+        <= workload_of_jobs (GEL_from tsk_o)
+            (arrivals_between arr_seq t1
+               `|Num.max 0%R (t1%:R + interval tsk_o A)%R|).
       Proof.
-        apply leq_sum_seq => tsko INtsko NEQT.
-        have [LEQ|LT] := leqP Δ `|Num.max 0%R (interval tsko A)|;
-          first by apply: rbf_spec' => // ? /andP[].
-        apply: leq_trans;
-          first by apply: total_workload_shorten_range => //; lia.
-        have [POS0|NEG] := lerP 0%R (interval tsko A).
-        - have -> : `|Num.max 0%R (t1%:R + interval tsko A)%R|
-            = t1 + `|interval tsko A| by lia.
-          by apply: rbf_spec' => // ? /andP[].
-        - by rewrite arrivals_between_geq /workload_of_jobs ?big_nil//; lia.
+        have BOUNDED: `|Num.max 0%R (t1%:R + interval tsk_o A)%R| <= t1 + Δ by lia.
+        rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
+        rewrite /GEL_from.
+        case: (eqVneq (job_task j') tsk_o) => TSK'; last by rewrite andbF.
+        rewrite andbT; apply: contraT  => /negPn HEP.
+        move: (hep_job_arrives_after_zero _ j' HEP) => GT0.
+        move: (hep_job_arrives_before _ j' HEP) => EARLIEST.
+        move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
+        move: ARR'; rewrite /interval  => LATEST.
+        have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk -
+                    task_priority_point tsk_o <= (job_arrival j')%:R)%R by lia.
+        by move: LATEST'; rewrite -TSK -TSK' => LATEST'; lia.
       Qed.
 
-    End HepWorkloadBound.
+    End ShortenRange.
 
-    (** Finally, we prove that [task_IBF] bounds the interference incurred by [tsk]. *)
-    Corollary instantiated_task_interference_is_bounded :
-      task_interference_is_bounded_by
-        arr_seq sched tsk task_IBF.
+    (** Using the above lemma, we prove that [bound_on_total_hep_workload]
+        bounds the sum of higher-priority workload over all tasks in [ts]. *)
+    Corollary sum_of_workloads_is_at_most_bound_on_total_hep_workload :
+      \sum_(tsk_o <- ts | tsk_o != tsk) workload_of_jobs (GEL_from tsk_o) jobs
+      <= bound_on_total_hep_workload A Δ.
     Proof.
-      move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
-      move: (OFF _ _ BUSY) => EQA; subst A.
-      move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
-      - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
-        by rewrite /completed_by /completed_by ZERO.
-      - rewrite -/(cumul_task_interference _ _ _ _ _).
-        rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
-        rewrite /I leq_add //.
-        + exact: cumulative_priority_inversion_is_bounded.
-        + eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
-          eapply leq_trans; first exact: service_of_jobs_le_workload.
-          eapply leq_trans.
-          * eapply reorder_summation; eauto 2 => j' IN _.
-            by apply H_all_jobs_from_taskset; eapply in_arrivals_implies_arrived; exact IN.
-          * move : TSK => /eqP TSK; rewrite TSK.
-            eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
-            by apply /eqP.
+      apply leq_sum_seq => tsko INtsko NEQT.
+      have [LEQ|LT] := leqP Δ `|Num.max 0%R (interval tsko A)|;
+        first by apply: rbf_spec' => // ? /andP[].
+      apply: leq_trans;
+        first by apply: total_workload_shorten_range => //; lia.
+      have [POS0|NEG] := lerP 0%R (interval tsko A).
+      - have -> : `|Num.max 0%R (t1%:R + interval tsko A)%R|
+          = t1 + `|interval tsko A| by lia.
+        by apply: rbf_spec' => // ? /andP[].
+      - by rewrite arrivals_between_geq /workload_of_jobs ?big_nil//; lia.
     Qed.
+
+  End HepWorkloadBound.
+
+  (** Finally, we prove that [task_IBF] bounds the interference incurred by [tsk]. *)
+  Corollary instantiated_task_interference_is_bounded :
+    task_interference_is_bounded_by
+      arr_seq sched tsk task_IBF.
+  Proof.
+    move => t1 t2 Δ j ARR TSK BUSY LT NCOMPL A OFF.
+    move: (OFF _ _ BUSY) => EQA; subst A.
+    move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
+    - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
+      by rewrite /completed_by /completed_by ZERO.
+    - rewrite -/(cumul_task_interference _ _ _ _ _).
+      rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
+      rewrite /I leq_add //.
+      + exact: cumulative_priority_inversion_is_bounded.
+      + eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
+        eapply leq_trans; first exact: service_of_jobs_le_workload.
+        eapply leq_trans.
+        * eapply reorder_summation; eauto 2 => j' IN _.
+          by apply H_all_jobs_from_taskset; eapply in_arrivals_implies_arrived; exact IN.
+        * move : TSK => /eqP TSK; rewrite TSK.
+          eapply sum_of_workloads_is_at_most_bound_on_total_hep_workload; eauto 2.
+          by apply /eqP.
+  Qed.
 
   (** ** F. Defining the Search Space *)
 

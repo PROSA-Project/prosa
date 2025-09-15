@@ -117,20 +117,20 @@ Section FixpointSearch.
 
   (** Furthermore, we observe that [find_fixpoint_from] finds positive fixpoints
       when provided with a positive starting point [s]. *)
-  Lemma ffpf_finds_positive_fixpoint :
-    forall s fuel x,
-      Some x = find_fixpoint_from f s h fuel ->
-      0 < s ->
-      0 < x.
-  Proof.
-    move=> s fuel x.
-    rewrite /find_fixpoint_from.
-    elim: fuel s => // fuel' IH s.
-    case: (eqVneq (f s) s) => [_ SOME | NEQ].
-    - by move: SOME => []; lia.
-    - case (f s <= h) => // SOME GT.
-      have: 0 < f s. { by move: (H_f_mono 1 s GT) => MONO; lia. }
-      by apply (IH (f s)).
+    Lemma ffpf_finds_positive_fixpoint :
+      forall s fuel x,
+        Some x = find_fixpoint_from f s h fuel ->
+        0 < s ->
+        0 < x.
+    Proof.
+      move=> s fuel x.
+      rewrite /find_fixpoint_from.
+      elim: fuel s => // fuel' IH s.
+      case: (eqVneq (f s) s) => [_ SOME | NEQ].
+      - by move: SOME => []; lia.
+      - case (f s <= h) => // SOME GT.
+        have: 0 < f s. { by move: (H_f_mono 1 s GT) => MONO; lia. }
+        by apply (IH (f s)).
     Qed.
 
     (** Hence [finds_fixpoint] finds only positive fixpoints. *)

@@ -131,107 +131,107 @@ Section AbstractRTARestrictedSupply.
   (** In the next section, we prove a few helper lemmas. *)
   Section AuxiliaryLemmas.
 
-      (** Consider any job [j] of [tsk]. *)
-      Variable j : Job.
-      Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_of_tsk : job_of_task tsk j.
-      Hypothesis H_job_cost_positive : job_cost_positive j.
+    (** Consider any job [j] of [tsk]. *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+    Hypothesis H_job_of_tsk : job_of_task tsk j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
 
-      (** Consider the busy interval <<[t1, t2)>> of job [j]. *)
-      Variable t1 t2 : instant.
-      Hypothesis H_busy_interval : busy_interval_prefix sched j t1 t2.
+    (** Consider the busy interval <<[t1, t2)>> of job [j]. *)
+    Variable t1 t2 : instant.
+    Hypothesis H_busy_interval : busy_interval_prefix sched j t1 t2.
 
-      (** Let's define [A] as a relative arrival time of job [j] (with
-          respect to time [t1]). *)
-      Let A : duration := job_arrival j - t1.
+    (** Let's define [A] as a relative arrival time of job [j] (with
+        respect to time [t1]). *)
+    Let A : duration := job_arrival j - t1.
 
-      (** Consider an arbitrary time [Δ] ... *)
-      Variable Δ : duration.
-      (** ... such that [t1 + Δ] is inside the busy interval... *)
-      Hypothesis H_inside_busy_interval : t1 + Δ < t2.
-      (** ... the job [j] is not completed by time [(t1 + Δ)]. *)
-      Hypothesis H_job_j_is_not_completed : ~~ completed_by sched j (t1 + Δ).
+    (** Consider an arbitrary time [Δ] ... *)
+    Variable Δ : duration.
+    (** ... such that [t1 + Δ] is inside the busy interval... *)
+    Hypothesis H_inside_busy_interval : t1 + Δ < t2.
+    (** ... the job [j] is not completed by time [(t1 + Δ)]. *)
+    Hypothesis H_job_j_is_not_completed : ~~ completed_by sched j (t1 + Δ).
 
-      (** First, we show that blackout is counted as interference. *)
-      Lemma blackout_impl_interference :
-        forall t,
-          t1 <= t < t2 ->
-          is_blackout sched t ->
-          interference j t.
-      Proof.
-        move=> t /andP [LE1 LE2].
-        apply contraLR => /negP INT.
-        eapply H_work_conserving in INT =>//; last by lia.
-        by apply/negPn; eapply pos_service_impl_pos_supply.
-      Qed.
+    (** First, we show that blackout is counted as interference. *)
+    Lemma blackout_impl_interference :
+      forall t,
+        t1 <= t < t2 ->
+        is_blackout sched t ->
+        interference j t.
+    Proof.
+      move=> t /andP [LE1 LE2].
+      apply contraLR => /negP INT.
+      eapply H_work_conserving in INT =>//; last by lia.
+      by apply/negPn; eapply pos_service_impl_pos_supply.
+    Qed.
 
-      (** Next, we show that interference is equal to a sum of two
-          functions: [is_blackout] and [intra_interference]. *)
-      Lemma blackout_plus_local_is_interference :
-        forall t,
-          t1 <= t < t2 ->
-          is_blackout sched t + intra_interference sched j t
-          = interference j t.
-      Proof.
-        move=> t t_INT.
-        rewrite /intra_interference /cond_interference.
-        destruct (is_blackout sched t) eqn:BLACKOUT; rewrite (negbRL BLACKOUT) //.
-        by rewrite blackout_impl_interference.
-      Qed.
+    (** Next, we show that interference is equal to a sum of two
+        functions: [is_blackout] and [intra_interference]. *)
+    Lemma blackout_plus_local_is_interference :
+      forall t,
+        t1 <= t < t2 ->
+        is_blackout sched t + intra_interference sched j t
+        = interference j t.
+    Proof.
+      move=> t t_INT.
+      rewrite /intra_interference /cond_interference.
+      destruct (is_blackout sched t) eqn:BLACKOUT; rewrite (negbRL BLACKOUT) //.
+      by rewrite blackout_impl_interference.
+    Qed.
 
-      (** As a corollary, cumulative interference during a time
-          interval <<[t1, t1 + Δ)>> can be split into a sum of total
-          blackouts in <<[t1, t1 + Δ)>> and cumulative intra-supply
-          interference during <<[t1, t1 + Δ)>>. *)
-      Corollary blackout_plus_local_is_interference_cumul :
-        blackout_during sched t1 (t1 + Δ) + cumul_intra_interference sched j t1 (t1 + Δ)
-        = cumulative_interference j t1 (t1 + Δ).
-      Proof.
-        rewrite -big_split; apply eq_big_nat => //=.
-        move=> t /andP [t_GEQ t_LTN_td].
-        move: (ltn_trans t_LTN_td H_inside_busy_interval) => t_LTN_t2.
-        by apply blackout_plus_local_is_interference; apply /andP.
-      Qed.
+    (** As a corollary, cumulative interference during a time
+        interval <<[t1, t1 + Δ)>> can be split into a sum of total
+        blackouts in <<[t1, t1 + Δ)>> and cumulative intra-supply
+        interference during <<[t1, t1 + Δ)>>. *)
+    Corollary blackout_plus_local_is_interference_cumul :
+      blackout_during sched t1 (t1 + Δ) + cumul_intra_interference sched j t1 (t1 + Δ)
+      = cumulative_interference j t1 (t1 + Δ).
+    Proof.
+      rewrite -big_split; apply eq_big_nat => //=.
+      move=> t /andP [t_GEQ t_LTN_td].
+      move: (ltn_trans t_LTN_td H_inside_busy_interval) => t_LTN_t2.
+      by apply blackout_plus_local_is_interference; apply /andP.
+    Qed.
 
-      (** Moreover, since the total blackout duration in an interval
-          of length [Δ] is bounded by [Δ - SBF Δ], the cumulative
-          interference during the time interval <<[t1, t1 + Δ)>> is
-          bounded by the sum of [Δ - SBF Δ] and cumulative
-          intra-supply interference during <<[t1, t1 + Δ)>>. *)
-      Corollary cumulative_job_interference_bound :
-        cumulative_interference j t1 (t1 + Δ)
-        <= (Δ - SBF Δ) + cumul_intra_interference sched j t1 (t1 + Δ).
-      Proof.
-        rewrite -blackout_plus_local_is_interference_cumul leq_add2r.
-        by eapply blackout_during_bound_SBF with (t2 := t2) => //.
-      Qed.
+    (** Moreover, since the total blackout duration in an interval
+        of length [Δ] is bounded by [Δ - SBF Δ], the cumulative
+        interference during the time interval <<[t1, t1 + Δ)>> is
+        bounded by the sum of [Δ - SBF Δ] and cumulative
+        intra-supply interference during <<[t1, t1 + Δ)>>. *)
+    Corollary cumulative_job_interference_bound :
+      cumulative_interference j t1 (t1 + Δ)
+      <= (Δ - SBF Δ) + cumul_intra_interference sched j t1 (t1 + Δ).
+    Proof.
+      rewrite -blackout_plus_local_is_interference_cumul leq_add2r.
+      by eapply blackout_during_bound_SBF with (t2 := t2) => //.
+    Qed.
 
-      (** Next, consider a duration [F] such that [F <= Δ] and job [j]
-          has enough service to become non-preemptive by time instant
-          [t1 + F]. *)
-      Variable F : duration.
-      Hypothesis H_F_le_Δ : F <= Δ.
-      Hypothesis H_enough_service : task_rtct tsk <= service sched j (t1 + F).
+    (** Next, consider a duration [F] such that [F <= Δ] and job [j]
+        has enough service to become non-preemptive by time instant
+        [t1 + F]. *)
+    Variable F : duration.
+    Hypothesis H_F_le_Δ : F <= Δ.
+    Hypothesis H_enough_service : task_rtct tsk <= service sched j (t1 + F).
 
-      (** Then, we show that job [j] does not experience any
-          intra-supply interference in the time interval
-          <<[t1 + F, t1 + Δ)>>. *)
-      Lemma no_intra_interference_after_F :
-        cumul_intra_interference sched j (t1 + F) (t1 + Δ) = 0.
-      Proof.
-        rewrite /cumul_intra_interference/ cumul_cond_interference big_nat.
-        apply big1; move => t /andP [GE__t LT__t].
-        apply/eqP; rewrite eqb0; apply/negP.
-        move => /andP [P /negPn /negP D]; apply: D; apply/negP.
-        eapply H_work_conserving with (t1 := t1) (t2 := t2); eauto 2.
-        { by apply/andP; split; lia. }
-        eapply progress_inside_supplies; eauto.
-        eapply job_nonpreemptive_after_run_to_completion_threshold; eauto 2.
-        - rewrite -(leqRW H_enough_service).
-          by apply H_valid_run_to_completion_threshold.
-        - move: H_job_j_is_not_completed; apply contra.
-          by apply completion_monotonic; lia.
-      Qed.
+    (** Then, we show that job [j] does not experience any
+        intra-supply interference in the time interval
+        <<[t1 + F, t1 + Δ)>>. *)
+    Lemma no_intra_interference_after_F :
+      cumul_intra_interference sched j (t1 + F) (t1 + Δ) = 0.
+    Proof.
+      rewrite /cumul_intra_interference/ cumul_cond_interference big_nat.
+      apply big1; move => t /andP [GE__t LT__t].
+      apply/eqP; rewrite eqb0; apply/negP.
+      move => /andP [P /negPn /negP D]; apply: D; apply/negP.
+      eapply H_work_conserving with (t1 := t1) (t2 := t2); eauto 2.
+      { by apply/andP; split; lia. }
+      eapply progress_inside_supplies; eauto.
+      eapply job_nonpreemptive_after_run_to_completion_threshold; eauto 2.
+      - rewrite -(leqRW H_enough_service).
+        by apply H_valid_run_to_completion_threshold.
+      - move: H_job_j_is_not_completed; apply contra.
+        by apply completion_monotonic; lia.
+    Qed.
 
   End AuxiliaryLemmas.
 

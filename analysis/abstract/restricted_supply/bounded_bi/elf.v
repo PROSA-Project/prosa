@@ -179,7 +179,7 @@ Section BoundedBusyIntervals.
           move=> j'.
           move: H_job_of_tsk => /eqP <-.
           by apply hep_job_implies_hep_task.
-        Qed.
+      Qed.
 
       (** It follows that [t1 + L] is a quiet time, which means that
           the busy prefix ends (i.e., it is bounded). *)

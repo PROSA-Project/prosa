@@ -19,11 +19,12 @@ Section PeriodicArrivalTimes.
   (** Consider any unique arrival sequence with consistent arrivals ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
   (** ... and any periodic task [tsk] with a valid offset and period. *)
-    Variable tsk : Task.
-    Hypothesis H_valid_offset : valid_offset arr_seq tsk.
-    Hypothesis H_valid_period : valid_period tsk.
-    Hypothesis H_task_respects_periodic_model : respects_periodic_task_model arr_seq tsk.
+  Variable tsk : Task.
+  Hypothesis H_valid_offset : valid_offset arr_seq tsk.
+  Hypothesis H_valid_period : valid_period tsk.
+  Hypothesis H_task_respects_periodic_model : respects_periodic_task_model arr_seq tsk.
 
   (** We show that the nth job [j] of task [tsk]
       arrives at the instant [task_offset tsk + n * task_period tsk]. *)

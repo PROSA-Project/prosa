@@ -91,19 +91,19 @@ Section State.
 
     (** Finally we can declare our processor state as an instance of the
         [ProcessorState] typeclass. *)
-    Global Program Instance exceedance_proc_state : ProcessorState Job :=
-      {|
-        State := exceedance_processor_state;
-        scheduled_on := exceedance_scheduled_on;
-        supply_on := exceedance_supply_on;
-        service_on := exceedance_service_on
-      |}.
-    Next Obligation.
-      by move => j [] // s [] /=; case: eqP; lia.
-    Qed.
-    Next Obligation.
-      by move => j [] // s [] /=; case: eqP; lia.
-    Qed.
+  Global Program Instance exceedance_proc_state : ProcessorState Job :=
+    {|
+      State := exceedance_processor_state;
+      scheduled_on := exceedance_scheduled_on;
+      supply_on := exceedance_supply_on;
+      service_on := exceedance_service_on
+    |}.
+  Next Obligation.
+    by move => j [] // s [] /=; case: eqP; lia.
+  Qed.
+  Next Obligation.
+    by move => j [] // s [] /=; case: eqP; lia.
+  Qed.
 
 End State.
 

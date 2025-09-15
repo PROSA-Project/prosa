@@ -203,23 +203,23 @@ Section GenericModelLemmas.
       by apply/eqP/big_geq.
     Qed.
 
-    End ArbitraryInterval.
+  End ArbitraryInterval.
 
-    (** When considering the service accumulated by bunch of jobs in an interval
-        <<[t1, t2]>>, the total amount of service can be split into the service
-        received during <<[t1, t2)>> and the service received at the last point in
-        time [t2]. *)
-    Lemma service_of_jobs_cat_last :
-      forall  js t1 t2,
-        t1 <= t2 ->
-        service_of_jobs sched P js t1 t2.+1
-        = service_of_jobs sched P js t1 t2
-          + service_of_jobs_at sched P js t2.
-    Proof.
-      move=> js t1 t2 LEQ.
-      rewrite !service_of_jobs_sum_over_time_interval.
-      by rewrite big_nat_recr.
-    Qed.
+  (** When considering the service accumulated by bunch of jobs in an interval
+      <<[t1, t2]>>, the total amount of service can be split into the service
+      received during <<[t1, t2)>> and the service received at the last point in
+      time [t2]. *)
+  Lemma service_of_jobs_cat_last :
+    forall  js t1 t2,
+      t1 <= t2 ->
+      service_of_jobs sched P js t1 t2.+1
+      = service_of_jobs sched P js t1 t2
+        + service_of_jobs_at sched P js t2.
+  Proof.
+    move=> js t1 t2 LEQ.
+    rewrite !service_of_jobs_sum_over_time_interval.
+    by rewrite big_nat_recr.
+  Qed.
 
 End GenericModelLemmas.
 

@@ -313,7 +313,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
         by rewrite addnA [_ + priority_inversion_bound A]addnC -!addnA.
       Qed.
 
-      End SolutionOfResponseTimeReccurenceExists.
+    End SolutionOfResponseTimeReccurenceExists.
 
   End FillingOutHypothesesOfAbstractRTATheorem.
 

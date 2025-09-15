@@ -27,14 +27,14 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       characterized by an arrival time and an execution cost. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job} `{JobCost Job}.
 
-   (** We assume that jobs and tasks are fully preemptive. *)
-   #[local] Existing Instance fully_preemptive_job_model.
-   #[local] Existing Instance fully_preemptive_task_model.
-   #[local] Existing Instance fully_preemptive_rtc_threshold.
+  (** We assume that jobs and tasks are fully preemptive. *)
+  #[local] Existing Instance fully_preemptive_job_model.
+  #[local] Existing Instance fully_preemptive_task_model.
+  #[local] Existing Instance fully_preemptive_rtc_threshold.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
-   Variable arr_seq : arrival_sequence Job.
-   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** Consider an arbitrary task set [ts], ... *)
   Variable ts : list Task.

@@ -174,24 +174,24 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
      forall {A L},
        bounded_pi.is_in_search_space ts tsk (blocking_bound ts tsk) L A ->
        is_in_search_space L A.
-   Proof.
-     move=> A L /andP[BOUND STEP].
-     apply /andP; split => //; apply /orP.
-     move: STEP => /orP[/orP[STEP|RBF] | IBF]; [right| by left| by right].
-     move: (task_with_equal_deadline_exists STEP) => [tsk_o /andP[/andP[/andP[IN REL] OTHER] EQ]].
-     rewrite /bound_on_total_hep_workload_changes_at.
-     apply /hasP; exists tsk_o => //.
-     apply /andP; split; first by rewrite eq_sym.
-     move: EQ. rewrite /D => /eqP EQ.
-     rewrite /task_request_bound_function EQ.
-     move: REL; rewrite /blocking_relevant => /andP [ARRIVES COST].
-     rewrite eqn_pmul2l //.
-     have -> : A + task_deadline tsk - (task_deadline tsk + A)
-              = 0 by lia.
-     have -> : A + ε + task_deadline tsk - (task_deadline tsk + A)
-              = ε by lia.
-     by move: (H_valid_arrival_curve tsk_o IN) => [-> _]; lia.
-   Qed.
+  Proof.
+    move=> A L /andP[BOUND STEP].
+    apply /andP; split => //; apply /orP.
+    move: STEP => /orP[/orP[STEP|RBF] | IBF]; [right| by left| by right].
+    move: (task_with_equal_deadline_exists STEP) => [tsk_o /andP[/andP[/andP[IN REL] OTHER] EQ]].
+    rewrite /bound_on_total_hep_workload_changes_at.
+    apply /hasP; exists tsk_o => //.
+    apply /andP; split; first by rewrite eq_sym.
+    move: EQ. rewrite /D => /eqP EQ.
+    rewrite /task_request_bound_function EQ.
+    move: REL; rewrite /blocking_relevant => /andP [ARRIVES COST].
+    rewrite eqn_pmul2l //.
+    have -> : A + task_deadline tsk - (task_deadline tsk + A)
+             = 0 by lia.
+    have -> : A + ε + task_deadline tsk - (task_deadline tsk + A)
+             = ε by lia.
+    by move: (H_valid_arrival_curve tsk_o IN) => [-> _]; lia.
+  Qed.
 
 
   (** ** Response-Time Bound *)

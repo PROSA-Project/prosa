@@ -157,6 +157,6 @@ Section NoPreemptionsEquivalence.
       apply /negP.
       by rewrite Bool.negb_involutive.
     }
-    Qed.
+  Qed.
 
 End NoPreemptionsEquivalence.

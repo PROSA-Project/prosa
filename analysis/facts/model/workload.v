@@ -252,7 +252,7 @@ Section WorkloadFacts.
 
   (** We observe that the cumulative workload of all jobs arriving in a time
       interval <<[t1, t2)>> and respecting a predicate [P] can be split into two parts. *)
-   Lemma workload_of_jobs_cat :
+  Lemma workload_of_jobs_cat :
     forall t t1 t2 P,
       t1 <= t <= t2 ->
       workload_of_jobs P (arrivals_between arr_seq t1 t2) =
@@ -265,17 +265,17 @@ Section WorkloadFacts.
 
   (** As a corollary, we prove that the workload in any range <<[t1,t3)>>
       always bounds the workload in any sub-range <<[t1,t2)>>. *)
-    Corollary workload_of_jobs_reduce_range :
-      forall t1 t2 t3 P,
-        t1 <= t2 ->
-        t2 <= t3 ->
-        workload_of_jobs P (arrivals_between arr_seq t1 t2)
-        <= workload_of_jobs P (arrivals_between arr_seq t1 t3).
-    Proof.
-      move => t1 t2 t3 P ??.
-      rewrite (workload_of_jobs_cat t2 t1 t3 P _  ) //=; [| apply /andP; split; done].
-      by apply leq_addr.
-    Qed.
+  Corollary workload_of_jobs_reduce_range :
+    forall t1 t2 t3 P,
+      t1 <= t2 ->
+      t2 <= t3 ->
+      workload_of_jobs P (arrivals_between arr_seq t1 t2)
+      <= workload_of_jobs P (arrivals_between arr_seq t1 t3).
+  Proof.
+    move => t1 t2 t3 P ??.
+    rewrite (workload_of_jobs_cat t2 t1 t3 P _  ) //=; [| apply /andP; split; done].
+    by apply leq_addr.
+  Qed.
 
   (** Consider a job [j] ... *)
   Variable j : Job.

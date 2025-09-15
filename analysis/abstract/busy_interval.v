@@ -275,21 +275,21 @@ Section AbstractBusyIntervalExists.
     (** Then the cumulative interfering workload within interval <<[0, t1 + δ)>>
         is bounded by the cumulative interference in the
         same interval. *)
-      Local Lemma cumul_iw_bounded_by_cumul_i :
-        cumulative_interfering_workload j 0 (t1 + δ) <= cumulative_interference j 0 (t1 + δ).
-      Proof.
-        move: (H_iw_bounded) => LE.
-        rewrite /definitions.cumulative_interference
-                /definitions.cumulative_interfering_workload
-                /cumul_cond_interference.
-        rewrite (@big_cat_nat _ _ _ t1) //=; last by lia.
-        rewrite [in X in _ <= X](@big_cat_nat _ _ _ t1) //=; last by lia.
-        move: H_is_busy_prefix => [_  [/andP [/eqP DD KK ] ADD]].
-        rewrite /cumulative_interfering_workload in LE; rewrite (leqRW LE); clear LE.
-        rewrite leq_add2r.
-        rewrite /cumulative_interfering_workload in DD.
-        by rewrite -DD; clear DD.
-      Qed.
+    Local Lemma cumul_iw_bounded_by_cumul_i :
+      cumulative_interfering_workload j 0 (t1 + δ) <= cumulative_interference j 0 (t1 + δ).
+    Proof.
+      move: (H_iw_bounded) => LE.
+      rewrite /definitions.cumulative_interference
+              /definitions.cumulative_interfering_workload
+              /cumul_cond_interference.
+      rewrite (@big_cat_nat _ _ _ t1) //=; last by lia.
+      rewrite [in X in _ <= X](@big_cat_nat _ _ _ t1) //=; last by lia.
+      move: H_is_busy_prefix => [_  [/andP [/eqP DD KK ] ADD]].
+      rewrite /cumulative_interfering_workload in LE; rewrite (leqRW LE); clear LE.
+      rewrite leq_add2r.
+      rewrite /cumulative_interfering_workload in DD.
+      by rewrite -DD; clear DD.
+    Qed.
 
   End CumulativeIntIntWorkExtension.
 

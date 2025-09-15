@@ -49,12 +49,12 @@ Section JointWCETCompliance.
   Lemma sum_job_costs_bounded :
     \sum_(j <- js) job_cost j <= task_cost tsk * size js.
   Proof.
-      rewrite -sum1_size big_distrr /=.
-      rewrite [leqLHS]big_seq_cond [leqRHS]big_seq_cond.
-      apply: leq_sum => j /andP[IN _] /[! muln1].
-      move: (H_valid_jobs _ IN) => /andP[/eqP <- COST].
-      by apply: COST.
-    Qed.
+    rewrite -sum1_size big_distrr /=.
+    rewrite [leqLHS]big_seq_cond [leqRHS]big_seq_cond.
+    apply: leq_sum => j /andP[IN _] /[! muln1].
+    move: (H_valid_jobs _ IN) => /andP[/eqP <- COST].
+    by apply: COST.
+  Qed.
 
 End JointWCETCompliance.
 

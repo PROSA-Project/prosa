@@ -436,7 +436,7 @@ Section ArrivalSequencePrefix.
         last by apply mem_nth; auto.
       rewrite in_cons; apply /orP; right.
       by exact: mem_nth.
-   Qed.
+    Qed.
 
     (** By design, the list of arrivals in any interval is sorted. *)
     Lemma arrivals_between_sorted :
@@ -473,7 +473,7 @@ Section ArrivalSequencePrefix.
             rewrite /path -/(path _ _ js') {1}/by_arrival_times.
             by apply /andP; split => //. } } }
       by move: CAT; rewrite /sorted A1 cat_cons {1}/path -/(path _ _ (js ++ _)) => /andP [_ CAT].
-   Qed.
+    Qed.
 
   End ArrivalTimes.
 
