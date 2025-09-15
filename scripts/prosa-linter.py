@@ -43,6 +43,11 @@ ISSUES = [
             1,
         ),
         ("trailing whitespace", r"(?P<issue>[ \t]+)\n", 0),
+        (
+            "operator at end of line (move to next line)",
+            r"\s(?P<issue>[-+*/\\=!&|]+)\n",
+            0,
+        ),
     ]
 ]
 
@@ -51,6 +56,8 @@ EXCEPTIONS = [
     ("", r"[::", "]"),  # MathComp empty list notation
     (" ", "::", " "),  # cons notation
     ("[", "::", " "),  # singleton list notation
+    (" ", "//", "\n"),  # proof-mode '//'
+    (" ", "//=", "\n"),  # proof-mode '//='
 ]
 
 
