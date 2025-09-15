@@ -149,6 +149,13 @@ spell-check:
   script:
     - make spell
 
+lint:
+  extends:
+    - .not_in_wip_branches
+  stage: build
+  image: python:3
+  script:
+    - make lint
 # Disabled until alectryon gains support for Rocq Prover 9.0
 # See https://github.com/cpitclaudel/alectryon/issues/104
 # proof-state:

@@ -88,6 +88,9 @@ spell:
 	./scripts/flag-typos-in-comments.sh `find . -iname '*.v'`
 	./scripts/flag-typos-in-Markdown.sh `find . -iname '*.md'`
 
+lint:
+	./scripts/prosa-linter.py -e  `find . -iname '*.v'`
+
 proof-length:
 	./scripts/proofloc.py --check `find . -iname '*.v'`
 
@@ -115,9 +118,10 @@ help:
 	@echo "'make macos-clean' to clean macos' .DS_Store dirs"
 	@echo "'make distclean' to remove all generated files"
 	@echo
-	@echo "'make mangle-names' to compile with mangle-names option"	
+	@echo "'make mangle-names' to compile with mangle-names option"
 	@echo "'make spell' to run a spell checker on comments and Markdown files"
-	@echo "'make proof-length' to flag too-long proofs"
+	@echo "'make proof-length' to flag overlength proofs"
+	@echo "'make lint'" to flag some common coding-style issues
 	@echo
 
 .PHONY: all prosa refinements mangle-names mangle-namesCoqProject
