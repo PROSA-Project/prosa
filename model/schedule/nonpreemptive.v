@@ -14,14 +14,14 @@ Section NonpreemptiveSchedule.
 
   (** ... and any kind of processor model. *)
   Context {PState : ProcessorState Job}.
-  
+
   (** We say that a given schedule is _nonpreemptive_ if every job,
       once it is scheduled, remains scheduled until completion. *)
-  Definition nonpreemptive_schedule (sched : schedule PState) := 
+  Definition nonpreemptive_schedule (sched : schedule PState) :=
     forall (j : Job) (t t' : instant),
-      t <= t' -> 
+      t <= t' ->
       scheduled_at sched j t ->
-      ~~ completed_by sched j t' -> 
-      scheduled_at sched j t'. 
+      ~~ completed_by sched j t' ->
+      scheduled_at sched j t'.
 
 End NonpreemptiveSchedule.

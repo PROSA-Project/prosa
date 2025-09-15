@@ -305,7 +305,7 @@ Section BusyIntervalExistence.
     have NEQ: t1 <= job_arrival j < t2.
     { apply/andP; split=> [//|].
       rewrite ltnNge; apply/negP => CONTR.
-      have [_ [_ [NQT _]]] := PREFIX. 
+      have [_ [_ [NQT _]]] := PREFIX.
       have {}NQT := NQT t2.
       feed NQT; first by (apply/andP; split; [|rewrite ltnS]).
       by apply: NQT; apply/quiet_time_P. }

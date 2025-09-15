@@ -39,11 +39,11 @@ Section TaskArrivals.
     move=> tsk t1 t t2 LEQ_t1 LEQ_t2.
     now rewrite /task_arrivals_between -filter_cat -arrivals_between_cat.
   Qed.
-  
-  (** We show that [task_arrivals_up_to_job_arrival j1] is a prefix 
-   of [task_arrivals_up_to_job_arrival j2] if [j2] arrives at the same time 
+
+  (** We show that [task_arrivals_up_to_job_arrival j1] is a prefix
+   of [task_arrivals_up_to_job_arrival j2] if [j2] arrives at the same time
    or after [j1]. *)
-  Lemma task_arrivals_up_to_prefix_cat : 
+  Lemma task_arrivals_up_to_prefix_cat :
     forall j1 j2,
       arrives_in arr_seq j1 ->
       arrives_in arr_seq j2 ->
@@ -54,12 +54,12 @@ Section TaskArrivals.
     intros j1 j2 ARR1 ARR2 TSK ARR_LT.
     exists (task_arrivals_between arr_seq (job_task j1) (job_arrival j1 + 1) (job_arrival j2 + 1)).
     now rewrite /task_arrivals_up_to_job_arrival !addn1 TSK -task_arrivals_between_cat.
-  Qed.    
+  Qed.
 
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
-  
-  (** Any job [j] from the arrival sequence is contained in 
+
+  (** Any job [j] from the arrival sequence is contained in
    [task_arrivals_up_to_job_arrival j]. *)
   Lemma arrives_in_task_arrivals_up_to :
     forall j,
@@ -68,14 +68,14 @@ Section TaskArrivals.
   Proof.
     intros j ARR.
     rewrite mem_filter; apply /andP.
-    split; first by apply /eqP => //. 
+    split; first by apply /eqP => //.
     move : ARR => [t ARR]; move : (ARR) => EQ.
     apply H_consistent_arrivals in EQ.
     rewrite (mem_bigcat_nat _ (fun t => arrivals_at arr_seq t) j 0 _ (job_arrival j)) // EQ //.
     now lia.
   Qed.
 
-  (** Also, any job [j] from the arrival sequence is contained in 
+  (** Also, any job [j] from the arrival sequence is contained in
    [task_arrivals_at_job_arrival j]. *)
   Lemma arrives_in_task_arrivals_at :
     forall j,
@@ -84,13 +84,13 @@ Section TaskArrivals.
   Proof.
     intros j ARR.
     rewrite mem_filter; apply /andP.
-    split; first by apply /eqP => //. 
+    split; first by apply /eqP => //.
     rewrite /arrivals_at.
     move : ARR => [t ARR].
     now rewrite (H_consistent_arrivals j t ARR).
   Qed.
 
-  (** We show that for any time [t_m] less than or equal to [t], 
+  (** We show that for any time [t_m] less than or equal to [t],
       task arrivals up to [t_m] forms a prefix of task arrivals up to [t]. *)
   Lemma task_arrivals_cat :
     forall t_m t,
@@ -99,11 +99,11 @@ Section TaskArrivals.
       task_arrivals_up_to arr_seq tsk t_m ++ task_arrivals_between arr_seq tsk t_m.+1 t.+1.
   Proof.
     intros t1 t2 INEQ.
-    now rewrite -filter_cat -arrivals_between_cat. 
+    now rewrite -filter_cat -arrivals_between_cat.
   Qed.
 
-  (** We observe that for any job [j], task arrivals up to [job_arrival j] is a 
-      concatenation of task arrivals before [job_arrival j] and task arrivals 
+  (** We observe that for any job [j], task arrivals up to [job_arrival j] is a
+      concatenation of task arrivals before [job_arrival j] and task arrivals
       at [job_arrival j]. *)
   Lemma task_arrivals_up_to_cat :
     forall j,
@@ -113,18 +113,18 @@ Section TaskArrivals.
   Proof.
     intros j ARR.
     rewrite /task_arrivals_up_to_job_arrival /task_arrivals_up_to
-            /task_arrivals_before /task_arrivals_between. 
+            /task_arrivals_before /task_arrivals_between.
     rewrite -filter_cat (arrivals_between_cat _ 0 (job_arrival j) (job_arrival j).+1) //.
     now rewrite /arrivals_between big_nat1.
   Qed.
 
-  (** We show that any job [j] in the arrival sequence is also contained in task arrivals 
+  (** We show that any job [j] in the arrival sequence is also contained in task arrivals
       between time instants [t1] and [t2], if [job_arrival j] lies in the interval <<[t1,t2)>>. *)
   Lemma job_in_task_arrivals_between :
     forall j t1 t2,
       arrives_in arr_seq j ->
       job_task j = tsk ->
-      t1 <= job_arrival j < t2 -> 
+      t1 <= job_arrival j < t2 ->
       j \in task_arrivals_between arr_seq tsk t1 t2.
   Proof.
     intros * ARR TSK INEQ.
@@ -141,7 +141,7 @@ Section TaskArrivals.
       j \in arrivals_between arr_seq t1 t2.
   Proof. move=> t1 t2 j. by rewrite mem_filter; move => /andP [/eqP TSK JB_IN]. Qed.
 
-  (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] arrives 
+  (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] arrives
       in the arrival sequence [arr_seq]. *)
   Corollary arrives_in_task_arrivals_implies_arrived :
     forall t1 t2 j,
@@ -198,7 +198,7 @@ Section TaskArrivals.
       t1 < t2.
   Proof. by move=> t1 t2; rewrite -has_predT => /hasP [j IN] _; eapply task_arrivals_nonempty; eauto. Qed.
 
-  (** An arrival sequence with non-duplicate arrivals implies that the 
+  (** An arrival sequence with non-duplicate arrivals implies that the
       task arrivals also contain non-duplicate arrivals. *)
   Lemma uniq_task_arrivals :
     forall t,
@@ -216,10 +216,10 @@ Section TaskArrivals.
       arrival_sequence_uniq arr_seq ->
       uniq (task_arrivals_between arr_seq tsk t1 t2).
   Proof. move=> t1 t2 UNIQ. by apply/filter_uniq/arrivals_uniq. Qed.
-  
-  (** A job cannot arrive before it's arrival time. *) 
+
+  (** A job cannot arrive before it's arrival time. *)
   Lemma job_notin_task_arrivals_before :
-    forall j t, 
+    forall j t,
       arrives_in arr_seq j ->
       job_arrival j > t ->
       j \notin task_arrivals_up_to arr_seq (job_task j) t.
@@ -231,14 +231,14 @@ Section TaskArrivals.
     now lia.
   Qed.
 
-  (** We show that for any two jobs [j1] and [j2], task arrivals up to arrival of job [j1] form a 
+  (** We show that for any two jobs [j1] and [j2], task arrivals up to arrival of job [j1] form a
       strict prefix of task arrivals up to arrival of job [j2]. *)
   Lemma arrival_lt_implies_strict_prefix :
     forall j1 j2,
       job_task j1 = tsk ->
       job_task j2 = tsk ->
       arrives_in arr_seq j1 ->
-      arrives_in arr_seq j2 -> 
+      arrives_in arr_seq j2 ->
       job_arrival j1 < job_arrival j2 ->
       strict_prefix_of (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
   Proof.
@@ -252,7 +252,7 @@ Section TaskArrivals.
       now rewrite -task_arrivals_cat; try by lia.
   Qed.
 
-  (** For any job [j2] with [job_index] equal to [n], the nth job 
+  (** For any job [j2] with [job_index] equal to [n], the nth job
    in the sequence [task_arrivals_up_to arr_seq tsk t] is [j2], given that
    [t] is not less than [job_arrival j2]. *)
   (** Note that [j_def] is used as a default job for the access function and
@@ -282,7 +282,7 @@ Section TaskArrivals.
     now apply job_in_arrivals_between => //.
   Qed.
 
-  (** We show that task arrivals in the interval <<[t1, t2)>> 
+  (** We show that task arrivals in the interval <<[t1, t2)>>
    is the same as concatenation of task arrivals at each instant in <<[t1, t2)>>. *)
   Lemma task_arrivals_between_is_cat_of_task_arrivals_at :
     forall t1 t2,
@@ -293,12 +293,12 @@ Section TaskArrivals.
     now apply bigcat_nat_filter_eq_filter_bigcat_nat.
   Qed.
 
-  (** The number of jobs of a task [tsk] in the interval <<[t1, t2)>> is the same 
+  (** The number of jobs of a task [tsk] in the interval <<[t1, t2)>> is the same
    as sum of the number of jobs of the task [tsk] at each instant in <<[t1, t2)>>. *)
   Lemma size_of_task_arrivals_between :
     forall t1 t2,
       size (task_arrivals_between arr_seq tsk t1 t2)
-      = \sum_(t1 <= t < t2) size (task_arrivals_at arr_seq tsk t). 
+      = \sum_(t1 <= t < t2) size (task_arrivals_at arr_seq tsk t).
   Proof.
     intros *.
     rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.

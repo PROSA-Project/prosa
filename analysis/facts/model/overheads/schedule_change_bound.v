@@ -174,7 +174,7 @@ Section ScheduleChangesBoundedHelper.
         rewrite leqn0; apply/eqP.
         rewrite big_seq_cond; apply big1 => jl /andP [ARRl LPl].
         apply/eqP; rewrite eqb0; apply/negP => COMP.
-        move: (COMP) => SCHED; apply scheduled_at_precedes_completes_at in SCHED; last by move: NEQ; clear; lia. 
+        move: (COMP) => SCHED; apply scheduled_at_precedes_completes_at in SCHED; last by move: NEQ; clear; lia.
         have EQ : jl = jlp.
         { by apply: only_one_pi_job; (try exact BUSY) => //; (try move : NEQ H_t_in_busy_prefix; clear; lia). }
         by subst; rewrite COMP in NCOMP.
@@ -330,7 +330,7 @@ Section ScheduleChangesBoundedHelper.
     move=> FIFO; apply/eqP; rewrite -leqn0; move_neq_up POS.
     move: POS; rewrite -has_predT => /hasP [pb]; rewrite mem_filter => /andP [PB IN] _.
     move: IN; rewrite mem_index_iota => IN.
-    eapply no_priority_bumps_in_fifo with (t := pb) in FIFO => //; last by lia. 
+    eapply no_priority_bumps_in_fifo with (t := pb) in FIFO => //; last by lia.
     by erewrite PB in FIFO.
   Qed.
 

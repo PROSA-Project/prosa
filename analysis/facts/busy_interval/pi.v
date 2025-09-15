@@ -223,7 +223,7 @@ Section PriorityInversionIsBounded.
       by apply (lower_priority_job_scheduled_implies_no_preemption_time jlp NHEP t_pi).
     Qed.
 
-    (** Next, we show that the same job will be scheduled from the start of the 
+    (** Next, we show that the same job will be scheduled from the start of the
         busy interval to the priority inversion time [t_pi]. *)
     Lemma pi_job_remains_scheduled :
       forall jlp,
@@ -403,7 +403,7 @@ Section PriorityInversionIsBounded.
         (** Then time instant [t1] is a preemption time. *)
         Lemma preemption_time_exists_case1 :
           exists pr_t,
-            preemption_time arr_seq sched pr_t 
+            preemption_time arr_seq sched pr_t
             /\ t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).

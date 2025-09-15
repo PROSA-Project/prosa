@@ -132,14 +132,14 @@ Section GenericModelLemmas.
         predicate. That is, given the fact [∀ j ∈ jobs: P1 j ==> P2 j], we show
         that the service of [{jobs | P1}] is bounded by the service of [{jobs | P2}]. *)
     Lemma service_of_jobs_pred_impl :
-      (forall j : Job, j \in jobs -> P1 j -> P2 j) -> 
+      (forall j : Job, j \in jobs -> P1 j -> P2 j) ->
       service_of_jobs sched P1 jobs t1 t2 <= service_of_jobs sched P2 jobs t1 t2.
     Proof. by intros IMPL; apply leq_sum_seq_pred; eauto. Qed.
 
     (** Similarly, we show that if [P1] is equivalent to [P2], then the service
         of [{jobs | P1}] is equal to the service of [{jobs | P2}]. *)
     Lemma service_of_jobs_equiv_pred :
-      {in jobs, P1 =1 P2} -> 
+      {in jobs, P1 =1 P2} ->
       service_of_jobs sched P1 jobs t1 t2 = service_of_jobs sched P2 jobs t1 t2.
     Proof.
       intros * EQUIV.
@@ -157,24 +157,24 @@ Section GenericModelLemmas.
         instances (in <<[t1,t2)>>) of [service_of_jobs_at].
 
         In other words, we show that
-        <<[∑_{j ∈ jobs} ∑_{t \in [t1,t2)} service of j at t]>> 
+        <<[∑_{j ∈ jobs} ∑_{t \in [t1,t2)} service of j at t]>>
         is equal to <<[∑_{t \in [t1,t2)} ∑_{j ∈ jobs} service of j at t]>>. *)
     Lemma service_of_jobs_sum_over_time_interval :
       service_of_jobs sched P jobs t1 t2
       = \sum_(t1 <= t < t2) service_of_jobs_at sched P jobs t.
     Proof. by apply exchange_big. Qed.
 
-    (** We show that service of [{jobs | false}] is equal to 0. *) 
+    (** We show that service of [{jobs | false}] is equal to 0. *)
     Lemma service_of_jobs_pred0 :
       service_of_jobs sched pred0 jobs t1 t2 = 0.
     Proof. by apply big_pred0. Qed.
 
     (** More generally, if none of the jobs inside [jobs] is scheduled
         at time [t] or satisfies [P], then total service of [jobs] at
-        time [t] is equal to 0. *) 
+        time [t] is equal to 0. *)
     Lemma service_of_jobs_nsched_or_unsat :
       forall (t : instant),
-        (forall j, j \in jobs -> ~~ (P j && scheduled_at sched j t)) -> 
+        (forall j, j \in jobs -> ~~ (P j && scheduled_at sched j t)) ->
         service_of_jobs_at sched P jobs t = 0.
     Proof.
       intros ? ALL.
@@ -321,7 +321,7 @@ Section UnitServiceModelLemmas.
   Variable P : pred Job.
 
   (** First, we prove that the service received by any set of jobs is
-      upper-bounded by the corresponding workload. *) 
+      upper-bounded by the corresponding workload. *)
   Lemma service_of_jobs_le_workload :
     forall (jobs : seq Job) (t1 t2 : instant),
       service_of_jobs sched P jobs t1 t2 <= workload_of_jobs P jobs.
@@ -410,7 +410,7 @@ Section UnitServiceModelLemmas.
         + rewrite /workload_of_jobs big_seq_cond [X in _ <= X]big_seq_cond.
           rewrite leq_sum // => j /andP [ARR Pj].
           specialize (COMPL _ ARR Pj).
-          rewrite -[service_during _ _ _ _ ]add0n -(F j t1) //= -(big_cat_nat) //=. 
+          rewrite -[service_during _ _ _ _ ]add0n -(F j t1) //= -(big_cat_nat) //=.
           move: EQ =>/negP /negP; rewrite -ltnNge => EQ.
           by apply ltnW.
     Qed.
@@ -496,7 +496,7 @@ Section UnitServiceUniProcessorModelLemmas.
           by move: uniq_js; rewrite cons_uniq => /andP [/negP NIN _].
     Qed.
 
-    (** Next, we prove that the service received by those jobs is no larger 
+    (** Next, we prove that the service received by those jobs is no larger
         than their workload. *)
     Corollary service_of_jobs_le_length_of_interval :
       forall (t : instant) (Δ : duration),
@@ -519,7 +519,7 @@ Section UnitServiceUniProcessorModelLemmas.
     Proof.
       move=> t1 t2.
       have <-: \sum_(t1 <= x < t2) 1 = t2 - t1.
-      { by rewrite big_const_nat iter_addn mul1n addn0. } 
+      { by rewrite big_const_nat iter_addn mul1n addn0. }
       rewrite /service_of_jobs exchange_big //=.
       rewrite leq_sum //.
       move => t' _.

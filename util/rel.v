@@ -1,6 +1,6 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq.
 
-(** In this section, we define the notion of monotonicity for functions. *) 
+(** In this section, we define the notion of monotonicity for functions. *)
 Section MonotoneFunction.
 
   (** Consider a type [T], a relation [R] over type [T], and a
@@ -20,12 +20,12 @@ End MonotoneFunction.
 Section Order.
 
   (** Consider a type [T], a relation [R] over type [T], and a
-      sequence [xs]. *) 
+      sequence [xs]. *)
   Context {T : eqType}.
   Variable R : T -> T -> bool.
   Variable xs : seq T.
 
-  (** Relation [R] is total over list [xs], iff for any 
+  (** Relation [R] is total over list [xs], iff for any
       [x1 x2 \in xs], either [R x1 x2] or [R x2 x1] holds. *)
   Definition total_over_list :=
     forall x1 x2,
@@ -33,7 +33,7 @@ Section Order.
       x2 \in xs ->
       R x1 x2 \/ R x2 x1.
 
-  (** Relation [R] is antisymmetric over list [xs], iff for any 
+  (** Relation [R] is antisymmetric over list [xs], iff for any
       [x1 x2 \in xs], [R x1 x2] and [R x2 x1] imply that [x1 = x2]. *)
   Definition antisymmetric_over_list :=
     forall x1 x2,

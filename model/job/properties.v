@@ -15,7 +15,7 @@ Section PropertiesOfJob.
 
 End PropertiesOfJob.
 
-(** In the next section, we lift the above property to the level 
+(** In the next section, we lift the above property to the level
     of arrival sequences. *)
 Section PropertiesOfAllJobs.
 

@@ -126,13 +126,13 @@ Section Suspensions.
       (** Consider a point [tf] inside <<[t1, t2)>>. *)
       Variable tf : instant.
       Hypothesis INtf : t1 <= tf < t2.
-      
+
       (** Let [tf] be the first point in the interval <<[t1, t2)>> that is also inside
          the self-suspension segment. *)
       Hypothesis H_suspended_tf : suspended sched j tf.
       Hypothesis H_service_at_tf : service sched j tf = ρ.
       Hypothesis H_before_tf :
-        forall to, 
+        forall to,
           t1 <= to < tf ->
           ~~ (suspended sched j to && (service sched j to == ρ)).
 
@@ -153,15 +153,15 @@ Section Suspensions.
         Lemma suspension_bounded_trivial :
           \sum_(tf <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
         Proof.
-          apply: leq_trans; 
+          apply: leq_trans;
             first by apply sum_majorant_constant with (c := 1) => ? ? ?; lia.
           rewrite mul1n -sum1_size big_filter.
           apply leq_trans with (n := \sum_(t0 <- index_iota tf t2) 1); first by apply leq_sum_seq_pred.
-          by rewrite sum1_size size_iota. 
+          by rewrite sum1_size size_iota.
         Qed.
 
       End TrivialCase.
-      
+
       (** Next, we consider the case when the suspension period is within the interval <<[tf, t2)>>. *)
       Section IntervalLengthLonger.
         Hypothesis H_GT : t2 - tf > job_suspension j ρ.
@@ -196,7 +196,7 @@ Section Suspensions.
             first by apply leq_sum_seq_pred.
           by rewrite sum1_size size_iota; lia.
         Qed.
-      
+
       End IntervalLengthLonger.
 
       (** Now we prove the required bound in case a point like [tf] exists. This helps to simplify
@@ -211,7 +211,7 @@ Section Suspensions.
         have [LEQ | GT] := boolP(t2 - tf <= job_suspension j ρ).
         - by apply suspension_bounded_trivial.
         - by apply suspension_bounded_longer_interval; lia.
-      Qed.          
+      Qed.
 
     End Step1.
 
@@ -242,7 +242,7 @@ Section Suspensions.
         have indexLT: index to (index_iota t1 t2) < ind.
         { rewrite /index_iota.
           have SPLIT: t2 - t1 = (t' - t1) + (t2 - t') by rewrite addBnAC; lia.
-          rewrite SPLIT iotaD index_cat. 
+          rewrite SPLIT iotaD index_cat.
           have ->: to \in iota t1 (t' - t1) by [].
           have NOTINt': t' \notin iota t1 (t' - t1) by apply /negP; rewrite mem_index_iota; lia.
           have GT: index t' (index_iota t1 t2) >= size (iota t1 (t' - t1)).
@@ -264,7 +264,7 @@ Section Suspensions.
     End Step2.
 
     (** Finally we prove the required result. *)
-    Lemma suspension_bounded_in_interval : 
+    Lemma suspension_bounded_in_interval :
       \sum_(t1 <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
     Proof.
       have [/hasP HAS|/hasPn NOTHAS] := boolP(has (fun t => (suspended sched j t && (service sched j t == ρ))) (index_iota t1 t2)).

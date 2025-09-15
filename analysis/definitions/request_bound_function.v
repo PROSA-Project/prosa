@@ -33,7 +33,7 @@ Section TaskWorkloadBoundedByArrivalCurves.
   Definition total_request_bound_function (Δ : duration) :=
     \sum_(tsk <- ts) task_request_bound_function tsk Δ.
 
-  (** For convenience, we additionally introduce specialized notions of total RBF for use 
+  (** For convenience, we additionally introduce specialized notions of total RBF for use
       under FP scheduling that consider only certain tasks.
       relation. *)
   Context `{FP_policy Task}.

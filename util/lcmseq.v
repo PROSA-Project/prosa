@@ -1,12 +1,12 @@
 From mathcomp Require Export ssreflect seq div ssrbool ssrnat eqtype ssrfun.
 Require Export prosa.util.tactics.
 
-(** A function to calculate the least common multiple 
+(** A function to calculate the least common multiple
     of all integers in a sequence [xs], denoted by [lcml xs]. *)
 Definition lcml (xs : seq nat) : nat := foldr lcmn 1 xs.
 
 (** First we show that [x] divides [lcml (x :: xs)] for any [x] and [xs]. *)
-Lemma int_divides_lcm_in_seq : 
+Lemma int_divides_lcm_in_seq :
   forall (x : nat) (xs : seq nat), x %| lcml (x :: xs).
 Proof.
   move=> x xs; induction xs.
@@ -15,9 +15,9 @@ Proof.
     by apply dvdn_lcml.
 Qed.
 
-(** Similarly, [lcml xs] divides [lcml (x :: xs)] for any [x] and [xs]. *) 
-Lemma lcm_seq_divides_lcm_super : 
-  forall (x : nat) (xs : seq nat), 
+(** Similarly, [lcml xs] divides [lcml (x :: xs)] for any [x] and [xs]. *)
+Lemma lcm_seq_divides_lcm_super :
+  forall (x : nat) (xs : seq nat),
   lcml xs %| lcml (x :: xs).
 Proof.
   move=> x xs; induction xs; first by auto.
@@ -26,8 +26,8 @@ Proof.
 Qed.
 
 (** Given a sequence [xs], any integer [x \in xs] divides [lcml xs]. *)
-Lemma lcm_seq_is_mult_of_all_ints : 
-  forall (x : nat) (xs : seq nat), x \in xs -> x %| lcml xs. 
+Lemma lcm_seq_is_mult_of_all_ints :
+  forall (x : nat) (xs : seq nat), x \in xs -> x %| lcml xs.
 Proof.
   intros x xs IN; apply/dvdnP.
   induction xs as [ | z sq IH_DIV]; first by done.

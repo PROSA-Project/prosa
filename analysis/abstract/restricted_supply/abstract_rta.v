@@ -306,7 +306,7 @@ Section AbstractRTARestrictedSupply.
       { rewrite addnC -{1}(leqRW FIX) -addnA leq_add2l /IBF_P.
         rewrite (@addnC (_ - _) _) -addnA subnKC; last by apply complement_SBF_monotone.
         rewrite -/(cumulative_interference _ _ _).
-        erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY. 
+        erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY.
         rewrite addnC leq_add //; last first.
         { by eapply blackout_during_bound_SBF with (t2 := t2) => //; split; [ | apply BUSY]. }
         rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.

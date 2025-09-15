@@ -87,7 +87,7 @@ Section ModelValidity.
         valid_job_cost j.
 
   End ValidJobCost.
-  
+
   (** Third, we relate the cost of a task's jobs to its BCET. *)
   Section ValidMinJobCost.
 
@@ -101,7 +101,7 @@ Section ModelValidity.
         task. *)
     Definition valid_min_job_cost j :=
       task_min_cost (job_task j) <= job_cost j.
-    
+
     (** Every job have a valid job cost *)
     Definition jobs_have_valid_min_job_costs :=
       forall j, valid_min_job_cost j.

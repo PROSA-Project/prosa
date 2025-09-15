@@ -30,7 +30,7 @@ Section TotalSuspensionBounded.
   (** Consider any valid arrival sequence of jobs ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
-  
+
   (** ... and assume the notion of readiness for self-suspending jobs. *)
   #[local] Existing Instance suspension_ready_instance.
 
@@ -40,7 +40,7 @@ Section TotalSuspensionBounded.
   (** Consider any valid schedule. *)
   Variable sched : schedule PState.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
-  
+
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
@@ -89,7 +89,7 @@ Section TotalSuspensionBounded.
         by apply : suspension_bounded_in_interval. }
       { apply leq_trans with (n := \sum_(0 <= r < job_cost j)
           \sum_(t1 <= t < t1 + Δ | service sched j t == r) suspended sched j t).
-        { rewrite -ltnNge in LT. 
+        { rewrite -ltnNge in LT.
           rewrite [in leqRHS](@big_cat_nat _ _ _ (service sched j (t1 + Δ) + 1)) => //=.
           by lia. }
         rewrite leq_sum_seq //= => r _ _.
@@ -101,7 +101,7 @@ Section TotalSuspensionBounded.
 
   (* Next, assume that [tsk] respects the arrival curve defined by [max_arrivals]. *)
   Hypothesis H_tsk_respects_max_arrivals : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
-  
+
   (** Now we establish a bound on the total duration the jobs of task [tsk] remain suspended in the interval
       <<[t1, t2)>>. *)
   Lemma suspension_of_task_bounded :
@@ -115,7 +115,7 @@ Section TotalSuspensionBounded.
       apply: H_tsk_respects_max_arrivals; by lia. }
     rewrite /number_of_task_arrivals -sum1_size big_distrl //=.
     rewrite exchange_big_idem //=.
-    apply leq_sum_seq => jo INjo _; rewrite mul1n. 
+    apply leq_sum_seq => jo INjo _; rewrite mul1n.
     apply job_suspension_bounded.
     by move: INjo; rewrite mem_filter => /andP[? ?].
   Qed.

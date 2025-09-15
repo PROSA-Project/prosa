@@ -17,7 +17,7 @@ Definition total_hep_rbf (ts : seq Task) (tsk : Task) (Δ : duration) :=
 Definition total_ohep_rbf (ts : seq Task) (tsk : Task) (Δ : duration) :=
   total_ohep_request_bound_function_FP ts tsk Δ.
 
-(** Next, we provide a function that checks a single point [P=(A,F)] of the search space 
+(** Next, we provide a function that checks a single point [P=(A,F)] of the search space
     when adopting a fully-preemptive policy. *)
 Definition check_point_FP (ts : seq Task) (tsk : Task) (R : nat) (P : nat * nat) :=
   (task_rbf tsk (P.1 + ε) + total_ohep_rbf ts tsk (P.1 + P.2) <= P.1 + P.2) && (P.2 <= R).
@@ -70,7 +70,7 @@ Section FastSearchSpaceComputationSubset.
   Hypothesis H_positive_cost : 0 < task_cost tsk.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Then, abstract RTA's standard search space is a subset of the computation-oriented 
+  (** Then, abstract RTA's standard search space is a subset of the computation-oriented
       version defined above. *)
   Lemma search_space_subset_FP :
     forall A, A \in correct_search_space tsk L -> A \in search_space_emax_FP tsk L.

@@ -37,7 +37,7 @@ Section ScheduleChanges.
       idle at every instant in <<[t1, t2)>>.
 
       Unlike [number_schedule_changes], [scheduled_job_invariant]
-      fixes a specific job (or idle state). This is useful when 
+      fixes a specific job (or idle state). This is useful when
       bounding overheads that can be attributed to a specific job. *)
   Definition scheduled_job_invariant (oj : option Job) (t1 t2 : instant) :=
     all (fun t => scheduled_job sched t == oj) (index_iota t1 t2).

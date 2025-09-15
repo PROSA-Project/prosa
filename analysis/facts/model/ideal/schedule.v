@@ -147,7 +147,7 @@ Section ScheduleClass.
   Qed.
 
   (** We prove that if a job [j] is scheduled at a time instant [t],
-      then the scheduler is not idle at [t]. *) 
+      then the scheduler is not idle at [t]. *)
   Lemma ideal_sched_implies_not_idle sched (j : Job) t :
     scheduled_at sched j t ->
     ~ ideal_is_idle sched t.
@@ -155,7 +155,7 @@ Section ScheduleClass.
     rewrite scheduled_at_def => /eqP SCHED /eqP IDLE.
     by rewrite IDLE in SCHED; inversion SCHED.
   Qed.
-  
+
   (** On a similar note, if a scheduler is idle at a time instant [t],
       then no job can receive service at [t]. *)
   Lemma ideal_not_idle_implies_sched sched (j : Job) t :

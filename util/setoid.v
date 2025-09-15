@@ -42,7 +42,7 @@ Definition leqRW {m n} : m <= n -> le m n := leP.
 
 (** To see the benefits, consider the following example. *)
 (*
-[Goal                                                                      ] 
+[Goal                                                                      ]
 [  forall a b c d x y,                                                     ]
 [    x <= y ->                                                             ]
 [    a + (b + (x + c)) + d <= a + (b + (y + c)) + d.                       ]
@@ -53,7 +53,7 @@ Definition leqRW {m n} : m <= n -> le m n := leP.
 [Qed.                                                                      ]
 *)
 
-(** Another benefit of [leqRW] is that it allows 
+(** Another benefit of [leqRW] is that it allows
     to avoid unnecessary [eapply leq_trans]. *)
 (*
 [Goal                                                                      ]
@@ -66,4 +66,4 @@ Definition leqRW {m n} : m <= n -> le m n := leP.
 [  move => a b x y z LE1 LE2 LE3.                                          ]
 [  rewrite -(leqRW LE3) leq_add //.                                        ]
 [Qed.                                                                      ]
-*)  
+*)

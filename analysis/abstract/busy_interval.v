@@ -328,7 +328,7 @@ Section AbstractBusyIntervalExists.
           exists last0.
           have JARRIN: last0 <= job_arrival j <= t_busy.
           { move: PEND => /andP [ARR NCOM].
-            apply/andP; split => //. move: QUIET => /andP [_ PE]. 
+            apply/andP; split => //. move: QUIET => /andP [_ PE].
             move: PE; rewrite negb_and -leqNgt => /orP [ | /negPn COMPL] => //; exfalso.
             apply completion_monotonic with (t' := t_busy) in COMPL.
             - by move: NCOM => /negP.
@@ -524,7 +524,7 @@ Section AbstractBusyIntervalExists.
         { apply negbT in EX; rewrite negb_exists in EX; move: EX => /forallP ALL'.
           have ALL: forall t, t1 < t <= t1 + δ -> ~ quiet_time t.
           { move => t /andP [GTt LEt] QUIET; rewrite -ltnS in LEt.
-            specialize (ALL' (Ordinal LEt)); rewrite negb_and /= GTt orFb in ALL'. 
+            specialize (ALL' (Ordinal LEt)); rewrite negb_and /= GTt orFb in ALL'.
             by move: ALL' => /negP ALL'; apply ALL'; clear ALL'.
           }
           by clear ALL'; exfalso; eapply t1δ_is_quiet_contra.

@@ -108,9 +108,9 @@ Section NonIdleSwapWorkConservationLemmas.
     have [j_other j_other_scheduled] : exists j_other, scheduled_at sched j_other t.
     { rewrite /work_conserving in WC_sched. apply (WC_sched j) => //; move :H_backlogged_j_t.
       rewrite /backlogged/job_ready/basic_ready_instance/pending/completed_by.
-      move /andP => [ARR_INCOMP scheduled]; move :ARR_INCOMP; move /andP => [arrive not_comp]. 
+      move /andP => [ARR_INCOMP scheduled]; move :ARR_INCOMP; move /andP => [arrive not_comp].
       apply /andP; split; first (apply /andP; split) => //.
-      + by rewrite (service_before_swap_invariant sched t1 t2 _ t). 
+      + by rewrite (service_before_swap_invariant sched t1 t2 _ t).
       + by rewrite -(swap_job_scheduled_other_times _ t1 t2 j t) //; (apply /neqP; eauto).
     }
     exists j_other; by rewrite  (swap_job_scheduled_other_times) //; do 2! (apply /neqP; eauto).
@@ -336,7 +336,7 @@ Section EDFPrefixWorkConservationLemmas.
   Proof.
     rewrite/sched_trans/edf_transform_prefix. apply (prefix_map_property_invariance ). rewrite /P.
     move=> sched' t  [[H_ARR [H_COMPLETED [H_COME H_all_deadlines_met]]] H_wc_sched].
-    rewrite/scheduled_behavior_premises/valid_schedule; split; first split. 
+    rewrite/scheduled_behavior_premises/valid_schedule; split; first split.
     - by apply mea_jobs_must_arrive.
     - split; last split.
       + by apply mea_completed_jobs.

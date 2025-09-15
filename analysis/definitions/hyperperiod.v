@@ -12,7 +12,7 @@ Section Hyperperiod.
 
   (** The hyperperiod of a task set is defined as the least common multiple
       (LCM) of the periods of all tasks in the task set. **)
-  Definition hyperperiod : duration := lcml (map task_period ts).        
+  Definition hyperperiod : duration := lcml (map task_period ts).
 
 End Hyperperiod.
 
@@ -44,13 +44,13 @@ Section HyperperiodDefinitions.
 
   (** We define a hyperperiod index based on an instant [t]
       which lies in it. *)
-  (** Note that we consider the first hyperperiod to start at time [O_max], 
-      i.e., shifted by the maximum offset (and not at time zero as can also 
+  (** Note that we consider the first hyperperiod to start at time [O_max],
+      i.e., shifted by the maximum offset (and not at time zero as can also
       be found sometimes in the literature) *)
   Definition hyperperiod_index (t : instant) :=
     (t - O_max) %/ HP.
 
-  (** Given an instant [t], we define the starting instant of the hyperperiod 
+  (** Given an instant [t], we define the starting instant of the hyperperiod
    that contains [t]. *)
   Definition starting_instant_of_hyperperiod (t : instant) :=
     hyperperiod_index t * HP + O_max.
@@ -69,8 +69,8 @@ Section HyperperiodDefinitions.
   Definition job_index_in_hyperperiod (j : Job) (h : instant) (tsk : Task) :=
     index j (jobs_in_hyperperiod h tsk).
 
-  (** Given a job [j] of task [tsk] and the hyperperiod starting at [h], we define a 
-      [corresponding_job_in_hyperperiod] which is the job that arrives in given hyperperiod 
+  (** Given a job [j] of task [tsk] and the hyperperiod starting at [h], we define a
+      [corresponding_job_in_hyperperiod] which is the job that arrives in given hyperperiod
       and has the same [job_index] as [j]. *)
   Definition corresponding_job_in_hyperperiod (j : Job) (h : instant) (tsk : Task) :=
     nth j (jobs_in_hyperperiod h tsk) (job_index_in_hyperperiod j (starting_instant_of_corresponding_hyperperiod j) tsk).

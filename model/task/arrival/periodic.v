@@ -21,7 +21,7 @@ Class PeriodicModel (Task : TaskType) := task_period : Task -> duration.
 
 (** Next, we define the semantics of the periodic task model. *)
 Section ValidPeriodicTaskModel.
-  
+
   (** Consider any type of periodic tasks. *)
   Context {Task : TaskType} `{PeriodicModel Task}.
 
@@ -34,14 +34,14 @@ Section ValidPeriodicTaskModel.
   (** ... and an arbitrary arrival sequence of such jobs. *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** We say that a task respects the periodic task model if every job [j] 
-      (except the first one) has a predecessor [j'] that arrives exactly one 
+  (** We say that a task respects the periodic task model if every job [j]
+      (except the first one) has a predecessor [j'] that arrives exactly one
       task period before it. *)
-  Definition respects_periodic_task_model (tsk : Task) := 
+  Definition respects_periodic_task_model (tsk : Task) :=
     forall j,
-      arrives_in arr_seq j -> 
+      arrives_in arr_seq j ->
       job_index arr_seq j > 0 ->
-      job_task j = tsk -> 
+      job_task j = tsk ->
       exists j',
         arrives_in arr_seq j' /\
         job_index arr_seq j' = job_index arr_seq j - 1 /\
@@ -53,8 +53,8 @@ Section ValidPeriodicTaskModel.
 
   (** ... every task in the set must have a valid period ... *)
   Definition valid_periods := forall tsk : Task, tsk \in ts -> valid_period tsk.
-  
-  (** ... and all jobs of every task in a set of periodic tasks must 
+
+  (** ... and all jobs of every task in a set of periodic tasks must
       respect the period constraint on arrival times. *)
   Definition taskset_respects_periodic_task_model :=
     forall tsk, tsk \in ts -> respects_periodic_task_model tsk.

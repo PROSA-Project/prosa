@@ -1,33 +1,33 @@
 From mathcomp Require Export ssreflect ssrbool eqtype ssrnat div seq path fintype bigop.
 
-(** In this section, we define and prove facts about subadditivity and 
-    subadditive functions. The definition of subadditivity presented here 
-    slightly differs from the standard one ([f (a + b) <= f a + f b] for any 
+(** In this section, we define and prove facts about subadditivity and
+    subadditive functions. The definition of subadditivity presented here
+    slightly differs from the standard one ([f (a + b) <= f a + f b] for any
     [a] and [b]), but it is proven to be equivalent to it. *)
 Section Subadditivity.
 
-  (** First, we define subadditivity as a point-wise property; i.e., [f] is 
-      subadditive at [h] if standard subadditivity holds for any pair [(a,b)] 
+  (** First, we define subadditivity as a point-wise property; i.e., [f] is
+      subadditive at [h] if standard subadditivity holds for any pair [(a,b)]
       that sums to [h]. *)
   Definition subadditive_at f h :=
     forall a b,
       a + b = h ->
       f h <= f a + f b.
 
-  (** Second, we define the concept of partial subadditivity until a certain 
+  (** Second, we define the concept of partial subadditivity until a certain
       horizon [h]. This definition is useful when dealing with finite sequences. *)
   Definition subadditive_until f h :=
     forall x,
       x < h ->
       subadditive_at f x.
 
-  (** Finally, give a definition of subadditive function: [f] is subadditive 
+  (** Finally, give a definition of subadditive function: [f] is subadditive
       when it is subadditive at any point [h].*)
   Definition subadditive f :=
     forall h,
       subadditive_at f h.
 
-  (** In this section, we show that the proposed definition of subadditivity is 
+  (** In this section, we show that the proposed definition of subadditivity is
       equivalent to the standard one. *)
   Section EquivalenceWithStandardDefinition.
 
@@ -78,8 +78,8 @@ Section Subadditivity.
       Qed.
 
     End SubadditiveFunctions.
-    
+
   End Facts.
-  
+
 End Subadditivity.
 

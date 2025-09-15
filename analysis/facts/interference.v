@@ -188,7 +188,7 @@ Section InterferencePropertiesJLFP.
     Proof.
       move=> j; apply/hasPn=> jo SERV; exfalso.
       rewrite mem_filter in SERV; move: SERV => /andP [SERV _].
-      by apply/negP; first apply: no_service_received_when_idle => //. 
+      by apply/negP; first apply: no_service_received_when_idle => //.
     Qed.
 
     (** ... and that there is no interference from higher-or-equal
@@ -198,7 +198,7 @@ Section InterferencePropertiesJLFP.
     Proof.
       move=> j; apply/hasPn=> jo SERV; exfalso.
       rewrite mem_filter in SERV; move: SERV => /andP [SERV _].
-      by apply/negP; first apply: no_service_received_when_idle => //. 
+      by apply/negP; first apply: no_service_received_when_idle => //.
     Qed.
 
   End Idle.

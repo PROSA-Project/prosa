@@ -88,7 +88,7 @@ Section  MaxNPSegmentIsBounded.
     { rewrite /hep_job -ltnNge in NOTHEP.
       move: H_job_of_tsk => /eqP <-.
       have ARRLE: job_arrival j' < job_arrival j.
-      { by apply: (@leq_trans t1) => //; move: BUSY => [ _  [ _ [ _ /andP [F G]]] ]. } 
+      { by apply: (@leq_trans t1) => //; move: BUSY => [ _  [ _ [ _ /andP [F G]]] ]. }
       move: NOTHEP; rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline.
       by lia. }
     { move: NOTHEP => /andP [_ NZ].

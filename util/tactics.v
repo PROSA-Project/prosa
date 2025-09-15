@@ -132,7 +132,7 @@ Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
 #[global] Obligation Tactic := idtac.
 
 (** The mathematical components library turns off Coq' s support for the enforcement
-    of structured sub-proofs. We do want structured sub-proofs in Prosa, however, so 
+    of structured sub-proofs. We do want structured sub-proofs in Prosa, however, so
     here we turn strict checking back on. *)
 #[global] Set Bullet Behavior "Strict Subproofs".
 #[global] Set Default Goal Selector "!".

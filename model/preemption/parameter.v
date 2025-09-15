@@ -96,7 +96,7 @@ Section PreemptionModel.
     scheduled_at sched j t.-1
     && ~~ completed_by sched j t
     && ~~ scheduled_at sched j t.
-  
+
   (** In the following, we define the notion of a valid preemption model.  To
       begin with, we require that a job has to be executed at least one time
       instant in order to reach a nonpreemptive segment. In other words, a job
@@ -131,8 +131,8 @@ Section PreemptionModel.
       /\ job_cannot_be_nonpreemptive_after_completion j
       /\ not_preemptive_implies_scheduled j
       /\ execution_starts_with_preemption_point j.
-  
-  (** We say that there are no superfluous preemptions if a job can 
+
+  (** We say that there are no superfluous preemptions if a job can
       only be preempted by another job having strictly higher priority. *)
   Definition no_superfluous_preemptions :=
     forall t j j_hp,

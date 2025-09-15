@@ -320,7 +320,7 @@ Section ServiceInversionIsBounded.
         + rewrite POS eqb1; apply/andP; split.
           * apply/negP => IN; apply served_at_and_receives_service_consistent in IN.
             have EQ: j = jlp by apply: only_one_job_receives_service_at_uni => //; rewrite /receives_service_at.
-            by subst jlp; move: LP => /negP LP; apply: LP; apply H_priority_is_reflexive. 
+            by subst jlp; move: LP => /negP LP; apply: LP; apply H_priority_is_reflexive.
           * apply/hasP; exists jlp; last by apply: LP.
             apply receives_service_and_served_at_consistent => //.
             by rewrite /receives_service_at POS.

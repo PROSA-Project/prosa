@@ -129,7 +129,7 @@ Section AbstractRTAIdeal.
     { rewrite -leq_subLR in NEQ1.
       rewrite -(leqRW NEQ1) (leqRW RTC) (leqRW (service_at_most_cost _ _ _ _ _)) //
               (leqRW (service_within_busy_interval_ge_job_cost  _ _ _ _ _ _ _)) //.
-      rewrite (leqRW (cumulative_interference_sub _ _ t1 _ t1 t2 _ _)) //. 
+      rewrite (leqRW (cumulative_interference_sub _ _ t1 _ t1 t2 _ _)) //.
       have LLL : (t1 < t2) = true by apply leq_ltn_trans with (t1 + Δ); lia.
       interval_to_duration t1 t2 k.
       eapply leq_trans.

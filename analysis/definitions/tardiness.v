@@ -2,11 +2,11 @@ Require Export prosa.analysis.definitions.schedulability.
 
 (** * Tardiness *)
 
-(** In the following section we define the notion of bounded tardiness, 
-    i.e., an upper-bound on the difference between the response time of 
+(** In the following section we define the notion of bounded tardiness,
+    i.e., an upper-bound on the difference between the response time of
     any job of a task and its relative deadline. *)
 Section Tardiness.
-  
+
   (** Consider any type of tasks and its deadline, ... *)
   Context {Task : TaskType}.
   Context `{TaskDeadline Task}.
@@ -36,5 +36,5 @@ Section Tardiness.
          completed no more that [B] time units after its deadline. *)
   Definition task_tardiness_is_bounded arr_seq sched tsk B :=
     task_response_time_bound arr_seq sched tsk (task_deadline tsk + B).
-  
+
 End Tardiness.

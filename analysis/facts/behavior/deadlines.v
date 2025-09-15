@@ -88,7 +88,7 @@ Section DeadlineFacts.
     Variable sched sched' : schedule PState.
 
     (** We observe that, if the service is invariant at the time of a
-       job's absolute deadline, and if the job meets its deadline in one of the schedules, 
+       job's absolute deadline, and if the job meets its deadline in one of the schedules,
        then it meets its deadline also in the other schedule. *)
     Lemma service_invariant_implies_deadline_met :
       forall j,

@@ -81,11 +81,11 @@ Section LowerBoundOnService.
       case INT: interference; first by lia.
       by rewrite // addn0; apply Workj; rewrite INT.
     Qed.
-    
+
     (** Also, note that under the unit-service processor model
-        assumption, the sum of service within the interval <<[t, t + δ)>> 
+        assumption, the sum of service within the interval <<[t, t + δ)>>
         and the cumulative interference within the same interval
-        is bounded by the length of the interval (i.e., [δ]).  *) 
+        is bounded by the length of the interval (i.e., [δ]).  *)
     Remark service_and_interference_bounded :
       unit_service_proc_model PState ->
       service_during sched j t (t + δ) + cumulative_interference j t (t + δ) <= δ.
@@ -103,7 +103,7 @@ Section LowerBoundOnService.
         by move_neq_up NE; apply Workj.
       - by rewrite addn0; apply UNIT.
     Qed.
-    
+
   End InterferenceIsComplement.
 
   (** In this section, we prove a sufficient condition under which job

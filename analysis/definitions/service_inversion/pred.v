@@ -98,7 +98,7 @@ Section TaskServiceInversionBound.
 
   (** Consider an arbitrary task [tsk]. *)
   Variable tsk : Task.
-  
+
   (** We say that task [tsk] has bounded service inversion if all its
       jobs have cumulative service inversion bounded by function [B :
       duration -> duration]. *)

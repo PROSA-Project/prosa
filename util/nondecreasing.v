@@ -523,7 +523,7 @@ Section NondecreasingSequence.
           move: SIZE => /negP /negP.
           by rewrite ltnNge.
     Qed.
-    
+
     (** Note that the distances-function has the expected behavior indeed. I.e. an element
         on the position [n] of the distance-sequence is equal to the difference between
         elements on positions [n+1] and [n]. *)

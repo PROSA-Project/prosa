@@ -12,13 +12,13 @@ Section BigCatNatLemmas.
 
   (** ...and a function [f] that, given an index, yields a sequence. *)
   Variable f : nat -> seq T.
-  
-  (** In this section, we prove that the concatenation over sequences works as expected: 
+
+  (** In this section, we prove that the concatenation over sequences works as expected:
       no element is lost during the concatenation, and no new element is introduced. *)
   Section BigCatNatElements.
-    
-    (** First, we show that the concatenation comprises all the elements of each sequence; 
-        i.e. any element contained in one of the sequences will also be an element of the 
+
+    (** First, we show that the concatenation comprises all the elements of each sequence;
+        i.e. any element contained in one of the sequences will also be an element of the
         result of the concatenation. *)
     Lemma mem_bigcat_nat :
       forall x m n j,
@@ -33,8 +33,8 @@ Section BigCatNatLemmas.
       rewrite big_nat_recl; last by ins.
       by rewrite mem_cat; apply/orP; left.
     Qed.
-      
-    (** Conversely, we prove that any element belonging to a concatenation of sequences 
+
+    (** Conversely, we prove that any element belonging to a concatenation of sequences
         must come from one of the sequences. *)
     Lemma mem_bigcat_nat_exists :
       forall x m n,
@@ -69,10 +69,10 @@ Section BigCatNatLemmas.
         apply (IHn (Ordinal Hj)); [by []|].
         by set j' := widen_ord _ _; have -> : j' = j; [apply ord_inj|].
     Qed.
-      
+
   End BigCatNatElements.
 
-  (** In this section, we show how we can preserve uniqueness of the elements 
+  (** In this section, we show how we can preserve uniqueness of the elements
       (i.e. the absence of a duplicate) over a concatenation of sequences. *)
   Section BigCatNatDistinctElements.
 
@@ -83,7 +83,7 @@ Section BigCatNatLemmas.
     (** ...and that there are no elements in common between the sequences. *)
     Hypothesis H_no_elements_in_common :
       forall x i1 i2, x \in f i1 -> x \in f i2 -> i1 = i2.
-    
+
     (** We prove that the concatenation will yield a sequence with unique elements. *)
     Lemma bigcat_nat_uniq :
       forall n1 n2,
@@ -149,7 +149,7 @@ Section BigCatNatLemmas.
 
   (** We show that filtering a concatenated sequence by any predicate
       [P] is the same as concatenating the elements of the sequence
-      that satisfy [P]. *) 
+      that satisfy [P]. *)
   Lemma bigcat_nat_filter_eq_filter_bigcat_nat :
     forall {X : Type} (F : nat -> seq X) (P : X -> bool) (t1 t2 : nat),
       [seq x <- \cat_(t1 <= t < t2) F t | P x] = \cat_(t1 <= t < t2)[seq x <- F t | P x].
@@ -168,7 +168,7 @@ Section BigCatNatLemmas.
 
   (** We show that the size of a concatenated sequence is the same as
       summation of sizes of each element of the sequence. *)
-  Lemma size_big_nat : 
+  Lemma size_big_nat :
     forall {X : Type} (F : nat -> seq X) (t1 t2 : nat),
       \sum_(t1 <= t < t2) size (F t) =
       size (\cat_(t1 <= t < t2) F t).
@@ -180,10 +180,10 @@ Section BigCatNatLemmas.
       elim: Δ T1_LT => [|Δ IHΔ] T1_LT.
       { by rewrite addn0 !big_geq => //. }
       { rewrite addnS !big_nat_recr => //=; try by rewrite leq_addr.
-        by rewrite size_cat IHΔ => //; lia. }         
+        by rewrite size_cat IHΔ => //; lia. }
     - by rewrite !big_geq => //.
-  Qed.      
-  
+  Qed.
+
 End BigCatNatLemmas.
 
 
@@ -197,13 +197,13 @@ Section BigCatLemmas.
   (** ...and a function [f] that, given an index [X], yields a sequence of [Y]. *)
   Variable f : X -> seq Y.
 
-  (** First, we show that the concatenation comprises all the elements of each sequence; 
-      i.e. any element contained in one of the sequences will also be an element of the 
+  (** First, we show that the concatenation comprises all the elements of each sequence;
+      i.e. any element contained in one of the sequences will also be an element of the
       result of the concatenation. *)
   Lemma mem_bigcat :
-      forall x y s, 
+      forall x y s,
       x \in s ->
-      y \in f x -> 
+      y \in f x ->
       y \in \cat_(x <- s) f x.
   Proof.
     move=> x y s INs INfx.
@@ -214,7 +214,7 @@ Section BigCatLemmas.
     - by apply /orP; right; apply IHs.
   Qed.
 
-  (** Conversely, we prove that any element belonging to a concatenation of sequences 
+  (** Conversely, we prove that any element belonging to a concatenation of sequences
       must come from one of the sequences. *)
   Lemma mem_bigcat_exists :
     forall {P} s y,
@@ -234,11 +234,11 @@ Section BigCatLemmas.
       by rewrite in_cons; apply /orP; right.
   Qed.
 
-  (** Next, we show that a map and filter operation can be done either 
+  (** Next, we show that a map and filter operation can be done either
       before or after a concatenation, leading to the same result. *)
   Lemma bigcat_filter_eq_filter_bigcat :
-    forall xss P, 
-      [seq x <- \cat_(xs <- xss) f xs | P x]  =        
+    forall xss P,
+      [seq x <- \cat_(xs <- xss) f xs | P x]  =
       \cat_(xs <- xss) [seq x <- f xs | P x] .
   Proof.
     move=> xss P.
@@ -247,7 +247,7 @@ Section BigCatLemmas.
     - by rewrite !big_cons filter_cat IHxss.
   Qed.
 
-  (** In this section, we show how we can preserve uniqueness of the elements 
+  (** In this section, we show how we can preserve uniqueness of the elements
       (i.e. the absence of a duplicate) over a concatenation of sequences. *)
   Section BigCatDistinctElements.
 
@@ -260,12 +260,12 @@ Section BigCatLemmas.
     (** ... assume that there are no duplicates in each of the possible
         sequences to concatenate... *)
     Hypothesis H_uniq_f : forall x, P x -> uniq (f x).
-    
+
     (** ...and that there are no elements in common between the sequences. *)
     Hypothesis H_no_elements_in_common :
       forall x y z,
         x \in f y -> x \in f z -> y = z.
-    
+
     (** We prove that the concatenation will yield a sequence with unique elements. *)
     Lemma bigcat_uniq :
         uniq xs ->
@@ -287,26 +287,26 @@ Section BigCatLemmas.
 
   End BigCatDistinctElements.
 
-  (** In this section, we show some properties of the concatenation of 
+  (** In this section, we show some properties of the concatenation of
       sequences in combination with a function [g] that cancels [f]. *)
   Section BigCatWithCancelFunctions.
 
     (** Consider a function [g]... *)
     Variable g : Y -> X.
 
-    (** ... and assume that [g] can cancel [f] starting from an element of 
+    (** ... and assume that [g] can cancel [f] starting from an element of
         the sequence [f x]. *)
     Hypothesis H_g_cancels_f : forall x y, y \in f x -> g y = x.
 
-    (** First, we show that no element of a sequence [f x1] can be fed into 
-        [g] and obtain an element [x2] which differs from [x1]. Hence, filtering 
+    (** First, we show that no element of a sequence [f x1] can be fed into
+        [g] and obtain an element [x2] which differs from [x1]. Hence, filtering
         by this condition always leads to the empty sequence. *)
     Lemma seq_different_elements_nil :
       forall x1 x2,
         x1 != x2 ->
         [seq x <- f x1 | g x == x2] = [::].
     Proof.
-      move => x1 x2 => /negP NEQ. 
+      move => x1 x2 => /negP NEQ.
       apply filter_in_pred0.
       move => y IN; apply/negP => /eqP EQ2.
       apply: NEQ; apply/eqP.
@@ -314,15 +314,15 @@ Section BigCatLemmas.
       by rewrite -EQ1 -EQ2.
     Qed.
 
-    (** Finally, assume we are given an element [y] which is contained in a 
-        duplicate-free sequence [xs]. Then, [f] is applied to each element of 
-        [xs], but only the elements for which [g] yields [y] are kept. In this 
+    (** Finally, assume we are given an element [y] which is contained in a
+        duplicate-free sequence [xs]. Then, [f] is applied to each element of
+        [xs], but only the elements for which [g] yields [y] are kept. In this
         scenario, concatenating the resulting sequences will always lead to [f y]. *)
     Lemma bigcat_seq_uniqK :
       forall y xs,
         y \in xs ->
-        uniq xs -> 
-        \cat_(x <- xs) [seq x' <- f x | g x' == y] = f y. 
+        uniq xs ->
+        \cat_(x <- xs) [seq x' <- f x | g x' == y] = f y.
     Proof.
       move=> y xs IN UNI.
       elim: xs IN UNI => [//|x' xs IHxs] IN UNI.
@@ -344,16 +344,16 @@ Section BigCatLemmas.
         move: UNI; rewrite cons_uniq => /andP [NIN _].
         by move: NIN => /negP NIN; apply: NIN. }
     Qed.
-    
+
   End BigCatWithCancelFunctions.
 
 End BigCatLemmas.
 
 (** In this section, we show that the number of elements of the result
-    of a nested mapping and concatenation operation is independent from 
+    of a nested mapping and concatenation operation is independent from
     the order in which the concatenations are performed. *)
 Section BigCatNestedCount.
-  
+
   (** Consider any three types supporting equality comparisons... *)
   Variable X Y Z : eqType.
 
@@ -363,25 +363,25 @@ Section BigCatNestedCount.
   (** and a predicate [P]. *)
   Variable P : pred Z.
 
-  (** Assume that, given two sequences [xs] and [ys], their elements are fed to 
-      [F] in a pair-wise fashion. The resulting lists are then concatenated. 
-      The following lemma shows that, when the operation described above is performed, 
-      the number of elements respecting [P] in the resulting list is the same, regardless 
+  (** Assume that, given two sequences [xs] and [ys], their elements are fed to
+      [F] in a pair-wise fashion. The resulting lists are then concatenated.
+      The following lemma shows that, when the operation described above is performed,
+      the number of elements respecting [P] in the resulting list is the same, regardless
       of the order in which [xs] and [ys] are combined. *)
   Lemma bigcat_count_exchange :
     forall xs ys,
       count P (\cat_(x <- xs) \cat_(y <- ys) F x y) =
-      count P (\cat_(y <- ys) \cat_(x <- xs) F x y). 
+      count P (\cat_(y <- ys) \cat_(x <- xs) F x y).
   Proof.
     elim=> [|x0 seqX IHxs]; elim=> [|y0 seqY IHys].
     { by rewrite !big_nil. }
-    { by rewrite big_cons count_cat -IHys !big_nil. } 
-    { by rewrite big_cons count_cat IHxs !big_nil. } 
+    { by rewrite big_cons count_cat -IHys !big_nil. }
+    { by rewrite big_cons count_cat IHxs !big_nil. }
     { rewrite !big_cons !count_cat.
       apply/eqP; rewrite -!addnA eqn_add2l.
       rewrite IHxs -IHys !big_cons !count_cat.
       rewrite addnC -!addnA eqn_add2l addnC eqn_add2l.
-      by rewrite IHxs. } 
+      by rewrite IHxs. }
   Qed.
 
 End BigCatNestedCount.

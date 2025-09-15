@@ -74,7 +74,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     - rewrite !cons_uniq.
       apply/andP; split=> [|//].
       rewrite in_cons negb_or; apply/andP; split=> [|//].
-      by rewrite neq_ltn; apply/orP; left. 
+      by rewrite neq_ltn; apply/orP; left.
     - intros t EQ; move: EQ; rewrite !in_cons.
       move => /orP[/eqP EQ | /orP[/eqP EQ|//]].
       + rewrite EQ; clear EQ.

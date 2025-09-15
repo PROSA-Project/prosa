@@ -36,19 +36,19 @@ Section FullyPreemptiveModel.
       j = 0] ... *)
   Lemma job_max_nps_is_0 :
     forall j,
-      job_cost j = 0 -> 
+      job_cost j = 0 ->
       job_max_nonpreemptive_segment j = 0.
   Proof.
     move=> j H1.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
-            /job_preemption_points. 
+            /job_preemption_points.
     by rewrite H1.
   Qed.
 
-  (** ... or ε when [job_cost j > 0]. *)  
+  (** ... or ε when [job_cost j > 0]. *)
   Lemma job_max_nps_is_ε :
     forall j,
-      job_cost j > 0 -> 
+      job_cost j > 0 ->
       job_max_nonpreemptive_segment j = ε.
   Proof.
     intros ? POS.
@@ -62,7 +62,7 @@ Section FullyPreemptiveModel.
       + by rewrite -pred_Sn.
       + by rewrite ltnS.
     - by apply distances_of_iota_ε.
-  Qed.    
-  
+  Qed.
+
 End FullyPreemptiveModel.
 Global Hint Resolve valid_fully_preemptive_model : basic_rt_facts.

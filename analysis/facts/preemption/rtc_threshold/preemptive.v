@@ -20,7 +20,7 @@ Section TaskRTCThresholdFullyPreemptiveModel.
   (** Assume that jobs and tasks are fully preemptive. *)
   #[local] Existing Instance fully_preemptive_job_model.
   #[local] Existing Instance fully_preemptive_task_model.
-  #[local] Existing Instance fully_preemptive_rtc_threshold.  
+  #[local] Existing Instance fully_preemptive_rtc_threshold.
 
   (** Next, consider any arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -30,7 +30,7 @@ Section TaskRTCThresholdFullyPreemptiveModel.
     arrivals_have_valid_job_costs arr_seq.
 
   (** Then, we prove that [task_rtct] function
-      defines a valid task's run to completion threshold. *)     
+      defines a valid task's run to completion threshold. *)
   Lemma fully_preemptive_valid_task_run_to_completion_threshold :
     forall tsk, valid_task_run_to_completion_threshold arr_seq tsk.
   Proof.
@@ -40,6 +40,6 @@ Section TaskRTCThresholdFullyPreemptiveModel.
       apply leq_trans with (job_cost j) => //.
       by move: TSK => /eqP <-; apply H_valid_job_cost.
   Qed.
-    
+
 End TaskRTCThresholdFullyPreemptiveModel.
 Global Hint Resolve fully_preemptive_valid_task_run_to_completion_threshold : basic_rt_facts.

@@ -5,7 +5,7 @@ Require Export prosa.analysis.facts.behavior.all.
     instant up to a given horizon. *)
 
 Section SchedulePrefixMap.
-  
+
   (** For any type of jobs and... *)
   Context {Job : JobType}.
 
@@ -97,7 +97,7 @@ Section SchedulePrefixMap.
       apply H_f_grows_Q => //.
       by apply prefix_map_property_invariance.
     Qed.
-    
+
   End PointwiseProperty.
 
 End SchedulePrefixMap.

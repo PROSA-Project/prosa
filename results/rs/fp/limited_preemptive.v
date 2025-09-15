@@ -205,7 +205,7 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
     move=> R SOL js ARRs TSKs.
     have VAL1 : valid_preemption_model arr_seq sched.
     { apply valid_fixed_preemption_points_model_lemma => //.
-      by apply H_valid_model_with_fixed_preemption_points. }    
+      by apply H_valid_model_with_fixed_preemption_points. }
     have [ZERO|POS] := posnP (job_cost js);
       first by rewrite /job_response_time_bound /completed_by ZERO.
     have READ : work_bearing_readiness arr_seq sched

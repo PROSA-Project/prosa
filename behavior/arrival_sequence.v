@@ -47,7 +47,7 @@ Section ValidArrivalSequence.
   (** Assume that job arrival times are known. *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
-  
+
   (** Consider any job arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 
@@ -118,9 +118,9 @@ Section ArrivalSequencePrefix.
   (** ... the list of jobs that arrived strictly before time t, ... *)
   Definition arrivals_before (t : instant) := arrivals_between 0 t.
 
-  (** ... and the list of jobs that arrive in the interval <<[t1, t2)>> and 
+  (** ... and the list of jobs that arrive in the interval <<[t1, t2)>> and
    satisfy a certain predicate [P]. *)
   Definition arrivals_between_P (P : Job -> bool) (t1 t2 : instant) :=
-    [seq j <- arrivals_between t1 t2 | P j].  
-  
+    [seq j <- arrivals_between t1 t2 | P j].
+
 End ArrivalSequencePrefix.

@@ -6,7 +6,7 @@ Require Import prosa.model.task.absolute_deadline.
 (** In the following section we define the notion of schedulable
     task. *)
 Section Task.
-  
+
   (** Consider any type of tasks, ... *)
   Context {Task : TaskType}.
 
@@ -46,12 +46,12 @@ Section Task.
       arrives_in arr_seq j ->
       job_of_task tsk j ->
       job_meets_deadline sched j.
-  
+
 End Task.
 
 (** In this section we infer schedulability from a response-time bound
     of a task. *)
-Section Schedulability.  
+Section Schedulability.
 
   (** Consider any type of tasks, ... *)
   Context {Task : TaskType}.
@@ -65,7 +65,7 @@ Section Schedulability.
 
   (** ... and any kind of processor state. *)
   Context {PState : ProcessorState Job}.
-  
+
   (** Consider any job arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
 
@@ -105,7 +105,7 @@ End Schedulability.
     given schedule and one w.r.t. all jobs that arrive in a given
     arrival sequence. *)
 Section AllDeadlinesMet.
-  
+
   (** Consider any given type of jobs... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
@@ -131,7 +131,7 @@ Section AllDeadlinesMet.
   Section DeadlinesOfArrivals.
 
     (** Given an arbitrary job arrival sequence ... *)
-    Variable arr_seq : arrival_sequence Job.  
+    Variable arr_seq : arrival_sequence Job.
 
     (** ... we say that all arrivals meet their deadline if every job
        that arrives at some point in time meets its deadline. Note
@@ -158,5 +158,5 @@ Section AllDeadlinesMet.
     apply DL_ARR_MET.
     by apply (FROM_ARR _ t).
   Qed.
-    
+
 End AllDeadlinesMet.

@@ -472,7 +472,7 @@ Section JLFPInstantiation.
       Lemma not_interference_implies_scheduled :
         ~~ interference j t -> receives_service_at sched j t.
       Proof.
-        rewrite !negb_or /another_hep_job_interference => /andP [/andP [HYP1 HYP2] /hasPn HYP3].        
+        rewrite !negb_or /another_hep_job_interference => /andP [/andP [HYP1 HYP2] /hasPn HYP3].
         move: HYP1; rewrite /is_blackout negbK => SUP; apply ideal_progress_inside_supplies => //.
         move: HYP2; rewrite negb_and negbK => /orP [SERV | /hasPn SI].
         { by apply service_at_implies_scheduled_at; apply: served_at_and_receives_service_consistent => //. }

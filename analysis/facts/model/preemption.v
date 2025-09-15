@@ -218,9 +218,9 @@ Section PreemptionTimes.
         scheduled_at sched j' t' ->
         j != j' ->
         t <= t' ->
-        exists pt, 
-          preemption_time arr_seq sched pt 
-          /\ t < pt <= t' 
+        exists pt,
+          preemption_time arr_seq sched pt
+          /\ t < pt <= t'
           /\ scheduled_at sched j' pt.
   Proof.
     move=> j t SCHED j'.
@@ -327,9 +327,9 @@ Section PreemptionFacts.
       t1 <= t2 ->
       preemption_time arr_seq sched t1 ->
       scheduled_at sched j t2 ->
-      exists ptst, 
-        t1 <= ptst <= t2 
-        /\ preemption_time arr_seq sched ptst 
+      exists ptst,
+        t1 <= ptst <= t2
+        /\ preemption_time arr_seq sched ptst
         /\ scheduled_at sched j ptst.
   Proof.
     move => j t1 t2 GE PREEMPT SCHED.

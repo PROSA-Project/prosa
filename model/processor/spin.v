@@ -57,7 +57,7 @@ Section State.
       end.
 
   End Service.
-  
+
   (** Finally, we connect the above definitions with the generic Prosa
       interface for abstract processor states. *)
   Program Definition pstate_instance : ProcessorState Job :=

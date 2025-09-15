@@ -255,7 +255,7 @@ Proof.
       inversion Ra; inversion Rb.
       set (a := @task_deadline_T N tsk') in *.
       set (b := @task_deadline_T N tsk1') in *.
-      by apply refine_ltn; [apply refinesP; refines_apply | done].    
+      by apply refine_ltn; [apply refinesP; refines_apply | done].
 Qed.
 
 (** Next, we prove a refinement for the [check_point_NP] function. *)

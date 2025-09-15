@@ -6,7 +6,7 @@ Require Export prosa.analysis.facts.behavior.service.
     conversely a notion of a lack of progress. *)
 
 Section Progress.
-  
+
   (** Consider any type of jobs with a known cost... *)
   Context {Job : JobType}.
   Context `{JobCost Job}.

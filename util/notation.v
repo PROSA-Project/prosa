@@ -5,7 +5,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
 Definition constant {X Y : Type} (c : Y) : (X -> Y) := fun _ => c.
 
 (** We define a notation for the big concatenation operator.*)
-  
+
  Reserved Notation "\cat_ ( m <= i < n ) F"
   (at level 41, F at level 41, i, m, n at level 50,
    format "'[' \cat_ ( m <= i < n ) '/ ' F ']'").

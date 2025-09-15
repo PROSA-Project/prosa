@@ -1,4 +1,4 @@
-Require Export prosa.model.preemption.parameter. 
+Require Export prosa.model.preemption.parameter.
 
 (** * Preemption Model Compliance *)
 
@@ -13,16 +13,16 @@ Section ScheduleWithLimitedPreemptions.
 
   (** ... any processor model, ... *)
   Context {PState : ProcessorState Job}.
-  
+
   (** ... and any preemption model. *)
   Context `{JobPreemptable Job}.
 
   (** Consider any arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
-  
+
   (** ... and a schedule of the jobs in the arrival sequence. *)
   Variable sched : schedule PState.
-  
+
   (** We say that a schedule respects the preemption model given by
       [job_preemptable] if non-preemptable jobs remain scheduled. *)
   Definition schedule_respects_preemption_model :=
@@ -30,5 +30,5 @@ Section ScheduleWithLimitedPreemptions.
       arrives_in arr_seq j ->
       ~~ job_preemptable j (service sched j t) ->
       scheduled_at sched j t.
-  
+
 End ScheduleWithLimitedPreemptions.
