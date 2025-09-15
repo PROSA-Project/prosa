@@ -78,6 +78,11 @@ KEYWORDS_FOR_INDENTATION_CHECK = re.compile(
     re.MULTILINE | re.DOTALL,
 )
 
+QUANTIFIER_FOR_INDENTATION_CHECK = re.compile(
+    r"\s+(forall|exists)[^,\n]+,\n\s*([^ \n]+)",
+    re.MULTILINE | re.DOTALL,
+)
+
 INDENT_SPACES = 2
 
 
@@ -90,11 +95,11 @@ def lint_file(opts, fpath):
     comments = Comments(src)
     lineno = LineNumbers(src)
 
-    def violations_of(regex):
+    def matches_of(regex):
         return (m for m in regex.finditer(src) if m.span() not in comments)
 
     for i, (rule, msg, shift) in enumerate(ISSUES):
-        for m in violations_of(rule):
+        for m in matches_of(rule):
             if is_excepted(m):
                 continue
             rule = f" [rule: {i + 1}]" if opts.show_rule_number else ""
@@ -103,13 +108,12 @@ def lint_file(opts, fpath):
                     m.span("issue"),
                     f"{fpath}:{lineno[m.span('issue')[0]]}: coding style{rule}: {msg}",
                     shift,
+                    0,
                 )
             )
 
     expected_indent = 0
-    for m in KEYWORDS_FOR_INDENTATION_CHECK.finditer(src):
-        if m.span() in comments:
-            continue
+    for m in matches_of(KEYWORDS_FOR_INDENTATION_CHECK):
         s, e = m.span("section")
         if s == -1:
             s, e = m.span("kw")
@@ -124,18 +128,36 @@ def lint_file(opts, fpath):
                     (s, e),
                     f"{fpath}:{lineno[s]}: bad indentation (expected {expected_indent}, found {indentation})",
                     0,
+                    0,
                 )
             )
         if src[s:e] == "Section":
             expected_indent += INDENT_SPACES
         assert expected_indent >= 0
 
-    for i, ((s, e), msg, offset_shift) in enumerate(sorted(issues)):
+    for m in matches_of(QUANTIFIER_FOR_INDENTATION_CHECK):
+        quantifier_indentation = lineno.offset_within_line(m.span(1)[0])
+        expression_indentation = lineno.offset_within_line(m.span(2)[0])
+        if quantifier_indentation + INDENT_SPACES != expression_indentation:
+            issues.append(
+                (
+                    m.span(2),
+                    f"{fpath}:{lineno[m.span(2)[0]]}: bad indentation after "
+                    f"{m.group(1)} (expected {quantifier_indentation + INDENT_SPACES}, "
+                    f"found {expression_indentation})",
+                    0,
+                    1,
+                )
+            )
+
+    for i, ((s, e), msg, offset_shift, context_above) in enumerate(sorted(issues)):
         print(msg, file=sys.stderr)
         if opts.explain:
-            line = lineno.line_for_offset(s)
             indent = "  "
-            print(f"\n{indent}{line}", end="", file=sys.stderr)
+            ln = lineno[s]
+            print(file=sys.stderr)
+            for k in range(max(0, ln - context_above), ln + 1):
+                print(f"{indent}{lineno.line(k)}", end="", file=sys.stderr)
             space = " " * lineno.offset_within_line(s)
             marker = "^" * (e - s)
             print(f"{indent}{space}{marker}\n", file=sys.stderr)

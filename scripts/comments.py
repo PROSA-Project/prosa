@@ -103,6 +103,13 @@ class LineNumbers:
     def lines(self) -> Iterator[str]:
         return (self.src[s:e] for s, e in self.ranges)
 
+    @cached_property
+    def _lines(self) -> list[str]:
+        return list(self.lines())
+
+    def line(self, line_number: int) -> str:
+        return self._lines[line_number - 1]
+
     def line_containing(self, pos: int) -> tuple[int, tuple[int, int]]:
         where = self.ranges.lookup(pos)
         if where is not None:
