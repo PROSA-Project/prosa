@@ -36,9 +36,9 @@ Section ValidTaskOffset.
       arrives exactly at the offset. *)
   Definition job_released_at_offset (tsk : Task) :=
     exists j',
-      arrives_in arr_seq j' /\
-      job_task j' = tsk /\
-      job_arrival j' = task_offset tsk.
+      arrives_in arr_seq j'
+      /\ job_task j' = tsk
+      /\ job_arrival j' = task_offset tsk.
 
   (** An offset is valid iff it satisfies both of the above conditions. *)
   Definition valid_offset (tsk : Task) := no_jobs_before_offset tsk /\ job_released_at_offset tsk.

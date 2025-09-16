@@ -61,13 +61,13 @@ Section Optimality.
       met. *)
   Theorem EDF_WC_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
-        valid_schedule any_sched arr_seq /\
-        all_deadlines_of_arrivals_met arr_seq any_sched) ->
+        valid_schedule any_sched arr_seq
+        /\ all_deadlines_of_arrivals_met arr_seq any_sched) ->
     exists edf_wc_sched : schedule (ideal.processor_state Job),
-      valid_schedule edf_wc_sched arr_seq /\
-      all_deadlines_of_arrivals_met arr_seq edf_wc_sched /\
-      work_conserving arr_seq edf_wc_sched /\
-      EDF_schedule edf_wc_sched.
+      valid_schedule edf_wc_sched arr_seq
+      /\ all_deadlines_of_arrivals_met arr_seq edf_wc_sched
+      /\ work_conserving arr_seq edf_wc_sched
+      /\ EDF_schedule edf_wc_sched.
   Proof.
     move=> [sched [[COME READY] DL_ARR_MET]].
     move: (all_deadlines_met_in_valid_schedule _ _ COME DL_ARR_MET) => DL_MET.
@@ -106,13 +106,13 @@ Section Optimality.
       [EDF_WC_optimality] theorem. *)
   Corollary EDF_priority_compliant_WC_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
-        valid_schedule any_sched arr_seq /\
-        all_deadlines_of_arrivals_met arr_seq any_sched) ->
+        valid_schedule any_sched arr_seq
+        /\ all_deadlines_of_arrivals_met arr_seq any_sched) ->
     exists priority_compliant_sched : schedule (ideal.processor_state Job),
-      valid_schedule priority_compliant_sched arr_seq /\
-        all_deadlines_of_arrivals_met arr_seq priority_compliant_sched /\
-        work_conserving arr_seq priority_compliant_sched /\
-        respects_JLFP_policy_at_preemption_point arr_seq priority_compliant_sched (EDF Job).
+      valid_schedule priority_compliant_sched arr_seq
+      /\ all_deadlines_of_arrivals_met arr_seq priority_compliant_sched
+      /\ work_conserving arr_seq priority_compliant_sched
+      /\ respects_JLFP_policy_at_preemption_point arr_seq priority_compliant_sched (EDF Job).
   Proof.
     move /EDF_WC_optimality => [edf_sched [[ARR READY] [DL_MET [WC EDF]]]].
     exists edf_sched.
@@ -148,13 +148,12 @@ Section WeakOptimality.
       scheduled, as ensured by the last clause). *)
   Theorem weak_EDF_optimality :
     exists edf_sched : schedule (ideal.processor_state Job),
-      jobs_must_arrive_to_execute edf_sched /\
-        completed_jobs_dont_execute edf_sched /\
-        all_deadlines_met edf_sched /\
-        EDF_schedule edf_sched /\
-        forall j,
-          (exists t,  scheduled_at any_sched j t) <->
-            (exists t', scheduled_at edf_sched j t').
+      jobs_must_arrive_to_execute edf_sched
+      /\ completed_jobs_dont_execute edf_sched
+      /\ all_deadlines_met edf_sched
+      /\ EDF_schedule edf_sched
+      /\ forall j, (exists t, scheduled_at any_sched j t)
+             <-> (exists t', scheduled_at edf_sched j t').
   Proof.
     set sched' := edf_transform any_sched.
     exists sched'. repeat split.

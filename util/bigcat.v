@@ -170,8 +170,8 @@ Section BigCatNatLemmas.
       summation of sizes of each element of the sequence. *)
   Lemma size_big_nat :
     forall {X : Type} (F : nat -> seq X) (t1 t2 : nat),
-      \sum_(t1 <= t < t2) size (F t) =
-      size (\cat_(t1 <= t < t2) F t).
+      \sum_(t1 <= t < t2) size (F t)
+      = size (\cat_(t1 <= t < t2) F t).
   Proof.
     move=> X F t1 t2.
     specialize (leq_total t1 t2) => /orP [T1_LT | T2_LT].
@@ -238,8 +238,8 @@ Section BigCatLemmas.
       before or after a concatenation, leading to the same result. *)
   Lemma bigcat_filter_eq_filter_bigcat :
     forall xss P,
-      [seq x <- \cat_(xs <- xss) f xs | P x]  =
-      \cat_(xs <- xss) [seq x <- f xs | P x] .
+      [seq x <- \cat_(xs <- xss) f xs | P x]
+      = \cat_(xs <- xss) [seq x <- f xs | P x].
   Proof.
     move=> xss P.
     elim: xss => [|a xss IHxss].
@@ -370,8 +370,8 @@ Section BigCatNestedCount.
       of the order in which [xs] and [ys] are combined. *)
   Lemma bigcat_count_exchange :
     forall xs ys,
-      count P (\cat_(x <- xs) \cat_(y <- ys) F x y) =
-      count P (\cat_(y <- ys) \cat_(x <- xs) F x y).
+      count P (\cat_(x <- xs) \cat_(y <- ys) F x y)
+      = count P (\cat_(y <- ys) \cat_(x <- xs) F x y).
   Proof.
     elim=> [|x0 seqX IHxs]; elim=> [|y0 seqY IHys].
     { by rewrite !big_nil. }

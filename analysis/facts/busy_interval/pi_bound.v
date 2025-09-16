@@ -99,9 +99,9 @@ Section PriorityInversionIsBounded.
       rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat.
       by rewrite leq_sum //; move=> t _; destruct (priority_inversion). }
     have [ppt [PPT' /andP[GE LE]]]: exists ppt : instant,
-                                      preemption_time arr_seq sched ppt /\
-                                      t1 <= ppt <=
-                                      t1 + max_lp_nonpreemptive_segment arr_seq j t1
+                                      preemption_time arr_seq sched ppt
+                                      /\ t1 <= ppt
+                                        <= t1 + max_lp_nonpreemptive_segment arr_seq j t1
       by exact: preemption_time_exists.
     apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt).
     - by apply: priority_inversion_occurs_only_till_preemption_point =>//.

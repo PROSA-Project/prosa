@@ -219,8 +219,8 @@ Section MaximalArrivalSequence.
         destruct supremum eqn:SUP; last by  move:(supremum_none _ _ SUP); rewrite map_cons.
         eapply (supremum_spec _ leqnn leq_total leq_trans _ _ SUP).
         rewrite /suffix_sum prefix_up_to_size /max_arrivals_at.
-        have -> : \sum_(t.+1 - Δ <= i < t.+1) nth 0 (maximal_arrival_prefix tsk i) i =
-                 \sum_(t.+1 - Δ <= i < t.+1) nth 0 (maximal_arrival_prefix tsk t) i.
+        have -> : \sum_(t.+1 - Δ <= i < t.+1) nth 0 (maximal_arrival_prefix tsk i) i
+                 = \sum_(t.+1 - Δ <= i < t.+1) nth 0 (maximal_arrival_prefix tsk t) i.
         { apply eq_big_nat => i RANGE.
           by apply n_arrivals_at_prefix_inclusion; lia. }
         set f := fun x => max_arrivals _ x.+1 - \sum_(t.+1-x <= i < t.+1) nth 0 (maximal_arrival_prefix _ t) i.

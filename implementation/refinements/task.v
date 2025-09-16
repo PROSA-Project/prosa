@@ -38,11 +38,11 @@ Section Definitions.
   (** Further, we define the equality for two generic tasks as the equality
         of each attribute. *)
   Definition task_eqdef_T (t1 t2 : task_T) :=
-    (task_id_T t1 == task_id_T t2)%C &&
-    (task_cost_T t1 == task_cost_T t2)%C &&
-    (task_arrival_T t1 == task_arrival_T t2)%C &&
-    (task_deadline_T t1 == task_deadline_T t2)%C &&
-    (task_priority_T t1 == task_priority_T t2)%C.
+    (task_id_T t1 == task_id_T t2)%C
+    && (task_cost_T t1 == task_cost_T t2)%C
+    && (task_arrival_T t1 == task_arrival_T t2)%C
+    && (task_deadline_T t1 == task_deadline_T t2)%C
+    && (task_priority_T t1 == task_priority_T t2)%C.
 
   (** Next, we define a helper function that convert a minimum inter-arrival time
         to an arrival curve prefix. *)

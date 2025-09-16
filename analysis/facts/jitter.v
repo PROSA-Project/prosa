@@ -169,8 +169,8 @@ Section JitterPropagationFacts.
       one intuitively might expect. *)
   Lemma jitter_scheduled_jobs_at_equiv :
     forall t j,
-      (j \in scheduled_jobs_at rel_seq sched t) =
-      (j \in scheduled_jobs_at arr_seq sched t).
+      (j \in scheduled_jobs_at rel_seq sched t)
+      = (j \in scheduled_jobs_at arr_seq sched t).
   Proof.
     move=> j t.
     have SRC := @valid_schedule_jobs_come_from_arrival_sequence _ _ sched _

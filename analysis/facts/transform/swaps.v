@@ -62,8 +62,7 @@ Section SwappedFacts.
      schedule, then it is found at t1 in the new schedule. *)
   Lemma swap_job_scheduled_t1 :
     forall j,
-      scheduled_at sched' j t1 =
-      scheduled_at sched j t2.
+      scheduled_at sched' j t1 = scheduled_at sched j t2.
   Proof.
     move=> j.
     rewrite /scheduled_at /sched' /swapped /replace_at.
@@ -76,8 +75,7 @@ Section SwappedFacts.
      scheduled at t2 after the swap. *)
   Lemma swap_job_scheduled_t2 :
     forall j,
-      scheduled_at sched' j t2 =
-      scheduled_at sched j t1.
+      scheduled_at sched' j t2 = scheduled_at sched j t1.
   Proof.
     move=> j.
     rewrite /sched' /scheduled_at /swapped /replace_at.
@@ -92,8 +90,7 @@ Section SwappedFacts.
     forall j t,
       t1 != t ->
       t2 != t ->
-      scheduled_at sched' j t =
-      scheduled_at sched j t.
+      scheduled_at sched' j t = scheduled_at sched j t.
   Proof.
     move=> j t /eqP NOT_t1 /eqP NOT_t2.
     rewrite /scheduled_at.
@@ -106,10 +103,8 @@ Section SwappedFacts.
     forall j t,
       scheduled_at sched' j t ->
       scheduled_at sched' j t = scheduled_at sched j t
-      \/
-      t = t1 /\ scheduled_at sched' j t = scheduled_at sched j t2
-      \/
-      t = t2 /\ scheduled_at sched' j t = scheduled_at sched j t1.
+      \/ (t = t1 /\ scheduled_at sched' j t = scheduled_at sched j t2)
+      \/ (t = t2 /\ scheduled_at sched' j t = scheduled_at sched j t1).
   Proof.
     move=> j t SCHED.
     destruct (t1 == t) eqn:T1.
@@ -149,10 +144,8 @@ Section SwappedFacts.
     forall j t,
       scheduled_at sched j t ->
       scheduled_at sched' j t = scheduled_at sched j t
-      \/
-      t = t1 /\ scheduled_at sched' j t2 = scheduled_at sched j t
-      \/
-      t = t2 /\ scheduled_at sched' j t1 = scheduled_at sched j t.
+      \/ (t = t1 /\ scheduled_at sched' j t2 = scheduled_at sched j t)
+      \/ (t = t2 /\ scheduled_at sched' j t1 = scheduled_at sched j t).
   Proof.
     move=> j t SCHED.
     destruct (t1 == t) eqn:T1.

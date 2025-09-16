@@ -110,8 +110,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       is_in_search_space A ->
       exists F,
         A + F >= blocking_bound A + (task_rbf (A + ε) - (task_cost tsk - ε))
-                + bound_on_athep_workload ts tsk A (A + F) /\
-        R >= F + (task_cost tsk - ε).
+                + bound_on_athep_workload ts tsk A (A + F)
+        /\ R >= F + (task_cost tsk - ε).
 
   (** Now, we can leverage the results for the abstract model with bounded nonpreemptive segments
      to establish a response-time bound for the more concrete model of fully nonpreemptive scheduling. *)

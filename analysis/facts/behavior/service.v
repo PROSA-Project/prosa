@@ -196,8 +196,8 @@ Section UnitService.
         t0 <= t1 <= t2 ->
         service_during sched j t0 t1 <= s < service_during sched j t0 t2 ->
       exists t,
-        t1 <= t < t2 /\
-        service_during sched j t0 t = s.
+        t1 <= t < t2
+        /\ service_during sched j t0 t = s.
     Proof.
       move=> t0 t1 t2 s /andP [t0t1 t1t2] SERV.
       apply: exists_intermediate_point => //.
@@ -214,8 +214,8 @@ Section UnitService.
        units of service. *)
     Corollary exists_intermediate_service :
       exists t',
-        t' < t /\
-        service sched j t' = s.
+        t' < t
+        /\ service sched j t' = s.
     Proof.
       apply: (exists_intermediate_point _ service_is_unit_growth_function 0) => //.
       by rewrite service0.
@@ -356,8 +356,8 @@ Section RelationToScheduled.
       service_during sched j t1 t2 > 0
       <->
       exists t,
-        t1 <= t < t2 /\
-        service_at sched j t > 0.
+        t1 <= t < t2
+        /\ service_at sched j t > 0.
   Proof.
     move=> t1 t2.
     split=> [|[t [titv nz_serv]]].
@@ -373,8 +373,8 @@ Section RelationToScheduled.
     forall t1 t2,
       service_during sched j t1 t2 > 0 ->
       exists t,
-        t1 <= t < t2 /\
-        scheduled_at sched j t.
+        t1 <= t < t2
+        /\ scheduled_at sched j t.
   Proof.
     move=> t1 t2; rewrite service_during_service_at => -[t' [TIMES SERVICED]].
     exists t'; split=> //; exact: service_at_implies_scheduled_at.
@@ -463,9 +463,7 @@ Section RelationToScheduled.
        positive cumulative service during the interval ... *)
     Lemma scheduled_implies_cumulative_service :
       forall t1 t2,
-        (exists t,
-            t1 <= t < t2 /\
-             scheduled_at sched j t) ->
+        (exists t, t1 <= t < t2 /\ scheduled_at sched j t) ->
         service_during sched j t1 t2 > 0.
     Proof.
       move=> t1 t2 [t [titv sch]]; rewrite service_during_service_at.
@@ -475,9 +473,7 @@ Section RelationToScheduled.
     (** ... which again applies to total service, too. *)
     Corollary scheduled_implies_nonzero_service :
       forall t,
-        (exists t',
-            t' < t /\
-            scheduled_at sched j t') ->
+        (exists t', t' < t /\ scheduled_at sched j t') ->
         service sched j t > 0.
     Proof.
       move=> t.
@@ -604,8 +600,8 @@ Section RelationToScheduled.
     (** We show that job [j] receives service at some point [t < t1]
        iff [j] receives service at some point [t' < t2]. *)
     Lemma same_service_implies_serviced_at_earlier_times :
-      [exists t : 'I_t1, service_at sched j t > 0] =
-      [exists t' : 'I_t2, service_at sched j t' > 0].
+      [exists t : 'I_t1, service_at sched j t > 0]
+      = [exists t' : 'I_t2, service_at sched j t' > 0].
     Proof.
       apply/idP/idP => /existsP[t serv].
       { by apply/existsP; exists (widen_ord H_t1_le_t2 t). }
@@ -624,8 +620,8 @@ Section RelationToScheduled.
     (** We show that job [j] is scheduled at some point [t < t1] iff [j] is scheduled
        at some point [t' < t2].  *)
     Lemma same_service_implies_scheduled_at_earlier_times :
-      [exists t : 'I_t1, scheduled_at sched j t] =
-      [exists t' : 'I_t2, scheduled_at sched j t'].
+      [exists t : 'I_t1, scheduled_at sched j t]
+      = [exists t' : 'I_t2, scheduled_at sched j t'].
     Proof.
       have CONV B : [exists b: 'I_B, scheduled_at sched j b]
                     = [exists b: 'I_B, service_at sched j b > 0].

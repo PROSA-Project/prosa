@@ -138,8 +138,8 @@ Section ArrivalSequencePrefix.
       forall t1 t t2,
         t1 <= t ->
         t <= t2 ->
-        arrivals_between arr_seq t1 t2 =
-        arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2.
+        arrivals_between arr_seq t1 t2
+        = arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2.
     Proof. by move=> ? ? ? ? ?; rewrite -big_cat_nat. Qed.
 
     (** We also prove a stronger version of the above lemma
@@ -147,8 +147,8 @@ Section ArrivalSequencePrefix.
     Lemma arrivals_P_cat :
       forall P t t1 t2,
         t1 <= t < t2 ->
-        arrivals_between_P arr_seq P t1 t2 =
-        arrivals_between_P arr_seq P t1 t ++ arrivals_between_P arr_seq P t t2.
+        arrivals_between_P arr_seq P t1 t2
+        = arrivals_between_P arr_seq P t1 t ++ arrivals_between_P arr_seq P t t2.
     Proof.
       move=> P t t1 t2.
       by move=> /andP[? ?]; rewrite -filter_cat -arrivals_between_cat// ltnW.
@@ -160,8 +160,8 @@ Section ArrivalSequencePrefix.
       forall j t1 t t2,
         t1 <= t ->
         t <= t2 ->
-        j \in arrivals_between arr_seq t1 t2 =
-        (j \in arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2).
+        j \in arrivals_between arr_seq t1 t2
+        = (j \in arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2).
     Proof. by move=> ? ? ? ? ? ?; rewrite -arrivals_between_cat. Qed.
 
     (** We observe that we can grow the considered interval without

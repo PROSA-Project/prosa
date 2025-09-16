@@ -130,8 +130,8 @@ Section PeriodicLemmas.
   Lemma eq_size_hyp_lt :
     forall n1 n2,
       n1 <= n2 ->
-      size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk) =
-      size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
+      size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk)
+      = size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
   Proof.
     move=> n1 n2 N1_LT.
     have -> : n2 * HP + O_max = n1 * HP + O_max + (n2 - n1) * HP.
@@ -150,8 +150,8 @@ Section PeriodicLemmas.
    [n1] and [n2]. *)
   Lemma eq_size_of_arrivals_in_hyperperiod :
     forall n1 n2,
-      size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk) =
-      size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
+      size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk)
+      = size (jobs_in_hyperperiod ts arr_seq (n2 * HP + O_max) tsk).
   Proof.
     move=> n1 n2.
     case : (boolP (n1 == n2)) => [/eqP EQ | NEQ]; first by rewrite EQ.

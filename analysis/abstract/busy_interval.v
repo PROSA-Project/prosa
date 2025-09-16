@@ -316,8 +316,8 @@ Section AbstractBusyIntervalExists.
           than with the arrival of [j]. *)
       Lemma exists_busy_interval_prefix :
         exists t1,
-          busy_interval_prefix t1 t_busy.+1 /\
-          t1 <= job_arrival j <= t_busy.
+          busy_interval_prefix t1 t_busy.+1
+          /\ t1 <= job_arrival j <= t_busy.
       Proof.
         rename H_j_is_pending into PEND.
         destruct ([exists t:'I_t_busy.+1, quiet_time t]) eqn:EX.

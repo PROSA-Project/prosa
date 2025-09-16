@@ -255,8 +255,8 @@ Section NondecreasingSequence.
         2 <= size xs ->
         first0 xs <= x < last0 xs ->
         exists n,
-          n.+1 < size xs /\
-          xs[|n|] <= x < xs[|n.+1|].
+          n.+1 < size xs
+          /\ xs[|n|] <= x < xs[|n.+1|].
     Proof.
       move=> xs x SIZE LAST.
       have EX: exists n, size xs <= n by exists (size xs). move: EX => [n LE].

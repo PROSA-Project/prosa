@@ -233,8 +233,8 @@ Section NPUniprocessorScheduler.
         rewrite ifT // -pred_Sn.
         move: NP; rewrite /prev_job_nonpreemptive.
         elim: (schedule_up_to policy idle_state t t) => // j.
-        have ->: (service (fun t0 : instant => schedule_up_to policy idle_state t0 t0) j t.+1 =
-                    service (schedule_up_to policy idle_state t) j t.+1) => //.
+        have ->: (service (fun t0 : instant => schedule_up_to policy idle_state t0 t0) j t.+1
+                  = service (schedule_up_to policy idle_state t) j t.+1) => //.
         + rewrite /service.
           apply equal_prefix_implies_same_service_during => t' /andP [_ BOUND].
           rewrite (schedule_up_to_prefix_inclusion _ _ t' t) //.

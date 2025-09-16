@@ -19,8 +19,8 @@ Section TaskArrivals.
   Lemma num_arrivals_of_task_cat :
     forall tsk t t1 t2,
       t1 <= t <= t2 ->
-      number_of_task_arrivals arr_seq tsk t1 t2 =
-      number_of_task_arrivals arr_seq tsk t1 t + number_of_task_arrivals arr_seq tsk t t2.
+      number_of_task_arrivals arr_seq tsk t1 t2
+      = number_of_task_arrivals arr_seq tsk t1 t + number_of_task_arrivals arr_seq tsk t t2.
   Proof.
     move => tsk t t1 t2 /andP [GE LE].
     rewrite /number_of_task_arrivals /task_arrivals_between /arrivals_between.
@@ -95,8 +95,9 @@ Section TaskArrivals.
   Lemma task_arrivals_cat :
     forall t_m t,
       t_m <= t ->
-      task_arrivals_up_to arr_seq tsk t =
-      task_arrivals_up_to arr_seq tsk t_m ++ task_arrivals_between arr_seq tsk t_m.+1 t.+1.
+      task_arrivals_up_to arr_seq tsk t
+      = task_arrivals_up_to arr_seq tsk t_m
+        ++ task_arrivals_between arr_seq tsk t_m.+1 t.+1.
   Proof.
     intros t1 t2 INEQ.
     now rewrite -filter_cat -arrivals_between_cat.
@@ -108,8 +109,9 @@ Section TaskArrivals.
   Lemma task_arrivals_up_to_cat :
     forall j,
       arrives_in arr_seq j ->
-      task_arrivals_up_to_job_arrival arr_seq j =
-      task_arrivals_before_job_arrival arr_seq j ++ task_arrivals_at_job_arrival arr_seq j.
+      task_arrivals_up_to_job_arrival arr_seq j
+      = task_arrivals_before_job_arrival arr_seq j
+        ++ task_arrivals_at_job_arrival arr_seq j.
   Proof.
     intros j ARR.
     rewrite /task_arrivals_up_to_job_arrival /task_arrivals_up_to

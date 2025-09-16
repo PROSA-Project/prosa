@@ -235,8 +235,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         eapply leq_trans; last first.
         - eapply task_rbf_without_job_under_analysis with (t1 := t1) => //=.
           lia.
-        -
-          set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
+        - set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
           rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) ));
             last first.
           { move => j' _.

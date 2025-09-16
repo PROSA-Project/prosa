@@ -771,8 +771,8 @@ Section IotaRange.
       head of a sequence by which [range] is filtered. *)
   Lemma range_filter_2cons :
     forall x xs k,
-      [seq ρ <- range 0 k | ρ \in x :: x :: xs] =
-      [seq ρ <- range 0 k | ρ \in x :: xs].
+      [seq ρ <- range 0 k | ρ \in x :: x :: xs]
+      = [seq ρ <- range 0 k | ρ \in x :: xs].
   Proof.
     move=> x xs k; apply: eq_filter => x0.
     by rewrite !in_cons; destruct (x0 == x), (x0 \in xs).
@@ -831,8 +831,8 @@ Section IotaRange.
   Lemma index_iota_filter_inxs :
     forall a b x xs,
       x < a ->
-      [seq ρ <- index_iota a b | ρ \in xs] =
-      [seq ρ <- index_iota a b | ρ \in rem_all x xs].
+      [seq ρ <- index_iota a b | ρ \in xs]
+      = [seq ρ <- index_iota a b | ρ \in rem_all x xs].
   Proof.
     intros a b x xs LT.
     apply eq_in_filter.
@@ -853,8 +853,8 @@ Section IotaRange.
     forall x xs a b,
       a <= x < b ->
       (forall y, y \in xs -> x <= y) ->
-      [seq ρ <- index_iota a b | ρ \in x :: xs] =
-      x :: [seq ρ <- index_iota a b | ρ \in rem_all x xs].
+      [seq ρ <- index_iota a b | ρ \in x :: xs]
+      = x :: [seq ρ <- index_iota a b | ρ \in rem_all x xs].
   Proof.
     intros x xs a b B MIN.
     have EX : exists k, b - a <= k.
@@ -899,8 +899,8 @@ Section IotaRange.
     forall x xs k,
       x <= k ->
       (forall y, y \in xs -> x <= y) ->
-      [seq ρ <- range 0 k | ρ \in x :: xs] =
-      x :: [seq ρ <- range 0 k | ρ \in rem_all x xs].
+      [seq ρ <- range 0 k | ρ \in x :: xs]
+      = x :: [seq ρ <- range 0 k | ρ \in rem_all x xs].
   Proof.
     intros x xs k LE MIN.
       by apply index_iota_filter_step; auto.

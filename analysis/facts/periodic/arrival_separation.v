@@ -80,8 +80,8 @@ Section JobArrivalSeparation.
         their index differs by a number [k]. *)
     Lemma job_arrival_separation_when_index_diff_is_k :
       exists n,
-        n > 0 /\
-        job_arrival j2 = job_arrival j1 + n * task_period tsk.
+        n > 0
+        /\ job_arrival j2 = job_arrival j1 + n * task_period tsk.
     Proof.
       move: j1 j2 H_j1_of_task H_j2_of_task H_index_difference_k H_job_arrival_lt H_j2_from_arr_seq H_j1_from_arr_seq;
         clear H_index_difference_k H_job_arrival_lt H_j2_from_arr_seq H_j1_from_arr_seq H_j1_of_task H_j2_of_task j1 j2.
@@ -135,8 +135,8 @@ Section JobArrivalSeparation.
       of [task_period tsk]. *)
   Lemma job_sep_periodic :
     exists n,
-      n > 0 /\
-      job_arrival j2 = job_arrival j1 + n * task_period tsk.
+      n > 0
+      /\ job_arrival j2 = job_arrival j1 + n * task_period tsk.
   Proof.
     apply job_arrival_separation_when_index_diff_is_k with (k := (job_index arr_seq j2 - job_index arr_seq j1)) => //.
     - apply subnKC.

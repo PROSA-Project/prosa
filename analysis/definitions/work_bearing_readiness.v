@@ -40,8 +40,8 @@ Section WorkBearingReadiness.
       arrives_in arr_seq j ->
       pending sched j t ->
       exists j_hp,
-        arrives_in arr_seq j_hp /\
-        job_ready sched j_hp t /\
-        hep_job j_hp j.
+        arrives_in arr_seq j_hp
+        /\ job_ready sched j_hp t
+        /\ hep_job j_hp j.
 
 End WorkBearingReadiness.

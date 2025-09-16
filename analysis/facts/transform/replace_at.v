@@ -49,9 +49,7 @@ Section ReplaceAtFacts.
     forall t1 t2,
       t2 <= t' \/ t' < t1 ->
       forall j,
-        service_during sched  j t1 t2
-        =
-        service_during sched' j t1 t2.
+        service_during sched  j t1 t2 = service_during sched' j t1 t2.
   Proof.
     move => t1 t2 SWAP_EXCLUDED j.
     rewrite /service_during /service_at.
@@ -70,8 +68,7 @@ Section ReplaceAtFacts.
       t1 <= t' < t2 ->
       forall j,
         service_during sched  j t1 t2 + service_at sched' j t'
-        =
-        service_during sched' j t1 t2 + service_at sched  j t'.
+        = service_during sched' j t1 t2 + service_at sched  j t'.
   Proof.
     move => t1 t2 TIMES j.
     rewrite -(service_split_at_point sched  _ _ t' _) //
@@ -85,8 +82,9 @@ Section ReplaceAtFacts.
       t1 <= t' < t2 ->
       forall j,
         service_during sched' j t1 t2
-        =
-        service_during sched  j t1 t2 + service_at sched' j t' - service_at sched j t'.
+        = service_during sched  j t1 t2
+          + service_at sched' j t'
+          - service_at sched j t'.
   Proof. move => t1 t2 ORDER j. by rewrite service_delta// addnK. Qed.
 
   (** As another simple invariant (useful for case analysis), we

@@ -297,8 +297,8 @@ Section SumsOverRanges.
       require that one function dominates the other in the summing range. *)
   Lemma sumnB_nat m n F G :
     (forall i, m <= i < n -> F i >= G i) ->
-    \sum_(m <= i < n) (F i - G i) =
-      (\sum_(m <= i < n) (F i)) - (\sum_(m <= i < n) (G i)).
+    \sum_(m <= i < n) (F i - G i)
+    = (\sum_(m <= i < n) (F i)) - (\sum_(m <= i < n) (G i)).
   Proof.
     move=> le.
     rewrite big_nat_cond [X in X - _]big_nat_cond [X in _ - X]big_nat_cond.

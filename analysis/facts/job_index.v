@@ -101,9 +101,9 @@ Section JobIndexLemmas.
   (** We show that [job_index j] can be written as a sum of [size (task_arrivals_before_job_arrival j)]
       and [index j (task_arrivals_at arr_seq (job_task j) (job_arrival j))]. *)
   Lemma index_as_sum_size_and_index :
-    job_index arr_seq j1 =
-    size (task_arrivals_before_job_arrival arr_seq j1)
-    + index j1 (task_arrivals_at_job_arrival arr_seq j1).
+    job_index arr_seq j1
+    = size (task_arrivals_before_job_arrival arr_seq j1)
+      + index j1 (task_arrivals_at_job_arrival arr_seq j1).
   Proof.
     rewrite /task_arrivals_at_job_arrival /job_index task_arrivals_up_to_cat //.
     rewrite index_cat ifF; first by reflexivity.
@@ -348,10 +348,10 @@ Section PreviousJob.
     forall k,
       k < job_index arr_seq j ->
       exists j',
-        j <> j' /\
-        job_task j' = job_task j /\
-        arrives_in arr_seq j' /\
-        job_index arr_seq j' = k.
+        j <> j'
+        /\ job_task j' = job_task j
+        /\ arrives_in arr_seq j'
+        /\ job_index arr_seq j' = k.
   Proof.
     clear H_positive_job_index.
     intros k K_LT.

@@ -59,11 +59,10 @@ Section UniprocessorScheduler.
       Definition prev_job_nonpreemptive : bool :=
         match t with
         | 0 => false
-        | S t' => if sched_prefix t' is Some j then
-                   job_ready sched_prefix j t &&
-                   ~~job_preemptable j (service sched_prefix j t)
-                  else
-                    false
+        | S t' => if sched_prefix t' is Some j
+                 then job_ready sched_prefix j t
+                      && ~~job_preemptable j (service sched_prefix j t)
+                 else false
         end.
 
       (** Based on the [prev_job_nonpreemptive] predicate, either the previous

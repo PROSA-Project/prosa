@@ -41,8 +41,8 @@ Section FastSearchSpaceComputation.
     (** We begin by showing that either each time step of an arrival curve prefix
         is either strictly less than the horizon, or it is the horizon. *)
     Lemma steps_lt_horizon_last_eq_horizon :
-      (forall s, s \in get_time_steps_of_task tsk -> s < get_horizon_of_task tsk) \/
-      (last0 (get_time_steps_of_task tsk) = get_horizon_of_task tsk).
+      (forall s, s \in get_time_steps_of_task tsk -> s < get_horizon_of_task tsk)
+      \/ (last0 (get_time_steps_of_task tsk) = get_horizon_of_task tsk).
     Proof.
       move: (has_valid_arrival_curve_prefix_tsk _ H_valid_task_set _ H_tsk_in_ts).
       move => [arrival_curve_prefix [EQ [POSh [LARGEh [NOINF [BUR SORT]]]]]].

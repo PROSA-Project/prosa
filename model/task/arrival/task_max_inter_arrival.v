@@ -38,16 +38,18 @@ Section ValidTaskMaxInterArrival.
       job_task j = tsk ->
       job_index arr_seq j > 0 ->
       exists (j' : Job),
-        j <> j' /\
-        arrives_in arr_seq j' /\
-        job_task j' = tsk /\
-        job_arrival j' <= job_arrival j <= job_arrival j' + task_max_inter_arrival_time tsk.
+        j <> j'
+        /\ arrives_in arr_seq j'
+        /\ job_task j' = tsk
+        /\ job_arrival j'
+          <= job_arrival j
+          <= job_arrival j' + task_max_inter_arrival_time tsk.
 
   (** Finally, we say that the maximum inter-arrival time of a task [tsk] is
       valid iff it satisfies the above two properties. *)
   Definition valid_task_max_inter_arrival_time (tsk : Task) :=
-    positive_task_max_inter_arrival_time tsk /\
-    arr_sep_task_max_inter_arrival tsk.
+    positive_task_max_inter_arrival_time tsk
+    /\ arr_sep_task_max_inter_arrival tsk.
 
   (** A task set is said to respect the task max inter-arrival model iff all tasks
    in the task set have valid task max inter-arrival times as defined above. *)

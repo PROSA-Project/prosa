@@ -38,8 +38,8 @@ Section Definitions.
 
   (** Next, we define a generic version of [check_point_FP], ... *)
   Definition check_point_FP_T (ts : seq task_T) (tsk : task_T) (R : T) (P : T * T) : bool :=
-    (task_rbf_T tsk (P.1 + 1) +
-     total_ohep_rbf_T ts tsk (P.1 + P.2) <= P.1 + P.2)%C && (P.2 <= R)%C.
+    (task_rbf_T tsk (P.1 + 1) + total_ohep_rbf_T ts tsk (P.1 + P.2)
+     <= P.1 + P.2)%C && (P.2 <= R)%C.
 
   (** ... a generic version of [blocking_bound_NP], ... *)
   Definition blocking_bound_NP_T (ts : seq task_T) (tsk : task_T) :=

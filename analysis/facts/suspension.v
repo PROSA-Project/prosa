@@ -223,12 +223,11 @@ Section Suspensions.
 
       Lemma exists_some_point :
         exists t',
-          t1 <= t' < t2 /\
-          suspended sched j t' /\
-          service sched j t' = ρ /\
-          forall to,
-            t1 <= to < t' ->
-            ~~ (suspended sched j to && (service sched j to == ρ)).
+          t1 <= t' < t2
+          /\ suspended sched j t'
+          /\ service sched j t' = ρ
+          /\ forall to, t1 <= to < t' ->
+                  ~~ (suspended sched j to && (service sched j to == ρ)).
       Proof.
         set P := (fun t => suspended sched j t && (service sched j t == ρ)).
         set ind := find P (index_iota t1 t2).

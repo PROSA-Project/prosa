@@ -173,8 +173,8 @@ Section AbstractRTAforFPwithArrivalCurves.
       exists (F : duration),
         A + F >= priority_inversion_bound
                 + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
-                + total_ohep_rbf (A + F) /\
-        R >= F + (task_cost tsk - task_rtct tsk).
+                + total_ohep_rbf (A + F)
+        /\ R >= F + (task_cost tsk - task_rtct tsk).
 
   (** Finally, we define the interference bound function
       ([task_IBF]). [task_IBF] bounds the interference if tasks are
@@ -304,8 +304,8 @@ Section AbstractRTAforFPwithArrivalCurves.
           recurrence (in the abstract sense). *)
       Corollary correct_search_space :
         exists (F : duration),
-          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF (A + F) /\
-          R >= F + (task_cost tsk - task_rtct tsk).
+          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF (A + F)
+          /\ R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         move: (H_R_is_maximum A) => FIX.
         feed FIX; first by apply A_is_in_concrete_search_space.

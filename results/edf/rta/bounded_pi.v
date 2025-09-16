@@ -205,8 +205,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
       exists (F : duration),
         A + F >= priority_inversion_bound A
                 + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
-                + bound_on_athep_workload ts tsk  A (A + F) /\
-        R >= F + (task_cost tsk - task_rtct tsk).
+                + bound_on_athep_workload ts tsk  A (A + F)
+        /\ R >= F + (task_cost tsk - task_rtct tsk).
 
 
   (** Finally, we define the interference bound function
@@ -304,8 +304,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
       (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
       Corollary correct_search_space :
         exists F,
-          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF A (A + F) /\
-          R >= F + (task_cost tsk - task_rtct tsk).
+          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF A (A + F)
+          /\ R >= F + (task_cost tsk - task_rtct tsk).
       Proof.
         edestruct H_R_is_maximum as [F [FIX NEQ]]; first by apply A_is_in_concrete_search_space.
         exists F; split=> [|//].

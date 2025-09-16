@@ -53,8 +53,9 @@ Definition is_etamax_arrivals (tsk : Task) : Prop :=
 (** Further, for convenience, we define the notion of task
       having a valid arrival curve. *)
 Definition has_valid_arrival_curve_prefix (tsk : Task) :=
-  exists ac_prefix_vec,  get_arrival_curve_prefix tsk = ac_prefix_vec /\
-                    valid_arrival_curve_prefix ac_prefix_vec.
+  exists ac_prefix_vec,
+    get_arrival_curve_prefix tsk = ac_prefix_vec
+    /\ valid_arrival_curve_prefix ac_prefix_vec.
 
 (** Finally, we define the notion of task set with
       valid arrivals. *)

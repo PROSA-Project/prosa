@@ -35,11 +35,10 @@ Section SporadicArrivals.
   (** We show that a sporadic task with valid min inter-arrival time cannot
       have more than one job arriving at any time. *)
   Lemma size_task_arrivals_at_leq_one :
-    (exists j,
-        size (task_arrivals_at_job_arrival arr_seq j) > 1 /\
-        respects_sporadic_task_model arr_seq (job_task j) /\
-        valid_task_min_inter_arrival_time (job_task j)) ->
-      False.
+    ~ (exists j,
+          size (task_arrivals_at_job_arrival arr_seq j) > 1
+          /\ respects_sporadic_task_model arr_seq (job_task j)
+          /\ valid_task_min_inter_arrival_time (job_task j)).
   Proof.
     move => [j [SIZE_G [PERIODIC VALID_TMIA]]].
     specialize (exists_two (task_arrivals_at_job_arrival arr_seq j)) => EXISTS_TWO.

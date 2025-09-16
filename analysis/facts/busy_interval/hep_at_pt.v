@@ -298,9 +298,9 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
       t1 <= tp < t2 ->
       tp <= t < t2 ->
       exists j_hp,
-        arrived_between j_hp t1 t.+1 /\
-          hep_job j_hp j /\
-          scheduled_at sched j_hp t.
+        arrived_between j_hp t1 t.+1
+        /\ hep_job j_hp j
+        /\ scheduled_at sched j_hp t.
   Proof.
     move => tp t PRPOINT /andP [GEtp LTtp] /andP [LEtp LTt].
     have [Idle|[jhp Sched_jhp]] :=
@@ -355,9 +355,9 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
     forall t,
       t1 + K <= t < t2 ->
       exists j_hp,
-        arrived_between j_hp t1 t.+1 /\
-          hep_job j_hp j /\
-          scheduled_at sched j_hp t.
+        arrived_between j_hp t1 t.+1
+        /\ hep_job j_hp j
+        /\ scheduled_at sched j_hp t.
   Proof.
     move => t /andP [GE LT].
     move: H_preemption_time_exists => [prt [PR /andP [GEprt LEprt]]].

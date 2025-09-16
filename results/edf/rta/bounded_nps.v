@@ -214,8 +214,8 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         exists (F : duration),
           A + F >= blocking_bound ts tsk A
                   + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
-                  + bound_on_athep_workload ts tsk A (A + F) /\
-          R >= F + (task_cost tsk - task_rtct tsk).
+                  + bound_on_athep_workload ts tsk A (A + F)
+          /\ R >= F + (task_cost tsk - task_rtct tsk).
 
     (** Then, using the results for the general RTA for EDF-schedulers, we establish a
          response-time bound for the more concrete model of bounded non-preemptive segments.

@@ -43,8 +43,8 @@ Section ValidModelWithFloatingNonpreemptiveRegions.
   (** A model with floating nonpreemptive regions is valid if it is both valid
       a the job level and jobs respect the upper bound of their task. *)
   Definition valid_model_with_floating_nonpreemptive_regions :=
-    valid_limited_preemptions_job_model arr_seq /\
-    job_respects_task_max_np_segment.
+    valid_limited_preemptions_job_model arr_seq
+    /\ job_respects_task_max_np_segment.
 
 End ValidModelWithFloatingNonpreemptiveRegions.
 

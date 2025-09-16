@@ -123,8 +123,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       exists (F : duration),
         A + F >= blocking_bound ts tsk
                 + (task_rbf (A + ε) - (task_last_nonpr_segment tsk - ε))
-                + total_ohep_rbf (A + F) /\
-        R >= F + (task_last_nonpr_segment tsk - ε).
+                + total_ohep_rbf (A + F)
+        /\ R >= F + (task_last_nonpr_segment tsk - ε).
 
   (** Now, we can reuse the results for the abstract model with
       bounded non-preemptive segments to establish a response-time

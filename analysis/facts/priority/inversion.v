@@ -145,8 +145,8 @@ Section PI.
     forall (t_mid t1 t2 : instant),
       t1 <= t_mid ->
       t_mid <= t2 ->
-      cumulative_priority_inversion arr_seq sched j t1 t2 =
-        cumulative_priority_inversion arr_seq sched j t1 t_mid
+      cumulative_priority_inversion arr_seq sched j t1 t2
+      = cumulative_priority_inversion arr_seq sched j t1 t_mid
         + cumulative_priority_inversion arr_seq sched j t_mid t2.
   Proof.
     intros t_mid t1 t2 LE1 LE2.

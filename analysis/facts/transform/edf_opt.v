@@ -537,10 +537,8 @@ Section EDFPrefixFacts.
      without deadline misses. *)
   Lemma edf_prefix_well_formedness :
     completed_jobs_dont_execute sched'
-    /\
-    jobs_must_arrive_to_execute sched'
-    /\
-    all_deadlines_met sched'.
+    /\ jobs_must_arrive_to_execute sched'
+    /\ all_deadlines_met sched'.
   Proof.
     rewrite /sched' /edf_transform_prefix.
     apply prefix_map_property_invariance; last by split.
@@ -639,10 +637,8 @@ Section EDFPrefixFacts.
     apply prefix_map_pointwise_property
       with (Q := EDF_at)
            (P := (fun sched => completed_jobs_dont_execute sched
-                               /\
-                               jobs_must_arrive_to_execute sched
-                               /\
-                               all_deadlines_met sched))=> //.
+                            /\ jobs_must_arrive_to_execute sched
+                            /\ all_deadlines_met sched))=> //.
     - move=> schedX t_ref [COMP [ARR DL]].
       split; last split.
       + by apply mea_completed_jobs => //.

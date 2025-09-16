@@ -66,9 +66,9 @@ Section LimitedPreemptions.
     (** A job model is considered valid w.r.t. limited-preemptive preemption
         model if it satisfies each of the preceding definitions. *)
     Definition valid_limited_preemptions_job_model :=
-      beginning_of_execution_in_preemption_points /\
-      end_of_execution_in_preemption_points /\
-      preemption_points_is_nondecreasing_sequence.
+      beginning_of_execution_in_preemption_points
+      /\ end_of_execution_in_preemption_points
+      /\ preemption_points_is_nondecreasing_sequence.
 
   End ValidLimitedPreemptiveModel.
 

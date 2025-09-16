@@ -675,9 +675,9 @@ Section WorkConservingTransformation.
       all the properties of validity, does not introduce new deadline misses, and
       establishes the work-conservation property. *)
   Theorem wc_transform_correctness :
-    valid_schedule sched_wc arr_seq /\
-    all_deadlines_of_arrivals_met arr_seq sched_wc /\
-    work_conserving arr_seq sched_wc.
+    valid_schedule sched_wc arr_seq
+    /\ all_deadlines_of_arrivals_met arr_seq sched_wc
+    /\ work_conserving arr_seq sched_wc.
   Proof.
     repeat split.
     - apply wc_jobs_come_from_arrival_sequence.

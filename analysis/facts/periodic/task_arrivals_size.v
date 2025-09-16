@@ -55,8 +55,8 @@ Section TaskArrivalsSize.
       can arrive (i.e. size of [task_arrivals_at arr_seq tsk t] is at most one). *)
   Lemma task_arrivals_at_size_cases :
     forall t,
-      size (task_arrivals_at arr_seq tsk t) = 0 \/
-        size (task_arrivals_at arr_seq tsk t) = 1.
+      size (task_arrivals_at arr_seq tsk t) = 0
+      \/ size (task_arrivals_at arr_seq tsk t) = 1.
   Proof.
     intro t.
     case: (ltngtP (size (task_arrivals_at arr_seq tsk t)) 1) => [LT|GT|EQ];
@@ -108,10 +108,10 @@ Section TaskArrivalsSize.
         at [task_offset tsk + n * task_period tsk]. *)
     Lemma jobs_exists_later :
       forall n, exists j,
-        arrives_in arr_seq j /\
-        job_task j = tsk /\
-        job_arrival j = task_offset tsk + n * task_period tsk /\
-        job_index arr_seq j = n.
+        arrives_in arr_seq j
+        /\ job_task j = tsk
+        /\ job_arrival j = task_offset tsk + n * task_period tsk
+        /\ job_index arr_seq j = n.
     Proof.
       move=> n.
       destruct (H_infinite_jobs tsk n) as [j [ARR [TSK IND]]].
@@ -182,8 +182,8 @@ Section TaskArrivalsSize.
     Lemma eq_size_of_task_arrivals_seperated_by_period :
       forall n t,
         t >= task_offset tsk ->
-        size (task_arrivals_at arr_seq tsk t) =
-        size (task_arrivals_at arr_seq tsk (t + n * task_period tsk)).
+        size (task_arrivals_at arr_seq tsk t)
+        = size (task_arrivals_at arr_seq tsk (t + n * task_period tsk)).
     Proof.
       move=> n t o_le_t.
       have [tmo_eq0|tmo_neq0] :=

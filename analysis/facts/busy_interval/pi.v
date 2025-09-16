@@ -428,8 +428,8 @@ Section PriorityInversionIsBounded.
         (** Then time instant [t1] is a preemption time. *)
         Lemma preemption_time_exists_case2 :
           exists pr_t,
-            preemption_time arr_seq sched pr_t /\
-            t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
+            preemption_time arr_seq sched pr_t
+            /\ t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).
           move :  (H_valid_model_with_bounded_nonpreemptive_segments) =>  [VALID BOUNDED].
@@ -586,8 +586,8 @@ Section PriorityInversionIsBounded.
         (** Next, we combine the above facts to conclude the lemma. *)
         Lemma preemption_time_exists_case3 :
           exists pr_t,
-            preemption_time arr_seq sched pr_t /\
-            t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
+            preemption_time arr_seq sched pr_t
+            /\ t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
         Proof.
           set (service := service sched).
           have EX:
@@ -634,8 +634,8 @@ Section PriorityInversionIsBounded.
         max_lp_nonpreemptive_segment j t1]]. *)
     Lemma preemption_time_exists :
       exists pr_t,
-        preemption_time arr_seq sched pr_t /\
-        t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
+        preemption_time arr_seq sched pr_t
+        /\ t1 <= pr_t <= t1 + max_lp_nonpreemptive_segment j t1.
     Proof.
       have [Idle|[s Sched_s]] :=
         scheduled_at_cases _ H_valid_arrivals sched ltac:(by []) ltac:(by []) t1.

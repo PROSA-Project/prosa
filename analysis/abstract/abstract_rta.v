@@ -140,8 +140,8 @@ Section Abstract_RTA.
   Definition relative_time_to_reach_rtct (j : Job) (F : duration) :=
     forall (t1 t2 : instant),
       busy_interval sched j t1 t2 ->
-      task_rtct tsk + IBF_P (job_arrival j - t1) F <= F /\
-      task_rtct tsk <= service sched j (t1 + F).
+      task_rtct tsk + IBF_P (job_arrival j - t1) F <= F
+      /\ task_rtct tsk <= service sched j (t1 + F).
 
   (** Next, consider a valid interference bound function [IBF_NP] that
       can use information about the relative time when any given job of task
@@ -176,8 +176,8 @@ Section Abstract_RTA.
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
-        task_rtct tsk + IBF_P A F <= F /\
-        task_cost tsk + IBF_NP F (A + R) <= A + R.
+        task_rtct tsk + IBF_P A F <= F
+        /\ task_cost tsk + IBF_NP F (A + R) <= A + R.
 
   (** * Proof of the Theorem *)
   (** In the next section we show a detailed proof of the main theorem

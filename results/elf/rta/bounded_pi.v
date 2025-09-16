@@ -197,8 +197,8 @@ Section AbstractRTAforELFwithArrivalCurves.
       for any of its jobs to cause blocking (or priority inversion) to a job [j] in [j]'s
       busy interval starting at [t1]. *)
   Let ep_task_blocking_relevant tsk_other j t1 :=
-    ep_task tsk_other tsk && ~~ is_ep_causing_intf j t1 tsk_other &&
-      blocking_relevant tsk_other.
+    ep_task tsk_other tsk && ~~ is_ep_causing_intf j t1 tsk_other
+    && blocking_relevant tsk_other.
 
   (** Finally, we assume that the [priority_inversion_ep_tasks_bound] is bounded by the
       maximum [task_cost] of tasks which satisfy the above condition. Note that this

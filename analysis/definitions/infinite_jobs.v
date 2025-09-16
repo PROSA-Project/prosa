@@ -20,8 +20,8 @@ Section InfiniteJobs.
       such that [job_index] of [j] is equal to [n]. *)
   Definition infinite_jobs :=
     forall tsk n, exists j,
-      arrives_in arr_seq j /\
-      job_task j = tsk /\
-      job_index arr_seq j = n.
+      arrives_in arr_seq j
+      /\ job_task j = tsk
+      /\ job_index arr_seq j = n.
 
 End InfiniteJobs.

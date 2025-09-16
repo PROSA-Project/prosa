@@ -43,10 +43,10 @@ Section ValidPeriodicTaskModel.
       job_index arr_seq j > 0 ->
       job_task j = tsk ->
       exists j',
-        arrives_in arr_seq j' /\
-        job_index arr_seq j' = job_index arr_seq j - 1 /\
-        job_task j' = tsk /\
-        job_arrival j = job_arrival j' + task_period tsk.
+        arrives_in arr_seq j'
+        /\ job_index arr_seq j' = job_index arr_seq j - 1
+        /\ job_task j' = tsk
+        /\ job_arrival j = job_arrival j' + task_period tsk.
 
   (** Further, in the context of a set of periodic tasks, ... *)
   Variable ts : TaskSet Task.

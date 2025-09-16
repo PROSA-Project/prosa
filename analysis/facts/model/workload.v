@@ -99,8 +99,8 @@ Section WorkloadFacts.
         and higher-or-equal priority jobs from all tasks except for the task of [j]. *)
     Lemma workload_of_other_jobs_split :
       forall jobs j,
-        workload_of_jobs (another_hep_job^~j) jobs =
-          workload_of_jobs (another_task_hep_job^~j) jobs
+        workload_of_jobs (another_hep_job^~j) jobs
+        = workload_of_jobs (another_task_hep_job^~j) jobs
           + workload_of_jobs (another_hep_job_of_same_task^~j) jobs.
     Proof.
       move => jobs j.
@@ -147,8 +147,9 @@ Section WorkloadFacts.
         (1) [workload_of_jobs] conditioned on [P /\ P'] and
         (2) [workload_of_jobs] conditioned on [P /\ ~~ P']. *)
     Lemma workload_of_jobs_case_on_pred :
-      workload_of_jobs P jobs =
-        workload_of_jobs (fun j => P j && P' j) jobs + workload_of_jobs (fun j => P j && ~~ P' j) jobs.
+      workload_of_jobs P jobs
+      = workload_of_jobs (fun j => P j && P' j) jobs
+        + workload_of_jobs (fun j => P j && ~~ P' j) jobs.
     Proof.
       rewrite /workload_of_jobs !big_mkcond [in X in _ = X]big_mkcond
               [in X in _ = _ + X]big_mkcond //= -big_split //=.
@@ -255,8 +256,9 @@ Section WorkloadFacts.
   Lemma workload_of_jobs_cat :
     forall t t1 t2 P,
       t1 <= t <= t2 ->
-      workload_of_jobs P (arrivals_between arr_seq t1 t2) =
-      workload_of_jobs P (arrivals_between arr_seq t1 t) + workload_of_jobs P (arrivals_between arr_seq t t2).
+      workload_of_jobs P (arrivals_between arr_seq t1 t2)
+      = workload_of_jobs P (arrivals_between arr_seq t1 t)
+        + workload_of_jobs P (arrivals_between arr_seq t t2).
   Proof.
     move => t t1 t2 P /andP [GE LE].
     rewrite /workload_of_jobs.
@@ -315,8 +317,8 @@ Section WorkloadFacts.
 
   (** Next, we specialize the above lemma to the trivial predicate [predT]. *)
   Corollary workload_minus_job_cost :
-    workload_of_jobs (fun jhp : Job => jhp != j) jobs =
-    workload_of_jobs predT jobs - job_cost j.
+    workload_of_jobs (fun jhp : Job => jhp != j) jobs
+    = workload_of_jobs predT jobs - job_cost j.
   Proof.
     by rewrite (workload_minus_job_cost' predT) //=.
   Qed.

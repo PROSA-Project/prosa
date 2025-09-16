@@ -179,8 +179,8 @@ Section Sequential_Abstract_RTA.
       forall (A : duration),
         is_in_search_space A ->
         exists (F : duration),
-          A + F >= task_rtct tsk +
-                    (task_rbf (A + ε) - task_cost tsk + task_IBF A (A + F))
+          A + F >= task_rtct tsk
+                  + (task_rbf (A + ε) - task_cost tsk + task_IBF A (A + F))
           /\ R >= F + (task_cost tsk - task_rtct tsk).
     Proof.
       move: H_valid_run_to_completion_threshold => [PRT1 PRT2]; move => A INSP.

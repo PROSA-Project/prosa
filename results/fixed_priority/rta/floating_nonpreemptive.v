@@ -120,8 +120,8 @@ Section RTAforFloatingModelwithArrivalCurves.
     forall (A : duration),
       is_in_search_space A ->
       exists  (F : duration),
-        A + F >= blocking_bound ts tsk + task_rbf (A + ε) + total_ohep_rbf (A + F) /\
-        R >= F.
+        A + F >= blocking_bound ts tsk + task_rbf (A + ε) + total_ohep_rbf (A + F)
+        /\ R >= F.
 
   (** Now, we can reuse the results for the abstract model with
       bounded non-preemptive segments to establish a response-time

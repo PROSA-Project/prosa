@@ -14,9 +14,9 @@ Definition check_point_FP (ts : seq Task) (tsk : Task) (R : nat) (P : nat * nat)
 
 (** Further, we provide a way to compute the blocking bound when using nonpreemptive policies. *)
 Definition blocking_bound_NP (ts : seq Task) (tsk : Task) (A : nat) :=
-  \max_(tsk_o <- [seq i | i <- ts] | blocking_relevant tsk_o &&
-                                   (task_deadline tsk + A <
-                                    task_deadline tsk_o)) (task_cost tsk_o - ε).
+  \max_(tsk_o <- [seq i | i <- ts]
+       | blocking_relevant tsk_o
+         && (task_deadline tsk + A < task_deadline tsk_o)) (task_cost tsk_o - ε).
 
 (** Finally, we provide a function that checks a single point [P=(A,F)] of the search space when
     adopting a fully-nonpreemptive policy. *)

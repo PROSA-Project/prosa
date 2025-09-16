@@ -121,8 +121,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       exists (F : duration),
         A + F >= blocking_bound
                 + (task_rbf (A + ε) - (task_cost tsk - ε))
-                + total_ohep_rbf (A + F) /\
-        R >= F + (task_cost tsk - ε).
+                + total_ohep_rbf (A + F)
+        /\ R >= F + (task_cost tsk - ε).
 
   (** Now, we can leverage the results for the abstract model with
       bounded non-preemptive segments to establish a response-time

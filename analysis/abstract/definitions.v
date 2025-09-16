@@ -148,16 +148,16 @@ Section AbstractRTADefinitions.
         job j, (b) starts with a quiet time and (c) remains
         non-quiet. *)
     Definition busy_interval_prefix (j : Job) (t1 t2 : instant) :=
-      t1 <= job_arrival j < t2 /\
-      quiet_time j t1 /\
-      (forall t, t1 < t < t2 -> ~ quiet_time j t).
+      t1 <= job_arrival j < t2
+      /\ quiet_time j t1
+      /\ (forall t, t1 < t < t2 -> ~ quiet_time j t).
 
     (** Next, we say that an interval <<[t1, t2)>> is a busy interval
         iff <<[t1, t2)>> is a busy-interval prefix and [t2] is a quiet
         time. *)
     Definition busy_interval (j : Job) (t1 t2 : instant) :=
-      busy_interval_prefix j t1 t2 /\
-      quiet_time j t2.
+      busy_interval_prefix j t1 t2
+      /\ quiet_time j t2.
 
     (** Note that the busy interval, if it exists, is unique. *)
     Fact busy_interval_is_unique :
@@ -237,9 +237,9 @@ Section AbstractRTADefinitions.
         job_of_task tsk j ->
         job_cost j > 0 ->
         exists t1 t2,
-          t1 <= job_arrival j < t2 /\
-          t2 <= t1 + L /\
-          busy_interval j t1 t2.
+          t1 <= job_arrival j < t2
+          /\ t2 <= t1 + L
+          /\ busy_interval j t1 t2.
 
     (** Although we have defined the notion of cumulative
         (conditional) interference of a job, it cannot be used in a

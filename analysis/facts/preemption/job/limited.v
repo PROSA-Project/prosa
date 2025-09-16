@@ -139,8 +139,8 @@ Section ModelWithLimitedPreemptions.
         ρ <= job_cost j ->
         ~~ (ρ \in job_preemptive_points j) ->
         exists n,
-          n.+1 < size (job_preemptive_points j) /\
-          nth 0 (job_preemptive_points j) n < ρ < nth 0 (job_preemptive_points j) n.+1.
+          n.+1 < size (job_preemptive_points j)
+          /\ nth 0 (job_preemptive_points j) n < ρ < nth 0 (job_preemptive_points j) n.+1.
     Proof.
       intros ρ LE NotIN.
       case: (posnP (job_cost j)) => [ZERO|POS].
@@ -168,8 +168,8 @@ Section ModelWithLimitedPreemptions.
         [job_preemption_points] is equal to the length of the last non-empty
         non-preemptive segment of [job_preemptive_points]. *)
     Lemma job_parameters_last_np_to_job_limited :
-        last0 (distances (job_preemption_points j)) =
-        last0 (filter (fun x => 0 < x) (distances (job_preemptive_points j))).
+        last0 (distances (job_preemption_points j))
+        = last0 (filter (fun x => 0 < x) (distances (job_preemptive_points j))).
     Proof.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
       unfold job_preemption_points, job_preemptable, limited_preemptive_job_model.
@@ -182,8 +182,8 @@ Section ModelWithLimitedPreemptions.
         [job_preemption_points] is equal to the length of the max non-preemptive
         segment of [job_preemptive_points]. *)
     Lemma job_parameters_max_np_to_job_limited :
-      max0 (distances (job_preemption_points j)) =
-      max0 (distances (job_preemptive_points j)).
+      max0 (distances (job_preemption_points j))
+      = max0 (distances (job_preemptive_points j)).
     Proof.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
       unfold job_preemption_points, job_preemptable, limited_preemptive_job_model.

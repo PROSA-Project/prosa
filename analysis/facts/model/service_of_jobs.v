@@ -384,8 +384,7 @@ Section UnitServiceModelLemmas.
        implies that the workload of [jobs] is equal to the service of [jobs]. *)
     Lemma all_jobs_have_completed_impl_workload_eq_service :
       all_jobs_completed_by t_compl ->
-      workload_of_jobs P jobs =
-      service_of_jobs sched P jobs t1 t_compl.
+      workload_of_jobs P jobs = service_of_jobs sched P jobs t1 t_compl.
     Proof.
       unfold jobs; intros COMPL.
       have F: forall j t, t <= t1 -> j \in arrivals_between arr_seq t1 t2 -> service_during sched j 0 t = 0.

@@ -280,9 +280,9 @@ Section PreemptionFacts.
     forall j t,
       scheduled_at sched j t ->
       exists pt,
-        job_arrival j <= pt <= t /\
-          preemption_time arr_seq sched pt /\
-          (forall t', pt <= t' <= t -> scheduled_at sched j t').
+        job_arrival j <= pt <= t
+        /\ preemption_time arr_seq sched pt
+        /\ (forall t', pt <= t' <= t -> scheduled_at sched j t').
   Proof.
     intros s t SCHEDst.
     have EX: exists t', (t' <= t) && (scheduled_at sched s t')

@@ -368,9 +368,8 @@ Section TransferSchedulability.
         encountered in for instance Haskell or Python. *)
 
     Definition critical_jobs t1 t2 :=
-      [seq j <- arrivals_up_to arr_seq t2 |
-        ref_completed_by j t2
-        && ~~ online_completed_by j t1].
+      [seq j <- arrivals_up_to arr_seq t2
+      | ref_completed_by j t2 && ~~ online_completed_by j t1].
 
 
     (** *** Basic Facts About the Set of Critical Jobs *)
@@ -420,8 +419,8 @@ Section TransferSchedulability.
     Lemma critical_jobs_filter_complete :
       forall t1 t2 t3,
         t1 <= t2 ->
-        critical_jobs t2 t3 =
-          [seq j <- critical_jobs t1 t3 | ~~ online_completed_by j t2].
+        critical_jobs t2 t3
+        = [seq j <- critical_jobs t1 t3 | ~~ online_completed_by j t2].
     Proof.
       move=> t1 t2 t3 LEQ.
       rewrite -filter_predI.

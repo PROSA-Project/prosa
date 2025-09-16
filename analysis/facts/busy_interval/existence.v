@@ -95,10 +95,10 @@ Section ExistsBusyIntervalJLFP.
         that has higher or equal priority (with respect to [tsk]). *)
     Lemma not_quiet_implies_exists_pending_job :
       exists j_hp,
-        arrives_in arr_seq j_hp /\
-        arrived_between j_hp t1 t2 /\
-        hep_job j_hp j /\
-        ~ job_completed_by j_hp t2.
+        arrives_in arr_seq j_hp
+        /\ arrived_between j_hp t1 t2
+        /\ hep_job j_hp j
+        /\ ~ job_completed_by j_hp t2.
     Proof.
       rename H_quiet into QUIET, H_not_quiet into NOTQUIET.
       destruct (has (fun j_hp => (~~ job_completed_by j_hp t2) && hep_job j_hp j)
@@ -166,9 +166,9 @@ Section ExistsBusyIntervalJLFP.
       forall t,
         t1 <= t < t2 ->
         exists jhp,
-          arrives_in arr_seq jhp /\
-          job_pending_at jhp t /\
-          hep_job jhp j.
+          arrives_in arr_seq jhp
+          /\ job_pending_at jhp t
+          /\ hep_job jhp j.
     Proof.
       move => t /andP [GE LT]; move: (H_busy_interval_prefix) => [_ [QTt [NQT REL]]].
       move: (ltngtP t1.+1 t2) => [GT|CONTR|EQ]; first last.
@@ -258,8 +258,8 @@ Section ExistsBusyIntervalJLFP.
         released before time instant [t1] receive no service after time
         instant [t1]. *)
     Lemma hep_jobs_receive_no_service_before_quiet_time :
-      service_received_by_hep_jobs_released_during t1 (t1 + Δ) =
-      service_received_by_hep_jobs_released_during 0 (t1 + Δ).
+      service_received_by_hep_jobs_released_during t1 (t1 + Δ)
+      = service_received_by_hep_jobs_released_during 0 (t1 + Δ).
     Proof.
       intros.
       rewrite /service_received_by_hep_jobs_released_during
@@ -372,8 +372,8 @@ Section ExistsBusyIntervalJLFP.
             busy interval that starts no later than with the arrival of [j]. *)
         Lemma exists_busy_interval_prefix :
           exists t1,
-            busy_interval_prefix t1 t_busy.+1 /\
-            t1 <= job_arrival j <= t_busy.
+            busy_interval_prefix t1 t_busy.+1
+            /\ t1 <= job_arrival j <= t_busy.
         Proof.
           rename H_j_is_pending into PEND, H_work_conserving into WORK.
           destruct ([exists t:'I_t_busy.+1, quiet_time_dec t]) eqn:EX.
@@ -560,8 +560,8 @@ Section ExistsBusyIntervalJLFP.
             t1 + delta]. *)
         Lemma busy_interval_is_bounded :
           exists t2,
-            t2 <= t1 + delta /\
-            busy_interval t1 t2.
+            t2 <= t1 + delta
+            /\ busy_interval t1 t2.
         Proof.
           move: H_is_busy_prefix => [LT [QT [NQ NEQ]]].
           destruct ([exists t2:'I_(t1 + delta).+1, (t2 > t1) && quiet_time_dec t2]) eqn:EX.
@@ -632,9 +632,9 @@ Section ExistsBusyIntervalJLFP.
       (** Therefore there must exists a busy interval <<[t1, t2)>> that contains the arrival time of [j]. *)
       Corollary exists_busy_interval :
         exists t1 t2,
-          t1 <= job_arrival j < t2 /\
-          t2 <= t1 + delta /\
-          busy_interval t1 t2.
+          t1 <= job_arrival j < t2
+          /\ t2 <= t1 + delta
+          /\ busy_interval t1 t2.
       Proof.
         have PREFIX := exists_busy_interval_prefix.
         move: (H_workload_is_bounded) => WORK.

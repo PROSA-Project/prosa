@@ -318,8 +318,9 @@ Section AbstractRTAforFIFOwithArrivalCurves.
       search space is the set of offsets less than [L] such that there exists a
       task [tsk'] in [ts] such that [rbf tsk' (A) ≠ rbf tsk' (A + ε)]. *)
   Definition is_in_concrete_search_space (A : duration) :=
-    (A < L) && has (fun tsk' => task_request_bound_function tsk' (A) !=
-                               task_request_bound_function tsk' ( A + ε )) ts.
+    (A < L)
+    && has (fun tsk' => task_request_bound_function tsk' (A)
+                     != task_request_bound_function tsk' ( A + ε )) ts.
 
   (** To enable the use of aRTA, we must now show that any offset [A] included
       in the abstract search space is also included in the concrete search
@@ -359,8 +360,8 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         move => EQ2. unfold IBF in INSP2.
         rewrite subnK in INSP2 => //.
         apply INSP2; clear INSP2.
-        have ->// : \sum_(tsko <- ts) task_request_bound_function tsko A =
-                   \sum_(tsko <- ts)  task_request_bound_function tsko (A + ε).
+        have ->// : \sum_(tsko <- ts) task_request_bound_function tsko A
+                    = \sum_(tsko <- ts)  task_request_bound_function tsko (A + ε).
         apply eq_big_seq => //= task IN.
         by move: (EQ2 task IN) => /negPn /eqP. }
     Qed.

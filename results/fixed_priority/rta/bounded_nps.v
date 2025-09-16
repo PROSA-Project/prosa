@@ -175,8 +175,8 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
         exists (F : duration),
           A + F >= blocking_bound ts tsk
                   + (task_rbf (A + ε) - (task_cost tsk - task_rtct tsk))
-                  + total_ohep_rbf (A + F) /\
-          F + (task_cost tsk - task_rtct tsk) <= R.
+                  + total_ohep_rbf (A + F)
+          /\ F + (task_cost tsk - task_rtct tsk) <= R.
 
     (** Then, using the results for the general RTA for FP-schedulers, we establish a
        response-time bound for the more concrete model of bounded non-preemptive segments.

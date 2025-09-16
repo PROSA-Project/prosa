@@ -140,15 +140,15 @@ Section TDMASchedule.
           isn't in its own time slot or another previous job of the same task is scheduled *)
   Definition backlogged_implies_not_in_slot_or_other_job_sched j t :=
     backlogged sched j t ->
-    ~ job_in_time_slot j t \/
-    exists j_other, arrives_in arr_seq j_other/\
-                    job_arrival j_other < job_arrival j/\
-                    job_task j = job_task j_other/\
-                    scheduled_at sched j_other t.
+    ~ job_in_time_slot j t
+    \/ exists j_other, arrives_in arr_seq j_other
+                 /\ job_arrival j_other < job_arrival j
+                 /\ job_task j = job_task j_other
+                 /\ scheduled_at sched j_other t.
 
   Definition respects_TDMA_policy :=
     forall (j:Job) (t:instant),
       arrives_in arr_seq j ->
-      sched_implies_in_slot j t /\
-      backlogged_implies_not_in_slot_or_other_job_sched j t.
+      sched_implies_in_slot j t
+      /\ backlogged_implies_not_in_slot_or_other_job_sched j t.
 End TDMASchedule.

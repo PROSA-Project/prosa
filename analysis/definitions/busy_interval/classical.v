@@ -45,16 +45,16 @@ Section BusyIntervalJLFP.
          priority job is released and remains non-quiet. We also require
          job [j] to be released in the interval. *)
     Definition busy_interval_prefix (t1 t_busy : instant) :=
-      t1 < t_busy /\
-      quiet_time t1 /\
-      (forall t, t1 < t < t_busy -> ~ quiet_time t) /\
-      t1 <= job_arrival j < t_busy.
+      t1 < t_busy
+      /\ quiet_time t1
+      /\ (forall t, t1 < t < t_busy -> ~ quiet_time t)
+      /\ t1 <= job_arrival j < t_busy.
 
     (** Next, we say that an interval <<[t1, t2)>> is a busy interval iff
         <<[t1, t2)>> is a busy-interval prefix and [t2] is a quiet time. *)
     Definition busy_interval (t1 t2 : instant) :=
-      busy_interval_prefix t1 t2 /\
-      quiet_time t2.
+      busy_interval_prefix t1 t2
+      /\ quiet_time t2.
 
   End BusyInterval.
 

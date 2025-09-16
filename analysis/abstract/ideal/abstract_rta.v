@@ -169,8 +169,8 @@ Section AbstractRTAIdeal.
     forall A,
       is_in_search_space A ->
       exists F,
-        task_rtct tsk + interference_bound_function A (A + F) <= A + F /\
-        F + (task_cost tsk - task_rtct tsk) <= R.
+        task_rtct tsk + interference_bound_function A (A + F) <= A + F
+        /\ F + (task_cost tsk - task_rtct tsk) <= R.
 
   (** Using the lemma about [IBF_NP], we instantiate the general RTA
       theorem's result to the ideal uniprocessor's case to prove that

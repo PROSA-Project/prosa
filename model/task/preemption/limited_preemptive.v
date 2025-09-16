@@ -74,20 +74,20 @@ Section ValidModelWithFixedPreemptionPoints.
       ε <= nth 0 (distances (task_preemption_points tsk)) n.
 
   (** We define a valid task-level model with fixed preemption points as the
-      conjunction of the hypotheses above. *)
+      conjunction of the requirements above. *)
   Definition valid_fixed_preemption_points_task_model :=
-    task_beginning_of_execution_in_preemption_points /\
-    task_end_of_execution_in_preemption_points /\
-    nondecreasing_task_preemption_points /\
-    consistent_job_segment_count /\
-    job_respects_segment_lengths /\
-    task_segments_are_nonempty.
+    task_beginning_of_execution_in_preemption_points
+    /\ task_end_of_execution_in_preemption_points
+    /\ nondecreasing_task_preemption_points
+    /\ consistent_job_segment_count
+    /\ job_respects_segment_lengths
+    /\ task_segments_are_nonempty.
 
   (** Finally, a model with fixed preemption points is valid if it is both valid
       a the job and task levels. *)
   Definition valid_fixed_preemption_points_model :=
-    valid_limited_preemptions_job_model arr_seq /\
-    valid_fixed_preemption_points_task_model.
+    valid_limited_preemptions_job_model arr_seq
+    /\ valid_fixed_preemption_points_task_model.
 
 End ValidModelWithFixedPreemptionPoints.
 

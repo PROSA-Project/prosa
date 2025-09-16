@@ -40,9 +40,10 @@ Section GELBasicFacts.
 
     (** The arrival time of [j'] is bounded as follows. *)
     Lemma hep_job_arrives_before :
-      ((job_arrival j')%:R <=
-         (job_arrival j)%:R +
-           task_priority_point (job_task j) - task_priority_point (job_task j'))%R.
+      ((job_arrival j')%:R
+       <= (job_arrival j)%:R
+         + task_priority_point (job_task j)
+         - task_priority_point (job_task j'))%R.
     Proof. by move : H_j'_hep; rewrite hep_job_priority_point; lia. Qed.
 
     (** Using the above lemma, we prove that for any
@@ -50,8 +51,9 @@ Section GELBasicFacts.
         [job_arrival j +  task_priority_point (job_task j) -
         task_priority_point (job_task j')] is positive.  *)
     Corollary hep_job_arrives_after_zero :
-      (0 <= (job_arrival j)%:R +
-             task_priority_point (job_task j) - task_priority_point (job_task j'))%R.
+      (0 <= (job_arrival j)%:R
+           + task_priority_point (job_task j)
+           - task_priority_point (job_task j'))%R.
     Proof. exact: le_trans hep_job_arrives_before. Qed.
 
   End HEPJobArrival.

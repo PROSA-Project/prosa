@@ -357,8 +357,8 @@ Section EMSOFTModel.
   Hypothesis H_non_starvation :
     forall j,
       arrives_in arr_seq j ->
-      { R : duration |
-        @job_response_time_bound _ _ (algA omega_0) (job_cost omega_0) _  j R }.
+      { R : duration | @job_response_time_bound
+                         _ _ (algA omega_0) (job_cost omega_0) _  j R }.
 
   (** ** Definition of Finish Times *)
 

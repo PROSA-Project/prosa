@@ -101,8 +101,8 @@ Section ValidPreemptionModel.
     forall (ρ : duration),
       0 <= ρ <= job_cost j ->
       exists (pp : duration),
-        ρ <= pp <= ρ + (job_max_nonpreemptive_segment j - ε) /\
-        job_preemptable j pp.
+        ρ <= pp <= ρ + (job_max_nonpreemptive_segment j - ε)
+        /\ job_preemptable j pp.
 
   (** We say that the schedule exhibits bounded nonpreemptive segments iff the
       predicate [job_preemptable] satisfies the two preceding conditions. *)
@@ -116,8 +116,8 @@ Section ValidPreemptionModel.
       segments iff the predicate [job_preemptable] defines a valid preemption
       model and if this model has non-preemptive segments of bounded length. *)
   Definition valid_model_with_bounded_nonpreemptive_segments :=
-    valid_preemption_model arr_seq sched /\
-    model_with_bounded_nonpreemptive_segments.
+    valid_preemption_model arr_seq sched
+    /\ model_with_bounded_nonpreemptive_segments.
 
 End ValidPreemptionModel.
 
@@ -176,7 +176,7 @@ Section ValidTaskRunToCompletionThreshold.
   (** Finally, we require that a valid run-to-completion threshold parameter
       will satisfy the two above definitions. *)
   Definition valid_task_run_to_completion_threshold tsk :=
-    task_rtc_bounded_by_cost tsk /\
-    job_respects_task_rtc tsk.
+    task_rtc_bounded_by_cost tsk
+    /\ job_respects_task_rtc tsk.
 
 End ValidTaskRunToCompletionThreshold.

@@ -60,9 +60,10 @@ Section AbstractRTAReduction.
      <<[0, B)>> for which the interference bound function changes, i.e., every point [x] in which
      [interference_bound_function (A - ε, x)] is not equal to [interference_bound_function (A, x)]. *)
   Definition is_in_search_space A :=
-    A = 0 \/
-    0 < A < B /\ are_not_equivalent_at_values_less_than
-                  (interference_bound_function (A - ε)) (interference_bound_function A) B.
+    A = 0
+    \/ 0 < A < B
+      /\ are_not_equivalent_at_values_less_than
+          (interference_bound_function (A - ε)) (interference_bound_function A) B.
 
   (** In this section we prove that for every [A] there exists a smaller [A_sp]
      in the search space such that [interference_bound_function(A_sp,x)] is
@@ -80,10 +81,11 @@ Section AbstractRTAReduction.
        to the "left" until we reach [A_sp], which will be inside the search space. *)
     Lemma representative_exists :
       exists A_sp,
-        A_sp <= A /\
-        are_equivalent_at_values_less_than (interference_bound_function A)
-                                           (interference_bound_function A_sp) B /\
-        is_in_search_space A_sp.
+        A_sp <= A
+        /\ are_equivalent_at_values_less_than
+            (interference_bound_function A)
+            (interference_bound_function A_sp) B
+        /\ is_in_search_space A_sp.
     Proof.
       induction A as [|n IHn].
       - exists 0; repeat split.
@@ -145,9 +147,9 @@ Section AbstractRTAReduction.
        and [A + F] is a solution for the response-time recurrence for [A]. *)
     Lemma solution_for_A_exists :
       exists F,
-        A_sp + F_sp = A + F /\
-        F <= F_sp /\
-        A + F >= interference_bound_function A (A + F).
+        A_sp + F_sp = A + F
+        /\ F <= F_sp
+        /\ A + F >= interference_bound_function A (A + F).
     Proof.
       move: H_bounds_for_A => /andP [NEQ1 NEQ2].
       set (X := A_sp + F_sp) in *.

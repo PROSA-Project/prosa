@@ -248,8 +248,8 @@ Section JLFPInstantiation.
         equal priority. *)
     Lemma cumulative_interfering_workload_split :
       forall j t1 t2,
-        cumulative_interfering_workload j t1 t2 =
-          cumulative_priority_inversion arr_seq sched j t1 t2
+        cumulative_interfering_workload j t1 t2
+        = cumulative_priority_inversion arr_seq sched j t1 t2
           + cumulative_other_hep_jobs_interfering_workload arr_seq j t1 t2.
     Proof.
       rewrite /cumulative_interfering_workload

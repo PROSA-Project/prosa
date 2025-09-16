@@ -195,8 +195,8 @@ Section AbstractRTAforGELwithArrivalCurves.
         move: (hep_job_arrives_before _ j' HEP) => EARLIEST.
         move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
         move: ARR'; rewrite /interval  => LATEST.
-        have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk -
-                    task_priority_point tsk_o <= (job_arrival j')%:R)%R by lia.
+        have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk
+                       - task_priority_point tsk_o <= (job_arrival j')%:R)%R by lia.
         by move: LATEST'; rewrite -TSK -TSK' => LATEST'; lia.
       Qed.
 
@@ -332,8 +332,8 @@ Section AbstractRTAforGELwithArrivalCurves.
       exists (F : duration),
         A + F >= priority_inversion_bound A
                 + (task_request_bound_function tsk (A + ε) - (task_cost tsk - task_rtct tsk))
-                + bound_on_total_hep_workload  A (A + F) /\
-          R >= F + (task_cost tsk - task_rtct tsk).
+                + bound_on_total_hep_workload  A (A + F)
+        /\ R >= F + (task_cost tsk - task_rtct tsk).
 
   Section ResponseTimeReccurence.
 
@@ -360,8 +360,10 @@ Section AbstractRTAforGELwithArrivalCurves.
       forall A,
         search_space.is_in_search_space L total_interference_bound A ->
         exists F,
-          A + F >= task_request_bound_function tsk (A + ε) - (task_cost tsk - task_rtct tsk) +
-                    task_IBF A (A + F) /\ R >= F + (task_cost tsk - task_rtct tsk).
+          A + F >= task_request_bound_function tsk (A + ε)
+                  - (task_cost tsk - task_rtct tsk)
+                  + task_IBF A (A + F)
+          /\ R >= F + (task_cost tsk - task_rtct tsk).
     Proof.
       move => A IN.
       edestruct H_R_is_maximum as [F [FIX NEQ]];

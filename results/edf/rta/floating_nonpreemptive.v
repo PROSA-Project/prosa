@@ -111,8 +111,9 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
-        A + F >= blocking_bound ts tsk A + task_rbf (A + ε) + bound_on_athep_workload ts tsk A (A + F) /\
-        R >= F.
+        A + F >= blocking_bound ts tsk A + task_rbf (A + ε)
+                + bound_on_athep_workload ts tsk A (A + F)
+        /\ R >= F.
 
   (** Now, we can leverage the results for the abstract model with
       bounded nonpreemptive segments to establish a response-time
