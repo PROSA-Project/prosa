@@ -48,6 +48,12 @@ ISSUES = [
             r"\s(?P<issue>[-+*/\\=!&|]+)\n",
             0,
         ),
+        (
+            "preceding comment missing",
+            r"\.(\s*\n\s*)+\n\s*(?P<issue>Hypothesis|Lemma|Theorem|Corollary|"
+            r"Fact|Remark|Definition|Fixpoint|Variable|Context)",
+            0,
+        ),
     ]
 ]
 
