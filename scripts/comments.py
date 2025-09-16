@@ -1,3 +1,4 @@
+import re
 from bisect import bisect
 from collections.abc import Iterable, Iterator
 from functools import cached_property
@@ -48,6 +49,27 @@ def line_ranges(src) -> Iterator[tuple[int, int]]:
         yield (last, len(src))
 
 
+PROOF_TOKENS_RE = re.compile(
+    r"Proof\.|Qed\.|Obligation\.|Defined\.|Admitted\.|Abort\.|\(\*|\*\)",
+    re.MULTILINE | re.DOTALL,
+)
+
+
+def proof_ranges(src):
+    in_comment = 0
+    proof_start = -1
+    for m in PROOF_TOKENS_RE.finditer(src):
+        if m[0] == "(*":
+            in_comment += 1
+        elif m[0] == "*)":
+            in_comment -= 1
+        elif not in_comment:
+            if m[0] in ["Proof.", "Obligation."]:
+                proof_start = m.span()[0]
+            elif m[0] in ["Qed.", "Defined.", "Abort.", "Admitted."]:
+                yield (proof_start, m.span()[1])
+
+
 class Ranges:
     def __init__(self, ranges: Iterable[tuple[int, int]]):
         self.ranges = tuple(ranges)
@@ -71,7 +93,7 @@ class Ranges:
         if where is not None:
             return where[1]
         else:
-            return
+            return None
 
     def __contains__(self, pos: int | tuple[int, int]) -> bool:
         return self.lookup(pos) is not None
@@ -84,6 +106,21 @@ class Comments:
     @cached_property
     def ranges(self) -> Ranges:
         return Ranges(comment_ranges(self.src))
+
+    def __iterator__(self) -> Iterator[str]:
+        return (self.src[s:e] for s, e in self.ranges)
+
+    def __contains__(self, pos):
+        return pos in self.ranges
+
+
+class Proofs:
+    def __init__(self, src):
+        self.src = src
+
+    @cached_property
+    def ranges(self) -> Ranges:
+        return Ranges(proof_ranges(self.src))
 
     def __iterator__(self) -> Iterator[str]:
         return (self.src[s:e] for s, e in self.ranges)

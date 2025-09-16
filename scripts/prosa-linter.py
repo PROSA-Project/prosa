@@ -7,39 +7,45 @@ import subprocess
 import sys
 from pathlib import Path
 
-from comments import Comments, LineNumbers
+from comments import Comments, LineNumbers, Proofs
 
 ISSUES = [
     (re.compile(regex, re.MULTILINE | re.DOTALL), msg, adjust_edit_offset)
     for msg, regex, adjust_edit_offset in [
         (
             "missing space before ':='",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>\S:=)[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint)"
+            r"\s+[^.]*?(?P<issue>\S:=)[^.]*?\.",
             1,
         ),
         (
             "missing space after ':='",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>:=\S)[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint)"
+            r"\s+[^.]*?(?P<issue>:=\S)[^.]*?\.",
             2,
         ),
         (
             "missing space before ':'",
-            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?(?P<issue>\S:)\s[^.]*?\.",
+            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?"
+            r"(?P<issue>\S:)\s[^.]*?\.",
             1,
         ),
         (
             "missing space after ':'",
-            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?(?P<issue>[^. \n]:[^= \n])[^.]*?\.",
+            r"(Hypothesis|Variable|Variables|Instance|Context)\s+[^.]*?"
+            r"(?P<issue>[^. \n]:[^= \n])[^.]*?\.",
             2,
         ),
         (
             "missing space before ':'",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>\S:)\s[^.]*?(:=)?[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint)"
+            r"\s+[^.]*?(?P<issue>\S:)\s[^.]*?(:=)?[^.]*?\.",
             1,
         ),
         (
             "missing space after ':'",
-            r"(Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint)\s+[^.]*?(?P<issue>:[^= \n])[^.]*?:=[^.]*?\.",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint)"
+            r"\s+[^.]*?(?P<issue>:[^= \n])[^.]*?:=[^.]*?\.",
             1,
         ),
         ("trailing whitespace", r"(?P<issue>[ \t]+)\n", 0),
@@ -51,7 +57,7 @@ ISSUES = [
         (
             "preceding comment missing",
             r"\.(\s*\n\s*)+\n\s*(?P<issue>Hypothesis|Lemma|Theorem|Corollary|"
-            r"Fact|Remark|Definition|Fixpoint|Variable|Context)",
+            r"Fact|Example|Remark|Definition|Fixpoint|Variable|Context)",
             0,
         ),
     ]
@@ -85,9 +91,13 @@ def is_excepted(m):
     return False
 
 
+NONROCQDOC_COMMENT = re.compile(r"\(\*[^\*]")
+
 KEYWORDS_FOR_INDENTATION_CHECK = re.compile(
-    r"(?P<section>Section|End)\s+[a-zA-Z_]+.|^\s+(?P<kw>Lemma|Theorem|Fact|Corollary|Remark|Definition|Fixpoint|Hypothesis|"
-    r"Variable|Variables|Instance|Context|Global|Local|Proof|Qed|Defined|Aborted|Admitted)",
+    r"(?P<section>Section|End)\s+[a-zA-Z_]+.|^\s+(?P<kw>Lemma|Theorem|Fact|"
+    r"Corollary|Remark|Definition|Fixpoint|Hypothesis|"
+    r"Variable|Variables|Instance|Context|Global|Local|"
+    r"Proof|Qed|Defined|Aborted|Admitted)",
     re.MULTILINE | re.DOTALL,
 )
 
@@ -107,6 +117,7 @@ def lint_file(opts, fpath):
 
     comments = Comments(src)
     lineno = LineNumbers(src)
+    proofs = Proofs(src)
 
     def matches_of(regex):
         return (m for m in regex.finditer(src) if m.span() not in comments)
@@ -162,6 +173,22 @@ def lint_file(opts, fpath):
                     1,
                 )
             )
+
+    for m in NONROCQDOC_COMMENT.finditer(src):
+        if m.span() in proofs:
+            continue
+        r = comments.ranges[m.span()]
+        if r and r[0] < m.span()[0]:
+            # contained in another comment, ignore
+            continue
+        issues.append(
+            (
+                m.span(),
+                f"{fpath}:{lineno[m.span()[0]]}: non-rocqdoc-comment outside of proof",
+                0,
+                0,
+            )
+        )
 
     for i, ((s, e), msg, offset_shift, context_above) in enumerate(sorted(issues)):
         print(msg, file=sys.stderr)
@@ -261,6 +288,8 @@ def main():
             print(e, file=sys.stderr)
             issues += 1
 
+    if issues > 10:
+        print(f"prosa-linter: {issues} issues found")
     sys.exit(issues > 0)
 
 
