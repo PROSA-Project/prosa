@@ -128,8 +128,8 @@ Section JitterPropagationFacts.
   (** If the given schedule respects release jitter, then it continues to do so
       after we've reinterpreted the release times to be the arrival times. *)
   Lemma jitter_ready_to_execute :
-    @jobs_must_be_ready_to_execute _ _ sched _ original_arrival jitter_ready_instance ->
-    @jobs_must_be_ready_to_execute _ _ sched _ release_as_arrival basic_ready_instance.
+    @jobs_must_be_ready_to_execute _ original_arrival _ sched _ jitter_ready_instance ->
+    @jobs_must_be_ready_to_execute _ release_as_arrival _ sched _ basic_ready_instance.
   Proof. move=> RDY j t SCHED; by move: (RDY j t SCHED). Qed.
 
   (** If the schedule is work-conserving, then it continues to be so after we've
@@ -149,8 +149,8 @@ Section JitterPropagationFacts.
       continues to be valid after reinterpreting release times as arrival
       times. *)
   Lemma jitter_valid_schedule :
-    @valid_schedule _ _ sched _ original_arrival jitter_ready_instance arr_seq ->
-    @valid_schedule _ _ sched _ release_as_arrival basic_ready_instance rel_seq.
+    @valid_schedule _ original_arrival _ sched _ jitter_ready_instance arr_seq ->
+    @valid_schedule _ release_as_arrival _ sched _ basic_ready_instance rel_seq.
   Proof.
     move => [SRC RDY].
     split.
@@ -161,7 +161,7 @@ Section JitterPropagationFacts.
   (** In the following, suppose the given schedule is valid w.r.t. the original
       arrival times and jitter-affected readiness. *)
   Hypothesis H_valid_schedule :
-    @valid_schedule _ _ sched _ original_arrival jitter_ready_instance arr_seq.
+    @valid_schedule _ original_arrival _ sched _ jitter_ready_instance arr_seq.
 
   (** As one would think, the set of scheduled jobs remains unchanged. For
       technical reasons (dependence of the definition of [scheduled_jobs_at] on

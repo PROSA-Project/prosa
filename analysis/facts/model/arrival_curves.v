@@ -115,9 +115,12 @@ Section FPArrivalBounds.
   Context {Task : TaskType}.
   Context `{MaxArrivals Task}.
 
+  (** ... and their associated jobs. *)
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
+
+  (** Allow for any fixed-priority policy. *)
   Context `{FP_policy Task}.
 
   (** Consider any kind of processor state model... *)

@@ -41,25 +41,25 @@ End Backlogged.
 
 (** With the readiness concept in place, we define the notion of valid schedules. *)
 Section ValidSchedule.
-  (** Consider any kind of jobs and any kind of processor state. *)
-  Context {Job : JobType} {PState : ProcessorState Job}.
+  (** Consider any kind of jobs with arrival times, and any kind of processor state. *)
+  Context {Job : JobType} `{JobArrival Job} {PState : ProcessorState Job}.
 
   (** Consider any schedule. *)
   Variable sched : schedule PState.
 
-  Context `{JobArrival Job}.
-
-  (** We define whether jobs come from some arrival sequence... *)
+  (** We define whether jobs come from some given arrival sequence... *)
   Definition jobs_come_from_arrival_sequence (arr_seq : arrival_sequence Job) :=
     forall j t, scheduled_at sched j t -> arrives_in arr_seq j.
 
-  (** ..., whether a job can only be scheduled if it has arrived ... *)
+  (** ... whether a job can only be scheduled if it has arrived. *)
   Definition jobs_must_arrive_to_execute :=
     forall j t, scheduled_at sched j t -> has_arrived j t.
 
-  Context {jc : JobCost Job} {ja : JobArrival Job} {jr : JobReady Job PState}.
+  (** Furthermore, for jobs that have execution costs and a notion of
+      readiness ... *)
+  Context `{JobCost Job} `{!JobReady Job PState}.
 
-  (** ..., whether a job can only be scheduled if it is ready ... *)
+  (** ... we define whether a job can only be scheduled if it is ready ... *)
   Definition jobs_must_be_ready_to_execute :=
     forall j t, scheduled_at sched j t -> job_ready sched j t.
 

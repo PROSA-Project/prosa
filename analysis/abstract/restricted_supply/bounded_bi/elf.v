@@ -115,13 +115,12 @@ Section BoundedBusyIntervals.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
   (** The next step is to establish a bound on the maximum busy-window length,
-      which aRSA requires to be given. To this end, let L be any positive
+      which aRSA requires to be given. To this end, let [L] be any positive
       fixed point of the busy-interval recurrence. As the lemma
-      busy_intervals_are_bounded_rs_elf shows, under ELF scheduling, this is
-      sufficient to guarantee that all busy intervals are bounded by L. *)
+      [busy_intervals_are_bounded_rs_elf] shows, under ELF scheduling, this is
+      sufficient to guarantee that all busy intervals are bounded by [L]. *)
   Variable L : duration.
   Hypothesis H_L_positive : 0 < L.
-
   Hypothesis H_fixed_point :
     forall (A : duration),
       blocking_bound ts tsk A + total_hep_request_bound_function_FP ts tsk L <= SBF L.

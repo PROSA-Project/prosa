@@ -104,11 +104,11 @@ Section RequestBoundFunctionsModel.
     forall (tsk : Task), tsk \in ts -> valid_request_bound_function (request_bound tsk).
 
   (** Finally, we lift the per-task semantics of the respective
-      request bound functions to the entire task set.  *)
-
+      request bound functions to the entire task set for both the maximum ... *)
   Definition taskset_respects_max_request_bound :=
     forall (tsk : Task), tsk \in ts -> respects_max_request_bound arr_seq tsk (max_request_bound tsk).
 
+  (** ... and minimum request-bound functions. *)
   Definition taskset_respects_min_request_bound :=
     forall (tsk : Task), tsk \in ts -> respects_min_request_bound arr_seq tsk (min_request_bound tsk).
 

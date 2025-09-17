@@ -77,6 +77,8 @@ Section ScheduleClass.
     by move=> s; rewrite /supply_in /index_enum sum_unit1.
   Qed.
 
+  (** For ease of rewriting, we restate the definition of [scheduled_in] as a
+      lemma, ... *)
   Lemma scheduled_in_def (j : Job) s :
     scheduled_in j s = (s == Some j).
   Proof.
@@ -86,10 +88,37 @@ Section ScheduleClass.
     by exists.
   Qed.
 
+  (** ... and also the definitions of [scheduled_at], *)
   Lemma scheduled_at_def sched (j : Job) t :
     scheduled_at sched j t = (sched t == Some j).
   Proof.
       by rewrite /scheduled_at scheduled_in_def.
+  Qed.
+
+  (** ... [service_on], ... *)
+  Lemma service_on_def (j : Job) (s : processor_state Job) c :
+    service_on j s c = (s == Some j).
+  Proof. by []. Qed.
+
+  (** ... and [service_at]. *)
+  Lemma service_at_def sched (j : Job) t :
+    service_at sched j t = (sched t == Some j).
+  Proof.
+    by rewrite /service_at service_in_def.
+  Qed.
+
+  (** We similarly note ways of rewriting [service_in] as [scheduled_in] ...  *)
+  Lemma service_in_is_scheduled_in (j : Job) s :
+    service_in j s = scheduled_in j s.
+  Proof.
+    by rewrite service_in_def scheduled_in_def.
+  Qed.
+
+  (** ... and [service_at] as [scheduled_at]. *)
+  Lemma service_at_is_scheduled_at sched (j : Job) t :
+    service_at sched j t = scheduled_at sched j t.
+  Proof.
+      by rewrite /service_at service_in_is_scheduled_in.
   Qed.
 
   (** The ideal processor model is a fully supply-consuming processor
@@ -101,28 +130,6 @@ Section ScheduleClass.
     rewrite /service_at /supply_at /supply_in service_in_def.
     move: SCHED; rewrite scheduled_at_def => ->.
     by rewrite sum_unit1.
-  Qed.
-
-  Lemma service_in_is_scheduled_in (j : Job) s :
-    service_in j s = scheduled_in j s.
-  Proof.
-    by rewrite service_in_def scheduled_in_def.
-  Qed.
-
-  Lemma service_at_is_scheduled_at sched (j : Job) t :
-    service_at sched j t = scheduled_at sched j t.
-  Proof.
-      by rewrite /service_at service_in_is_scheduled_in.
-  Qed.
-
-  Lemma service_on_def (j : Job) (s : processor_state Job) c :
-    service_on j s c = (s == Some j).
-  Proof. by []. Qed.
-
-  Lemma service_at_def sched (j : Job) t :
-    service_at sched j t = (sched t == Some j).
-  Proof.
-    by rewrite /service_at service_in_def.
   Qed.
 
   (** The ideal uniprocessor always has supply. *)

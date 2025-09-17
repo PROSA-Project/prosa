@@ -114,12 +114,10 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
         /\ R >= F + (task_cost tsk - ε).
 
   (** Now, we can leverage the results for the abstract model with bounded nonpreemptive segments
-     to establish a response-time bound for the more concrete model of fully nonpreemptive scheduling. *)
-
-  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
+      to establish a response-time bound for the more concrete model of fully nonpreemptive scheduling. *)
 
   Theorem uniprocessor_response_time_bound_fully_nonpreemptive_edf :
-    response_time_bounded_by tsk R.
+    task_response_time_bound arr_seq sched tsk R.
   Proof.
     case: (posnP (task_cost tsk)) => [ZERO|POS].
     { intros j ARR TSK.

@@ -23,8 +23,8 @@ Require Export prosa.util.rel.
 (** We define the TDMA policy as follows.*)
 Section TDMAPolicy.
 
-  Variable Task : eqType.
   (** With each task, we associate the duration of the corresponding TDMA slot. *)
+  Variable Task : eqType.
   Definition TDMA_slot := Task -> duration.
 
   (** Moreover, within each TDMA cycle, task slots are ordered according to
@@ -46,9 +46,8 @@ Class TDMAPolicy (T : TaskType) :=
 (** First, we define the properties of a valid TDMA policy. *)
 Section ValidTDMAPolicy.
 
-  Context {Task : eqType}.
-
   (** Consider any task set ts... *)
+  Context {Task : eqType}.
   Variable ts : {set Task}.
 
   (** ...and a TDMA policy. *)
@@ -69,8 +68,12 @@ Section ValidTDMAPolicy.
   Definition valid_time_slot :=
     forall tsk, tsk \in ts -> task_time_slot tsk > 0.
 
+  (** A valid TDMA policy satisfies all of the above conditions. *)
   Definition valid_TDMAPolicy :=
-    transitive_slot_order /\ total_slot_order /\ antisymmetric_slot_order /\ valid_time_slot.
+    transitive_slot_order
+    /\ total_slot_order
+    /\ antisymmetric_slot_order
+    /\ valid_time_slot.
 
 End ValidTDMAPolicy.
 
@@ -79,9 +82,8 @@ End ValidTDMAPolicy.
 (** In this section, we define key TDMA concepts. *)
 Section TDMADefinitions.
 
-  Context {Task : eqType}.
-
   (** Consider any task set ts... *)
+  Context {Task : eqType}.
   Variable ts : {set Task}.
 
   (** ...and a TDMA policy. *)
@@ -109,8 +111,9 @@ End TDMADefinitions.
 
 Section TDMASchedule.
 
+  (** Consider arbitrary tasks and their jobs with arrival times, costs, and any
+      notion of readiness, scheduled on any type of processor. *)
   Context {Task : TaskType} {Job : JobType}.
-
   Context {PState : ProcessorState Job}.
   Context {ja : JobArrival Job} {jc : JobCost Job}.
   Context {jr : @JobReady Job PState jc ja} `{JobTask Job Task}.
@@ -124,9 +127,11 @@ Section TDMASchedule.
   (** ... and any sporadic task set. *)
   Variable ts : {set Task}.
 
+  (** Suppose we are given a TDMA policy for the tasks. *)
   Context `{TDMAPolicy Task}.
 
-  (** In order to characterize a TDMA policy, we first define whether a job is executing its TDMA slot at time [t]. *)
+  (** In order to characterize adherence to the TDMA policy, we first define
+      whether a job is executing its TDMA slot at time [t]. *)
   Definition job_in_time_slot (job : Job) (t : instant) :=
     task_in_time_slot ts (job_task job) t.
 
@@ -146,6 +151,8 @@ Section TDMASchedule.
                  /\ job_task j = job_task j_other
                  /\ scheduled_at sched j_other t.
 
+  (** For brevity, we combine the above two conditions into one validity
+      condition. *)
   Definition respects_TDMA_policy :=
     forall (j:Job) (t:instant),
       arrives_in arr_seq j ->

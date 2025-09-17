@@ -1,5 +1,7 @@
 Require Export prosa.model.readiness.suspension.
 
+(** * Facts about Self-Suspensions *)
+
 (** In this file, we establish some basic facts related to self-suspensions. *)
 
 Section Suspensions.
@@ -25,73 +27,74 @@ Section Suspensions.
   Variable sched : schedule PState.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
+  (** ** Basic Lemmas *)
+
   (** First, we establish some basic lemmas regarding self-suspending jobs. *)
-  Section BasicLemmas.
 
-    (** We show that a self-suspended job cannot be ready, ... *)
-    Lemma suspended_implies_job_not_ready :
-      forall j t,
-        suspended sched j t ->
-        ~~ job_ready sched j t.
-    Proof.
-      move=> j t /andP[SUS PEND].
-      rewrite /job_ready /suspension_ready_instance.
-      by rewrite negb_and; apply /orP; left.
-    Qed.
+  (** We show that a self-suspended job cannot be ready, ... *)
+  Lemma suspended_implies_job_not_ready :
+    forall j t,
+      suspended sched j t ->
+      ~~ job_ready sched j t.
+  Proof.
+    move=> j t /andP[SUS PEND].
+    rewrite /job_ready /suspension_ready_instance.
+    by rewrite negb_and; apply /orP; left.
+  Qed.
 
-    (** ... which trivially implies that the job cannot be scheduled. *)
-    Lemma suspended_implies_not_scheduled :
-      forall j t,
-        suspended sched j t ->
-        ~~ scheduled_at sched j t.
-    Proof.
-      move=> j t /suspended_implies_job_not_ready SUS.
-      by move: SUS; apply contra.
-    Qed.
+  (** ... which trivially implies that the job cannot be scheduled. *)
+  Lemma suspended_implies_not_scheduled :
+    forall j t,
+      suspended sched j t ->
+      ~~ scheduled_at sched j t.
+  Proof.
+    move=> j t /suspended_implies_job_not_ready SUS.
+    by move: SUS; apply contra.
+  Qed.
 
-    (** Next, we observe that a self-suspended job has already arrived. *)
-    Lemma suspended_implies_arrived :
-      forall j t,
-        suspended sched j t ->
-        has_arrived j t.
-    Proof.
-      by move=> j t /andP [? /andP [? ?]].
-    Qed.
+  (** Next, we observe that a self-suspended job has already arrived. *)
+  Lemma suspended_implies_arrived :
+    forall j t,
+      suspended sched j t ->
+      has_arrived j t.
+  Proof.
+    by move=> j t /andP [? /andP [? ?]].
+  Qed.
 
-    (** By definition, only pending jobs can be self-suspended. *)
-    Lemma suspended_implies_pending :
-      forall j t,
-        suspended sched j t ->
-        pending sched j t.
-    Proof.
-      by move=> j t /andP [? ?].
-    Qed.
+  (** By definition, only pending jobs can be self-suspended. *)
+  Lemma suspended_implies_pending :
+    forall j t,
+      suspended sched j t ->
+      pending sched j t.
+  Proof.
+    by move=> j t /andP [? ?].
+  Qed.
 
-    (** Next, we note that self-suspended jobs are not backlogged. *)
-    Lemma suspended_implies_not_backlogged :
-      forall j t,
-        suspended sched j t ->
-        ~~ backlogged sched j t.
-    Proof.
-      move=> j t /suspended_implies_job_not_ready SUS.
-      by rewrite /backlogged negb_and; apply /orP; left.
-    Qed.
+  (** Next, we note that self-suspended jobs are not backlogged. *)
+  Lemma suspended_implies_not_backlogged :
+    forall j t,
+      suspended sched j t ->
+      ~~ backlogged sched j t.
+  Proof.
+    move=> j t /suspended_implies_job_not_ready SUS.
+    by rewrite /backlogged negb_and; apply /orP; left.
+  Qed.
 
-    (** Further, we prove that if a job is pending and not self-suspended then
-        it is ready. *)
-    Lemma pending_and_not_suspended_implies_ready :
-      forall j t,
-        pending sched j t ->
-        ~~ suspended sched j t ->
-        job_ready sched j t.
-    Proof.
-      move=> j t; rewrite /suspended => PEND NOTSUS.
-      rewrite PEND andbT negbK in NOTSUS.
-      move: PEND => /andP [ARR NOTCOMP].
-      by rewrite /job_ready /suspension_ready_instance; apply /andP; split.
-    Qed.
+  (** Further, we prove that if a job is pending and not self-suspended then
+      it is ready. *)
+  Lemma pending_and_not_suspended_implies_ready :
+    forall j t,
+      pending sched j t ->
+      ~~ suspended sched j t ->
+      job_ready sched j t.
+  Proof.
+    move=> j t; rewrite /suspended => PEND NOTSUS.
+    rewrite PEND andbT negbK in NOTSUS.
+    move: PEND => /andP [ARR NOTCOMP].
+    by rewrite /job_ready /suspension_ready_instance; apply /andP; split.
+  Qed.
 
-  End BasicLemmas.
+  (** ** Self-Suspension Bound at any Point During a Job's Execution *)
 
   (** Next, we focus on bounding the self-suspension period of a job after receiving
       some amount of service. *)
@@ -118,6 +121,8 @@ Section Suspensions.
 
         Essentially here we are establishing a bound on the length of the self-suspension segment of [j]
         characterized by [ρ]. *)
+
+    (** *** Step 1 *)
 
     (** Note that we can have two cases here, either the job [j] starts a suspension segment within
         the interval <<[t1, t2)>>, or the job is already suspended at [t1]. *)
@@ -147,28 +152,24 @@ Section Suspensions.
       Qed.
 
       (** Next we consider the trivial case when the suspension period exceeds the interval <<[tf, t2)>>. *)
-      Section TrivialCase.
-        Hypothesis H_LEQ : t2 - tf <= job_suspension j ρ.
-
-        Lemma suspension_bounded_trivial :
-          \sum_(tf <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
-        Proof.
-          apply: leq_trans;
-            first by apply sum_majorant_constant with (c := 1) => ? ? ?; lia.
-          rewrite mul1n -sum1_size big_filter.
-          apply leq_trans with (n := \sum_(t0 <- index_iota tf t2) 1); first by apply leq_sum_seq_pred.
-          by rewrite sum1_size size_iota.
-        Qed.
-
-      End TrivialCase.
+      Lemma suspension_bounded_trivial :
+        t2 - tf <= job_suspension j ρ ->
+        \sum_(tf <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
+      Proof.
+        move=> LEQ.
+        apply: leq_trans;
+          first by apply sum_majorant_constant with (c := 1) => ? ? ?; lia.
+        rewrite mul1n -sum1_size big_filter.
+        apply leq_trans with (n := \sum_(t0 <- index_iota tf t2) 1); first by apply leq_sum_seq_pred.
+        by rewrite sum1_size size_iota.
+      Qed.
 
       (** Next, we consider the case when the suspension period is within the interval <<[tf, t2)>>. *)
-      Section IntervalLengthLonger.
-        Hypothesis H_GT : t2 - tf > job_suspension j ρ.
-
-        Lemma suspension_bounded_longer_interval :
-          \sum_(tf <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
-        Proof.
+      Lemma suspension_bounded_longer_interval :
+        t2 - tf > job_suspension j ρ ->
+        \sum_(tf <= t < t2 | service sched j t == ρ) suspended sched j t <= job_suspension j ρ.
+      Proof.
+        move=> GT.
         have ARRj : job_arrival j <= tf by apply suspended_implies_arrived.
         have PENDj : pending sched j tf by apply suspended_implies_pending.
         erewrite big_cat_nat with (n := tf + job_suspension j ρ); rewrite //=; try by lia.
@@ -189,15 +190,13 @@ Section Suspensions.
               have SERVLT : ρ >= service sched j (to - job_suspension j ρ)
                by rewrite -[in leqRHS]SERVto; apply service_monotonic; lia.
               by apply /eqP; lia. } } }
-          rewrite addn0.
+           rewrite addn0.
           apply: leq_trans; first by apply sum_majorant_constant with (c := 1) => ? ? ?; lia.
           rewrite mul1n -sum1_size big_filter.
           apply leq_trans with (n := \sum_(t0 <- index_iota tf (tf + job_suspension j ρ)) 1);
             first by apply leq_sum_seq_pred.
           by rewrite sum1_size size_iota; lia.
-        Qed.
-
-      End IntervalLengthLonger.
+      Qed.
 
       (** Now we prove the required bound in case a point like [tf] exists. This helps to simplify
           our final proof. *)
@@ -215,52 +214,52 @@ Section Suspensions.
 
     End Step1.
 
-    Section Step2.
+    (** *** Step 2 *)
 
-      (** Now we prove that the point [tf], as used in the above lemmas, always exists if [suspended]
-          is true at some point inside <<[t1, t2)>>. *)
-      Hypothesis H_exists : (exists2 t, t \in index_iota t1 t2 & (suspended sched j t && (service sched j t == ρ))).
+    (** Now we prove that the point [tf], as used in the above lemmas, always exists if [suspended]
+        is true at some point inside <<[t1, t2)>>. *)
+    Lemma exists_some_point :
+      (exists2 t, t \in index_iota t1 t2 & (suspended sched j t && (service sched j t == ρ))) ->
+      exists t',
+        t1 <= t' < t2
+        /\ suspended sched j t'
+        /\ service sched j t' = ρ
+        /\ forall to, t1 <= to < t' ->
+                ~~ (suspended sched j to && (service sched j to == ρ)).
+    Proof.
+      move=> EXISTS.
+      set P := (fun t => suspended sched j t && (service sched j t == ρ)).
+      set ind := find P (index_iota t1 t2).
+      set t' := nth 0 (index_iota t1 t2) ind.
+      move /hasP: (EXISTS); rewrite has_find //= => indLT.
+      have INt' : t1 <= t' < t2 by rewrite -mem_index_iota mem_nth.
+      have /andP[SUSt' /eqP SERVt'] :  P t' by apply (@nth_find _ 0 P (index_iota t1 t2)); apply /hasP.
+      exists t'; do 3![split; eauto].
+      move=> to; rewrite -mem_index_iota => INto.
+      have LT : index to (iota t1 (t' - t1)) < size (iota t1 (t' - t1)) by rewrite index_mem.
+      have indexLT: index to (index_iota t1 t2) < ind.
+      { rewrite /index_iota.
+        have SPLIT: t2 - t1 = (t' - t1) + (t2 - t') by rewrite addBnAC; lia.
+        rewrite SPLIT iotaD index_cat.
+        have ->: to \in iota t1 (t' - t1) by [].
+        have NOTINt': t' \notin iota t1 (t' - t1) by apply /negP; rewrite mem_index_iota; lia.
+        have GT: index t' (index_iota t1 t2) >= size (iota t1 (t' - t1)).
+        { rewrite /index_iota SPLIT iotaD index_cat.
+          have ->: t' \in iota t1 (t' - t1) = false; try by lia.
+          rewrite size_iota; by lia. }
+        move: LT; rewrite size_iota => LT.
+        move: GT; rewrite size_iota {2}/t' index_uniq; try by lia.
+        { by rewrite /ind /P. }
+        { by apply iota_uniq. } }
+      have : P to = false.
+      { apply (@before_find _ 0 P (index_iota t1 t2) _) in indexLT.
+        rewrite nth_index in indexLT => //=.
+        move: INto; rewrite mem_index_iota => INto.
+        rewrite mem_index_iota; lia. }
+      by rewrite /P => ->.
+    Qed.
 
-      Lemma exists_some_point :
-        exists t',
-          t1 <= t' < t2
-          /\ suspended sched j t'
-          /\ service sched j t' = ρ
-          /\ forall to, t1 <= to < t' ->
-                  ~~ (suspended sched j to && (service sched j to == ρ)).
-      Proof.
-        set P := (fun t => suspended sched j t && (service sched j t == ρ)).
-        set ind := find P (index_iota t1 t2).
-        set t' := nth 0 (index_iota t1 t2) ind.
-        move /hasP: H_exists; rewrite has_find //= => indLT.
-        have INt' : t1 <= t' < t2 by rewrite -mem_index_iota mem_nth.
-        have /andP[SUSt' /eqP SERVt'] :  P t' by apply (@nth_find _ 0 P (index_iota t1 t2)); apply /hasP.
-        exists t'; do 3![split; eauto].
-        move=> to; rewrite -mem_index_iota => INto.
-        have LT : index to (iota t1 (t' - t1)) < size (iota t1 (t' - t1)) by rewrite index_mem.
-        have indexLT: index to (index_iota t1 t2) < ind.
-        { rewrite /index_iota.
-          have SPLIT: t2 - t1 = (t' - t1) + (t2 - t') by rewrite addBnAC; lia.
-          rewrite SPLIT iotaD index_cat.
-          have ->: to \in iota t1 (t' - t1) by [].
-          have NOTINt': t' \notin iota t1 (t' - t1) by apply /negP; rewrite mem_index_iota; lia.
-          have GT: index t' (index_iota t1 t2) >= size (iota t1 (t' - t1)).
-          { rewrite /index_iota SPLIT iotaD index_cat.
-            have ->: t' \in iota t1 (t' - t1) = false; try by lia.
-            rewrite size_iota; by lia. }
-          move: LT; rewrite size_iota => LT.
-          move: GT; rewrite size_iota {2}/t' index_uniq; try by lia.
-          { by rewrite /ind /P. }
-          { by apply iota_uniq. } }
-        have : P to = false.
-        { apply (@before_find _ 0 P (index_iota t1 t2) _) in indexLT.
-          rewrite nth_index in indexLT => //=.
-          move: INto; rewrite mem_index_iota => INto.
-          rewrite mem_index_iota; lia. }
-        by rewrite /P => ->.
-      Qed.
-
-    End Step2.
+    (** *** Final Bound *)
 
     (** Finally we prove the required result. *)
     Lemma suspension_bounded_in_interval :

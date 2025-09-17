@@ -499,14 +499,21 @@ Section RelationToScheduled.
       interval during which they must have been scheduled. *)
   Section AfterArrival.
 
+    (** Assume that jobs have arrival times and ... *)
     Context `{JobArrival Job}.
 
-    (** Assume that jobs must arrive to execute. *)
-    Hypothesis H_jobs_must_arrive :
-      jobs_must_arrive_to_execute sched.
+    (** ... must arrive to execute. *)
+    Hypothesis H_jobs_must_arrive : jobs_must_arrive_to_execute sched.
+
+    (** Then, trivially, no job is scheduled before its arrival. *)
+    Lemma not_scheduled_before_arrival :
+      forall t, t < job_arrival j -> ~~ scheduled_at sched j t.
+    Proof.
+      by move=> t ?; apply: (contra (H_jobs_must_arrive j t)); rewrite -ltnNge.
+    Qed.
 
     (** We prove that any job with positive cumulative service at time [t] must
-       have been scheduled some time since its arrival and before time [t]. *)
+        have been scheduled at some time since its arrival and before time [t]. *)
     Lemma positive_service_implies_scheduled_since_arrival :
       forall t,
         service sched j t > 0 ->
@@ -514,12 +521,6 @@ Section RelationToScheduled.
     Proof.
       move=> t /positive_service_implies_scheduled_before[t' [t't sch]].
       exists t'; split=> //; rewrite t't andbT; exact: H_jobs_must_arrive.
-    Qed.
-
-    Lemma not_scheduled_before_arrival :
-      forall t, t < job_arrival j -> ~~ scheduled_at sched j t.
-    Proof.
-      by move=> t ?; apply: (contra (H_jobs_must_arrive j t)); rewrite -ltnNge.
     Qed.
 
     (** We show that job [j] does not receive service at any time [t] prior to its

@@ -29,11 +29,12 @@ Definition check_point_NP (ts : seq Task) (tsk : Task) (R : nat) (P : nat * nat)
 (** * Search Space Definitions *)
 Section SearchSpaceDefinition.
 
-  (** Assume that an arrival curve based on a concrete prefix is given. *)
+  (** Assume that an arrival curve based on a concrete prefix is given ... *)
   #[local] Existing Instance ConcreteMaxArrivals.
   Definition Task := concrete_task : eqType.
   Definition Job := concrete_job : eqType.
 
+  (** ... and that we know the maximum non-preemptive segment for each task. *)
   Context (TMNSP : TaskMaxNonpreemptiveSegment Task).
 
   (** First, we recall the notion of correct search space as defined by

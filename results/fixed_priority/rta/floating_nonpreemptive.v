@@ -128,10 +128,8 @@ Section RTAforFloatingModelwithArrivalCurves.
       bound for the more concrete model with floating non-preemptive
       regions.  *)
 
-  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-
   Theorem uniprocessor_response_time_bound_fp_with_floating_nonpreemptive_regions :
-    response_time_bounded_by tsk R.
+    task_response_time_bound arr_seq sched tsk R.
   Proof.
     move: (H_valid_task_model_with_floating_nonpreemptive_regions) => [LIMJ JMLETM].
     move: (LIMJ) => [BEG [END _]].

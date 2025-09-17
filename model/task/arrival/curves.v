@@ -137,17 +137,21 @@ Section ArrivalCurvesModel.
     forall (tsk : Task), tsk \in ts -> valid_arrival_curve (arrivals tsk).
 
   (** Finally, we lift the per-task semantics of the respective arrival and
-  separation curves to the entire task set.  *)
+      separation curves to the entire task set for...  *)
 
+  (** ... the maximum number of arrivals, ... *)
   Definition taskset_respects_max_arrivals :=
     forall (tsk : Task), tsk \in ts -> respects_max_arrivals arr_seq tsk (max_arrivals tsk).
 
+  (** ... the minimum number of arrivals, ... *)
   Definition taskset_respects_min_arrivals :=
     forall (tsk : Task), tsk \in ts -> respects_min_arrivals arr_seq tsk (min_arrivals tsk).
 
+  (** ... the maximum separation, ... *)
   Definition taskset_respects_max_separation :=
     forall (tsk : Task), tsk \in ts -> respects_max_separation arr_seq tsk (max_separation tsk).
 
+  (**.. as well as for the minimum separation. *)
   Definition taskset_respects_min_separation :=
     forall (tsk : Task), tsk \in ts -> respects_min_separation arr_seq tsk (min_separation tsk).
 

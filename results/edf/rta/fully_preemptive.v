@@ -116,10 +116,8 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       bound for the more concrete model of fully preemptive
       scheduling. *)
 
-  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-
   Theorem uniprocessor_response_time_bound_fully_preemptive_edf :
-    response_time_bounded_by tsk R.
+    task_response_time_bound arr_seq sched tsk R.
   Proof.
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L:=L) => //.
     move => A /andP [LT CHANGE].

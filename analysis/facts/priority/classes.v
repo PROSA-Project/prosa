@@ -253,9 +253,11 @@ Section FPRemarks.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider any FP policy. *)
+  (** Under any FP policy, ... *)
   Context {FP : FP_policy Task}.
 
+  (** ... later-arriving jobs do not have higher priority than earlier-arriving
+      ones. *)
   Remark respects_sequential_tasks :
     reflexive_task_priorities FP ->
     policy_respects_sequential_tasks (FP_to_JLFP FP).

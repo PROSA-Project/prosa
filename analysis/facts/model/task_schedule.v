@@ -25,9 +25,14 @@ Section TaskSchedule.
   Hypothesis H_uniproc : uniprocessor_model PState.
   Variable sched : schedule PState.
 
+  (** Suppose all scheduled jobs come from the given arrival sequence [arr_seq]
+      ... *)
   Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+
+  (** ... and execute only after their arrival time. *)
+  Hypothesis H_jobs_must_arrive_to_execute :
+    jobs_must_arrive_to_execute sched.
 
   (** Let [tsk] be any task. *)
   Variable tsk : Task.

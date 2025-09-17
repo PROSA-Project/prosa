@@ -255,11 +255,12 @@ Section PreemptionFacts.
   Context `{Arrival : JobArrival Job}.
   Context `{Cost : JobCost Job}.
 
-  (** Allow for any uniprocessor model. *)
+  (** Allow for any uniprocessor model ... *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniproc : uniprocessor_model PState.
 
-  Context `{@JobReady Job PState Cost Arrival}.
+  (** ... and for any notion of job readiness. *)
+  Context `{!JobReady Job PState}.
 
   (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.

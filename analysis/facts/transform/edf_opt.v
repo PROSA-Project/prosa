@@ -277,16 +277,20 @@ Section MakeEDFAtFacts.
   Section GuaranteeCaseAnalysis.
 
     (** Let [j_orig] denote the job scheduled in [sched] at time
-        [t_edf], let [j_edf] denote the job scheduled in [sched'] at
-        time [t_edf], and let [j'] denote any job scheduled in
-        [sched'] at some time [t'] after [t_edf]...  *)
-    Variable j_orig j_edf j' : Job.
+        [t_edf], ... *)
+    Variable j_orig : Job.
+    Hypothesis H_sched_orig : scheduled_at sched  j_orig t_edf.
 
+    (** ... let [j_edf] denote the job scheduled in [sched'] at
+        time [t_edf], ... *)
+    Variable j_edf : Job.
+    Hypothesis H_sched_edf : scheduled_at sched' j_edf t_edf.
+
+    (** ... and let [j'] denote any job scheduled in
+        [sched'] at some time [t'] after [t_edf] ...  *)
+    Variable j' : Job.
     Variable t' : instant.
     Hypothesis H_t_edf_le_t' : t_edf <= t'.
-
-    Hypothesis H_sched_orig : scheduled_at sched  j_orig t_edf.
-    Hypothesis H_sched_edf : scheduled_at sched' j_edf t_edf.
     Hypothesis H_sched' : scheduled_at sched' j' t'.
 
     (** ... and that arrives before time [t_edf]. *)
@@ -387,7 +391,7 @@ Section MakeEDFAtFacts.
     case: (boolP (t' < job_deadline j_orig)).
     - by apply mea_guarantee_case_t'_before_deadline.
     - rewrite -leqNgt => BOUND_t'.
-      now  apply: (mea_guarantee_case_t'_past_deadline j_orig j_edf j' t').
+      by apply: mea_guarantee_case_t'_past_deadline.
   Qed.
 
   (** We observe that [make_edf_at] maintains the property that jobs
@@ -651,24 +655,26 @@ Section EDFPrefixFacts.
 End EDFPrefixFacts.
 
 (** Finally, we observe that [edf_transform_prefix] is prefix-stable, which
-   allows us to replace an earlier horizon with a later horizon.  Note: this is
-   in a separate section because we need [edf_prefix_jobs_must_arrive]
-   generalized for any schedule. *)
+    allows us to replace an earlier horizon with a later horizon.
+
+    Note: this is in a separate section because we need
+    [edf_prefix_jobs_must_arrive] generalized for any schedule. *)
 Section EDFPrefixInclusion.
 
-  (** For any given type of jobs... *)
+  (** For any given type of jobs ... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
-  (** ...consider an ideal uniprocessor schedule... *)
+  (** ... consider an ideal uniprocessor schedule ... *)
   Variable sched : schedule (ideal.processor_state Job).
 
-  (** ...that is well-behaved...  *)
+  (** ... that is well-behaved ...  *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
-  (** ...and in which no scheduled job misses a deadline. *)
+  (** ... and in which no scheduled job misses a deadline. *)
   Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
+  (** The EDF-transformed schedule remains stable as the horizon grows. *)
   Lemma edf_prefix_inclusion :
     forall h1 h2,
       h1 <= h2 ->

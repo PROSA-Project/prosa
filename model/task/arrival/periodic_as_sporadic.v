@@ -16,12 +16,8 @@ Section PeriodicTasksAsSporadicTasks.
   (** Any type of periodic tasks ... *)
   Context {Task : TaskType} `{PeriodicModel Task}.
 
-  (** ... and their corresponding jobs from a consistent arrival sequence with
-      non-duplicate arrivals ... *)
+  (** ... and their corresponding jobs ... *)
   Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
-
-  Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
   (** ... may be interpreted as a type of sporadic tasks by using each task's
       period as its minimum inter-arrival time ... *)
@@ -36,7 +32,11 @@ Section PeriodicTasksAsSporadicTasks.
     forall tsk, valid_period tsk -> valid_task_min_inter_arrival_time tsk.
   Proof. trivial. Qed.
 
-  (** ... and the separation of job arrivals. *)
+  (** ... and, in a given valid arrival sequence,  ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
+   (** ... w.r.t. the separation of job arrivals. *)
   Remark periodic_task_respects_sporadic_task_model :
     forall tsk, valid_period tsk ->
            respects_periodic_task_model arr_seq tsk ->

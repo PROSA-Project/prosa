@@ -226,9 +226,9 @@ Section EMSOFTModel.
       always produce well-formed schedules. *)
 
   Hypothesis H_well_formed_A :
-    @valid_schedule _ _ (algA omega_0) (job_cost omega_0) _  (job_ready omega_0) arr_seq.
+    @valid_schedule _ _ _ (algA omega_0) (job_cost omega_0) (job_ready omega_0) arr_seq.
   Hypothesis H_well_formed_B :
-    forall omega, @valid_schedule _ _ (algB omega) (job_cost omega) _  (job_ready omega) arr_seq.
+    forall omega, @valid_schedule _ _ _ (algB omega) (job_cost omega) (job_ready omega) arr_seq.
 
 
   (** For brevity, recall the notion of [schedulability_transferred]. We

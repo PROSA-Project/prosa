@@ -78,11 +78,12 @@ Section Schedulability.
   (** Let [tsk] be any task that is to be analyzed. *)
   Variable tsk : Task.
 
-  (** Given  a response-time bound of [tsk] in this schedule no larger than its deadline, ... *)
+  (** If there is a response-time bound [R] for [tsk] in schedule [sched] ... *)
   Variable R : duration.
-
-  Hypothesis H_R_le_deadline : R <= task_deadline tsk.
   Hypothesis H_response_time_bounded : task_response_time_bound arr_seq sched tsk R.
+
+  (** ... no larger than its deadline, ... *)
+  Hypothesis H_R_le_deadline : R <= task_deadline tsk.
 
   (** ...then [tsk] is schedulable. *)
   Lemma schedulability_from_response_time_bound :

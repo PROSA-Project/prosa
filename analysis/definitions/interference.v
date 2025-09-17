@@ -32,10 +32,13 @@ Section Definitions.
                       && receives_service_at sched jhp t)
         (arrivals_up_to arr_seq t).
 
+    (** Next, consider a job-level priority policy in addition to the given [FP]
+        policy to break ties among jobs of equal-priority tasks. *)
     Context {JLFP : JLFP_policy Job}.
 
-    (** Then, to define interference from equal-priority tasks, we first
-        define higher-or-equal-priority jobs from an equal-priority task... *)
+    (** In order to define interference from equal-priority tasks, we first
+        define the notion of higher-or-equal-priority jobs from an
+        equal-priority task ... *)
     Definition ep_task_hep_job j1 j2 :=
       hep_job j1 j2 && ep_task (job_task j1) (job_task j2).
 

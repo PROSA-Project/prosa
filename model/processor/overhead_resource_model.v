@@ -19,35 +19,40 @@ Section OverheadResourceModel.
 
   (** We define functions that quantify the cumulative time that a
       given job (including the idle thread represented as [None])
-      spends in dispatch, context switching, and CRPD overheads. *)
+      spends in dispatch overhead, ... *)
 
   Definition time_spent_in_dispatch (oj : option Job) (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) (scheduled_job sched t == oj) && is_dispatch sched t.
 
+  (** ... context-switching overhead, ... *)
   Definition time_spent_in_context_switch (oj : option Job) (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) (scheduled_job sched t == oj) && is_context_switch sched t.
 
+  (** ... and CRPD overhead. *)
   Definition time_spent_in_CRPD (oj : option Job) (t1 t2 : instant) :=
     \sum_(t1 <= t < t2) (scheduled_job sched t == oj) && is_CRPD sched t.
 
-  (** Next, we define boundedness predicates on the duration of
+  (** Next, we define "boundedness predicates" on the duration of
       overheads. We assume that, if the processor continuously
-      schedules the same job (or remains idle) over a time interval,
+      schedules the same job (or remains idle) during a time interval,
       then the total time spent in each type of overhead is bounded by
       a fixed constant. These assumptions are used to control the
       contribution of each overhead type when no other scheduling
-      activity occurs. *)
+      activity occurs.
 
+      Specifically, we express bounded dispatch overhead, ... *)
   Definition time_spent_in_dispatch_is_bounded_by DB :=
     forall (t1 t2 : instant) (oj : option Job),
       scheduled_job_invariant sched oj t1 t2 ->
       time_spent_in_dispatch oj t1 t2 <= DB.
 
+  (** ... bounded context-switching overhead, ... *)
   Definition time_spent_in_context_switch_is_bounded_by CSB :=
     forall (t1 t2 : instant) (oj : option Job),
       scheduled_job_invariant sched oj t1 t2 ->
       time_spent_in_context_switch oj t1 t2 <= CSB.
 
+  (** ... and bounded overhead due to CRPD. *)
   Definition time_spent_in_CRPD_is_bounded_by CRPDB :=
     forall (t1 t2 : instant) (oj : option Job),
       scheduled_job_invariant sched oj t1 t2 ->

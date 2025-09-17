@@ -123,10 +123,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       bound for the more concrete model of fully preemptive
       scheduling. *)
 
-  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-
   Theorem uniprocessor_response_time_bound_fully_preemptive_fp :
-    response_time_bounded_by tsk R.
+    task_response_time_bound arr_seq sched tsk R.
   Proof.
     have BLOCK: blocking_bound ts tsk = 0.
     { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment

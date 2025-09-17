@@ -541,17 +541,23 @@ Section AbstractRTAforELFwithArrivalCurves.
       bound on total equal-priority workload are dependent on the offset [A]. *)
 
   (** Therefore, in order to define the concrete search space, we define
-      predicates that capture when these values change for successive
-      values of the offset [A]. *)
+      predicates that capture when these values change for successive values of
+      the offset [A].
+
+      First, we define a predicate that captures whether the RBF of the task
+      under analysis changes, ... *)
   Definition task_rbf_changes_at (A : duration) :=
     task_request_bound_function tsk  A != task_request_bound_function tsk (A + ε).
 
+  (** ... second, whether the total equal-priority workload bound changes, and ... *)
   Definition bound_on_total_ep_workload_changes_at A :=
-    has (fun tsk_o => ep_task tsk tsk_o
-                   && (tsk_o != tsk)
-                   && (ep_task_intf_interval tsk_o (A - ε) != ep_task_intf_interval tsk_o A))
-      ts.
+    let any_task_bound_changes tsk_o := ep_task tsk tsk_o
+                                        && (tsk_o != tsk)
+                                        && (ep_task_intf_interval tsk_o (A - ε)
+                                           != ep_task_intf_interval tsk_o A)
+    in has (any_task_bound_changes) ts.
 
+  (** ... third, whether the priority-inversion bound changes. *)
   Definition priority_inversion_changes_at (A : duration) :=
     priority_inversion_bound (A - ε) != priority_inversion_bound A.
 

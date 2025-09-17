@@ -44,18 +44,22 @@ Section ValidTaskArrivalSequence.
     valid_task_arrival_sequence -> valid_arrival_sequence arr_seq.
   Proof. by move=> //= []. Qed.
 
+  (** All arriving jobs have valid costs.. *)
   Lemma valid_task_arrival_sequence_valid_costs :
     valid_task_arrival_sequence -> arrivals_have_valid_job_costs arr_seq.
   Proof. by move=> [_ []]. Qed.
 
+  (** All arriving jobs belong to tasks in the task set. *)
   Lemma valid_task_arrival_sequence_from_taskset :
     valid_task_arrival_sequence -> all_jobs_from_taskset arr_seq ts.
   Proof. by move=> [_ [_ []]]. Qed.
 
+  (** Jobs do not arrive too frequently. *)
   Lemma valid_task_arrival_sequence_respects_max :
     valid_task_arrival_sequence -> taskset_respects_max_arrivals arr_seq ts.
   Proof. by move=> [_ [_ [_ []]]]. Qed.
 
+  (** The arrival curves are well-formed. *)
   Lemma valid_task_arrival_sequence_valid_curve :
     valid_task_arrival_sequence -> valid_taskset_arrival_curve ts max_arrivals.
   Proof. by move=> [_ [_ [_ []]]]. Qed.

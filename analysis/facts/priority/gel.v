@@ -67,24 +67,26 @@ Section GELBasicFacts.
       the GEL policy, tasks are always sequential. *)
   Section SequentialTasks.
 
-    (** Consider any arrival sequence. *)
-    Variable arr_seq : arrival_sequence Job.
+    (** Consider jobs with execution costs ... *)
+    Context `{JobCost Job}.
 
-    (** Allow for any uniprocessor model. *)
+    (** ... and any valid  arrival sequence of such jobs. *)
+    Variable arr_seq : arrival_sequence Job.
+    Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
+
+    (** Allow for any uniprocessor model ... *)
     Context {PState : ProcessorState Job}.
     Hypothesis H_uniproc : uniprocessor_model PState.
 
     (** Next, consider any schedule of the arrival sequence, ... *)
     Variable sched : schedule PState.
 
-    Context `{JobCost Job}.
-    Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
-
-    (** ... allow for any work-bearing notion of job readiness, ... *)
-    Context `{@JobReady Job PState _ Arrival}.
+    (** ...allow for any work-bearing notion of job readiness, ... *)
+    Context `{!JobReady Job PState}.
     Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
 
-    (** ... and assume that the schedule is valid. *)
+    (** ... and assume that the schedule is valid w.r.t. said work-bearing
+        readiness model. *)
     Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
     (** In addition, we assume the existence of a function mapping jobs

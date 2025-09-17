@@ -120,10 +120,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   (** Now, we can leverage the results for the abstract model with bounded non-preemptive segments
       to establish a response-time bound for the more concrete model of fixed preemption points.  *)
 
-  Let response_time_bounded_by := task_response_time_bound arr_seq sched.
-
   Theorem uniprocessor_response_time_bound_edf_with_fixed_preemption_points :
-    response_time_bounded_by tsk R.
+    task_response_time_bound arr_seq sched tsk R.
   Proof.
     move: (H_valid_model_with_fixed_preemption_points) => [MLP [BEG [END [INCR [HYP1 [HYP2 HYP3]]]]]].
     move: (MLP) => [BEGj [ENDj _]].

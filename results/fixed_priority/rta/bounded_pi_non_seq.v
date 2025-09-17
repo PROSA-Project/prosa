@@ -171,94 +171,87 @@ Section AbstractRTAforFPwithArrivalCurves.
 
     (** First, we consider the case where the job arrives _before_ the end of
         the interval under consideration. *)
-    Section SelfInterferenceBoundCase1.
 
-      Hypothesis H_j_arrives_before_Δ : job_arrival j < t1 + Δ.
+    (** Under the assumption that [j] arrives before [t1 + Δ], the interference
+        caused by the task under consideration itself is bounded by the cost of
+        the workload released by the tasks in the interval (given by the
+        RBF). However, we do not want to account for the job under consideration
+        itself as interference and hence we subtract the cost of the task. *)
+    Lemma self_intf_bound_case1 :
+      job_arrival j < t1 + Δ ->
+      workload_of_jobs
+        (another_hep_job_of_same_task^~ j)
+        (arrivals_between arr_seq t1 (t1 + Δ))
+      <= task_rbf Δ - task_cost (tsk).
+    Proof.
+      move=> LT.
+      eapply leq_trans; last eapply leq_trans;
+        last eapply task_rbf_without_job_under_analysis => //=.
+      - rewrite (workload_of_jobs_equiv_pred _  _
+                   (another_hep_job_of_same_task^~ j));
+          last by move => jo IN1; lia.
+        set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
+        rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) ));
+          last first.
+        { move => j' _.
+          rewrite /another_hep_job_of_same_task /hep_job_of_same_task /another_hep_job.
+          move : H_job_of_task => /eqP ->.
+          lia. }
+        rewrite workload_minus_job_cost'; [apply leqnn| by done|].
+        rewrite job_arrival_in_bounds //=.
+        by split; [| apply /andP; split] => //=.
+      -  rewrite /task_workload_between /task_workload.
+         move : H_job_of_task => TSK.
+         move : TSK => /eqP TSK.
+         rewrite  /hep_job /FP_to_JLFP H_priority_is_reflexive andTb TSK eq_refl //=.
+         apply leq_sub; last by done.
+         apply workload_of_jobs_weaken.
+         move => ? /andP[_  /eqP EQ].
+         by apply /eqP.
+    Qed.
 
-      (** In this case, we bound the interference caused by the task under
-          consideration itself by the cost of the workload released by the tasks in the
-          interval (given by the RBF). However, we do not want to account for the job under
-          consideration itself as interference and hence we subtract the cost
-          of the task. *)
-      Lemma self_intf_bound_case1 :
-        workload_of_jobs
-          (another_hep_job_of_same_task^~ j)
-          (arrivals_between arr_seq t1 (t1 + Δ))
-        <= task_rbf Δ - task_cost (tsk).
-      Proof.
-        eapply leq_trans; last eapply leq_trans;
-          last eapply task_rbf_without_job_under_analysis => //=.
-        - rewrite (workload_of_jobs_equiv_pred _  _
-                     (another_hep_job_of_same_task^~ j));
-            last by move => jo IN1; lia.
-          set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
-          rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) ));
-            last first.
-          { move => j' _.
-            rewrite /another_hep_job_of_same_task /hep_job_of_same_task /another_hep_job.
-            move : H_job_of_task => /eqP ->.
-            lia. }
-          rewrite workload_minus_job_cost'; [apply leqnn| by done|].
-          rewrite job_arrival_in_bounds //=.
-          by split; [| apply /andP; split] => //=.
-        -  rewrite /task_workload_between /task_workload.
-           move : H_job_of_task => TSK.
-           move : TSK => /eqP TSK.
-           rewrite  /hep_job /FP_to_JLFP H_priority_is_reflexive andTb TSK eq_refl //=.
-           apply leq_sub; last by done.
-           apply workload_of_jobs_weaken.
-           move => ? /andP[_  /eqP EQ].
-           by apply /eqP.
-      Qed.
-
-    End SelfInterferenceBoundCase1.
-
-    (** Next, we consider the case where the job arrives _after_ the
-        interval under consideration has ended. *)
-    Section SelfInterferenceBoundCase2.
-
-      Hypothesis H_j_arrives_after_Δ : t1 + Δ <= job_arrival j.
-
-      (** In this case we proceed similarly to the first case.
-          However in order to safely subtract the task cost from the RBF, we need
-          to consider the interval up to the arrival of the job under consideration. *)
-      Lemma self_intf_bound_case2 :
-        workload_of_jobs
-          (another_hep_job_of_same_task^~ j)
-          (arrivals_between arr_seq t1 (t1 + Δ))
-        <= task_rbf ((job_arrival j - t1) + ε) - task_cost tsk.
-      Proof.
-        eapply leq_trans with
-          (workload_of_jobs (another_hep_job_of_same_task^~ j)
-             (arrivals_between arr_seq t1 ( (job_arrival j) + 1)));
-          first by apply workload_of_jobs_reduce_range => //=;lia.
-        eapply leq_trans; last first.
-        - eapply task_rbf_without_job_under_analysis with (t1 := t1) => //=.
-          lia.
-        - set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
-          rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) ));
-            last first.
-          { move => j' _.
-            rewrite /another_hep_job_of_same_task /hep_job_of_same_task /another_hep_job.
-            move : H_job_of_task => /eqP ->.
-            lia. }
-          rewrite workload_minus_job_cost' //=.
-          + apply leq_sub; last first.
-            * rewrite /hep_job_of_same_task.
-              case (hep_job j j && (job_task j == tsk)) eqn: EQ1; try done.
-              contradict EQ1.
-              move : H_job_of_task => /eqP TSK.
-              by rewrite /hep_job /FP_to_JLFP H_priority_is_reflexive TSK eq_refl  //=.
-            * rewrite /task_workload_between /task_workload addnA.
-              have ->  :t1 + (job_arrival j - t1) + ε = job_arrival j + ε by lia.
-              apply workload_of_jobs_weaken.
-              move : H_job_of_task => /eqP TSK.
-              by move => jo /andP[_ /eqP TSK']; apply /eqP; rewrite -TSK TSK'.
-          + apply arrived_between_implies_in_arrivals => //=.
-            apply /andP; split; [done| lia].
-      Qed.
-
-    End SelfInterferenceBoundCase2.
+    (** Next, we consider the case where the job arrives _after_ the interval
+        under consideration has ended.  Here, we proceed similarly to the first
+        case. However in order to safely subtract the task cost from the RBF,
+        we need to consider the interval up to the arrival of the job under
+        consideration. *)
+    Lemma self_intf_bound_case2 :
+      t1 + Δ <= job_arrival j ->
+      workload_of_jobs
+        (another_hep_job_of_same_task^~ j)
+        (arrivals_between arr_seq t1 (t1 + Δ))
+      <= task_rbf ((job_arrival j - t1) + ε) - task_cost tsk.
+    Proof.
+      move=> LEQ.
+      eapply leq_trans with
+        (workload_of_jobs (another_hep_job_of_same_task^~ j)
+           (arrivals_between arr_seq t1 ( (job_arrival j) + 1)));
+        first by apply workload_of_jobs_reduce_range => //=;lia.
+      eapply leq_trans; last first.
+      - eapply task_rbf_without_job_under_analysis with (t1 := t1) => //=.
+        lia.
+      - set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
+        rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) ));
+          last first.
+        { move => j' _.
+          rewrite /another_hep_job_of_same_task /hep_job_of_same_task /another_hep_job.
+          move : H_job_of_task => /eqP ->.
+          lia. }
+        rewrite workload_minus_job_cost' //=.
+        + apply leq_sub; last first.
+          * rewrite /hep_job_of_same_task.
+            case (hep_job j j && (job_task j == tsk)) eqn: EQ1; try done.
+            contradict EQ1.
+            move : H_job_of_task => /eqP TSK.
+            by rewrite /hep_job /FP_to_JLFP H_priority_is_reflexive TSK eq_refl  //=.
+          * rewrite /task_workload_between /task_workload addnA.
+            have ->  :t1 + (job_arrival j - t1) + ε = job_arrival j + ε by lia.
+            apply workload_of_jobs_weaken.
+            move : H_job_of_task => /eqP TSK.
+            by move => jo /andP[_ /eqP TSK']; apply /eqP; rewrite -TSK TSK'.
+        + apply arrived_between_implies_in_arrivals => //=.
+          apply /andP; split; [done| lia].
+    Qed.
 
     (** Combining the above two bounds, we obtain the final bound on the
         self-interference incurred by any job [j] of task [tsk]. *)
