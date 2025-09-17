@@ -82,9 +82,11 @@ Section TaskIntraInterferenceIsBounded.
     service_inversion_is_bounded_by
      arr_seq sched tsk service_inversion_bound.
 
-  (** Assume that there exists a bound on the higher-or-equal-priority
-      (w.r.t. a [tsk]'s job) workload of tasks different from [tsk]. *)
-  Variable athep_workload_bound : (* A *) duration -> (* Δ *) duration -> duration.
+  (** Assume that there exists a bound [athep_workload_bound A Δ] on the
+      higher-or-equal-priority (w.r.t. a job of task [tsk]) workload of tasks
+      different from [tsk] that is parametric in the job's relative arrival
+      offset [A] and the interval length [Δ]. *)
+  Variable athep_workload_bound : duration -> duration -> duration.
   Hypothesis H_workload_is_bounded :
     athep_workload_is_bounded arr_seq sched tsk athep_workload_bound.
 

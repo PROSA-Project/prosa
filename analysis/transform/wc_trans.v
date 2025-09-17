@@ -45,24 +45,22 @@ Section WCTransformation.
 
   (** Next, we define a central element of the work-conserving transformation
       procedure: given an idle allocation at [t], find a job allocation in the future
-      to swap with. *)
+      to swap with. Note that [order _ _ := false] ensures that the first instant is chosen. *)
   Definition find_swap_candidate sched t :=
-    let order _ _ := false (* always take the first result *)
-    in
-    let max_dl := max_deadline_for_jobs_arrived_before t
-    in
-    let search_result := search_arg sched (relevant_pstate t) order t max_dl
-    in
+    let order _ _ := false in
+    let max_dl := max_deadline_for_jobs_arrived_before t in
+    let search_result := search_arg sched (relevant_pstate t) order t max_dl in
     if search_result is Some t_swap
     then t_swap
-    else t. (* if nothing is found, swap with yourself *)
+    else t.
 
-  (** The point-wise transformation procedure: given a schedule and a
-      time [t1], ensure that the schedule is work-conserving at time
-      [t1]. *)
+  (** The point-wise transformation procedure: given a schedule [sched] and a
+      time [t1], ensure that the schedule is work-conserving at time [t1].  If
+      [sched] is already non-idle at time [t1], there is nothing to
+      do. Otherwise, move job here if possible. *)
   Definition make_wc_at sched t1 : schedule PState :=
     match sched t1 with
-    | Some j => sched (* leave working instants alone *)
+    | Some j => sched
     | None =>
       let
         t2 := find_swap_candidate sched t1

@@ -73,15 +73,15 @@ Section TDMAFacts.
     Hypothesis time_slot_positive :
       valid_time_slot ts.
 
-    (** Assume that slot order is total... *)
+    (** Assume that slot order is total, ... *)
     Hypothesis slot_order_total :
       total_slot_order ts.
 
-    (*..., antisymmetric... *)
+    (** ... antisymmetric, ... *)
     Hypothesis slot_order_antisymmetric :
       antisymmetric_slot_order ts.
 
-    (*... and transitive. *)
+    (** ... and transitive. *)
     Hypothesis slot_order_transitive :
       transitive_slot_order.
 

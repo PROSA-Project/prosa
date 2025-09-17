@@ -107,12 +107,11 @@ Section BoundedBusyIntervals.
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
-  (** Let [blocking_bound] be a function that bounds the priority
-      inversion caused by lower-priority jobs, where the argument
-      [blocking_bound] takes is the relative offset (w.r.t. the
-      beginning of the corresponding busy interval) of a job to be
-      analyzed. *)
-  Variable blocking_bound : (* A *) duration -> duration.
+  (** Let [blocking_bound] be a function that bounds the priority inversion
+      caused by lower-priority jobs, where the argument [A] in [blocking_bound A]
+      is the relative offset (w.r.t. the beginning of the corresponding busy
+      interval) of a job to be analyzed. *)
+  Variable blocking_bound : duration -> duration.
 
   (** Assume that the service inversion is bounded by the blocking
       bound, ... *)

@@ -107,11 +107,12 @@ Section Abstract_RTA.
       busy_interval sched j t1 t2 ->
       A = job_arrival j - t1.
 
-  (** Next, consider a valid interference bound function [IBF_P] that
-      can use information about relative time arrival of a job of task
-      [tsk]. Recall that an interference bound function gives a bound on
-      the cumulative interference incurred by jobs of task [tsk]. *)
-  Variable IBF_P : (* A *) duration -> (* Δ *) duration -> duration.
+  (** Next, consider a valid interference bound function [IBF_P A Δ] that is
+      parametric in the relative time arrival [A] of a job of task [tsk]. Recall
+      that an interference bound function gives a bound on the cumulative
+      interference incurred by jobs of task [tsk] in an interval of length
+      [Δ]. *)
+  Variable IBF_P : duration -> duration -> duration.
   Hypothesis H_job_interference_is_bounded_IBFP :
     job_interference_is_bounded_by
       arr_seq sched tsk IBF_P relative_arrival_time_of_job_is_A.
@@ -143,10 +144,10 @@ Section Abstract_RTA.
       task_rtct tsk + IBF_P (job_arrival j - t1) F <= F
       /\ task_rtct tsk <= service sched j (t1 + F).
 
-  (** Next, consider a valid interference bound function [IBF_NP] that
-      can use information about the relative time when any given job of task
+  (** Next, consider a valid interference bound function [IBF_NP F Δ] that
+      is parametric in the relative time [F] when any given job of task
       [tsk] receives at least [task_rtc tsk] units of service. *)
-  Variable IBF_NP : (* F *) duration -> (* Δ *) duration -> duration.
+  Variable IBF_NP : duration -> duration -> duration.
   Hypothesis H_job_interference_is_bounded_IBFNP :
     job_interference_is_bounded_by
       arr_seq sched tsk IBF_NP relative_time_to_reach_rtct.

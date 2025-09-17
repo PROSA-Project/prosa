@@ -40,11 +40,13 @@ Section EDFTransformation.
     then t
     else 0.
 
-  (** The point-wise EDF transformation procedure: given a schedule and a time
-      [t1], ensure that the schedule satisfies [EDF_at] at time [t1]. *)
+  (** The point-wise EDF transformation procedure: given a schedule [sched] and
+      a time [t1], ensure that the schedule satisfies [EDF_at] at time [t1]. If
+      [sched t1] is idle, there is nothing to do. Otherwise, swap jobs if
+      necessary. *)
   Definition make_edf_at (sched : SchedType) (t1 : instant) : SchedType :=
     match sched t1 with
-    | None => sched (* leave idle instants alone *)
+    | None => sched
     | Some j =>
       let
         t2 := find_swap_candidate sched t1 j

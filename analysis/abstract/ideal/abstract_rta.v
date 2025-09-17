@@ -82,10 +82,11 @@ Section AbstractRTAIdeal.
   Hypothesis H_busy_interval_exists :
     busy_intervals_are_bounded_by arr_seq sched tsk L.
 
-  (** Next, assume that [interference_bound_function] is a bound on
-      the interference incurred by jobs of task [tsk] parametrized by
-      the relative arrival time [A]. *)
-  Variable interference_bound_function : (* A *) duration -> (* Δ *) duration -> duration.
+  (** Next, assume that we are given a bound [interference_bound_function A Δ]
+      on the interference incurred by jobs of task [tsk]. The bound is
+      parametrized by the relative arrival time [A] and the interval length
+      [Δ]. *)
+  Variable interference_bound_function : duration -> duration -> duration.
   Hypothesis H_job_interference_is_bounded :
     job_interference_is_bounded_by
       arr_seq sched tsk interference_bound_function (relative_arrival_time_of_job_is_A sched).

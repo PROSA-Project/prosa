@@ -58,7 +58,7 @@ Section ATHEPWorkloadBoundIsValidForELF.
   (** Consider any schedule. *)
   Variable sched : schedule PState.
 
-  (* Consider any fixed-priority scheduling policy. *)
+  (** Consider any fixed-priority scheduling policy. *)
   Context (FP : FP_policy Task).
 
   (** Before we prove the main result, we establish some auxiliary lemmas. *)

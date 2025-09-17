@@ -51,8 +51,8 @@ Definition time_steps_of (ac_prefix : ArrivalCurvePrefix) :=
 Definition step_at (ac_prefix : ArrivalCurvePrefix) (t : duration) :=
   last (0, 0) [ seq step <- steps_of ac_prefix | fst step <= t ].
 
-(* The function [value_at] returns the _value_ of the last step
-   ([duration × value]) such that [duration ≤ t] *)
+(** The function [value_at] returns the _value_ of the last step
+    ([duration × value]) such that [duration ≤ t] *)
 Definition value_at (ac_prefix : ArrivalCurvePrefix) (t : duration) :=
   snd (step_at ac_prefix t).
 

@@ -12,7 +12,7 @@ Section SeqSet.
   Record set :=
   {
     _set_seq :> seq T ;
-    _ : uniq _set_seq (* no duplicates *)
+    _ : uniq _set_seq
   }.
 
   (** Now we add the [ssreflect] boilerplate code to support [_ == _]

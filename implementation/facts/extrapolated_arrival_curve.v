@@ -126,15 +126,14 @@ Section ArrivalCurvePrefixSortedLeq.
 
 End ArrivalCurvePrefixSortedLeq.
 
-(* In the next section, we make the stronger assumption that
-   arrival-curve prefixes are sorted according to the [ltn_steps]
-   relation. *)
+(** In the next section, we make the stronger assumption that arrival-curve
+    prefixes are sorted according to the [ltn_steps] relation. *)
 Section ArrivalCurvePrefixSortedLtn.
 
   (** Consider an arbitrary [ltn]-sorted arrival-curve prefix without
       infinite arrivals. *)
   Variable ac_prefix : ArrivalCurvePrefix.
-  Hypothesis H_sorted_ltn : sorted_ltn_steps ac_prefix. (* Stronger assumption. *)
+  Hypothesis H_sorted_ltn : sorted_ltn_steps ac_prefix.
   Hypothesis H_no_inf_arrivals : no_inf_arrivals ac_prefix.
 
   (** First, we show that an [ltn]-sorted arrival-curve prefix is an
@@ -246,8 +245,8 @@ Section ExtrapolatedArrivalCurve.
   Lemma extrapolated_arrival_curve_change :
     forall t,
       extrapolated_arrival_curve ac_prefix t != extrapolated_arrival_curve ac_prefix (t + ε) ->
-      (* 1 *) t %/ h < (t + ε) %/ h
-      \/ (* 2 *) t %/ h = (t + ε) %/ h /\ prefix (t %% h) < prefix ((t + ε) %% h).
+      t %/ h < (t + ε) %/ h
+      \/ t %/ h = (t + ε) %/ h /\ prefix (t %% h) < prefix ((t + ε) %% h).
   Proof.
     intros t NEQ.
     have LT := ltn_neqAle (extrapolated_arrival_curve ac_prefix t) (extrapolated_arrival_curve ac_prefix (t + ε)).

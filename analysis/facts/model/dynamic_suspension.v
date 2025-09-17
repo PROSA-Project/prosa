@@ -99,7 +99,7 @@ Section TotalSuspensionBounded.
 
   End JobSuspensionBounded.
 
-  (* Next, assume that [tsk] respects the arrival curve defined by [max_arrivals]. *)
+  (** Next, assume that [tsk] respects the arrival curve defined by [max_arrivals]. *)
   Hypothesis H_tsk_respects_max_arrivals : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
 
   (** Now we establish a bound on the total duration the jobs of task [tsk] remain suspended in the interval

@@ -15,10 +15,10 @@ Require Export prosa.model.priority.numeric_fixed_priority.
 (** ** Implementation of a Concrete Task *)
 
 
-(** A task comprises of an id, a cost, an arrival bound, a deadline
-    and a priority. *)
+(** A task comprises of an ID, a cost, an arrival bound, a deadline
+    and a priority. The ID is required to ensure uniqueness. *)
 Structure concrete_task :=
-  { task_id: nat (* for uniqueness *)
+  { task_id: nat
   ; task_cost: nat
   ; task_arrival: task_arrivals_bound
   ; task_deadline: instant

@@ -7,9 +7,7 @@ Proof. intros; case eqP; constructor; auto. Qed.
 
 Ltac ins := simpl in *; try done; intros.
 
-(* ************************************************************************** *)
 (** ** Exploiting a hypothesis *)
-(* ************************************************************************** *)
 
 (** Exploit an assumption (adapted from [CompCert]). *)
 
@@ -74,16 +72,18 @@ Ltac rewrite_neg H :=
   (unshelve ((exploit H; last (rewrite -eqbF_neg => /eqP NEWH; rewrite NEWH; clear NEWH)) => //)) => //.
 
 
-(* This tactic feeds the precondition of an implication in order to derive the conclusion
-   (taken from http://comments.gmane.org/gmane.science.mathematics.logic.coq.club/7013).
+(** This tactic feeds the precondition of an implication in order to derive the conclusion
+    (taken from http://comments.gmane.org/gmane.science.mathematics.logic.coq.club/7013).
 
-   Usage: feed H.
+    Usage: <<feed H.>>
 
+<<
    H: P -> Q  ==becomes==>  H: P
                             ____
                             Q
-
-   After completing this proof, Q becomes a hypothesis in the context. *)
+>>
+   After completing this proof, [Q] becomes a hypothesis in the context.
+ *)
 Ltac feed H :=
   match type of H with
   | ?foo -> _ =>
@@ -91,13 +91,14 @@ Ltac feed H :=
     assert foo as FOO; [|specialize (H FOO); clear FOO]
   end.
 
-(* Generalization of feed for multiple hypotheses.
-   feed_n is useful for accessing conclusions of long implications.
+(** Generalization of feed for multiple hypotheses.
+    feed_n is useful for accessing conclusions of long implications.
 
-   Usage: feed_n 3 H.
-     H: P1 -> P2 -> P3 -> Q.
+    Usage: <<feed_n 3 H>>.
 
-   We'll be asked to prove P1, P2 and P3, so that Q can be inferred. *)
+    <<H:>> [P1 -> P2 -> P3 -> Q.]
+
+    We'll be asked to prove [P1], [P2] and [P3], so that [Q] can be inferred. *)
 Ltac feed_n n H := match constr:(n) with
   | O => idtac
   | (S ?m) => feed H ; [| feed_n m H]
@@ -122,7 +123,7 @@ Ltac rt_auto := auto 4 with basic_rt_facts.
 Ltac rt_eauto := eauto 4 with basic_rt_facts.
 
 Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
-#[export] Hint Resolve I : basic_rt_facts.  (* ensure the database exists *)
+#[export] Hint Resolve I : basic_rt_facts.
 
 (** Note: [idtac] is a no-op. However, it suppresses the default obligation tactic,
     which uses [intros] to introduce unnamed variables. This is a Coq technicality
@@ -137,9 +138,8 @@ Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
 #[global] Set Bullet Behavior "Strict Subproofs".
 #[global] Set Default Goal Selector "!".
 
-(* ************************************************************************** *)
 (** * Handier movement of inequalities. *)
-(* ************************************************************************** *)
+
 Ltac move_neq_down H :=
   exfalso;
   (move: H; rewrite ltnNge; move => /negP H; apply: H; clear H)

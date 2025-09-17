@@ -58,7 +58,7 @@ Section IsIdle.
   Variable arr_seq : arrival_sequence Job.
 
   (** ... and any ideal uniprocessor schedule of such jobs. *)
-  Variable sched : schedule ((*ideal*)processor_state Job).
+  Variable sched : schedule (processor_state Job).
 
   (** We say that the processor is idle at time [t] iff there is no job being scheduled. *)
   Definition ideal_is_idle (t : instant) := sched t == None.

@@ -66,16 +66,16 @@ Section Interval.
 
 End Interval.
 
-(* [ltn_leq_trans]: Establish that [m < p] if [m < n] and [n <= p], to mirror the
-   lemma [leq_ltn_trans] in [ssrnat].
+(** [ltn_leq_trans]: Establish that [m < p] if [m < n] and [n <= p], to mirror
+    the lemma [leq_ltn_trans] in [ssrnat].
 
-   NB: There is a good reason for this lemma to be "missing" in [ssrnat] --
-   since [m < n] is defined as [m.+1 <= n], [ltn_leq_trans] is just
-   [m.+1 <= n -> n <= p -> m.+1 <= p], that is [@leq_trans n m.+1 p].
+    NB: There is a good reason for this lemma to be "missing" in [ssrnat] --
+    since [m < n] is defined as [m.+1 <= n], [ltn_leq_trans] is just [m.+1 <= n ->
+    n <= p -> m.+1 <= p], that is [@leq_trans n m.+1 p].
 
-   Nonetheless we introduce it here because an additional (even though
-   arguably redundant) lemma doesn't hurt, and for newcomers the apparent
-   absence of the mirror case of [leq_ltn_trans] can be somewhat confusing.  *)
+    Nonetheless we introduce it here because an additional (even though arguably
+    redundant) lemma doesn't hurt, and for newcomers the apparent absence of the
+    mirror case of [leq_ltn_trans] can be somewhat confusing. *)
 Lemma ltn_leq_trans_deprecated [n m p] : m < n -> n <= p -> m < p.
 Proof. exact: leq_trans. Qed.
 #[deprecated(since="0.4",note="Use leq_trans instead since n < m is just a notation for n.+1 <= m (c.f., comment in util/nat.v).")]
