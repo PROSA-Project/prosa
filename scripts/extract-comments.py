@@ -7,6 +7,7 @@ import sys
 from comments import comment_ranges
 
 INLINE_CODE_RE = re.compile(r"\[[^]]*?\]")
+VERBATIM_RE = re.compile(r"<<(>[^>]|[^>])*>>")
 INLINE_HTML_RE = re.compile(r"#[^#]*?#")
 WHITESPACE_RE = re.compile(r"\s+")
 REPETITION_RE = re.compile(r"\W([a-zA-Z-]+)\s+\1\W")
@@ -21,15 +22,12 @@ def process(opts, fname):
     comments = [INLINE_HTML_RE.sub("", c) for c in comments]
 
     if not opts.keep_inline:
-        count = 0
-
-        def code(_):
-            nonlocal count
-            count += 1
-            return f"CODE{count}"
-
         replacement = "[…]" if opts.flag_repeated_words else ""
         comments = [INLINE_CODE_RE.sub(replacement, c) for c in comments]
+
+    if not opts.keep_verbatim:
+        replacement = "[…]" if opts.flag_repeated_words else ""
+        comments = [VERBATIM_RE.sub(replacement, c) for c in comments]
 
     if not opts.keep_bullets:
         comments = [BULLET_RE.sub(" ", c) for c in comments]
@@ -89,6 +87,11 @@ def parse_args():
         "--keep-inline",
         action="store_true",
         help="Do not strip inline code from comments.",
+    )
+    parser.add_argument(
+        "--keep-verbatim",
+        action="store_true",
+        help="Do not strip verbatim code from comments.",
     )
     parser.add_argument(
         "--keep-bullets",

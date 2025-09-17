@@ -30,7 +30,7 @@ for file in $FILES; do
   case "$file" in
     *.v)
       echo "Checking Rocq file: $file"
-      if ! "$SCRIPT_DIR/extract-comments.py" --keep-inline --single-line --merge-dots "$file" | "$SCRIPT_DIR/spell-check-llm.sh"; then
+      if ! "$SCRIPT_DIR/extract-comments.py" --keep-inline --keep-verbatim --single-line --merge-dots "$file" | "$SCRIPT_DIR/spell-check-llm.sh"; then
         echo "Command failed for: $file" >&2
         status=1
       fi
