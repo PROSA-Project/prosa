@@ -60,6 +60,16 @@ ISSUES = [
             r"Fact|Example|Remark|Definition|Fixpoint|Variable|Context)",
             0,
         ),
+        (
+            "superfluous `move` (use `=>` tactical directly)",
+            r";\s+(?P<issue>move)\s+=>",
+            0,
+        ),
+        (
+            "unnecesary move to/from context (`=>` followed by `move:`)",
+            r"=>\s*([^; ]+)\s*;\s*(?P<issue>move)\s*:\s*\1",
+            0,
+        ),
     ]
 ]
 
