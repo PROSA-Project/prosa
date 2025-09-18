@@ -54,20 +54,20 @@ Section FloatingNonPreemptiveRegionsModel.
   Lemma floating_preemption_points_model_is_model_with_bounded_nonpreemptive_regions :
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof.
-    intros j ARR.
-    move: (H_valid_model_with_floating_nonpreemptive_regions) => LIM; move: LIM (LIM) => [LIM L] [[BEG [END NDEC]] MAX].
+    move: (H_valid_model_with_floating_nonpreemptive_regions) (H_valid_model_with_floating_nonpreemptive_regions)
+        => [LIM L] [[BEG [END NDEC]] MAX] j ARR.
     case: (posnP (job_cost j)) => [ZERO|POS].
     - split.
       + rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
               /lengths_of_segments /job_preemption_points; rewrite ZERO; simpl.
         by rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
-      + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].
+      + move => progr; rewrite ZERO leqn0 => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.
           by eapply zero_in_preemption_points; eauto 2.
     - split; last (move => progr /andP [_ LE]; destruct (progr \in job_preemptive_points j) eqn:NotIN).
       + by apply MAX.
       + by exists progr; split; first apply/andP; first split; rewrite ?leq_addr // conversion_preserves_equivalence.
-      + move: NotIN => /eqP; rewrite eqbF_neg; move => NotIN.
+      + move: NotIN => /eqP; rewrite eqbF_neg => NotIN.
         edestruct (work_belongs_to_some_nonpreemptive_segment arr_seq) as [x [SIZE2 N]]; eauto 2. move: N => /andP [N1 N2].
         set ptl := nth 0 (job_preemptive_points j) x.
         set ptr := nth 0 (job_preemptive_points j) x.+1.

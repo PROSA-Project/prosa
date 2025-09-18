@@ -120,14 +120,14 @@ Qed.
 Global Instance refine_total_hep_rbf :
   refines ( list_R Rtask ==> Rtask ==> Rnat ==> Rnat )%rel total_hep_rbf total_hep_rbf_T.
 Proof.
-  apply refines_abstr; move => ts ts' Rts.
-  apply refines_abstr; move => tsk tsk' Rtsk.
-  apply refines_abstr; move => Δ Δ' RΔ.
+  apply refines_abstr => ts ts' Rts.
+  apply refines_abstr => tsk tsk' Rtsk.
+  apply refines_abstr => Δ Δ' RΔ.
   rewrite /total_hep_rbf /total_hep_request_bound_function_FP /total_hep_rbf_T.
   eapply refine_foldr.
   - by apply Rts.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
+  - by apply refines_abstr => tsk1 tsk1' Rtsk1; tc.
+  - by apply refines_abstr => tsk1 tsk1' Rtsk1; tc.
 Qed.
 
 (** Next, we prove a special-case refinement for the [total_hep_rbf] function
@@ -184,14 +184,14 @@ Qed.
 Global Instance refine_total_ohep_rbf :
   refines ( list_R Rtask ==> Rtask ==> Rnat ==> Rnat )%rel total_ohep_rbf total_ohep_rbf_T.
 Proof.
-  apply refines_abstr; move => ts ts' Rts.
-  apply refines_abstr; move => tsk tsk' Rtsk.
-  apply refines_abstr; move => Δ Δ' RΔ.
+  apply refines_abstr => ts ts' Rts.
+  apply refines_abstr => tsk tsk' Rtsk.
+  apply refines_abstr => Δ Δ' RΔ.
   rewrite /total_hep_rbf /total_hep_request_bound_function_FP.
   eapply refine_foldr.
   - by apply Rts.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
-  - by unfold ohep_task_T; apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
+  - by apply refines_abstr => tsk1 tsk1' Rtsk1; tc.
+  - by unfold ohep_task_T; apply refines_abstr => tsk1 tsk1' Rtsk1; tc.
 Qed.
 
 (** Next, we prove a refinement for the [check_point_FP] function. *)
@@ -228,8 +228,8 @@ Proof.
   unfold blocking_bound, blocking_bound_NP_T.
   apply refinesP; eapply refine_foldr_max.
   - by rewrite refinesE; apply Rts.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
+  - by apply refines_abstr => tsk1 tsk1' Rtsk1; tc.
+  - by apply refines_abstr => tsk1 tsk1' Rtsk1; tc.
 Qed.
 
 (** Next, we prove a special-case refinement for the [blocking_bound_NP] function

@@ -89,7 +89,7 @@ Section RunToCompletionThreshold.
         + rewrite !in_cons Bool.negb_orb.
           by apply/andP; split; [rewrite neq_ltn POS|].
         + by [].
-      - intros ρ; rewrite !in_cons; move => /orP [/eqP EQ| /orP [/eqP Cost | C]].
+      - intros ρ; rewrite !in_cons => /orP [/eqP EQ| /orP [/eqP Cost | C]].
         + by subst; apply zero_in_preemption_points.
         + by subst; apply job_cost_in_preemption_points.
         + by [].

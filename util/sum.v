@@ -285,7 +285,7 @@ Section SumsOverRanges.
     destruct (f (t + Δ)) as [|n] eqn: EQ.
     { exists (t + Δ); split; last by done.
       by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS]. }
-    { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS; move => H.
+    { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS => H.
       have {}/IHΔ [z [/andP[LE GE] ZERO]] : \sum_(t <= t' < t + Δ) f t' < Δ.
       { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
       by exists z; split=> //; rewrite LE/= ltnS ltnW. }

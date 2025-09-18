@@ -52,13 +52,13 @@ Section NondecreasingSequence.
       { by exists (b-a). } destruct EX as [k BO].
       revert a b P BO; elim: k => [ |k IHk].
       { move => a b P BO n1 n2.
-        move: BO; rewrite leqn0; move => /eqP BO.
+        move: BO; rewrite leqn0 => /eqP BO.
         rewrite /index_iota BO; simpl.
         by move => /andP [_ F].
       }
       { move => a b P BO n1 n2 /andP [GE LT].
         case: (leqP b a) => [N|N].
-        - move: N; rewrite -subn_eq0; move => /eqP EQ.
+        - move: N; rewrite -subn_eq0 => /eqP EQ.
           by rewrite /index_iota EQ //= in LT.
         - rewrite index_iota_lt_step; last by done.
           simpl; destruct (P a) eqn:PA.
@@ -82,9 +82,8 @@ Section NondecreasingSequence.
         nondecreasing_sequence xs.
     Proof.
       intros ? INC n1 n2.
-      move => /andP; rewrite leq_eqVlt; move => [/orP [/eqP EQ| LT1] LT2].
-      - by subst.
-      - by apply ltnW; apply INC; apply/andP; split.
+      move => /andP [+ LT2]; rewrite leq_eqVlt => /orP [/eqP -> //| LT1].
+      by apply: ltnW; apply: INC; apply/andP.
     Qed.
 
   End IncreasingSequence.
@@ -104,7 +103,7 @@ Section NondecreasingSequence.
       move=> xs.
       destruct xs as [ | x xs]; first by done.
       destruct x as [ | x]; first by done.
-      rewrite in_cons; move => /orP [/eqP EQ | IN] ND; first by done.
+      rewrite in_cons => /orP [/eqP EQ | IN] ND; first by done.
       exfalso.
       have NTH := nth_index 0 IN.
       specialize (ND 0 (index 0 xs).+1).
@@ -220,7 +219,7 @@ Section NondecreasingSequence.
       move=> xs x n STR H; apply/negP => /nthP => /(_ 0) [ind LE HHH].
       subst x; rename ind into x.
       destruct (n.+1 < size xs) eqn:Bt; last first.
-      { move: Bt => /negP /negP; rewrite -leqNgt; move => Bt.
+      { move: Bt => /negP /negP; rewrite -leqNgt => Bt.
         apply nth_default with (x0 := 0) in Bt.
         by rewrite Bt in H; move: H => /andP [_ T]. }
       have B1: n.+1 < size xs; first by done. clear Bt.
@@ -231,20 +230,20 @@ Section NondecreasingSequence.
         specialize (STR x n).
         feed STR.
         { by apply/andP; split. }
-        by move: STR; rewrite leqNgt; move => /negP STR; apply: STR.
+        by move: STR; rewrite leqNgt => /negP STR; apply: STR.
       }
       have LT: x < n.+1.
       { clear GT.
         move: H => /andP [_ T].
         rewrite ltnNge; apply/negP; intros CONTR.
-        move: CONTR; rewrite leq_eqVlt; move => /orP [/eqP EQ | CONTR].
+        move: CONTR; rewrite leq_eqVlt => /orP [/eqP EQ | CONTR].
         - by subst; rewrite ltnn in T.
         - specialize (STR n.+1 x).
           feed STR.
           { by apply/andP; split; first apply ltnW. }
-          by move: STR; rewrite leqNgt; move => /negP STR; apply: STR.
+          by move: STR; rewrite leqNgt => /negP STR; apply: STR.
       }
-      by move: LT; rewrite ltnNge; move => /negP LT; apply: LT.
+      by move: LT; rewrite ltnNge => /negP LT; apply: LT.
     Qed.
 
     (** Alternatively, consider an arbitrary natural number x that is
@@ -301,7 +300,7 @@ Section NondecreasingSequence.
         - by left; apply/eqP.
         - by right.
       }
-      move: (NEQ _ x (last0 xs)); clear NEQ; move => [EQ|NEQ].
+      move: {NEQ} (NEQ _ x (last0 xs)) => [EQ|NEQ].
       { by subst x. }
       { move: IN => /nthP EX.
         specialize (EX 0).
@@ -381,7 +380,7 @@ Section NondecreasingSequence.
       have EX: exists len, size xs <= len.
       { by exists (size xs). } destruct EX as [n BO].
       revert xs BO; elim: n => [ |n IHn].
-      - by intros xs; rewrite leqn0 size_eq0; move => /eqP EQ; subst xs.
+      - by intros xs; rewrite leqn0 size_eq0 => /eqP EQ; subst xs.
       - intros [ |x1 [ | x2 xs]] Size NonDec; try done.
         destruct (nondecreasing_sequence_2cons_leVeq _ _ _ NonDec) as [EQ|LT].
         + subst; rename x2 into x.
@@ -406,7 +405,7 @@ Section NondecreasingSequence.
       have EX: exists len, size xs <= len by (exists (size xs)).
       destruct EX as [n BO].
       revert xs BO; elim: n => [ |n IHn].
-      - by intros xs; rewrite leqn0 size_eq0; move => /eqP EQ; subst xs.
+      - by intros xs; rewrite leqn0 size_eq0 => /eqP EQ; subst xs.
       - intros [ |x1 [ | x2 xs]] Size NonDec; try done.
         destruct (nondecreasing_sequence_2cons_leVeq _ _ _ NonDec) as [EQ|LT].
         * subst; rename x2 into x.
@@ -452,7 +451,7 @@ Section NondecreasingSequence.
       have EX: exists n, size xs <= n by (exists (size xs)).
       destruct EX as [n LE].
       elim: n xs LE => [ |n IHn] xs LE.
-      - by move: LE; rewrite leqn0 size_eq0; move => /eqP LE; subst.
+      - by move: LE; rewrite leqn0 size_eq0 => /eqP LE; subst.
       - destruct xs as [ | x0 xs]; first by unfold distances.
         destruct xs as [ | x1 xs]; first by unfold distances.
         have -> : distances ([:: x0, x1 & xs] ++ [:: a; b]) =  x1 - x0 :: distances ((x1 :: xs) ++ [:: a; b]).
@@ -474,8 +473,8 @@ Section NondecreasingSequence.
       have EX: exists n, size xs <= n by (exists (size xs)).
       destruct EX as [n LE].
       elim: n x xs LE POS => [ |n IHn] x xs LE POS.
-      - by move: LE; rewrite leqn0 size_eq0; move => /eqP LE; subst.
-      - move: LE; rewrite leq_eqVlt; move => /orP [/eqP LEN' | LE]; last first.
+      - by move: LE; rewrite leqn0 size_eq0 => /eqP LE; subst.
+      - move: LE; rewrite leq_eqVlt => /orP [/eqP LEN' | LE]; last first.
         + by rewrite ltnS in LE; apply IHn.
         + destruct (seq_elim_last _ _ LEN') as [x__new [xs__l [EQ2 LEN]]].
           subst xs; clear LEN' POS; rename xs__l into xs.
@@ -497,10 +496,10 @@ Section NondecreasingSequence.
         have EX: exists n, size xs <= n by (exists (size xs)).
         move: EX => [n LE]; move: xs id LE.
         elim: n => [ |n IHn] xs id LE.
-        { move: LE; rewrite leqn0 size_eq0; move => /eqP EQ; subst.
+        { move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst.
           by rewrite !nth_default.
         }
-        { move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT]; last first.
+        { move: LE; rewrite leq_eqVlt => /orP [/eqP EQ|LT]; last first.
           { by apply IHn; rewrite ltnS in LT. }
           destruct xs as [ | n0 xs]; first by done.
           destruct xs as [ | n1 xs]; first by destruct id; [simpl |rewrite !nth_default].
@@ -513,7 +512,7 @@ Section NondecreasingSequence.
       - have Lem: forall xs x, x \in xs -> x <= max0 xs.
         { clear; elim=> [//|a xs IHxs] x IN.
           rewrite max0_cons leq_max; apply/orP.
-          move: IN; rewrite in_cons; move => /orP [/eqP EQ| IN].
+          move: IN; rewrite in_cons => /orP [/eqP EQ| IN].
           + by left; subst.
           + by right; apply IHxs.
         }
@@ -535,8 +534,8 @@ Section NondecreasingSequence.
       have EX: exists len, size xs <= len by (exists (size xs)).
       move: EX => [len LE]; move: xs LE.
       elim: len => [ |len IHlen] xs LE n.
-      { by move: LE; rewrite leqn0 size_eq0; move => /eqP EQ; subst; destruct n. }
-      move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LE]; last by apply IHlen.
+      { by move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst; destruct n. }
+      move: LE; rewrite leq_eqVlt => /orP [/eqP EQ| LE]; last by apply IHlen.
       destruct xs as [ | x1 xs]; first by done.
       destruct xs as [ | x2 xs]; first by destruct n as [ | [ | ]].
       destruct n as [ |n]; first by done.
@@ -560,8 +559,8 @@ Section NondecreasingSequence.
       have EX: exists len, size xs <= len by (exists (size xs)).
       move: EX => [len LE]; move: xs LE.
       elim: len => [ |len IHlen] xs LE SIZE.
-      { by move: LE; rewrite leqn0 size_eq0; move => /eqP EQ; subst. }
-      { move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LE]; last by apply IHlen.
+      { by move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst. }
+      { move: LE; rewrite leq_eqVlt => /orP [/eqP EQ| LE]; last by apply IHlen.
         destruct xs as [ | x1 xs]; first by inversion EQ.
         destruct xs as [ | x2 xs]; first by inversion SIZE.
         destruct xs as [ | x3 xs]; first by done.
@@ -587,8 +586,7 @@ Section NondecreasingSequence.
         rewrite mem_cat => /orP [IN|IN].
         + by apply IHn; rewrite /index_iota subn0; simpl.
         + by move: IN;
-            rewrite -addn1 iotaD /last0 last_cat add0n addn1 // subSnn in_cons;
-            move => /orP [/eqP EQ|F]; subst.
+            rewrite -addn1 iotaD /last0 last_cat add0n addn1 // subSnn in_cons => /orP [/eqP EQ|F]; subst.
     Qed.
 
   End Distances.
@@ -632,7 +630,7 @@ Section NondecreasingSequence.
         { apply/orP; rewrite -leq_eqVlt addnS.
           apply SIZE; apply/andP; split; first by done.
           rewrite ltnNge; apply/negP; intros CONTR.
-          move: LT; rewrite ltnNge; move => /negP LT; apply: LT.
+          move: LT; rewrite ltnNge => /negP LT; apply: LT.
           by rewrite nth_default ?addnS. }
         move: ALT => [/eqP EQ|LT'].
         - edestruct (IHΔ) as [ind [B UP]]; eauto 5 using addn1, leq_add2l.
@@ -696,8 +694,8 @@ Section NondecreasingSequence.
         - by rewrite leq_eqVlt; apply/orP; left.
         - rewrite /last0 -nth_last. apply H.
           rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; last by done.
-          move: IN; rewrite leq_eqVlt; move => /orP [/eqP KK|KK].
-          + move: EQ; rewrite /last0 -nth_last -{1}KK -[_.+2.-1]pred_Sn; move => /eqP; by done.
+          move: IN; rewrite leq_eqVlt => /orP [/eqP KK|KK].
+          + move: EQ; rewrite /last0 -nth_last -{1}KK -[_.+2.-1]pred_Sn => /eqP; by done.
           + apply/andP; split; first rewrite -(ltn_add2r 1) !addn1 prednK //.
           by rewrite prednK //; apply ltn_trans with idx.+2.
       }
@@ -705,7 +703,7 @@ Section NondecreasingSequence.
         - by rewrite leq_eqVlt; apply/orP; left.
         - rewrite /first0 -nth0. apply H.
           rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; last by done.
-          destruct idx as [ |idx]; first by move: EQ; rewrite /first0 -nth0; move => /eqP.
+          destruct idx as [ |idx]; first by move: EQ; rewrite /first0 -nth0 => /eqP.
           apply/andP; split; first by done.
           by apply ltn_trans with idx.+2.
       }
@@ -724,7 +722,7 @@ Section NondecreasingSequence.
       have EX: exists len, size xs <= len by (exists (size xs)).
       destruct EX as [n BO].
       elim: n xs BO => [ |n IHn] xs Len k Bound NonDec.
-      { move: Len; rewrite leqn0 size_eq0; move => /eqP T; subst.
+      { move: Len; rewrite leqn0 size_eq0 => /eqP T; subst.
         by rewrite filter_pred0.
       }
       { destruct xs as [ |x1 [ |x2 xs]].
@@ -819,7 +817,7 @@ Section NondecreasingSequence.
           specialize (STRys 0 1); feed STRys; first by done.
           specialize (LE 0); simpl in LE, FLE.
           rewrite leqNgt; apply/negP; intros NEQ.
-          move: LE; rewrite leqNgt; move => /negP LE; apply: LE.
+          move: LE; rewrite leqNgt => /negP LE; apply: LE.
           rewrite -(ltn_add2r x1) subnK // addnBAC // -(ltn_add2r y1) subnK.
           - by eapply leq_ltn_trans; [erewrite leq_add2l | erewrite ltn_add2r].
           - by apply leq_trans with y2; auto using leq_addr.

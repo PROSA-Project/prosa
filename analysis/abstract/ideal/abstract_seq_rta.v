@@ -183,7 +183,7 @@ Section Sequential_Abstract_RTA.
                   + (task_rbf (A + ε) - task_cost tsk + task_IBF A (A + F))
           /\ R >= F + (task_cost tsk - task_rtct tsk).
     Proof.
-      move: H_valid_run_to_completion_threshold => [PRT1 PRT2]; move => A INSP.
+      move: H_valid_run_to_completion_threshold => [PRT1 PRT2] => A INSP.
       clear H_sequential_tasks H_interference_and_workload_consistent_with_sequential_tasks.
       move: (H_R_is_maximum_seq _ INSP) => [F [FIX LE]].
       exists F; split=> [|//].

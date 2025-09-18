@@ -102,7 +102,7 @@ Section PeriodicLemmas.
     set IND := (job_index_in_hyperperiod ts arr_seq j1 (starting_instant_of_hyperperiod ts (job_arrival j1)) (job_task j1)).
     have SIZE_G : size ARRIVALS <= IND -> job_task (nth j1 ARRIVALS IND) = job_task j1 by intro SG; rewrite nth_default.
     case: (boolP (size ARRIVALS == IND)) => [/eqP EQ|NEQ]; first by apply SIZE_G; lia.
-    move : NEQ; rewrite neq_ltn; move => /orP [LT | G]; first by apply SIZE_G; lia.
+    move : NEQ; rewrite neq_ltn => /orP [LT | G]; first by apply SIZE_G; lia.
     set jb := nth j1 ARRIVALS IND.
     have JOB_IN : jb \in ARRIVALS by apply mem_nth.
     rewrite /ARRIVALS /task_arrivals_between mem_filter in JOB_IN.
@@ -155,7 +155,7 @@ Section PeriodicLemmas.
   Proof.
     move=> n1 n2.
     case : (boolP (n1 == n2)) => [/eqP EQ | NEQ]; first by rewrite EQ.
-    move : NEQ; rewrite neq_ltn; move => /orP [LT | LT].
+    move : NEQ; rewrite neq_ltn => /orP [LT | LT].
     + by apply eq_size_hyp_lt => //; lia.
     + move : (eq_size_hyp_lt n2 n1) => EQ_S.
       by feed_n 1 EQ_S => //; lia.

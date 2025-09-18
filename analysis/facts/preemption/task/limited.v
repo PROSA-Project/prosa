@@ -60,7 +60,7 @@ Section LimitedPreemptionsModel.
       + rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
               /lengths_of_segments /job_preemption_points; rewrite ZERO; simpl.
         by rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
-      + move => progr; rewrite ZERO leqn0; move => /andP [_ /eqP LE].
+      + move => progr; rewrite ZERO leqn0 => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.
           by eapply zero_in_preemption_points; eauto 2.
     - split; last (move => progr /andP [_ LE]; destruct (progr \in job_preemptive_points j) eqn:NotIN).
@@ -68,7 +68,7 @@ Section LimitedPreemptionsModel.
                 /job_max_nonpreemptive_segment /lengths_of_segments; erewrite job_parameters_max_np_to_job_limited; eauto.
           by apply max_of_dominating_seq; intros; apply A5.
       + by exists progr; split; first apply/andP; first split; rewrite ?leq_addr.
-      + move: NotIN => /eqP; rewrite eqbF_neg; move => NotIN.
+      + move: NotIN => /eqP; rewrite eqbF_neg => NotIN.
         edestruct (work_belongs_to_some_nonpreemptive_segment arr_seq) as [x [SIZE2 N]]; eauto 2. move: N => /andP [N1 N2].
         set ptl := nth 0 (job_preemptive_points j) x.
         set ptr := nth 0 (job_preemptive_points j) x.+1.

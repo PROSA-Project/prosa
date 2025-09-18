@@ -190,7 +190,7 @@ Section ServiceInversion.
         <= cumulative_priority_inversion arr_seq sched j t1 t2.
     Proof.
       move=> j t1 t2; apply leq_sum => t _.
-      have L : forall (a b : bool), (a -> b) -> a <= b by clear; move => [] [].
+      have L : forall (a b : bool), (a -> b) -> a <= b by move => [] [].
       by apply L, service_inv_implies_priority_inv.
     Qed.
 
@@ -453,7 +453,7 @@ Section ServiceInversionIsBounded.
         have [t' [NEQ' [SERV' SCHED']]] := kth_scheduling_time sched _ _ _ _ EQ GT.
         have PT : preemption_time arr_seq sched t'.
         { move: SCHED'; erewrite <-scheduled_job_at_scheduled_at => //.
-          by rewrite /preemption_time; move => /eqP ->; rewrite SERV'. }
+          by rewrite /preemption_time => /eqP ->; rewrite SERV'. }
         move: H_jlp_lp => /negP LP2; apply: LP2.
         apply: scheduled_at_preemption_time_implies_higher_or_equal_priority => //.
         by move: NEQ' LEpt H_t_le_t2; clear; lia.

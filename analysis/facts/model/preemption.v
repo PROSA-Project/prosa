@@ -290,7 +290,7 @@ Section PreemptionFacts.
                         && (all (fun t'' => scheduled_at sched  s t'') (index_iota t' t.+1 )).
     { exists t. apply/andP; split; [ by apply/andP; split | ].
       apply/allP; intros t'.
-      by rewrite mem_index_iota ltnS -eqn_leq; move => /eqP <-.
+      by rewrite mem_index_iota ltnS -eqn_leq => /eqP <-.
     }
     have MATE : jobs_must_arrive_to_execute sched by [].
     move :  (H_sched_valid) =>  [COME_ARR READY].
@@ -307,8 +307,8 @@ Section PreemptionFacts.
         apply MIN.
         apply/andP; split; [by apply/andP; split; [ apply ltnW | ] | ].
         apply/allP; intros t'.
-        rewrite mem_index_iota; move => /andP [GE LE].
-        move: GE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LT].
+        rewrite mem_index_iota => /andP [GE LE].
+        move: GE; rewrite leq_eqVlt => /orP [/eqP EQ| LT].
         - by subst t'.
         - by apply ALL; rewrite mem_index_iota; apply/andP; split.
       }

@@ -86,7 +86,7 @@ End Definitions.
 Global Instance refine_b2n :
   refines (unify (A:=N) ==> Rnat)%rel nat_of_bin id.
 Proof.
-  apply refines_abstr; move => n n' Rn.
+  apply refines_abstr => n n' Rn.
   compute in Rn; destruct refines_key in Rn; subst.
   by apply trivial_refines.
 Qed.

@@ -142,8 +142,8 @@ Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
 
 Ltac move_neq_down H :=
   exfalso;
-  (move: H; rewrite ltnNge; move => /negP H; apply: H; clear H)
-  || (move: H; rewrite leqNgt; move => /negP H; apply: H; clear H).
+  (move: H; rewrite ltnNge => /negP H; apply: H; clear H)
+  || (move: H; rewrite leqNgt => /negP H; apply: H; clear H).
 
 Ltac move_neq_up H :=
   (rewrite ltnNge; apply/negP; intros H)

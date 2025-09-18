@@ -491,7 +491,7 @@ Section PriorityInversionIsBounded.
               + exact: ltnW.
               + by rewrite leq_add2l; apply H_progr_le_max_nonp_segment.
             }
-            by move: K; rewrite leqNgt; move => /negP NLT; apply: NLT.
+            by move: K; rewrite leqNgt => /negP NLT; apply: NLT.
           Qed.
 
           (** Thanks to the fact that the scheduler respects the notion of preemption points
@@ -700,7 +700,7 @@ Section PriorityInversionIsBounded.
       move: (H_busy_interval_prefix) => [_ [_ [_ /andP [T _]]]].
       rewrite /cumulative_priority_inversion (@big_cat_nat _ _ _ ppt) //=.
       rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
-      rewrite big_nat_cond big1 //; move => t /andP[/andP[GEt LEt] _].
+      rewrite big_nat_cond big1 // => t /andP[/andP[GEt LEt] _].
       apply/eqP; rewrite eqb0.
       by apply/no_priority_inversion_after_preemption_point/andP.
     Qed.

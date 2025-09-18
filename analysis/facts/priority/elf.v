@@ -86,7 +86,7 @@ Section ELFBasicFacts.
   Lemma ELF_is_JLFP_FP_compatible :
     JLFP_FP_compatible (ELF FP) FP.
   Proof.
-    split; move => j1 j2.
+    split => j1 j2.
     - rewrite /hep_job /ELF.
       by move => /orP [/andP [HPTASK1 HPTASK2] | /andP [HEPTASK HEPJOB]].
     - move => HP_TASK.

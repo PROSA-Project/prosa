@@ -368,7 +368,7 @@ Section UnitServiceModelLemmas.
         rewrite exchange_big big_geq //= in EQ.
         rewrite /workload_of_jobs in EQ.
         rewrite (big_rem j) ?Pj //= in EQ.
-        move: EQ => /eqP; rewrite addn_eq0; move => /andP [CZ _].
+        move: EQ => /eqP; rewrite addn_eq0 => /andP [CZ _].
         unfold completed_by, service.completed_by.
         by move: CZ => /eqP CZ; rewrite CZ.
       - unfold workload_of_jobs, service_of_jobs in EQ; unfold completed_by, service.completed_by.
@@ -637,7 +637,7 @@ Section UnitServiceUniProcessorModelLemmas.
         = has (fun j => (P j) && (receives_service_at sched j x)) js.
       { clear xltt t1lex Phep.
         have L : forall (n : nat) (b : bool), (b -> n = 1) -> (~~ b -> n = 0) -> (n = b)
-            by clear; move => n [] A B; [rewrite A | rewrite B].
+            by clear => n [] A B; [rewrite A | rewrite B].
         apply: L.
         { move=> /hasP [jo IN /andP [Pjo SERVjo]].
           apply/eqP; rewrite eqn_leq; apply/andP; split.

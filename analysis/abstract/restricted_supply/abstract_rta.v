@@ -220,7 +220,7 @@ Section AbstractRTARestrictedSupply.
       cumul_intra_interference sched j (t1 + F) (t1 + Δ) = 0.
     Proof.
       rewrite /cumul_intra_interference/ cumul_cond_interference big_nat.
-      apply big1; move => t /andP [GE__t LT__t].
+      apply big1 => t /andP [GE__t LT__t].
       apply/eqP; rewrite eqb0; apply/negP.
       move => /andP [P /negPn /negP D]; apply: D; apply/negP.
       eapply H_work_conserving with (t1 := t1) (t2 := t2); eauto 2.

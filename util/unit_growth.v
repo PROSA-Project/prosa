@@ -57,7 +57,7 @@ Section Lemmas.
         by rewrite subnKC in DELTA.
       }
       elim=> [|delta IHdelta].
-      { rewrite addn0; move => /andP [GE0 LT0].
+      { rewrite addn0 => /andP [GE0 LT0].
         by apply (leq_ltn_trans GE0) in LT0; rewrite ltnn in LT0.
       }
       { move => /andP [GT LT].
@@ -145,7 +145,7 @@ Section Lemmas.
       { exists t2.
         apply/andP; split; first by done.
         apply/andP; split; last by done.
-        move: H_t1_le_t2; rewrite leq_eqVlt; move => /orP [/eqP EQ | NEQ1]; last by done.
+        move: H_t1_le_t2; rewrite leq_eqVlt => /orP [/eqP EQ | NEQ1]; last by done.
         by exfalso; subst t2; move: H_not_P_at_t1 => /negP NPt1.
       }
       have MIN := ex_minnP EX.
@@ -155,11 +155,11 @@ Section Lemmas.
       feed (MIN y).
       { apply/andP; split; first by done.
         apply/andP; split.
-        - move: NEQ1. rewrite leq_eqVlt; move => /orP [/eqP EQ | NEQ1]; last by done.
+        - move: NEQ1. rewrite leq_eqVlt => /orP [/eqP EQ | NEQ1]; last by done.
           by exfalso; subst y; move: H_not_P_at_t1 => /negP NPt1.
         - by apply ltnW, leq_trans with x.
       }
-      by move: NEQ2; rewrite ltnNge; move => /negP NEQ2.
+      by move: NEQ2; rewrite ltnNge => /negP NEQ2.
     Qed.
 
   End ExistsIntermediateValuePredicates.

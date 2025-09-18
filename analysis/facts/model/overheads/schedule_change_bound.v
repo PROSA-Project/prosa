@@ -211,7 +211,7 @@ Section ScheduleChangesBoundedHelper.
     apply/eqP; rewrite eqb0; apply/negP => COMPL.
     rewrite FIFO -ltnNge in LP.
     move: (H_busy_interval_prefix) => [_ [_ [NQT _]]].
-    move: (NQT t2.-1 ltac:(lia)); clear NQT => NQT; apply: NQT => jhp ARR HEP _.
+    move: (NQT t2.-1 ltac:(lia)); apply => jhp ARR HEP _.
     rewrite FIFO in HEP.
     have HEP2 : job_arrival jhp < job_arrival jlp; [ by lia | clear HEP LP].
     apply scheduled_at_precedes_completes_at in COMPL; last by lia.

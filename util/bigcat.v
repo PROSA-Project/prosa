@@ -333,7 +333,7 @@ Section BigCatLemmas.
           intros y IN; apply/eqP.
           by apply H_g_cancels_f. }
         have ->: \cat_(j<-xs)[seq x <- f j | g x == x'] = [::]; last by rewrite cats0.
-        rewrite big1_seq //; move => xs2 /andP [_ IN].
+        rewrite big1_seq // => xs2 /andP [_ IN].
         have NEQ: xs2 != x'; last by rewrite seq_different_elements_nil.
         apply/neqP; intros EQ; subst x'.
         move: UNI; rewrite cons_uniq => /andP [NIN _].

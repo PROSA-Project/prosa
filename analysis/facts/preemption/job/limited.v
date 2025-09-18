@@ -145,14 +145,14 @@ Section ModelWithLimitedPreemptions.
       intros ρ LE NotIN.
       case: (posnP (job_cost j)) => [ZERO|POS].
       { exfalso; move: NotIN => /negP NIN; apply: NIN.
-        move: LE. rewrite ZERO leqn0; move => /eqP ->.
+        move: LE. rewrite ZERO leqn0 => /eqP ->.
           by apply zero_in_preemption_points. }
       move: (belonging_to_segment_of_seq_is_total
                (job_preemptive_points j) ρ (number_of_preemption_points_at_least_two POS)
                (antidensity_of_preemption_points _ LE NotIN)) => [n [SIZE2 /andP [N1 N2]]].
       exists n; split=> [//|].
       apply/andP; split=> [|//].
-      move: N1; rewrite leq_eqVlt; move => /orP [/eqP EQ | //].
+      move: N1; rewrite leq_eqVlt => /orP [/eqP EQ | //].
       exfalso.
       move: NotIN => /negP CONTR; apply: CONTR.
       rewrite -EQ; clear EQ.

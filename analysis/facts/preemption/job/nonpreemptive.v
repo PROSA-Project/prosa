@@ -38,14 +38,14 @@ Section FullyNonPreemptiveModel.
     valid_preemption_model arr_seq sched.
   Proof.
     move=> j _; split; [by apply/orP; left | split; [by apply/orP; right | split]].
-    - move => t; rewrite /job_preemptable /fully_nonpreemptive_job_model Bool.negb_orb -lt0n; move => /andP [POS NCOMPL].
+    - move => t; rewrite /job_preemptable /fully_nonpreemptive_job_model Bool.negb_orb -lt0n => /andP [POS NCOMPL].
       move: (incremental_service_during _ H_unit_service _ _ _ _ POS) => [ft [/andP [_ LT] [SCHED SERV]]].
       apply H_nonpreemptive_sched with ft.
       + by apply ltnW.
       + by [].
       + rewrite /completed_by -ltnNge.
-        move: NCOMPL; rewrite neq_ltn; move => /orP [//|GE]; exfalso.
-        move: GE; rewrite ltnNge; move => /negP GE; apply: GE.
+        move: NCOMPL; rewrite neq_ltn => /orP [//|GE]; exfalso.
+        move: GE; rewrite ltnNge => /negP GE; apply: GE.
         exact: completion.service_at_most_cost.
     - intros t NSCHED SCHED.
       rewrite /job_preemptable /fully_nonpreemptive_job_model.
@@ -83,7 +83,7 @@ Section FullyNonPreemptiveModel.
       }
       - rewrite filter_pred1_uniq//; first by apply iota_uniq.
         by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
-      - intros x; rewrite mem_iota; move => /andP [POS _].
+      - intros x; rewrite mem_iota => /andP [POS _].
         by rewrite -lt0n.
     }
     { by rewrite /distances/= subn0 /max0/= max0n. }
@@ -109,7 +109,7 @@ Section FullyNonPreemptiveModel.
       }
       - rewrite filter_pred1_uniq //; first by apply iota_uniq.
         by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
-      - intros x; rewrite mem_iota; move => /andP [POS _].
+      - intros x; rewrite mem_iota => /andP [POS _].
         by rewrite -lt0n.
     }
     { by rewrite /distances/= subn0. }

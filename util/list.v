@@ -106,7 +106,7 @@ Section Max0.
     forall xs x, x \in xs -> x <= max0 xs.
   Proof.
     elim=> [//|a xs IHxs] x.
-    rewrite in_cons; move => /orP [/eqP EQ | IN]; subst.
+    rewrite in_cons => /orP [/eqP EQ | IN]; subst.
     - by rewrite !max0_cons leq_maxl.
     - apply leq_trans with (max0 xs); first by eauto.
       by rewrite max0_cons; apply leq_maxr.
@@ -125,7 +125,7 @@ Section Max0.
     - rewrite max0_cons.
       move: (leq_total a (max0 (n::xs))) => /orP [LE|LE].
       + by rewrite maxnE subnKC // in_cons; apply/orP; right; apply IHxs.
-      + rewrite maxnE; move: LE; rewrite -subn_eq0; move => /eqP EQ.
+      + rewrite maxnE; move: LE; rewrite -subn_eq0 => /eqP EQ.
         by rewrite EQ addn0 in_cons; apply/orP; left.
   Qed.
 
@@ -168,13 +168,13 @@ Section Max0.
     { by exists (size xs). }
     move: EX => [len LE].
     generalize dependent xs; elim: len => [|n IHlen] xs LE.
-    - by intros; move: LE; rewrite leqn0 size_eq0; move => /eqP EQ; subst.
-    - move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ| LE]; last by apply IHlen.
+    - by intros; move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst.
+    - move: LE; rewrite leq_eqVlt => /orP [/eqP EQ| LE]; last by apply IHlen.
       destruct xs as [ | x1 xs]; first by inversion EQ.
       destruct xs as [ | x2 xs]; first by rewrite /max leq_max; apply/orP; right.
       have ->: last0 [:: x1, x2 & xs] = last0 [:: x2 & xs] by done.
       rewrite max0_cons leq_max; apply/orP; right; apply IHlen.
-      move: EQ => /eqP; simpl; rewrite eqSS; move => /eqP EQ.
+      move: EQ => /eqP; simpl; rewrite eqSS => /eqP EQ.
       by subst.
   Qed.
 
@@ -197,7 +197,7 @@ Section Max0.
     move: EX => [len [LE1 LE2]].
     generalize dependent xs; generalize dependent ys.
     elim: len => [ | len IHlen] xs LE1 ys LE2.
-    { by move: LE1 LE2; rewrite !leqn0 !size_eq0; move => /eqP E1 /eqP E2; subst. }
+    { by move: LE1 LE2; rewrite !leqn0 !size_eq0 => /eqP E1 /eqP E2; subst. }
     { move: xs ys LE1 LE2 => [ |x xs] [//|y ys] LE1 LE2 H.
       { have L: forall xs, (forall n, xs [| n |] = 0) -> max0 xs = 0.
         { clear; elim=> [//|x xs IHxs] H.
@@ -238,7 +238,7 @@ Section RemList.
     { rewrite in_cons; apply/orP.
       destruct (a == y) eqn:EQ.
       { by move: EQ => /eqP EQ; subst a; right. }
-      { move: H; rewrite in_cons; move => /orP [/eqP H | H].
+      { move: H; rewrite in_cons => /orP [/eqP H | H].
         - by subst a; left.
         - by right; apply IHxs.
       }
@@ -274,7 +274,7 @@ Section RemList.
       size [seq y <- xs | P y] = size [seq y <- rem x xs | P y] + 1.
   Proof.
     move=> X x + P + H0; elim=> [|a xs IHxs] H; first by inversion H.
-    move: H; rewrite in_cons; move => /orP [/eqP H | H]; subst.
+    move: H; rewrite in_cons => /orP [/eqP H | H]; subst.
     { by simpl; rewrite H0 -[X in X = _]addn1 eq_refl. }
     { specialize (IHxs H); simpl in *.
       case EQab: (a == x); simpl.
@@ -367,7 +367,7 @@ Section AdditionalLemmas.
       x \in xs -> exists xsl xsr, xs = xsl ++ [::x] ++ xsr.
   Proof.
     move=> X x; elim=> [//|a xs IHxs] SUB.
-    move: SUB; rewrite in_cons; move => /orP [/eqP EQ|IN].
+    move: SUB; rewrite in_cons => /orP [/eqP EQ|IN].
     - by subst; exists [::], xs.
     - feed IHxs; first by done.
       clear IN; move: IHxs => [xsl [xsr EQ]].
@@ -387,7 +387,7 @@ Section AdditionalLemmas.
     move: EXm => [m SIZEm].
     move: xs ys SIZEm UNIQ SUB.
     elim: m => [|m IHm] xs ys SIZEm UNIQ SUB.
-    { move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys.
+    { move: SIZEm; rewrite leqn0 size_eq0 => /eqP SIZEm; subst ys.
       destruct xs as [|s xs]; first by done.
       specialize (SUB s).
       by feed SUB; [rewrite in_cons; apply/orP; left | done].
@@ -403,12 +403,12 @@ Section AdditionalLemmas.
       - intros a IN.
         destruct (a == x) eqn: EQ.
         { exfalso.
-          move: EQ UNIQ; rewrite cons_uniq; move => /eqP EQ /andP [NIN UNIQ].
+          move: EQ UNIQ; rewrite cons_uniq => /eqP EQ /andP [NIN UNIQ].
           by subst; move: NIN => /negP NIN; apply: NIN.
         }
         { specialize (SUB a).
           feed SUB; first by rewrite in_cons; apply/orP; right.
-          clear IN; move: SUB; rewrite !mem_cat; move => /orP [IN| /orP [IN|IN]].
+          clear IN; move: SUB; rewrite !mem_cat => /orP [IN| /orP [IN|IN]].
           - by apply/orP; right.
           - by exfalso; move: IN; rewrite in_cons => /orP [IN|IN]; [rewrite IN in EQ | ].
           - by apply/orP; left.
@@ -476,7 +476,7 @@ Section AdditionalLemmas.
     move: EXm => [m SIZEm].
     move: SIZEm UNIQ SUB; move: xs ys.
     elim: m => [|m IHm] xs ys SIZEm UNIQx UNIQy EQ SUB a IN.
-    { by move: SIZEm; rewrite leqn0 size_eq0; move => /eqP SIZEm; subst ys. }
+    { by move: SIZEm; rewrite leqn0 size_eq0 => /eqP SIZEm; subst ys. }
     { destruct xs as [ | x xs].
       { by move: EQ; simpl => /eqP; rewrite eq_sym size_eq0 => /eqP EQ; subst ys. }
       { destruct (x == a) eqn:XA; first by rewrite in_cons eq_sym; apply/orP; left.
@@ -516,7 +516,7 @@ Section AdditionalLemmas.
     rewrite //= IHxs; last first.
     + by intros; apply ALLF; rewrite in_cons; apply/orP; right.
     + destruct (P a) eqn:EQ; last by done.
-      move: EQ => /eqP; rewrite eqb_id -[P a]Bool.negb_involutive; move => /negP T.
+      move: EQ => /eqP; rewrite eqb_id -[P a]Bool.negb_involutive => /negP T.
       exfalso; apply: T.
       by apply ALLF; apply/orP; left.
   Qed.
@@ -689,7 +689,7 @@ Section RemAllList.
     move=> X x; elim=> [//|a xs IHxs] IN.
     apply: IHxs.
     simpl in IN; destruct (a == x) eqn:EQ; first by done.
-    move: IN; rewrite in_cons; move => /orP [/eqP EQ2 | IN]; last by done.
+    move: IN; rewrite in_cons => /orP [/eqP EQ2 | IN]; last by done.
     by subst; exfalso; rewrite eq_refl in EQ.
   Qed.
 
@@ -701,7 +701,7 @@ Section RemAllList.
     intros X a x; elim=> [//|a0 xs IHxs] /= IN.
     destruct (a0 == x) eqn:EQ.
     - by rewrite in_cons; apply/orP; right; eauto.
-    - move: IN; rewrite in_cons; move => /orP [EQ2|IN].
+    - move: IN; rewrite in_cons => /orP [EQ2|IN].
       + by rewrite in_cons; apply/orP; left.
       + by rewrite in_cons; apply/orP; right; auto.
   Qed.
@@ -791,21 +791,21 @@ Section IotaRange.
     { exists (b-a); by simpl. }
     destruct EX as [k BO].
     revert x a b BO; elim: k => [|k IHk] => x a b BO /andP [GE LT].
-    { by exfalso; move: BO; rewrite leqn0 subn_eq0; move => BO; lia. }
+    { by exfalso; move: BO; rewrite leqn0 subn_eq0 => BO; lia. }
     { destruct a as [|a].
       { destruct b; first by done.
         rewrite index_iota_lt_step //; simpl.
         destruct (0 == x) eqn:EQ.
         - move: EQ => /eqP EQ; subst x.
           rewrite filter_in_pred0 //.
-          by intros x; rewrite mem_index_iota -lt0n; move => /andP [T1 _].
+          by intros x; rewrite mem_index_iota -lt0n => /andP [T1 _].
         - by apply IHk; lia.
       }
       rewrite index_iota_lt_step; last by lia.
       simpl; destruct (a.+1 == x) eqn:EQ.
       - move: EQ => /eqP EQ; subst x.
         rewrite filter_in_pred0 //.
-        intros x; rewrite mem_index_iota; move => /andP [T1 _].
+        intros x; rewrite mem_index_iota => /andP [T1 _].
         by rewrite neq_ltn; apply/orP; right.
       - by rewrite IHk //; lia.
     }
@@ -836,7 +836,7 @@ Section IotaRange.
   Proof.
     intros a b x xs LT.
     apply eq_in_filter.
-    intros y; rewrite mem_index_iota; move => /andP [LE GT].
+    intros y; rewrite mem_index_iota => /andP [LE GT].
     elim: xs => [//|y' xs IHxs].
     rewrite in_cons IHxs; simpl; clear IHxs.
     destruct (y == y') eqn:EQ1, (y' == x) eqn:EQ2; auto.
@@ -862,7 +862,7 @@ Section IotaRange.
     revert x xs a b B MIN BO.
     elim: k => [ |k IHk] x xs a b /andP [LE GT] MIN BO.
     - by move_neq_down BO; lia.
-    - move: LE; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
+    - move: LE; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
       + subst.
         rewrite index_iota_lt_step //.
         replace ([seq ρ <- x :: index_iota x.+1 b | ρ \in x :: xs])
@@ -919,11 +919,11 @@ Section IotaRange.
     { exists (b-a); by simpl. } destruct EX as [k BO].
     revert x a b idx P BO; elim: k => [|k IHk].
     - move => x a b idx P BO LT1 LT2.
-      move: BO; rewrite leqn0; move => /eqP BO.
+      move: BO; rewrite leqn0 => /eqP BO.
         by rewrite /index_iota BO in LT2; simpl in LT2.
     - move => x a b idx P BO LT1 LT2.
       case: (leqP b a) => [N|N].
-      + move: N; rewrite -subn_eq0; move => /eqP EQ.
+      + move: N; rewrite -subn_eq0 => /eqP EQ.
           by rewrite /index_iota EQ //= in LT2.
       + rewrite index_iota_lt_step; last by done.
         simpl in *; destruct (P a) eqn:PA.

@@ -219,7 +219,7 @@ Proof.
   set fps := [seq find_fixpoint (f s) h | s <- sp] => H.
   have ALL: all (fun opt => opt != None) fps
               by case: (all _ _) H => //.
-  move: H. rewrite ifT //; move => [] H.
+  move: H. rewrite ifT //= => [][]H.
   have NN': ~~ nilp fps
     by rewrite /fps /nilp size_map -/(nilp sp).
   move: (bigmax_witness
@@ -247,7 +247,7 @@ Proof.
   set fps := [seq find_fixpoint (f s) h | s <- sp] => H.
   have ALL : all (fun opt => opt != None) fps
     by case: (all _ _) H => //.
-  move: H. rewrite ifT //; move => [] H IN.
+  move: H. rewrite ifT // => [][]H IN.
   exists ((odflt 0) (find_fixpoint (f s) h)).
   - case FFP: (find_fixpoint _ _) => //=; exfalso.
     suff: find_fixpoint (f s) h != None;

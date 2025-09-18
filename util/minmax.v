@@ -119,7 +119,7 @@ Section ExtraLemmas.
         have LT: i0 < n; last by rewrite (IHn (Ordinal LT)).
         rewrite ltn_neqAle; apply/andP; split;
           last by rewrite -ltnS; apply ltn_ord.
-        apply/negP; move => /eqP BUG.
+        apply/negP => /eqP BUG.
         by rewrite -BUG Pi0 in Pn.
       }
     }

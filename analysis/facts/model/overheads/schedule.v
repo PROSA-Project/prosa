@@ -18,7 +18,7 @@ Section OverheadsProceProperties.
     uniprocessor_model (overheads.processor_state Job).
   Proof.
     intros j1 j2 sched t; rewrite /scheduled_at /scheduled_in/ scheduled_on/=.
-    rewrite /overheads_scheduled_on; move => /existsP [[] OH1] /existsP [[] OH2].
+    rewrite /overheads_scheduled_on => /existsP [[] OH1] /existsP [[] OH2].
     destruct (sched t) as [ | j3 j4 | j3 | j3 | ] eqn:EQ => //.
     { by destruct j3, j4 => //; move: OH1 OH2 => /eqP OH1 /eqP OH2; subst. }
     { by destruct j3 => //; move: OH1 OH2 => /eqP OH1 /eqP OH2; subst. }
@@ -43,7 +43,7 @@ Section OverheadsProceProperties.
     move=> j sched t.
     rewrite /service_at /supply_at /service_in /supply_in.
     rewrite /scheduled_at /scheduled_in /scheduled_on /=.
-    rewrite /overheads_scheduled_on; move => /existsP [[] /eqP OH1]; subst.
+    rewrite /overheads_scheduled_on => /existsP [[] /eqP OH1]; subst.
     apply eq_big => // => [[]] _.
     destruct (sched t) eqn:SCHED => //=.
     by move: OH1 => /eqP; rewrite eq_sym => EQ; rewrite EQ.
@@ -94,11 +94,11 @@ Section OverheadScheduleProperties.
       destruct (sched t) as [ | j3 j4 | j3 | j3 | ] eqn:EQ.
       { by rewrite /overheads_scheduled_on. }
       { rewrite /overheads_scheduled_on.
-        by destruct j3, j4; (try done); move => /eqP E; subst.
+        by destruct j3, j4; (try done) => /eqP E; subst.
       }
-      { by rewrite /overheads_scheduled_on; destruct j3; (try done); move => /eqP E; subst. }
-      { by rewrite /overheads_scheduled_on; (try done); move => /eqP E; subst. }
-      { by rewrite /overheads_scheduled_on; (try done); move => /eqP E; subst. }
+      { by rewrite /overheads_scheduled_on; destruct j3; (try done) => /eqP E; subst. }
+      { by rewrite /overheads_scheduled_on; (try done) => /eqP E; subst. }
+      { by rewrite /overheads_scheduled_on; (try done) => /eqP E; subst. }
     }
     { move: SCHED. rewrite /scheduled_at /scheduled_job /scheduled_in.
       destruct (sched t) as [ | j3 j4 | j3 | j3 | ] => SCHED; first by done.

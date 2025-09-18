@@ -90,7 +90,7 @@ Section MaxNPSegmentIsBounded.
     apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
       first by apply H_all_jobs_from_taskset.
     apply in_arrivals_implies_arrived_between in JINB => //.
-    move: JINB; move => /andP [_ TJ'].
+    move: JINB => /andP [_ TJ'].
     have ->: (max_arrivals (job_task j') ε > 0) && (task_cost (job_task j') > 0) = true.
     { apply /andP; split.
       { apply: non_pathological_max_arrivals; last first.

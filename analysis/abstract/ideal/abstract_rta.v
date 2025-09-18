@@ -119,7 +119,7 @@ Section AbstractRTAIdeal.
   Proof.
     move => t1 t2 Δ j ARR TSK BUSY LT NCOM F RTC; specialize (RTC _ _ BUSY).
     have POS : 0 < job_cost j.
-    { move_neq_up ZE; move: ZE; rewrite leqn0; move => /eqP ZE.
+    { move_neq_up ZE; move: ZE; rewrite leqn0 => /eqP ZE.
       move: NCOM => /negP NCOM; apply: NCOM.
       by rewrite /completed_by ZE.
     }
@@ -140,7 +140,7 @@ Section AbstractRTAIdeal.
     }
     { have NoInterference: cumulative_interference j (t1 + F) (t1 + Δ) = 0.
       { rewrite /cumulative_interference /cumul_cond_interference big_nat.
-        apply big1; move => t /andP [GE__t LT__t].
+        apply big1 => t /andP [GE__t LT__t].
         apply/eqP; rewrite eqb0; apply/negP; eapply H_work_conserving => //.
         { by apply/andP; split; lia. }
         apply: H_ideal_progress_proc_model.

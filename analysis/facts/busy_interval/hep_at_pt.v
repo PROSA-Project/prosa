@@ -89,7 +89,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       scheduled_at sched jhp t ->
       hep_job jhp j.
   Proof.
-    intros LTt2m1 jlp Sched_jlp; apply contraT; move => /negP NOTHP; exfalso.
+    intros LTt2m1 jlp Sched_jlp; apply contraT => /negP NOTHP; exfalso.
     move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]].
     apply NOTQUIET with (t := t.+1).
     { apply/andP; split.
@@ -126,7 +126,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       scheduled_at sched jhp t ->
       hep_job jhp j.
   Proof.
-    intros EQUALt2m1 jlp Sched_jlp; apply contraT; move => /negP NOTHP; exfalso.
+    intros EQUALt2m1 jlp Sched_jlp; apply contraT => /negP NOTHP; exfalso.
     move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]].
     rewrite leq_eqVlt in GEt; first move: GEt => /orP [/eqP EQUALt1 | LARGERt1].
     { subst t t1; clear LEt SL.

@@ -164,7 +164,7 @@ Section BusyIntervalExistence.
         rewrite -{3}EQ {EQ}.
         rewrite /total_service /blackout_during /supply.blackout_during.
         rewrite /service_of_jobs/service_during/service_at exchange_big //=.
-        rewrite -big_split //= leq_sum //; move => t' _.
+        rewrite -big_split //= leq_sum // => t' _.
         have [BL|SUP] := blackout_or_supply sched t'.
         { rewrite -[1]addn0; apply leq_add; first by case: (is_blackout).
           rewrite leqn0; apply/eqP; apply big1 => j _.
@@ -193,7 +193,7 @@ Section BusyIntervalExistence.
         { apply: low_service_implies_existence_of_idle_time_rs =>//.
           rewrite !subnKC in LTS; try by apply leq_addr.
           by rewrite addKn. }
-        move: LEt; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
+        move: LEt; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
         { exists 0; split => //.
           rewrite addn0 EQ => s ARR BEF.
           by apply: idle_instant_next_no_carry_in. }
@@ -314,7 +314,7 @@ Section BusyIntervalExistence.
     { move: PREFIX => [_ [QTt1 [NQT _]]]; repeat split=> //; last by exact/quiet_time_P.
       move => t /andP [GEt LTt] QTt.
       feed (MIN t);
-        last by move: LTt; rewrite ltnNge; move => /negP LTt; apply: LTt.
+        last by move: LTt; rewrite ltnNge => /negP LTt; apply: LTt.
       apply/andP; split.
       + by apply/andP; split; last (apply leq_trans with t2; [apply ltnW |]).
       + exact/quiet_time_P. }

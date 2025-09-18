@@ -95,7 +95,7 @@ Section JLFPArrivalBounds.
   Proof.
     move=> j t1 Δ; rewrite -sum1_size big_filter.
     apply leq_trans with (\sum_(i <- arrivals_between arr_seq t1 (t1 + Δ)) 1).
-    { by rewrite big_mkcond //=; apply leq_sum; move => i _ ; destruct hep_job. }
+    { by rewrite big_mkcond //=; apply leq_sum => i _ ; destruct hep_job. }
     apply: leq_trans.
     { apply sum_over_partitions_le with (x_to_y := job_task) (ys := ts) => s IN HEP.
       by eapply H_all_jobs_from_taskset, in_arrivals_implies_arrived => //. }
@@ -155,7 +155,7 @@ Section FPArrivalBounds.
     apply leq_trans with (
         \sum_(i <- arrivals_between arr_seq t1 (t1 + Δ) | hep_task (job_task i) (job_task j)) 1
       ).
-    { by rewrite big_mkcond //=; apply leq_sum; move => i _ ; destruct hep_job. }
+    { by rewrite big_mkcond //=; apply leq_sum => i _ ; destruct hep_job. }
     apply: leq_trans.
     { apply sum_over_partitions_le with (x_to_y := job_task) (ys := ts) => s IN HEP.
       by eapply H_all_jobs_from_taskset, in_arrivals_implies_arrived => //. }

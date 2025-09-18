@@ -40,7 +40,7 @@ Section CompletesAtLemmas.
     destruct t as [|t]; first by lia.
     rewrite -pred_Sn -service_last_plus_before.
     have ->: t.+1 == 0 = false by lia.
-    rewrite orbF; move => /andP [A B]; move: (leq_trans A B).
+    rewrite orbF => /andP [A B]; move: (leq_trans A B).
     rewrite -addn1 leq_add2l => SP.
     by apply service_at_implies_scheduled_at.
   Qed.

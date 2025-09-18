@@ -174,7 +174,7 @@ Section JLFPInstantiation.
         Lemma task_interference_eq_false :
           ~~ task_interference arr_seq sched j t.
         Proof.
-          apply/negP; move => /andP [+ _]; rewrite /nonself /task_scheduled_at.
+          apply/negP => /andP [+ _]; rewrite /nonself /task_scheduled_at.
           rewrite task_served_eq_task_scheduled //=; erewrite job_of_scheduled_task => //.
           move: H_j_tsk  H_j'_tsk; rewrite /job_of_task => /eqP -> /eqP ->.
           by rewrite eq_refl.
@@ -275,7 +275,7 @@ Section JLFPInstantiation.
       move=> j t1 R ARR TSK NCOMPL.
       rewrite /cumul_task_interference /cumul_cond_interference.
       rewrite -big_split //= big_seq_cond [leqRHS]big_seq_cond.
-      apply leq_sum; move => t /andP [IN _].
+      apply leq_sum => t /andP [IN _].
       rewrite /cond_interference /nonself /interference /ideal_jlfp_interference.
       have [IDLE|[s SCHEDs]] := ideal_proc_model_sched_case_analysis sched t.
       { move: (IDLE) => IIDLE; erewrite <-is_idle_def in IDLE => //.
@@ -322,7 +322,7 @@ Section JLFPInstantiation.
       Proof.
         rewrite /cumulative_other_hep_jobs_interfering_workload /workload_of_other_hep_jobs.
         case NEQ: (t1 < t2); last first.
-        { move: NEQ => /negP /negP; rewrite -leqNgt; move => NEQ.
+        { move: NEQ => /negP /negP; rewrite -leqNgt => NEQ.
           rewrite big_geq//.
           rewrite /arrivals_between /arrival_sequence.arrivals_between big_geq//.
           by rewrite /workload_of_jobs big_nil.

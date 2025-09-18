@@ -176,7 +176,7 @@ Section ExistsBusyIntervalJLFP.
         have EQ: t1 = t by apply/eqP; rewrite eqn_leq; apply/andP; split.
         subst t1; clear GE LT.
         exists j; repeat split=> //.
-        + move: REL; rewrite ltnS -eqn_leq eq_sym; move => /eqP REL.
+        + move: REL; rewrite ltnS -eqn_leq eq_sym => /eqP REL.
             by rewrite -REL; eapply job_pending_at_arrival; eauto 2.
       - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
       - have EX:
@@ -184,7 +184,7 @@ Section ExistsBusyIntervalJLFP.
             j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ job_pending_at j__hp t /\ hep_job j__hp j.
         { exists (filter (fun jo => (job_pending_at jo t) && (hep_job jo j)) (arrivals_between arr_seq 0 t.+1)).
           intros; split; intros T.
-          - move: T; rewrite mem_filter; move => /andP [/andP [PEN HP] IN].
+          - move: T; rewrite mem_filter => /andP [/andP [PEN HP] IN].
             repeat split; eauto using in_arrivals_implies_arrived.
           - move: T => [ARR [PEN HP]].
             rewrite mem_filter; apply/andP; split; first (apply/andP; split=> //).
@@ -192,7 +192,7 @@ Section ExistsBusyIntervalJLFP.
             by apply/andP; split; last rewrite ltnS; move: PEN => /andP [T _].
         } move: EX => [hp__seq SE]; case FL: (hp__seq) => [ | jhp jhps].
         + subst hp__seq; exfalso.
-          move: GE; rewrite leq_eqVlt; move => /orP [/eqP EQ| GE].
+          move: GE; rewrite leq_eqVlt => /orP [/eqP EQ| GE].
           * subst t.
             apply NQT with t1.+1; first by apply/andP; split.
             intros jhp ARR HP ARRB; apply negbNE; apply/negP; intros NCOMP.
@@ -302,7 +302,7 @@ Section ExistsBusyIntervalJLFP.
                 leq_sum // => t' /andP [/andP [LT GT] _].
         rewrite sum_nat_gt0 filter_predT; apply/hasP.
         have [Idle|[jo Sched_jo]] := (scheduled_at_cases _ H_valid_arrival_time sched ltac:(auto) ltac:(auto) t').
-        { exfalso; move: LT; rewrite leq_eqVlt; move => /orP [/eqP EQ|LT].
+        { exfalso; move: LT; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
           { subst t'.
             feed (H_no_quiet_time t1.+1); first by apply/andP; split.
             by apply H_no_quiet_time, idle_time_implies_quiet_time_at_the_next_time_instant. }
@@ -474,7 +474,7 @@ Section ExistsBusyIntervalJLFP.
               rewrite service_of_jobs_negate_pred // addnBA; last by apply service_of_jobs_pred_impl; eauto 2.
               rewrite addnC -addnBA; first by rewrite no_idle_time_within_non_quiet_time_interval // leq_addr.
               rewrite service_of_jobs_sum_over_time_interval //.
-              apply leq_sum_seq; move => t II _; rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
+              apply leq_sum_seq => t II _; rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
               have [IDLE|[j' SCHED]] := (scheduled_at_cases _ H_valid_arrival_time sched ltac:(auto) ltac:(auto) t).
               { apply leq_trans with 0; [rewrite leqn0; apply/eqP | by apply leq0n].
                 apply: big1 => j' NHEP.

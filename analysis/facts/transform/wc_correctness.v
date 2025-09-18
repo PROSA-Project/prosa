@@ -317,7 +317,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
             move=> t_at RANGE.
             move:(no_relevant_state_in_range t_at RANGE) => NOT_REL.
             rewrite scheduled_at_def.
-            apply/negP; move => /eqP EQ.
+            apply/negP => /eqP EQ.
               by move: NOT_REL => /negP T; apply: T; rewrite EQ.
           }
             by rewrite ZERO_SERVICE; rewrite addn0.

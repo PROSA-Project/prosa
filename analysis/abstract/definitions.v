@@ -172,7 +172,7 @@ Section AbstractRTADefinitions.
         apply/negPn/negP; intros CONTR.
         move: BUSY => [[IN [QT1 NQ]] _].
         move: BUSY' => [[IN' [QT1' NQ']] _].
-        move: CONTR; rewrite neq_ltn; move => /orP [LT|GT].
+        move: CONTR; rewrite neq_ltn => /orP [LT|GT].
         { apply NQ with t1' => //; clear NQ.
           apply/andP; split=> [//|].
           move: IN IN' => /andP [_ T1] /andP [T2 _].
@@ -190,7 +190,7 @@ Section AbstractRTADefinitions.
         apply/negPn/negP; intros CONTR.
         move: BUSY => [[IN [_ NQ]] QT2].
         move: BUSY' => [[IN' [_ NQ']] QT2'].
-        move: CONTR; rewrite neq_ltn; move => /orP [LT|GT].
+        move: CONTR; rewrite neq_ltn => /orP [LT|GT].
         { apply NQ' with t2 => //; clear NQ'.
           apply/andP; split=> [|//].
           move: IN IN' => /andP [_ T1] /andP [T2 _].

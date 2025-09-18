@@ -307,7 +307,7 @@ Section TaskIBFtoJobIBF.
           Proof.
             replace (service_of_jobs_at _ _ _ _) with 0; last first.
             { symmetry; rewrite /service_of_jobs_at /=.
-              eapply big1; move => j' _.
+              eapply big1 => j' _.
               apply not_scheduled_implies_no_service.
               exact: not_scheduled_when_idle. }
             have ->: service_at sched j t = 0.
@@ -386,8 +386,8 @@ Section TaskIBFtoJobIBF.
             { have NEQT: t1 <= t < t2
                 by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x).
               move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [Hn _].
-              apply/negPn/negP; move => CONTR; move: CONTR => /negP CONTR.
-              by apply Hn in CONTR; move: CONTR; rewrite /receives_service_at SERVj.
+              apply/negPn/negP => /negP CONTR.
+              by move: (Hn CONTR); rewrite /receives_service_at SERVj.
             }
             have /eqP-> : nonself arr_seq sched j t == true.
             { rewrite eqb_id.
@@ -413,8 +413,8 @@ Section TaskIBFtoJobIBF.
             { rewrite SERVj.
               have ->: interference j t = true; last by done.
               { move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [Hn _].
-                apply/negPn/negP; move => CONTR; move: CONTR => /negP CONTR.
-                by apply Hn in CONTR; move: CONTR; rewrite /receives_service_at SERVj.
+                apply/negPn/negP => /negP CONTR.
+                by move: (Hn CONTR); rewrite /receives_service_at SERVj.
               }
             }
             { rewrite SERVj.
@@ -501,7 +501,7 @@ Section TaskIBFtoJobIBF.
         { rewrite (exchange_big _ _ (arrivals_between _ _ _)) /= (big_rem j) //=.
           by rewrite H_job_of_tsk leq_addr. }
         rewrite -big_split -big_split //=.
-        rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum //; move => t /andP [NEQ _].
+        rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum // => t /andP [NEQ _].
         rewrite -(leqRW (interference_plus_sched_le_serv_of_task_plus_task_interference _ _ )) => //.
       Qed.
 

@@ -254,4 +254,4 @@ Ltac ideal_proc_model_sched_case_analysis_eq sched t JobName :=
   let SchedEq := fresh "Eq" Sched in
   destruct (ideal_proc_model_sched_case_analysis sched t) as [Idle | [JobName Sched]];
   [move: (Idle) => /eqP IdleEq; rewrite ?IdleEq
-  | move: (Sched); simpl; move => /eqP SchedEq; rewrite ?SchedEq].
+  | move: (Sched); simpl => /eqP SchedEq; rewrite ?SchedEq].

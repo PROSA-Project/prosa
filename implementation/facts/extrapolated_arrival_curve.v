@@ -62,7 +62,7 @@ Section ArrivalCurvePrefixSortedLeq.
         snd (last (t__d1, v__d1) [seq step <- steps | fst step <= t1]) <= snd (last (t__d2, v__d2) [seq step <- steps | fst step <= t2]).
     { have steps_sorted := H_sorted_leq; clear H_sorted_leq.
       elim: steps steps_sorted => [//|[t__c v__c] steps IHsteps] steps_sorted.
-      simpl; intros *; move => LEv /andP [LTN1 /allP ALL1] /andP [LTN2 /allP ALL2].
+      simpl; intros * => LEv /andP [LTN1 /allP ALL1] /andP [LTN2 /allP ALL2].
       move: (steps_sorted); rewrite //= (@path_sorted_inE _ predT leq_steps); first last.
       { by apply/allP. }
       { by intros ? ? ? _ _ _; apply leq_steps_is_transitive. }
@@ -115,7 +115,7 @@ Section ArrivalCurvePrefixSortedLeq.
     }
     { move: (H_sorted_leq); clear H_sorted_leq; rewrite /sorted_leq_steps //= => SORT; clear H_no_inf_arrivals.
       elim: steps SORT => [//|a steps IHsteps] /= SORT.
-      move: SORT; rewrite path_sortedE; auto using leq_steps_is_transitive; move => /andP [LE SORT].
+      move: SORT; rewrite path_sortedE; auto using leq_steps_is_transitive => /andP [LE SORT].
       apply IHsteps in SORT.
       rewrite path_sortedE; last by intros ? ? ? LE1 LE2; lia.
       apply/andP; split=> [|//].

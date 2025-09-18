@@ -279,7 +279,7 @@ Section TotalBlackoutDueToOverheadsBounded.
   Proof.
     move => k.
     have [Z|POS] := posnP k.
-    { subst; move => t1 t2 NSC0.
+    { subst => t1 t2 NSC0.
       rewrite add0n muln1; apply no_sched_changes_bounded_overheads_blackout.
       by rewrite /no_schedule_changes_during NSC0.
     }

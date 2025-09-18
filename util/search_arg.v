@@ -257,7 +257,7 @@ Section ExMinn.
     pattern (ex_minn (P:=P) exP) in GT;
       apply prop_on_ex_minn in GT; move: GT => [n [LT [Pn MIN]]].
     specialize (MIN c EX).
-      by move: MIN; rewrite leqNgt; move => /negP MIN; apply: MIN.
+      by move: MIN; rewrite leqNgt => /negP MIN; apply: MIN.
   Qed.
 
 End ExMinn.

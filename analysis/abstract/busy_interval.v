@@ -55,9 +55,9 @@ Section LemmasAboutAbstractBusyInterval.
   Proof.
     move=> t1 t2.
     have [JA|NAT] := boolP (t1 <= job_arrival j < t2); last first.
-    { by right; move => PREF; move: NAT => /negP NQT; apply: NQT; apply PREF. }
+    { by right => PREF; move: NAT => /negP NQT; apply: NQT; apply PREF. }
     have [QT1|NQT] := boolP (quiet_time sched j t1); last first.
-    { by right; move => PREF; move: NQT => /negP NQT; apply: NQT; apply PREF. }
+    { by right => PREF; move: NQT => /negP NQT; apply: NQT; apply PREF. }
     have [AQT|NQT] := boolP (all (fun t => ~~ quiet_time sched j t) (index_iota t1.+1 t2)); last first.
     { right; move=> PREF; move: NQT => /negP NQT; apply: NQT.
       apply/allP => t IO; apply/negP.

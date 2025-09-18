@@ -141,7 +141,7 @@ Section TaskArrivals.
     forall t1 t2 j,
       j \in task_arrivals_between arr_seq tsk t1 t2 ->
       j \in arrivals_between arr_seq t1 t2.
-  Proof. move=> t1 t2 j. by rewrite mem_filter; move => /andP [/eqP TSK JB_IN]. Qed.
+  Proof. move=> t1 t2 j. by rewrite mem_filter => /andP [/eqP TSK JB_IN]. Qed.
 
   (** Any job [j] in [task_arrivals_between arr_seq tsk t1 t2] arrives
       in the arrival sequence [arr_seq]. *)

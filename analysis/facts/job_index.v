@@ -325,7 +325,7 @@ Section PreviousJob.
                           (job_arrival (prev_job arr_seq j)).+1 (job_arrival j) = [::].
   Proof.
     move => POS_IND.
-    move : (prev_job_arr_lte); rewrite leq_eqVlt; move => /orP [/eqP EQ | LT].
+    move : (prev_job_arr_lte); rewrite leq_eqVlt => /orP [/eqP EQ | LT].
     - rewrite EQ.
       apply/eqP/negPn/negP; rewrite -has_filter => /hasP [j' IN /eqP TASK].
       apply mem_bigcat_nat_exists in IN; move : IN => [i [J'_IN ARR_INEQ]].

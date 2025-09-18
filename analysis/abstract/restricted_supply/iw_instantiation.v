@@ -163,7 +163,7 @@ Section JLFPInstantiation.
       move=> j t1 R ARR TSK NCOMPL.
       rewrite /cumul_task_interference /cumul_cond_interference.
       rewrite -big_split //= big_seq_cond [leqRHS]big_seq_cond.
-      apply leq_sum; move => t /andP [IN _].
+      apply leq_sum => t /andP [IN _].
       rewrite /cond_interference /nonself /interference /rs_jlfp_interference /nonself_intra.
       have [SUP|NOSUP] := boolP (has_supply sched t); last first.
       { by move: (NOSUP); rewrite /is_blackout => -> //=; rewrite andbT andbF //. }
@@ -202,7 +202,7 @@ Section JLFPInstantiation.
     Proof.
       move=> j t1 t2.
       rewrite /cumul_cond_interference -big_split //= big_seq_cond [leqRHS]big_seq_cond.
-      apply leq_sum; move => t /andP [IN _].
+      apply leq_sum => t /andP [IN _].
       rewrite /cond_interference /nonself /interference /rs_jlfp_interference.
       have [SUP|NOSUP] := boolP (has_supply sched t); last first.
       { by move: (NOSUP); rewrite /is_blackout => -> //=; rewrite andbT andbF //. }
@@ -235,7 +235,7 @@ Section JLFPInstantiation.
       Proof.
         rewrite /cumulative_other_hep_jobs_interfering_workload /workload_of_other_hep_jobs.
         case NEQ: (t1 < t2); last first.
-        { move: NEQ => /negP /negP; rewrite -leqNgt; move => NEQ.
+        { move: NEQ => /negP /negP; rewrite -leqNgt => NEQ.
           rewrite big_geq // /arrivals_between big_geq //.
           by rewrite /workload_of_jobs big_nil. }
         { interval_to_duration t1 t2 k.

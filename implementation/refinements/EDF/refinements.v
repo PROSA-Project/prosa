@@ -242,7 +242,7 @@ Proof.
   unfold blocking_bound_NP, blocking_bound_NP_T, blocking_relevant.
   intros A A' RA; apply refinesP; eapply refine_foldr_max.
   - by rewrite refinesE map_id; apply Rts.
-  - by apply refines_abstr; move => tsk1 tsk1' Rtsk1; tc.
+  - by apply refines_abstr => tsk1 tsk1' Rtsk1; tc.
   - rewrite refinesE => tsk1 tsk1' Rtsk1.
     apply andb_R; first apply andb_R.
     + apply refine_ltn; first by done.
