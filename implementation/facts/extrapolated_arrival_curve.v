@@ -6,34 +6,31 @@ Require Export prosa.implementation.definitions.extrapolated_arrival_curve.
     prefix and the [extrapolated_arrival_curve] function. *)
 
 (** We start with basic facts about the relations [ltn_steps] and [leq_steps]. *)
-Section BasicFacts.
 
-  (** We show that the relation [ltn_steps] is transitive. *)
-  Lemma ltn_steps_is_transitive :
-    transitive ltn_steps.
-  Proof.
-    move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    by apply /andP; split; lia.
-  Qed.
+(** We show that the relation [ltn_steps] is transitive. *)
+Lemma ltn_steps_is_transitive :
+  transitive ltn_steps.
+Proof.
+  move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
+  by apply /andP; split; lia.
+Qed.
 
-  (** Next, we show that the relation [leq_steps] is reflexive... *)
-  Lemma leq_steps_is_reflexive :
-    reflexive leq_steps.
-  Proof.
-    move=> [l r].
-    rewrite /leq_steps.
-    by apply /andP; split.
-  Qed.
+(** Next, we show that the relation [leq_steps] is reflexive... *)
+Lemma leq_steps_is_reflexive :
+  reflexive leq_steps.
+Proof.
+  move=> [l r].
+  rewrite /leq_steps.
+  by apply /andP; split.
+Qed.
 
-  (** ... and transitive. *)
-  Lemma leq_steps_is_transitive :
-    transitive leq_steps.
-  Proof.
-    move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    by apply /andP; split; lia.
-  Qed.
-
-End BasicFacts.
+(** ... and transitive. *)
+Lemma leq_steps_is_transitive :
+  transitive leq_steps.
+Proof.
+  move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
+  by apply /andP; split; lia.
+Qed.
 
 (** In the following section, we prove a few properties of
     arrival-curve prefixes assuming that there are no infinite

@@ -94,48 +94,45 @@ Section Definitions.
     (flatten (map (time_steps_with_offset_T tsk) offsets))%C.
 End Definitions.
 
-(** In this section, we define two functions used to convert from a generic task
-      to the standard task definition, and vice-versa. *)
-Section Translation.
+(** In the following, we define two functions used to convert from a generic task
+    to the standard task definition, and vice-versa. *)
 
-  (** First, we define the function that maps a generic task to a natural-number
-        task... *)
-  Definition taskT_to_task (tsk : @task_T N) : Task :=
-    match tsk with
-    | {| task_id_T := id;
-         task_cost_T := cost;
-         task_arrival_T := arrival_bound;
-         task_deadline_T := deadline;
-         task_priority_T := priority |}
-      =>
-      {| task.task_id := nat_of_bin id;
-         task.task_cost := nat_of_bin cost;
-         task.task_arrival := task_abT_to_task_ab arrival_bound;
-         task.task_deadline := nat_of_bin deadline;
-         task.task_priority := nat_of_bin priority |}
-    end.
+(** First, we define the function that maps a generic task to a natural-number
+      task... *)
+Definition taskT_to_task (tsk : @task_T N) : Task :=
+  match tsk with
+  | {| task_id_T := id;
+       task_cost_T := cost;
+       task_arrival_T := arrival_bound;
+       task_deadline_T := deadline;
+       task_priority_T := priority |}
+    =>
+    {| task.task_id := nat_of_bin id;
+       task.task_cost := nat_of_bin cost;
+       task.task_arrival := task_abT_to_task_ab arrival_bound;
+       task.task_deadline := nat_of_bin deadline;
+       task.task_priority := nat_of_bin priority |}
+  end.
 
-  (** ... and its function relationship. *)
-  Definition Rtask := fun_hrel taskT_to_task.
+(** ... and its function relationship. *)
+Definition Rtask := fun_hrel taskT_to_task.
 
-  (** Finally, we define the converse function, mapping a natural-number
-        task to a generic one. *)
-  Definition task_to_taskT (tsk : Task) : @task_T N :=
-    match tsk with
-    | {| task.task_id := id;
-         task.task_cost := cost;
-         task.task_arrival := arrival_bound;
-         task.task_deadline := deadline;
-         task.task_priority := priority |}
-      =>
-      {| task_id_T := bin_of_nat id;
-         task_cost_T := bin_of_nat cost;
-         task_arrival_T := task_ab_to_task_abT arrival_bound;
-         task_deadline_T := bin_of_nat deadline;
-         task_priority_T := bin_of_nat priority |}
-    end.
-
-End Translation.
+(** Finally, we define the converse function, mapping a natural-number
+      task to a generic one. *)
+Definition task_to_taskT (tsk : Task) : @task_T N :=
+  match tsk with
+  | {| task.task_id := id;
+       task.task_cost := cost;
+       task.task_arrival := arrival_bound;
+       task.task_deadline := deadline;
+       task.task_priority := priority |}
+    =>
+    {| task_id_T := bin_of_nat id;
+       task_cost_T := bin_of_nat cost;
+       task_arrival_T := task_ab_to_task_abT arrival_bound;
+       task_deadline_T := bin_of_nat deadline;
+       task_priority_T := bin_of_nat priority |}
+  end.
 
 (** In this fairly technical section, we prove a series of refinements
       aimed to be able to convert between a standard natural-number task

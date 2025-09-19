@@ -250,62 +250,61 @@ Section SumsOverSequences.
 
 End SumsOverSequences.
 
-(** In this section, we prove a variety of properties of sums performed over ranges. *)
-Section SumsOverRanges.
+(** In the following, we prove a variety of simple properties of sums over
+    ranges. *)
 
-  (** First, we prove that the sum of Δ ones is equal to Δ     . *)
-  Lemma sum_of_ones :
-    forall t Δ,
-      \sum_(t <= x < t + Δ) 1 = Δ.
-  Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
+(** First, we prove that the sum of Δ ones is equal to Δ     . *)
+Lemma sum_of_ones :
+  forall t Δ,
+    \sum_(t <= x < t + Δ) 1 = Δ.
+Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
 
-  (** Next, we show that a sum of natural numbers equals zero if and only
-      if all terms are zero. *)
-  Lemma big_nat_eq0 m n F :
-    \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
-  Proof.
-    split.
-    - rewrite /index_iota => /eqP.
-      rewrite sum_nat_eq0_nat filter_predT => /allP ZERO i.
-      rewrite -mem_index_iota /index_iota => IN.
-      by apply/eqP; apply ZERO.
-    - move=> ZERO.
-      have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
-      exact: big1_eq.
-  Qed.
+(** Next, we show that a sum of natural numbers equals zero if and only
+    if all terms are zero. *)
+Lemma big_nat_eq0 m n F :
+  \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
+Proof.
+  split.
+  - rewrite /index_iota => /eqP.
+    rewrite sum_nat_eq0_nat filter_predT => /allP ZERO i.
+    rewrite -mem_index_iota /index_iota => IN.
+    by apply/eqP; apply ZERO.
+  - move=> ZERO.
+    have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
+    exact: big1_eq.
+Qed.
 
-  (** Moreover, the fact that the sum is smaller than the range of the summation
-      implies the existence of a zero element. *)
-  Lemma sum_le_summation_range :
-    forall f t Δ,
-      \sum_(t <= x < t + Δ) f x < Δ ->
-      exists x, t <= x < t + Δ /\ f x = 0.
-  Proof.
-    move=> f t; elim=> [|Δ IHΔ] H; first by rewrite ltn0 in H.
-    destruct (f (t + Δ)) as [|n] eqn: EQ.
-    { exists (t + Δ); split; last by done.
-      by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS]. }
-    { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS => H.
-      have {}/IHΔ [z [/andP[LE GE] ZERO]] : \sum_(t <= t' < t + Δ) f t' < Δ.
-      { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
-      by exists z; split=> //; rewrite LE/= ltnS ltnW. }
-  Qed.
+(** Moreover, the fact that the sum is smaller than the range of the summation
+    implies the existence of a zero element. *)
+Lemma sum_le_summation_range :
+  forall f t Δ,
+    \sum_(t <= x < t + Δ) f x < Δ ->
+    exists x, t <= x < t + Δ /\ f x = 0.
+Proof.
+  move=> f t; elim=> [|Δ IHΔ] H; first by rewrite ltn0 in H.
+  destruct (f (t + Δ)) as [|n] eqn: EQ.
+  { exists (t + Δ); split; last by done.
+    by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS]. }
+  { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS => H.
+    have {}/IHΔ [z [/andP[LE GE] ZERO]] : \sum_(t <= t' < t + Δ) f t' < Δ.
+    { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
+    by exists z; split=> //; rewrite LE/= ltnS ltnW. }
+Qed.
 
-  (** Next, we prove that the summing over the difference of two functions is
-      the same as summing over the two functions separately, and then taking the
-      difference of the two sums. Since we are using natural numbers, we have to
-      require that one function dominates the other in the summing range. *)
-  Lemma sumnB_nat m n F G :
-    (forall i, m <= i < n -> F i >= G i) ->
-    \sum_(m <= i < n) (F i - G i)
-    = (\sum_(m <= i < n) (F i)) - (\sum_(m <= i < n) (G i)).
-  Proof.
-    move=> le.
-    rewrite big_nat_cond [X in X - _]big_nat_cond [X in _ - X]big_nat_cond.
-    rewrite sumnB// => i; rewrite andbT; exact: le.
-  Qed.
+(** Next, we prove that the summing over the difference of two functions is
+    the same as summing over the two functions separately, and then taking the
+    difference of the two sums. Since we are using natural numbers, we have to
+    require that one function dominates the other in the summing range. *)
+Lemma sumnB_nat m n F G :
+  (forall i, m <= i < n -> F i >= G i) ->
+  \sum_(m <= i < n) (F i - G i)
+  = (\sum_(m <= i < n) (F i)) - (\sum_(m <= i < n) (G i)).
+Proof.
+  move=> le.
+  rewrite big_nat_cond [X in X - _]big_nat_cond [X in _ - X]big_nat_cond.
+  rewrite sumnB// => i; rewrite andbT; exact: le.
+Qed.
 
-End SumsOverRanges.
 
 (** In this section, we show how it is possible to equate the result of two sums performed
     on two different functions and on different intervals, provided that the two functions

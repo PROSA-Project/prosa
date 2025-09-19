@@ -118,94 +118,91 @@ Section AbstractRTADefinitions.
     forall j t,
       cumulative_interference j 0 t <= cumulative_interfering_workload j 0 t.
 
-  (** Definition of Busy Interval *)
+  (** ** Definition of Busy Interval *)
   (** Further analysis will be based on the notion of a busy
       interval. The overall idea of the busy interval is to take into
       account the workload that cause a job under consideration to
       incur interference. In this section, we provide a definition of
       an abstract busy interval. *)
-  Section BusyInterval.
 
-    (** We say that time instant [t] is a quiet time for job [j] iff
-        two conditions hold. First, the cumulative interference at
-        time [t] must be equal to the cumulative interfering
-        workload. Intuitively, this condition indicates that the
-        potential interference seen so far has been fully "consumed"
-        (i.e., there is no more higher-priority work or other kinds of
-        delay pending). Second, job [j] cannot be pending at any time
-        earlier than [t] _and_ at time instant [t] (i.e., either it
-        was pending earlier but is no longer pending now, or it was
-        previously not pending and may or may not be released
-        now). The second condition ensures that the busy window
-        captures the execution of job [j]. *)
-    Definition quiet_time (j : Job) (t : instant) :=
-      (cumulative_interference j 0 t == cumulative_interfering_workload j 0 t)
-      && ~~ pending_earlier_and_at sched j t.
+  (** We say that time instant [t] is a quiet time for job [j] iff
+      two conditions hold. First, the cumulative interference at
+      time [t] must be equal to the cumulative interfering
+      workload. Intuitively, this condition indicates that the
+      potential interference seen so far has been fully "consumed"
+      (i.e., there is no more higher-priority work or other kinds of
+      delay pending). Second, job [j] cannot be pending at any time
+      earlier than [t] _and_ at time instant [t] (i.e., either it
+      was pending earlier but is no longer pending now, or it was
+      previously not pending and may or may not be released
+      now). The second condition ensures that the busy window
+      captures the execution of job [j]. *)
+  Definition quiet_time (j : Job) (t : instant) :=
+    (cumulative_interference j 0 t == cumulative_interfering_workload j 0 t)
+    && ~~ pending_earlier_and_at sched j t.
 
-    (** Based on the definition of quiet time, we say that an interval
-        <<[t1, t2)>> is a (potentially unbounded) busy-interval prefix
-        w.r.t. job [j] iff the interval (a) contains the arrival of
-        job j, (b) starts with a quiet time and (c) remains
-        non-quiet. *)
-    Definition busy_interval_prefix (j : Job) (t1 t2 : instant) :=
-      t1 <= job_arrival j < t2
-      /\ quiet_time j t1
-      /\ (forall t, t1 < t < t2 -> ~ quiet_time j t).
+  (** Based on the definition of quiet time, we say that an interval
+      <<[t1, t2)>> is a (potentially unbounded) busy-interval prefix
+      w.r.t. job [j] iff the interval (a) contains the arrival of
+      job j, (b) starts with a quiet time and (c) remains
+      non-quiet. *)
+  Definition busy_interval_prefix (j : Job) (t1 t2 : instant) :=
+    t1 <= job_arrival j < t2
+    /\ quiet_time j t1
+    /\ (forall t, t1 < t < t2 -> ~ quiet_time j t).
 
-    (** Next, we say that an interval <<[t1, t2)>> is a busy interval
-        iff <<[t1, t2)>> is a busy-interval prefix and [t2] is a quiet
-        time. *)
-    Definition busy_interval (j : Job) (t1 t2 : instant) :=
-      busy_interval_prefix j t1 t2
-      /\ quiet_time j t2.
+  (** Next, we say that an interval <<[t1, t2)>> is a busy interval
+      iff <<[t1, t2)>> is a busy-interval prefix and [t2] is a quiet
+      time. *)
+  Definition busy_interval (j : Job) (t1 t2 : instant) :=
+    busy_interval_prefix j t1 t2
+    /\ quiet_time j t2.
 
-    (** Note that the busy interval, if it exists, is unique. *)
-    Fact busy_interval_is_unique :
-      forall j t1 t2 t1' t2',
-        busy_interval j t1 t2 ->
-        busy_interval j t1' t2' ->
-        t1 = t1' /\ t2 = t2'.
-    Proof.
-      move=> j t1 t2 t1' t2' BUSY BUSY'.
-      have EQ: t1 = t1'.
-      { apply/eqP.
-        apply/negPn/negP; intros CONTR.
-        move: BUSY => [[IN [QT1 NQ]] _].
-        move: BUSY' => [[IN' [QT1' NQ']] _].
-        move: CONTR; rewrite neq_ltn => /orP [LT|GT].
-        { apply NQ with t1' => //; clear NQ.
-          apply/andP; split=> [//|].
-          move: IN IN' => /andP [_ T1] /andP [T2 _].
-            by apply leq_ltn_trans with (job_arrival j).
-        }
-        { apply NQ' with t1 => [|//]; clear NQ'.
-          apply/andP; split=> [//|].
-          move: IN IN' => /andP [T1 _] /andP [_ T2].
+  (** Note that the busy interval, if it exists, is unique. *)
+  Fact busy_interval_is_unique :
+    forall j t1 t2 t1' t2',
+      busy_interval j t1 t2 ->
+      busy_interval j t1' t2' ->
+      t1 = t1' /\ t2 = t2'.
+  Proof.
+    move=> j t1 t2 t1' t2' BUSY BUSY'.
+    have EQ: t1 = t1'.
+    { apply/eqP.
+      apply/negPn/negP; intros CONTR.
+      move: BUSY => [[IN [QT1 NQ]] _].
+      move: BUSY' => [[IN' [QT1' NQ']] _].
+      move: CONTR; rewrite neq_ltn => /orP [LT|GT].
+      { apply NQ with t1' => //; clear NQ.
+        apply/andP; split=> [//|].
+        move: IN IN' => /andP [_ T1] /andP [T2 _].
           by apply leq_ltn_trans with (job_arrival j).
-        }
       }
-      subst t1'.
-      have EQ: t2 = t2'.
-      { apply/eqP.
-        apply/negPn/negP; intros CONTR.
-        move: BUSY => [[IN [_ NQ]] QT2].
-        move: BUSY' => [[IN' [_ NQ']] QT2'].
-        move: CONTR; rewrite neq_ltn => /orP [LT|GT].
-        { apply NQ' with t2 => //; clear NQ'.
-          apply/andP; split=> [|//].
-          move: IN IN' => /andP [_ T1] /andP [T2 _].
-          by apply leq_ltn_trans with (job_arrival j).
-        }
-        { apply NQ with t2' => //; clear NQ.
-          apply/andP; split=> [|//].
-          move: IN IN' => /andP [T1 _] /andP [_ T2].
-          by apply leq_ltn_trans with (job_arrival j).
-        }
+      { apply NQ' with t1 => [|//]; clear NQ'.
+        apply/andP; split=> [//|].
+        move: IN IN' => /andP [T1 _] /andP [_ T2].
+        by apply leq_ltn_trans with (job_arrival j).
       }
-      by subst t2'.
-    Qed.
-
-  End BusyInterval.
+    }
+    subst t1'.
+    have EQ: t2 = t2'.
+    { apply/eqP.
+      apply/negPn/negP; intros CONTR.
+      move: BUSY => [[IN [_ NQ]] QT2].
+      move: BUSY' => [[IN' [_ NQ']] QT2'].
+      move: CONTR; rewrite neq_ltn => /orP [LT|GT].
+      { apply NQ' with t2 => //; clear NQ'.
+        apply/andP; split=> [|//].
+        move: IN IN' => /andP [_ T1] /andP [T2 _].
+        by apply leq_ltn_trans with (job_arrival j).
+      }
+      { apply NQ with t2' => //; clear NQ.
+        apply/andP; split=> [|//].
+        move: IN IN' => /andP [T1 _] /andP [_ T2].
+        by apply leq_ltn_trans with (job_arrival j).
+      }
+    }
+    by subst t2'.
+  Qed.
 
   (** In this section, we introduce some assumptions about the busy
       interval that are fundamental to the analysis. *)

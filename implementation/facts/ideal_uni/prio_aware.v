@@ -86,58 +86,55 @@ Section PrioAwareUniprocessorScheduler.
       the following section we establish that [uni_schedule arr_seq] is
       compliant with the given priority policy whenever jobs are
       preemptable. *)
-  Section Priority.
 
-    (** For notational convenience, recall the definitions of the job-selection
-        policy and a prefix of the schedule based on which the next decision is
-        made. *)
-    Let policy := allocation_at arr_seq choose_highest_prio_job.
-    Let prefix t := if t is t'.+1 then schedule_up_to policy idle_state t' else empty_schedule idle_state.
+  (** For notational convenience, recall the definitions of the job-selection
+      policy and a prefix of the schedule based on which the next decision is
+      made. *)
+  Let policy := allocation_at arr_seq choose_highest_prio_job.
+  Let prefix t := if t is t'.+1 then schedule_up_to policy idle_state t' else empty_schedule idle_state.
 
-    (** To start, we observe that, at preemption times, the scheduled job is a
-        supremum w.r.t. to the priority order and the set of backlogged
-        jobs. *)
-    Lemma scheduled_job_is_supremum :
-      forall j t,
-        scheduled_at schedule j t ->
-        preemption_time arr_seq schedule t ->
-        supremum (hep_job_at t) (jobs_backlogged_at arr_seq (prefix t) t) = Some j.
-    Proof.
-      move=> j t SCHED PREEMPT.
-      have NOT_NP: ~~ prev_job_nonpreemptive (prefix t) t.
-      { apply /(contraL _ PREEMPT)/np_consistent => // t' s j'.
-        exact: supremum_in. }
-      move: SCHED.
-      rewrite scheduled_at_def => /eqP.
-      rewrite {1}/schedule/uni_schedule/pmc_uni_schedule/generic_schedule schedule_up_to_def /allocation_at -/(prefix t).
-      rewrite ifF //.
-      by apply negbTE.
-    Qed.
+  (** To start, we observe that, at preemption times, the scheduled job is a
+      supremum w.r.t. to the priority order and the set of backlogged
+      jobs. *)
+  Lemma scheduled_job_is_supremum :
+    forall j t,
+      scheduled_at schedule j t ->
+      preemption_time arr_seq schedule t ->
+      supremum (hep_job_at t) (jobs_backlogged_at arr_seq (prefix t) t) = Some j.
+  Proof.
+    move=> j t SCHED PREEMPT.
+    have NOT_NP: ~~ prev_job_nonpreemptive (prefix t) t.
+    { apply /(contraL _ PREEMPT)/np_consistent => // t' s j'.
+      exact: supremum_in. }
+    move: SCHED.
+    rewrite scheduled_at_def => /eqP.
+    rewrite {1}/schedule/uni_schedule/pmc_uni_schedule/generic_schedule schedule_up_to_def /allocation_at -/(prefix t).
+    rewrite ifF //.
+    by apply negbTE.
+  Qed.
 
-    (** From the preceding facts, we conclude that [uni_schedule arr_seq]
-        respects the priority policy at preemption times. *)
-    Theorem schedule_respects_policy :
-      respects_JLDP_policy_at_preemption_point arr_seq schedule JLDP.
-    Proof.
-      move=> j1 j2 t ARRIVES PREEMPT BACK_j1 SCHED_j2.
-      case: (boolP (scheduled_at (uni_schedule arr_seq) j1 t)) => [SCHED_j1|NOT_SCHED_j1].
-      { have <-: j1 = j2 by apply (ideal_proc_model_is_a_uniprocessor_model j1 j2 (uni_schedule arr_seq) t).
-        by apply H_reflexive_priorities. }
-      { move: BACK_j1.
-        have ->: backlogged (uni_schedule arr_seq) j1 t = backlogged (prefix t) j1 t.
-        { apply backlogged_prefix_invariance' with (h := t) => //.
-          - rewrite /identical_prefix /uni_schedule /prefix => t' LT.
-            elim: t PREEMPT SCHED_j2 NOT_SCHED_j1 LT => [//|t IHt] PREEMPT SCHED_j2 NOT_SCHED_j1 LT.
-            rewrite /pmc_uni_schedule/generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
-          - rewrite /prefix scheduled_at_def.
-            induction t => //.
-            by rewrite schedule_up_to_empty. }
-        move=> BACK_j1.
-        move: (scheduled_job_is_supremum j2 t SCHED_j2 PREEMPT) => SUPREMUM.
-        apply supremum_spec with (s := jobs_backlogged_at arr_seq (prefix t) t) => //.
-        exact: mem_backlogged_jobs. }
-    Qed.
-
-  End Priority.
+  (** From the preceding facts, we conclude that [uni_schedule arr_seq]
+      respects the priority policy at preemption times. *)
+  Theorem schedule_respects_policy :
+    respects_JLDP_policy_at_preemption_point arr_seq schedule JLDP.
+  Proof.
+    move=> j1 j2 t ARRIVES PREEMPT BACK_j1 SCHED_j2.
+    case: (boolP (scheduled_at (uni_schedule arr_seq) j1 t)) => [SCHED_j1|NOT_SCHED_j1].
+    { have <-: j1 = j2 by apply (ideal_proc_model_is_a_uniprocessor_model j1 j2 (uni_schedule arr_seq) t).
+      by apply H_reflexive_priorities. }
+    { move: BACK_j1.
+      have ->: backlogged (uni_schedule arr_seq) j1 t = backlogged (prefix t) j1 t.
+      { apply backlogged_prefix_invariance' with (h := t) => //.
+        - rewrite /identical_prefix /uni_schedule /prefix => t' LT.
+          elim: t PREEMPT SCHED_j2 NOT_SCHED_j1 LT => [//|t IHt] PREEMPT SCHED_j2 NOT_SCHED_j1 LT.
+          rewrite /pmc_uni_schedule/generic_schedule (schedule_up_to_prefix_inclusion _ _ t' t) //.
+        - rewrite /prefix scheduled_at_def.
+          induction t => //.
+          by rewrite schedule_up_to_empty. }
+      move=> BACK_j1.
+      move: (scheduled_job_is_supremum j2 t SCHED_j2 PREEMPT) => SUPREMUM.
+      apply supremum_spec with (s := jobs_backlogged_at arr_seq (prefix t) t) => //.
+      exact: mem_backlogged_jobs. }
+  Qed.
 
 End PrioAwareUniprocessorScheduler.

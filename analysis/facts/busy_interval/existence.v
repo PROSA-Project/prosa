@@ -366,52 +366,50 @@ Section ExistsBusyIntervalJLFP.
       Hypothesis H_j_is_pending : job_pending_at j t_busy.
 
       (** First, we show that there must exist a busy interval prefix. *)
-      Section LowerBound.
 
-        (** Since job [j] is pending, there is a (potentially unbounded)
-            busy interval that starts no later than with the arrival of [j]. *)
-        Lemma exists_busy_interval_prefix :
-          exists t1,
-            busy_interval_prefix t1 t_busy.+1
-            /\ t1 <= job_arrival j <= t_busy.
-        Proof.
-          rename H_j_is_pending into PEND, H_work_conserving into WORK.
-          destruct ([exists t:'I_t_busy.+1, quiet_time_dec t]) eqn:EX.
-          - set last0 := \max_(t < t_busy.+1 | quiet_time_dec t) t.
-            move: EX => /existsP [t EX].
-            have PRED: quiet_time_dec last0 by apply (bigmax_pred t_busy.+1 (quiet_time_dec) t).
-            have QUIET: quiet_time last0.
-            { intros j_hp IN HP ARR; move: PRED => /allP PRED; feed (PRED j_hp).
-              - by eapply arrived_between_implies_in_arrivals; eauto.
-              - by rewrite HP implyTb in PRED.
-            }
-            exists last0.
-            have JAIN: last0 <= job_arrival j <= t_busy.
-            { apply/andP; split; last by move: PEND => /andP [ARR _].
-              move_neq_up BEFORE.
-              move: PEND => /andP [_ NOTCOMP].
-              feed (QUIET j H_from_arrival_sequence); first by apply H_priority_is_reflexive.
-              specialize (QUIET BEFORE).
-              apply completion_monotonic with (t' := t_busy) in QUIET; first by rewrite QUIET in NOTCOMP.
-                by apply bigmax_ltn_ord with (i0 := t).
-            }
-            repeat split=> //.
-            * by apply bigmax_ltn_ord with (i0 := t).
-            * move => t0 /andP [GTlast LTbusy] QUIET0.
-              have PRED0: quiet_time_dec t0 by apply/quiet_time_P.
-              move: (@leq_bigmax_cond _ (fun (x: 'I_t_busy.+1) => quiet_time_dec x) (fun x => x) (Ordinal LTbusy) PRED0) => /=.
-              by rewrite -/last0; move: GTlast; clear; lia.
-          - apply negbT in EX; rewrite negb_exists in EX; move: EX => /forallP /= ALL.
-            exists 0; split; last by apply/andP; split; last by move: PEND => /andP [ARR _].
-            repeat split; first by intros j_hp _ _ ARR; rewrite /arrived_before ltn0 in ARR.
-            * move => t /andP [GE LT] /quiet_time_P QUIET.
-              apply/negP; [exact: (ALL (Ordinal LT))|] => /=.
-              exact: QUIET.
-            * apply/andP; split=> [//|].
-              by move: PEND => /andP[].
-        Qed.
+      (** Since job [j] is pending, there is a (potentially unbounded)
+          busy interval that starts no later than with the arrival of [j]. *)
+      Lemma exists_busy_interval_prefix :
+        exists t1,
+          busy_interval_prefix t1 t_busy.+1
+          /\ t1 <= job_arrival j <= t_busy.
+      Proof.
+        rename H_j_is_pending into PEND, H_work_conserving into WORK.
+        destruct ([exists t:'I_t_busy.+1, quiet_time_dec t]) eqn:EX.
+        - set last0 := \max_(t < t_busy.+1 | quiet_time_dec t) t.
+          move: EX => /existsP [t EX].
+          have PRED: quiet_time_dec last0 by apply (bigmax_pred t_busy.+1 (quiet_time_dec) t).
+          have QUIET: quiet_time last0.
+          { intros j_hp IN HP ARR; move: PRED => /allP PRED; feed (PRED j_hp).
+            - by eapply arrived_between_implies_in_arrivals; eauto.
+            - by rewrite HP implyTb in PRED.
+          }
+          exists last0.
+          have JAIN: last0 <= job_arrival j <= t_busy.
+          { apply/andP; split; last by move: PEND => /andP [ARR _].
+            move_neq_up BEFORE.
+            move: PEND => /andP [_ NOTCOMP].
+            feed (QUIET j H_from_arrival_sequence); first by apply H_priority_is_reflexive.
+            specialize (QUIET BEFORE).
+            apply completion_monotonic with (t' := t_busy) in QUIET; first by rewrite QUIET in NOTCOMP.
+              by apply bigmax_ltn_ord with (i0 := t).
+          }
+          repeat split=> //.
+          * by apply bigmax_ltn_ord with (i0 := t).
+          * move => t0 /andP [GTlast LTbusy] QUIET0.
+            have PRED0: quiet_time_dec t0 by apply/quiet_time_P.
+            move: (@leq_bigmax_cond _ (fun (x: 'I_t_busy.+1) => quiet_time_dec x) (fun x => x) (Ordinal LTbusy) PRED0) => /=.
+            by rewrite -/last0; move: GTlast; clear; lia.
+        - apply negbT in EX; rewrite negb_exists in EX; move: EX => /forallP /= ALL.
+          exists 0; split; last by apply/andP; split; last by move: PEND => /andP [ARR _].
+          repeat split; first by intros j_hp _ _ ARR; rewrite /arrived_before ltn0 in ARR.
+          * move => t /andP [GE LT] /quiet_time_P QUIET.
+            apply/negP; [exact: (ALL (Ordinal LT))|] => /=.
+            exact: QUIET.
+          * apply/andP; split=> [//|].
+            by move: PEND => /andP[].
+      Qed.
 
-      End LowerBound.
 
       (** Next we prove that, if there is a point where the requested
           workload is upper-bounded by the supply, then the busy

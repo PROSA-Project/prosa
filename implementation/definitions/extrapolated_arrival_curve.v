@@ -70,79 +70,77 @@ Definition extrapolated_arrival_curve (ac_prefix : ArrivalCurvePrefix) (t : dura
   t %/ h * value_at ac_prefix h + value_at ac_prefix (t %% h).
 
 (** In the following section, we define a few validity predicates. *)
-Section ValidArrivalCurvePrefix.
 
-  (** Horizon should be positive. *)
-  Definition positive_horizon (ac_prefix : ArrivalCurvePrefix) :=
-    horizon_of ac_prefix > 0.
+(** Horizon should be positive. *)
+Definition positive_horizon (ac_prefix : ArrivalCurvePrefix) :=
+  horizon_of ac_prefix > 0.
 
-  (** Horizon should bound time steps. *)
-  Definition large_horizon (ac_prefix : ArrivalCurvePrefix) :=
-    forall s, s \in time_steps_of ac_prefix -> s <= horizon_of ac_prefix.
+(** Horizon should bound time steps. *)
+Definition large_horizon (ac_prefix : ArrivalCurvePrefix) :=
+  forall s, s \in time_steps_of ac_prefix -> s <= horizon_of ac_prefix.
 
-  (** We define an alternative, decidable version of [large_horizon]... *)
-  Definition large_horizon_dec (ac_prefix : ArrivalCurvePrefix) : bool :=
-    all (fun s => s <= horizon_of ac_prefix) (time_steps_of ac_prefix).
+(** We define an alternative, decidable version of [large_horizon]... *)
+Definition large_horizon_dec (ac_prefix : ArrivalCurvePrefix) : bool :=
+  all (fun s => s <= horizon_of ac_prefix) (time_steps_of ac_prefix).
 
-  (** ... and prove that the two definitions are equivalent. *)
-  Lemma large_horizon_P :
-    forall (ac_prefix : ArrivalCurvePrefix),
-      reflect (large_horizon ac_prefix) (large_horizon_dec ac_prefix).
-  Proof.
-    move=> ac.
-    apply /introP; first by move=> /allP ?.
-    apply ssr.ssrbool.contraNnot => ?.
-    by apply /allP.
-  Qed.
+(** ... and prove that the two definitions are equivalent. *)
+Lemma large_horizon_P :
+  forall (ac_prefix : ArrivalCurvePrefix),
+    reflect (large_horizon ac_prefix) (large_horizon_dec ac_prefix).
+Proof.
+  move=> ac.
+  apply /introP; first by move=> /allP ?.
+  apply ssr.ssrbool.contraNnot => ?.
+  by apply /allP.
+Qed.
 
-  (** There should be no infinite arrivals; that is, [value_at 0 = 0]. *)
-  Definition no_inf_arrivals (ac_prefix : ArrivalCurvePrefix) :=
-    value_at ac_prefix 0 == 0.
+(** There should be no infinite arrivals; that is, [value_at 0 = 0]. *)
+Definition no_inf_arrivals (ac_prefix : ArrivalCurvePrefix) :=
+  value_at ac_prefix 0 == 0.
 
-  (** Bursts must be specified; that is, [steps_of] should contain a
-      pair [(ε, b)]. *)
-  Definition specified_bursts (ac_prefix : ArrivalCurvePrefix) :=
-    ε \in time_steps_of ac_prefix.
+(** Bursts must be specified; that is, [steps_of] should contain a
+    pair [(ε, b)]. *)
+Definition specified_bursts (ac_prefix : ArrivalCurvePrefix) :=
+  ε \in time_steps_of ac_prefix.
 
-  (** Steps should be strictly increasing both in time steps and values. *)
-  Definition ltn_steps a b := (fst a < fst b) && (snd a < snd b).
-  Definition sorted_ltn_steps (ac_prefix : ArrivalCurvePrefix) :=
-    sorted ltn_steps (steps_of ac_prefix).
+(** Steps should be strictly increasing both in time steps and values. *)
+Definition ltn_steps a b := (fst a < fst b) && (snd a < snd b).
+Definition sorted_ltn_steps (ac_prefix : ArrivalCurvePrefix) :=
+  sorted ltn_steps (steps_of ac_prefix).
 
-  (** The conjunction of the 5 afore-defined properties defines a
-      valid arrival-curve prefix. *)
-  Definition valid_arrival_curve_prefix (ac_prefix : ArrivalCurvePrefix) :=
-    positive_horizon ac_prefix
-    /\ large_horizon ac_prefix
-    /\ no_inf_arrivals ac_prefix
-    /\ specified_bursts ac_prefix
-    /\ sorted_ltn_steps ac_prefix.
+(** The conjunction of the 5 afore-defined properties defines a
+    valid arrival-curve prefix. *)
+Definition valid_arrival_curve_prefix (ac_prefix : ArrivalCurvePrefix) :=
+  positive_horizon ac_prefix
+  /\ large_horizon ac_prefix
+  /\ no_inf_arrivals ac_prefix
+  /\ specified_bursts ac_prefix
+  /\ sorted_ltn_steps ac_prefix.
 
-  (** We define an alternative, decidable version of [valid_arrival_curve_prefix]... *)
-  Definition valid_arrival_curve_prefix_dec (ac_prefix : ArrivalCurvePrefix) : bool :=
-    (positive_horizon ac_prefix)
-    && (large_horizon_dec ac_prefix)
-    && (no_inf_arrivals ac_prefix)
-    && (specified_bursts ac_prefix)
-    && (sorted_ltn_steps ac_prefix).
+(** We define an alternative, decidable version of [valid_arrival_curve_prefix]... *)
+Definition valid_arrival_curve_prefix_dec (ac_prefix : ArrivalCurvePrefix) : bool :=
+  (positive_horizon ac_prefix)
+  && (large_horizon_dec ac_prefix)
+  && (no_inf_arrivals ac_prefix)
+  && (specified_bursts ac_prefix)
+  && (sorted_ltn_steps ac_prefix).
 
-  (** ... and prove that the two definitions are equivalent. *)
-  Lemma valid_arrival_curve_prefix_P :
-    forall (ac_prefix : ArrivalCurvePrefix),
-      reflect (valid_arrival_curve_prefix ac_prefix) (valid_arrival_curve_prefix_dec ac_prefix).
-  Proof.
-    move=> ac.
-    apply /introP.
-    - by move => /andP[/andP[/andP[/andP[? /large_horizon_P ?] ?]?]?].
-    - apply ssr.ssrbool.contraNnot.
-      move=> [?[/large_horizon_P ?[?[??]]]].
-      by repeat (apply /andP; split => //).
-  Qed.
+(** ... and prove that the two definitions are equivalent. *)
+Lemma valid_arrival_curve_prefix_P :
+  forall (ac_prefix : ArrivalCurvePrefix),
+    reflect (valid_arrival_curve_prefix ac_prefix) (valid_arrival_curve_prefix_dec ac_prefix).
+Proof.
+  move=> ac.
+  apply /introP.
+  - by move => /andP[/andP[/andP[/andP[? /large_horizon_P ?] ?]?]?].
+  - apply ssr.ssrbool.contraNnot.
+    move=> [?[/large_horizon_P ?[?[??]]]].
+    by repeat (apply /andP; split => //).
+Qed.
 
-  (** We also define a predicate for non-decreasing order that is
-      more convenient for proving some of the claims. *)
-  Definition leq_steps a b := (fst a <= fst b) && (snd a <= snd b).
-  Definition sorted_leq_steps (ac_prefix : ArrivalCurvePrefix) :=
-    sorted leq_steps (steps_of ac_prefix).
+(** We also define a predicate for non-decreasing order that is
+    more convenient for proving some of the claims. *)
+Definition leq_steps a b := (fst a <= fst b) && (snd a <= snd b).
+Definition sorted_leq_steps (ac_prefix : ArrivalCurvePrefix) :=
+  sorted leq_steps (steps_of ac_prefix).
 
-End ValidArrivalCurvePrefix.

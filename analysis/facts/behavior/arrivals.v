@@ -130,60 +130,57 @@ Section ArrivalSequencePrefix.
   Variable arr_seq : arrival_sequence Job.
 
   (** We begin with basic lemmas for manipulating the sequences. *)
-  Section Composition.
 
-    (** We show that the set of arriving jobs can be split
-         into disjoint intervals. *)
-    Lemma arrivals_between_cat :
-      forall t1 t t2,
-        t1 <= t ->
-        t <= t2 ->
-        arrivals_between arr_seq t1 t2
-        = arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2.
-    Proof. by move=> ? ? ? ? ?; rewrite -big_cat_nat. Qed.
+  (** We show that the set of arriving jobs can be split
+       into disjoint intervals. *)
+  Lemma arrivals_between_cat :
+    forall t1 t t2,
+      t1 <= t ->
+      t <= t2 ->
+      arrivals_between arr_seq t1 t2
+      = arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2.
+  Proof. by move=> ? ? ? ? ?; rewrite -big_cat_nat. Qed.
 
-    (** We also prove a stronger version of the above lemma
-     in the case of arrivals that satisfy a predicate [P]. *)
-    Lemma arrivals_P_cat :
-      forall P t t1 t2,
-        t1 <= t < t2 ->
-        arrivals_between_P arr_seq P t1 t2
-        = arrivals_between_P arr_seq P t1 t ++ arrivals_between_P arr_seq P t t2.
-    Proof.
-      move=> P t t1 t2.
-      by move=> /andP[? ?]; rewrite -filter_cat -arrivals_between_cat// ltnW.
-    Qed.
+  (** We also prove a stronger version of the above lemma
+   in the case of arrivals that satisfy a predicate [P]. *)
+  Lemma arrivals_P_cat :
+    forall P t t1 t2,
+      t1 <= t < t2 ->
+      arrivals_between_P arr_seq P t1 t2
+      = arrivals_between_P arr_seq P t1 t ++ arrivals_between_P arr_seq P t t2.
+  Proof.
+    move=> P t t1 t2.
+    by move=> /andP[? ?]; rewrite -filter_cat -arrivals_between_cat// ltnW.
+  Qed.
 
-    (** The same observation applies to membership in the set of
-         arrived jobs. *)
-    Lemma arrivals_between_mem_cat :
-      forall j t1 t t2,
-        t1 <= t ->
-        t <= t2 ->
-        j \in arrivals_between arr_seq t1 t2
-        = (j \in arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2).
-    Proof. by move=> ? ? ? ? ? ?; rewrite -arrivals_between_cat. Qed.
+  (** The same observation applies to membership in the set of
+       arrived jobs. *)
+  Lemma arrivals_between_mem_cat :
+    forall j t1 t t2,
+      t1 <= t ->
+      t <= t2 ->
+      j \in arrivals_between arr_seq t1 t2
+      = (j \in arrivals_between arr_seq t1 t ++ arrivals_between arr_seq t t2).
+  Proof. by move=> ? ? ? ? ? ?; rewrite -arrivals_between_cat. Qed.
 
-    (** We observe that we can grow the considered interval without
-         "losing" any arrived jobs, i.e., membership in the set of arrived jobs
-         is monotonic. *)
-    Lemma arrivals_between_sub :
-      forall j t1 t1' t2 t2',
-        t1' <= t1 ->
-        t2 <= t2' ->
-        j \in arrivals_between arr_seq t1 t2 ->
-        j \in arrivals_between arr_seq t1' t2'.
-    Proof.
-      move=> j t1 t1' t2 t2' t1'_le_t1 t2_le_t2' j_in.
-      have /orP[t2_le_t1|t1_le_t2] := leq_total t2 t1.
-      { by move: j_in; rewrite /arrivals_between big_geq. }
-      rewrite (arrivals_between_mem_cat _ _ t1)// ?mem_cat.
-      2:{ exact: leq_trans t2_le_t2'. }
-      rewrite [X in _ || X](arrivals_between_mem_cat _ _ t2)// mem_cat.
-      by rewrite j_in orbT.
-    Qed.
-
-  End Composition.
+  (** We observe that we can grow the considered interval without
+       "losing" any arrived jobs, i.e., membership in the set of arrived jobs
+       is monotonic. *)
+  Lemma arrivals_between_sub :
+    forall j t1 t1' t2 t2',
+      t1' <= t1 ->
+      t2 <= t2' ->
+      j \in arrivals_between arr_seq t1 t2 ->
+      j \in arrivals_between arr_seq t1' t2'.
+  Proof.
+    move=> j t1 t1' t2 t2' t1'_le_t1 t2_le_t2' j_in.
+    have /orP[t2_le_t1|t1_le_t2] := leq_total t2 t1.
+    { by move: j_in; rewrite /arrivals_between big_geq. }
+    rewrite (arrivals_between_mem_cat _ _ t1)// ?mem_cat.
+    2:{ exact: leq_trans t2_le_t2'. }
+    rewrite [X in _ || X](arrivals_between_mem_cat _ _ t2)// mem_cat.
+    by rewrite j_in orbT.
+  Qed.
 
   (** Next, we relate the arrival prefixes with job arrival times. *)
   Section ArrivalTimes.

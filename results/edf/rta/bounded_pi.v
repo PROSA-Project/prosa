@@ -221,101 +221,98 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** ** Filling Out Hypothesis Of Abstract RTA Theorem *)
   (** In this section we prove that all hypotheses necessary to use
       the abstract theorem are satisfied. *)
-  Section FillingOutHypothesesOfAbstractRTATheorem.
 
-    (** First, we prove that [task_IBF] is indeed a valid bound on the
-        cumulative task interference. *)
-    Lemma instantiated_task_interference_is_bounded :
-      task_interference_is_bounded_by arr_seq sched tsk task_IBF.
+  (** First, we prove that [task_IBF] is indeed a valid bound on the
+      cumulative task interference. *)
+  Lemma instantiated_task_interference_is_bounded :
+    task_interference_is_bounded_by arr_seq sched tsk task_IBF.
+  Proof.
+    move => t1 t2 R2 j ARR TSK BUSY LT NCOMPL A OFF.
+    move: (OFF _ _ BUSY) => EQA; subst A.
+    move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
+    - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
+      by rewrite /completed_by /completed_by ZERO.
+    - rewrite -/(cumul_task_interference _ _ _ _ _).
+      rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
+      rewrite /I leq_add //; first exact: cumulative_priority_inversion_is_bounded.
+      eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
+      eapply leq_trans; first exact: service_of_jobs_le_workload.
+      eapply leq_trans.
+      + eapply reorder_summation.
+        move => j' IN _.
+        apply H_all_jobs_from_taskset.
+        eapply in_arrivals_implies_arrived.
+        exact IN.
+      + move : TSK => /eqP TSK.
+        rewrite TSK.
+        apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
+        by apply /eqP.
+  Qed.
+
+    (** Finally, we show that there exists a solution for the response-time recurrence. *)
+  Section SolutionOfResponseTimeReccurenceExists.
+
+    (** To rule out pathological cases with the concrete search
+        space, we assume that the task cost is positive and the
+        arrival curve is non-pathological. *)
+    Hypothesis H_task_cost_pos : 0 < task_cost tsk.
+    Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
+
+    (** Given any job [j] of task [tsk] that arrives exactly [A] units
+        after the beginning of the busy interval, the bound of the
+        total interference incurred by [j] within an interval of
+        length [Δ] is equal to [task_rbf (A + ε) - task_cost tsk +
+        task_IBF(A, Δ)]. *)
+    Let total_interference_bound (A Δ : duration) :=
+      task_rbf (A + ε) - task_cost tsk + task_IBF A Δ.
+
+    (** Next, consider any [A] from the search space (in the abstract sense). *)
+    Variable A : duration.
+    Hypothesis H_A_is_in_abstract_search_space :
+      search_space.is_in_search_space L total_interference_bound A.
+
+    (** We prove that A is also in the concrete search space. *)
+    Lemma A_is_in_concrete_search_space :
+      is_in_search_space A.
     Proof.
-      move => t1 t2 R2 j ARR TSK BUSY LT NCOMPL A OFF.
-      move: (OFF _ _ BUSY) => EQA; subst A.
-      move: (posnP (@job_cost _ Cost j)) => [ZERO|POS].
-      - exfalso; move: NCOMPL => /negP COMPL; apply: COMPL.
-        by rewrite /completed_by /completed_by ZERO.
-      - rewrite -/(cumul_task_interference _ _ _ _ _).
-        rewrite (leqRW (cumulative_task_interference_split _ _ _ _ _ _ _ _ _ _ _ _ _)) //=.
-        rewrite /I leq_add //; first exact: cumulative_priority_inversion_is_bounded.
-        eapply leq_trans; first exact: cumulative_interference_is_bounded_by_total_service.
-        eapply leq_trans; first exact: service_of_jobs_le_workload.
-        eapply leq_trans.
-        + eapply reorder_summation.
-          move => j' IN _.
-          apply H_all_jobs_from_taskset.
-          eapply in_arrivals_implies_arrived.
-          exact IN.
-        + move : TSK => /eqP TSK.
-          rewrite TSK.
-          apply: sum_of_workloads_is_at_most_bound_on_total_hep_workload => //.
-          by apply /eqP.
+      move: H_A_is_in_abstract_search_space => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]; apply/andP; split => //.
+      { apply/orP; left; apply/orP; right.
+        rewrite /task_rbf_changes_at /task_rbf /rbf task_rbf_0_zero // eq_sym -lt0n add0n.
+        by apply task_rbf_epsilon_gt_0 => //.
+      }
+      { apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
+        exfalso; apply INSP2.
+        rewrite /total_interference_bound subnK // RBF.
+        apply /eqP; rewrite eqn_add2l /task_IBF PI eqn_add2l.
+        rewrite /bound_on_athep_workload subnK //.
+        apply /eqP; rewrite big_seq_cond [RHS]big_seq_cond.
+        apply eq_big => // tsk_i /andP [TS OTHER].
+        fold (D tsk) (D tsk_i).
+        move: WL; rewrite /bound_on_total_hep_workload_changes_at => /hasPn WL.
+        move: {WL} (WL tsk_i TS) =>  /nandP [/negPn/eqP EQ|/negPn/eqP WL];
+          first by move: OTHER; rewrite EQ => /neqP.
+        case: (ltngtP (A + ε + D tsk - D tsk_i) x) => [ltn_x|gtn_x|eq_x]; rewrite /minn.
+        { by rewrite ifT //; lia. }
+        { rewrite ifF //.
+          by move: gtn_x; rewrite leq_eqVlt  => /orP [/eqP EQ|LEQ]; lia. }
+        { case: (A + D tsk - D tsk_i < x).
+          - by rewrite -/(rbf _) WL.
+          - by rewrite eq_x. } }
     Qed.
 
-      (** Finally, we show that there exists a solution for the response-time recurrence. *)
-    Section SolutionOfResponseTimeReccurenceExists.
+    (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
+    Corollary correct_search_space :
+      exists F,
+        A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF A (A + F)
+        /\ R >= F + (task_cost tsk - task_rtct tsk).
+    Proof.
+      edestruct H_R_is_maximum as [F [FIX NEQ]]; first by apply A_is_in_concrete_search_space.
+      exists F; split=> [|//].
+      rewrite -{2}(leqRW FIX).
+      by rewrite addnA [_ + priority_inversion_bound A]addnC -!addnA.
+    Qed.
 
-      (** To rule out pathological cases with the concrete search
-          space, we assume that the task cost is positive and the
-          arrival curve is non-pathological. *)
-      Hypothesis H_task_cost_pos : 0 < task_cost tsk.
-      Hypothesis H_arrival_curve_pos : 0 < max_arrivals tsk ε.
-
-      (** Given any job [j] of task [tsk] that arrives exactly [A] units
-          after the beginning of the busy interval, the bound of the
-          total interference incurred by [j] within an interval of
-          length [Δ] is equal to [task_rbf (A + ε) - task_cost tsk +
-          task_IBF(A, Δ)]. *)
-      Let total_interference_bound (A Δ : duration) :=
-        task_rbf (A + ε) - task_cost tsk + task_IBF A Δ.
-
-      (** Next, consider any [A] from the search space (in the abstract sense). *)
-      Variable A : duration.
-      Hypothesis H_A_is_in_abstract_search_space :
-        search_space.is_in_search_space L total_interference_bound A.
-
-      (** We prove that A is also in the concrete search space. *)
-      Lemma A_is_in_concrete_search_space :
-        is_in_search_space A.
-      Proof.
-        move: H_A_is_in_abstract_search_space => [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]; apply/andP; split => //.
-        { apply/orP; left; apply/orP; right.
-          rewrite /task_rbf_changes_at /task_rbf /rbf task_rbf_0_zero // eq_sym -lt0n add0n.
-          by apply task_rbf_epsilon_gt_0 => //.
-        }
-        { apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
-          exfalso; apply INSP2.
-          rewrite /total_interference_bound subnK // RBF.
-          apply /eqP; rewrite eqn_add2l /task_IBF PI eqn_add2l.
-          rewrite /bound_on_athep_workload subnK //.
-          apply /eqP; rewrite big_seq_cond [RHS]big_seq_cond.
-          apply eq_big => // tsk_i /andP [TS OTHER].
-          fold (D tsk) (D tsk_i).
-          move: WL; rewrite /bound_on_total_hep_workload_changes_at => /hasPn WL.
-          move: {WL} (WL tsk_i TS) =>  /nandP [/negPn/eqP EQ|/negPn/eqP WL];
-            first by move: OTHER; rewrite EQ => /neqP.
-          case: (ltngtP (A + ε + D tsk - D tsk_i) x) => [ltn_x|gtn_x|eq_x]; rewrite /minn.
-          { by rewrite ifT //; lia. }
-          { rewrite ifF //.
-            by move: gtn_x; rewrite leq_eqVlt  => /orP [/eqP EQ|LEQ]; lia. }
-          { case: (A + D tsk - D tsk_i < x).
-            - by rewrite -/(rbf _) WL.
-            - by rewrite eq_x. } }
-      Qed.
-
-      (** Then, there exists a solution for the response-time recurrence (in the abstract sense). *)
-      Corollary correct_search_space :
-        exists F,
-          A + F >= task_rbf (A + ε) - (task_cost tsk - task_rtct tsk) + task_IBF A (A + F)
-          /\ R >= F + (task_cost tsk - task_rtct tsk).
-      Proof.
-        edestruct H_R_is_maximum as [F [FIX NEQ]]; first by apply A_is_in_concrete_search_space.
-        exists F; split=> [|//].
-        rewrite -{2}(leqRW FIX).
-        by rewrite addnA [_ + priority_inversion_bound A]addnC -!addnA.
-      Qed.
-
-    End SolutionOfResponseTimeReccurenceExists.
-
-  End FillingOutHypothesesOfAbstractRTATheorem.
+  End SolutionOfResponseTimeReccurenceExists.
 
   (** ** Final Theorem *)
   (** Based on the properties established above, we apply the abstract

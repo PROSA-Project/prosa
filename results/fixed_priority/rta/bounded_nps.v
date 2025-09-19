@@ -111,47 +111,45 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** ** Priority inversion is bounded *)
   (** In this section, we prove that a priority inversion for task [tsk] is bounded by
       the maximum length of non-preemptive segments among the tasks with lower priority. *)
-  Section PriorityInversionIsBounded.
 
-    (** First, we prove that the maximum length of a priority inversion of a job j is
-       bounded by the maximum length of a non-preemptive section of a task with
-       lower priority (i.e., the blocking term). *)
-    Lemma priority_inversion_is_bounded_by_blocking :
-      forall j t1 t2,
-        arrives_in arr_seq j ->
-        job_of_task tsk j ->
-        busy_interval_prefix arr_seq sched j t1 t2 ->
-        max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound ts tsk.
-    Proof.
-      move=> j t1 t2 ARR TSK BUSY; move: TSK => /eqP TSK.
-      rewrite /blocking_bound /max_lp_nonpreemptive_segment.
-      apply: leq_trans; first exact: max_np_job_segment_bounded_by_max_np_task_segment.
-      apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t1
-                | (~~ hep_task (job_task j_lp) tsk) && (0 < job_cost j_lp))
-                            (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
-      { rewrite /hep_job /FP_to_JLFP TSK.
-        apply: leq_big_max => j' JINB NOTHEP.
-        rewrite leq_sub2r //. }
-      { apply /bigmax_leq_seqP => j' JINB /andP[NOTHEP POS].
-        apply leq_bigmax_cond_seq with
-            (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
-          last by done.
-        apply: H_all_jobs_from_taskset.
-        by apply: in_arrivals_implies_arrived (JINB). }
-    Qed.
+  (** First, we prove that the maximum length of a priority inversion of a job j is
+     bounded by the maximum length of a non-preemptive section of a task with
+     lower priority (i.e., the blocking term). *)
+  Lemma priority_inversion_is_bounded_by_blocking :
+    forall j t1 t2,
+      arrives_in arr_seq j ->
+      job_of_task tsk j ->
+      busy_interval_prefix arr_seq sched j t1 t2 ->
+      max_lp_nonpreemptive_segment arr_seq j t1 <= blocking_bound ts tsk.
+  Proof.
+    move=> j t1 t2 ARR TSK BUSY; move: TSK => /eqP TSK.
+    rewrite /blocking_bound /max_lp_nonpreemptive_segment.
+    apply: leq_trans; first exact: max_np_job_segment_bounded_by_max_np_task_segment.
+    apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t1
+              | (~~ hep_task (job_task j_lp) tsk) && (0 < job_cost j_lp))
+                          (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
+    { rewrite /hep_job /FP_to_JLFP TSK.
+      apply: leq_big_max => j' JINB NOTHEP.
+      rewrite leq_sub2r //. }
+    { apply /bigmax_leq_seqP => j' JINB /andP[NOTHEP POS].
+      apply leq_bigmax_cond_seq with
+          (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
+        last by done.
+      apply: H_all_jobs_from_taskset.
+      by apply: in_arrivals_implies_arrived (JINB). }
+  Qed.
 
-    (** Using the above lemma, we prove that the priority inversion of the task
-        is bounded by the blocking_bound. *)
-    Lemma priority_inversion_is_bounded :
-      priority_inversion_is_bounded_by
-        arr_seq sched tsk (constant (blocking_bound ts tsk)).
-    Proof.
-      have PIB: priority_inversion_is_bounded_by arr_seq sched tsk (fun=> blocking_bound ts tsk); last by done.
-      apply: priority_inversion_is_bounded => //.
-      by exact: priority_inversion_is_bounded_by_blocking.
-    Qed.
+  (** Using the above lemma, we prove that the priority inversion of the task
+      is bounded by the blocking_bound. *)
+  Lemma priority_inversion_is_bounded :
+    priority_inversion_is_bounded_by
+      arr_seq sched tsk (constant (blocking_bound ts tsk)).
+  Proof.
+    have PIB: priority_inversion_is_bounded_by arr_seq sched tsk (fun=> blocking_bound ts tsk); last by done.
+    apply: priority_inversion_is_bounded => //.
+    by exact: priority_inversion_is_bounded_by_blocking.
+  Qed.
 
-  End PriorityInversionIsBounded.
 
   (** ** Response-Time Bound *)
   (** In this section, we prove that the maximum among the solutions of the response-time

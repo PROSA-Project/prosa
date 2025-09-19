@@ -259,117 +259,114 @@ Section AbstractRTARestrictedSupply.
         /\ task_rtct tsk + intra_IBF A F <= SBF F
         /\ SBF F + (task_cost tsk - task_rtct tsk) <= SBF (A + R).
 
-  (** In the following section we prove that all the premises of
-      abstract RTA are satisfied. *)
-  Section RSaRTAPremises.
+  (** In the following, we prove that all premises of abstract RTA are
+      satisfied. *)
 
-    (** First, we show that [IBF_P] correctly upper-bounds
-        interference in the preemptive stage of execution. *)
-    Lemma IBF_P_bounds_interference :
-      job_interference_is_bounded_by
-        arr_seq sched tsk IBF_P (relative_arrival_time_of_job_is_A sched).
-    Proof.
-      move=> t1 t2 Δ j ARR TSK BUSY LT NCOM A PAR; move: (PAR _ _ BUSY) => EQ.
-      rewrite fold_cumul_interference.
-      rewrite (leqRW (cumulative_job_interference_bound _ _ _ _ _ t2 _ _ _ _)) => //.
-      - rewrite leq_add2l /cumul_intra_interference.
-        by apply: H_intra_supply_interference_is_bounded => //.
-      - by eapply incomplete_implies_positive_cost => //.
-      - by apply BUSY.
-    Qed.
+  (** First, we show that [IBF_P] correctly upper-bounds
+      interference in the preemptive stage of execution. *)
+  Lemma IBF_P_bounds_interference :
+    job_interference_is_bounded_by
+      arr_seq sched tsk IBF_P (relative_arrival_time_of_job_is_A sched).
+  Proof.
+    move=> t1 t2 Δ j ARR TSK BUSY LT NCOM A PAR; move: (PAR _ _ BUSY) => EQ.
+    rewrite fold_cumul_interference.
+    rewrite (leqRW (cumulative_job_interference_bound _ _ _ _ _ t2 _ _ _ _)) => //.
+    - rewrite leq_add2l /cumul_intra_interference.
+      by apply: H_intra_supply_interference_is_bounded => //.
+    - by eapply incomplete_implies_positive_cost => //.
+    - by apply BUSY.
+  Qed.
 
-    (** Next, we prove that [IBF_NP] correctly bounds interference in
-        the non-preemptive stage given a solution to the preemptive
-        stage [F]. *)
-    Lemma IBF_NP_bounds_interference :
-      job_interference_is_bounded_by
-        arr_seq sched tsk IBF_NP (relative_time_to_reach_rtct sched tsk IBF_P).
-    Proof.
-      have USER : unit_service_proc_model PState by apply unit_supply_is_unit_service.
-      move=> t1 t2 Δ j ARR TSK BUSY LT NCOM F RT.
-      have POS := incomplete_implies_positive_cost _ _ _ NCOM.
-      move: (RT _ _ BUSY) (BUSY) => [FIX RTC] [[/andP [LE1 LE2] _] _].
-      have RleF : task_rtct tsk <= F.
-      { apply cumulative_service_ge_delta with (j := j) (t := t1) (sched := sched) => //.
-        rewrite -[X in _ <= X]add0n.
-        by erewrite <-cumulative_service_before_job_arrival_zero;
-          first erewrite service_during_cat with (t1 := 0) => //; auto; lia. }
-      rewrite /IBF_NP addnBAC // leq_subRL_impl // addnC.
-      have [NEQ1|NEQ1] := leqP t2 (t1 + F); last have [NEQ2|NEQ2] := leqP F Δ.
-      { rewrite -leq_subLR in NEQ1.
-        rewrite -{1}(leqRW NEQ1) (leqRW RTC) (leqRW (service_at_most_cost _ _ _ _ _)) => //.
-        rewrite (leqRW (cumulative_interference_sub _ _ _ _ t1 t2 _ _)) => //.
-        rewrite (leqRW (service_within_busy_interval_ge_job_cost _ _ _ _ _ _ _)) => //.
-        have LLL : (t1 < t2) by lia.
-        interval_to_duration t1 t2 k.
-        by rewrite addnC (leqRW (service_and_interference_bound _ _ _ _ _ _ _ _ _ _ _ _)) => //; lia. }
-      { rewrite addnC -{1}(leqRW FIX) -addnA leq_add2l /IBF_P.
-        rewrite (@addnC (_ - _) _) -addnA subnKC; last by apply complement_SBF_monotone.
-        rewrite -/(cumulative_interference _ _ _).
-        erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY.
-        rewrite addnC leq_add //; last first.
-        { by eapply blackout_during_bound_SBF with (t2 := t2) => //; split; [ | apply BUSY]. }
-        rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
-        rewrite -!/(cumul_intra_interference _ _ _ _).
-        rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].
-        rewrite addn0 //; eapply H_intra_supply_interference_is_bounded => //.
-        - by move : NCOM; apply contra, completion_monotonic; lia.
-        - move => t1' t2' BUSY'.
-          have [EQ1 E2] := busy_interval_is_unique _ _ _ _ _ _ BUSY BUSY'.
-          by subst; lia. }
-      { rewrite addnC (leqRW RTC); eapply leq_trans.
-        - by erewrite leq_add2l; apply cumulative_interference_sub with (bl := t1) (br := t1 + F); lia.
-        - erewrite no_service_before_busy_interval => //.
-          by rewrite (leqRW (service_and_interference_bound _ _ _ _ _ _ _ _ _ _ _ _)) => //; lia.  }
-    Qed.
+  (** Next, we prove that [IBF_NP] correctly bounds interference in
+      the non-preemptive stage given a solution to the preemptive
+      stage [F]. *)
+  Lemma IBF_NP_bounds_interference :
+    job_interference_is_bounded_by
+      arr_seq sched tsk IBF_NP (relative_time_to_reach_rtct sched tsk IBF_P).
+  Proof.
+    have USER : unit_service_proc_model PState by apply unit_supply_is_unit_service.
+    move=> t1 t2 Δ j ARR TSK BUSY LT NCOM F RT.
+    have POS := incomplete_implies_positive_cost _ _ _ NCOM.
+    move: (RT _ _ BUSY) (BUSY) => [FIX RTC] [[/andP [LE1 LE2] _] _].
+    have RleF : task_rtct tsk <= F.
+    { apply cumulative_service_ge_delta with (j := j) (t := t1) (sched := sched) => //.
+      rewrite -[X in _ <= X]add0n.
+      by erewrite <-cumulative_service_before_job_arrival_zero;
+        first erewrite service_during_cat with (t1 := 0) => //; auto; lia. }
+    rewrite /IBF_NP addnBAC // leq_subRL_impl // addnC.
+    have [NEQ1|NEQ1] := leqP t2 (t1 + F); last have [NEQ2|NEQ2] := leqP F Δ.
+    { rewrite -leq_subLR in NEQ1.
+      rewrite -{1}(leqRW NEQ1) (leqRW RTC) (leqRW (service_at_most_cost _ _ _ _ _)) => //.
+      rewrite (leqRW (cumulative_interference_sub _ _ _ _ t1 t2 _ _)) => //.
+      rewrite (leqRW (service_within_busy_interval_ge_job_cost _ _ _ _ _ _ _)) => //.
+      have LLL : (t1 < t2) by lia.
+      interval_to_duration t1 t2 k.
+      by rewrite addnC (leqRW (service_and_interference_bound _ _ _ _ _ _ _ _ _ _ _ _)) => //; lia. }
+    { rewrite addnC -{1}(leqRW FIX) -addnA leq_add2l /IBF_P.
+      rewrite (@addnC (_ - _) _) -addnA subnKC; last by apply complement_SBF_monotone.
+      rewrite -/(cumulative_interference _ _ _).
+      erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY.
+      rewrite addnC leq_add //; last first.
+      { by eapply blackout_during_bound_SBF with (t2 := t2) => //; split; [ | apply BUSY]. }
+      rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
+      rewrite -!/(cumul_intra_interference _ _ _ _).
+      rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].
+      rewrite addn0 //; eapply H_intra_supply_interference_is_bounded => //.
+      - by move : NCOM; apply contra, completion_monotonic; lia.
+      - move => t1' t2' BUSY'.
+        have [EQ1 E2] := busy_interval_is_unique _ _ _ _ _ _ BUSY BUSY'.
+        by subst; lia. }
+    { rewrite addnC (leqRW RTC); eapply leq_trans.
+      - by erewrite leq_add2l; apply cumulative_interference_sub with (bl := t1) (br := t1 + F); lia.
+      - erewrite no_service_before_busy_interval => //.
+        by rewrite (leqRW (service_and_interference_bound _ _ _ _ _ _ _ _ _ _ _ _)) => //; lia.  }
+  Qed.
 
-    (** Next, we prove that [F] is bounded by [task_cost tsk + IBF_NP
-        F Δ] for any [F] and [Δ]. As explained in file
-        [analysis/abstract/abstract_rta], this shows that the second
-        stage indeed takes into account service received in the first
-        stage. *)
-    Lemma IBF_P_sol_le_IBF_NP :
-      forall (F Δ : duration),
-        F <= task_cost tsk + IBF_NP F Δ.
-    Proof.
-      move=> F Δ.
-      have [NEQ|NEQ] := leqP F (task_rtct tsk).
-      - apply: leq_trans; [apply NEQ | ].
-        by apply: leq_trans; [apply H_valid_run_to_completion_threshold | lia].
-      - rewrite addnA (@addnBCA _ F _); try lia.
-        by apply H_valid_run_to_completion_threshold; lia.
-    Qed.
+  (** Next, we prove that [F] is bounded by [task_cost tsk + IBF_NP
+      F Δ] for any [F] and [Δ]. As explained in file
+      [analysis/abstract/abstract_rta], this shows that the second
+      stage indeed takes into account service received in the first
+      stage. *)
+  Lemma IBF_P_sol_le_IBF_NP :
+    forall (F Δ : duration),
+      F <= task_cost tsk + IBF_NP F Δ.
+  Proof.
+    move=> F Δ.
+    have [NEQ|NEQ] := leqP F (task_rtct tsk).
+    - apply: leq_trans; [apply NEQ | ].
+      by apply: leq_trans; [apply H_valid_run_to_completion_threshold | lia].
+    - rewrite addnA (@addnBCA _ F _); try lia.
+      by apply H_valid_run_to_completion_threshold; lia.
+  Qed.
 
-    (** Next we prove that [H_R_is_maximum_rs] implies [H_R_is_maximum]. *)
-    Lemma max_in_rs_hypothesis_impl_max_in_arta_hypothesis :
-      forall (A : duration),
-        is_in_search_space L IBF_P A ->
-        exists (F : duration),
-          task_rtct tsk + (F - SBF F + intra_IBF A F) <= F
-          /\ task_cost tsk + (F - task_rtct tsk + (A + R - SBF (A + R) - (F - SBF F))) <= A + R.
-    Proof.
-      move=> A SP.
-      case: (H_R_is_maximum_rs A SP) => [F [EQ0 [EQ1 EQ2]]].
-      exists F; split.
-      { have -> : forall a b c, a + (b + c) = (a + c) + b by lia.
-        have -T : forall a b c, c >= b -> (a <= c - b) -> (a + b <= c); [by lia | apply: T; first by lia].
-        have LE : SBF F <= F by eapply sbf_bounded_by_duration; eauto.
-        by rewrite (leqRW EQ1); lia.
-      }
-      { have JJ := IBF_P_sol_le_IBF_NP F (A + R); rewrite /IBF_NP in JJ.
-        rewrite addnA; rewrite addnA in JJ.
-        have T: forall a b c, c >= b -> (a <= c - b) -> (a + b <= c); [by lia | apply: T; first by lia].
-        rewrite subnA; [ | by apply complement_SBF_monotone | by lia].
-        have LE : forall Δ, SBF Δ <= Δ by move => ?; eapply sbf_bounded_by_duration; eauto.
-        rewrite subKn; last by eauto.
-        have T: forall a b c d e, b >= e -> b >= c ->  e + (a - c) <= d -> a + (b - c) <= d + (b - e) by lia.
-        apply : T => //.
-        eapply leq_trans; last by apply LE.
-        by rewrite -(leqRW EQ1); lia.
-      }
-    Qed.
-
-  End RSaRTAPremises.
+  (** Next we prove that [H_R_is_maximum_rs] implies [H_R_is_maximum]. *)
+  Lemma max_in_rs_hypothesis_impl_max_in_arta_hypothesis :
+    forall (A : duration),
+      is_in_search_space L IBF_P A ->
+      exists (F : duration),
+        task_rtct tsk + (F - SBF F + intra_IBF A F) <= F
+        /\ task_cost tsk + (F - task_rtct tsk + (A + R - SBF (A + R) - (F - SBF F))) <= A + R.
+  Proof.
+    move=> A SP.
+    case: (H_R_is_maximum_rs A SP) => [F [EQ0 [EQ1 EQ2]]].
+    exists F; split.
+    { have -> : forall a b c, a + (b + c) = (a + c) + b by lia.
+      have -T : forall a b c, c >= b -> (a <= c - b) -> (a + b <= c); [by lia | apply: T; first by lia].
+      have LE : SBF F <= F by eapply sbf_bounded_by_duration; eauto.
+      by rewrite (leqRW EQ1); lia.
+    }
+    { have JJ := IBF_P_sol_le_IBF_NP F (A + R); rewrite /IBF_NP in JJ.
+      rewrite addnA; rewrite addnA in JJ.
+      have T: forall a b c, c >= b -> (a <= c - b) -> (a + b <= c); [by lia | apply: T; first by lia].
+      rewrite subnA; [ | by apply complement_SBF_monotone | by lia].
+      have LE : forall Δ, SBF Δ <= Δ by move => ?; eapply sbf_bounded_by_duration; eauto.
+      rewrite subKn; last by eauto.
+      have T: forall a b c d e, b >= e -> b >= c ->  e + (a - c) <= d -> a + (b - c) <= d + (b - e) by lia.
+      apply : T => //.
+      eapply leq_trans; last by apply LE.
+      by rewrite -(leqRW EQ1); lia.
+    }
+  Qed.
 
   (** Finally, we apply the [uniprocessor_response_time_bound]
       theorem, and using the lemmas above, we prove that all the

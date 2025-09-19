@@ -267,7 +267,7 @@ Section TaskIBFtoJobIBF.
     (** ... and job [j] is not completed by time [t1 + x]. *)
     Hypothesis H_job_j_is_not_completed : ~~ completed_by sched j (t1 + x).
 
-    (** In this section, we show that the cumulative interference of
+    (** In the following, we show that the cumulative interference of
         job [j] in the interval <<[t1, t1 + x)>> is bounded by the sum
         of the task workload in the interval <<[t1, t1 + A + ε)>> and
         the cumulative interference of [j]'s task in the interval
@@ -275,273 +275,271 @@ Section TaskIBFtoJobIBF.
         on the interval <<[t1, t1 + A + ε)>>. Thanks to the hypothesis
         about sequential tasks, jobs of task [tsk] that arrive after
         [t1 + A + ε] cannot interfere with [j]. *)
-    Section TaskInterferenceBoundsInterference.
 
-      (** We start by proving a simpler analog of the lemma that
-          states that at any time instant <<t ∈ [t1, t1 + x)>> the sum
-          of [interference j t] and [scheduled_at j t] is no larger
-          than the sum of [the service received by jobs of task tsk at
-          time t] and [task_iterference tsk t]. *)
+    (** We start by proving a simpler analog of the lemma that
+        states that at any time instant <<t ∈ [t1, t1 + x)>> the sum
+        of [interference j t] and [scheduled_at j t] is no larger
+        than the sum of [the service received by jobs of task tsk at
+        time t] and [task_iterference tsk t]. *)
 
-      (** Next we consider 4 cases. *)
-      Section CaseAnalysis.
+    (** Next we consider 4 cases. *)
+    Section CaseAnalysis.
 
-        (** Consider an arbitrary time instant [t] ∈ <<[t1, t1 + x)>>. *)
-        Variable t : instant.
-        Hypothesis H_t_in_interval : t1 <= t < t1 + x.
+      (** Consider an arbitrary time instant [t] ∈ <<[t1, t1 + x)>>. *)
+      Variable t : instant.
+      Hypothesis H_t_in_interval : t1 <= t < t1 + x.
 
-        Section Case1.
+      Section Case1.
 
-          (** Assume the processor is idle at time [t]. *)
-          Hypothesis H_idle : is_idle arr_seq sched t.
+        (** Assume the processor is idle at time [t]. *)
+        Hypothesis H_idle : is_idle arr_seq sched t.
 
-          (** In case when the processor is idle, one can show that
-              [interference j t = 1, service_at j t = 0]. But since
-              interference doesn't come from a job of task [tsk]
-              [task_interference tsk = 1]. Which reduces to [1 ≤
-              1]. *)
-          Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_idle :
-            interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
-              + task_interference arr_seq sched j t.
-          Proof.
-            replace (service_of_jobs_at _ _ _ _) with 0; last first.
-            { symmetry; rewrite /service_of_jobs_at /=.
-              eapply big1 => j' _.
-              apply not_scheduled_implies_no_service.
-              exact: not_scheduled_when_idle. }
-            have ->: service_at sched j t = 0.
-            { apply: not_scheduled_implies_no_service.
-              exact: not_scheduled_when_idle. }
-            rewrite addn0 add0n /task_interference /cond_interference.
-            case INT: (interference j t) => [|//].
-            rewrite //= lt0b // andbT.
-            exact: no_task_served_when_idle.
-          Qed.
+        (** In case when the processor is idle, one can show that
+            [interference j t = 1, service_at j t = 0]. But since
+            interference doesn't come from a job of task [tsk]
+            [task_interference tsk = 1]. Which reduces to [1 ≤
+            1]. *)
+        Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_idle :
+          interference j t + service_at sched j t
+          <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
+            + task_interference arr_seq sched j t.
+        Proof.
+          replace (service_of_jobs_at _ _ _ _) with 0; last first.
+          { symmetry; rewrite /service_of_jobs_at /=.
+            eapply big1 => j' _.
+            apply not_scheduled_implies_no_service.
+            exact: not_scheduled_when_idle. }
+          have ->: service_at sched j t = 0.
+          { apply: not_scheduled_implies_no_service.
+            exact: not_scheduled_when_idle. }
+          rewrite addn0 add0n /task_interference /cond_interference.
+          case INT: (interference j t) => [|//].
+          rewrite //= lt0b // andbT.
+          exact: no_task_served_when_idle.
+        Qed.
 
-        End Case1.
+      End Case1.
 
-        Section Case2.
+      Section Case2.
 
-          (** Assume a job [j'] from another task is scheduled at time [t]. *)
-          Variable j' : Job.
-          Hypothesis H_sched : scheduled_at sched j' t.
-          Hypothesis H_not_job_of_tsk : ~~ job_of_task tsk j'.
+        (** Assume a job [j'] from another task is scheduled at time [t]. *)
+        Variable j' : Job.
+        Hypothesis H_sched : scheduled_at sched j' t.
+        Hypothesis H_not_job_of_tsk : ~~ job_of_task tsk j'.
 
-          (** If a job [j'] from another task is scheduled at time
-              [t], then [interference j t = 1, served_at j t = 0]. But
-              since interference doesn't come from a job of task [tsk]
-              [task_interference tsk = 1]. Which reduces to [1 ≤
-              1]. *)
-          Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_task :
-            interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
-              + task_interference arr_seq sched j t.
-          Proof.
-            have ARRs : arrives_in arr_seq j'.
-            { by apply H_jobs_come_from_arrival_sequence with t. }
-            rewrite /task_interference /cond_interference.
-            have ->: service_at sched j t = 0.
-            { apply: not_scheduled_implies_no_service; apply/negP => SCHED.
-              have EQ : j' = j by eapply H_uniprocessor_proc_model.
-              by subst; move: H_not_job_of_tsk; rewrite H_job_of_tsk. }
-            case INT: (interference j t) => [|//].
-            rewrite andbT.
-            have ->: nonself arr_seq sched j t.
-            { eapply job_of_other_task_scheduled' => //.
-              by move: (H_job_of_tsk) => /eqP ->; apply: H_not_job_of_tsk. }
-            by clear; lia.
-          Qed.
+        (** If a job [j'] from another task is scheduled at time
+            [t], then [interference j t = 1, served_at j t = 0]. But
+            since interference doesn't come from a job of task [tsk]
+            [task_interference tsk = 1]. Which reduces to [1 ≤
+            1]. *)
+        Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_task :
+          interference j t + service_at sched j t
+          <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
+            + task_interference arr_seq sched j t.
+        Proof.
+          have ARRs : arrives_in arr_seq j'.
+          { by apply H_jobs_come_from_arrival_sequence with t. }
+          rewrite /task_interference /cond_interference.
+          have ->: service_at sched j t = 0.
+          { apply: not_scheduled_implies_no_service; apply/negP => SCHED.
+            have EQ : j' = j by eapply H_uniprocessor_proc_model.
+            by subst; move: H_not_job_of_tsk; rewrite H_job_of_tsk. }
+          case INT: (interference j t) => [|//].
+          rewrite andbT.
+          have ->: nonself arr_seq sched j t.
+          { eapply job_of_other_task_scheduled' => //.
+            by move: (H_job_of_tsk) => /eqP ->; apply: H_not_job_of_tsk. }
+          by clear; lia.
+        Qed.
 
-        End Case2.
+      End Case2.
 
-        Section Case3.
+      Section Case3.
 
-          (** Assume a job [j'] of task [tsk] is scheduled at time [t]
-              but receives no service. *)
-          Variable j' : Job.
-          Hypothesis H_sched : scheduled_at sched j' t.
-          Hypothesis H_not_job_of_tsk : job_of_task tsk j'.
-          Hypothesis H_serv : service_at sched j' t = 0.
+        (** Assume a job [j'] of task [tsk] is scheduled at time [t]
+            but receives no service. *)
+        Variable j' : Job.
+        Hypothesis H_sched : scheduled_at sched j' t.
+        Hypothesis H_not_job_of_tsk : job_of_task tsk j'.
+        Hypothesis H_serv : service_at sched j' t = 0.
 
-          (** If a job [j'] of task [tsk] is scheduled at time [t],
-              then [interference j t = 1, service_at j t =
-              0]. Moreover, since interference comes from a job of the
-              same task [task_interference tsk = 0]. However, in this
-              case [service_of_jobs of tsk = 1]. Which reduces to [1 ≤
-              1]. *)
-          Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_job :
-            interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
-              + task_interference arr_seq sched j t.
-          Proof.
-            rewrite /task_interference /cond_interference.
-            have SERVj: service_at sched j t = 0; last rewrite SERVj.
-            { have [] := service_is_zero_or_one _ sched j t => // => SERVj.
-              apply: not_scheduled_implies_no_service; apply/negP => SCHED.
-              have EQ : j' = j by eapply H_uniprocessor_proc_model.
-              by subst j';  move: H_serv SERVj => ->.
-            }
-            have ->: interference j t = true.
-            { have NEQT: t1 <= t < t2
-                by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x).
-              move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [Hn _].
-              apply/negPn/negP => /negP CONTR.
-              by move: (Hn CONTR); rewrite /receives_service_at SERVj.
-            }
-            have /eqP-> : nonself arr_seq sched j t == true.
-            { rewrite eqb_id.
-              apply: job_of_task_not_served => //.
-              by move: H_job_of_tsk => /eqP ->.
-            }
-            by rewrite addnC leq_add => //.
-          Qed.
-
-        End Case3.
-
-        Section Case4.
-
-          (** Before proceeding to the last case, let us note that the
-              sum of interference and the service of [j] at [t] always
-              equals to [1]. *)
-          Fact interference_and_service_eq_1 :
-            interference j t + service_at sched j t = 1.
-          Proof.
-            have NEQT: t1 <= t < t2
-              by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x).
-            have [] := service_is_zero_or_one _ sched j t => // => SERVj.
-            { rewrite SERVj.
-              have ->: interference j t = true; last by done.
-              { move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [Hn _].
-                apply/negPn/negP => /negP CONTR.
-                by move: (Hn CONTR); rewrite /receives_service_at SERVj.
-              }
-            }
-            { rewrite SERVj.
-              have ->: interference j t = false; last by done.
-              { move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [_ Hs].
-                apply/negP; apply: Hs.
-                by rewrite /receives_service_at SERVj.
-              }
-            }
-          Qed.
-
-          (** Assume that a job [j'] is scheduled at time [t] and receives service. *)
-          Variable j' : Job.
-          Hypothesis H_sched : scheduled_at sched j' t.
-          Hypothesis H_not_job_of_tsk : job_of_task tsk j'.
-          Hypothesis H_serv : service_at sched j' t = 1.
-
-          (** If job [j'] is served at time [t], then [service_of_jobs
-              of tsk = 1]. With the fact that [interference +
-              service_at = 1], we get the inequality to [1 ≤ 1]. *)
-          Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_j :
-            interference j t + service_at sched j t
-            <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
-              + task_interference arr_seq sched j t.
-          Proof.
-            rewrite interference_and_service_eq_1 -addn1 addnC leq_add //.
-            rewrite /service_of_jobs_at big_mkcond sum_nat_gt0 filter_predT; apply/hasP.
-            exists j'; last by rewrite H_not_job_of_tsk.
-            eapply arrived_between_implies_in_arrivals => //.
-            apply/andP; split.
-            - move_neq_up CONTR.
-              eapply completed_before_beginning_of_busy_interval in CONTR => //.
-              apply scheduled_implies_not_completed in H_sched => //.
-              move: H_sched => /negP T; apply: T.
-              by apply (completion_monotonic _ _ t1) => //; move: (H_t_in_interval); clear; lia.
-            - rewrite -addn1 leq_add2r /A subnKC //.
-              have NCOMPL : ~~ completed_by sched j t.
-              { by apply: (incompletion_monotonic _ _ _ (t1 + x)) => //; move: (H_t_in_interval); clear; lia. }
-              clear H_job_j_is_not_completed; apply: scheduler_executes_job_with_earliest_arrival => //.
-              by rewrite /same_task; move: (H_job_of_tsk) (H_not_job_of_tsk) => /eqP -> /eqP ->.
-          Qed.
-
-        End Case4.
-
-        (** We use the above case analysis to prove that any time
-            instant <<t ∈ [t1, t1 + x)>> the sum of [interference j t]
-            and [scheduled_at j t] is no larger than the sum of [the
-            service received by jobs of task tsk at time t] and
-            [task_iterference tsk t]. *)
-        Lemma interference_plus_sched_le_serv_of_task_plus_task_interference :
+        (** If a job [j'] of task [tsk] is scheduled at time [t],
+            then [interference j t = 1, service_at j t =
+            0]. Moreover, since interference comes from a job of the
+            same task [task_interference tsk = 0]. However, in this
+            case [service_of_jobs of tsk = 1]. Which reduces to [1 ≤
+            1]. *)
+        Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_job :
           interference j t + service_at sched j t
           <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
             + task_interference arr_seq sched j t.
         Proof.
           rewrite /task_interference /cond_interference.
-          have [IDLE|SCHED] := boolP (is_idle arr_seq sched t).
-          { by apply interference_plus_sched_le_serv_of_task_plus_task_interference_idle. }
-          { apply is_nonidle_iff in SCHED; move: SCHED => // => [[s SCHEDs]].
-            have ARRs: arrives_in arr_seq s by done.
-            have [TSKEQ|TSKNEQ] := boolP (job_of_task tsk s); last first.
-            { exact: interference_plus_sched_le_serv_of_task_plus_task_interference_task. }
-            { have [] := service_is_zero_or_one _ sched s t => // => SERVj.
-              { exact: interference_plus_sched_le_serv_of_task_plus_task_interference_job. }
-              { exact: interference_plus_sched_le_serv_of_task_plus_task_interference_j. }
+          have SERVj: service_at sched j t = 0; last rewrite SERVj.
+          { have [] := service_is_zero_or_one _ sched j t => // => SERVj.
+            apply: not_scheduled_implies_no_service; apply/negP => SCHED.
+            have EQ : j' = j by eapply H_uniprocessor_proc_model.
+            by subst j';  move: H_serv SERVj => ->.
+          }
+          have ->: interference j t = true.
+          { have NEQT: t1 <= t < t2
+              by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x).
+            move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [Hn _].
+            apply/negPn/negP => /negP CONTR.
+            by move: (Hn CONTR); rewrite /receives_service_at SERVj.
+          }
+          have /eqP-> : nonself arr_seq sched j t == true.
+          { rewrite eqb_id.
+            apply: job_of_task_not_served => //.
+            by move: H_job_of_tsk => /eqP ->.
+          }
+          by rewrite addnC leq_add => //.
+        Qed.
+
+      End Case3.
+
+      Section Case4.
+
+        (** Before proceeding to the last case, let us note that the
+            sum of interference and the service of [j] at [t] always
+            equals to [1]. *)
+        Fact interference_and_service_eq_1 :
+          interference j t + service_at sched j t = 1.
+        Proof.
+          have NEQT: t1 <= t < t2
+            by move: H_t_in_interval => /andP [NEQ1 NEQ2]; apply/andP; split; last apply ltn_trans with (t1 + x).
+          have [] := service_is_zero_or_one _ sched j t => // => SERVj.
+          { rewrite SERVj.
+            have ->: interference j t = true; last by done.
+            { move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [Hn _].
+              apply/negPn/negP => /negP CONTR.
+              by move: (Hn CONTR); rewrite /receives_service_at SERVj.
+            }
+          }
+          { rewrite SERVj.
+            have ->: interference j t = false; last by done.
+            { move: (H_work_conserving j t1 t2 t H_j_arrives H_job_cost_positive (fst H_busy_interval) NEQT) => [_ Hs].
+              apply/negP; apply: Hs.
+              by rewrite /receives_service_at SERVj.
             }
           }
         Qed.
 
-      End CaseAnalysis.
+        (** Assume that a job [j'] is scheduled at time [t] and receives service. *)
+        Variable j' : Job.
+        Hypothesis H_sched : scheduled_at sched j' t.
+        Hypothesis H_not_job_of_tsk : job_of_task tsk j'.
+        Hypothesis H_serv : service_at sched j' t = 1.
 
-      (** Next we prove cumulative version of the lemma above. *)
-      Lemma cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference :
-        cumulative_interference j t1 (t1 + x)
-        <= (task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
-           - service_during sched j t1 (t1 + x)) + cumul_task_interference arr_seq sched j t1 (t1 + x).
+        (** If job [j'] is served at time [t], then [service_of_jobs
+            of tsk = 1]. With the fact that [interference +
+            service_at = 1], we get the inequality to [1 ≤ 1]. *)
+        Lemma interference_plus_sched_le_serv_of_task_plus_task_interference_j :
+          interference j t + service_at sched j t
+          <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
+            + task_interference arr_seq sched j t.
+        Proof.
+          rewrite interference_and_service_eq_1 -addn1 addnC leq_add //.
+          rewrite /service_of_jobs_at big_mkcond sum_nat_gt0 filter_predT; apply/hasP.
+          exists j'; last by rewrite H_not_job_of_tsk.
+          eapply arrived_between_implies_in_arrivals => //.
+          apply/andP; split.
+          - move_neq_up CONTR.
+            eapply completed_before_beginning_of_busy_interval in CONTR => //.
+            apply scheduled_implies_not_completed in H_sched => //.
+            move: H_sched => /negP T; apply: T.
+            by apply (completion_monotonic _ _ t1) => //; move: (H_t_in_interval); clear; lia.
+          - rewrite -addn1 leq_add2r /A subnKC //.
+            have NCOMPL : ~~ completed_by sched j t.
+            { by apply: (incompletion_monotonic _ _ _ (t1 + x)) => //; move: (H_t_in_interval); clear; lia. }
+            clear H_job_j_is_not_completed; apply: scheduler_executes_job_with_earliest_arrival => //.
+            by rewrite /same_task; move: (H_job_of_tsk) (H_not_job_of_tsk) => /eqP -> /eqP ->.
+        Qed.
+
+      End Case4.
+
+      (** We use the above case analysis to prove that any time
+          instant <<t ∈ [t1, t1 + x)>> the sum of [interference j t]
+          and [scheduled_at j t] is no larger than the sum of [the
+          service received by jobs of task tsk at time t] and
+          [task_iterference tsk t]. *)
+      Lemma interference_plus_sched_le_serv_of_task_plus_task_interference :
+        interference j t + service_at sched j t
+        <= service_of_jobs_at sched (job_of_task tsk) (arrivals_between arr_seq t1 (t1 + A + ε)) t
+          + task_interference arr_seq sched j t.
       Proof.
-        have j_is_in_arrivals_between: j \in arrivals_between arr_seq t1 (t1 + A + ε).
-        { eapply arrived_between_implies_in_arrivals => //.
-          by apply/andP; split; last rewrite /A subnKC // addn1.
+        rewrite /task_interference /cond_interference.
+        have [IDLE|SCHED] := boolP (is_idle arr_seq sched t).
+        { by apply interference_plus_sched_le_serv_of_task_plus_task_interference_idle. }
+        { apply is_nonidle_iff in SCHED; move: SCHED => // => [[s SCHEDs]].
+          have ARRs: arrives_in arr_seq s by done.
+          have [TSKEQ|TSKNEQ] := boolP (job_of_task tsk s); last first.
+          { exact: interference_plus_sched_le_serv_of_task_plus_task_interference_task. }
+          { have [] := service_is_zero_or_one _ sched s t => // => SERVj.
+            { exact: interference_plus_sched_le_serv_of_task_plus_task_interference_job. }
+            { exact: interference_plus_sched_le_serv_of_task_plus_task_interference_j. }
+          }
         }
-        rewrite /task_service_of_jobs_in /service_of_jobs.task_service_of_jobs_in /service_of_jobs exchange_big //=.
-        rewrite -(leq_add2r (\sum_(t1 <= t < (t1 + x)) service_at sched j t)).
-        rewrite [X in _ <= X]addnC addnA subnKC; last first.
-        { rewrite (exchange_big _ _ (arrivals_between _ _ _)) /= (big_rem j) //=.
-          by rewrite H_job_of_tsk leq_addr. }
-        rewrite -big_split -big_split //=.
-        rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum // => t /andP [NEQ _].
-        rewrite -(leqRW (interference_plus_sched_le_serv_of_task_plus_task_interference _ _ )) => //.
       Qed.
 
-      (** As the next step, the service terms in the inequality above
-          can be upper-bound by the workload terms. *)
-      Lemma serv_of_task_le_workload_of_task_plus :
-        task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
-        - service_during sched j t1 (t1 + x) + cumul_task_interference arr_seq sched j t1 (t1 + x)
-        <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)
-          + cumul_task_interference arr_seq sched j t1 (t1 + x).
-      Proof.
-        have j_is_in_arrivals_between: j \in arrivals_between arr_seq t1 (t1 + A + ε).
-        { eapply arrived_between_implies_in_arrivals => //.
-          by apply/andP; split; last rewrite /A subnKC // addn1. }
-        rewrite leq_add2r.
-        rewrite /task_workload_between/task_service_of_jobs_in/task_service_of_jobs_in/service_of_jobs.
-        rewrite (big_rem j) ?[X in _ <= X - _](big_rem j) //=; auto using j_is_in_arrivals_between.
-        rewrite H_job_of_tsk addnC -addnBA// [X in _ <= X - _]addnC -addnBA//.
-        rewrite !subnn !addn0.
-        exact: service_of_jobs_le_workload.
-      Qed.
+    End CaseAnalysis.
 
-      (** Finally, we show that the cumulative interference of job [j]
-          in the interval <<[t1, t1 + x)>> is bounded by the sum of
-          the task workload in the interval <<[t1, t1 + A + ε)>> and the
-          cumulative interference of [j]'s task in the interval <<[t1, t1 + x)>>. *)
-      Lemma cumulative_job_interference_le_task_interference_bound :
-        cumulative_interference j t1 (t1 + x)
-        <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)
-          + cumul_task_interference arr_seq sched j t1 (t1 + x).
-      Proof.
-        by apply leq_trans with
-          (task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
-           - service_during sched j t1 (t1 + x)
-           + cumul_task_interference arr_seq sched j t1 (t1 + x));
-        [ apply cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference
-        | apply serv_of_task_le_workload_of_task_plus].
-      Qed.
+    (** Next we prove cumulative version of the lemma above. *)
+    Lemma cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference :
+      cumulative_interference j t1 (t1 + x)
+      <= (task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
+         - service_during sched j t1 (t1 + x)) + cumul_task_interference arr_seq sched j t1 (t1 + x).
+    Proof.
+      have j_is_in_arrivals_between: j \in arrivals_between arr_seq t1 (t1 + A + ε).
+      { eapply arrived_between_implies_in_arrivals => //.
+        by apply/andP; split; last rewrite /A subnKC // addn1.
+      }
+      rewrite /task_service_of_jobs_in /service_of_jobs.task_service_of_jobs_in /service_of_jobs exchange_big //=.
+      rewrite -(leq_add2r (\sum_(t1 <= t < (t1 + x)) service_at sched j t)).
+      rewrite [X in _ <= X]addnC addnA subnKC; last first.
+      { rewrite (exchange_big _ _ (arrivals_between _ _ _)) /= (big_rem j) //=.
+        by rewrite H_job_of_tsk leq_addr. }
+      rewrite -big_split -big_split //=.
+      rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum // => t /andP [NEQ _].
+      rewrite -(leqRW (interference_plus_sched_le_serv_of_task_plus_task_interference _ _ )) => //.
+    Qed.
 
-    End TaskInterferenceBoundsInterference.
+    (** As the next step, the service terms in the inequality above
+        can be upper-bound by the workload terms. *)
+    Lemma serv_of_task_le_workload_of_task_plus :
+      task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
+      - service_during sched j t1 (t1 + x) + cumul_task_interference arr_seq sched j t1 (t1 + x)
+      <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)
+        + cumul_task_interference arr_seq sched j t1 (t1 + x).
+    Proof.
+      have j_is_in_arrivals_between: j \in arrivals_between arr_seq t1 (t1 + A + ε).
+      { eapply arrived_between_implies_in_arrivals => //.
+        by apply/andP; split; last rewrite /A subnKC // addn1. }
+      rewrite leq_add2r.
+      rewrite /task_workload_between/task_service_of_jobs_in/task_service_of_jobs_in/service_of_jobs.
+      rewrite (big_rem j) ?[X in _ <= X - _](big_rem j) //=; auto using j_is_in_arrivals_between.
+      rewrite H_job_of_tsk addnC -addnBA// [X in _ <= X - _]addnC -addnBA//.
+      rewrite !subnn !addn0.
+      exact: service_of_jobs_le_workload.
+    Qed.
+
+    (** Finally, we show that the cumulative interference of job [j]
+        in the interval <<[t1, t1 + x)>> is bounded by the sum of
+        the task workload in the interval <<[t1, t1 + A + ε)>> and the
+        cumulative interference of [j]'s task in the interval <<[t1, t1 + x)>>. *)
+    Lemma cumulative_job_interference_le_task_interference_bound :
+      cumulative_interference j t1 (t1 + x)
+      <= (task_workload_between arr_seq tsk t1 (t1 + A + ε) - job_cost j)
+        + cumul_task_interference arr_seq sched j t1 (t1 + x).
+    Proof.
+      by apply leq_trans with
+        (task_service_of_jobs_in sched tsk (arrivals_between arr_seq t1 (t1 + A + ε)) t1 (t1 + x)
+         - service_during sched j t1 (t1 + x)
+         + cumul_task_interference arr_seq sched j t1 (t1 + x));
+      [ apply cumul_interference_plus_sched_le_serv_of_task_plus_cumul_task_interference
+      | apply serv_of_task_le_workload_of_task_plus].
+    Qed.
+
 
     (** We use the lemmas above to obtain the bound on [interference]
         in terms of [task_rbf] and [task_interference]. *)

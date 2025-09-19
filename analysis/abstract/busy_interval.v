@@ -309,53 +309,50 @@ Section AbstractBusyIntervalExists.
     Hypothesis H_j_is_pending : pending sched j t_busy.
 
     (** First, we show that there must exist a busy interval prefix. *)
-    Section LowerBound.
 
-      (** Since job [j] is pending at time [t_busy], there is a
-          (potentially unbounded) busy interval that starts no later
-          than with the arrival of [j]. *)
-      Lemma exists_busy_interval_prefix :
-        exists t1,
-          busy_interval_prefix t1 t_busy.+1
-          /\ t1 <= job_arrival j <= t_busy.
-      Proof.
-        rename H_j_is_pending into PEND.
-        destruct ([exists t:'I_t_busy.+1, quiet_time t]) eqn:EX.
-        { set (last0 := \max_(t < t_busy.+1 | quiet_time t) t).
-          move: EX => /existsP [t EX].
-          have PRED: quiet_time last0 by apply (bigmax_pred t_busy.+1 (quiet_time) t).
-          move: PRED => QUIET.
-          exists last0.
-          have JARRIN: last0 <= job_arrival j <= t_busy.
-          { move: PEND => /andP [ARR NCOM].
-            apply/andP; split => //. move: QUIET => /andP [_ PE].
-            move: PE; rewrite negb_and -leqNgt => /orP [ | /negPn COMPL] => //; exfalso.
-            apply completion_monotonic with (t' := t_busy) in COMPL.
-            - by move: NCOM => /negP.
-            - by rewrite -ltnS; eapply bigmax_ltn_ord.
-          }
-          repeat split; auto 2; try apply QUIET => //=.
-          move => t0 /andP [GTlast LTbusy] QUIET0.
-          move_neq_down GTlast.
-          by eapply (@leq_bigmax_cond
-                       _ (fun (x: 'I_t_busy.+1) => quiet_time x)
-                       (fun x => x) (Ordinal LTbusy)).
+    (** Since job [j] is pending at time [t_busy], there is a
+        (potentially unbounded) busy interval that starts no later
+        than with the arrival of [j]. *)
+    Lemma exists_busy_interval_prefix :
+      exists t1,
+        busy_interval_prefix t1 t_busy.+1
+        /\ t1 <= job_arrival j <= t_busy.
+    Proof.
+      rename H_j_is_pending into PEND.
+      destruct ([exists t:'I_t_busy.+1, quiet_time t]) eqn:EX.
+      { set (last0 := \max_(t < t_busy.+1 | quiet_time t) t).
+        move: EX => /existsP [t EX].
+        have PRED: quiet_time last0 by apply (bigmax_pred t_busy.+1 (quiet_time) t).
+        move: PRED => QUIET.
+        exists last0.
+        have JARRIN: last0 <= job_arrival j <= t_busy.
+        { move: PEND => /andP [ARR NCOM].
+          apply/andP; split => //. move: QUIET => /andP [_ PE].
+          move: PE; rewrite negb_and -leqNgt => /orP [ | /negPn COMPL] => //; exfalso.
+          apply completion_monotonic with (t' := t_busy) in COMPL.
+          - by move: NCOM => /negP.
+          - by rewrite -ltnS; eapply bigmax_ltn_ord.
         }
-        { apply negbT in EX; rewrite negb_exists in EX; move: EX => /forallP ALL.
-          exists 0; split; last by apply/andP; split; last by move: PEND => /andP [ARR _].
-          repeat split.
-          - apply/andP; split => //; rewrite ltnS.
-            by move: PEND => /andP PEND; apply PEND.
-          - apply/andP; split;
-              first by rewrite /cumulative_interference /cumul_cond_interference /cumulative_interfering_workload !big_geq.
-            by apply not_pending_earlier_and_at_0.
-          - move => t /andP [GE LT] QUIET.
-            move: (ALL (Ordinal LT)) => /negP ALL'.
-            by apply ALL'.
-        }
-      Qed.
-
-    End LowerBound.
+        repeat split; auto 2; try apply QUIET => //=.
+        move => t0 /andP [GTlast LTbusy] QUIET0.
+        move_neq_down GTlast.
+        by eapply (@leq_bigmax_cond
+                     _ (fun (x: 'I_t_busy.+1) => quiet_time x)
+                     (fun x => x) (Ordinal LTbusy)).
+      }
+      { apply negbT in EX; rewrite negb_exists in EX; move: EX => /forallP ALL.
+        exists 0; split; last by apply/andP; split; last by move: PEND => /andP [ARR _].
+        repeat split.
+        - apply/andP; split => //; rewrite ltnS.
+          by move: PEND => /andP PEND; apply PEND.
+        - apply/andP; split;
+            first by rewrite /cumulative_interference /cumul_cond_interference /cumulative_interfering_workload !big_geq.
+          by apply not_pending_earlier_and_at_0.
+        - move => t /andP [GE LT] QUIET.
+          move: (ALL (Ordinal LT)) => /negP ALL'.
+          by apply ALL'.
+      }
+    Qed.
 
     (** Next we prove that, if there is a point where the requested
         workload is upper-bounded by the supply, then the busy

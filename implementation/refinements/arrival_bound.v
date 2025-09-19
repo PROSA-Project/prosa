@@ -101,79 +101,73 @@ Section Definitions.
 
 End Definitions.
 
-Section Translation.
 
-  (** First, we define the function that maps a generic arrival-curve prefix to a natural-number
-      one... *)
-  Definition ACPrefixT_to_ACPrefix (ac_prefix_vec_T : N * seq (N * N)) : ArrivalCurvePrefix :=
-    (nat_of_bin (horizon_of_T ac_prefix_vec_T), m_tb2tn (steps_of_T ac_prefix_vec_T)).
+(** First, we define the function that maps a generic arrival-curve prefix to a natural-number
+    one... *)
+Definition ACPrefixT_to_ACPrefix (ac_prefix_vec_T : N * seq (N * N)) : ArrivalCurvePrefix :=
+  (nat_of_bin (horizon_of_T ac_prefix_vec_T), m_tb2tn (steps_of_T ac_prefix_vec_T)).
 
-  (** ... and its function relationship. *)
-  Definition RArrivalCurvePrefix := fun_hrel ACPrefixT_to_ACPrefix.
+(** ... and its function relationship. *)
+Definition RArrivalCurvePrefix := fun_hrel ACPrefixT_to_ACPrefix.
 
-  (** Next, we define the converse function, mapping a natural-number arrival-curve prefix
-      task to a generic one. *)
-  Definition ACPrefix_to_ACPrefixT (ac_prefix_vec : ArrivalCurvePrefix) : (N * seq (N * N)) :=
-    (bin_of_nat (horizon_of ac_prefix_vec), m_tn2tb (steps_of ac_prefix_vec)).
+(** Next, we define the converse function, mapping a natural-number arrival-curve prefix
+    task to a generic one. *)
+Definition ACPrefix_to_ACPrefixT (ac_prefix_vec : ArrivalCurvePrefix) : (N * seq (N * N)) :=
+  (bin_of_nat (horizon_of ac_prefix_vec), m_tn2tb (steps_of ac_prefix_vec)).
 
-  (** Further, we define the function that maps a generic task arrival-bound to a natural-number
-      one... *)
-  Definition task_abT_to_task_ab (ab : @task_arrivals_bound_T N) : task_arrivals_bound :=
-    match ab with
-    | Periodic_T p => Periodic p
-    | Sporadic_T m => Sporadic m
-    | ArrivalPrefix_T ac_prefix_vec => ArrivalPrefix (ACPrefixT_to_ACPrefix ac_prefix_vec)
-    end.
+(** Further, we define the function that maps a generic task arrival-bound to a natural-number
+    one... *)
+Definition task_abT_to_task_ab (ab : @task_arrivals_bound_T N) : task_arrivals_bound :=
+  match ab with
+  | Periodic_T p => Periodic p
+  | Sporadic_T m => Sporadic m
+  | ArrivalPrefix_T ac_prefix_vec => ArrivalPrefix (ACPrefixT_to_ACPrefix ac_prefix_vec)
+  end.
 
-  (** ... and its function relationship. *)
-  Definition Rtask_ab := fun_hrel task_abT_to_task_ab.
+(** ... and its function relationship. *)
+Definition Rtask_ab := fun_hrel task_abT_to_task_ab.
 
-  (** Finally, we define the converse function, mapping a natural-number task arrival-bound
-      task to a generic one. *)
-  Definition task_ab_to_task_abT (ab : task_arrivals_bound) : @task_arrivals_bound_T N :=
-    match ab with
-    | Periodic p => Periodic_T (bin_of_nat p)
-    | Sporadic m => Sporadic_T (bin_of_nat m)
-    | ArrivalPrefix ac_prefix_vec => ArrivalPrefix_T (ACPrefix_to_ACPrefixT ac_prefix_vec)
-    end.
+(** Finally, we define the converse function, mapping a natural-number task arrival-bound
+    task to a generic one. *)
+Definition task_ab_to_task_abT (ab : task_arrivals_bound) : @task_arrivals_bound_T N :=
+  match ab with
+  | Periodic p => Periodic_T (bin_of_nat p)
+  | Sporadic m => Sporadic_T (bin_of_nat m)
+  | ArrivalPrefix ac_prefix_vec => ArrivalPrefix_T (ACPrefix_to_ACPrefixT ac_prefix_vec)
+  end.
 
-End Translation.
 
-Section Lemmas.
+(** We prove that [leq_steps_T] is transitive... *)
+Lemma leq_stepsT_is_transitive :
+  transitive (@leq_steps_T N leq_N).
+Proof.
+  move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
+  rewrite /leq_steps_T.
+  destruct a as [a1 a2], b as [b1 b2], c as [c1 c2]; simpl in *.
+  apply/andP; split.
+  - by apply /N.leb_spec0; eapply N.le_trans;
+    [apply /N.leb_spec0; apply FSTab
+    | apply /N.leb_spec0; apply FSTbc].
+  - by apply /N.leb_spec0; eapply N.le_trans;
+    [apply /N.leb_spec0; apply SNDab
+    | apply /N.leb_spec0; apply SNDbc].
+Qed.
 
-  (** We prove that [leq_steps_T] is transitive... *)
-  Lemma leq_stepsT_is_transitive :
-    transitive (@leq_steps_T N leq_N).
-  Proof.
-    move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    rewrite /leq_steps_T.
-    destruct a as [a1 a2], b as [b1 b2], c as [c1 c2]; simpl in *.
-    apply/andP; split.
-    - by apply /N.leb_spec0; eapply N.le_trans;
-      [apply /N.leb_spec0; apply FSTab
-      | apply /N.leb_spec0; apply FSTbc].
-    - by apply /N.leb_spec0; eapply N.le_trans;
-      [apply /N.leb_spec0; apply SNDab
-      | apply /N.leb_spec0; apply SNDbc].
-  Qed.
-
-  (** ... and so is [ltn_steps_T]. *)
-  Lemma ltn_stepsT_is_transitive :
-    transitive (@ltn_steps_T N lt_N).
-  Proof.
-    move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
-    rewrite /ltn_steps_T.
-    destruct a as [a1 a2], b as [b1 b2], c as [c1 c2]; simpl in *.
-    apply/andP; split.
-    - by apply /N.ltb_spec0; eapply N.lt_trans;
-      [apply /N.ltb_spec0; apply FSTab
-      | apply /N.ltb_spec0; apply FSTbc].
-    - by apply /N.ltb_spec0; eapply N.lt_trans;
-      [apply /N.ltb_spec0; apply SNDab
-      | apply /N.ltb_spec0; apply SNDbc].
-  Qed.
-
-End Lemmas.
+(** ... and so is [ltn_steps_T]. *)
+Lemma ltn_stepsT_is_transitive :
+  transitive (@ltn_steps_T N lt_N).
+Proof.
+  move=> a b c /andP [FSTab SNDab] /andP [FSTbc SNDbc].
+  rewrite /ltn_steps_T.
+  destruct a as [a1 a2], b as [b1 b2], c as [c1 c2]; simpl in *.
+  apply/andP; split.
+  - by apply /N.ltb_spec0; eapply N.lt_trans;
+    [apply /N.ltb_spec0; apply FSTab
+    | apply /N.ltb_spec0; apply FSTbc].
+  - by apply /N.ltb_spec0; eapply N.lt_trans;
+    [apply /N.ltb_spec0; apply SNDab
+    | apply /N.ltb_spec0; apply SNDbc].
+Qed.
 
 (** In this fairly technical section, we prove a series of refinements
     aimed to be able to convert between a standard natural-number task
