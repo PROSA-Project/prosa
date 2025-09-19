@@ -295,18 +295,6 @@ Proof.
   - by rewrite in_cons IHxs.
 Qed.
 
-(** We prove that [x::xs = ys] is a sufficient condition for [x] to
-    be in [ys]. *)
-Lemma mem_head_impl :
-  forall {X : eqType} (x : X) (xs ys : seq X),
-    x::xs = ys ->
-    x \in ys.
-Proof.
-  intros X x xs [ |y ys] EQ; first by done.
-  move: EQ => /eqP; rewrite eqseq_cons => /andP [/eqP EQ _].
-  by subst y; rewrite in_cons; apply/orP; left.
-Qed.
-
 (** We show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
 Lemma nth0_cons :
   forall x xs n,
@@ -449,50 +437,6 @@ Proof.
   - by apply nth_index.
     Unshelve. by done.
 Qed.
-
-(** Given two sequences [xs] and [ys] of equal size and without
-    duplicates, the fact that [xs ⊆ ys] implies that [ys ⊆ xs]. *)
-Lemma subseq_eq :
-  forall {X : eqType} (xs ys : seq X),
-    uniq xs ->
-    uniq ys ->
-    size xs = size ys ->
-    (forall x, x \in xs -> x \in ys) ->
-    (forall x, x \in ys -> x \in xs).
-Proof.
-  intros X xs ys UNIQ SUB.
-  have EXm: exists m, size ys <= m; first by exists (size ys).
-  move: EXm => [m SIZEm].
-  move: SIZEm UNIQ SUB; move: xs ys.
-  elim: m => [|m IHm] xs ys SIZEm UNIQx UNIQy EQ SUB a IN.
-  { by move: SIZEm; rewrite leqn0 size_eq0 => /eqP SIZEm; subst ys. }
-  { destruct xs as [ | x xs].
-    { by move: EQ; simpl => /eqP; rewrite eq_sym size_eq0 => /eqP EQ; subst ys. }
-    { destruct (x == a) eqn:XA; first by rewrite in_cons eq_sym; apply/orP; left.
-      move: XA => /negP/negP NEQ.
-      rewrite in_cons eq_sym; apply/orP; right.
-      specialize (IHm xs (rem x ys)); apply IHm.
-      { rewrite size_rem; last by apply SUB; rewrite in_cons; apply/orP; left.
-        by rewrite -EQ //=; move: SIZEm; rewrite -EQ //=. }
-      { by move: UNIQx; rewrite cons_uniq => /andP [_ UNIQ]. }
-      { by apply rem_uniq. }
-      { rewrite size_rem; last by apply SUB; rewrite in_cons; apply/orP; left.
-        by rewrite -EQ //=. }
-      { intros b INb.
-        apply in_neq_impl_rem_in.
-        -  apply SUB.
-           rewrite in_cons.
-           by apply/orP; right.
-        - move: UNIQx.
-          rewrite cons_uniq => /andP [NIN _].
-          apply/negP => /eqP EQbx; subst.
-          by move: NIN => /negP NIN; apply: NIN.
-      }
-      { by apply in_neq_impl_rem_in; last rewrite eq_sym. }
-    }
-  }
-Qed.
-
 (** We prove that if no element of a sequence [xs] satisfies a
    predicate [P], then [filter P xs] is equal to an empty
    sequence. *)

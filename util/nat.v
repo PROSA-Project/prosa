@@ -22,15 +22,6 @@ Proof.
   by move=> /(leq_trans (ltn_addr _ pltm)); rewrite ltnn.
 Qed.
 
-(** Given constants [a, b, c, z] such that [b <= a], if there is no
-    constant [m] such that [a = b + m * c], then it holds that there
-    is no constant [n] such that [a + z * c = b + n * c]. *)
-Lemma mul_add_neq a b c z :
-  b <= a ->
-  (forall m, a <> b + m * c) ->
-  forall n, a + z * c <> b + n * c.
-Proof. move=> b_le_a + n => /(_ (n - z)); rewrite mulnBl; lia. Qed.
-
 (** Next, we show that the maximum of any two natural numbers [m,n] is smaller than
     the sum of the numbers [m + n]. *)
 Lemma max_leq_add m n :

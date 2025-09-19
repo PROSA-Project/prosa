@@ -242,20 +242,3 @@ Proof.
   exists (ex_minn ex); repeat split; auto.
   all: have MIN := ex_minnP ex; move: MIN => [n Pn MIN]; auto.
 Qed.
-
-(** As a corollary, we show that if there is a constant [c] such
-    that [P c], then the minimal satisfying argument [ex_minn ex]
-    of a predicate [P] is less than or equal to [c]. *)
-Corollary ex_minn_le_ex :
-  forall (P : nat -> bool) (exP : exists n, P n) (c : nat),
-    P c ->
-    ex_minn exP <= c.
-Proof.
-  move=> P exP c EX.
-  rewrite leqNgt; apply/negP; intros GT.
-  pattern (ex_minn (P:=P) exP) in GT;
-    apply prop_on_ex_minn in GT; move: GT => [n [LT [Pn MIN]]].
-  specialize (MIN c EX).
-    by move: MIN; rewrite leqNgt => /negP MIN; apply: MIN.
-Qed.
-
