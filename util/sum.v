@@ -72,10 +72,7 @@ Section SumsOverSequences.
         function over the elements. *)
     Lemma bigmax_leq_sum :
       \max_(i <- r | P i) F i <= \sum_(i <- r | P i) F i.
-    Proof.
-      apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2.
-      by rewrite (leq_trans (max_leq_add m1 m2)) ?leq_add.
-    Qed.
+    Proof. by apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2; lia. Qed.
 
     (** We show that if [r1] is a subsequence of [r2], then the sum of
         function [F] over elements satisfying predicate [P] in [r1] is

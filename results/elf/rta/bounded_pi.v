@@ -264,7 +264,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       apply leq_trans with (priority_inversion_lp_tasks_bound
                             + priority_inversion_ep_tasks_bound (job_arrival j - t)
                             + workload_of_hep_jobs arr_seq j t (t + L));
-        first by rewrite leq_add2r max_leq_add.
+        first by (rewrite leq_add2r /priority_inversion_bound; lia).
       rewrite -addnA leq_add2l /total_hep_rbf.
       rewrite hep_rbf_taskwise_partitioning /total_ep_request_bound_function_FP (bigID (is_ep_causing_intf j t)) /=.
       rewrite hep_workload_partitioning_taskwise =>//; rewrite -[leqRHS]addnACl addnA.

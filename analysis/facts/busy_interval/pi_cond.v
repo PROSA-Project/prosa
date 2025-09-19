@@ -73,7 +73,7 @@ Section CondPI.
   Proof.
     move=> jlp P SCHED Pjlp.
     apply: eq_big_nat => // t /andP [t1t tt2].
-    apply/eqP; rewrite nat_of_bool_eq; apply/eqP/andb_id2l => NSCHED.
+    f_equal; apply/andb_id2l => NSCHED.
     have suff:
       forall j',
         j' \in scheduled_jobs_at arr_seq sched t ->

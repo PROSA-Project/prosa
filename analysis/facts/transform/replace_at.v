@@ -55,8 +55,7 @@ Section ReplaceAtFacts.
     rewrite /service_during /service_at.
     apply eq_big_nat => t /andP [le_t1t lt_tt2].
     rewrite rest_of_schedule_invariant//.
-    eapply point_not_in_interval; eauto.
-    apply /andP; by split.
+    by lia.
   Qed.
 
   (** Next, we consider the amount of service received in intervals
