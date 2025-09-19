@@ -18,3 +18,5 @@ Require Export prosa.util.supremum.
 Require Export prosa.util.nondecreasing.
 Require Export prosa.util.setoid.
 Require Export prosa.util.tactics.
+Require Export prosa.util.poet.
+
