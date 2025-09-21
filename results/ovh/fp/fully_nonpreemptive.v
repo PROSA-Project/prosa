@@ -34,7 +34,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       - the sequence of job arrivals,
       - the absence of self-suspensions,
       - an arbitrary schedule of the task set, and finally,
-      - a supply-bound function to account for overhead-induced delays. *)
+      - an upper bound on overhead-induced delays. *)
 
   (** *** Processor Model *)
 
@@ -170,8 +170,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
       length.  To this end, let [L] be any positive solution of the
-      busy-interval "recurrence" (i.e., inequality) [blocking_bound ts tsk +
-      total_hep_rbf L <= SBF tsk L], as defined below.
+      busy-interval "recurrence" (i.e., inequality) [overhead_bound L +
+      blocking_bound ts tsk + total_hep_rbf L <= L], as defined below.
 
       As the lemma [busy_intervals_are_bounded_rs_fp] shows, under [FP]
       scheduling, this condition is sufficient to guarantee that the maximum

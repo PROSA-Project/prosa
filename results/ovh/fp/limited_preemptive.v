@@ -33,7 +33,7 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
       - the sequence of job arrivals,
       - the absence of self-suspensions,
       - an arbitrary schedule of the task set, and finally,
-      - a supply-bound function to account for overhead-induced delays. *)
+      - an upper bound on overhead-induced delays. *)
 
   (** *** Processor Model *)
 
@@ -43,15 +43,14 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
   (** *** Tasks and Jobs  *)
 
   (** Consider tasks characterized by a WCET [task_cost], an arrival curve
-      [max_arrivals], and a list of preemption points
-      [task_preemption_points], ... *)
+      [max_arrivals], and a list of preemption points [task_preemption_points], ... *)
   Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task} `{TaskPreemptionPoints Task}.
 
   (** ... and their associated jobs, where each job has a corresponding task
       [job_task], an execution time [job_cost], an arrival time [job_arrival],
-      and a list of preemption points
-      [job_preemptive_points]. *)
-  Context {Job : JobType} `{JobTask Job Task} `{JobCost Job} `{JobArrival Job} `{JobPreemptionPoints Job}.
+      and a list of preemption points [job_preemptable]. *)
+  Context {Job : JobType} `{JobTask Job Task} `{JobCost Job} `{JobArrival Job}
+          `{JobPreemptionPoints Job}.
 
   (** We assume that jobs are limited-preemptive. *)
   #[local] Existing Instance limited_preemptive_job_model.
@@ -176,8 +175,8 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
       length.  To this end, let [L] be any positive solution of the
-      busy-interval "recurrence" (i.e., inequality) [blocking_bound ts tsk +
-      total_hep_rbf L <= SBF tsk L], as defined below.
+      busy-interval "recurrence" (i.e., inequality) [overhead_bound L +
+      blocking_bound ts tsk + total_hep_rbf L <= L], as defined below.
 
       As the lemma [busy_intervals_are_bounded_rs_fp] shows, under [FP]
       scheduling, this condition is sufficient to guarantee that the maximum
