@@ -6,11 +6,10 @@ Require Export prosa.analysis.definitions.workload.edf_athep_bound.
 
 (** * Bound on Higher-or-Equal Priority Workload under EDF Scheduling is Valid *)
 
-(** In this file, we prove that the upper bound on interference
-    incurred by a job from jobs with higher-or-equal priority that
-    come from other tasks under EDF scheduling (defined in
-    [prosa.analysis.definitions.workload.edf_athep_bound]) is
-    valid. *)
+(** In this section, we prove that the upper bound on interference incurred by a
+    job from jobs with higher-or-equal priority that come from other tasks under
+    EDF scheduling (defined in
+    [prosa.analysis.definitions.workload.edf_athep_bound]) is valid. *)
 Section ATHEPWorkloadBoundIsValidForEDF.
 
   (** Consider any type of tasks, each characterized by a WCET
@@ -102,7 +101,7 @@ Section ATHEPWorkloadBoundIsValidForEDF.
 
       (** Then we prove that the total workload of jobs with
           higher-or-equal priority from task [tsk_o] over the interval
-          [[t1, t1 + Δ]] is bounded by workload over the interval
+          [[t1, t1 + Δ]] is bounded by the workload over the interval
           [[t1, t1 + A + ε + D tsk - D tsk_o]]. The intuition behind
           this inequality is that jobs that arrive after time instant
           [t1 + A + ε + D tsk - D tsk_o] have lower priority than job
@@ -154,3 +153,42 @@ Section ATHEPWorkloadBoundIsValidForEDF.
   Qed.
 
 End ATHEPWorkloadBoundIsValidForEDF.
+
+(** * Monotonicity of the Bound on Higher-or-Equal Priority Workload under EDF *)
+
+(** In the following section, we show that the bound on the higher-or-equal
+    priority workload under EDF scheduling is monotone. *)
+Section ATHEPWorkloadBoundIsMonotone.
+
+  (** Consider any type of tasks, each characterized by a WCET [task_cost], a
+      relative deadline [task_deadline], and an arrival curve [max_arrivals]. *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+  Context `{TaskDeadline Task}.
+  Context `{MaxArrivals Task}.
+
+  (** Consider an arbitrary task set [ts]. *)
+  Variable ts : seq Task.
+
+  (** Assume that [max_arrivals] is a valid arrival curve; that is, it is a
+      monotone function that equals 0 for the empty interval [delta = 0]. *)
+  Hypothesis H_valid_taskset_arrival_curve :
+    valid_taskset_arrival_curve ts max_arrivals.
+
+  (** Let [tsk] be any task to be analyzed. *)
+  Variable tsk : Task.
+
+  (** Then, [bound_on_athep_workload] is monotone. *)
+  Lemma bound_on_athep_workload_monotone :
+    forall A,
+      monotone leq (bound_on_athep_workload ts tsk A).
+  Proof.
+    move=> A δ F LE; unfold bound_on_athep_workload.
+    rewrite big_seq_cond [leqRHS]big_seq_cond.
+    apply leq_sum => tsko /andP [IN _]; apply task_rbf_monotone => //.
+    have [O1|O2] := leqP (A + 1 + task_deadline tsk - task_deadline tsko) δ.
+    { by rewrite leq_min; lia. }
+    { by rewrite leq_min; lia. }
+  Qed.
+
+End ATHEPWorkloadBoundIsMonotone.
