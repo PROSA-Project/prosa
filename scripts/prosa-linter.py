@@ -48,6 +48,34 @@ ISSUES = [
             r"\s+[^.]*?(?P<issue>:[^= \n])[^.]*?:=[^.]*?\.",
             1,
         ),
+        (
+            "missing space before '->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue>[^-< ]->)[^.]*?\.",
+            1,
+        ),
+        (
+            "missing space after '->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue>->\S)[^.]*?\.",
+            2,
+        ),
+        (
+            "missing space before '<->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue>\S<->)[^.]*?\.",
+            1,
+        ),
+        (
+            "missing space after '<->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue><->\S)[^.]*?\.",
+            3,
+        ),
         ("trailing whitespace", r"(?P<issue>[ \t]+)\n", 0),
         (
             "operator at end of line (move to next line)",
