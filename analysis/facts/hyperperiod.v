@@ -113,7 +113,7 @@ Section PeriodicLemmas.
    at instant [t] then [j] arrives in the interval <<[t, t + HP)>>. *)
   Lemma all_jobs_arrive_within_hyperperiod :
     forall j t,
-      j \in jobs_in_hyperperiod ts arr_seq t tsk->
+      j \in jobs_in_hyperperiod ts arr_seq t tsk ->
       t <= job_arrival j < t + HP.
   Proof.
     intros * JB_IN_HP.
