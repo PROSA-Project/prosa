@@ -235,3 +235,80 @@ Proof.
     by clear; induction (x + k); [done | simpl; lia].
   }
 Qed.
+
+(** The slowed version of a function never exceeds the original
+    function. *)
+Lemma slowed_never_exceeds :
+  forall (f : nat -> nat) (x : nat),
+    slowed f x <= f x.
+Proof.
+  by intros f x; destruct x; [ simpl | apply geq_minl].
+Qed.
+
+(** If some value [A] is bounded by [F - f δ] for a function [f], then
+    it is also bounded above by [F - slowed f δ]. *)
+Corollary bound_preserved_under_slowed :
+  forall (f : nat -> nat) (δ : nat) (A F : nat),
+    A <= F - f δ ->
+    A <= F - slowed f δ.
+Proof.
+  intros f δ A F LE; apply: leq_trans; first by apply: LE.
+  by apply leq_sub2l; destruct δ; last by apply geq_minl.
+Qed.
+
+(** Consider a monotone function [f] and the derived function [Δ ↦ Δ -
+    f Δ]. We show that whenever this derived function attains a value
+    at some interval length [Δ], there exists a (possibly smaller)
+    interval length [δ ≤ Δ] at which the same value is obtained after
+    applying the "slowing" transformation [slowed f].
+
+    Intuitively, this lemma justifies replacing [f] by its slowed
+    version without losing any possible output of [Δ - f Δ], because
+    for any [Δ] we can find a suitable [δ] where the slowed version
+    matches. *)
+Lemma slowed_subtraction_value_preservation :
+  forall (f : nat -> nat) (Δ : nat),
+    monotone leq f ->
+    exists (δ : nat),
+      δ <= Δ
+      /\ Δ - f Δ = δ - slowed f δ.
+Proof.
+  move=> f Δ MON.
+  set g := fun n => n - slowed f n.
+  have NNDC: forall n, g n <= g n.+1.
+  { move=> n.
+    have STEP: slowed f n.+1 <= slowed f n + 1 by rewrite -addn1; apply slowed_is_unit_step.
+    by rewrite /g; lia.
+  }
+  have SLOW : forall n, g n.+1 <= g n + 1.
+  { intros n; rewrite /g -addn1 leq_subLR.
+    have [O1|O2] := leqP (slowed f n) n.
+    { rewrite addnA addnBA // [_ + n]addnC -addnBA; first by lia.
+      by apply slowed_respects_monotone => //; lia.
+    }
+    { by have LE: slowed f n <=  slowed f (n + 1);
+      [apply slowed_respects_monotone => //; lia | lia].
+    }
+  }
+  have SLLE: forall n, slowed f n <= f n by intros n; induction n as [|n IH];[ simpl; lia | apply geq_minl].
+  have LEG: Δ - f Δ <= g Δ by apply: leq_sub => //.
+  set P := fun n => (n <= Δ) && (Δ - f Δ <= g n).
+  have PEX : exists n, P n by (exists Δ); apply/andP; split; [apply leqnn| apply LEG].
+  have MIN := ex_minnP PEX; move: MIN => [δmin Pmin MIN].
+  move: Pmin => /andP [LE Pδmin].
+  exists δmin; split; first by done.
+  have [ZERO|POS] := posnP δmin; first by have g0: g 0 = 0; [done | subst; rewrite /g in Pδmin; lia].
+  have [δs EQ] : exists δs, δs.+1 = δmin by (exists δmin.-1; lia).
+  have LTs: g δs < Δ - f Δ.
+  { move_neq_up LEδs.
+    specialize (MIN δs).
+    by feed MIN; [apply/andP; split; lia | lia].
+  }
+  move: (Pδmin) => Hδ. rewrite -EQ in Hδ.
+  have GAP: g δs + 1 <= Δ - f Δ by lia.
+  have F1 : Δ - f Δ <= g (δs.+1) by unfold g in *; lia.
+  have F2 : g δs.+1 <= g δs + 1 by apply SLOW.
+  have F3 : g δs + 1 <= Δ - f Δ by lia.
+  unfold g in *.
+  by apply/eqP; rewrite eqn_leq; apply/andP; split; [lia | rewrite -!EQ; lia].
+Qed.
