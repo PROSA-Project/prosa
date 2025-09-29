@@ -157,9 +157,9 @@ def parse_args():
     parser.add_argument(
         "--max-columns",
         action="store",
-        default=80,
+        default=72,
         type=int,
-        help="Maximum permitted line length (in characters, default: 80)",
+        help="Maximum permitted line length (in characters, default: 72)",
     )
     parser.add_argument(
         "--in-place",
