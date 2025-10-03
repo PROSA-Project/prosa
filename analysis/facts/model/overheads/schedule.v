@@ -56,6 +56,7 @@ End OverheadsProceProperties.
 Global Hint Resolve
        overheads_proc_model_is_a_uniprocessor_model
        overheads_proc_model_provides_unit_supply
+       overheads_proc_model_fully_consuming
   : basic_rt_facts.
 
 (** In this section, we prove basic properties of schedules with

@@ -2,24 +2,24 @@ Require Export prosa.model.job.properties.
 Require Export prosa.model.composite.valid_task_arrival_sequence.
 Require Export prosa.analysis.facts.readiness.sequential.
 Require Export prosa.analysis.facts.model.overheads.schedule.
-Require Export prosa.analysis.facts.preemption.task.preemptive.
-Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
+Require Export prosa.analysis.facts.preemption.task.nonpreemptive.
+Require Export prosa.analysis.facts.preemption.rtc_threshold.nonpreemptive.
 Require Export prosa.analysis.abstract.restricted_supply.task_intra_interference_bound.
 Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.fp.
 Require Export prosa.analysis.abstract.restricted_supply.search_space.fp.
 Require Export prosa.analysis.facts.model.task_cost.
 Require Export prosa.analysis.facts.model.overheads.sbf.fp.
 
-(** * RTA for Fully Preemptive FP Scheduling on Uniprocessors with Overheads *)
+(** * RTA for Fully Non-Preemptive FP Scheduling on Uniprocessors with Overheads *)
 
-(** In the following, we derive a response-time analysis for FP schedulers,
-    assuming a workload of fully preemptive sporadic real-time tasks,
-    characterized by arbitrary arrival curves, executing upon a uniprocessor
-    subject to scheduling overheads. To this end, we instantiate the sequential
-    variant of _abstract Restricted-Supply Analysis_ (aRSA) as provided in the
+(** In the following, we derive a response-time analysis for non-preemptive FP
+    scheduling, assuming a workload of sporadic real-time tasks, characterized
+    by arbitrary arrival curves, executing upon a uniprocessor subject to
+    scheduling overheads. To this end, we instantiate the sequential variant of
+    _abstract Restricted-Supply Analysis_ (aRSA) as provided in the
     [prosa.analysis.abstract.restricted_supply] module. *)
 
-Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
+Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
 
   (** ** Defining the System Model *)
 
@@ -52,12 +52,12 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       [job_arrival]. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobCost Job} `{JobArrival Job}.
 
-  (** Furthermore, assume that jobs and tasks are fully preemptive. *)
-  #[local] Existing Instance fully_preemptive_job_model.
-  #[local] Existing Instance fully_preemptive_task_model.
-  #[local] Existing Instance fully_preemptive_rtc_threshold.
+  (** Furthermore, assume that jobs and tasks are fully non-preemptive. *)
+  #[local] Existing Instance fully_nonpreemptive_job_model.
+  #[local] Existing Instance fully_nonpreemptive_task_model.
+  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
 
-  (** *** The Task Set and the Task Under Analysis*)
+  (** *** The Task Set and the Task Under Analysis *)
 
   (** Consider an arbitrary task set [ts], and ... *)
   Variable ts : seq Task.
@@ -98,12 +98,13 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
   Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
 
-  (** Consider a work-conserving, valid uniprocessor schedule _with explicit
-      overheads_ that corresponds to the given arrival sequence [arr_seq] (and
-      hence the given task set [ts]). *)
+  (** Consider a non-preemptive, work-conserving, valid uniprocessor schedule
+      _with explicit overheads_ that corresponds to the given arrival sequence
+      [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule (overheads.processor_state Job).
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
+  Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
 
   (** We assume that the schedule respects the given [FP] scheduling policy. *)
   Hypothesis H_respects_policy :
@@ -169,8 +170,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
       length.  To this end, let [L] be any positive solution of the
-      busy-interval "recurrence" (i.e., inequality) [total_hep_rbf L <= SBF tsk
-      L], as defined below.
+      busy-interval "recurrence" (i.e., inequality) [blocking_bound ts tsk +
+      total_hep_rbf L <= SBF tsk L], as defined below.
 
       As the lemma [busy_intervals_are_bounded_rs_fp] shows, under [FP]
       scheduling, this condition is sufficient to guarantee that the maximum
@@ -178,12 +179,14 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       is bounded by [L]. *)
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
-    /\ L >= overhead_bound L + total_hep_rbf L.
+    /\ L >= overhead_bound L
+          + blocking_bound ts tsk
+          + total_hep_rbf L.
 
   (** ** Response-Time Bound *)
 
-  (** Having established all necessary preliminaries, it is finally
-      time to state the claimed response-time bound [R]. *)
+  (** Having established all necessary preliminaries, it is finally time to
+      state the claimed response-time bound [R]. *)
 
   (** A value [R] is a response-time bound for task [tsk] if, for any given
       offset [A] in the search space (w.r.t. the busy-window bound [L]), the
@@ -194,57 +197,64 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       is_in_search_space tsk L A ->
       exists (F : duration),
         A <= F <= A + R
-        /\ F >= overhead_bound F + rbf tsk (A + ε) + total_ohep_rbf F.
+        /\ F >= overhead_bound F
+              + blocking_bound ts tsk
+              + (rbf tsk (A + ε) - (task_cost tsk - ε))
+              + total_ohep_rbf F
+        /\ A + R >= F + (overhead_bound (A + R) - overhead_bound F)
+                  + (task_cost tsk - ε).
 
   (** Finally, using the sequential variant of abstract restricted-supply
       analysis, we establish that, given a bound on the maximum busy-window
       length [L], any such [R] is indeed a sound response-time bound for task
-      [tsk] under fully-preemptive fixed-priority scheduling on a unit-speed
+      [tsk] under fully-non-preemptive fixed-priority scheduling on a unit-speed
       uniprocessor subject to scheduling overheads. *)
-  Theorem uniprocessor_response_time_bound_fully_preemptive_fp :
+  Theorem uniprocessor_response_time_bound_fully_non_preemptive_fp :
     forall (L : duration),
       busy_window_recurrence_solution L ->
       forall (R : duration),
         rta_recurrence_solution L R ->
         task_response_time_bound arr_seq sched tsk R.
   Proof.
-    set (sSBF := fp_ovh_sbf_slow ts DB CSB CRPDB tsk).
-    move=> L [BW_POS BW_SOL] R SOL js ARRs TSKs.
-    have BLOCK: forall tsk , blocking_bound ts tsk = 0.
-    { by move=> tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-                 /fully_preemptive_task_model subnn big1_eq. }
+    move=> L [BW_POS BW_SOL] R SOL js ARRs TSKs; rewrite /rta_recurrence_solution in SOL.
+    have VMBNS : valid_model_with_bounded_nonpreemptive_segments arr_seq sched
+      by apply fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions => //.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
+    set (sSBF := fp_ovh_sbf_slow ts DB CSB CRPDB tsk).
     have VBSBF : valid_busy_sbf arr_seq sched tsk sSBF by apply overheads_sbf_busy_valid => //=.
     have USBF : unit_supply_bound_function sSBF by apply overheads_sbf_unit => //=.
     have POStsk: 0 < task_cost tsk
       by move: TSKs => /eqP <-; apply: leq_trans; [apply POS | apply H_valid_task_arrival_sequence].
     eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) (SBF := sSBF) => //=.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
-    - apply instantiated_interference_and_workload_consistent_with_sequential_tasks => //.
+    - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - eapply busy_intervals_are_bounded_rs_fp with (SBF := sSBF) => //=.
-      + exact: instantiated_i_and_w_are_coherent_with_schedule.
-      + rewrite BLOCK add0n; apply bound_preserved_under_slowed.
-        unfold fp_blackout_bound, overhead_bound, total_hep_rbf in *; lia.
+      + by eapply instantiated_i_and_w_are_coherent_with_schedule.
+      + by apply bound_preserved_under_slowed; unfold fp_blackout_bound, overhead_bound, total_hep_rbf in *; lia.
     - apply: valid_pred_sbf_switch_predicate; last (eapply overheads_sbf_busy_valid) => //=.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
-        by unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //.
+        unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //.
+        by instantiate (1 := fun _ => blocking_bound ts tsk).
     - move => A SP; move: (SOL A) => [].
       + apply: search_space_sub => //=.
-        { by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence. }
-        apply: search_space_switch_IBF; last by exact: SP.
-        by move=> A1 Δ1; rewrite //= BLOCK.
-      + move => F [/andP [_ LE] FIX]; exists F; split => //.
-        rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
-        rewrite BLOCK subnn //= add0n addn0 subn0; split.
-        * apply bound_preserved_under_slowed.
-          move: FIX.
-          rewrite /sSBF -/rbf -/total_ohep_rbf /fp_blackout_bound /overhead_bound.
-          lia.
-        * by apply overheads_sbf_monotone.
+        by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
+      + move => F [/andP [_ LE] [FIX1 FIX2]].
+        have [δ [LEδ EQ]]:= slowed_subtraction_value_preservation
+                              (fp_blackout_bound ts DB CSB CRPDB tsk) F (ltac:(apply fp_blackout_bound_monotone => //)).
+        exists δ; split; [lia | split].
+        * rewrite /sSBF /fp_ovh_sbf_slow -EQ.
+          apply: leq_trans; last by apply leq_subRL_impl; rewrite -!addnA in FIX1; apply FIX1.
+          have NEQ: total_ohep_request_bound_function_FP ts tsk δ <= total_ohep_rbf F by apply total_ohep_rbf_monotone => //.
+          by move: FIX1; rewrite /task_intra_IBF; set (c := _ _ (A +1) - ( _ )); unfold total_ohep_rbf in *; lia.
+        * rewrite /sSBF /fp_ovh_sbf_slow -EQ.
+          apply bound_preserved_under_slowed, leq_subRL_impl.
+          apply: leq_trans; last by apply FIX2.
+          rewrite /task_rtct /fully_nonpreemptive_rtc_threshold /constant /fp_blackout_bound /overhead_bound.
+          unfold overhead_bound in *; lia.
   Qed.
 
-End RTAforFullyPreemptiveFPModelwithArrivalCurves.
+End RTAforFullyNonPreemptiveFPModelwithArrivalCurves.

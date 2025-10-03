@@ -40,13 +40,19 @@ Section OverheadResourceModelValidSBF.
   Definition fp_blackout_bound (Δ : duration) :=
     (DB + CSB + CRPDB) * (1 + 2 * \sum_(tsko <- ts | hep_task tsko tsk) max_arrivals tsko Δ).
 
-  (** We define FP's SBF as the interval length minus the
-      (slowed-down) blackout bound in the same interval.
-
-      The slowdown ensures that the resulting SBF is monotonic and
-      unit-growth, which is necessary to obtain response-time bounds
-      using aRTA. *)
+  (** First, we define the FP SBF as the interval length minus the FP
+      blackout bound. *)
   #[local] Instance fp_ovh_sbf : SupplyBoundFunction :=
+    fun Δ => Δ - fp_blackout_bound Δ.
+
+  (** Next, we define the "slowed-down" version of the FP SBF as the
+      interval length minus the slowed-down blackout bound. The
+      slowdown ensures that the resulting SBF is monotone and
+      unit-growth, which is necessary to obtain response-time bounds
+      using aRSA. This slowed-down FP SBF is used internally in the
+      analysis, while the unmodified FP SBF is used to state the
+      top-level analysis result. *)
+  Definition fp_ovh_sbf_slow : SupplyBoundFunction :=
     fun Δ => Δ - slowed fp_blackout_bound Δ.
 
 End OverheadResourceModelValidSBF.
@@ -109,7 +115,7 @@ Section OverheadResourceModelValidSBF.
       bound of [tsk], and ... *)
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
-  (** ... (2) a monotonic function that equals 0 for the empty interval [delta = 0]. *)
+  (** ... (2) a monotone function that equals 0 for the empty interval [delta = 0]. *)
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
 
   (** We assume that all jobs have positive cost. This restriction is
@@ -127,10 +133,10 @@ Section OverheadResourceModelValidSBF.
   Hypothesis H_valid_overheads_model :
     overhead_resource_model sched DB CSB CRPDB.
 
-  (** We show that the SBF is monotone. *)
+  (** We show that the slowed SBF is monotone. *)
   Lemma overheads_sbf_monotone :
     forall tsk,
-      sbf_is_monotone (fp_ovh_sbf ts DB CSB CRPDB tsk).
+      sbf_is_monotone (fp_ovh_sbf_slow ts DB CSB CRPDB tsk).
   Proof.
     move=> tsk x y NEQ.
     interval_to_duration x y k.
@@ -141,12 +147,27 @@ Section OverheadResourceModelValidSBF.
     by apply slowed_is_unit_step.
   Qed.
 
-  (** The introduced SBF is also a unit-supply SBF. *)
+  (** In addition, we note that [fp_blackout_bound] is monotone as well. *)
+  Remark fp_blackout_bound_monotone :
+    forall tsk,
+      monotone leq (fp_blackout_bound ts DB CSB CRPDB tsk).
+  Proof.
+    intros tsk; unfold fp_blackout_bound.
+    have Lem1 : forall f c, monotone leq f -> monotone leq (fun x => c * f x).
+    { intros f c MON x y LE; specialize (MON x y).
+      by apply MON in LE; apply leq_mul. }
+    have Lem2: forall f c, monotone leq f -> monotone leq (fun x => c + f x).
+    { intros f c MON x y LE; specialize (MON x y).
+      by apply MON in LE; apply leq_add. }
+    by apply Lem1, Lem2, Lem1, sum_leq_mono, H_valid_arrival_curve.
+  Qed.
+
+  (** The slowed SBF is also a unit-supply SBF. *)
   Lemma overheads_sbf_unit :
     forall tsk,
-      unit_supply_bound_function (fp_ovh_sbf ts DB CSB CRPDB tsk).
+      unit_supply_bound_function (fp_ovh_sbf_slow ts DB CSB CRPDB tsk).
   Proof.
-    move=> tsk δ; rewrite/fp_ovh_sbf.
+    move=> tsk δ; rewrite/fp_ovh_sbf_slow.
     have LE:
       slowed (fp_blackout_bound ts DB CSB CRPDB tsk) δ
       <= slowed (fp_blackout_bound ts DB CSB CRPDB tsk) δ.+1.
@@ -161,12 +182,12 @@ Section OverheadResourceModelValidSBF.
     lia.
   Qed.
 
-  (** Lastly, we prove that the SBF is valid. *)
+  (** Lastly, we prove that the slowed SBF is valid. *)
   Lemma overheads_sbf_busy_valid :
     forall tsk,
-      valid_busy_sbf arr_seq sched tsk (fp_ovh_sbf ts DB CSB CRPDB tsk).
+      valid_busy_sbf arr_seq sched tsk (fp_ovh_sbf_slow ts DB CSB CRPDB tsk).
   Proof.
-    move => tsk; split; first by unfold fp_ovh_sbf.
+    move => tsk; split; first by unfold fp_ovh_sbf_slow.
     move => j t1 t2 ARR [TSK PREF] t /andP [NEQ1 NEQ2].
     interval_to_duration t1 t δ.
     rewrite supply_during_complement; last first.
