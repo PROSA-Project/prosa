@@ -3,7 +3,9 @@ Require Export prosa.model.processor.supply.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.definitions.sbf.plain.
 Require Export prosa.model.processor.average_resource_model.
+Require Export prosa.analysis.definitions.average_resource_model.sbf.
 
+(** * SBF for Average Resource Model is Valid *)
 
 (** In this section, we define a valid SBF for the average resource model. *)
 Section AverageResourceModelValidSBF.
@@ -34,49 +36,35 @@ Section AverageResourceModelValidSBF.
   Variable Π Θ ν : duration.
   Hypothesis H_average_resource_model : average_resource_model Π Θ ν sched.
 
-  (** We define SBF for the average resource model as
-      [((Δ - ν) - (Π - Θ)) * Θ / Π]. *)
-  #[local] Instance sbf : SupplyBoundFunction :=
-    fun Δ =>
-      ((Δ - ν) - (Π - Θ)) * Θ %/ Π.
+  (** We recall the SBF defined for the average resource model. *)
+  #[local] Instance sbf : SupplyBoundFunction := arm_sbf Π Θ ν.
 
   (** We show that [sbf] is monotone. *)
   Lemma arm_sbf_monotone : sbf_is_monotone sbf.
   Proof.
-    move => δ1 δ2 LE; rewrite /sbf.
+    move => δ1 δ2 LE; rewrite /sbf /arm_sbf.
     interval_to_duration δ1 δ2 Δ.
-    set (A := Π - Θ).
-    have [LEA|LEA] := leqP (δ1 - ν) A.
-    { by move: LEA; rewrite -subn_eq0 => /eqP EQ; rewrite EQ div0n. }
-    { have ->: δ1 + Δ - ν - A = δ1 - ν - A + Δ by lia.
-      by rewrite mulnDl; apply leq_div2r; lia. }
+    apply leq_div2r, leq_mul; lia.
   Qed.
 
   (** The introduced SBF is also a unit-supply SBF. *)
   Lemma arm_sbf_unit : unit_supply_bound_function sbf.
   Proof.
     move: H_average_resource_model => [LEΠ _].
-    move => δ; rewrite /sbf.
+    move => δ; rewrite /sbf /arm_sbf.
     have [Z|POS] := posnP Π; first by subst; lia.
-    set (A := Π - Θ).
     have [LEν|LEν] := leqP δ ν.
     { move: (LEν); rewrite -subn_eq0 => /eqP ->.
       have [EQ|EQ]: (δ.+1 - ν = 0) \/ (δ.+1 - ν = 1) by lia.
       { by rewrite EQ. }
       { rewrite EQ //=; clear EQ.
-        have [EQ|EQ]: 1 - A = 0 \/ 1 - A = 1 by lia.
-        { by rewrite EQ. }
-        { rewrite EQ mul1n sub0n mul0n -addn1 div0n add0n.
-          move: LEΠ; rewrite leq_eqVlt => /orP [/eqP T| LT]; subst.
-          { by rewrite divnn POS. }
-          { by rewrite divn_small. }
-        }
+        rewrite mul1n mul0n. rewrite div0n.
+        rewrite -(@leq_pmul2r Π) // mul1n.
+        by apply: leq_trans; first by apply leq_divM.
       }
     }
     { rewrite -addn1 -addnBAC ?addn1; last by lia.
-      have [LEA|LEA] := leqP (δ - ν).+1 A.
-      { by move: LEA; rewrite -subn_eq0 => /eqP EQ; rewrite EQ div0n. }
-      by rewrite -addn1 -addnBAC // mulnDl mul1n -addn1 -divnDMl //; apply leq_div2r; lia.
+      by rewrite -addn1 mulnDl mul1n -addn1 -divnDMl //; apply leq_div2r; lia.
     }
   Qed.
 
@@ -85,13 +73,14 @@ Section AverageResourceModelValidSBF.
     valid_supply_bound_function arr_seq sched sbf.
   Proof.
     have FS: forall a, 0 - a = 0 by lia.
-    split; first by rewrite /sbf !FS mul0n div0n.
+    split; first by rewrite /sbf /arm_sbf !FS mul0n div0n.
     move => j t1 t2 ARR _ t /andP [LE1 LE2].
     move: H_average_resource_model => [LE SUP].
     interval_to_duration t1 t Δ.
-    rewrite -(leqRW (SUP _ _)) /sbf.
-    have ->: t1 + Δ - t1 = Δ by lia.
-    by rewrite subnBA //; apply leq_div2r, leq_mul => //; lia.
+    unfold sbf, arm_sbf.
+    rewrite -(leqRW (SUP _ _)) /sbf /arm_sbf.
+    rewrite addKn.
+    lia.
   Qed.
 
 End AverageResourceModelValidSBF.

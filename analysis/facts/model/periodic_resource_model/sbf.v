@@ -3,10 +3,13 @@ Require Export prosa.model.processor.supply.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.definitions.sbf.plain.
 Require Export prosa.model.processor.periodic_resource_model.
+Require Export prosa.analysis.definitions.periodic_resource_model.sbf.
 
-(** In this section, we recall the SBF defined in paper "Periodic
-    Resource Model for Compositional Real-Time Guarantees" and prove
-    that this SBF is valid. *)
+(** * SBF for Periodic Resource Model is Valid *)
+
+(** In this section, we prove that the SBF defined in paper "Periodic Resource
+    Model for Compositional Real-Time Guarantees" by Shin & Lee (RTSS 2003) is
+    valid. *)
 Section PeriodicResourceModelValidSBF.
 
   (** Consider any type of tasks ... *)
@@ -31,24 +34,22 @@ Section PeriodicResourceModelValidSBF.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
-  (** Assume a periodic resource model with a resource period [Π] and
-      resource allocation time [Θ]. *)
+  (** Assume a periodic resource model with a resource period [Π] and resource
+      allocation time [Θ]. *)
   Variable Π Θ : duration.
   Hypothesis H_periodic_resource_model : periodic_resource_model Π Θ sched.
 
-  (** We define SBF as introduced in "Periodic Resource Model for
-      Compositional Real-Time Guarantees". *)
-  #[local] Instance sbf : SupplyBoundFunction :=
-    fun Δ =>
-      (Δ - (Π - Θ)) %/ Π * Θ
-      + (Δ - 2 * (Π - Θ) - (Δ - (Π - Θ)) %/ Π * Π).
+  (** We recall the SBF defined in paper "Periodic Resource Model for
+      Compositional Real-Time Guarantees" by Shin & Lee (RTSS 2003). *)
+  #[local] Instance sbf : SupplyBoundFunction := prm_sbf Π Θ.
 
-  (** Next, we prove a few properties required by aRSA-based analyses. *)
+  (** Next, we prove a few properties required by aRSA-based analyses, in
+      particular that the SBF is valid. *)
 
   (** We show that [sbf] is monotone. *)
   Lemma prm_sbf_monotone : sbf_is_monotone sbf.
   Proof.
-    move => δ1 δ2 LE; rewrite /sbf.
+    move => δ1 δ2 LE; rewrite /sbf /prm_sbf.
     interval_to_duration δ1 δ2 Δ.
     have [Z|POS] := posnP Π; first by subst; rewrite divn0 !mul0n !add0n !subn0 leq_addr.
     set (A := Π - Θ); have ->: 2 * A = A + A by lia.
@@ -93,7 +94,7 @@ Section PeriodicResourceModelValidSBF.
   Lemma prm_sbf_unit : unit_supply_bound_function sbf.
   Proof.
     move: H_periodic_resource_model => [_ [LEΠ _]].
-    move => δ; rewrite /sbf !subnDAC.
+    move => δ; rewrite /sbf /prm_sbf !subnDAC.
     have [Z|POS] := posnP Π; first by subst; lia.
     have [h [j [EQ LT2]]] : exists k q, δ = k * Π + q /\ q < Π.
     { by eexists; eexists; split; [ apply divn_eq | rewrite ltn_mod ]. }
@@ -192,7 +193,7 @@ Section PeriodicResourceModelValidSBF.
         sbf (t2 - t1) <= supply_during sched t1 t2.
       Proof.
         move: (H_periodic_resource_model) => [POS [LE VAL]].
-        rewrite -(leqRW prm_sbf_valid_aux_11) // /sbf.
+        rewrite -(leqRW prm_sbf_valid_aux_11) // /sbf /prm_sbf.
         have ->: forall a b, a - 2 * b = a - b - b by lia.
         have ->: k * Π + q2 - (k * Π + q1) = q2 - q1 by lia.
         rewrite subnBA //.
@@ -330,6 +331,7 @@ Section PeriodicResourceModelValidSBF.
       Lemma prm_sbf_valid_aux_2 :
         sbf (t2 - t1) <= supply_during sched t1 t2.
       Proof.
+        rewrite /sbf /prm_sbf.
         move: (H_periodic_resource_model) => [POS [LE VAL]].
         rewrite prm_sbf_valid_aux_21 //
                 -(leqRW prm_sbf_valid_aux_22) //
@@ -375,7 +377,7 @@ Section PeriodicResourceModelValidSBF.
       valid_supply_bound_function arr_seq sched sbf.
     Proof.
       have FS: forall a, 0 - a = 0 by lia.
-      split; first by rewrite /sbf !FS addn0 div0n mul0n.
+      split; first by rewrite /sbf /prm_sbf !FS addn0 div0n mul0n.
       move => j t1 t2 ARR _ t /andP [LE1 LE2].
       move: H_periodic_resource_model => [POSΠ [LE SUP]].
       have [k1 [q1 [EQ1 LT1]]] : exists k1 q1, t1 = k1 * Π + q1 /\ q1 < Π.
