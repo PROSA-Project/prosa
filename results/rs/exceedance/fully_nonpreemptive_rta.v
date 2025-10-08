@@ -90,11 +90,10 @@ Section RTA.
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ F >= blocking_bound ts tsk
+        F >= blocking_bound ts tsk
               + (rbf tsk (A + ε) - (task_cost tsk - ε))
               + total_ohep_rbf F + e
-        /\ A + R >= F + (task_cost tsk - ε) + e.
+        /\ A + R >= F + (task_cost tsk - ε).
 
   (** ... and prove that any solution [R] satisfying this predicate is a bound on the
       maximum response time of task [tsk] in [sched]. *)
@@ -135,7 +134,7 @@ Section RTA.
     -  move => A SP; move: (SOL A) => [].
        + apply: search_space_sub => //; first lia.
          by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
-      + move => F [/andP [_ LE] [FIX1 FIX2]]; exists F; split => //.
+      + move => F [FIX1 FIX2]; exists F; split => //; try lia.
         rewrite /task_intra_IBF /task_rtct /fully_nonpreemptive_rtc_threshold /constant.
         rewrite /EPS_SBF_inst /eps_sbf.
         split; try lia.
