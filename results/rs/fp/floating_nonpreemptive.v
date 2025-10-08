@@ -182,13 +182,15 @@ Section RTAforFloatingFPModelwithArrivalCurves.
 
   (** A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
-      a solution [F] not exceeding [R]. *)
+      a solution [F] not exceeding [A + R]. *)
   Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ blocking_bound ts tsk + rbf tsk (A + ε) + total_ohep_rbf F <= SBF F.
+        SBF F >= blocking_bound ts tsk
+                + rbf tsk (A + ε)
+                + total_ohep_rbf F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
