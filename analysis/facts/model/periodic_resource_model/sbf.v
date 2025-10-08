@@ -124,7 +124,7 @@ Section PeriodicResourceModelValidSBF.
         have ->: (j + 1 + Θ) %/ Π = 1 by apply divn_leq; lia.
         by rewrite mul1n; lia.
       - have ->: (j + Θ) %/ Π = 1 by apply divn_leq; lia.
-        rewrite NEQ divnK; last by apply dvdn_mull, dvdnn. 
+        rewrite NEQ divnK; last by apply dvdn_mull, dvdnn.
         by rewrite mulnK //; lia.
     }
   Qed.
@@ -133,10 +133,9 @@ Section PeriodicResourceModelValidSBF.
   (** In the following section, we prove that the introduced SBF is valid. *)
   Section ValidSBF.
 
-    (** We prove the validity claim via a case analysis on the
-        interval for which SBF is computed. First, we consider an
-        interval that falls completely within a period <<[kΠ, (k +
-        1)Π)>> for some [k]. *)
+    (** We prove the validity claim via a case analysis on the interval for
+        which SBF is computed. First, we consider an interval that falls
+        completely within a period <<[kΠ, (k + 1)Π)>> for some [k]. *)
     Section Case1.
 
       (** Consider a constant [k] and two durations [q1, q2 < Π]. *)
@@ -210,9 +209,9 @@ Section PeriodicResourceModelValidSBF.
 
     End Case1.
 
-    (** For the second case, consider an interval that touches at
-        least two periods. That is, consider an interval <<[k1 Π + q1,
-        k2 Π + q2)>> for some [k1 < k2]. *)
+    (** For the second case, consider an interval that touches at least two
+        periods. That is, consider an interval <<[k1 Π + q1, k2 Π + q2)>> for
+        some [k1 < k2]. *)
     Section Case2.
 
       (** Consider two constants [k1, k2] such that [k1 < k2] and two durations [q1, q2 < Π]. *)
@@ -222,8 +221,8 @@ Section PeriodicResourceModelValidSBF.
       Hypothesis H_k1_lt_k2 : k1 < k2.
 
       (** First, we show that the interval can be split into three
-          sub-intervals: <<[k1 Π + q1, (k1 + 1) Π + q1)>>, <<[(k1 + 1)
-          Π + q1, k2 Π)>>, and <<[k2 Π, k2 Π + q2)>>. *)
+          sub-intervals: <<[k1 Π + q1, (k1 + 1) Π + q1)>>,
+          <<[(k1 + 1) Π + q1, k2 Π)>>, and <<[k2 Π, k2 Π + q2)>>. *)
       Lemma prm_sbf_valid_aux_21 :
         supply_during sched (k1 * Π + q1) (k2 * Π + q2)
         = supply_during sched (k1 * Π + q1) ((k1 + 1) * Π)
