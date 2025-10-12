@@ -79,7 +79,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
 
   (** Assume a model with floating non-preemptive regions. I.e., for each task
       only the length of the maximal non-preemptive segment is known and each
-      job level is divided into a number of non-preemptive segments by inserting
+      job is divided into a number of non-preemptive segments by inserting
       preemption points. *)
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :
     valid_model_with_floating_nonpreemptive_regions arr_seq.

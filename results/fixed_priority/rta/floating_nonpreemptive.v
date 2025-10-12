@@ -30,10 +30,10 @@ Section RTAforFloatingModelwithArrivalCurves.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Assume we have the model with floating non-preemptive regions.
-      I.e., for each task only the length of the maximal non-preemptive
-      segment is known _and_ each job level is divided into a number of
-      non-preemptive segments by inserting preemption points. *)
+  (** Assume we have the model with floating non-preemptive regions.  I.e., for
+      each task only the length of the maximal non-preemptive segment is known
+      _and_ each job is divided into a number of non-preemptive segments by
+      inserting preemption points. *)
   Context `{JobPreemptionPoints Job}
           `{TaskMaxNonpreemptiveSegment Task}.
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :

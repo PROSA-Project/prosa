@@ -86,10 +86,10 @@ Section RTAforFloatingFPModelwithArrivalCurves.
   (** ... and assume that all jobs stem from tasks in this task set. *)
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
-  (** Assume a model with floating non-preemptive regions. I.e., for
-      each task only the length of the maximal non-preemptive segment
-      is known and each job level is divided into a number of
-      non-preemptive segments by inserting preemption points. *)
+  (** Assume a model with floating non-preemptive regions. I.e., for each task
+      only the length of the maximal non-preemptive segment is known and each
+      job is divided into a number of non-preemptive segments by inserting
+      preemption points. *)
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :
     valid_model_with_floating_nonpreemptive_regions arr_seq.
 
