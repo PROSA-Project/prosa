@@ -188,13 +188,13 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** A value [R] is a response-time bound for task [tsk] if, for any given
       offset [A] in the search space (w.r.t. the busy-window bound [L]), the
       response-time bound "recurrence" (i.e., inequality) has a solution [F] not
-      exceeding [R]. *)
+      exceeding [A + R]. *)
   Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ F >= overhead_bound F + rbf tsk (A + ε) + total_ohep_rbf F.
+        F >= overhead_bound F + rbf tsk (A + ε) + total_ohep_rbf F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract restricted-supply
       analysis, we establish that, given a bound on the maximum busy-window
@@ -237,14 +237,13 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
         { by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence. }
         apply: search_space_switch_IBF; last by exact: SP.
         by move=> A1 Δ1; rewrite //= BLOCK.
-      + move => F [/andP [_ LE] FIX]; exists F; split => //.
+      + move => F [FIX LE]; exists F; split => //.
         rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
         rewrite BLOCK subnn //= add0n addn0 subn0; split.
         * apply bound_preserved_under_slowed.
           move: FIX.
-          rewrite /sSBF -/rbf -/total_ohep_rbf /fp_blackout_bound /overhead_bound.
-          lia.
-        * by apply overheads_sbf_monotone.
+          by rewrite /sSBF -/rbf -/total_ohep_rbf /fp_blackout_bound /overhead_bound; lia.
+        * exact: overheads_sbf_monotone.
   Qed.
 
 End RTAforFullyPreemptiveFPModelwithArrivalCurves.

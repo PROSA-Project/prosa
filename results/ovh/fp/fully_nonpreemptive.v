@@ -191,16 +191,17 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   (** A value [R] is a response-time bound for task [tsk] if, for any given
       offset [A] in the search space (w.r.t. the busy-window bound [L]), the
       response-time bound "recurrence" (i.e., inequality) has a solution [F] not
-      exceeding [R]. *)
+      exceeding [A + R] after accounting for overheads (i.e., [(overhead_bound
+      (A + R) - overhead_bound F]) and the benefit of non-preemptive execution
+      of the job under analysis (i.e., [task_cost tsk - ε]). *)
   Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ F >= overhead_bound F
-              + blocking_bound ts tsk
-              + (rbf tsk (A + ε) - (task_cost tsk - ε))
-              + total_ohep_rbf F
+        F >= overhead_bound F
+            + blocking_bound ts tsk
+            + (rbf tsk (A + ε) - (task_cost tsk - ε))
+            + total_ohep_rbf F
         /\ A + R >= F + (overhead_bound (A + R) - overhead_bound F)
                   + (task_cost tsk - ε).
 
@@ -242,7 +243,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     - move => A SP; move: (SOL A) => [].
       + apply: search_space_sub => //=.
         by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
-      + move => F [/andP [_ LE] [FIX1 FIX2]].
+      + move => F [FIX1 FIX2].
         have [δ [LEδ EQ]]:= slowed_subtraction_value_preservation
                               (fp_blackout_bound ts DB CSB CRPDB tsk) F (ltac:(apply fp_blackout_bound_monotone => //)).
         exists δ; split; [lia | split].

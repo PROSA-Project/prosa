@@ -198,16 +198,16 @@ Section RTAforFloatingFPModelwithArrivalCurves.
   (** A value [R] is a response-time bound for task [tsk] if, for any given
       offset [A] in the search space (w.r.t. the busy-window bound [L]), the
       response-time bound "recurrence" (i.e., inequality) has a solution [F] not
-      exceeding [R]. *)
+      exceeding [A + R]. *)
   Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ F >= overhead_bound F
-              + blocking_bound ts tsk
-              + rbf tsk (A + ε)
-              + total_ohep_rbf F.
+        F >= overhead_bound F
+            + blocking_bound ts tsk
+            + rbf tsk (A + ε)
+            + total_ohep_rbf F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract restricted-supply
       analysis, we establish that, given a bound on the maximum busy-window
@@ -252,7 +252,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
       + move => F [EQ1 EQ2].
         exists F; split; last split.
         * lia.
-        * apply bound_preserved_under_slowed; move: EQ2.
+        * apply bound_preserved_under_slowed; move: EQ1 EQ2.
           by rewrite /task_intra_IBF  -/rbf -/total_ohep_rbf /fp_blackout_bound /overhead_bound; lia.
         * by rewrite subnn addn0; apply overheads_sbf_monotone; lia.
   Qed.

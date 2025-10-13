@@ -171,13 +171,13 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
-      a solution [F] not exceeding [R]. *)
+      a solution [F] not exceeding [A + R]. *)
   Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ rbf tsk (A + ε) + total_ohep_rbf F <= SBF F.
+        SBF F >= rbf tsk (A + ε) + total_ohep_rbf F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
@@ -214,7 +214,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     - move => A SP; move: (SOL A) => [].
       + apply: search_space_sub => //; apply: search_space_switch_IBF; last by exact: SP.
         by move=> A1 Δ1; rewrite //= BLOCK.
-      + move => F [/andP [_ LE] FIX]; exists F; split => //.
+      + move => F [FIX LE]; exists F; split => //.
         rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
         by rewrite BLOCK subnn //= add0n addn0 subn0.
   Qed.

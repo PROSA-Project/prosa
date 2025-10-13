@@ -164,15 +164,14 @@ Section RTAforFullyPreemptiveELFModelwithArrivalCurves.
 
       A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
-      a solution [F] not exceeding [R]. *)
+      a solution [F] not exceeding [A + R]. *)
   Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ task_request_bound_function tsk (A + ε)
-           + bound_on_athep_workload ts tsk A F
-           <= SBF F.
+        SBF F >= task_request_bound_function tsk (A + ε)
+                + bound_on_athep_workload ts tsk A F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
@@ -208,7 +207,7 @@ Section RTAforFullyPreemptiveELFModelwithArrivalCurves.
     - move => A SP.
       move: (SOL A) => [].
       + by apply: search_space_sub => //.
-      + move => F [/andP [_ LE] FIX]; exists F; split => //.
+      + move => F [FIX LE]; exists F; split => //.
         rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
         by rewrite BLOCK subnn //= add0n addn0 subn0.
   Qed.

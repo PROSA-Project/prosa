@@ -181,16 +181,16 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
 
   (** A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
-      a solution [F] not exceeding [R]. *)
+      a solution [F] not exceeding [A + R]. *)
   Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ blocking_bound ts tsk
-          + (rbf tsk (A + ε) - (task_last_nonpr_segment tsk - ε))
-          + total_ohep_rbf F <= SBF F
-        /\ SBF F + (task_last_nonpr_segment tsk - ε) <= SBF (A + R).
+        SBF F >= blocking_bound ts tsk
+                + (rbf tsk (A + ε) - (task_last_nonpr_segment tsk - ε))
+                + total_ohep_rbf F
+        /\ SBF (A + R) >= SBF F + (task_last_nonpr_segment tsk - ε)
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
@@ -229,7 +229,7 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
       { by apply: search_space_sub => //; apply: search_space_switch_IBF. }
       move=> FF [EQ1 [EQ2 EQ3]].
       exists FF; split; last split.
-      + lia.
+      + by lia.
       + move: EQ2; rewrite /task_intra_IBF -/rbf -/total_ohep_rbf.
         by erewrite last_segment_eq_cost_minus_rtct => //; lia.
       + by erewrite last_segment_eq_cost_minus_rtct.

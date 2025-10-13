@@ -180,8 +180,10 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ blocking_bound ts tsk A + task_rbf (A + ε) + bound_on_athep_workload ts tsk A F <= SBF F.
+        SBF F >= blocking_bound ts tsk A
+                + task_rbf (A + ε)
+                + bound_on_athep_workload ts tsk A F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
