@@ -89,55 +89,53 @@ Section FPRelationsProperties.
 
   (** First, we prove some trivial lemmas about the [hep_task] and [ep_task]
       relations. *)
-  Section BasicProperties.
 
-    (** [hp_task] is irreflexive. *)
-    Lemma hp_task_irrefl : irreflexive hp_task.
-    Proof. by move=> tsk; rewrite /hp_task; case: hep_task. Qed.
+  (** [hp_task] is irreflexive. *)
+  Lemma hp_task_irrefl : irreflexive hp_task.
+  Proof. by move=> tsk; rewrite /hp_task; case: hep_task. Qed.
 
-    (** If a task [tsk1] has higher priority than task [tsk2], then task [tsk1] has
-        higher-or-equal priority than task [tsk2]. *)
-    Lemma hp_hep_task :
-      forall tsk1 tsk2,
-        hp_task tsk1 tsk2 ->
-        hep_task tsk1 tsk2.
-    Proof. by move=> ? ? /andP[]. Qed.
+  (** If a task [tsk1] has higher priority than task [tsk2], then task [tsk1] has
+      higher-or-equal priority than task [tsk2]. *)
+  Lemma hp_hep_task :
+    forall tsk1 tsk2,
+      hp_task tsk1 tsk2 ->
+      hep_task tsk1 tsk2.
+  Proof. by move=> ? ? /andP[]. Qed.
 
-    (** If a task [tsk1] has equal priority as task [tsk2], then task [tsk1] has
-        higher-or-equal priority than task [tsk2]. *)
-    Lemma ep_hep_task :
-      forall tsk1 tsk2,
-        ep_task tsk1 tsk2 ->
-        hep_task tsk1 tsk2.
-    Proof. by move=> ? ? /andP[]. Qed.
+  (** If a task [tsk1] has equal priority as task [tsk2], then task [tsk1] has
+      higher-or-equal priority than task [tsk2]. *)
+  Lemma ep_hep_task :
+    forall tsk1 tsk2,
+      ep_task tsk1 tsk2 ->
+      hep_task tsk1 tsk2.
+  Proof. by move=> ? ? /andP[]. Qed.
 
-    (** If a task has higher priority than another task, then the two do not
-        have equal priority. *)
-    Lemma ep_not_hp_task :
-      forall tsk1 tsk2,
-        ep_task tsk1 tsk2 ->
-        ~~ hp_task tsk1 tsk2.
-    Proof.
-      move=> ? ? /andP[_ ?].
-      by rewrite negb_and; apply/orP; right; apply/negPn.
-    Qed.
+  (** If a task has higher priority than another task, then the two do not
+      have equal priority. *)
+  Lemma ep_not_hp_task :
+    forall tsk1 tsk2,
+      ep_task tsk1 tsk2 ->
+      ~~ hp_task tsk1 tsk2.
+  Proof.
+    move=> ? ? /andP[_ ?].
+    by rewrite negb_and; apply/orP; right; apply/negPn.
+  Qed.
 
-    (** Task [tsk1] having equal priority as task [tsk2] is equivalent to task [tsk2]
-        having equal priority as task [tsk1]. *)
-    Lemma ep_task_sym :
-      forall tsk1 tsk2,
-        ep_task tsk1 tsk2 = ep_task tsk2 tsk1.
-    Proof. by move=> x y; rewrite /ep_task andbC. Qed.
+  (** Task [tsk1] having equal priority as task [tsk2] is equivalent to task [tsk2]
+      having equal priority as task [tsk1]. *)
+  Lemma ep_task_sym :
+    forall tsk1 tsk2,
+      ep_task tsk1 tsk2 = ep_task tsk2 tsk1.
+  Proof. by move=> x y; rewrite /ep_task andbC. Qed.
 
-    (** If a task [tsk1] has higher-or-equal priority than a task
-        [tsk2], then [tsk1] either has strictly higher priority than
-        [tsk2] or the two have equal priority. *)
-    Lemma hep_hp_ep_task :
-      forall tsk1 tsk2,
-        hep_task tsk1 tsk2 = hp_task tsk1 tsk2 || ep_task tsk1 tsk2.
-    Proof. by move=> ? ?; rewrite /hp_task /ep_task -andb_orr orNb andbT. Qed.
+  (** If a task [tsk1] has higher-or-equal priority than a task
+      [tsk2], then [tsk1] either has strictly higher priority than
+      [tsk2] or the two have equal priority. *)
+  Lemma hep_hp_ep_task :
+    forall tsk1 tsk2,
+      hep_task tsk1 tsk2 = hp_task tsk1 tsk2 || ep_task tsk1 tsk2.
+  Proof. by move=> ? ?; rewrite /hp_task /ep_task -andb_orr orNb andbT. Qed.
 
-  End BasicProperties.
 
   (** In the following section, we establish a useful property about the equal
       priority relation, which follows when the FP policy is reflexive.  *)

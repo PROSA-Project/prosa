@@ -13,64 +13,58 @@ Section BigCatNatLemmas.
   (** ...and a function [f] that, given an index, yields a sequence. *)
   Variable f : nat -> seq T.
 
-  (** In this section, we prove that the concatenation over sequences works as expected:
-      no element is lost during the concatenation, and no new element is introduced. *)
-  Section BigCatNatElements.
+  (** First, we show that the concatenation comprises all the elements of each sequence;
+      i.e., any element contained in one of the sequences will also be an element of the
+      result of the concatenation. *)
+  Lemma mem_bigcat_nat :
+    forall x m n j,
+      m <= j < n ->
+      x \in f j ->
+      x \in \cat_(m <= i < n) (f i).
+  Proof.
+    intros x m n j LE IN; move: LE => /andP [LE LE0].
+    rewrite -> big_cat_nat with (n := j); simpl; [| by ins | by apply ltnW].
+    rewrite mem_cat; apply/orP; right.
+    destruct n; first by rewrite ltn0 in LE0.
+    rewrite big_nat_recl; last by ins.
+    by rewrite mem_cat; apply/orP; left.
+  Qed.
 
-    (** First, we show that the concatenation comprises all the elements of each sequence;
-        i.e. any element contained in one of the sequences will also be an element of the
-        result of the concatenation. *)
-    Lemma mem_bigcat_nat :
-      forall x m n j,
-        m <= j < n ->
-        x \in f j ->
-        x \in \cat_(m <= i < n) (f i).
-    Proof.
-      intros x m n j LE IN; move: LE => /andP [LE LE0].
-      rewrite -> big_cat_nat with (n := j); simpl; [| by ins | by apply ltnW].
-      rewrite mem_cat; apply/orP; right.
-      destruct n; first by rewrite ltn0 in LE0.
-      rewrite big_nat_recl; last by ins.
-      by rewrite mem_cat; apply/orP; left.
-    Qed.
+  (** Conversely, we prove that any element belonging to a concatenation of sequences
+      must come from one of the sequences. *)
+  Lemma mem_bigcat_nat_exists :
+    forall x m n,
+      x \in \cat_(m <= i < n) (f i) ->
+      exists i,
+        x \in f i /\ m <= i < n.
+  Proof.
+    intros x m n IN.
+    elim: n IN => [|n IHn] IN; first by rewrite big_geq // in IN.
+    destruct (leqP m n); last by rewrite big_geq ?in_nil // ltnW in IN.
+    rewrite big_nat_recr // /= mem_cat in IN.
+    move: IN => /orP [HEAD | TAIL].
+    - move: (IHn HEAD) => [x0 [H /andP[H0 H1]]]; exists x0.
+      split; first by done.
+      by apply/andP; split; last by apply ltnW.
+    - exists n; split; first by done.
+      by apply/andP; split; last apply ltnSn.
+  Qed.
 
-    (** Conversely, we prove that any element belonging to a concatenation of sequences
-        must come from one of the sequences. *)
-    Lemma mem_bigcat_nat_exists :
-      forall x m n,
-        x \in \cat_(m <= i < n) (f i) ->
-        exists i,
-          x \in f i /\ m <= i < n.
-    Proof.
-      intros x m n IN.
-      elim: n IN => [|n IHn] IN; first by rewrite big_geq // in IN.
-      destruct (leqP m n); last by rewrite big_geq ?in_nil // ltnW in IN.
-      rewrite big_nat_recr // /= mem_cat in IN.
-      move: IN => /orP [HEAD | TAIL].
-      - move: (IHn HEAD) => [x0 [H /andP[H0 H1]]]; exists x0.
-        split; first by done.
-        by apply/andP; split; last by apply ltnW.
-      - exists n; split; first by done.
-        by apply/andP; split; last apply ltnSn.
-    Qed.
-
-    (** We also restate lemma [mem_bigcat_nat] in terms of ordinals. *)
-    Lemma mem_bigcat_ord :
-      forall (x : T) (n : nat) (j : 'I_n) (f : 'I_n -> seq T),
-        j < n ->
-        x \in (f j) ->
-        x \in \cat_(i < n) (f i).
-    Proof.
-      move=> x; elim=> [//|n IHn] j f' Hj Hx.
-      rewrite big_ord_recr /= mem_cat; apply /orP.
-      move: Hj; rewrite ltnS leq_eqVlt => /orP [/eqP Hj|Hj].
-      - by right; rewrite (_ : ord_max = j); [|apply ord_inj].
-      - left.
-        apply (IHn (Ordinal Hj)); [by []|].
-        by set j' := widen_ord _ _; have -> : j' = j; [apply ord_inj|].
-    Qed.
-
-  End BigCatNatElements.
+  (** We also restate lemma [mem_bigcat_nat] in terms of ordinals. *)
+  Lemma mem_bigcat_ord :
+    forall (x : T) (n : nat) (j : 'I_n) (f : 'I_n -> seq T),
+      j < n ->
+      x \in (f j) ->
+      x \in \cat_(i < n) (f i).
+  Proof.
+    move=> x; elim=> [//|n IHn] j f' Hj Hx.
+    rewrite big_ord_recr /= mem_cat; apply /orP.
+    move: Hj; rewrite ltnS leq_eqVlt => /orP [/eqP Hj|Hj].
+    - by right; rewrite (_ : ord_max = j); [|apply ord_inj].
+    - left.
+      apply (IHn (Ordinal Hj)); [by []|].
+      by set j' := widen_ord _ _; have -> : j' = j; [apply ord_inj|].
+  Qed.
 
   (** In this section, we show how we can preserve uniqueness of the elements
       (i.e. the absence of a duplicate) over a concatenation of sequences. *)
@@ -103,46 +97,6 @@ Section BigCatNatLemmas.
       move: BUG => [i [IN /andP [_ LTi]]].
       apply H_no_elements_in_common with (i1 := i) in INx; last by done.
       by rewrite INx ltnn in LTi.
-    Qed.
-
-    (** Conversely, if the concatenation of the sequences has no duplicates, any
-        element can only belong to a single sequence. *)
-    Lemma bigcat_ord_uniq_reverse :
-      forall (n : nat) (f : 'I_n -> seq T),
-        uniq (\cat_(i < n) (f i)) ->
-        (forall x i1 i2,
-            x \in (f i1) -> x \in (f i2) -> i1 = i2).
-    Proof.
-      case=> [|n]; [by move=> f' Huniq x; case|].
-      elim: n => [|n IHn] f' Huniq x i1 i2 Hi1 Hi2.
-      { move: i1 i2 {Hi1 Hi2}; case; case=> [i1|//]; case; case=> [i2|//].
-        apply f_equal, eq_irrelevance. }
-      move: (leq_ord i1); rewrite leq_eqVlt => /orP [H'i1|H'i1].
-      all: move: (leq_ord i2); rewrite leq_eqVlt => /orP [H'i2|H'i2].
-      { by apply ord_inj; move: H'i1 H'i2 => /eqP -> /eqP ->. }
-      { exfalso.
-        move: Huniq; rewrite big_ord_recr cat_uniq => /andP [_ /andP [H _]].
-        move: H; apply /negP; rewrite Bool.negb_involutive.
-        apply /hasP; exists x => /=.
-        { set o := ord_max; suff -> : o = i1; [by []|].
-          by apply ord_inj; move: H'i1 => /eqP ->. }
-        apply (mem_bigcat_ord _ _ (Ordinal H'i2)) => //.
-        by set o := widen_ord _ _; suff -> : o = i2; [|apply ord_inj]. }
-      { exfalso.
-        move: Huniq; rewrite big_ord_recr cat_uniq => /andP [_ /andP [H _]].
-        move: H; apply /negP; rewrite Bool.negb_involutive.
-        apply /hasP; exists x => /=.
-        { set o := ord_max; suff -> : o = i2; [by []|].
-          by apply ord_inj; move: H'i2 => /eqP ->. }
-        apply (mem_bigcat_ord _ _ (Ordinal H'i1)) => //.
-        by set o := widen_ord _ _; suff -> : o = i1; [|apply ord_inj]. }
-      move: Huniq; rewrite big_ord_recr cat_uniq => /andP [Huniq _].
-      apply ord_inj; rewrite -(inordK H'i1) -(inordK H'i2); apply f_equal.
-      apply (IHn _ Huniq x).
-      { set i1' := widen_ord _ _; suff -> : i1' = i1; [by []|].
-        by apply ord_inj; rewrite /= inordK. }
-      set i2' := widen_ord _ _; suff -> : i2' = i2; [by []|].
-      by apply ord_inj; rewrite /= inordK.
     Qed.
 
   End BigCatNatDistinctElements.
@@ -349,42 +303,6 @@ Section BigCatLemmas.
 
 End BigCatLemmas.
 
-(** In this section, we show that the number of elements of the result
-    of a nested mapping and concatenation operation is independent from
-    the order in which the concatenations are performed. *)
-Section BigCatNestedCount.
-
-  (** Consider any three types supporting equality comparisons... *)
-  Variable X Y Z : eqType.
-
-  (** ... a function [F] that, given two indices, yields a sequence... *)
-  Variable F : X -> Y -> seq Z.
-
-  (** and a predicate [P]. *)
-  Variable P : pred Z.
-
-  (** Assume that, given two sequences [xs] and [ys], their elements are fed to
-      [F] in a pair-wise fashion. The resulting lists are then concatenated.
-      The following lemma shows that, when the operation described above is performed,
-      the number of elements respecting [P] in the resulting list is the same, regardless
-      of the order in which [xs] and [ys] are combined. *)
-  Lemma bigcat_count_exchange :
-    forall xs ys,
-      count P (\cat_(x <- xs) \cat_(y <- ys) F x y)
-      = count P (\cat_(y <- ys) \cat_(x <- xs) F x y).
-  Proof.
-    elim=> [|x0 seqX IHxs]; elim=> [|y0 seqY IHys].
-    { by rewrite !big_nil. }
-    { by rewrite big_cons count_cat -IHys !big_nil. }
-    { by rewrite big_cons count_cat IHxs !big_nil. }
-    { rewrite !big_cons !count_cat.
-      apply/eqP; rewrite -!addnA eqn_add2l.
-      rewrite IHxs -IHys !big_cons !count_cat.
-      rewrite addnC -!addnA eqn_add2l addnC eqn_add2l.
-      by rewrite IHxs. }
-  Qed.
-
-End BigCatNestedCount.
 
 (** In the following section we introduce a lemma that relates to partitioning.*)
 Section BigCatPartitionLemma.

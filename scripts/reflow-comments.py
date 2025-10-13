@@ -3,6 +3,7 @@
 import argparse
 import contextlib
 import sys
+import re
 from pathlib import Path
 
 from comments import comment_ranges
@@ -79,25 +80,29 @@ def reflow_comments(src, max_cols=80, strict_at_end=False, dump_tokens=False):
                 cursor = 0
                 print("\n\n", end="")
             else:
+                token = src[a:b]
+                if not (token.startswith("<<") and token.endswith(">>")):
+                    # normalize any contained whitespace
+                    token = re.sub(r"\s+", " ", token)
                 if indent is None:
                     indent = indentation(a)
                     if first_line is not None:
                         print(" " * first_line, end="")
-                        print(src[a:b], end="")
+                        print(token, end="")
                         first_line = None
                     else:
                         print(" " * indent, end="")
-                        print(src[a:b], end="")
+                        print(token, end="")
                     cursor += indent + b - a
                     if is_bullet(a, b):
                         indent += 2
                 elif cursor + (b - a + 1) <= max_cols:
                     print(" ", end="")
-                    print(src[a:b], end="")
+                    print(token, end="")
                     cursor += b - a + 1
                 else:
                     print("\n" + (" " * indent), end="")
-                    print(src[a:b], end="")
+                    print(token, end="")
                     cursor = indent + b - a
         if cursor + 3 <= max_cols or not strict_at_end:
             print(" ", end="")
@@ -157,9 +162,9 @@ def parse_args():
     parser.add_argument(
         "--max-columns",
         action="store",
-        default=80,
+        default=72,
         type=int,
-        help="Maximum permitted line length (in characters, default: 80)",
+        help="Maximum permitted line length (in characters, default: 72)",
     )
     parser.add_argument(
         "--in-place",

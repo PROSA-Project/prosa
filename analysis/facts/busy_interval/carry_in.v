@@ -139,138 +139,136 @@ Section BusyIntervalExistence.
   (** Next we prove that, if for any time instant [t] there is a point where the
       total workload generated since [t] is upper-bounded by the length of the
       interval, there must exist a no-carry-in instant. *)
-  Section ProcessorIsNotTooBusy.
 
-    (** As a stepping stone, we prove in the following section that for any time
-        instant [t] there exists another time instant <<t' ∈ (t, t + Δ]>> such
-        that the processor has no carry-in at time [t']. *)
-    Section ProcessorIsNotTooBusyInduction.
+  (** As a stepping stone, we prove in the following section that for any time
+      instant [t] there exists another time instant <<t' ∈ (t, t + Δ]>> such
+      that the processor has no carry-in at time [t']. *)
+  Section ProcessorIsNotTooBusyInduction.
 
-      (** Consider an arbitrary time instant [t] ... *)
-      Variable t : duration.
+    (** Consider an arbitrary time instant [t] ... *)
+    Variable t : duration.
 
-      (** ... such that there is no carry-in at time [t]. *)
-      Hypothesis H_no_carry_in : no_carry_in arr_seq sched t.
+    (** ... such that there is no carry-in at time [t]. *)
+    Hypothesis H_no_carry_in : no_carry_in arr_seq sched t.
 
-      (** First, recall that the total service is bounded by the total
-          workload. Therefore the sum of the total blackout and the
-          total service of jobs in the interval <<[t, t + Δ)>> is
-          bounded by [Δ]. *)
-      Lemma total_service_is_bounded_by_Δ :
-        blackout_during sched t (t + Δ) + total_service t (t + Δ) <= Δ.
-      Proof.
-        have EQ: \sum_(t <= x < t + Δ) 1 = Δ.
-        { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t]addn0 subnDl subn0. }
-        rewrite -{3}EQ {EQ}.
-        rewrite /total_service /blackout_during /supply.blackout_during.
-        rewrite /service_of_jobs/service_during/service_at exchange_big //=.
-        rewrite -big_split //= leq_sum // => t' _.
-        have [BL|SUP] := blackout_or_supply sched t'.
-        { rewrite -[1]addn0; apply leq_add; first by case: (is_blackout).
-          rewrite leqn0; apply/eqP; apply big1 => j _.
-          eapply no_service_during_blackout in BL.
-          by apply: BL. }
-        { rewrite /is_blackout SUP add0n.
-          exact: service_of_jobs_le_1. }
-      Qed.
-
-      (** Next we consider two cases:
-          (1) The case when the sum of blackout and service is strictly less than [Δ], and
-          (2) the case when the sum of blackout and service is equal to [Δ]. *)
-
-      (** In the first case, we use the pigeonhole principle to
-          conclude that there is an idle time instant; which in turn
-          implies existence of a time instant with no carry-in. *)
-      Lemma low_total_service_implies_existence_of_time_with_no_carry_in :
-        blackout_during sched t (t + Δ) + total_service t (t + Δ) < Δ ->
-        exists δ,
-          δ < Δ /\ no_carry_in arr_seq sched (t.+1 + δ).
-      Proof.
-        rewrite /total_service-{3}[Δ]addn0 -{2}(subnn t) addnBA // [Δ + t]addnC => LTS.
-        have [t_idle [/andP [LEt GTe] IDLE]]: exists t0 : nat,
-                                                t <= t0 < t + Δ
-                                                /\ is_idle arr_seq sched t0.
-        { apply: low_service_implies_existence_of_idle_time_rs =>//.
-          rewrite !subnKC in LTS; try by apply leq_addr.
-          by rewrite addKn. }
-        move: LEt; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
-        { exists 0; split => //.
-          rewrite addn0 EQ => s ARR BEF.
-          by apply: idle_instant_next_no_carry_in. }
-        have EX: exists γ, t_idle = t + γ.
-        { by exists (t_idle - t); rewrite subnKC // ltnW. }
-        move: EX => [γ EQ].
-        move : GTe LT; rewrite EQ ltn_add2l -{1}[t]addn0 ltn_add2l => GTe LT.
-        exists (γ.-1); split.
-        - apply leq_trans with γ.
-          + by rewrite prednK.
-          + by rewrite ltnW.
-        - rewrite -subn1 -addn1 -addnA subnKC // => s ARR BEF.
-          exact: idle_instant_no_carry_in.
-      Qed.
-
-      (** In the second case, the sum of blackout and service within
-          the time interval <<[t, t + Δ)>> is equal to [Δ]. We also
-          know that the total workload is lower-bounded by the total
-          service and upper-bounded by [Δ]. Therefore, the total
-          workload is equal to the total service, which implies
-          completion of all jobs by time [t + Δ] and hence no carry-in
-          at time [t + Δ]. *)
-      Lemma completion_of_all_jobs_implies_no_carry_in :
-        blackout_during sched t (t + Δ) + total_service t (t + Δ) = Δ ->
-        no_carry_in arr_seq sched (t + Δ).
-      Proof.
-        rewrite /total_service => EQserv s ARR BEF.
-        move: (H_workload_is_bounded t) => WORK.
-        have EQ: total_workload_between arr_seq 0 (t + Δ)
-                 = service_of_jobs sched predT (arrivals_between arr_seq 0 (t + Δ)) 0 (t + Δ);
-          last exact: workload_eq_service_impl_all_jobs_have_completed.
-        have CONSIST: consistent_arrival_times arr_seq by [].
-        have COMPL := all_jobs_have_completed_impl_workload_eq_service
-                        _ arr_seq CONSIST sched
-                        H_jobs_must_arrive_to_execute
-                        H_completed_jobs_dont_execute
-                        predT 0 t t.
-        feed_n 2 COMPL => //.
-        { move=> j A B; apply: H_no_carry_in.
-          - apply: in_arrivals_implies_arrived =>//.
-          - by have : arrived_between j 0 t
-                        by apply: (in_arrivals_implies_arrived_between arr_seq). }
-        apply/eqP; rewrite eqn_leq; apply/andP; split;
-          last by apply: service_of_jobs_le_workload.
-        rewrite /total_workload_between/total_workload (workload_of_jobs_cat arr_seq t);
-          last by apply/andP; split; [|rewrite leq_addr].
-        - rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t) //;
-            last by apply/andP; split; [|rewrite leq_addr].
-          + rewrite COMPL -addnA leq_add2l.
-            rewrite -service_of_jobs_cat_arrival_interval;
-              last by apply/andP; split; [|rewrite leq_addr].
-            by evar (b : nat); rewrite -(leq_add2l b) EQserv.
-      Qed.
-
-    End ProcessorIsNotTooBusyInduction.
-
-    (** Finally, we show that any interval of length [Δ] contains a time instant
-        with no carry-in. *)
-    Lemma processor_is_not_too_busy :
-      forall t, exists δ,
-        δ < Δ /\ no_carry_in arr_seq sched (t + δ).
+    (** First, recall that the total service is bounded by the total
+        workload. Therefore the sum of the total blackout and the
+        total service of jobs in the interval <<[t, t + Δ)>> is
+        bounded by [Δ]. *)
+    Lemma total_service_is_bounded_by_Δ :
+      blackout_during sched t (t + Δ) + total_service t (t + Δ) <= Δ.
     Proof.
-      elim=> [|t [δ [LE FQT]]];
-        first by exists 0; split; [ | rewrite addn0; apply: no_carry_in_at_zero].
-      move: (posnP δ) => [Z|POS]; last first.
-      - exists (δ.-1); split.
-        + by apply: leq_trans LE; rewrite prednK.
-        + by rewrite -subn1 -addn1 -addnA subnKC //.
-      - move: FQT; rewrite Z addn0 => FQT {LE}.
-        move: (total_service_is_bounded_by_Δ t); rewrite leq_eqVlt => /orP [/eqP EQ | LT].
-        + exists (Δ.-1); split; first by rewrite prednK.
-          rewrite addSn -subn1 -addn1 -addnA subnK //.
-          by apply: completion_of_all_jobs_implies_no_carry_in.
-        + by apply:low_total_service_implies_existence_of_time_with_no_carry_in.
+      have EQ: \sum_(t <= x < t + Δ) 1 = Δ.
+      { by rewrite big_const_nat iter_addn mul1n addn0 -{2}[t]addn0 subnDl subn0. }
+      rewrite -{3}EQ {EQ}.
+      rewrite /total_service /blackout_during /supply.blackout_during.
+      rewrite /service_of_jobs/service_during/service_at exchange_big //=.
+      rewrite -big_split //= leq_sum // => t' _.
+      have [BL|SUP] := blackout_or_supply sched t'.
+      { rewrite -[1]addn0; apply leq_add; first by case: (is_blackout).
+        rewrite leqn0; apply/eqP; apply big1 => j _.
+        eapply no_service_during_blackout in BL.
+        by apply: BL. }
+      { rewrite /is_blackout SUP add0n.
+        exact: service_of_jobs_le_1. }
     Qed.
 
-  End ProcessorIsNotTooBusy.
+    (** Next we consider two cases:
+        (1) The case when the sum of blackout and service is strictly less than [Δ], and
+        (2) the case when the sum of blackout and service is equal to [Δ]. *)
+
+    (** In the first case, we use the pigeonhole principle to
+        conclude that there is an idle time instant; which in turn
+        implies existence of a time instant with no carry-in. *)
+    Lemma low_total_service_implies_existence_of_time_with_no_carry_in :
+      blackout_during sched t (t + Δ) + total_service t (t + Δ) < Δ ->
+      exists δ,
+        δ < Δ /\ no_carry_in arr_seq sched (t.+1 + δ).
+    Proof.
+      rewrite /total_service-{3}[Δ]addn0 -{2}(subnn t) addnBA // [Δ + t]addnC => LTS.
+      have [t_idle [/andP [LEt GTe] IDLE]]: exists t0 : nat,
+                                              t <= t0 < t + Δ
+                                              /\ is_idle arr_seq sched t0.
+      { apply: low_service_implies_existence_of_idle_time_rs =>//.
+        rewrite !subnKC in LTS; try by apply leq_addr.
+        by rewrite addKn. }
+      move: LEt; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
+      { exists 0; split => //.
+        rewrite addn0 EQ => s ARR BEF.
+        by apply: idle_instant_next_no_carry_in. }
+      have EX: exists γ, t_idle = t + γ.
+      { by exists (t_idle - t); rewrite subnKC // ltnW. }
+      move: EX => [γ EQ].
+      move : GTe LT; rewrite EQ ltn_add2l -{1}[t]addn0 ltn_add2l => GTe LT.
+      exists (γ.-1); split.
+      - apply leq_trans with γ.
+        + by rewrite prednK.
+        + by rewrite ltnW.
+      - rewrite -subn1 -addn1 -addnA subnKC // => s ARR BEF.
+        exact: idle_instant_no_carry_in.
+    Qed.
+
+    (** In the second case, the sum of blackout and service within
+        the time interval <<[t, t + Δ)>> is equal to [Δ]. We also
+        know that the total workload is lower-bounded by the total
+        service and upper-bounded by [Δ]. Therefore, the total
+        workload is equal to the total service, which implies
+        completion of all jobs by time [t + Δ] and hence no carry-in
+        at time [t + Δ]. *)
+    Lemma completion_of_all_jobs_implies_no_carry_in :
+      blackout_during sched t (t + Δ) + total_service t (t + Δ) = Δ ->
+      no_carry_in arr_seq sched (t + Δ).
+    Proof.
+      rewrite /total_service => EQserv s ARR BEF.
+      move: (H_workload_is_bounded t) => WORK.
+      have EQ: total_workload_between arr_seq 0 (t + Δ)
+               = service_of_jobs sched predT (arrivals_between arr_seq 0 (t + Δ)) 0 (t + Δ);
+        last exact: workload_eq_service_impl_all_jobs_have_completed.
+      have CONSIST: consistent_arrival_times arr_seq by [].
+      have COMPL := all_jobs_have_completed_impl_workload_eq_service
+                      _ arr_seq CONSIST sched
+                      H_jobs_must_arrive_to_execute
+                      H_completed_jobs_dont_execute
+                      predT 0 t t.
+      feed_n 2 COMPL => //.
+      { move=> j A B; apply: H_no_carry_in.
+        - apply: in_arrivals_implies_arrived =>//.
+        - by have : arrived_between j 0 t
+                      by apply: (in_arrivals_implies_arrived_between arr_seq). }
+      apply/eqP; rewrite eqn_leq; apply/andP; split;
+        last by apply: service_of_jobs_le_workload.
+      rewrite /total_workload_between/total_workload (workload_of_jobs_cat arr_seq t);
+        last by apply/andP; split; [|rewrite leq_addr].
+      - rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t) //;
+          last by apply/andP; split; [|rewrite leq_addr].
+        + rewrite COMPL -addnA leq_add2l.
+          rewrite -service_of_jobs_cat_arrival_interval;
+            last by apply/andP; split; [|rewrite leq_addr].
+          by evar (b : nat); rewrite -(leq_add2l b) EQserv.
+    Qed.
+
+  End ProcessorIsNotTooBusyInduction.
+
+  (** Finally, we show that any interval of length [Δ] contains a time instant
+      with no carry-in. *)
+  Lemma processor_is_not_too_busy :
+    forall t, exists δ,
+      δ < Δ /\ no_carry_in arr_seq sched (t + δ).
+  Proof.
+    elim=> [|t [δ [LE FQT]]];
+      first by exists 0; split; [ | rewrite addn0; apply: no_carry_in_at_zero].
+    move: (posnP δ) => [Z|POS]; last first.
+    - exists (δ.-1); split.
+      + by apply: leq_trans LE; rewrite prednK.
+      + by rewrite -subn1 -addn1 -addnA subnKC //.
+    - move: FQT; rewrite Z addn0 => FQT {LE}.
+      move: (total_service_is_bounded_by_Δ t); rewrite leq_eqVlt => /orP [/eqP EQ | LT].
+      + exists (Δ.-1); split; first by rewrite prednK.
+        rewrite addSn -subn1 -addn1 -addnA subnK //.
+        by apply: completion_of_all_jobs_implies_no_carry_in.
+      + by apply:low_total_service_implies_existence_of_time_with_no_carry_in.
+  Qed.
+
 
   (** ** Busy Interval Existence *)
 

@@ -40,18 +40,6 @@ Section SumsOverSequences.
       by apply/eq_all => ?; rewrite /= lt0n negbK.
     Qed.
 
-    (** Next, we show that if a number [a] is not contained in [r], then filtering or not
-        filtering [a] when summing leads to the same result. *)
-    Lemma sum_notin_rem_eqn a :
-      a \notin r ->
-      \sum_(x <- r | P x && (x != a)) F x = \sum_(x <- r | P x) F x.
-    Proof.
-      move=> a_notin_r; rewrite [LHS]big_seq_cond [RHS]big_seq_cond.
-      apply: eq_bigl => x; case xinr: (x \in r) => //=.
-      have [xa|] := eqP; last by rewrite andbT.
-      by move: xinr a_notin_r; rewrite xa => ->.
-    Qed.
-
     (** We prove that if any element of [r] is bounded by constant [c],
         then the sum of the whole set is bounded by [c * size r]. *)
     Lemma sum_majorant_constant c :
@@ -63,13 +51,6 @@ Section SumsOverSequences.
       rewrite big_seq_cond [X in _ <= X]big_seq_cond.
       apply: leq_sum => i /andP[ir Pi]; exact: Fa_le_c.
     Qed.
-
-    (** Next, we show that the sum of the elements in [r] respecting [P] can
-        be obtained by removing from the total sum over [r] the sum of the elements
-        in [r] not respecting [P]. *)
-    Lemma sum_pred_diff :
-      \sum_(r <- r | P r) F r = \sum_(r <- r) F r - \sum_(r <- r | ~~ P r) F r.
-    Proof. by rewrite [X in X - _](bigID P)/= addnK. Qed.
 
     (** Next, we show that if the predicate [P] is a disjunction of the predicates [Q]
         and [R], and [Q] and [R] can never be simultaneously satisfied by any element,
@@ -91,10 +72,7 @@ Section SumsOverSequences.
         function over the elements. *)
     Lemma bigmax_leq_sum :
       \max_(i <- r | P i) F i <= \sum_(i <- r | P i) F i.
-    Proof.
-      apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2.
-      by rewrite (leq_trans (max_leq_add m1 m2)) ?leq_add.
-    Qed.
+    Proof. by apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2; lia. Qed.
 
     (** We show that if [r1] is a subsequence of [r2], then the sum of
         function [F] over elements satisfying predicate [P] in [r1] is
@@ -250,62 +228,47 @@ Section SumsOverSequences.
 
 End SumsOverSequences.
 
-(** In this section, we prove a variety of properties of sums performed over ranges. *)
-Section SumsOverRanges.
+(** In the following, we prove a variety of simple properties of sums over
+    ranges. *)
 
-  (** First, we prove that the sum of Δ ones is equal to Δ     . *)
-  Lemma sum_of_ones :
-    forall t Δ,
-      \sum_(t <= x < t + Δ) 1 = Δ.
-  Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
+(** First, we prove that the sum of Δ ones is equal to Δ     . *)
+Lemma sum_of_ones :
+  forall t Δ,
+    \sum_(t <= x < t + Δ) 1 = Δ.
+Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
 
-  (** Next, we show that a sum of natural numbers equals zero if and only
-      if all terms are zero. *)
-  Lemma big_nat_eq0 m n F :
-    \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
-  Proof.
-    split.
-    - rewrite /index_iota => /eqP.
-      rewrite sum_nat_eq0_nat filter_predT => /allP ZERO i.
-      rewrite -mem_index_iota /index_iota => IN.
-      by apply/eqP; apply ZERO.
-    - move=> ZERO.
-      have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
-      exact: big1_eq.
-  Qed.
+(** Next, we show that a sum of natural numbers equals zero if and only
+    if all terms are zero. *)
+Lemma big_nat_eq0 m n F :
+  \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
+Proof.
+  split.
+  - rewrite /index_iota => /eqP.
+    rewrite sum_nat_eq0_nat filter_predT => /allP ZERO i.
+    rewrite -mem_index_iota /index_iota => IN.
+    by apply/eqP; apply ZERO.
+  - move=> ZERO.
+    have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
+    exact: big1_eq.
+Qed.
 
-  (** Moreover, the fact that the sum is smaller than the range of the summation
-      implies the existence of a zero element. *)
-  Lemma sum_le_summation_range :
-    forall f t Δ,
-      \sum_(t <= x < t + Δ) f x < Δ ->
-      exists x, t <= x < t + Δ /\ f x = 0.
-  Proof.
-    move=> f t; elim=> [|Δ IHΔ] H; first by rewrite ltn0 in H.
-    destruct (f (t + Δ)) as [|n] eqn: EQ.
-    { exists (t + Δ); split; last by done.
-      by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS]. }
-    { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS => H.
-      have {}/IHΔ [z [/andP[LE GE] ZERO]] : \sum_(t <= t' < t + Δ) f t' < Δ.
-      { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
-      by exists z; split=> //; rewrite LE/= ltnS ltnW. }
-  Qed.
+(** Moreover, the fact that the sum is smaller than the range of the summation
+    implies the existence of a zero element. *)
+Lemma sum_le_summation_range :
+  forall f t Δ,
+    \sum_(t <= x < t + Δ) f x < Δ ->
+    exists x, t <= x < t + Δ /\ f x = 0.
+Proof.
+  move=> f t; elim=> [|Δ IHΔ] H; first by rewrite ltn0 in H.
+  destruct (f (t + Δ)) as [|n] eqn: EQ.
+  { exists (t + Δ); split; last by done.
+    by apply/andP; split; [rewrite leq_addr | rewrite addnS ltnS]. }
+  { move: H; rewrite addnS big_nat_recr //= ?leq_addr // EQ addnS ltnS => H.
+    have {}/IHΔ [z [/andP[LE GE] ZERO]] : \sum_(t <= t' < t + Δ) f t' < Δ.
+    { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
+    by exists z; split=> //; rewrite LE/= ltnS ltnW. }
+Qed.
 
-  (** Next, we prove that the summing over the difference of two functions is
-      the same as summing over the two functions separately, and then taking the
-      difference of the two sums. Since we are using natural numbers, we have to
-      require that one function dominates the other in the summing range. *)
-  Lemma sumnB_nat m n F G :
-    (forall i, m <= i < n -> F i >= G i) ->
-    \sum_(m <= i < n) (F i - G i)
-    = (\sum_(m <= i < n) (F i)) - (\sum_(m <= i < n) (G i)).
-  Proof.
-    move=> le.
-    rewrite big_nat_cond [X in X - _]big_nat_cond [X in _ - X]big_nat_cond.
-    rewrite sumnB// => i; rewrite andbT; exact: le.
-  Qed.
-
-End SumsOverRanges.
 
 (** In this section, we show how it is possible to equate the result of two sums performed
     on two different functions and on different intervals, provided that the two functions
@@ -491,31 +454,6 @@ Proof.
   by rewrite big_seq1.
 Qed.
 
-(** We prove that, given an interval <<[t1, t2)>> and two predicates
-    [P1, P2], if [P1] is satisfied at least [n1] times and [P2] is
-    satisfied at least [n2] times, then their intersection [P1 ∧ P2]
-    is satisfied at least [(n1 + n2) - (t2 - t1)] times. *)
-Lemma pigeonhole_on_interval :
-  forall (P1 P2 : pred nat) (t1 t2 : nat) (n1 n2 : nat),
-    n1 <= \sum_(t1 <= t < t2) P1 t ->
-    n2 <= \sum_(t1 <= t < t2) P2 t ->
-    (n1 + n2) - (t2 - t1) <= \sum_(t1 <= t < t2) (P1 t && P2 t).
-Proof.
-  move=> P1 P2 t1 t2.
-  have [Z|LE] := leqP t1 t2; last by move=> n1 n2; rewrite !big_geq; lia.
-  interval_to_duration t1 t2 Δ.
-  have -> : t1 + Δ - t1 = Δ by lia.
-  induction Δ as [ | Δ IHΔ]; first by move=> n1 n2; rewrite !big_geq; lia.
-  move=> n1 n2 LE1 LE2.
-  rewrite addnS big_nat_recr //=; last by apply leq_addr.
-  specialize (IHΔ (n1 - P1 (t1 + Δ)) (n2 - P2 (t1 + Δ))).
-  feed_n 2 IHΔ.
-  { rewrite addnS big_nat_recr //= in LE1; last by apply leq_addr.
-    by lia. }
-  { rewrite addnS big_nat_recr //= in LE2; last by apply leq_addr.
-    by lia. }
-  by lia.
-Qed.
 
 (** If a function [p] (bounded by 1) sums to at least two over a list
     of unique elements, then there must be two distinct elements in

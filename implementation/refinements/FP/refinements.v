@@ -56,25 +56,22 @@ Section Definitions.
 
 End Definitions.
 
-(** In this section, we introduce some functions operating on binary numbers. *)
-Section DefinitionsN.
+(** We introduce some functions operating on binary numbers. *)
 
-  (** We provide a definition of [iota], ... *)
-  Definition iota_N (a Δ : N) := iota_T a Δ.
+(** We provide a definition of [iota], ... *)
+Definition iota_N (a Δ : N) := iota_T a Δ.
 
-  (** ... of [search_space_emax_FP_h], ... *)
-  Definition search_space_emax_FP_h_N (tsk : task_T) (l r : N) : seq N :=
-    let h := get_horizon_of_task_T tsk in
-    let offsets := map (N.mul h) (iota_N l r) in
-    let emax_offsets := repeat_steps_with_offset_T tsk offsets in
-    map predn_T emax_offsets.
+(** ... of [search_space_emax_FP_h], ... *)
+Definition search_space_emax_FP_h_N (tsk : task_T) (l r : N) : seq N :=
+  let h := get_horizon_of_task_T tsk in
+  let offsets := map (N.mul h) (iota_N l r) in
+  let emax_offsets := repeat_steps_with_offset_T tsk offsets in
+  map predn_T emax_offsets.
 
-  (** ... and of [search_space_emax_FP]. *)
-  Definition search_space_emax_FP_N (tsk : task_T) (L : N) :=
-    let h := get_horizon_of_task_T tsk in
-    search_space_emax_FP_h_N tsk 0 (((L %/ h)+1))%C.
-
-End DefinitionsN.
+(** ... and of [search_space_emax_FP]. *)
+Definition search_space_emax_FP_N (tsk : task_T) (L : N) :=
+  let h := get_horizon_of_task_T tsk in
+  search_space_emax_FP_h_N tsk 0 (((L %/ h)+1))%C.
 
 (** ** Refinements *)
 

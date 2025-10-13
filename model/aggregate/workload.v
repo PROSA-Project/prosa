@@ -37,17 +37,14 @@ Section WorkloadOfJobs.
   Definition workload_of_job (j : Job) (t1 t2 : instant) :=
     workload_of_jobs (xpred1 j) (arrivals_between arr_seq t1 t2).
 
-  (** In this section, we add definitions for total workload. *)
-  Section TotalWorkload.
+  (** In the following, we add definitions for total workload. *)
 
-    (** We define the total workload as the sum of workloads of all incoming jobs. *)
-    Definition total_workload (jobs : seq Job) := workload_of_jobs predT jobs.
+  (** We define the total workload as the sum of workloads of all incoming jobs. *)
+  Definition total_workload (jobs : seq Job) := workload_of_jobs predT jobs.
 
-    (** We also define the total workload in a given interval <<[t1, t2)>>. *)
-    Definition total_workload_between (t1 t2 : instant) :=
-      total_workload (arrivals_between arr_seq t1 t2).
-
-  End TotalWorkload.
+  (** We also define the total workload in a given interval <<[t1, t2)>>. *)
+  Definition total_workload_between (t1 t2 : instant) :=
+    total_workload (arrivals_between arr_seq t1 t2).
 
   (** Next, we define the workload of jobs with higher or
       equal priority under JLFP policies. *)

@@ -48,6 +48,34 @@ ISSUES = [
             r"\s+[^.]*?(?P<issue>:[^= \n])[^.]*?:=[^.]*?\.",
             1,
         ),
+        (
+            "missing space before '->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue>[^-< ]->)[^.]*?\.",
+            1,
+        ),
+        (
+            "missing space after '->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue>->\S)[^.]*?\.",
+            2,
+        ),
+        (
+            "missing space before '<->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue>\S<->)[^.]*?\.",
+            1,
+        ),
+        (
+            "missing space after '<->'",
+            r"(Lemma|Theorem|Fact|Corollary|Remark|Example|Definition|Fixpoint|"
+            r"Hypothesis|Variable|Variables|Instance|Context)"
+            r"\s+[^.]*?(?P<issue><->\S)[^.]*?\.",
+            3,
+        ),
         ("trailing whitespace", r"(?P<issue>[ \t]+)\n", 0),
         (
             "operator at end of line (move to next line)",
@@ -118,6 +146,12 @@ QUANTIFIER_FOR_INDENTATION_CHECK = re.compile(
 
 INDENT_SPACES = 2
 
+SECTION_SCOPE_KEYWORDS = re.compile(
+    r"(?P<keyword>Variable|Variables|Hypothesis|Context|Local|Instance|Notation|Let)[^.]+\.|"
+    r"(?P<token>Section|End)\s+(?P<name>[^.]+)\s*\.",
+    re.MULTILINE | re.DOTALL,
+)
+
 
 def lint_file(opts, fpath):
     issues = []
@@ -129,8 +163,8 @@ def lint_file(opts, fpath):
     lineno = LineNumbers(src)
     proofs = Proofs(src)
 
-    def matches_of(regex):
-        return (m for m in regex.finditer(src) if m.span() not in comments)
+    def matches_of(regex, start=0, end=-1):
+        return (m for m in regex.finditer(src[start:end]) if m.span() not in comments)
 
     for i, (rule, msg, shift) in enumerate(ISSUES):
         for m in matches_of(rule):
@@ -199,6 +233,31 @@ def lint_file(opts, fpath):
                 0,
             )
         )
+
+    section_stack = []
+    for m in matches_of(SECTION_SCOPE_KEYWORDS):
+        if m.span("token")[0] != -1:
+            if m.group("token") == "Section":
+                section_stack.append([m, 0])
+            elif (
+                m.group("token") == "End"
+                and section_stack
+                and section_stack[-1][0].group("name") == m.group("name")
+            ):
+                sm, counter = section_stack.pop()
+                if counter == 0:
+                    issues.append(
+                        (
+                            sm.span(),
+                            f"{fpath}:{lineno[sm.span()[0]]}: "
+                            "superfluous section (not used as a scope for local variables, hypotheses, etc.)",
+                            0,
+                            0,
+                        )
+                    )
+
+        elif m.span("keyword")[0] != -1 and section_stack:
+            section_stack[-1][1] += 1
 
     for i, ((s, e), msg, offset_shift, context_above) in enumerate(sorted(issues)):
         print(msg, file=sys.stderr)

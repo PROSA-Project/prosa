@@ -56,37 +56,33 @@ Section Definitions.
 
 End Definitions.
 
-(** In this section, we introduce some functions operating on binary numbers. *)
-Section DefinitionsN.
+(** In the following, we introduce some functions operating on binary numbers. *)
 
-  (** We provide a definition of [iota], ... *)
-  Definition iota_N (a Δ : N) := iota_T a Δ.
+(** We provide a definition of [iota], ... *)
+Definition iota_N (a Δ : N) := iota_T a Δ.
 
-  (** ... of [task_search_space_emax_EDF_h], ... *)
-  Definition task_search_space_emax_EDF_h_N (tsk tsko : task_T) (l r : N) : seq N :=
-    let h := get_horizon_of_task_T tsko in
-    let offsets := map (N.mul h) (iota_N l r) in
-    let emax_offsets := repeat_steps_with_offset_T tsko offsets in
-    let emax_edf_offsets :=
-        shift_points_neg_T
-          (shift_points_pos_T emax_offsets (task_deadline_T tsko))
-          (task_deadline_T tsk) in
-    map predn_T emax_edf_offsets.
+(** ... of [task_search_space_emax_EDF_h], ... *)
+Definition task_search_space_emax_EDF_h_N (tsk tsko : task_T) (l r : N) : seq N :=
+  let h := get_horizon_of_task_T tsko in
+  let offsets := map (N.mul h) (iota_N l r) in
+  let emax_offsets := repeat_steps_with_offset_T tsko offsets in
+  let emax_edf_offsets :=
+      shift_points_neg_T
+        (shift_points_pos_T emax_offsets (task_deadline_T tsko))
+        (task_deadline_T tsk) in
+  map predn_T emax_edf_offsets.
 
-  (** ... of [task_search_space_emax_EDF], ... *)
-  Definition task_search_space_emax_EDF_N (tsk tsko : task_T)  (L : N) :=
-    let h := get_horizon_of_task_T tsko in
-    task_search_space_emax_EDF_h_N
-      tsk tsko 0
-      (((L + (task_deadline_T tsk - task_deadline_T tsko)) %/ h) + 1)%C.
+(** ... of [task_search_space_emax_EDF], ... *)
+Definition task_search_space_emax_EDF_N (tsk tsko : task_T)  (L : N) :=
+  let h := get_horizon_of_task_T tsko in
+  task_search_space_emax_EDF_h_N
+    tsk tsko 0
+    (((L + (task_deadline_T tsk - task_deadline_T tsko)) %/ h) + 1)%C.
 
-  (** ... and of [search_space_emax_EDF_N]. *)
-  Definition search_space_emax_EDF_N (ts : seq task_T) (tsk : task_T) (L : N) :=
-    let points := map (fun tsko => task_search_space_emax_EDF_N tsk tsko L) ts in
-    flatten points.
-
-End DefinitionsN.
-
+(** ... and of [search_space_emax_EDF_N]. *)
+Definition search_space_emax_EDF_N (ts : seq task_T) (tsk : task_T) (L : N) :=
+  let points := map (fun tsko => task_search_space_emax_EDF_N tsk tsko L) ts in
+  flatten points.
 
 (** ** Refinements *)
 

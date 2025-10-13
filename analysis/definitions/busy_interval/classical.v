@@ -58,35 +58,32 @@ Section BusyIntervalJLFP.
 
   End BusyInterval.
 
-  (** In this section we define the computational
+  (** In the following, we define the computational
       version of the notion of quiet time. *)
-  Section DecidableQuietTime.
 
-    (** We say that t is a quiet time for [j] iff every higher-priority job from
-        the arrival sequence that arrived before [t] has completed by that time. *)
-    Definition quiet_time_dec (j : Job) (t : instant) :=
-      all
-        (fun j_hp => hep_job j_hp j ==> (completed_by sched j_hp t))
-        (arrivals_before arr_seq t).
+  (** We say that t is a quiet time for [j] iff every higher-priority job from
+      the arrival sequence that arrived before [t] has completed by that time. *)
+  Definition quiet_time_dec (j : Job) (t : instant) :=
+    all
+      (fun j_hp => hep_job j_hp j ==> (completed_by sched j_hp t))
+      (arrivals_before arr_seq t).
 
-    (** We also show that the computational and propositional definitions are equivalent. *)
-    Lemma quiet_time_P :
-      forall j t, reflect (quiet_time j t) (quiet_time_dec j t).
-    Proof.
-      intros; apply/introP.
-      - intros QT s ARRs HPs BEFs.
-        move: QT => /allP QT.
-        specialize (QT s); feed QT.
-        + by eapply arrived_between_implies_in_arrivals; eauto 2.
-        + by move: QT => /implyP Q; apply Q in HPs.
-      - move => /negP DEC; intros QT; apply: DEC.
-        apply/allP; intros s ARRs.
-        apply/implyP; intros HPs.
-        apply QT => //.
-        + by apply in_arrivals_implies_arrived in ARRs.
-        + by eapply in_arrivals_implies_arrived_between in ARRs; eauto 2.
-    Qed.
-
-  End DecidableQuietTime.
+  (** We also show that the computational and propositional definitions are equivalent. *)
+  Lemma quiet_time_P :
+    forall j t, reflect (quiet_time j t) (quiet_time_dec j t).
+  Proof.
+    intros; apply/introP.
+    - intros QT s ARRs HPs BEFs.
+      move: QT => /allP QT.
+      specialize (QT s); feed QT.
+      + by eapply arrived_between_implies_in_arrivals; eauto 2.
+      + by move: QT => /implyP Q; apply Q in HPs.
+    - move => /negP DEC; intros QT; apply: DEC.
+      apply/allP; intros s ARRs.
+      apply/implyP; intros HPs.
+      apply QT => //.
+      + by apply in_arrivals_implies_arrived in ARRs.
+      + by eapply in_arrivals_implies_arrived_between in ARRs; eauto 2.
+  Qed.
 
 End BusyIntervalJLFP.

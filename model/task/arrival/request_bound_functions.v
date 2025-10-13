@@ -45,31 +45,28 @@ Section RequestBoundFunctions.
   (** *** Definition of Request Bound Functions *)
 
   (** First, what constitutes a valid request bound function for a task? *)
-  Section RequestBoundFunctions.
 
-    (** We say that a given bound [request_bound] is a valid request
-        bound function iff [request_bound] is a monotonic function
-        that equals 0 for the empty interval [delta = 0]. *)
-    Definition valid_request_bound_function (request_bound : duration -> work) :=
-      request_bound 0 = 0
-      /\ monotone leq request_bound.
+  (** We say that a given bound [request_bound] is a valid request
+      bound function iff [request_bound] is a monotonic function
+      that equals 0 for the empty interval [delta = 0]. *)
+  Definition valid_request_bound_function (request_bound : duration -> work) :=
+    request_bound 0 = 0
+    /\ monotone leq request_bound.
 
-    (** We say that [request_bound] is an upper request bound for task
-        [tsk] iff, for any interval <<[t1, t2)>>, [request_bound (t2 -
-        t1)] bounds the sum of costs of jobs of [tsk] that arrive in
-        that interval. *)
-    Definition respects_max_request_bound (tsk : Task) (max_request_bound : duration -> work) :=
-      forall (t1 t2 : instant),
-        t1 <= t2 ->
-        cost_of_task_arrivals arr_seq tsk t1 t2 <= max_request_bound (t2 - t1).
+  (** We say that [request_bound] is an upper request bound for task
+      [tsk] iff, for any interval <<[t1, t2)>>, [request_bound (t2 -
+      t1)] bounds the sum of costs of jobs of [tsk] that arrive in
+      that interval. *)
+  Definition respects_max_request_bound (tsk : Task) (max_request_bound : duration -> work) :=
+    forall (t1 t2 : instant),
+      t1 <= t2 ->
+      cost_of_task_arrivals arr_seq tsk t1 t2 <= max_request_bound (t2 - t1).
 
-    (** We analogously define the lower request bound. *)
-    Definition respects_min_request_bound (tsk : Task) (min_request_bound : duration -> work) :=
-      forall (t1 t2 : instant),
-        t1 <= t2 ->
-        min_request_bound (t2 - t1) <= cost_of_task_arrivals arr_seq tsk t1 t2.
-
-  End RequestBoundFunctions.
+  (** We analogously define the lower request bound. *)
+  Definition respects_min_request_bound (tsk : Task) (min_request_bound : duration -> work) :=
+    forall (t1 t2 : instant),
+      t1 <= t2 ->
+      min_request_bound (t2 - t1) <= cost_of_task_arrivals arr_seq tsk t1 t2.
 
 End RequestBoundFunctions.
 

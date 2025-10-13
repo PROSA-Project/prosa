@@ -108,406 +108,403 @@ Section JLFPInstantiation.
       notions like service or workload. Next, we prove the equivalence
       between the instantiations and conventional notions as well as a
       few useful rewrite rules. *)
-  Section Equivalences.
 
-    (** In the following subsection, we prove properties of the
-        introduced functions under the assumption that the schedule is
-        idle. *)
-    Section IdleSchedule.
+  (** In the following subsection, we prove properties of the
+      introduced functions under the assumption that the schedule is
+      idle. *)
+  Section IdleSchedule.
 
-      (** Consider a time instant [t] ... *)
-      Variable t : instant.
+    (** Consider a time instant [t] ... *)
+    Variable t : instant.
 
-      (** ... and assume that the schedule is idle at [t]. *)
-      Hypothesis H_idle : ideal_is_idle sched t.
+    (** ... and assume that the schedule is idle at [t]. *)
+    Hypothesis H_idle : ideal_is_idle sched t.
 
-      (** We prove that in this case: ... *)
+    (** We prove that in this case: ... *)
 
-      (** ... there is no interference, ... *)
-      Lemma no_interference_when_idle :
-        forall j, ~~ interference j t.
+    (** ... there is no interference, ... *)
+    Lemma no_interference_when_idle :
+      forall j, ~~ interference j t.
+    Proof.
+      move => j; apply/negP.
+      rewrite /interference /ideal_jlfp_interference => /orP [PI | HEPI].
+      - have [j' schj'] : exists j' : Job, scheduled_at sched j' t
+          by exact/priority_inversion_scheduled_at.
+        exact: ideal_sched_implies_not_idle schj' H_idle.
+      - by move: HEPI => /negPn; rewrite no_hep_job_interference_when_idle // is_idle_def //.
+    Qed.
+
+    (** ... as well as no interference for [tsk]. *)
+    Lemma no_task_interference_when_idle :
+      forall j, ~~ task_interference arr_seq sched j t.
+    Proof.
+      move=> j; rewrite /task_interference /cond_interference.
+      by rewrite negb_and; apply/orP; right; apply no_interference_when_idle.
+    Qed.
+
+  End IdleSchedule.
+
+  (** Next, we prove properties of the introduced functions under
+      the assumption that the scheduler is not idle. *)
+  Section ScheduledJob.
+
+    (** Consider a job [j] of task [tsk]. In this subsection, job
+        [j] is deemed to be the main job with respect to which the
+        functions are computed. *)
+    Variable j : Job.
+    Hypothesis H_j_tsk : job_of_task tsk j.
+
+    (** Consider a time instant [t]. *)
+    Variable t : instant.
+
+    (** In the next subsection, we consider a case when a job [j']
+        from the same task (as job [j]) is scheduled. *)
+    Section FromSameTask.
+
+      (** Consider a job [j'] that comes from task [tsk] and is
+          scheduled at time instant [t].  *)
+      Variable j' : Job.
+      Hypothesis H_j'_tsk : job_of_task tsk j'.
+      Hypothesis H_j'_sched : scheduled_at sched j' t.
+
+      (** Similarly, there is no task interference, since in order
+          to incur the task interference, a job from a distinct task
+          must be scheduled. *)
+      Lemma task_interference_eq_false :
+        ~~ task_interference arr_seq sched j t.
       Proof.
-        move => j; apply/negP.
-        rewrite /interference /ideal_jlfp_interference => /orP [PI | HEPI].
-        - have [j' schj'] : exists j' : Job, scheduled_at sched j' t
-            by exact/priority_inversion_scheduled_at.
-          exact: ideal_sched_implies_not_idle schj' H_idle.
-        - by move: HEPI => /negPn; rewrite no_hep_job_interference_when_idle // is_idle_def //.
+        apply/negP => /andP [+ _]; rewrite /nonself /task_scheduled_at.
+        rewrite task_served_eq_task_scheduled //=; erewrite job_of_scheduled_task => //.
+        move: H_j_tsk  H_j'_tsk; rewrite /job_of_task => /eqP -> /eqP ->.
+        by rewrite eq_refl.
       Qed.
 
-      (** ... as well as no interference for [tsk]. *)
-      Lemma no_task_interference_when_idle :
-        forall j, ~~ task_interference arr_seq sched j t.
+    End FromSameTask.
+
+    (** In the next subsection, we consider a case when a job [j']
+        from a task other than [j]'s task is scheduled. *)
+    Section FromDifferentTask.
+
+      (** Consider a job [j'] that _does_ _not_ comes from task
+          [tsk] and is scheduled at time instant [t].  *)
+      Variable j' : Job.
+      Hypothesis H_j'_not_tsk : ~~ job_of_task tsk j'.
+      Hypothesis H_j'_sched : scheduled_at sched j' t.
+
+      (** Hence, if we assume that [j'] has higher-or-equal priority, ... *)
+      Hypothesis H_j'_hep : hep_job j' j.
+
+      (** Moreover, in this case, task [tsk] also incurs interference. *)
+      Lemma sched_athep_implies_task_interference :
+        task_interference arr_seq sched j t.
       Proof.
-        move=> j; rewrite /task_interference /cond_interference.
-        by rewrite negb_and; apply/orP; right; apply no_interference_when_idle.
+        apply/andP; split.
+        - rewrite /nonself task_served_eq_task_scheduled => //.
+          apply: job_of_other_task_scheduled => //.
+          by move: H_j_tsk => /eqP -> .
+        - apply/orP; right.
+          apply/hasP; exists j'.
+          + by apply scheduled_at_implies_in_served_at => //.
+          + rewrite another_hep_job_diff_task // same_task_sym.
+            exact: (diff_task tsk).
       Qed.
 
-    End IdleSchedule.
+    End FromDifferentTask.
 
-    (** Next, we prove properties of the introduced functions under
-        the assumption that the scheduler is not idle. *)
-    Section ScheduledJob.
+  End ScheduledJob.
 
-      (** Consider a job [j] of task [tsk]. In this subsection, job
-          [j] is deemed to be the main job with respect to which the
-          functions are computed. *)
-      Variable j : Job.
-      Hypothesis H_j_tsk : job_of_task tsk j.
+  (** We prove that we can split cumulative interference into two
+      parts: (1) cumulative priority inversion and (2) cumulative
+      interference from jobs with higher or equal priority. *)
+  Lemma cumulative_interference_split :
+    forall j t1 t2,
+      cumulative_interference j t1 t2
+      = cumulative_priority_inversion arr_seq sched j t1 t2
+        + cumulative_another_hep_job_interference arr_seq sched j t1 t2.
+  Proof.
+    rewrite /cumulative_interference /cumul_cond_interference /cond_interference /interference.
+    move=> j t1 t2; rewrite -big_split //=.
+    apply/eqP; rewrite eqn_leq; apply/andP; split; rewrite leq_sum//.
+    { move => t _; unfold ideal_jlfp_interference.
+      by destruct (priority_inversion _ _ _ _), (another_hep_job_interference arr_seq sched j t).
+    }
+    { move => t _; rewrite /ideal_jlfp_interference.
+      destruct (ideal_proc_model_sched_case_analysis sched t) as [IDLE | [s SCHED]].
+      - have -> : priority_inversion arr_seq sched j t = false
+          by exact/negbTE/idle_implies_no_priority_inversion.
+        by rewrite add0n.
+      - destruct (hep_job s j) eqn:PRIO.
+        + by erewrite sched_hep_implies_no_priority_inversion => //; rewrite add0n.
+        + erewrite !sched_lp_implies_priority_inversion => //; last by rewrite PRIO.
+          rewrite orTb.
+          by rewrite add1n ltnS //= leqn0 eqb0; erewrite no_ahep_interference_when_scheduled_lp; last by erewrite PRIO.
+    }
+  Qed.
 
-      (** Consider a time instant [t]. *)
-      Variable t : instant.
+  (** Similarly, we prove that we can split cumulative interfering
+      workload into two parts: (1) cumulative priority inversion and
+      (2) cumulative interfering workload from jobs with higher or
+      equal priority. *)
+  Lemma cumulative_interfering_workload_split :
+    forall j t1 t2,
+      cumulative_interfering_workload j t1 t2
+      = cumulative_priority_inversion arr_seq sched j t1 t2
+        + cumulative_other_hep_jobs_interfering_workload arr_seq j t1 t2.
+  Proof.
+    rewrite /cumulative_interfering_workload
+            /cumulative_priority_inversion
+            /cumulative_other_hep_jobs_interfering_workload.
+    by move => j t1 t2; rewrite -big_split //=.
+  Qed.
 
-      (** In the next subsection, we consider a case when a job [j']
-          from the same task (as job [j]) is scheduled. *)
-      Section FromSameTask.
+  (** Let [j] be any job of task [tsk]. Then the cumulative task
+      interference received by job [j] is bounded to the sum of the
+      cumulative priority inversion of job [j] and the cumulative
+      interference incurred by job [j] due to higher-or-equal
+      priority jobs from other tasks. *)
+  Lemma cumulative_task_interference_split :
+    forall j t1 t2,
+      arrives_in arr_seq j ->
+      job_of_task tsk j ->
+      ~~ completed_by sched j t2 ->
+      cumul_task_interference arr_seq sched j t1 t2
+      <= cumulative_priority_inversion arr_seq sched j t1 t2
+        + cumulative_another_task_hep_job_interference arr_seq sched j t1 t2.
+  Proof.
+    move=> j t1 R ARR TSK NCOMPL.
+    rewrite /cumul_task_interference /cumul_cond_interference.
+    rewrite -big_split //= big_seq_cond [leqRHS]big_seq_cond.
+    apply leq_sum => t /andP [IN _].
+    rewrite /cond_interference /nonself /interference /ideal_jlfp_interference.
+    have [IDLE|[s SCHEDs]] := ideal_proc_model_sched_case_analysis sched t.
+    { move: (IDLE) => IIDLE; erewrite <-is_idle_def in IDLE => //.
+      have ->: priority_inversion arr_seq sched j t = false
+        by apply/eqP; rewrite eqbF_neg; apply: no_priority_inversion_when_idle => //.
+      have ->: another_hep_job_interference arr_seq sched j t = false
+        by apply/eqP; rewrite eqbF_neg; apply no_hep_job_interference_when_idle.
+      have ->: another_task_hep_job_interference arr_seq sched j t = false
+        by apply/eqP; rewrite eqbF_neg; apply/negP; rewrite_neg @no_hep_task_interference_when_idle.
+      by rewrite andbF.
+    }
+    { rewrite (interference_ahep_def _ _ _ _ _ _ _ _ _ _ _ SCHEDs) //.
+      rewrite (interference_athep_def _ _ _ _ _ _ _ _ _ _ _ SCHEDs) => //.
+      rewrite (priority_inversion_equiv_sched_lower_priority _ _ _ _ _ _ _ _ _ SCHEDs) => //.
+      rewrite task_served_eq_task_scheduled // (job_of_scheduled_task _ _ _ _ _ _ _ _ _ SCHEDs) => //.
+      rewrite /another_hep_job /another_task_hep_job.
+      have [EQj|NEQj] := eqVneq s j.
+      { by subst; rewrite /job_of_task eq_refl H_priority_is_reflexive. }
+      have [/eqP EQt|NEQt] := eqVneq (job_task s) (job_task j).
+      { apply/eqP; move: (EQt) => /eqP <-.
+        by rewrite /job_of_task eq_refl //= andbF addn0 eq_sym eqb0; apply/negP => LPs. }
+      { by rewrite /job_of_task NEQt //= andbT; case: hep_job. }
+    }
+  Qed.
 
-        (** Consider a job [j'] that comes from task [tsk] and is
-            scheduled at time instant [t].  *)
-        Variable j' : Job.
-        Hypothesis H_j'_tsk : job_of_task tsk j'.
-        Hypothesis H_j'_sched : scheduled_at sched j' t.
+  (** In this section, we prove that the (abstract) cumulative
+      interfering workload is equivalent to the conventional workload,
+      i.e., the one defined with concrete schedule parameters. *)
+  Section InstantiatedWorkloadEquivalence.
 
-        (** Similarly, there is no task interference, since in order
-            to incur the task interference, a job from a distinct task
-            must be scheduled. *)
-        Lemma task_interference_eq_false :
-          ~~ task_interference arr_seq sched j t.
-        Proof.
-          apply/negP => /andP [+ _]; rewrite /nonself /task_scheduled_at.
-          rewrite task_served_eq_task_scheduled //=; erewrite job_of_scheduled_task => //.
-          move: H_j_tsk  H_j'_tsk; rewrite /job_of_task => /eqP -> /eqP ->.
-          by rewrite eq_refl.
-        Qed.
+    (** Let <<[t1,t2)>> be any time interval. *)
+    Variables t1 t2 : instant.
 
-      End FromSameTask.
+    (** Consider any job [j] of [tsk]. *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+    Hypothesis H_job_of_tsk : job_of_task tsk j.
 
-      (** In the next subsection, we consider a case when a job [j']
-          from a task other than [j]'s task is scheduled. *)
-      Section FromDifferentTask.
-
-        (** Consider a job [j'] that _does_ _not_ comes from task
-            [tsk] and is scheduled at time instant [t].  *)
-        Variable j' : Job.
-        Hypothesis H_j'_not_tsk : ~~ job_of_task tsk j'.
-        Hypothesis H_j'_sched : scheduled_at sched j' t.
-
-        (** Hence, if we assume that [j'] has higher-or-equal priority, ... *)
-        Hypothesis H_j'_hep : hep_job j' j.
-
-        (** Moreover, in this case, task [tsk] also incurs interference. *)
-        Lemma sched_athep_implies_task_interference :
-          task_interference arr_seq sched j t.
-        Proof.
-          apply/andP; split.
-          - rewrite /nonself task_served_eq_task_scheduled => //.
-            apply: job_of_other_task_scheduled => //.
-            by move: H_j_tsk => /eqP -> .
-          - apply/orP; right.
-            apply/hasP; exists j'.
-            + by apply scheduled_at_implies_in_served_at => //.
-            + rewrite another_hep_job_diff_task // same_task_sym.
-              exact: (diff_task tsk).
-        Qed.
-
-      End FromDifferentTask.
-
-    End ScheduledJob.
-
-    (** We prove that we can split cumulative interference into two
-        parts: (1) cumulative priority inversion and (2) cumulative
-        interference from jobs with higher or equal priority. *)
-    Lemma cumulative_interference_split :
-      forall j t1 t2,
-        cumulative_interference j t1 t2
-        = cumulative_priority_inversion arr_seq sched j t1 t2
-          + cumulative_another_hep_job_interference arr_seq sched j t1 t2.
+    (** Then for any job [j], the cumulative interfering workload is
+        equal to the conventional workload. *)
+    Lemma cumulative_iw_hep_eq_workload_of_ohep :
+      cumulative_other_hep_jobs_interfering_workload arr_seq j t1 t2
+      = workload_of_other_hep_jobs arr_seq j t1 t2.
     Proof.
-      rewrite /cumulative_interference /cumul_cond_interference /cond_interference /interference.
-      move=> j t1 t2; rewrite -big_split //=.
-      apply/eqP; rewrite eqn_leq; apply/andP; split; rewrite leq_sum//.
-      { move => t _; unfold ideal_jlfp_interference.
-        by destruct (priority_inversion _ _ _ _), (another_hep_job_interference arr_seq sched j t).
+      rewrite /cumulative_other_hep_jobs_interfering_workload /workload_of_other_hep_jobs.
+      case NEQ: (t1 < t2); last first.
+      { move: NEQ => /negP /negP; rewrite -leqNgt => NEQ.
+        rewrite big_geq//.
+        rewrite /arrivals_between /arrival_sequence.arrivals_between big_geq//.
+        by rewrite /workload_of_jobs big_nil.
       }
-      { move => t _; rewrite /ideal_jlfp_interference.
-        destruct (ideal_proc_model_sched_case_analysis sched t) as [IDLE | [s SCHED]].
-        - have -> : priority_inversion arr_seq sched j t = false
-            by exact/negbTE/idle_implies_no_priority_inversion.
-          by rewrite add0n.
-        - destruct (hep_job s j) eqn:PRIO.
-          + by erewrite sched_hep_implies_no_priority_inversion => //; rewrite add0n.
-          + erewrite !sched_lp_implies_priority_inversion => //; last by rewrite PRIO.
-            rewrite orTb.
-            by rewrite add1n ltnS //= leqn0 eqb0; erewrite no_ahep_interference_when_scheduled_lp; last by erewrite PRIO.
-      }
-    Qed.
-
-    (** Similarly, we prove that we can split cumulative interfering
-        workload into two parts: (1) cumulative priority inversion and
-        (2) cumulative interfering workload from jobs with higher or
-        equal priority. *)
-    Lemma cumulative_interfering_workload_split :
-      forall j t1 t2,
-        cumulative_interfering_workload j t1 t2
-        = cumulative_priority_inversion arr_seq sched j t1 t2
-          + cumulative_other_hep_jobs_interfering_workload arr_seq j t1 t2.
-    Proof.
-      rewrite /cumulative_interfering_workload
-              /cumulative_priority_inversion
-              /cumulative_other_hep_jobs_interfering_workload.
-      by move => j t1 t2; rewrite -big_split //=.
-    Qed.
-
-    (** Let [j] be any job of task [tsk]. Then the cumulative task
-        interference received by job [j] is bounded to the sum of the
-        cumulative priority inversion of job [j] and the cumulative
-        interference incurred by job [j] due to higher-or-equal
-        priority jobs from other tasks. *)
-    Lemma cumulative_task_interference_split :
-      forall j t1 t2,
-        arrives_in arr_seq j ->
-        job_of_task tsk j ->
-        ~~ completed_by sched j t2 ->
-        cumul_task_interference arr_seq sched j t1 t2
-        <= cumulative_priority_inversion arr_seq sched j t1 t2
-          + cumulative_another_task_hep_job_interference arr_seq sched j t1 t2.
-    Proof.
-      move=> j t1 R ARR TSK NCOMPL.
-      rewrite /cumul_task_interference /cumul_cond_interference.
-      rewrite -big_split //= big_seq_cond [leqRHS]big_seq_cond.
-      apply leq_sum => t /andP [IN _].
-      rewrite /cond_interference /nonself /interference /ideal_jlfp_interference.
-      have [IDLE|[s SCHEDs]] := ideal_proc_model_sched_case_analysis sched t.
-      { move: (IDLE) => IIDLE; erewrite <-is_idle_def in IDLE => //.
-        have ->: priority_inversion arr_seq sched j t = false
-          by apply/eqP; rewrite eqbF_neg; apply: no_priority_inversion_when_idle => //.
-        have ->: another_hep_job_interference arr_seq sched j t = false
-          by apply/eqP; rewrite eqbF_neg; apply no_hep_job_interference_when_idle.
-        have ->: another_task_hep_job_interference arr_seq sched j t = false
-          by apply/eqP; rewrite eqbF_neg; apply/negP; rewrite_neg @no_hep_task_interference_when_idle.
-        by rewrite andbF.
-      }
-      { rewrite (interference_ahep_def _ _ _ _ _ _ _ _ _ _ _ SCHEDs) //.
-        rewrite (interference_athep_def _ _ _ _ _ _ _ _ _ _ _ SCHEDs) => //.
-        rewrite (priority_inversion_equiv_sched_lower_priority _ _ _ _ _ _ _ _ _ SCHEDs) => //.
-        rewrite task_served_eq_task_scheduled // (job_of_scheduled_task _ _ _ _ _ _ _ _ _ SCHEDs) => //.
-        rewrite /another_hep_job /another_task_hep_job.
-        have [EQj|NEQj] := eqVneq s j.
-        { by subst; rewrite /job_of_task eq_refl H_priority_is_reflexive. }
-        have [/eqP EQt|NEQt] := eqVneq (job_task s) (job_task j).
-        { apply/eqP; move: (EQt) => /eqP <-.
-          by rewrite /job_of_task eq_refl //= andbF addn0 eq_sym eqb0; apply/negP => LPs. }
-        { by rewrite /job_of_task NEQt //= andbT; case: hep_job. }
-      }
-    Qed.
-
-    (** In this section, we prove that the (abstract) cumulative
-        interfering workload is equivalent to the conventional workload,
-        i.e., the one defined with concrete schedule parameters. *)
-    Section InstantiatedWorkloadEquivalence.
-
-      (** Let <<[t1,t2)>> be any time interval. *)
-      Variables t1 t2 : instant.
-
-      (** Consider any job [j] of [tsk]. *)
-      Variable j : Job.
-      Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_of_tsk : job_of_task tsk j.
-
-      (** Then for any job [j], the cumulative interfering workload is
-          equal to the conventional workload. *)
-      Lemma cumulative_iw_hep_eq_workload_of_ohep :
-        cumulative_other_hep_jobs_interfering_workload arr_seq j t1 t2
-        = workload_of_other_hep_jobs arr_seq j t1 t2.
-      Proof.
-        rewrite /cumulative_other_hep_jobs_interfering_workload /workload_of_other_hep_jobs.
-        case NEQ: (t1 < t2); last first.
-        { move: NEQ => /negP /negP; rewrite -leqNgt => NEQ.
+      { unfold other_hep_jobs_interfering_workload, workload_of_jobs.
+        interval_to_duration t1 t2 k.
+        elim: k => [|k IHk].
+        - rewrite !addn0.
           rewrite big_geq//.
           rewrite /arrivals_between /arrival_sequence.arrivals_between big_geq//.
           by rewrite /workload_of_jobs big_nil.
-        }
-        { unfold other_hep_jobs_interfering_workload, workload_of_jobs.
-          interval_to_duration t1 t2 k.
-          elim: k => [|k IHk].
-          - rewrite !addn0.
-            rewrite big_geq//.
-            rewrite /arrivals_between /arrival_sequence.arrivals_between big_geq//.
-            by rewrite /workload_of_jobs big_nil.
-          - rewrite addnS big_nat_recr //=; last by rewrite leq_addr.
-            rewrite IHk.
-            rewrite /arrivals_between /arrival_sequence.arrivals_between big_nat_recr //=.
-            + by rewrite big_cat.
-            + by rewrite leq_addr.
-        }
-      Qed.
+        - rewrite addnS big_nat_recr //=; last by rewrite leq_addr.
+          rewrite IHk.
+          rewrite /arrivals_between /arrival_sequence.arrivals_between big_nat_recr //=.
+          + by rewrite big_cat.
+          + by rewrite leq_addr.
+      }
+    Qed.
 
-    End InstantiatedWorkloadEquivalence.
+  End InstantiatedWorkloadEquivalence.
 
-    (** In this section we prove that the abstract definition of busy
-        interval is equivalent to the conventional, concrete
-        definition of busy interval for JLFP scheduling. *)
-    Section BusyIntervalEquivalence.
+  (** In this section we prove that the abstract definition of busy
+      interval is equivalent to the conventional, concrete
+      definition of busy interval for JLFP scheduling. *)
+  Section BusyIntervalEquivalence.
 
-      (** In order to avoid confusion, we denote the notion of a quiet
-          time in the _classical_ sense as [quiet_time_cl], and the
-          notion of quiet time in the _abstract_ sense as
-          [quiet_time_ab]. *)
-      Let quiet_time_cl := classical.quiet_time arr_seq sched.
-      Let quiet_time_ab := abstract.definitions.quiet_time sched.
+    (** In order to avoid confusion, we denote the notion of a quiet
+        time in the _classical_ sense as [quiet_time_cl], and the
+        notion of quiet time in the _abstract_ sense as
+        [quiet_time_ab]. *)
+    Let quiet_time_cl := classical.quiet_time arr_seq sched.
+    Let quiet_time_ab := abstract.definitions.quiet_time sched.
 
-      (** Same for the two notions of a busy interval prefix ... *)
-      Let busy_interval_prefix_cl := classical.busy_interval_prefix arr_seq sched.
-      Let busy_interval_prefix_ab := abstract.definitions.busy_interval_prefix sched.
+    (** Same for the two notions of a busy interval prefix ... *)
+    Let busy_interval_prefix_cl := classical.busy_interval_prefix arr_seq sched.
+    Let busy_interval_prefix_ab := abstract.definitions.busy_interval_prefix sched.
 
-      (** ... and the two notions of a busy interval. *)
-      Let busy_interval_cl := classical.busy_interval arr_seq sched.
-      Let busy_interval_ab := abstract.definitions.busy_interval sched.
+    (** ... and the two notions of a busy interval. *)
+    Let busy_interval_cl := classical.busy_interval arr_seq sched.
+    Let busy_interval_ab := abstract.definitions.busy_interval sched.
 
-      (** Consider any job j of [tsk]. *)
-      Variable j : Job.
-      Hypothesis H_j_arrives : arrives_in arr_seq j.
-      Hypothesis H_job_cost_positive : job_cost_positive j.
+    (** Consider any job j of [tsk]. *)
+    Variable j : Job.
+    Hypothesis H_j_arrives : arrives_in arr_seq j.
+    Hypothesis H_job_cost_positive : job_cost_positive j.
 
-      (** To show the equivalence of the notions of busy intervals, we
-          first show that the notions of quiet time are also
-          equivalent. *)
+    (** To show the equivalence of the notions of busy intervals, we
+        first show that the notions of quiet time are also
+        equivalent. *)
 
-      (** First, we show that the classical notion of quiet time
-          implies the abstract notion of quiet time. *)
-      Lemma quiet_time_cl_implies_quiet_time_ab :
-        forall t, quiet_time_cl j t -> quiet_time_ab j t.
-      Proof.
-        clear H_JLFP_respects_sequential_tasks.
-        have zero_is_quiet_time: forall j, quiet_time_cl j 0.
-        { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
-        move=> t QT; apply/andP; split; last first.
-        { rewrite negb_and negbK; apply/orP.
-          by case ARR: (arrived_before j t); [right | left]; [apply QT | ]. }
-        { erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l.
-          rewrite cumulative_i_ohep_eq_service_of_ohep//.
-          rewrite //= cumulative_iw_hep_eq_workload_of_ohep eq_sym; apply/eqP.
-          apply all_jobs_have_completed_equiv_workload_eq_service => //.
-          move => j0 IN HEP; apply QT.
-          - by apply in_arrivals_implies_arrived in IN.
-          - by move: HEP => /andP [H6 H7].
-          - by apply in_arrivals_implies_arrived_between in IN.
-        }
-      Qed.
+    (** First, we show that the classical notion of quiet time
+        implies the abstract notion of quiet time. *)
+    Lemma quiet_time_cl_implies_quiet_time_ab :
+      forall t, quiet_time_cl j t -> quiet_time_ab j t.
+    Proof.
+      clear H_JLFP_respects_sequential_tasks.
+      have zero_is_quiet_time: forall j, quiet_time_cl j 0.
+      { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
+      move=> t QT; apply/andP; split; last first.
+      { rewrite negb_and negbK; apply/orP.
+        by case ARR: (arrived_before j t); [right | left]; [apply QT | ]. }
+      { erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l.
+        rewrite cumulative_i_ohep_eq_service_of_ohep//.
+        rewrite //= cumulative_iw_hep_eq_workload_of_ohep eq_sym; apply/eqP.
+        apply all_jobs_have_completed_equiv_workload_eq_service => //.
+        move => j0 IN HEP; apply QT.
+        - by apply in_arrivals_implies_arrived in IN.
+        - by move: HEP => /andP [H6 H7].
+        - by apply in_arrivals_implies_arrived_between in IN.
+      }
+    Qed.
 
-      (** And vice versa, the abstract notion of quiet time implies
-          the classical notion of quiet time. *)
-      Lemma quiet_time_ab_implies_quiet_time_cl :
-        forall t, quiet_time_ab j t -> quiet_time_cl j t.
-      Proof.
-        clear H_JLFP_respects_sequential_tasks.
-        have zero_is_quiet_time: forall j, quiet_time_cl j 0.
-        { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
-        move => t /andP [T0 T1] jhp ARR HP ARB.
-        eapply all_jobs_have_completed_equiv_workload_eq_service with
-          (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t) => //.
-        erewrite service_of_jobs_case_on_pred with (P2 := fun j' => j' != j).
-        erewrite workload_of_jobs_case_on_pred with (P' := fun j' => j' != j) => //.
-        replace ((fun j0 : Job => hep_job j0 j && (j0 != j))) with (another_hep_job^~j); last by rewrite /another_hep_job.
-        rewrite -/(service_of_other_hep_jobs arr_seq _ j 0 t) -cumulative_i_ohep_eq_service_of_ohep => //.
-        rewrite -/(workload_of_other_hep_jobs _ j 0 t) -cumulative_iw_hep_eq_workload_of_ohep; eauto.
-        move: T1; rewrite negb_and => /orP [NA | /negPn COMP].
-        { have PRED__eq: {in arrivals_between arr_seq 0 t, (fun j__copy : Job => hep_job j__copy j && ~~ (j__copy != j)) =1 pred0}.
-          { move => j__copy IN; apply negbTE.
-            rewrite negb_and; apply/orP; right; apply/negPn/eqP => EQ; subst j__copy.
-            move: NA => /negP CONTR; apply: CONTR.
-            by apply in_arrivals_implies_arrived_between in IN. }
-          erewrite service_of_jobs_equiv_pred with (P2 := pred0) => [|//].
-          erewrite workload_of_jobs_equiv_pred with (P' := pred0) => [|//].
-          move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l => /eqP EQ.
-          rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
-          by erewrite workload_of_jobs_pred0, service_of_jobs_pred0.
-        }
-        { have PRED__eq: {in arrivals_between arr_seq 0 t, (fun j0 : Job => hep_job j0 j && ~~ (j0 != j)) =1 eq_op j}.
-          { move => j__copy IN.
-            replace (~~ (j__copy != j)) with (j__copy == j); last by case: (j__copy == j).
-            rewrite eq_sym; destruct (j == j__copy) eqn:EQ; last by rewrite Bool.andb_false_r.
-            by move: EQ => /eqP EQ; rewrite Bool.andb_true_r; apply/eqP; rewrite eqb_id; subst. }
-          erewrite service_of_jobs_equiv_pred with (P2 := eq_op j) => [|//].
-          erewrite workload_of_jobs_equiv_pred with (P' := eq_op j) => [|//].
-          move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l => /eqP EQ.
-          rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
-          apply/eqP; eapply all_jobs_have_completed_equiv_workload_eq_service with
-            (P := eq_op j) (t1 := 0) (t2 := t) => //.
-          by move => j__copy _ /eqP EQ; subst j__copy.
-        }
-      Qed.
+    (** And vice versa, the abstract notion of quiet time implies
+        the classical notion of quiet time. *)
+    Lemma quiet_time_ab_implies_quiet_time_cl :
+      forall t, quiet_time_ab j t -> quiet_time_cl j t.
+    Proof.
+      clear H_JLFP_respects_sequential_tasks.
+      have zero_is_quiet_time: forall j, quiet_time_cl j 0.
+      { by move => jhp ARR HP AB; move: AB; rewrite /arrived_before ltn0. }
+      move => t /andP [T0 T1] jhp ARR HP ARB.
+      eapply all_jobs_have_completed_equiv_workload_eq_service with
+        (P := fun jhp => hep_job jhp j) (t1 := 0) (t2 := t) => //.
+      erewrite service_of_jobs_case_on_pred with (P2 := fun j' => j' != j).
+      erewrite workload_of_jobs_case_on_pred with (P' := fun j' => j' != j) => //.
+      replace ((fun j0 : Job => hep_job j0 j && (j0 != j))) with (another_hep_job^~j); last by rewrite /another_hep_job.
+      rewrite -/(service_of_other_hep_jobs arr_seq _ j 0 t) -cumulative_i_ohep_eq_service_of_ohep => //.
+      rewrite -/(workload_of_other_hep_jobs _ j 0 t) -cumulative_iw_hep_eq_workload_of_ohep; eauto.
+      move: T1; rewrite negb_and => /orP [NA | /negPn COMP].
+      { have PRED__eq: {in arrivals_between arr_seq 0 t, (fun j__copy : Job => hep_job j__copy j && ~~ (j__copy != j)) =1 pred0}.
+        { move => j__copy IN; apply negbTE.
+          rewrite negb_and; apply/orP; right; apply/negPn/eqP => EQ; subst j__copy.
+          move: NA => /negP CONTR; apply: CONTR.
+          by apply in_arrivals_implies_arrived_between in IN. }
+        erewrite service_of_jobs_equiv_pred with (P2 := pred0) => [|//].
+        erewrite workload_of_jobs_equiv_pred with (P' := pred0) => [|//].
+        move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l => /eqP EQ.
+        rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
+        by erewrite workload_of_jobs_pred0, service_of_jobs_pred0.
+      }
+      { have PRED__eq: {in arrivals_between arr_seq 0 t, (fun j0 : Job => hep_job j0 j && ~~ (j0 != j)) =1 eq_op j}.
+        { move => j__copy IN.
+          replace (~~ (j__copy != j)) with (j__copy == j); last by case: (j__copy == j).
+          rewrite eq_sym; destruct (j == j__copy) eqn:EQ; last by rewrite Bool.andb_false_r.
+          by move: EQ => /eqP EQ; rewrite Bool.andb_true_r; apply/eqP; rewrite eqb_id; subst. }
+        erewrite service_of_jobs_equiv_pred with (P2 := eq_op j) => [|//].
+        erewrite workload_of_jobs_equiv_pred with (P' := eq_op j) => [|//].
+        move: T0; erewrite cumulative_interference_split, cumulative_interfering_workload_split; rewrite eqn_add2l => /eqP EQ.
+        rewrite EQ; clear EQ; apply/eqP; rewrite eqn_add2l.
+        apply/eqP; eapply all_jobs_have_completed_equiv_workload_eq_service with
+          (P := eq_op j) (t1 := 0) (t2 := t) => //.
+        by move => j__copy _ /eqP EQ; subst j__copy.
+      }
+    Qed.
 
-      (** The equivalence trivially follows from the lemmas above. *)
-      Corollary instantiated_quiet_time_equivalent_quiet_time :
-        forall t,
-          quiet_time_cl j t <-> quiet_time_ab j t.
-      Proof.
-        clear H_JLFP_respects_sequential_tasks.
-        move => ?; split.
-        - by apply quiet_time_cl_implies_quiet_time_ab.
-        - by apply quiet_time_ab_implies_quiet_time_cl.
-      Qed.
+    (** The equivalence trivially follows from the lemmas above. *)
+    Corollary instantiated_quiet_time_equivalent_quiet_time :
+      forall t,
+        quiet_time_cl j t <-> quiet_time_ab j t.
+    Proof.
+      clear H_JLFP_respects_sequential_tasks.
+      move => ?; split.
+      - by apply quiet_time_cl_implies_quiet_time_ab.
+      - by apply quiet_time_ab_implies_quiet_time_cl.
+    Qed.
 
-      (** Based on that, we prove that the concept of busy interval
-          prefix obtained by instantiating the abstract definition of
-          busy interval prefix coincides with the conventional
-          definition of busy interval prefix. *)
-      Lemma instantiated_busy_interval_prefix_equivalent_busy_interval_prefix :
-        forall t1 t2, busy_interval_prefix_cl j t1 t2 <-> busy_interval_prefix_ab j t1 t2.
-      Proof.
-        move => t1 t2; split.
-        { move => [NEQ [QTt1 [NQT REL]]].
-          split=> [//|]; split.
-          - by apply instantiated_quiet_time_equivalent_quiet_time in QTt1.
-          - by move => t NE QT; eapply NQT; eauto 2; apply instantiated_quiet_time_equivalent_quiet_time.
-        }
-        { move => [/andP [NEQ1 NEQ2] [QTt1 NQT]].
-          split; [ | split; [ |split] ].
-          - by apply leq_ltn_trans with (job_arrival j).
-          - by eapply instantiated_quiet_time_equivalent_quiet_time.
-          - by move => t NEQ QT; eapply NQT; eauto 2; eapply instantiated_quiet_time_equivalent_quiet_time in QT.
-          - by apply/andP.
-        }
-      Qed.
+    (** Based on that, we prove that the concept of busy interval
+        prefix obtained by instantiating the abstract definition of
+        busy interval prefix coincides with the conventional
+        definition of busy interval prefix. *)
+    Lemma instantiated_busy_interval_prefix_equivalent_busy_interval_prefix :
+      forall t1 t2, busy_interval_prefix_cl j t1 t2 <-> busy_interval_prefix_ab j t1 t2.
+    Proof.
+      move => t1 t2; split.
+      { move => [NEQ [QTt1 [NQT REL]]].
+        split=> [//|]; split.
+        - by apply instantiated_quiet_time_equivalent_quiet_time in QTt1.
+        - by move => t NE QT; eapply NQT; eauto 2; apply instantiated_quiet_time_equivalent_quiet_time.
+      }
+      { move => [/andP [NEQ1 NEQ2] [QTt1 NQT]].
+        split; [ | split; [ |split] ].
+        - by apply leq_ltn_trans with (job_arrival j).
+        - by eapply instantiated_quiet_time_equivalent_quiet_time.
+        - by move => t NEQ QT; eapply NQT; eauto 2; eapply instantiated_quiet_time_equivalent_quiet_time in QT.
+        - by apply/andP.
+      }
+    Qed.
 
-      (** Similarly, we prove that the concept of busy interval
-          obtained by instantiating the abstract definition of busy
-          interval coincides with the conventional definition of busy
-          interval. *)
-      Lemma instantiated_busy_interval_equivalent_busy_interval :
-        forall t1 t2, busy_interval_cl j t1 t2 <-> busy_interval_ab j t1 t2.
-      Proof.
-        move => t1 t2; split.
-        { move => [PREF QTt2]; split.
-          - by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
-          - by eapply instantiated_quiet_time_equivalent_quiet_time in QTt2.
-        }
-        { move => [PREF QTt2]; split.
-          - by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
-          - by eapply instantiated_quiet_time_equivalent_quiet_time.
-        }
-      Qed.
+    (** Similarly, we prove that the concept of busy interval
+        obtained by instantiating the abstract definition of busy
+        interval coincides with the conventional definition of busy
+        interval. *)
+    Lemma instantiated_busy_interval_equivalent_busy_interval :
+      forall t1 t2, busy_interval_cl j t1 t2 <-> busy_interval_ab j t1 t2.
+    Proof.
+      move => t1 t2; split.
+      { move => [PREF QTt2]; split.
+        - by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
+        - by eapply instantiated_quiet_time_equivalent_quiet_time in QTt2.
+      }
+      { move => [PREF QTt2]; split.
+        - by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
+        - by eapply instantiated_quiet_time_equivalent_quiet_time.
+      }
+    Qed.
 
-      (** For the sake of proof automation, we note the frequently needed
-          special case of an abstract busy window implying the existence of a
-          classic quiet time. *)
-      Fact abstract_busy_interval_classic_quiet_time :
-        forall t1 t2,
-          busy_interval_ab j t1 t2 -> quiet_time_cl j t1.
-      Proof.
-        by move=> ? ? /instantiated_busy_interval_equivalent_busy_interval [[_ [? _]] _].
-      Qed.
+    (** For the sake of proof automation, we note the frequently needed
+        special case of an abstract busy window implying the existence of a
+        classic quiet time. *)
+    Fact abstract_busy_interval_classic_quiet_time :
+      forall t1 t2,
+        busy_interval_ab j t1 t2 -> quiet_time_cl j t1.
+    Proof.
+      by move=> ? ? /instantiated_busy_interval_equivalent_busy_interval [[_ [? _]] _].
+    Qed.
 
-      (** Also for automation, we note a similar fact about classic busy-window prefixes. *)
-      Fact abstract_busy_interval_classic_busy_interval_prefix :
-        forall t1 t2,
-          busy_interval_ab j t1 t2 -> busy_interval_prefix_cl j t1 t2.
-      Proof. by move=> ? ? /instantiated_busy_interval_equivalent_busy_interval [+ _]. Qed.
+    (** Also for automation, we note a similar fact about classic busy-window prefixes. *)
+    Fact abstract_busy_interval_classic_busy_interval_prefix :
+      forall t1 t2,
+        busy_interval_ab j t1 t2 -> busy_interval_prefix_cl j t1 t2.
+    Proof. by move=> ? ? /instantiated_busy_interval_equivalent_busy_interval [+ _]. Qed.
 
-    End BusyIntervalEquivalence.
-
-  End Equivalences.
+  End BusyIntervalEquivalence.
 
   (** In this section we prove some properties about the interference
       and interfering workload as defined in this file. *)
