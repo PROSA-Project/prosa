@@ -94,8 +94,8 @@ Section ConcreteToAbstractFixpointReduction.
     forall (A : duration),
       is_in_search_space ts L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ total_request_bound_function ts (A + ε) <= SBF F.
+        SBF F >= total_request_bound_function ts (A + ε)
+        /\ A + R >= F.
 
   (** However, in order to connect the definition of [R] with aRSA, we
       must first restate the bound in the shape of the abstract

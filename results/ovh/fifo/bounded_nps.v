@@ -183,13 +183,13 @@ Section RTAforFIFOModelwithArrivalCurves.
   (** A value [R] is a response-time bound for task [tsk] if, for any given
       offset [A] in the search space (w.r.t. the busy-window bound [L]), the
       response-time bound "recurrence" (i.e., inequality) has a solution [F] not
-      exceeding [R]. *)
+      exceeding [A + R]. *)
   Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space ts L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ F >= overhead_bound F + total_request_bound_function ts (A + ε).
+        F >= overhead_bound F + total_request_bound_function ts (A + ε)
+        /\  A + R >= F.
 
   (** Finally, using the abstract restricted-supply analysis, we establish that
       any [R] that satisfies the stated equation is a sound response-time bound
@@ -238,9 +238,9 @@ Section RTAforFIFOModelwithArrivalCurves.
     - apply: soln_abstract_response_time_recurrence => //.
       + by apply overheads_sbf_monotone.
       + by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
-      + move => A SP; move: (SOL A) => [] => // => δ [INδ FIXδ].
-        exists δ; split; [done | apply bound_preserved_under_slowed].
-        by move: FIXδ; rewrite /sSBF /fifo_blackout_bound /overhead_bound; lia.
+      + move => A SP; move: (SOL A SP)=> [] => // => δ [INδ FIXδ].
+        exists δ; split => //; apply bound_preserved_under_slowed.
+        by move: INδ FIXδ; rewrite /sSBF /fifo_blackout_bound /overhead_bound; lia.
   Qed.
 
 End RTAforFIFOModelwithArrivalCurves.

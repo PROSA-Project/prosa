@@ -164,13 +164,13 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
 
   (** A value [R] is an RTA-recurrence solution if, for any given
       offset [A] in the search space, the response-time bound
-      recurrence has a solution [F] not exceeding [R]. *)
+      recurrence has a solution [F] not exceeding [A + R]. *)
   Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space ts L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ total_request_bound_function ts (A + ε) <= SBF F.
+        SBF F >= total_request_bound_function ts (A + ε)
+        /\ A + R >= F.
 
   (** Finally, using the abstract restricted-supply analysis, we
       establish that any [R] that satisfies the stated equation is a
@@ -191,7 +191,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - eapply busy_intervals_are_bounded_rs_jlfp with (blocking_bound := fun _ => 0)=> //.
       + exact: instantiated_i_and_w_are_coherent_with_schedule.
-      + by apply: FIFO_implies_no_service_inversion.
+      + exact: FIFO_implies_no_service_inversion.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
@@ -211,8 +211,8 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
       unshelve apply: bound_on_hep_workload; (try apply H_fixed_point).
       all: try apply H_L_positive.
       all: try done.
-      apply instantiated_busy_interval_equivalent_busy_interval => //.
-    - apply: soln_abstract_response_time_recurrence => //.
+      by apply instantiated_busy_interval_equivalent_busy_interval => //.
+    - exact: soln_abstract_response_time_recurrence.
   Qed.
 
 End RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
