@@ -164,17 +164,16 @@ Section RTAforFullyNonPreemptiveELFModelwithArrivalCurves.
 
       A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
-      a solution [F] not exceeding [R]. *)
+      a solution [F] not exceeding [A + R]. *)
   Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ blocking_bound ts tsk A
-           + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
-           + bound_on_athep_workload ts tsk A F
-           <= SBF F
-        /\ SBF F + (task_cost tsk - ε) <= SBF (A + R).
+        SBF F >= blocking_bound ts tsk A
+                + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
+                + bound_on_athep_workload ts tsk A F
+        /\ SBF (A + R) >= SBF F + (task_cost tsk - ε)
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
@@ -204,7 +203,7 @@ Section RTAforFullyNonPreemptiveELFModelwithArrivalCurves.
         by apply: nonpreemptive_segments_bounded_by_blocking => //.
     - move => A SP; move: (SOL A) => [].
       + by apply: search_space_sub => //.
-      + move => F [/andP [_ LE] [FIX1 FIX2]]; exists F; split => //.
+      + move => F [FIX1 [FIX2 LE]]; exists F; split => //.
         rewrite /task_intra_IBF /task_rtct /fully_nonpreemptive_rtc_threshold /constant.
         by split; [rewrite -(leqRW FIX1) | ]; lia.
   Qed.

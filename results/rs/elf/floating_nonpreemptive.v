@@ -174,16 +174,15 @@ Section RTAforFloatingELFModelwithArrivalCurves.
 
       A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
-      a solution [F] not exceeding [R]. *)
+      a solution [F] not exceeding [A + R]. *)
   Definition rta_recurrence_solution R :=
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
-        A <= F <= A + R
-        /\ blocking_bound ts tsk A
-           + task_request_bound_function tsk (A + ε)
-           + bound_on_athep_workload ts tsk A F
-           <= SBF F.
+        SBF F >= blocking_bound ts tsk A
+                + task_request_bound_function tsk (A + ε)
+                + bound_on_athep_workload ts tsk A F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract
       restricted-supply analysis, we establish that any such [R] is a
@@ -219,7 +218,7 @@ Section RTAforFloatingELFModelwithArrivalCurves.
       { by apply: search_space_sub => //; apply: search_space_switch_IBF. }
       move=> FF [EQ1 EQ2].
       exists FF; split; last split.
-      + lia.
+      + by lia.
       + by move: EQ2; rewrite /task_intra_IBF; lia.
       + by rewrite subnn addn0; apply H_SBF_monotone; lia.
   Qed.
