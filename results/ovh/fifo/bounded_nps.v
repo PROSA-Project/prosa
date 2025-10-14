@@ -144,28 +144,16 @@ Section RTAforFIFOModelwithArrivalCurves.
       schedule change, each potentially incurring dispatch, context-switch, and
       preemption-related overhead. Unlike JLFP and FP, FIFO does not require
       doubling the arrivals (i.e., [1 + 2n]), because all jobs are treated
-      uniformly and there are no preemptions caused by higher-priority jobs.
-
-      We denote this bound by [overhead_bound] for the task under analysis
-      [tsk]. *)
+      uniformly and there are no preemptions caused by higher-priority jobs. *)
   Let overhead_bound Δ :=
     (DB + CSB + CRPDB) * (1 + \sum_(tsk_o <- ts) max_arrivals tsk_o Δ).
-
-  (** *** Workload Abbreviations *)
-
-  (** For brevity in the following definitions, we introduce a number of local
-      abbreviations. *)
-
-  (** We let [rbf] denote the task request-bound function, which is defined as
-      [task_cost(T) × max_arrivals(T,Δ)] for a task [T]. *)
-  Let rbf := task_request_bound_function.
 
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
       length. To this end, let [L] be any positive solution of the busy-interval
-      "recurrence" (i.e., inequality) [overhead_bound L + total_RBF ts L <= L],
-      as defined below.
+      "recurrence" (i.e., inequality) [overhead_bound L +
+      total_request_bound_function ts L <= L], as defined below.
 
       As the lemma [busy_intervals_are_bounded_rs_fifo] shows, under [EDF]
       scheduling, this condition is sufficient to guarantee that the maximum
