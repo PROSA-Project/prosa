@@ -7,7 +7,7 @@ Require Export prosa.analysis.definitions.sbf.busy.
     the presence of overheads. *)
 Section OverheadResourceModelValidSBF.
 
-  (** Consider any type of tasks... *)
+  (** Consider any type of tasks,... *)
   Context {Task : TaskType}.
   Context {FP : FP_policy Task}.
   Context `{MaxArrivals Task}.
