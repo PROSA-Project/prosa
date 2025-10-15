@@ -145,22 +145,24 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       for the task request bound function of task [tsk]. *)
   Let task_rbf := task_request_bound_function tsk.
 
-  (** ** Length of Busy Interval *)
 
-  (** The next step is to establish a bound on the maximum busy-window
-      length, which aRTA requires to be given. *)
+  (** ** Maximum Length of a Busy Interval *)
 
-  (** To this end, let [L] be any positive constant such that ...  *)
-  Variable L : duration.
-  Hypothesis H_L_positive : 0 < L.
+  (** In order to apply aRSA, we require a bound on the maximum busy-window
+      length. To this end, let [L] be any positive solution of the busy-interval
+      "recurrence" (i.e., set of inequalities) [SBF L >=
+      total_request_bound_function ts L] and [SBF L >=
+      longest_busy_interval_with_pi ts tsk], as defined below.
 
-  (** ... [L] satisfies a fixed-point recurrence for the
-      busy-interval-length bound (i.e., [total_RBF ts L <= SBF L] ... *)
-  Hypothesis H_fixed_point : total_request_bound_function ts L <= SBF L.
+      As the lemma [busy_intervals_are_bounded_rs_jlfp] shows, under [EDF]
+      scheduling, this condition is sufficient to guarantee that the maximum
+      busy-window length is at most [L], i.e., the length of any busy interval
+      is bounded by [L]. *)
+  Definition busy_window_recurrence_solution (L : duration) :=
+    L > 0
+    /\ SBF L >= total_request_bound_function ts L
+    /\ SBF L >= longest_busy_interval_with_pi ts tsk.
 
-  (** ... and [SBF L] bounds [longest_busy_interval_with_pi ts tsk]. *)
-  Hypothesis H_L_bounds_bi_with_pi :
-    longest_busy_interval_with_pi ts tsk <= SBF L.
 
   (** ** Response-Time Bound *)
 
@@ -170,7 +172,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
       a solution [F] not exceeding [A + R]. *)
-  Definition rta_recurrence_solution R :=
+  Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
@@ -186,11 +188,13 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       fully non-preemptive EDF scheduling with arbitrary supply
       restrictions. *)
   Theorem uniprocessor_response_time_bound_fully_nonpreemptive_edf :
-    forall (R : duration),
-      rta_recurrence_solution R ->
-      task_response_time_bound arr_seq sched tsk R.
+    forall (L : duration),
+      busy_window_recurrence_solution L ->
+      forall (R : duration),
+        rta_recurrence_solution L R ->
+        task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> R SOL js ARRs TSKs.
+    move=> L [BW_POS [BW_FIX BW_PI]] R SOL js ARRs TSKs.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have READ : work_bearing_readiness arr_seq sched by done.
     have VPR : valid_preemption_model arr_seq sched by exact: valid_fully_nonpreemptive_model => //.

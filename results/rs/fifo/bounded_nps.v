@@ -145,19 +145,20 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
       available in any busy-interval prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
-  (** ** Length of Busy Interval *)
+  (** ** Maximum Length of a Busy Interval *)
 
-  (** The next step is to establish a bound on the maximum busy-window
-      length, which aRSA requires to be given. *)
+  (** In order to apply aRSA, we require a bound on the maximum busy-window
+      length. To this end, let [L] be any positive solution of the busy-interval
+      "recurrence" (i.e., inequality) [SBF L >= total_request_bound_function ts
+      L], as defined below.
 
-  (** To this end, let [L] be any positive fixed point of the
-      busy-interval recurrence. As the
-      [busy_intervals_are_bounded_rs_jlfp] lemma shows, under any
-      preemptive [JLFP] scheduling policy, this is sufficient to
-      guarantee that all busy intervals are bounded by [L]. *)
-  Variable L : duration.
-  Hypothesis H_L_positive : 0 < L.
-  Hypothesis H_fixed_point : total_request_bound_function ts L <= SBF L.
+      As the lemma [busy_intervals_are_bounded_rs_jlfp] shows, under [FIFO]
+      scheduling, this condition is sufficient to guarantee that the maximum
+      busy-window length is at most [L], i.e., the length of any busy interval
+      is bounded by [L]. *)
+  Definition busy_window_recurrence_solution (L : duration) :=
+    L > 0
+    /\ SBF L >= total_request_bound_function ts L.
 
   (** ** Response-Time Bound *)
 
@@ -167,7 +168,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
   (** A value [R] is an RTA-recurrence solution if, for any given
       offset [A] in the search space, the response-time bound
       recurrence has a solution [F] not exceeding [A + R]. *)
-  Definition rta_recurrence_solution R :=
+  Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space ts L A ->
       exists (F : duration),
@@ -179,11 +180,13 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
       sound response-time bound for the FIFO scheduling with arbitrary
       supply restrictions. *)
   Theorem uniprocessor_response_time_bound_fifo :
-    forall (R : duration),
-      rta_recurrence_solution R ->
-      task_response_time_bound arr_seq sched tsk R.
+    forall (L : duration),
+      busy_window_recurrence_solution L ->
+      forall (R : duration),
+        rta_recurrence_solution L R ->
+        task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> R SOL js ARRs TSKs.
+    move=> L [BW_POS BW_FIX] R SOL js ARRs TSKs.
     have [ZERO|POS] := posnP (job_cost js).
     { by rewrite /job_response_time_bound /completed_by ZERO. }
     have READ : work_bearing_readiness arr_seq sched by done.

@@ -153,19 +153,22 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       priority other than task [tsk]. *)
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
 
-  (** ** Length of Busy Interval *)
 
-  (** The next step is to establish a bound on the maximum busy-window
-      length, which aRSA requires to be given. *)
+  (** ** Maximum Length of a Busy Interval *)
 
-  (** To this end, let [L] be any positive fixed point of the
-      busy-interval recurrence. As the lemma
-      [busy_intervals_are_bounded_rs_fp] shows, under [FP] scheduling,
-      this is sufficient to guarantee that all busy intervals are
-      bounded by [L]. *)
-  Variable L : duration.
-  Hypothesis H_L_positive : 0 < L.
-  Hypothesis H_fixed_point : total_hep_rbf L <= SBF L.
+  (** In order to apply aRSA, we require a bound on the maximum busy-window
+      length. To this end, let [L] be any positive solution of the busy-interval
+      "recurrence" (i.e., inequality) [SBF L >= total_hep_rbf L], as defined
+      below.
+
+      As the lemma [busy_intervals_are_bounded_rs_fp] shows, under [FP]
+      scheduling, this condition is sufficient to guarantee that the maximum
+      busy-window length is at most [L], i.e., the length of any busy interval
+      is bounded by [L]. *)
+  Definition busy_window_recurrence_solution (L : duration) :=
+    L > 0
+    /\ SBF L >= total_hep_rbf L.
+
 
   (** ** Response-Time Bound *)
 
@@ -175,7 +178,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
       a solution [F] not exceeding [A + R]. *)
-  Definition rta_recurrence_solution R :=
+  Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
@@ -188,11 +191,13 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       fully-preemptive fixed-priority scheduling with arbitrary supply
       restrictions.  *)
   Theorem uniprocessor_response_time_bound_fully_preemptive_fp :
-    forall (R : duration),
-      rta_recurrence_solution R ->
-      task_response_time_bound arr_seq sched tsk R.
+    forall (L : duration),
+      busy_window_recurrence_solution L ->
+      forall (R : duration),
+        rta_recurrence_solution L R ->
+        task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> R SOL js ARRs TSKs.
+    move=> L [BW_POS BW_FIX] R SOL js ARRs TSKs.
     have BLOCK: forall tsk , blocking_bound ts tsk = 0.
     { by move=> tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
                  /fully_preemptive_task_model subnn big1_eq. }

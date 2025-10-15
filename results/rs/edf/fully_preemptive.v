@@ -139,19 +139,22 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   (** Let's denote the relative deadline of a task as [D]. *)
   Let D tsk := task_deadline tsk.
 
-  (** ** Length of Busy Interval *)
 
-  (** The next step is to establish a bound on the maximum busy-window
-      length, which aRSA requires to be given. *)
+  (** ** Maximum Length of a Busy Interval *)
 
-  (** To this end, let [L] be any positive fixed point of the
-      busy-interval recurrence. As the
-      [busy_intervals_are_bounded_rs_jlfp] lemma shows, under any
-      preemptive [JLFP] scheduling policy, this is sufficient to
-      guarantee that all busy intervals are bounded by [L]. *)
-  Variable L : duration.
-  Hypothesis H_L_positive : 0 < L.
-  Hypothesis H_fixed_point : total_request_bound_function ts L <= SBF L.
+  (** In order to apply aRSA, we require a bound on the maximum busy-window
+      length. To this end, let [L] be any positive solution of the busy-interval
+      "recurrence" (i.e., inequality) [SBF L >= total_request_bound_function ts
+      L], as defined below.
+
+      As the lemma [busy_intervals_are_bounded_rs_jlfp] shows, under [EDF]
+      scheduling, this condition is sufficient to guarantee that the maximum
+      busy-window length is at most [L], i.e., the length of any busy interval
+      is bounded by [L]. *)
+  Definition busy_window_recurrence_solution (L : duration) :=
+    L > 0
+    /\ SBF L >=  total_request_bound_function ts L.
+
 
   (** ** Response-Time Bound *)
 
@@ -161,7 +164,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
       a solution [F] not exceeding [A + R]. *)
-  Definition rta_recurrence_solution R :=
+  Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
@@ -175,11 +178,13 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       fully-preemptive EDF scheduling with arbitrary supply
       restrictions.  *)
   Theorem uniprocessor_response_time_bound_fully_preemptive_edf :
-    forall (R : duration),
-      rta_recurrence_solution R ->
-      task_response_time_bound arr_seq sched tsk R.
+    forall (L : duration),
+      busy_window_recurrence_solution L ->
+      forall (R : duration),
+        rta_recurrence_solution L R ->
+        task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> R SOL js ARRs TSKs.
+    move=> L [BW_POS BW_FIX] R SOL js ARRs TSKs.
     have [ZERO|POS] := posnP (job_cost js);
                        first by rewrite /job_response_time_bound /completed_by ZERO.
     have READ : work_bearing_readiness arr_seq sched by done.
@@ -194,7 +199,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       + exact: instantiated_i_and_w_are_coherent_with_schedule.
       + apply: service_inversion_is_bounded => // => ? ? ? ? ? ?.
         exact: nonpreemptive_segments_bounded_by_blocking.
-      + by rewrite BLOCK add0n; apply H_fixed_point.
+      + by rewrite BLOCK add0n.
     - apply: valid_pred_sbf_switch_predicate; last by exact: H_valid_SBF.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
