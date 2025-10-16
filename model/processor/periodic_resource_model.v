@@ -11,13 +11,13 @@ Section PeriodicResourceModel.
   Context {Job : JobType} {PState : ProcessorState Job}.
 
   (** The supply is distributed according to the periodic resource model with a
-      resource period [Π] and a resource allocation time [Θ] if, for any
-      interval <<[Π⋅k, Π⋅(k+1))>>, the processor provides at least [Θ] units of
+      resource period [Π] and a resource allocation time [γ] if, for any
+      interval <<[Π⋅k, Π⋅(k+1))>>, the processor provides at least [γ] units of
       supply. *)
-  Definition periodic_resource_model (Π Θ : duration) (sched : schedule PState) :=
+  Definition periodic_resource_model (Π γ : duration) (sched : schedule PState) :=
     Π > 0
-    /\ Π >= Θ
+    /\ Π >= γ
     /\ forall (k : nat),
-         supply_during sched (Π * k) (Π * (k + 1)) >= Θ.
+         supply_during sched (Π * k) (Π * (k + 1)) >= γ.
 
 End PeriodicResourceModel.

@@ -3,11 +3,28 @@ Require Export prosa.model.processor.supply.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.definitions.sbf.plain.
 Require Export prosa.model.processor.average_resource_model.
-Require Export prosa.analysis.definitions.average_resource_model.sbf.
 
-(** * SBF for Average Resource Model is Valid *)
+(** * SBF for Average Resource Model *)
 
-(** In this section, we define a valid SBF for the average resource model. *)
+(** In this section, we define an SBF for the average resource model. *)
+Section AverageResourceModelSBF.
+
+  (** Given, the average resource model with a resource period [Π], resource
+      allocation time [Θ], and supply delay [ν],... *)
+  Variable Π Θ ν : duration.
+
+  (** ... we define SBF for the average resource model as [((Δ - ν) * Θ) / Π].
+
+      Note that this SBF directly mirrors the bound given by the average
+      resource model itself. This is due to the fact that the guaranteed supply
+      depends only on the interval length [Δ], not on its alignment. Therefore,
+      the same bound can be used as an SBF. *)
+  Definition arm_sbf Δ := ((Δ - ν) * Θ) %/ Π.
+
+End AverageResourceModelSBF.
+
+(** In this section, we prove that [arm_sbf] is a valid SBF for the average
+    resource model. *)
 Section AverageResourceModelValidSBF.
 
   (** Consider any type of tasks ... *)
@@ -36,22 +53,19 @@ Section AverageResourceModelValidSBF.
   Variable Π Θ ν : duration.
   Hypothesis H_average_resource_model : average_resource_model Π Θ ν sched.
 
-  (** We recall the SBF defined for the average resource model. *)
-  #[local] Instance sbf : SupplyBoundFunction := arm_sbf Π Θ ν.
-
   (** We show that [sbf] is monotone. *)
-  Lemma arm_sbf_monotone : sbf_is_monotone sbf.
+  Lemma arm_sbf_monotone : sbf_is_monotone (arm_sbf Π Θ ν).
   Proof.
-    move => δ1 δ2 LE; rewrite /sbf /arm_sbf.
+    move => δ1 δ2 LE; rewrite /arm_sbf.
     interval_to_duration δ1 δ2 Δ.
     apply leq_div2r, leq_mul; lia.
   Qed.
 
   (** The introduced SBF is also a unit-supply SBF. *)
-  Lemma arm_sbf_unit : unit_supply_bound_function sbf.
+  Lemma arm_sbf_unit : unit_supply_bound_function (arm_sbf Π Θ ν).
   Proof.
     move: H_average_resource_model => [LEΠ _].
-    move => δ; rewrite /sbf /arm_sbf.
+    move => δ; rewrite /arm_sbf.
     have [Z|POS] := posnP Π; first by subst; lia.
     have [LEν|LEν] := leqP δ ν.
     { move: (LEν); rewrite -subn_eq0 => /eqP ->.
@@ -70,15 +84,14 @@ Section AverageResourceModelValidSBF.
 
   (** Finally, we show that the defined [sbf] is a valid SBF. *)
   Lemma arm_sbf_valid :
-    valid_supply_bound_function arr_seq sched sbf.
+    valid_supply_bound_function arr_seq sched (arm_sbf Π Θ ν).
   Proof.
     have FS: forall a, 0 - a = 0 by lia.
-    split; first by rewrite /sbf /arm_sbf !FS mul0n div0n.
+    split; first by rewrite /arm_sbf !FS mul0n div0n.
     move => j t1 t2 ARR _ t /andP [LE1 LE2].
     move: H_average_resource_model => [LE SUP].
     interval_to_duration t1 t Δ.
-    unfold sbf, arm_sbf.
-    rewrite -(leqRW (SUP _ _)) /sbf /arm_sbf.
+    rewrite /arm_sbf -(leqRW (SUP _ _)) /arm_sbf.
     rewrite addKn.
     lia.
   Qed.

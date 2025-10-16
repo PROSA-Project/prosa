@@ -3,13 +3,31 @@ Require Export prosa.model.processor.supply.
 Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.definitions.sbf.plain.
 Require Export prosa.model.processor.periodic_resource_model.
-Require Export prosa.analysis.definitions.periodic_resource_model.sbf.
 
-(** * SBF for Periodic Resource Model is Valid *)
+(** * SBF for Periodic Resource Model *)
 
-(** In this section, we prove that the SBF defined in paper "Periodic Resource
-    Model for Compositional Real-Time Guarantees" by Shin & Lee (RTSS 2003) is
-    valid. *)
+(** In this section, we restate the SBF defined in the paper "Periodic Resource
+    Model for Compositional Real-Time Guarantees" by Shin & Lee (RTSS 2003). *)
+Section PeriodicResourceModelSBF.
+
+  (** Given a periodic resource model with a resource period [Π] and resource
+      allocation time [γ], ... *)
+  Variable Π γ : duration.
+
+  (** ... we define the corresponding SBF as introduced in "Periodic Resource
+      Model for Compositional Real-Time Guarantees" by Shin & Lee (RTSS
+      2003). *)
+  Definition prm_sbf Δ :=
+    let blackout := Π - γ in
+    let n_full_periods := (Δ - blackout) %/ Π in
+    let supply_in_full_periods := n_full_periods * γ in
+    let duration_of_full_periods := n_full_periods * Π in
+    supply_in_full_periods + (Δ - 2 * blackout - duration_of_full_periods).
+
+End PeriodicResourceModelSBF.
+
+(** In this section, we prove that [prm_sbf] is a valid SBF for the periodic
+    resource model. *)
 Section PeriodicResourceModelValidSBF.
 
   (** Consider any type of tasks ... *)
@@ -35,24 +53,20 @@ Section PeriodicResourceModelValidSBF.
   Variable sched : schedule PState.
 
   (** Assume a periodic resource model with a resource period [Π] and resource
-      allocation time [Θ]. *)
-  Variable Π Θ : duration.
-  Hypothesis H_periodic_resource_model : periodic_resource_model Π Θ sched.
-
-  (** We recall the SBF defined in paper "Periodic Resource Model for
-      Compositional Real-Time Guarantees" by Shin & Lee (RTSS 2003). *)
-  #[local] Instance sbf : SupplyBoundFunction := prm_sbf Π Θ.
+      allocation time [γ]. *)
+  Variable Π γ : duration.
+  Hypothesis H_periodic_resource_model : periodic_resource_model Π γ sched.
 
   (** Next, we prove a few properties required by aRSA-based analyses, in
       particular that the SBF is valid. *)
 
   (** We show that [sbf] is monotone. *)
-  Lemma prm_sbf_monotone : sbf_is_monotone sbf.
+  Lemma prm_sbf_monotone : sbf_is_monotone (prm_sbf Π γ).
   Proof.
-    move => δ1 δ2 LE; rewrite /sbf /prm_sbf.
+    move => δ1 δ2 LE; rewrite /prm_sbf.
     interval_to_duration δ1 δ2 Δ.
     have [Z|POS] := posnP Π; first by subst; rewrite divn0 !mul0n !add0n !subn0 leq_addr.
-    set (A := Π - Θ); have ->: 2 * A = A + A by lia.
+    set (A := Π - γ); have ->: 2 * A = A + A by lia.
     rewrite !subnDAC.
     have [LEA|LEA] := leqP δ1 A.
     { move: LEA; rewrite -subn_eq0 => /eqP EQ.
@@ -80,7 +94,7 @@ Section PeriodicResourceModelValidSBF.
       { by apply leq_div2r; lia. }
       { by rewrite divnDl; [rewrite divnn POS divn_small | apply dvdnn]. }
     }
-    rewrite [k*Θ + _]addnC -!addnA leq_add2l.
+    rewrite [k*γ + _]addnC -!addnA leq_add2l.
     have ->: forall a b c, a + b - c - a = b - c by lia.
     rewrite !addnA -!mulnDl -!subnDA  -!mulnDl !addnA.
     have -> : (k + h) * Π + j + q - (A + (k + h + s) * Π)
@@ -91,28 +105,28 @@ Section PeriodicResourceModelValidSBF.
   Qed.
 
   (** The introduced SBF is also a unit-supply SBF. *)
-  Lemma prm_sbf_unit : unit_supply_bound_function sbf.
+  Lemma prm_sbf_unit : unit_supply_bound_function (prm_sbf Π γ).
   Proof.
     move: H_periodic_resource_model => [_ [LEΠ _]].
-    move => δ; rewrite /sbf /prm_sbf !subnDAC.
+    move => δ; rewrite /prm_sbf !subnDAC.
     have [Z|POS] := posnP Π; first by subst; lia.
     have [h [j [EQ LT2]]] : exists k q, δ = k * Π + q /\ q < Π.
     { by eexists; eexists; split; [ apply divn_eq | rewrite ltn_mod ]. }
     subst δ; rewrite -addn1 -[leqRHS]addn1 !subnBA // !subn0.
-    have ALT : j + 1 + Θ < Π \/ j + 1 + Θ = Π \/ Π < j + 1 + Θ < 2 * Π \/ j + 1 + Θ = 2 * Π by lia.
+    have ALT : j + 1 + γ < Π \/ j + 1 + γ = Π \/ Π < j + 1 + γ < 2 * Π \/ j + 1 + γ = 2 * Π by lia.
     have [Z|POSh] := posnP h.
     { subst; rewrite mul0n add0n; move: ALT => [NEQ|[NEQ|[NEQ|NEQ]]].
       - by rewrite !divn_small //; lia.
       - by rewrite !NEQ subnn div0n mul0n divn_small; lia.
-      - have ->: (j + Θ - Π) %/ Π = 0 by rewrite divn_small; lia.
-        have ->: (j + 1 + Θ - Π) %/ Π = 0 by rewrite divn_small; lia.
+      - have ->: (j + γ - Π) %/ Π = 0 by rewrite divn_small; lia.
+        have ->: (j + 1 + γ - Π) %/ Π = 0 by rewrite divn_small; lia.
         by lia.
-      - have ->: (j + Θ - Π) %/ Π = 0 by rewrite divn_small; lia.
+      - have ->: (j + γ - Π) %/ Π = 0 by rewrite divn_small; lia.
         rewrite NEQ; have ->: 2 * Π - Π = Π by lia.
         by rewrite divnK ?dvdnn // divnn POS; lia. }
-    { have -> : h * Π + j + 1 + Θ - Π = (h - 1) * Π + j + 1 + Θ.
+    { have -> : h * Π + j + 1 + γ - Π = (h - 1) * Π + j + 1 + γ.
       { by rewrite mulnBl -!addnA addBnAC; [ lia | apply leq_mul ]. }
-      have -> : h * Π + j + Θ - Π = (h - 1) * Π + j + Θ.
+      have -> : h * Π + j + γ - Π = (h - 1) * Π + j + γ.
       { by rewrite mulnBl -!addnA addBnAC; [ lia | apply leq_mul ]. }
       rewrite -!addnA divnDl; last by rewrite dvdn_mull //.
       rewrite mulnK // !mulnDl [in leqRHS]divnDl; last by rewrite dvdn_mull //.
@@ -120,10 +134,10 @@ Section PeriodicResourceModelValidSBF.
       move: ALT => [NEQ|[NEQ|[NEQ|NEQ]]].
       - by rewrite !divn_small //; lia.
       - by rewrite !NEQ divnn POS mul1n divn_small; lia.
-      - have ->: (j + Θ) %/ Π = 1 by apply divn_leq; lia.
-        have ->: (j + 1 + Θ) %/ Π = 1 by apply divn_leq; lia.
+      - have ->: (j + γ) %/ Π = 1 by apply divn_leq; lia.
+        have ->: (j + 1 + γ) %/ Π = 1 by apply divn_leq; lia.
         by rewrite mul1n; lia.
-      - have ->: (j + Θ) %/ Π = 1 by apply divn_leq; lia.
+      - have ->: (j + γ) %/ Π = 1 by apply divn_leq; lia.
         rewrite NEQ divnK; last by apply dvdn_mull, dvdnn.
         by rewrite mulnK //; lia.
     }
@@ -134,7 +148,7 @@ Section PeriodicResourceModelValidSBF.
   Section ValidSBF.
 
     (** We prove the validity claim via a case analysis on the interval for
-        which SBF is computed. First, we consider an interval that falls
+        which the SBF is computed. First, we consider an interval that falls
         completely within a period <<[kΠ, (k + 1)Π)>> for some [k]. *)
     Section Case1.
 
@@ -146,7 +160,7 @@ Section PeriodicResourceModelValidSBF.
       (** We show that, in this case, supply during the interval is
           lower-bounded by [(q2 - q1) - (Π - Θ)].*)
       Local Lemma prm_sbf_valid_aux_11 :
-        (q2 - q1) - (Π - Θ) <= supply_during sched (k * Π + q1) (k * Π + q2).
+        (q2 - q1) - (Π - γ) <= supply_during sched (k * Π + q1) (k * Π + q2).
       Proof.
         have [Z|LT] := leqP q2 q1; first by lia.
         set (P2 t := (k * Π + q1) <= t < (k * Π + q2)).
@@ -173,7 +187,7 @@ Section PeriodicResourceModelValidSBF.
           rewrite big_seq_cond [leqRHS]big_seq_cond.
           by apply leq_sum => t; rewrite /P2 mem_index_iota => /andP [NEQ _]; lia.
         }
-        have B : Θ <= \sum_(k * Π <= t < (k + 1) * Π) has_supply sched t.
+        have B : γ <= \sum_(k * Π <= t < (k + 1) * Π) has_supply sched t.
         { move: (H_periodic_resource_model) => [_ [_ LE]]; rewrite (leqRW (LE k)).
           rewrite mulnC [_ * ( _ + _ ) ]mulnC; apply leq_sum => t _.
           by move: (H_unit_supply_proc_model (sched t)); rewrite /has_supply /supply_at; case:(supply_in _); lia.
@@ -189,19 +203,19 @@ Section PeriodicResourceModelValidSBF.
           inequalities, we show that the supply during <<[t1, t2)>> is
           indeed lower-bounded by [sbf (t2-t1)].  *)
       Lemma prm_sbf_valid_aux_1 :
-        sbf (t2 - t1) <= supply_during sched t1 t2.
+        prm_sbf Π γ (t2 - t1) <= supply_during sched t1 t2.
       Proof.
         move: (H_periodic_resource_model) => [POS [LE VAL]].
-        rewrite -(leqRW prm_sbf_valid_aux_11) // /sbf /prm_sbf.
+        rewrite -(leqRW prm_sbf_valid_aux_11) // /prm_sbf.
         have ->: forall a b, a - 2 * b = a - b - b by lia.
         have ->: k * Π + q2 - (k * Π + q1) = q2 - q1 by lia.
         rewrite subnBA //.
-        set (q3 := q2 - q1); set (q4 := q3 + Θ); set (q5 := q4 - Π).
+        set (q3 := q2 - q1); set (q4 := q3 + γ); set (q5 := q4 - Π).
         rewrite {2}(divn_eq q5 Π).
-        have -> : q5 %/ Π * Π + q5 %% Π - (Π - Θ) - q5 %/ Π * Π = q5 %% Π - (Π - Θ).
+        have -> : q5 %/ Π * Π + q5 %% Π - (Π - γ) - q5 %/ Π * Π = q5 %% Π - (Π - γ).
         { have -> : forall a b c d, a + b - c - d = a + b - d - c by lia.
           by set (q6 := q5 %/ Π * Π); lia. }
-        apply leq_trans with (q5 %/ Π * Θ + (q5 %% Π)); first by lia.
+        apply leq_trans with (q5 %/ Π * γ + (q5 %% Π)); first by lia.
         apply leq_trans with (q5 %/ Π * Π + (q5 %% Π)).
         { by rewrite leq_add2r leq_mul2l; apply/orP; right. }
         by rewrite -divn_eq.
@@ -245,7 +259,7 @@ Section PeriodicResourceModelValidSBF.
       (** Supply in the interval <<[k1 Π + q1, (k1 + 1) Π + q1)>> is
           lower-bounded by [(Π - q1) - (Π - Θ)]. *)
       Lemma prm_sbf_valid_aux_22 :
-        (Π - q1) - (Π - Θ) <= supply_during sched (k1 * Π + q1) ((k1 + 1) * Π).
+        (Π - q1) - (Π - γ) <= supply_during sched (k1 * Π + q1) ((k1 + 1) * Π).
       Proof.
         set (P2 t := (k1 * Π + q1) <= t < ((k1 + 1) * Π)).
         have LEQ: \sum_(k1 * Π <= t < (k1 + 1) * Π) (has_supply sched t && P2 t) <= supply_during sched (k1 * Π + q1) ((k1 + 1) * Π).
@@ -265,7 +279,7 @@ Section PeriodicResourceModelValidSBF.
           rewrite big_seq_cond [leqRHS]big_seq_cond.
           by apply leq_sum => t; rewrite /P2 mem_index_iota => /andP [NEQ _]; lia.
         }
-        have B : Θ <= \sum_(k1 * Π <= t < (k1 + 1) * Π) has_supply sched t.
+        have B : γ <= \sum_(k1 * Π <= t < (k1 + 1) * Π) has_supply sched t.
         { move: (H_periodic_resource_model) => [_ [_ LE]]; rewrite (leqRW (LE k1)).
           rewrite mulnC [_ * ( _ + _ ) ]mulnC; apply leq_sum => t _.
           by move: (H_unit_supply_proc_model (sched t)); rewrite /has_supply /supply_at; case:(supply_in _); lia.
@@ -276,7 +290,7 @@ Section PeriodicResourceModelValidSBF.
       (** Supply in the interval <<[(k1 + 1) Π + q1, k2 Π)>> is
           lower-bounded by [(k2 - (k1 + 1)) * Θ]. *)
       Lemma prm_sbf_valid_aux_23 :
-        (k2 - (k1 + 1)) * Θ <= supply_during sched ((k1 + 1) * Π) (k2 * Π).
+        (k2 - (k1 + 1)) * γ <= supply_during sched ((k1 + 1) * Π) (k2 * Π).
       Proof.
         move: (H_periodic_resource_model) => [_ [_ LE]].
         move: (H_k1_lt_k2) => NEQ; rewrite -addn1 in NEQ.
@@ -293,7 +307,7 @@ Section PeriodicResourceModelValidSBF.
       (** Supply in the interval <<[k2 Π, k2 Π + q2)>> is
           lower-bounded by [q2 - (Π - Θ)]. *)
       Lemma prm_sbf_valid_aux_24 :
-        q2 - (Π - Θ) <= supply_during sched (k2 * Π) (k2 * Π + q2).
+        q2 - (Π - γ) <= supply_during sched (k2 * Π) (k2 * Π + q2).
       Proof.
         set (P2 t := (k2 * Π) <= t < (k2 * Π + q2)).
         have LEQ: \sum_(k2 * Π <= t < (k2 + 1) * Π) (has_supply sched t && P2 t) <= supply_during sched (k2 * Π) (k2 * Π + q2).
@@ -312,7 +326,7 @@ Section PeriodicResourceModelValidSBF.
           rewrite big_seq_cond [leqRHS]big_seq_cond.
           by apply leq_sum => t; rewrite /P2 mem_index_iota => /andP [NEQ _]; lia.
         }
-        have B : Θ <= \sum_(k2 * Π <= t < (k2 + 1) * Π) has_supply sched t.
+        have B : γ <= \sum_(k2 * Π <= t < (k2 + 1) * Π) has_supply sched t.
         { move: (H_periodic_resource_model) => [_ [_ LE]]; rewrite (leqRW (LE k2)).
           rewrite mulnC [_ * ( _ + _ ) ]mulnC; apply leq_sum => t _.
           by move: (H_unit_supply_proc_model (sched t)); rewrite /has_supply /supply_at; case:(supply_in _); lia.
@@ -328,43 +342,43 @@ Section PeriodicResourceModelValidSBF.
           inequalities, we show that the supply during <<[t1, t2)>>
           is indeed lower-bounded by [sbf (t2-t1)].  *)
       Lemma prm_sbf_valid_aux_2 :
-        sbf (t2 - t1) <= supply_during sched t1 t2.
+        prm_sbf Π γ (t2 - t1) <= supply_during sched t1 t2.
       Proof.
-        rewrite /sbf /prm_sbf.
+        rewrite /prm_sbf.
         move: (H_periodic_resource_model) => [POS [LE VAL]].
         rewrite prm_sbf_valid_aux_21 //
                 -(leqRW prm_sbf_valid_aux_22) //
                 -(leqRW prm_sbf_valid_aux_23) //
-                -(leqRW prm_sbf_valid_aux_24) /sbf //.
-        have ->: Π - q1 - (Π - Θ) = Θ - q1 by lia.
+                -(leqRW prm_sbf_valid_aux_24) //.
+        have ->: Π - q1 - (Π - γ) = γ - q1 by lia.
         have [NEQk1|NEQk2] : k1 + 1 = k2 \/ k1 + 1 < k2 by lia.
         { subst k2; rewrite subnn mul0n addn0; clear H_k1_lt_k2.
           have ->: forall a b, a - 2 * b = a - b - b by lia.
           have ->: (k1 + 1) * Π + q2 - (k1 * Π + q1) = Π + q2 - q1 by lia.
           have ->: (Π + q2 - q1) = (Π - q1 + q2) by lia.
-          have ->: Π - q1 + q2 - (Π - Θ) = q2 + Θ - q1 by lia.
-          have [NEQ | NEQ] : (q2 + Θ - q1 < Π) \/ (Π <= q2 + Θ - q1 < 2 * Π).
-          { by enough (A : q2 + Θ - q1 < 2 * Π); lia. }
+          have ->: Π - q1 + q2 - (Π - γ) = q2 + γ - q1 by lia.
+          have [NEQ | NEQ] : (q2 + γ - q1 < Π) \/ (Π <= q2 + γ - q1 < 2 * Π).
+          { by enough (A : q2 + γ - q1 < 2 * Π); lia. }
           { by rewrite divn_small // !mul0n add0n subn0; lia. }
-          { by have ->: (q2 + Θ - q1) %/ Π = 1; [apply divn_leq | ]; lia. }
+          { by have ->: (q2 + γ - q1) %/ Π = 1; [apply divn_leq | ]; lia. }
         }
         { have ->: forall a b, a - 2 * b = a - b - b by lia.
           have ->: k2 * Π + q2 - (k1 * Π + q1) = (k2 - k1) * Π + q2 - q1 by lia.
-          have ->: (k2 - k1) * Π + q2 - q1 - (Π - Θ) = (k2 - (k1 + 1)) * Π + q2 - q1 + Θ.
+          have ->: (k2 - k1) * Π + q2 - q1 - (Π - γ) = (k2 - (k1 + 1)) * Π + q2 - q1 + γ.
           { rewrite subnBA // -addnBAC; first lia.
             apply leq_trans with (2 * Π + q2 - q1); first lia.
             by rewrite leq_sub2r // leq_add2r leq_mul //; lia.
           }
           have [k3 ->] : exists k3, (k2 - (k1 + 1)) = k3 + 1 by (exists (k2 - (k1 + 1) - 1); lia).
           rewrite !mulnDl mul1n.
-          have -> : k3 * Π + Π + q2 - q1 + Θ = k3 * Π + (Π + q2 - q1 + Θ) by lia.
+          have -> : k3 * Π + Π + q2 - q1 + γ = k3 * Π + (Π + q2 - q1 + γ) by lia.
           rewrite divnDl ?mulnK // ?mulnDl.
           have [NEQ | [NEQ | NEQ]] :
-            (Π + q2 - q1 + Θ < Π) \/ (Π <= Π + q2 - q1 + Θ < 2 * Π) \/ (2 * Π <= Π + q2 - q1 + Θ < 3 * Π).
-          { by enough (F : 0 <= Π + q2 - q1 + Θ < 3 * Π); lia. }
+            (Π + q2 - q1 + γ < Π) \/ (Π <= Π + q2 - q1 + γ < 2 * Π) \/ (2 * Π <= Π + q2 - q1 + γ < 3 * Π).
+          { by enough (F : 0 <= Π + q2 - q1 + γ < 3 * Π); lia. }
           { by rewrite divn_small //; lia. }
-          { by have ->: (Π + q2 - q1 + Θ) %/ Π = 1; [apply divn_leq | ]; lia. }
-          { by have ->: (Π + q2 - q1 + Θ) %/ Π = 2; [apply divn_leq | ]; lia. }
+          { by have ->: (Π + q2 - q1 + γ) %/ Π = 1; [apply divn_leq | ]; lia. }
+          { by have ->: (Π + q2 - q1 + γ) %/ Π = 2; [apply divn_leq | ]; lia. }
         }
       Qed.
 
@@ -373,10 +387,10 @@ Section PeriodicResourceModelValidSBF.
     (** By using the two auxiliary lemmas above, we prove that [sbf]
         is a valid SBF. *)
     Lemma prm_sbf_valid :
-      valid_supply_bound_function arr_seq sched sbf.
+      valid_supply_bound_function arr_seq sched (prm_sbf Π γ).
     Proof.
       have FS: forall a, 0 - a = 0 by lia.
-      split; first by rewrite /sbf /prm_sbf !FS addn0 div0n mul0n.
+      split; first by rewrite /prm_sbf !FS addn0 div0n mul0n.
       move => j t1 t2 ARR _ t /andP [LE1 LE2].
       move: H_periodic_resource_model => [POSΠ [LE SUP]].
       have [k1 [q1 [EQ1 LT1]]] : exists k1 q1, t1 = k1 * Π + q1 /\ q1 < Π.
