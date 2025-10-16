@@ -454,6 +454,31 @@ Proof.
   by rewrite big_seq1.
 Qed.
 
+(** We prove that, given an interval <<[t1, t2)>> and two predicates
+    [P1, P2], if [P1] is satisfied at least [n1] times and [P2] is
+    satisfied at least [n2] times, then their intersection [P1 ∧ P2]
+    is satisfied at least [(n1 + n2) - (t2 - t1)] times. *)
+Lemma pigeonhole_on_interval :
+  forall (P1 P2 : pred nat) (t1 t2 : nat) (n1 n2 : nat),
+    n1 <= \sum_(t1 <= t < t2) P1 t ->
+    n2 <= \sum_(t1 <= t < t2) P2 t ->
+    (n1 + n2) - (t2 - t1) <= \sum_(t1 <= t < t2) (P1 t && P2 t).
+Proof.
+  move=> P1 P2 t1 t2.
+  have [Z|LE] := leqP t1 t2; last by move=> n1 n2; rewrite !big_geq; lia.
+  interval_to_duration t1 t2 Δ.
+  have -> : t1 + Δ - t1 = Δ by lia.
+  induction Δ as [ | Δ IHΔ]; first by move=> n1 n2; rewrite !big_geq; lia.
+  move=> n1 n2 LE1 LE2.
+  rewrite addnS big_nat_recr //=; last by apply leq_addr.
+  specialize (IHΔ (n1 - P1 (t1 + Δ)) (n2 - P2 (t1 + Δ))).
+  feed_n 2 IHΔ.
+  { rewrite addnS big_nat_recr //= in LE1; last by apply leq_addr.
+    by lia. }
+  { rewrite addnS big_nat_recr //= in LE2; last by apply leq_addr.
+    by lia. }
+  by lia.
+Qed.
 
 (** If a function [p] (bounded by 1) sums to at least two over a list
     of unique elements, then there must be two distinct elements in
