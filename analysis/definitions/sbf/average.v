@@ -1,8 +1,36 @@
-Require Export prosa.model.priority.classes.
 Require Export prosa.model.processor.supply.
-Require Export prosa.model.processor.platform_properties.
-Require Export prosa.analysis.definitions.sbf.plain.
-Require Export prosa.model.processor.average_resource_model.
+
+(** * Average Resource Model *)
+
+(** In this file, we define the average resource model and the corresponding
+    SBF, inspired by the periodic resource model introduced in the paper
+    "Periodic Resource Model for Compositional Real-Time Guarantees" by Shin &
+    Lee (RTSS 2003). *)
+
+Section AverageResourceModel.
+
+  (** Consider any kind of jobs and any kind of processor state. *)
+  Context {Job : JobType} {PState : ProcessorState Job}.
+
+  (** The supply is distributed according to the average resource model with a
+      resource period [Π], a resource allocation time [Θ], and supply delay [ν]
+      if, for any interval <<[t1, t2)>>, the processor provides at least
+      [ (t2 - t1 - ν) * Θ / Π ] units of supply.
+
+      This model can be thought of as follows. On average, the processor
+      produces [Θ] units of output per [Π] units of time. However, the
+      distribution of supply is not ideal and is subject to fluctuations defined
+      by [ν].
+
+      Furthermore, we require [Π >= Θ] to focus on unit-supply processors. *)
+  Definition average_resource_model (Π Θ ν : duration) (sched : schedule PState) :=
+    Π >= Θ
+    /\ forall (t1 t2 : duration),
+         let Δ := t2 - t1 in
+         supply_during sched t1 t2 >= ((Δ - ν) * Θ) %/ Π.
+
+End AverageResourceModel.
+
 
 (** * SBF for Average Resource Model *)
 
@@ -22,78 +50,3 @@ Section AverageResourceModelSBF.
   Definition arm_sbf Δ := ((Δ - ν) * Θ) %/ Π.
 
 End AverageResourceModelSBF.
-
-(** In this section, we prove that [arm_sbf] is a valid SBF for the average
-    resource model. *)
-Section AverageResourceModelValidSBF.
-
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-
-  (** ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
-
-  (** Consider any kind of processor state. *)
-  Context {PState : ProcessorState Job}.
-
-  (** Consider a JLFP policy, ... *)
-  Context `{JLFP_policy Job}.
-
-  (** ... any arrival sequence, ... *)
-  Variable arr_seq : arrival_sequence Job.
-
-  (** ... and any schedule. *)
-  Variable sched : schedule PState.
-
-  (** Assume the average resource model with a resource period [Π],
-      resource allocation time [Θ], and supply delay [ν]. *)
-  Variable Π Θ ν : duration.
-  Hypothesis H_average_resource_model : average_resource_model Π Θ ν sched.
-
-  (** We show that [sbf] is monotone. *)
-  Lemma arm_sbf_monotone : sbf_is_monotone (arm_sbf Π Θ ν).
-  Proof.
-    move => δ1 δ2 LE; rewrite /arm_sbf.
-    interval_to_duration δ1 δ2 Δ.
-    apply leq_div2r, leq_mul; lia.
-  Qed.
-
-  (** The introduced SBF is also a unit-supply SBF. *)
-  Lemma arm_sbf_unit : unit_supply_bound_function (arm_sbf Π Θ ν).
-  Proof.
-    move: H_average_resource_model => [LEΠ _].
-    move => δ; rewrite /arm_sbf.
-    have [Z|POS] := posnP Π; first by subst; lia.
-    have [LEν|LEν] := leqP δ ν.
-    { move: (LEν); rewrite -subn_eq0 => /eqP ->.
-      have [EQ|EQ]: (δ.+1 - ν = 0) \/ (δ.+1 - ν = 1) by lia.
-      { by rewrite EQ. }
-      { rewrite EQ //=; clear EQ.
-        rewrite mul1n mul0n. rewrite div0n.
-        rewrite -(@leq_pmul2r Π) // mul1n.
-        by apply: leq_trans; first by apply leq_divM.
-      }
-    }
-    { rewrite -addn1 -addnBAC ?addn1; last by lia.
-      by rewrite -addn1 mulnDl mul1n -addn1 -divnDMl //; apply leq_div2r; lia.
-    }
-  Qed.
-
-  (** Finally, we show that the defined [sbf] is a valid SBF. *)
-  Lemma arm_sbf_valid :
-    valid_supply_bound_function arr_seq sched (arm_sbf Π Θ ν).
-  Proof.
-    have FS: forall a, 0 - a = 0 by lia.
-    split; first by rewrite /arm_sbf !FS mul0n div0n.
-    move => j t1 t2 ARR _ t /andP [LE1 LE2].
-    move: H_average_resource_model => [LE SUP].
-    interval_to_duration t1 t Δ.
-    rewrite /arm_sbf -(leqRW (SUP _ _)) /arm_sbf.
-    rewrite addKn.
-    lia.
-  Qed.
-
-End AverageResourceModelValidSBF.
