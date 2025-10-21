@@ -1,7 +1,5 @@
 Require Import prosa.analysis.facts.readiness.basic.
-Require Export prosa.model.job.properties.
 Require Export prosa.model.composite.valid_task_arrival_sequence.
-Require Export prosa.analysis.facts.readiness.sequential.
 Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.abstract.restricted_supply.task_intra_interference_bound.
