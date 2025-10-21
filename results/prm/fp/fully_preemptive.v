@@ -112,9 +112,15 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** *** Periodic Resource Model *)
 
-  (** Assume that the supply in this system follows the Periodic resource model
-      defined in the paper "Periodic Resource Model for Compositional Real-Time
-      Guarantees" by Shin & Lee (RTSS 2003). *)
+  (** Assume that the processor supply follows the *periodic resource model* as
+      defined in "Periodic Resource Model for Compositional Real-Time
+      Guarantees" by Shin & Lee (RTSS 2003). Under this model, the supply is
+      distributed periodically with a resource period [Π] and a resource
+      allocation time [γ]: in every interval <<[Π⋅k, Π⋅(k+1))>>, the processor
+      provides at least [γ] units of supply. Furthermore, let [prm_sbf Π γ]
+      denote the corresponding SBF defined in the paper, which, as proven in the
+      same paper and verified in [prosa.analysis.facts.model.sbf.periodic], is a
+      valid SBF. *)
   Variable Π γ : duration.
   Hypothesis H_periodic_resource_model : periodic_resource_model Π γ sched.
 
