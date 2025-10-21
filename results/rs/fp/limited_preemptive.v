@@ -4,6 +4,7 @@ Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.abstract.restricted_supply.task_intra_interference_bound.
 Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.fp.
 Require Export prosa.analysis.abstract.restricted_supply.search_space.fp.
+Require Export prosa.analysis.facts.model.sbf.periodic.
 
 (** * RTA for FP Scheduling with Fixed Preemption Points on Restricted-Supply Uniprocessors *)
 
