@@ -1,5 +1,4 @@
 Require Export prosa.analysis.facts.readiness.sequential.
-Require Export prosa.analysis.facts.model.restricted_supply.schedule.
 Require Export prosa.analysis.abstract.restricted_supply.task_intra_interference_bound.
 Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.fp.
 Require Export prosa.analysis.abstract.restricted_supply.search_space.fp.
@@ -25,18 +24,13 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       end, we next introduce and define the following notions using
       Prosa's standard definitions and behavioral semantics:
 
-      - processor model,
       - tasks, jobs, and their parameters,
+      - processor model,
       - the sequence of job arrivals,
       - worst-case execution time (WCET) and the absence of self-suspensions,
       - the task under analysis,
       - an arbitrary schedule of the task set, and finally,
       - a supply-bound function. *)
-
-  (** *** Processor Model *)
-
-  (** Consider a restricted-supply uniprocessor model. *)
-  #[local] Existing Instance rs_processor_state.
 
   (** *** Tasks and Jobs  *)
 
@@ -58,6 +52,15 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   #[local] Existing Instance fully_nonpreemptive_job_model.
   #[local] Existing Instance fully_nonpreemptive_task_model.
   #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
+
+  (** *** Processor Model *)
+
+  (** Consider any kind of fully-supply-consuming, unit-supply
+      processor state model. *)
+  Context `{PState : ProcessorState Job}.
+  Hypothesis H_uniprocessor_proc_model : uniprocessor_model PState.
+  Hypothesis H_unit_supply_proc_model : unit_supply_proc_model PState.
+  Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
 
   (** *** The Job Arrival Sequence *)
 
@@ -102,9 +105,9 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Consider any non-preemptive, work-conserving, valid
-      restricted-supply uniprocessor schedule of the given arrival
+      uniprocessor schedule of the given arrival
       sequence [arr_seq] (and hence the given task set [ts]). *)
-  Variable sched : schedule (rs_processor_state Job).
+  Variable sched : schedule PState.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
