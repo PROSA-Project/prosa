@@ -155,7 +155,7 @@ Section RTAforFIFOModelwithArrivalCurves.
       "recurrence" (i.e., inequality) [overhead_bound L +
       total_request_bound_function ts L <= L], as defined below.
 
-      As the lemma [busy_intervals_are_bounded_rs_fifo] shows, under [EDF]
+      As the lemma [busy_intervals_are_bounded_rs_jlfp] shows, under [FIFO]
       scheduling, this condition is sufficient to guarantee that the maximum
       busy-window length is at most [L], i.e., the length of any busy interval
       is bounded by [L]. *)
