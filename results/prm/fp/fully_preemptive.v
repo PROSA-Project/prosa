@@ -150,9 +150,9 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     forall (A : duration),
       is_in_search_space tsk L A ->
       exists (F : duration),
-        A + R >= F
-        /\ prm_sbf Π γ F >= task_request_bound_function tsk (A + ε)
-                          + total_ohep_request_bound_function_FP ts tsk F.
+        prm_sbf Π γ F >= task_request_bound_function tsk (A + ε)
+                        + total_ohep_request_bound_function_FP ts tsk F
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract restricted-supply
       analysis, we establish that, given a bound on the maximum busy-window

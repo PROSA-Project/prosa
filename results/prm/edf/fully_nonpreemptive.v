@@ -146,11 +146,11 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
-        A + R >= F
-        /\ prm_sbf Π γ F >= blocking_bound ts tsk A
-                          + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
-                          + bound_on_athep_workload ts tsk A F
-        /\ prm_sbf Π γ (A + R) >= prm_sbf Π γ F + (task_cost tsk - ε).
+        prm_sbf Π γ F >= blocking_bound ts tsk A
+                        + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
+                        + bound_on_athep_workload ts tsk A F
+        /\ prm_sbf Π γ (A + R) >= prm_sbf Π γ F + (task_cost tsk - ε)
+        /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract restricted-supply
       analysis, we establish that, given a bound on the maximum busy-window
