@@ -9,7 +9,7 @@ Require Export prosa.analysis.facts.blocking_bound.edf.
 Require Export prosa.analysis.facts.workload.edf_athep_bound.
 Require Export prosa.analysis.facts.model.sbf.periodic.
 
-(** * RTA for EDF Scheduling with Fixed Preemption Points on Uniprocessors under Periodic Resource Model *)
+(** * RTA for EDF Scheduling with Fixed Preemption Points on Uniprocessors under the Periodic Resource Model *)
 
 (** In the following, we derive a response-time analysis for EDF schedulers,
     assuming a workload of sporadic real-time tasks with fixed preemption

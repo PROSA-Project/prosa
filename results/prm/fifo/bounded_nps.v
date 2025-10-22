@@ -9,7 +9,7 @@ Require Export prosa.analysis.facts.priority.fifo.
 Require Export prosa.analysis.facts.priority.fifo_ahep_bound.
 Require Export prosa.analysis.facts.model.sbf.periodic.
 
-(** * RTA for FIFO Scheduling on Uniprocessors under Periodic Resource Model *)
+(** * RTA for FIFO Scheduling on Uniprocessors under the Periodic Resource Model *)
 
 (** In the following, we derive a response-time analysis for FIFO schedulers,
     assuming a workload of sporadic real-time tasks, characterized by arbitrary

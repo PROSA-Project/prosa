@@ -7,7 +7,7 @@ Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.fp.
 Require Export prosa.analysis.abstract.restricted_supply.search_space.fp.
 Require Export prosa.analysis.facts.model.sbf.periodic.
 
-(** * RTA for Fully Non-Preemptive FP Scheduling on Uniprocessors under Periodic Resource Model *)
+(** * RTA for Fully Non-Preemptive FP Scheduling on Uniprocessors under the Periodic Resource Model *)
 
 (** In the following, we derive a response-time analysis for non-preemptive FP
     scheduling, assuming a workload of sporadic real-time tasks, characterized
