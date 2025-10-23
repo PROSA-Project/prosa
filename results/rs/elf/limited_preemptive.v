@@ -152,21 +152,25 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
       any busy-interval prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
-  (** ** Length of Busy Interval *)
 
-  (** The next step is to establish a bound on the maximum busy-window
-      length, which aRSA requires to be given. *)
+  (** ** Maximum Length of a Busy Interval *)
 
-  (** To this end, let [L] be any positive fixed point of the
-      busy-interval recurrence. As the
-      [busy_intervals_are_bounded_rs_elf] lemma shows, under
-      [ELF] scheduling policy, this is sufficient to
-      guarantee that all busy intervals are bounded by [L]. *)
-  Variable L : duration.
-  Hypothesis H_L_positive : 0 < L.
-  Hypothesis H_fixed_point :
-    forall (A : duration),
-      blocking_bound ts tsk A + total_hep_request_bound_function_FP ts tsk L <= SBF L.
+  (** In order to apply aRSA, we require a bound on the maximum busy-window
+      length. To this end, let [L] be any positive solution of the busy-interval
+      "recurrence" (i.e., inequality) [SBF L >= blocking_bound ts tsk A +
+      total_hep_request_bound_function_FP ts tsk L] for any relative arrival
+      offset [A], as defined below.
+
+      As the lemma [busy_intervals_are_bounded_rs_elf] shows, under [ELF]
+      scheduling, this condition is sufficient to guarantee that the maximum
+      busy-window length is at most [L], i.e., the length of any busy interval
+      is bounded by [L]. *)
+  Definition busy_window_recurrence_solution (L : duration) :=
+    L > 0
+    /\ forall (A : duration),
+        SBF L >= blocking_bound ts tsk A
+                + total_hep_request_bound_function_FP ts tsk L.
+
 
   (** ** Response-Time Bound *)
 
@@ -176,7 +180,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
       A value [R] is a response-time bound if, for any given offset
       [A] in the search space, the response-time bound recurrence has
       a solution [F] not exceeding [A + R]. *)
-  Definition rta_recurrence_solution R :=
+  Definition rta_recurrence_solution L R :=
     forall (A : duration),
       is_in_search_space ts tsk L A ->
       exists (F : duration),
@@ -192,11 +196,13 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
       scheduling with limited preemptions and arbitrary supply
       restrictions. *)
   Theorem uniprocessor_response_time_bound_limited_elf :
-    forall (R : duration),
-      rta_recurrence_solution R ->
-      task_response_time_bound arr_seq sched tsk R.
+    forall (L : duration),
+      busy_window_recurrence_solution L ->
+      forall (R : duration),
+        rta_recurrence_solution L R ->
+        task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> R SOL js ARRs TSKs.
+    move=> L [BW_POS BW_FIX] R SOL js ARRs TSKs.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have VAL1 : valid_preemption_model arr_seq sched.
     { apply valid_fixed_preemption_points_model_lemma => //.
