@@ -26,8 +26,8 @@ Section AverageResourceModel.
   Definition average_resource_model (Π Θ ν : duration) (sched : schedule PState) :=
     Π >= Θ
     /\ forall (t1 t2 : duration),
-         let Δ := t2 - t1 in
-         supply_during sched t1 t2 >= ((Δ - ν) * Θ) %/ Π.
+        let Δ := t2 - t1 in
+        supply_during sched t1 t2 >= ((Δ - ν) * Θ) %/ Π.
 
 End AverageResourceModel.
 

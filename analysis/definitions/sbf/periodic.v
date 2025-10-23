@@ -18,7 +18,7 @@ Section PeriodicResourceModel.
     Π > 0
     /\ Π >= γ
     /\ forall (k : nat),
-         supply_during sched (Π * k) (Π * (k + 1)) >= γ.
+        supply_during sched (Π * k) (Π * (k + 1)) >= γ.
 
 End PeriodicResourceModel.
 

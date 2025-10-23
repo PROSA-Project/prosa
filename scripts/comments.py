@@ -129,6 +129,12 @@ class Proofs:
         return pos in self.ranges
 
 
+SYNTAX_REPLACEMENTS_RE = re.compile(
+    r"(/\\|\\/|<=|>=)",
+    re.MULTILINE | re.DOTALL,
+)
+
+
 class LineNumbers:
     def __init__(self, src):
         self.src = src
@@ -167,6 +173,12 @@ class LineNumbers:
 
     def offset_within_line(self, pos: int) -> int:
         return pos - self.line_start_for_offset(pos)
+
+    def visual_offset_within_line(self, pos: int) -> int:
+        "offset taking into account fancy unicode replacements"
+        start = self.line_start_for_offset(pos)
+        compactions = len(SYNTAX_REPLACEMENTS_RE.findall(self.src, start, pos))
+        return pos - start - compactions
 
     def __getitem__(self, pos: int) -> int:
         return self.line_number_for_offset(pos)

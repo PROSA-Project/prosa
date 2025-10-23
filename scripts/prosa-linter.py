@@ -204,8 +204,10 @@ def lint_file(opts, fpath):
         assert expected_indent >= 0
 
     for m in matches_of(QUANTIFIER_FOR_INDENTATION_CHECK):
-        quantifier_indentation = lineno.offset_within_line(m.span("quantifier")[0])
-        expression_indentation = lineno.offset_within_line(m.span("nline")[0])
+        quantifier_indentation = lineno.visual_offset_within_line(
+            m.span("quantifier")[0]
+        )
+        expression_indentation = lineno.visual_offset_within_line(m.span("nline")[0])
         if quantifier_indentation + INDENT_SPACES != expression_indentation:
             issues.append(
                 (
