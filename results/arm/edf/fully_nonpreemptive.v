@@ -3,21 +3,25 @@ Require Export prosa.model.composite.valid_task_arrival_sequence.
 Require Export prosa.analysis.facts.preemption.task.nonpreemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.nonpreemptive.
 Require Export prosa.analysis.abstract.restricted_supply.task_intra_interference_bound.
-Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.fp.
-Require Export prosa.analysis.abstract.restricted_supply.search_space.fp.
-Require Export prosa.analysis.facts.model.sbf.periodic.
+Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.edf.
+Require Export prosa.analysis.abstract.restricted_supply.search_space.edf.
+Require Export prosa.analysis.facts.priority.edf.
+Require Export prosa.analysis.facts.blocking_bound.edf.
+Require Export prosa.analysis.facts.workload.edf_athep_bound.
+Require Export prosa.analysis.facts.model.sbf.average.
 
-(** * RTA for Fully Non-Preemptive FP Scheduling on Uniprocessors under the Periodic Resource Model *)
+(** * RTA for Fully Non-Preemptive EDF Scheduling on Uniprocessors under the Average Resource Model *)
 
-(** In the following, we derive a response-time analysis for non-preemptive FP
-    scheduling, assuming a workload of sporadic real-time tasks, characterized
-    by arbitrary arrival curves, executing upon a uniprocessor under the
-    periodic resource model (see "Periodic Resource Model for Compositional
-    Real-Time Guarantees" by Shin & Lee, RTSS 2003). To this end, we instantiate
-    the sequential variant of _abstract Restricted-Supply Analysis_ (aRSA) as
-    provided in the [prosa.analysis.abstract.restricted_supply] module. *)
+(** In the following, we derive a response-time analysis for EDF schedulers,
+    assuming a workload of sporadic fully non-preemptive real-time tasks,
+    characterized by arbitrary arrival curves, executing upon a uniprocessor
+    under the average resource model (inspired by the paper "Periodic Resource Model for
+    Compositional Real-Time Guarantees" by Shin & Lee, RTSS 2003). To this end,
+    we instantiate the sequential variant of _abstract Restricted-Supply
+    Analysis_ (aRSA) as provided in the
+    [prosa.analysis.abstract.restricted_supply] module. *)
 
-Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
+Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
 
   (** ** Defining the System Model *)
 
@@ -36,9 +40,9 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
 
   (** *** Tasks and Jobs  *)
 
-  (** Consider tasks characterized by a WCET [task_cost] and an arrival curve
-      [max_arrivals], ... *)
-  Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task}.
+  (** Consider tasks characterized by a WCET [task_cost], relative deadline
+      [task_deadline], and an arrival curve [max_arrivals], ... *)
+  Context {Task : TaskType} `{TaskCost Task} `{TaskDeadline Task} `{MaxArrivals Task}.
 
   (** ... and their associated jobs, where each job has a corresponding task
       [job_task], an execution time [job_cost], and an arrival time
@@ -50,15 +54,6 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   #[local] Existing Instance fully_nonpreemptive_task_model.
   #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
 
-  (** *** The Task Set and the Task Under Analysis *)
-
-  (** Consider an arbitrary task set [ts], and ... *)
-  Variable ts : seq Task.
-
-  (** ... let [tsk] be any task in [ts] that is to be analyzed. *)
-  Variable tsk : Task.
-  Hypothesis H_tsk_in_ts : tsk \in ts.
-
   (** *** Processor Model *)
 
   (** Consider any kind of fully-supply-consuming, unit-supply
@@ -67,6 +62,15 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_uniprocessor_proc_model : uniprocessor_model PState.
   Hypothesis H_unit_supply_proc_model : unit_supply_proc_model PState.
   Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
+
+  (** *** The Task Set and the Task Under Analysis *)
+
+  (** Consider an arbitrary task set [ts], and ... *)
+  Variable ts : seq Task.
+
+  (** ... let [tsk] be any task in [ts] that is to be analyzed. *)
+  Variable tsk : Task.
+  Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** *** The Job Arrival Sequence *)
 
@@ -86,13 +90,6 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
 
   (** *** The Schedule *)
 
-  (** Consider an arbitrary fixed-priority policy [FP] that indicates a
-      higher-or-equal priority relation among the tasks in [ts], and assume that
-      the relation is reflexive and transitive. *)
-  Context {FP : FP_policy Task}.
-  Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
-  Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
-
   (** Consider a non-preemptive, work-conserving, valid uniprocessor schedule
       that corresponds to the given arrival sequence [arr_seq] (and hence the
       given task set [ts]). *)
@@ -101,43 +98,40 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
 
-  (** We assume that the schedule respects the given [FP] scheduling policy. *)
+  (** We assume that the schedule respects the given [EDF] scheduling policy. *)
   Hypothesis H_respects_policy :
-    respects_FP_policy_at_preemption_point arr_seq sched FP.
+    respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
 
-  (** Furthermore, we require that the schedule ensures that jobs of the same
-      task are executed in the order of their arrival. *)
-  Hypothesis H_sequential_tasks : sequential_tasks arr_seq sched.
+  (** *** Average Resource Model *)
 
-  (** *** Periodic Resource Model *)
-
-  (** Assume that the processor supply follows the *periodic resource model* as
-      defined in "Periodic Resource Model for Compositional Real-Time
-      Guarantees" by Shin & Lee (RTSS 2003). Under this model, the supply is
-      distributed periodically with a resource period [Π] and a resource
-      allocation time [γ]: in every interval <<[Π⋅k, Π⋅(k+1))>>, the processor
-      provides at least [γ] units of supply. Furthermore, let [prm_sbf Π γ]
-      denote the corresponding SBF defined in the paper, which, as proven in the
-      same paper and verified in [prosa.analysis.facts.model.sbf.periodic], is a
-      valid SBF. *)
-  Variable Π γ : duration.
-  Hypothesis H_periodic_resource_model : periodic_resource_model Π γ sched.
+  (** Assume that the processor supply follows the *average resource
+      model*. Under this model, for any interval <<[t1, t2)>>, and given a
+      resource period [Π], a resource allocation time [Θ], and a supply delay
+      [ν], the processor provides at least [(t2 - t1 - ν) ⋅ Θ / Π] units of
+      supply. Intuitively, this means that _on_ _average_, the processor
+      delivers [Θ] units of output every [Π] units of time, while the
+      distribution of supply is not ideal and is subject to fluctuations bounded
+      by [ν]. Furthermore, let [arm_sbf Π Θ ν] denote the SBF, which, as proven
+      in [prosa.analysis.facts.model.sbf.average], is a valid SBF. *)
+  Variables Π Θ ν : duration.
+  Hypothesis H_average_resource_model : average_resource_model Π Θ ν sched.
 
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
-      length.  To this end, let [L] be any positive solution of the
-      busy-interval "recurrence" (i.e., inequality) [prm_sbf Π γ L >=
-      blocking_bound ts tsk + total_hep_request_bound_function_FP ts tsk L], as
-      defined below.
+      length. To this end, let [L] be any positive solution of the busy-interval
+      "recurrences" (i.e., set of inequalities) [arm_sbf Π Θ ν L >=
+      total_request_bound_function ts L] and [arm_sbf Π Θ ν L >=
+      longest_busy_interval_with_pi ts tsk], as defined below.
 
-      As the lemma [busy_intervals_are_bounded_rs_fp] shows, under [FP]
+      As the lemma [busy_intervals_are_bounded_rs_edf] shows, under [EDF]
       scheduling, this condition is sufficient to guarantee that the maximum
       busy-window length is at most [L], i.e., the length of any busy interval
       is bounded by [L]. *)
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
-    /\ prm_sbf Π γ L >= blocking_bound ts tsk + total_hep_request_bound_function_FP ts tsk L.
+    /\ arm_sbf Π Θ ν L >= total_request_bound_function ts L
+    /\ arm_sbf Π Θ ν L >= longest_busy_interval_with_pi ts tsk.
 
   (** ** Response-Time Bound *)
 
@@ -150,49 +144,49 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       exceeding [A + R]. *)
   Definition rta_recurrence_solution L R :=
     forall (A : duration),
-      is_in_search_space tsk L A ->
+      is_in_search_space ts tsk L A ->
       exists (F : duration),
-        prm_sbf Π γ F >= blocking_bound ts tsk
-                        + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
-                        + total_ohep_request_bound_function_FP ts tsk F
-        /\ prm_sbf Π γ (A + R) >= prm_sbf Π γ F + (task_cost tsk - ε)
+        arm_sbf Π Θ ν F >= blocking_bound ts tsk A
+                          + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
+                          + bound_on_athep_workload ts tsk A F
+        /\ arm_sbf Π Θ ν (A + R) >= arm_sbf Π Θ ν F + (task_cost tsk - ε)
         /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract restricted-supply
       analysis, we establish that, given a bound on the maximum busy-window
       length [L], any such [R] is indeed a sound response-time bound for task
-      [tsk] under fully-non-preemptive fixed-priority scheduling on a unit-speed
-      uniprocessor under the periodic resource model. *)
-  Theorem uniprocessor_response_time_bound_fully_non_preemptive_fp :
+      [tsk] under fully non-preemptive EDF scheduling on a unit-speed
+      uniprocessor under the average resource model. *)
+  Theorem uniprocessor_response_time_bound_fully_nonpreemptive_edf :
     forall (L : duration),
       busy_window_recurrence_solution L ->
       forall (R : duration),
         rta_recurrence_solution L R ->
         task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> L [BW_POS BW_SOL] R SOL js ARRs TSKs; rewrite /rta_recurrence_solution in SOL.
+    move=> L [BW_POS [BW_SOL1 BW_SOL2]] R SOL js ARRs TSKs.
+    have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have VMBNS : valid_model_with_bounded_nonpreemptive_segments arr_seq sched
       by apply fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions => //.
-    have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
-    have VBSBF : valid_busy_sbf arr_seq sched tsk (prm_sbf Π γ).
-    { by apply: valid_pred_sbf_switch_predicate; last apply prm_sbf_valid. }
-    have US : unit_supply_bound_function (prm_sbf Π γ) by exact: prm_sbf_unit.
+    have VBSBF : valid_busy_sbf arr_seq sched tsk (arm_sbf Π Θ ν).
+    { by apply: valid_pred_sbf_switch_predicate; last apply arm_sbf_valid. }
+    have US : unit_supply_bound_function (arm_sbf Π Θ ν) by exact: arm_sbf_unit.
     have POStsk: 0 < task_cost tsk
       by move: TSKs => /eqP <-; apply: leq_trans; [apply POS | apply H_valid_task_arrival_sequence].
-    eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) (SBF := prm_sbf Π γ) => //=.
+    eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) (SBF := arm_sbf Π Θ ν) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
+    - exact: EDF_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
-    - eapply busy_intervals_are_bounded_rs_fp with (SBF := prm_sbf Π γ) => //=.
-      by eapply instantiated_i_and_w_are_coherent_with_schedule.
+    - apply: busy_intervals_are_bounded_rs_edf => //.
+      by apply: instantiated_i_and_w_are_coherent_with_schedule.
     - apply: valid_pred_sbf_switch_predicate; last first.
-      + by apply prm_sbf_valid.
+      + by apply arm_sbf_valid.
       + by move => ? ? ? ? [? ?]; split => //.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
-      + by apply athep_workload_le_total_ohep_rbf.
+      + by (apply: bound_on_athep_workload_is_valid; try apply H_fixed_point) => //.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
-        unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //.
-        by instantiate (1 := fun _ => blocking_bound ts tsk).
-    - move => A SP; move: (SOL A) => [].
+        by apply: nonpreemptive_segments_bounded_by_blocking => //.
+    - move=> A SP; move: (SOL A) => [].
       + apply: search_space_sub => //=.
         by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
       + move => F [FIX1 [FIX2 FIX3]]; exists F; split => //; split.
@@ -200,4 +194,4 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
         * by rewrite /task_rtct /fully_nonpreemptive_rtc_threshold /constant; lia.
   Qed.
 
-End RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
+End RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
