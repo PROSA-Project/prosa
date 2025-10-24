@@ -2,7 +2,7 @@ Require Export prosa.util.tactics.
 Require Import prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.busy_interval.pi_bound.
 Require Export prosa.analysis.facts.busy_interval.arrival.
-Require Export prosa.results.edf.rta.bounded_pi.
+Require Export prosa.results.rta.ideal.edf.bounded_pi.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.busy_interval.classical.
 Require Export prosa.analysis.facts.blocking_bound.edf.

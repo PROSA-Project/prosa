@@ -38,7 +38,7 @@ stages:
 .build-and-test-POET:
   extends: .build
   script:
-    - git clone https://gitlab.mpi-sws.org/RT-PROOFS/POET.git -b POET-for-Prosa-CI-next /tmp/POET
+    - git clone https://gitlab.mpi-sws.org/RT-PROOFS/POET.git -b POET-for-Prosa-CI-v0.6 /tmp/POET
     - !reference [.build-common, script]
     - mv /tmp/POET .
     - cd POET

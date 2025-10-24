@@ -18,7 +18,7 @@ Require Export prosa.analysis.abstract.ideal.abstract_rta.
     locking). We only assume that the duration of priority inversion is
     bounded. *)
 
-(** The difference in this RTA and the other RTA for FP (from the file bounded_pi.v)
+(** The difference in this RTA and the other RTA for FP (from the file ../bounded_pi.v)
     is that here we drop the sequential-tasks assumption and instead explicitly
     account for self-interference. *)
 

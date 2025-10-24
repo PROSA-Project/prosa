@@ -1,4 +1,4 @@
-Require Export prosa.results.fixed_priority.rta.bounded_nps.
+Require Export prosa.results.rta.ideal.fp.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.floating.
 Require Export prosa.analysis.facts.readiness.sequential.
 Require Export prosa.analysis.definitions.blocking_bound.fp.

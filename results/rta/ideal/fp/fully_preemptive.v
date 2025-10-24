@@ -1,22 +1,22 @@
-Require Export prosa.results.fixed_priority.rta.bounded_nps.
-Require Export prosa.analysis.facts.preemption.task.nonpreemptive.
-Require Export prosa.analysis.facts.preemption.rtc_threshold.nonpreemptive.
+Require Export prosa.results.rta.ideal.fp.bounded_nps.
+Require Export prosa.analysis.facts.preemption.task.preemptive.
+Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.facts.readiness.sequential.
-Require Export prosa.model.task.preemption.fully_nonpreemptive.
+Require Export prosa.model.task.preemption.fully_preemptive.
 
-(** * RTA for Fully Non-Preemptive FP Model *)
-(** In this module we prove the RTA theorem for the fully non-preemptive FP model. *)
+(** * RTA for Fully Preemptive FP Model *)
+(** In this section we prove the RTA theorem for the fully preemptive FP model *)
 
 (** ** Setup and Assumptions *)
 
-Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
+Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
-  (** We assume ideal uniprocessor schedules. *)
+  (** We assume ideal uni-processor schedules. *)
   #[local] Existing Instance ideal.processor_state.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  Context {tc : TaskCost Task}.
+  Context `{TaskCost Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType}.
@@ -24,10 +24,10 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** We assume that jobs and tasks are fully non-preemptive. *)
-  #[local] Existing Instance fully_nonpreemptive_job_model.
-  #[local] Existing Instance fully_nonpreemptive_task_model.
-  #[local] Existing Instance fully_nonpreemptive_rtc_threshold.
+   (** We assume that jobs and tasks are fully preemptive. *)
+   #[local] Existing Instance fully_preemptive_job_model.
+   #[local] Existing Instance fully_preemptive_task_model.
+   #[local] Existing Instance fully_preemptive_rtc_threshold.
 
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
@@ -43,9 +43,9 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
 
-  (** Let max_arrivals be a family of valid arrival curves, i.e., for
+  (** Let [max_arrivals] be a family of valid arrival curves, i.e., for
       any task [tsk] in ts [max_arrivals tsk] is (1) an arrival bound of
-      [tsk], and (2) it is a monotonic function that equals [0] for the
+      [tsk], and (2) it is a monotonic function that equals 0 for the
       empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
@@ -59,11 +59,11 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   #[local] Instance sequential_readiness : JobReady _ _ :=
     sequential_ready_instance arr_seq.
 
-  (** Next, consider any ideal non-preemptive uniprocessor schedule of
-      this arrival sequence ... *)
+  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule  sched.
+  Hypothesis H_jobs_come_from_arrival_sequence :
+    jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
      and assume that the relation is reflexive and transitive. *)
@@ -71,7 +71,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
   Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
 
-  (** Next, we assume that the schedule is a work-conserving schedule ... *)
+  (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... and the schedule respects the scheduling policy. *)
@@ -96,57 +96,50 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       priority other than task [tsk]. *)
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
 
-  (** Next, we define a bound for the priority inversion caused by tasks of lower priority. *)
-  Let blocking_bound :=
-    \max_(tsk_other <- ts | ~~ hep_task tsk_other tsk) (task_cost tsk_other - ε).
-
   (** Let L be any positive fixed point of the busy interval recurrence, determined by
       the sum of blocking and higher-or-equal-priority workload. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
-  Hypothesis H_fixed_point : L = blocking_bound + total_hep_rbf L.
+  Hypothesis H_fixed_point : L = total_hep_rbf L.
 
   (** ** Response-Time Bound *)
 
-  (** To reduce the time complexity of the analysis, recall the notion of search space. *)
+  (** To reduce the time complexity of the analysis, recall the notion of the search space. *)
   Let is_in_search_space := is_in_search_space tsk L.
 
   (** Next, consider any value [R], and assume that for any given
-      arrival [A] from search space there is a solution of the
-      response-time bound recurrence which is bounded by [R]. *)
+       arrival [A] from the search space there is a solution of the
+       response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum :
     forall (A : duration),
       is_in_search_space A ->
       exists (F : duration),
-        A + F >= blocking_bound
-                + (task_rbf (A + ε) - (task_cost tsk - ε))
-                + total_ohep_rbf (A + F)
-        /\ R >= F + (task_cost tsk - ε).
+        A + F >= task_rbf (A + ε) + total_ohep_rbf (A + F)
+        /\ R >= F.
 
   (** Now, we can leverage the results for the abstract model with
       bounded non-preemptive segments to establish a response-time
-      bound for the more concrete model of fully non-preemptive
+      bound for the more concrete model of fully preemptive
       scheduling. *)
 
-  Theorem uniprocessor_response_time_bound_fully_nonpreemptive_fp :
+  Theorem uniprocessor_response_time_bound_fully_preemptive_fp :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move: (posnP (@task_cost _ tc tsk)) => [ZERO|POS].
-    { intros j ARR TSK.
-      have ZEROj: job_cost j = 0.
-      { move: (H_valid_job_cost j ARR) => NEQ.
-        rewrite /valid_job_cost in NEQ.
-        move: TSK => /eqP -> in NEQ.
-        rewrite ZERO in NEQ.
-        by apply/eqP; rewrite -leqn0.
-      }
-      by rewrite /job_response_time_bound /completed_by ZEROj.
-    }
-    eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with
-        (L := L) => //.
+    have BLOCK: blocking_bound ts tsk = 0.
+    { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
+               /fully_preemptive_task_model subnn big1_eq. }
+    eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with (L:=L) => //
+.
     - exact: sequential_readiness_implies_work_bearing_readiness.
     - exact: sequential_readiness_implies_sequential_tasks.
+    - by rewrite BLOCK add0n.
+    - move => A /andP [LT NEQ].
+      edestruct H_R_is_maximum as [F [FIX BOUND]].
+      { by apply/andP; split; eauto 2. }
+      exists F; split.
+      + by rewrite BLOCK add0n subnn subn0.
+      + by rewrite subnn addn0.
   Qed.
 
-End RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
+End RTAforFullyPreemptiveFPModelwithArrivalCurves.

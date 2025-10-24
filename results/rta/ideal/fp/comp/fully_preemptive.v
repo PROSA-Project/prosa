@@ -1,11 +1,11 @@
 Require Export prosa.util.fixpoint.
-Require Export prosa.results.fixed_priority.rta.fully_preemptive.
+Require Export prosa.results.rta.ideal.fp.fully_preemptive.
 
 (** * RTA for Fully Preemptive FP Scheduling with Computed Fixpoints *)
 
 (** This module refines the general response-time bound for fully preemptive
     fixed-priority scheduling in
-    [prosa.results.fixed_priority.rta.fully_preemptive]. Whereas the general
+    [prosa.results.rta.ideal.fp.fully_preemptive]. Whereas the general
     result assumes that all fixpoints are given, i.e., that they have been found
     _somehow_ without imposing any assumptions on how they have been found, here
     we _compute_ all relevant fixpoints using the procedures provided in

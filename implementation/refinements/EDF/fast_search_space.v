@@ -1,4 +1,4 @@
-Require Export prosa.results.edf.rta.bounded_nps.
+Require Export prosa.results.rta.ideal.edf.bounded_nps.
 Require Export prosa.implementation.refinements.fast_search_space_computation.
 
 (** First, we define the concept of higher-or-equal-priority workload.  *)
