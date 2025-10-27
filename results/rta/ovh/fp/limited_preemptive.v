@@ -153,24 +153,6 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
   Let overhead_bound Δ :=
     (DB + CSB + CRPDB) * (1 + 2 * \sum_(tsk_o <- ts | hep_task tsk_o tsk) max_arrivals tsk_o Δ).
 
-  (** *** Workload Abbreviations *)
-
-  (** For brevity in the following definitions, we introduce a number of local
-      abbreviations. *)
-
-  (** We let [rbf] denote the task request-bound function, which is defined as
-      [task_cost(T) × max_arrivals(T,Δ)] for a task [T]. *)
-  Let rbf := task_request_bound_function.
-
-  (** Additionally, we let [total_hep_rbf] denote the cumulative request-bound
-      function w.r.t. all tasks with higher-or-equal priority ... *)
-  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
-
-  (** ... and use [total_ohep_rbf] as an abbreviation for the cumulative
-      request-bound function w.r.t. all tasks with higher-or-equal priority
-      other than task [tsk] itself. *)
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
-
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
@@ -186,7 +168,7 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
     L > 0
     /\ L >= overhead_bound L
           + blocking_bound ts tsk
-          + total_hep_rbf L.
+          + total_hep_request_bound_function_FP ts tsk L.
 
   (** ** Response-Time Bound *)
 
@@ -205,8 +187,8 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
       exists (F : duration),
         F >= overhead_bound F
             + blocking_bound ts tsk
-            + (rbf tsk (A + ε) - (task_last_nonpr_segment tsk - ε))
-            + total_ohep_rbf F
+            + (task_request_bound_function tsk (A + ε) - (task_last_nonpr_segment tsk - ε))
+            + total_ohep_request_bound_function_FP ts tsk F
         /\ A + R >= F + (overhead_bound (A + R) - overhead_bound F)
                   + (task_last_nonpr_segment tsk - ε).
 
@@ -236,7 +218,7 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
     - by exact: instantiated_interference_and_workload_consistent_with_sequential_tasks => //.
     - eapply busy_intervals_are_bounded_rs_fp with (SBF := sSBF); try done.
       + by eapply instantiated_i_and_w_are_coherent_with_schedule.
-      + by apply bound_preserved_under_slowed; unfold fp_blackout_bound, overhead_bound, total_hep_rbf in *; lia.
+      + by apply bound_preserved_under_slowed; unfold fp_blackout_bound, overhead_bound in *; lia.
     - apply: valid_pred_sbf_switch_predicate; last (eapply overheads_sbf_busy_valid) => //=.
       by move => ? ? ? ? [? ?]; split => //; apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
@@ -253,9 +235,10 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
         exists δ; split; [lia | split].
         * rewrite /sSBF /fp_ovh_sbf_slow -EQ.
           apply: leq_trans; last by apply leq_subRL_impl; rewrite -!addnA in FIX1; apply FIX1.
-          have NEQ: total_ohep_request_bound_function_FP ts tsk δ <= total_ohep_rbf F by apply total_ohep_rbf_monotone => //.
+          have NEQ: total_ohep_request_bound_function_FP ts tsk δ <= total_ohep_request_bound_function_FP ts tsk F
+            by apply total_ohep_rbf_monotone => //.
           erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ].
-          by move: FIX1; rewrite /task_intra_IBF; set (c := _ _ (A +1) - ( _ )); unfold total_ohep_rbf in *; lia.
+          by move: FIX1; rewrite /task_intra_IBF; set (c := _ _ (A +1) - ( _ )); lia.
         * rewrite /sSBF /fp_ovh_sbf_slow -EQ.
           apply bound_preserved_under_slowed, leq_subRL_impl; apply: leq_trans; last by apply FIX2.
           erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ].

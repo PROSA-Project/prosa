@@ -134,12 +134,6 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       any busy-interval prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
-  (** ** Workload Abbreviation *)
-
-  (** Let's denote the relative deadline of a task as [D]. *)
-  Let D tsk := task_deadline tsk.
-
-
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
@@ -154,7 +148,6 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
     /\ SBF L >=  total_request_bound_function ts L.
-
 
   (** ** Response-Time Bound *)
 

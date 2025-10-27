@@ -75,15 +75,12 @@ Section RTA.
       busy_interval_prefix arr_seq sched j t1 t2 ->
       \sum_(t1 <= t < t2) is_exceedance_exec (sched t) <= e.
 
-  (** Let us locally define some abbreviations for clarity. *)
-  Let rbf := task_request_bound_function.
-  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
-
   (** First, we define the bound on the maximum length of a busy window. *)
   Definition busy_window_recurrence_solution L :=
     L > e
-    /\ L >= blocking_bound ts tsk + total_hep_rbf L + e.
+    /\ L >= blocking_bound ts tsk
+          + total_hep_request_bound_function_FP ts tsk L
+          + e.
 
   (** Then we define the response-time "recurrence" (i.e., set of inequalities) ... *)
   Definition rta_recurrence_solution L R :=
@@ -91,8 +88,9 @@ Section RTA.
       is_in_search_space tsk L A ->
       exists (F : duration),
         F >= blocking_bound ts tsk
-              + (rbf tsk (A + ε) - (task_cost tsk - ε))
-              + total_ohep_rbf F + e
+            + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
+            + total_ohep_request_bound_function_FP ts tsk F
+            + e
         /\ A + R >= F + (task_cost tsk - ε).
 
   (** ... and prove that any solution [R] satisfying this predicate is a bound on the
@@ -120,8 +118,8 @@ Section RTA.
       + apply: eps_sbf_is_valid.
         exact: H_exceedance_in_busy_interval_bounded.
       + exact: eps_sbf_is_unit.
-      + by move: BW_FIX; rewrite /eps_sbf /total_hep_rbf; lia.
-      + by move: BW_FIX; rewrite /EPS_SBF_inst /eps_sbf /total_hep_rbf; lia.
+      + by move: BW_FIX; rewrite /eps_sbf; lia.
+      + by move: BW_FIX; rewrite /EPS_SBF_inst /eps_sbf; lia.
     - apply: valid_pred_sbf_switch_predicate; last by exact: eps_sbf_is_valid.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
@@ -137,9 +135,7 @@ Section RTA.
       + move => F [FIX1 FIX2]; exists F; split => //; try lia.
         rewrite /task_intra_IBF /task_rtct /fully_nonpreemptive_rtc_threshold /constant.
         rewrite /EPS_SBF_inst /eps_sbf.
-        split; try lia.
-        rewrite  -/rbf -/total_ohep_rbf.
-        by lia.
+        by split; lia.
   Qed.
 
 End RTA.

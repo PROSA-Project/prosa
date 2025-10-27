@@ -137,24 +137,6 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       any busy-interval prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
-  (** ** Workload Abbreviation *)
-
-  (** We introduce the abbreviation [rbf] for the task request-bound
-      function, which is defined as [task_cost(T) × max_arrivals(T,Δ)]
-      for a task [T]. *)
-  Let rbf := task_request_bound_function.
-
-  (** Next, we introduce [total_hep_rbf] as an abbreviation for the
-      request-bound function of all tasks with higher-or-equal
-      priority ... *)
-  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
-
-  (** ... and [total_ohep_rbf] as an abbreviation for the
-      request-bound function of all tasks with higher-or-equal
-      priority other than task [tsk]. *)
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
-
-
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
@@ -168,8 +150,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       is bounded by [L]. *)
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
-    /\ SBF L >= blocking_bound ts tsk + total_hep_rbf L.
-
+    /\ SBF L >= blocking_bound ts tsk
+              + total_hep_request_bound_function_FP ts tsk L.
 
   (** ** Response-Time Bound *)
 
@@ -184,8 +166,8 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       is_in_search_space tsk L A ->
       exists (F : duration),
         SBF F >= blocking_bound ts tsk
-                + (rbf tsk (A + ε) - (task_cost tsk - ε))
-                + total_ohep_rbf F
+                + (task_request_bound_function tsk (A + ε) - (task_cost tsk - ε))
+                + total_ohep_request_bound_function_FP ts tsk F
         /\ SBF (A + R) >= SBF F + (task_cost tsk - ε)
         /\ A + R >= F.
 
@@ -225,7 +207,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       + by apply: search_space_sub => //.
       + move => F [FIX1 [FIX2 LE]]; exists F; split => //.
         rewrite /task_intra_IBF /task_rtct /fully_nonpreemptive_rtc_threshold /constant.
-        split; [rewrite -(leqRW FIX1) -/rbf -/total_ohep_rbf| ]; lia.
+        split; [rewrite -(leqRW FIX1)| ]; lia.
   Qed.
 
 End RTAforFullyNonPreemptiveFPModelwithArrivalCurves.

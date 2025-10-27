@@ -157,24 +157,6 @@ Section RTAforFloatingFPModelwithArrivalCurves.
   Let overhead_bound Δ :=
     (DB + CSB + CRPDB) * (1 + 2 * \sum_(tsk_o <- ts | hep_task tsk_o tsk) max_arrivals tsk_o Δ).
 
-  (** *** Workload Abbreviations *)
-
-  (** For brevity in the following definitions, we introduce a number of local
-      abbreviations. *)
-
-  (** We let [rbf] denote the task request-bound function, which is defined as
-      [task_cost(T) × max_arrivals(T,Δ)] for a task [T]. *)
-  Let rbf := task_request_bound_function.
-
-  (** Additionally, we let [total_hep_rbf] denote the cumulative request-bound
-      function w.r.t. all tasks with higher-or-equal priority ... *)
-  Let total_hep_rbf := total_hep_request_bound_function_FP ts tsk.
-
-  (** ... and use [total_ohep_rbf] as an abbreviation for the cumulative
-      request-bound function w.r.t. all tasks with higher-or-equal priority
-      other than task [tsk] itself. *)
-  Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
-
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
@@ -190,7 +172,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
     L > 0
     /\ L >= overhead_bound L
           + blocking_bound ts tsk
-          + total_hep_rbf L.
+          + total_hep_request_bound_function_FP ts tsk L.
 
   (** ** Response-Time Bound *)
 
@@ -207,8 +189,8 @@ Section RTAforFloatingFPModelwithArrivalCurves.
       exists (F : duration),
         F >= overhead_bound F
             + blocking_bound ts tsk
-            + rbf tsk (A + ε)
-            + total_ohep_rbf F
+            + task_request_bound_function tsk (A + ε)
+            + total_ohep_request_bound_function_FP ts tsk F
         /\ A + R >= F.
 
   (** Finally, using the sequential variant of abstract restricted-supply
@@ -239,7 +221,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
     - by exact: instantiated_interference_and_workload_consistent_with_sequential_tasks => //.
     - eapply busy_intervals_are_bounded_rs_fp with (SBF := sSBF); try done.
       + by eapply instantiated_i_and_w_are_coherent_with_schedule.
-      + by apply bound_preserved_under_slowed; unfold fp_blackout_bound, overhead_bound, total_hep_rbf in *; lia.
+      + by apply bound_preserved_under_slowed; unfold fp_blackout_bound, overhead_bound in *; lia.
     - apply: valid_pred_sbf_switch_predicate; last (eapply overheads_sbf_busy_valid) => //=.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
@@ -255,7 +237,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
         exists F; split; last split.
         * lia.
         * apply bound_preserved_under_slowed; move: EQ1 EQ2.
-          by rewrite /task_intra_IBF  -/rbf -/total_ohep_rbf /fp_blackout_bound /overhead_bound; lia.
+          by rewrite /task_intra_IBF /fp_blackout_bound /overhead_bound; lia.
         * by rewrite subnn addn0; apply overheads_sbf_monotone; lia.
   Qed.
 

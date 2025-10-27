@@ -144,16 +144,6 @@ Section RTAforLimitedPreemptiveEDFModelwithArrivalCurves.
       any busy-interval prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
-  (** ** Workload Abbreviation *)
-
-  (** Let's denote the relative deadline of a task as [D]. *)
-  Let D tsk := task_deadline tsk.
-
-  (** We introduce [task_rbf] as an abbreviation
-      for the task request bound function of task [tsk]. *)
-  Let task_rbf := task_request_bound_function tsk.
-
-
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
@@ -171,7 +161,6 @@ Section RTAforLimitedPreemptiveEDFModelwithArrivalCurves.
     /\ SBF L >= total_request_bound_function ts L
     /\ SBF L >= longest_busy_interval_with_pi ts tsk.
 
-
   (** ** Response-Time Bound *)
 
   (** Having established all necessary preliminaries, it is finally
@@ -185,7 +174,7 @@ Section RTAforLimitedPreemptiveEDFModelwithArrivalCurves.
       is_in_search_space ts tsk L A ->
       exists (F : duration),
         SBF F >= blocking_bound ts tsk A
-                + (task_rbf (A + ε) - (task_last_nonpr_segment tsk - ε))
+                + (task_request_bound_function tsk (A + ε) - (task_last_nonpr_segment tsk - ε))
                 + bound_on_athep_workload ts tsk A F
         /\ SBF (A + R) >= SBF F + (task_last_nonpr_segment tsk - ε)
         /\ A + R >= F.
@@ -227,7 +216,7 @@ Section RTAforLimitedPreemptiveEDFModelwithArrivalCurves.
       move=> FF [EQ1 [EQ2 EQ3]].
       exists FF; split; last split.
       + lia.
-      + move: EQ2; rewrite /task_intra_IBF -/task_rbf.
+      + move: EQ2; rewrite /task_intra_IBF.
         by erewrite last_segment_eq_cost_minus_rtct => //; lia.
       + by erewrite last_segment_eq_cost_minus_rtct.
   Qed.

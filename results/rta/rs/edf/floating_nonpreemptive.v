@@ -144,16 +144,6 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       any busy-interval prefix of length [Δ]. *)
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
-  (** ** Workload Abbreviation *)
-
-  (** Let's denote the relative deadline of a task as [D]. *)
-  Let D tsk := task_deadline tsk.
-
-  (** We introduce [task_rbf] as an abbreviation
-      for the task request bound function of task [tsk]. *)
-  Let task_rbf := task_request_bound_function tsk.
-
-
   (** ** Maximum Length of a Busy Interval *)
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
@@ -171,7 +161,6 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
     /\ SBF L >= total_request_bound_function ts L
     /\ SBF L >= longest_busy_interval_with_pi ts tsk.
 
-
   (** ** Response-Time Bound *)
 
   (** Having established all necessary preliminaries, it is finally
@@ -185,7 +174,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       is_in_search_space ts tsk L A ->
       exists (F : duration),
         SBF F >= blocking_bound ts tsk A
-                + task_rbf (A + ε)
+                + task_request_bound_function tsk (A + ε)
                 + bound_on_athep_workload ts tsk A F
         /\ A + R >= F.
 
@@ -227,7 +216,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       move=> FF [EQ1 EQ2].
       exists FF; split; last split.
       + lia.
-      + by move: EQ2; rewrite /task_intra_IBF -/task_rbf; lia.
+      + by move: EQ2; rewrite /task_intra_IBF; lia.
       + by rewrite subnn addn0; apply H_SBF_monotone; lia.
   Qed.
 
