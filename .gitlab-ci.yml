@@ -23,10 +23,10 @@ stages:
 .build-common:
   stage: build
   script:
-    - opam pin add -n -y -k path coq-prosa .
-    - opam install -y -v -j ${NJOBS} coq-prosa
-    - opam pin add -n -y -k path coq-prosa-refinements .
-    - opam install -y -v -j ${NJOBS} coq-prosa-refinements
+    - opam pin add -n -y -k path rocq-prosa .
+    - opam install -y -v -j ${NJOBS} rocq-prosa
+    - opam pin add -n -y -k path rocq-prosa-refinements .
+    - opam install -y -v -j ${NJOBS} rocq-prosa-refinements
 
 .preferred-stable-version:
   image: bbbrandenburg/mathcomp-for-prosa:2.4.0-rocq-prover-9.0

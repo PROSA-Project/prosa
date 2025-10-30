@@ -28,6 +28,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Converted ε to notation to avoid having to unfold it.
 - Rewrote `create_makefile.sh` as a Makefile.
 - Removed work-conservation dependency from the priority inversion file.
+- Changed the OPAM package name to `rocq-prosa`. 
+- Split out the POET refinements into a separate OPAM package `rocq-prosa-refinements`.
 
 
 ### Removed
