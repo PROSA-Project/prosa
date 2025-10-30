@@ -10,6 +10,8 @@ Prover
 OCaml
 OPAM
 CoqEAL
+ssrlia
+mczify
 CoqdocJS
 CoqIDE
 Micromega
@@ -42,6 +44,9 @@ preemptable
 preemptions
 rebase
 evolutions
+changelog
+Makefile
+APA
 ACM
 MPI
 SWS
