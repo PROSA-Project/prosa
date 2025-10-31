@@ -514,7 +514,7 @@ Section TransferSchedulability.
 
     Definition slackless_interval t1 t2 :=
       (t1 < t2)
-      && \sum_(j <- critical_jobs t1 t2) remaining_cost_bound j t1 == t2 - t1.
+      && (\sum_(j <- critical_jobs t1 t2) remaining_cost_bound j t1 == t2 - t1).
 
     (** In fact, in our proof we require a stronger notion of slackless
         intervals: slackless intervals without "holes." To this end, we call an
