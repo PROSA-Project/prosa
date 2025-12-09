@@ -20,13 +20,25 @@ stages:
   rules:
     - if: ($CI_COMMIT_BRANCH =~ /^wip-.*$/) && ($CI_PIPELINE_SOURCE != "merge_request_event")
 
+.env-setup:
+  script:
+    - getconf _NPROCESSORS_ONLN
+    - "[ -f /sys/fs/cgroup/cpu.max ] && cat /sys/fs/cgroup/cpu.max"
+    - "[ -f /sys/fs/cgroup/cpuset.cpus ] && cat /sys/fs/cgroup/cpuset.cpus"
+    - "[ -f /sys/fs/cgroup/cpuset.cpus.effective ] && cat /sys/fs/cgroup/cpuset.cpus.effective"
+    - "[ -f /sys/fs/cgroup/cpu/cpu.cfs_quota_us ] && cat /sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+    - "[ -f /sys/fs/cgroup/cpu/cpu.cfs_period_us ] && cat /sys/fs/cgroup/cpu/cpu.cfs_period_us"
+    - export MAXPAR=`getconf _NPROCESSORS_ONLN`
+    - echo "MAXPAR=${MAXPAR}"
+
 .build-common:
   stage: build
   script:
+    - !reference [.env-setup, script]
     - opam pin add -n -y -k path rocq-prosa .
-    - opam install -y -v -j ${NJOBS} rocq-prosa
+    - opam install -y -v -j ${MAXPAR} rocq-prosa
     - opam pin add -n -y -k path rocq-prosa-refinements .
-    - opam install -y -v -j ${NJOBS} rocq-prosa-refinements
+    - opam install -y -v -j ${MAXPAR} rocq-prosa-refinements
 
 .preferred-stable-version:
   image: bbbrandenburg/mathcomp-for-prosa:2.4.0-rocq-prover-9.0
@@ -51,16 +63,16 @@ stages:
         echo "==================";
         echo "Testing $WORKLOAD:";
         mkdir -p $CERT;
-        time ./poet -v -o $CERT -j ${NJOBS} -s $WORKLOAD;
+        time ./poet -v -o $CERT -j ${MAXPAR} -s $WORKLOAD;
       done;
 
 .make-html:
   script:
-    - make html -j ${NJOBS}
+    - make html -j ${MAXPAR}
     - mv html with-proofs
-    - make gallinahtml -j ${NJOBS}
+    - make gallinahtml -j ${MAXPAR}
     - mv html without-proofs
-    - make htmlpretty -j ${NJOBS} 2> /tmp/rocqdoc-warnings.txt
+    - make htmlpretty -j ${MAXPAR} 2> /tmp/rocqdoc-warnings.txt
     - '[ ! -s /tmp/rocqdoc-warnings.txt ] || (echo "Please fix all rocqdoc warnings:" && cat /tmp/rocqdoc-warnings.txt && false)'
     - mv html pretty
 
@@ -83,7 +95,8 @@ compile-and-doc:
     - .only_in_wip_branches
     - .preferred-stable-version
   script:
-    - make -j ${NJOBS} all
+    - !reference [.env-setup, script]  
+    - make -j ${MAXPAR} all
     - !reference [.make-html, script]
   artifacts:
     name: "prosa-spec-$CI_COMMIT_REF_NAME"
@@ -99,7 +112,8 @@ compile-and-doc-and-validate:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - make -j ${NJOBS} all 2>&1 | tee coqc-messages.txt
+    - !reference [.env-setup, script]  
+    - make -j ${MAXPAR} all 2>&1 | tee coqc-messages.txt
     - if grep -q Warning coqc-messages.txt; then (echo "Please fix all Coq warnings:"; echo "--"; grep -B1 Warning coqc-messages.txt; exit 1); fi
     - !reference [.make-html, script]
     - scripts/check-axiom-free.sh results
@@ -120,7 +134,8 @@ mangle-names:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - make -j ${NJOBS} mangle-names
+    - !reference [.env-setup, script]
+    - make -j ${MAXPAR} mangle-names
 
 # Check that proof irrelevance shows up only due to refinements.
 compile-and-validate:
@@ -129,7 +144,8 @@ compile-and-validate:
     - .not_in_wip_branches
     - .preferred-stable-version
   script:
-    - make -j ${NJOBS}
+    - !reference [.env-setup, script]
+    - make -j ${MAXPAR}
     - scripts/check-axiom-free.sh results
 ##### `make validate` disabled because of https://github.com/LPCIC/coq-elpi/issues/677 and https://github.com/coq/coq/issues/17345
 #     - make validate 2>&1 | tee validation-results.txt
@@ -165,8 +181,8 @@ lint:
 #   image: registry.mpi-sws.org/alectryon-ci:2.4.0-rocq-prover-9.0
 #   script:
 #     - eval $(opam env)
-#     - make -j ${NJOBS} all
-#     - make -j ${NJOBS} alectryon
+#     - make -j ${MAXPAR} all
+#     - make -j ${MAXPAR} alectryon
 #   artifacts:
 #     name: "prosa-proof-state-$CI_COMMIT_REF_NAME"
 #     paths:
