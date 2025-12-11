@@ -28,4 +28,4 @@ opam update
 opam pin -n rocq-prover ${ROCQ_VERSION}
 opam pin -n rocq-core ${ROCQ_CORE_VERSION}
 opam pin -n rocq-mathcomp-ssreflect ${MATHCOMP_VERSION}
-opam install -y rocq-prover rocq-mathcomp-ssreflect coq-mathcomp-zify coq-coqeal
+opam install -y -j `getconf _NPROCESSORS_ONLN` rocq-prover rocq-mathcomp-ssreflect coq-mathcomp-zify coq-coqeal
