@@ -86,7 +86,7 @@ Section Facts.
   Proof.
     move=> t1 t2 BUSY.
     have NEQ: t1 <= t1 < t2 by move: (BUSY) => [LT _]; lia.
-    edestruct pending_hp_job_exists as [jh [ARR [PEND HEP]]]; (try exact BUSY) => //.
+    edestruct pending_hep_job_exists as [jh [ARR [PEND HEP]]]; (try exact BUSY) => //.
     exists jh; split; last by done.
     apply job_in_arrivals_at => //; apply/eqP.
     rewrite eqn_leq; apply/andP; split.

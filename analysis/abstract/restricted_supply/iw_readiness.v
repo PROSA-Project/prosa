@@ -454,59 +454,7 @@ Section IWInstantiation.
       Variable t : instant.
       Hypothesis H_t_in_busy_interval : t1 <= t < t2.
 
-      (** We first prove that, inside the busy interval, there always exists a
-          pending higher-or-equal-priority job. To prove this, we make use of
-          the obtained result that, for the given interference and interfering
-          workload functions, the notions of abstract and classical busy intervals
-          are equivalent. *)
-      Lemma pending_hep_job_exists_inside_busy_interval :
-        exists jhp,
-          arrives_in arr_seq jhp
-          /\ pending sched jhp t
-          /\ hep_job jhp j.
-      Proof.
-        move: H_t_in_busy_interval => /andP [GE LT].
-        move: H_busy_interval_prefix =>
-              /instantiated_busy_interval_prefix_equivalent_busy_interval_prefix BUSY_cl.
-        move: (BUSY_cl H_arrives) => [_ [QTt [NQT REL]]].
-        move: (ltngtP t1.+1 t2) => [GT|CONTR|EQ]; first last.
-        - subst t2; rewrite ltnS in LT.
-          have EQ: t1 = t by apply/eqP; rewrite eqn_leq; apply/andP; split.
-          subst t1; clear GE LT; exists j; repeat split=> //.
-          + move: REL; rewrite ltnS -eqn_leq eq_sym => /eqP REL;
-            by rewrite -REL; eapply job_pending_at_arrival; eauto 2.
-        - by exfalso; move_neq_down CONTR; eapply leq_ltn_trans; eauto 2.
-        - have EX:
-            exists hp__seq: seq Job, forall j__hp,
-              j__hp \in hp__seq <-> arrives_in arr_seq j__hp /\ pending sched j__hp t /\ hep_job j__hp j.
-          { exists (filter (fun jo => (pending sched jo t)
-                              && (hep_job jo j)) (arrivals_between arr_seq 0 t.+1)).
-            intros; split; intros T.
-            - move: T; rewrite mem_filter => /andP [/andP [PEN HP] IN].
-              repeat split; eauto using in_arrivals_implies_arrived.
-            - move: T => [ARR [PEN HP]].
-              rewrite mem_filter; apply/andP; split; first (apply/andP; split=> //).
-              apply: arrived_between_implies_in_arrivals => //.
-              by apply/andP; split; last rewrite ltnS; move: PEN => /andP [T _]. }
-          move: EX => [hp__seq SE]; case FL: (hp__seq) => [ | jhp jhps].
-          + subst hp__seq; exfalso; move: GE; rewrite leq_eqVlt => /orP [/eqP EQ| GE].
-            * subst t; apply NQT with t1.+1; first by apply/andP; split.
-              intros jhp ARR HP ARRB; apply negbNE; apply/negP; intros NCOMP.
-              move: (SE jhp) => [_ SE2].
-              rewrite in_nil in SE2; feed SE2=> [|//]; clear SE2.
-              repeat split=> //; first apply/andP; split=> //.
-              apply/negP; intros COMLP; move: NCOMP => /negP NCOMP; apply: NCOMP.
-              by apply completion_monotonic with t1.
-            * apply NQT with t; first by apply/andP; split.
-              intros jhp ARR HP ARRB; apply negbNE; apply/negP; intros NCOMP.
-              move: (SE jhp) => [_ SE2].
-              rewrite in_nil in SE2; feed SE2 => [|//]; clear SE2.
-              by repeat split; auto; apply/andP; split; first apply ltnW.
-          + move: (SE jhp)=> [SE1 _]; subst; clear SE.
-            by exists jhp; apply SE1; rewrite in_cons; apply/orP; left.
-      Qed.
-
-      (** We now prove that, if [interference] is [false] at a time [t], then the
+      (** We prove that, if [interference] is [false] at a time [t], then the
           job is scheduled at time [t]. *)
       Lemma not_interference_implies_scheduled :
         ~~ interference j t -> receives_service_at sched j t.

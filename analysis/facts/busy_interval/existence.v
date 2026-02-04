@@ -162,7 +162,7 @@ Section ExistsBusyIntervalJLFP.
     (** Next, we prove that at any time instant [t] within the busy interval there exists a job
         [jhp] such that (1) job [jhp] is pending at time [t] and (2) job [jhp] has higher-or-equal
         priority than task [tsk]. *)
-    Lemma pending_hp_job_exists :
+    Lemma pending_hep_job_exists :
       forall t,
         t1 <= t < t2 ->
         exists jhp,
@@ -218,7 +218,7 @@ Section ExistsBusyIntervalJLFP.
         ~ is_idle arr_seq sched t.
     Proof.
       intros t NEQ IDLE.
-      move: (pending_hp_job_exists _ NEQ) => [jhp [ARR [PEND HP]]].
+      move: (pending_hep_job_exists _ NEQ) => [jhp [ARR [PEND HP]]].
       apply H_job_ready in PEND => //; destruct PEND as [j' [ARR' [READY' _]]].
       feed (H_work_conserving _ t ARR').
       { apply/andP; split=> [//|].
