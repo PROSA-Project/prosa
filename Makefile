@@ -2,6 +2,7 @@
 
 COQ_PROJ := _CoqProject
 COQ_MAKEFILE := Makefile.coq
+COQ_ARTIFACTS := $(COQ_MAKEFILE) Makefile.coq.conf
 FIND_OPTS := . -name '*.v' ! -name '*\#*' ! -path './.git/*' ! -path './with-proof-state/*'
 
 default: prosa
@@ -77,8 +78,8 @@ vacuum: allCoqProject cleanall
 	@echo 'VACUUMING *.vo *.vok *.vos *.glob .*.aux <empty directories>'
 	@find . -depth \( -iname '*.vo' -or -iname "*.vok" -or -iname "*.vos" -or  -iname '*.glob' -or -iname '.*.aux' \)  ! -path './.git/*' -delete
 	@find . -depth -type d -empty ! -path './.git/*' -delete
-	@echo 'REMOVING ${COQ_MAKEFILE} ${COQ_PROJ}'
-	@rm -f ${COQ_MAKEFILE} ${COQ_PROJ}
+	@echo 'REMOVING ${COQ_ARTIFACTS} ${COQ_PROJ}'
+	@rm -f ${COQ_ARTIFACTS} ${COQ_PROJ}
 
 macos-clean:
 	@echo 'CLEAN .DS_Store'
@@ -114,7 +115,7 @@ help:
 	@echo "'make html' to build the documentation with all proofs"
 	@echo
 	@echo "'make clean' to remove generated files"
-	@echo "'make vacumm' to clean .vo .glob .aux files and empty dirs"
+	@echo "'make vacuum' to clean .vo .glob .aux files and empty dirs"
 	@echo "'make macos-clean' to clean macos' .DS_Store dirs"
 	@echo "'make distclean' to remove all generated files"
 	@echo
