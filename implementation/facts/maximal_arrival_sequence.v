@@ -233,26 +233,30 @@ Section MaximalArrivalSequence.
   Theorem concrete_is_arrival_curve :
     taskset_respects_max_arrivals (concrete_arrival_sequence generate_jobs_at ts) ts.
   Proof.
-    move=> tsk IN t1 t LEQ.
-    set Δ := t - t1.
-    replace t1 with (t-Δ); last by lia.
-    have LEQd: Δ <= t by lia.
-    generalize Δ LEQd; clear LEQ Δ LEQd.
-    elim: t => [|t IHt] Δ LEQ.
-    { rewrite sub0n.
-      rewrite number_of_task_arrivals_eq //.
-      by vm_compute; rewrite unlock. }
-    { rewrite number_of_task_arrivals_eq //.
-      destruct Δ as [|Δ]; first by rewrite /index_iota subnn; vm_compute; rewrite unlock.
-      rewrite subSS.
-      specialize (IHt Δ).
-      feed IHt; first by lia.
-      rewrite number_of_task_arrivals_eq // in IHt.
-      rewrite big_nat_recr //=; last by lia.
-      rewrite -leq_subRL; first apply n_arrivals_at_leq; try lia.
-      move: (H_valid_arrival_curve tsk IN) => [ZERO MONO].
-      apply (leq_trans IHt).
-      by apply MONO. }
+    move=> tsk IN t1 t.
+    have [LEQ|LT] := leqP t1 t.
+    - set Δ := t - t1.
+      replace t1 with (t - Δ); last by rewrite /Δ; lia.
+      have LEQd: Δ <= t by lia.
+      generalize Δ LEQd; clear LEQ Δ LEQd.
+      elim: t => [|t IHt] Δ LEQd.
+      { rewrite sub0n.
+        rewrite number_of_task_arrivals_eq //.
+        by vm_compute; rewrite unlock. }
+      { rewrite number_of_task_arrivals_eq //.
+        destruct Δ as [|Δ]; first by rewrite /index_iota subnn; vm_compute; rewrite unlock.
+        rewrite subSS.
+        specialize (IHt Δ).
+        feed IHt; first by lia.
+        rewrite number_of_task_arrivals_eq // in IHt.
+        rewrite big_nat_recr //=; last by lia.
+        rewrite -leq_subRL; first apply n_arrivals_at_leq; try lia.
+        move: (H_valid_arrival_curve tsk IN) => [ZERO MONO].
+        apply (leq_trans IHt).
+        by apply MONO. }
+    - rewrite /number_of_task_arrivals /task_arrivals_between.
+      rewrite arrivals_between_geq; last by lia.
+      by [].
   Qed.
 
 End MaximalArrivalSequence.

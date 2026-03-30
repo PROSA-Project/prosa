@@ -85,7 +85,7 @@ Section ArrivalCurveToRBF.
       respects_max_request_bound arr_seq tsk ((task_max_rbf MaxArr) tsk).
     Proof.
       move=> TASK_COST RESPECT t1 t2 LEQ.
-      specialize (RESPECT t1 t2 LEQ).
+      specialize (RESPECT t1 t2).
       apply leq_trans with (n := task_cost tsk * number_of_task_arrivals arr_seq tsk t1 t2) => //.
       - rewrite /max_arrivals /number_of_task_arrivals -sum1_size big_distrr //= muln1 leq_sum_seq // => j.
         rewrite mem_filter => /andP [/eqP TSK _] _.

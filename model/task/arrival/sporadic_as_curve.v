@@ -54,7 +54,7 @@ Section SporadicArrivalCurve.
         on the maximum number of arrivals. *)
     Lemma sporadic_arrival_curve_respects_max_arrivals :
       respects_max_arrivals arr_seq tsk (max_sporadic_arrivals tsk).
-    Proof. by move=> t1 t2 LEQ; apply: sporadic_task_arrivals_bound. Qed.
+    Proof. by move=> t1 t2; apply: sporadic_task_arrivals_bound. Qed.
 
   End Validity.
 

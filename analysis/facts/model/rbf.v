@@ -74,7 +74,7 @@ Section ProofRequestBoundFunction.
       rewrite /task_request_bound_function.
       rewrite leq_mul2l; apply/orP; right.
       rewrite -{2}[Δ](addKn t).
-      by apply/H_tsk_arrivals_bounded/leq_addr.
+      exact: H_tsk_arrivals_bounded.
     Qed.
 
   End RBF.
@@ -751,8 +751,7 @@ Section TaskWorkload.
     - rewrite leq_sub2r // leq_mul2l; apply/orP => //=; right.
       have POSE: Δ = (t1 + Δ - t1) by lia.
       rewrite [in leqRHS]POSE.
-      eapply (H_is_arrival_curve t1 (t1 + Δ)).
-      by lia.
+      exact: (H_is_arrival_curve t1 (t1 + Δ)).
     - rewrite (@num_arrivals_of_task_cat _ _ _ _ _ (job_arrival j)); last by apply /andP; split.
       rewrite mulnDr.
       rewrite /task_workload_between /task_workload (workload_of_jobs_cat _ (job_arrival j) );

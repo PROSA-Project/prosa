@@ -37,7 +37,7 @@ Section NonPathologicalCurve.
     max_arrivals tsk ε > 0.
   Proof.
     move: (H_arrives) => [t ARR].
-    move: (H_curve_is_valid t t.+1 ltac:(by done)).
+    move: (H_curve_is_valid t t.+1).
     rewrite -addn1 -addnBAC // addnBl_leq // => VALID.
     apply: (leq_trans _ VALID).
     rewrite /number_of_task_arrivals size_of_task_arrivals_between.
@@ -101,7 +101,7 @@ Section JLFPArrivalBounds.
       by eapply H_all_jobs_from_taskset, in_arrivals_implies_arrived => //. }
     { rewrite big_seq_cond [leqRHS]big_seq_cond; apply leq_sum => tsk /andP [IN _].
       rewrite -big_filter sum1_size -{2}[Δ](addKn t1).
-      apply:leq_trans; last by apply H_is_arrival_curve => //; lia.
+      apply:leq_trans; last by apply H_is_arrival_curve => //.
       by rewrite /number_of_task_arrivals /task_arrivals_between -sum1_size big_filter. }
   Qed.
 
@@ -172,7 +172,6 @@ Section FPArrivalBounds.
           by destruct (_ == _), (s \in _ ), (hep_task _ _), (hep_task _ _) => //.
         }
         { by done. }
-        { by lia. }
       }
       { rewrite big_seq_cond leqn0; apply/eqP; apply big1 => s /andP [INs /andP [HEPs /eqP EQs]].
         by subst tsk; rewrite HEP in HEPs.

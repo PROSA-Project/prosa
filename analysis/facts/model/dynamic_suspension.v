@@ -112,7 +112,7 @@ Section TotalSuspensionBounded.
       (n := number_of_task_arrivals arr_seq tsk t1 (t1 + Δ) * task_total_suspension tsk); last first.
     { rewrite leq_mul2r; apply /orP; right.
       rewrite -{2}[Δ](addKn t1).
-      apply: H_tsk_respects_max_arrivals; by lia. }
+      exact: H_tsk_respects_max_arrivals. }
     rewrite /number_of_task_arrivals -sum1_size big_distrl //=.
     rewrite exchange_big_idem //=.
     apply leq_sum_seq => jo INjo _; rewrite mul1n.

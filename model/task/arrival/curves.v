@@ -68,7 +68,6 @@ Section ArrivalCurves.
       number of jobs of [tsk] that arrive in that interval. *)
   Definition respects_max_arrivals (tsk : Task) (max_arrivals : duration -> nat) :=
     forall (t1 t2 : instant),
-      t1 <= t2 ->
       number_of_task_arrivals arr_seq tsk t1 t2 <= max_arrivals (t2 - t1).
 
   (** We analogously define the lower arrival bound.. *)

@@ -297,22 +297,31 @@ Section ACPropFacts.
     taskset_respects_max_arrivals arr_seq1 ts1 ->
     taskset_respects_max_arrivals arr_seq2 ts2.
   Proof.
-    move=> RESP1 tsk2 IN2 t1 t2 LEQ.
+    move=> RESP1 tsk2 IN2 t1 t2.
     have IN1 : task1_of tsk2 \in ts1 by rewrite /ts1 map_f.
     rewrite /max_arrivals/max_arrivals2/propagated_arrival_curve
               /number_of_task_arrivals/task_arrivals_between.
     case DELTA: (t2 - t1) => [|D];
       first by rewrite arrivals_between_geq //=; lia.
+    have ORDERED : t1 <= t2.
+    { have LT : t1 < t2.
+      { rewrite -subn_gt0.
+        by rewrite DELTA. }
+      exact: ltnW LT. }
     rewrite -DELTA => {D} {DELTA}.
     rewrite -(size_map job1_of) //.
-    apply: leq_trans; first exact: trigger_job_size.
+    have STEP1 :
+      size [seq job1_of j2 | j2 <- task_arrivals_between arr_seq2 tsk2 t1 t2]
+      <= size (task_arrivals_between arr_seq1 (task1_of tsk2)
+                  (t1 - delay_bound tsk2) t2).
+    { exact: (trigger_job_size t1 t2 ORDERED tsk2 IN2). }
+    apply: (leq_trans STEP1).
     apply (@leq_trans (max_arrivals (task1_of tsk2)
                          (t2 - (t1 - delay_bound tsk2)))).
     - rewrite -/(number_of_task_arrivals _ _ (t1 - delay_bound tsk2) t2).
-      by apply: (RESP1 _ IN1); lia.
+      exact: (RESP1 _ IN1 _ _).
     - move: (H_valid_ac _ IN1) => [_ MONO].
       by apply: MONO; lia.
   Qed.
 
 End ACPropFacts.
-
