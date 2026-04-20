@@ -46,7 +46,7 @@ Section SporadicArrivals.
     destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by [] | by apply filter_uniq | ].
     rewrite mem_filter in A_IN; rewrite mem_filter in B_IN.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].
-    move: (ARRA); move: (ARRB); rewrite /arrivals_at => A_IN B_IN.
+    move: (ARRA); move: (ARRB) => A_IN B_IN.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
     have EQ_ARR_A : (job_arrival a = job_arrival j) by [].
     have EQ_ARR_B : (job_arrival b = job_arrival j) by [].

@@ -39,13 +39,13 @@ Section JobConstructor.
       positioning inside the arrival sequence. *)
   Lemma job_arrival_consistent :
     forall j t,
-      j \in arrivals_at arr_seq t -> job_arrival j = t.
+      j \in arr_seq t -> job_arrival j = t.
   Proof. by move=> j t /mem_bigcat_exists [tsk [TSK_IN /mapP [i INi] ->]]. Qed.
 
   (** Next, we show that the list of arrivals at any time [t] is unique ... *)
   Lemma arrivals_at_unique :
     forall t,
-      uniq (arrivals_at arr_seq t).
+      uniq (arr_seq t).
   Proof.
     move=> t.
     apply bigcat_uniq => //=;

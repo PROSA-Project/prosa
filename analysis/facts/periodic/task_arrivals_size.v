@@ -43,7 +43,7 @@ Section TaskArrivalsSize.
     rewrite /task_arrivals_at mem_filter in A_IN; move : A_IN => /andP [/eqP TSK A_ARR].
     move : H_valid_arrival_sequence => [CONSISTENT UNIQ].
     move : (A_ARR) => A_IN; apply CONSISTENT in A_IN.
-    rewrite -A_IN in T; rewrite /arrivals_at in A_ARR.
+    rewrite -A_IN in T.
     apply in_arrseq_implies_arrives in A_ARR.
     have EXISTS_N : exists n, job_arrival a = task_offset tsk + n * task_period tsk
         by exact: (job_arrival_times arr_seq).
@@ -66,7 +66,7 @@ Section TaskArrivalsSize.
     destruct EXISTS_TWO as [a [b [NEQ [A_IN B_IN]]]]; [by [] | by apply filter_uniq | ].
     rewrite mem_filter in A_IN; rewrite mem_filter in B_IN.
     move: A_IN B_IN => /andP [/eqP TSKA ARRA] /andP [/eqP TSKB ARRB].
-    move: (ARRA); move: (ARRB); rewrite /arrivals_at => A_IN B_IN.
+    move: (ARRA); move: (ARRB) => A_IN B_IN.
     apply in_arrseq_implies_arrives in A_IN; apply in_arrseq_implies_arrives in B_IN.
     have SPO : respects_sporadic_task_model arr_seq tsk => [//|].
     have EQ_ARR_A : (job_arrival a = t) by [].

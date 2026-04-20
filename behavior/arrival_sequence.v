@@ -26,16 +26,13 @@ Section JobProperties.
   Context {Job : JobType}.
   Variable arr_seq : arrival_sequence Job.
 
-  (** First, we define the sequence of jobs arriving at time t. *)
-  Definition arrivals_at (t : instant) := arr_seq t.
-
-  (** Next, we say that job j arrives at a given time t iff it belongs to the
+  (** We say that job [j] arrives at a given time [t] iff it belongs to the
        corresponding sequence. *)
-  Definition arrives_at (j : Job) (t : instant) := j \in arrivals_at t.
+  Definition arrives_at (j : Job) (t : instant) := j \in arr_seq t.
 
   (** Similarly, we define whether job j arrives at some (unknown) time t, i.e.,
        whether it belongs to the arrival sequence. *)
-  Definition arrives_in (j : Job) := exists t, j \in arrivals_at t.
+  Definition arrives_in (j : Job) := exists t, j \in arr_seq t.
 
 End JobProperties.
 
@@ -59,7 +56,7 @@ Section ValidArrivalSequence.
 
   (** We say that the arrival sequence is a set iff it doesn't contain duplicate
      jobs at any given time. *)
-  Definition arrival_sequence_uniq := forall t, uniq (arrivals_at arr_seq t).
+  Definition arrival_sequence_uniq := forall t, uniq (arr_seq t).
 
   (** We say that the arrival sequence is valid iff it is a set and arrival times
      are consistent *)
@@ -110,7 +107,7 @@ Section ArrivalSequencePrefix.
   (** By concatenation, we construct the list of jobs that arrived in the
      interval <<[t1, t2)>>. *)
   Definition arrivals_between (t1 t2 : instant) :=
-    \cat_(t1 <= t < t2) arrivals_at arr_seq t.
+    \cat_(t1 <= t < t2) arr_seq t.
 
   (** Based on that, we define the list of jobs that arrived up to time t, ...*)
   Definition arrivals_up_to (t : instant) := arrivals_between 0 t.+1.

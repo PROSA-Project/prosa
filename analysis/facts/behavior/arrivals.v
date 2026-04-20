@@ -200,7 +200,7 @@ Section ArrivalSequencePrefix.
         corollary. *)
     Lemma job_arrival_at :
       forall {j t},
-        j \in arrivals_at arr_seq t -> job_arrival j = t.
+        j \in arr_seq t -> job_arrival j = t.
     Proof. exact: H_consistent_arrival_times. Qed.
 
     (** Next, we  prove that if [j] is a part of the arrival sequence,
@@ -209,7 +209,7 @@ Section ArrivalSequencePrefix.
       forall j t,
         arrives_in arr_seq j ->
         job_arrival j = t ->
-        j \in arrivals_at arr_seq t.
+        j \in arr_seq t.
     Proof.
       move => j t [t' IN] => /eqP.
       apply contraTT => /negP NOTIN.
@@ -422,12 +422,12 @@ Section ArrivalSequencePrefix.
         w.r.t. arrival times. *)
     Lemma arrivals_at_sorted :
       forall t,
-        sorted by_arrival_times (arrivals_at arr_seq t).
+        sorted by_arrival_times (arr_seq t).
     Proof.
       move=> t.
-      have AT_t : forall j, j \in (arrivals_at arr_seq t) -> job_arrival j = t
+      have AT_t : forall j, j \in (arr_seq t) -> job_arrival j = t
         by move=> j; apply job_arrival_at.
-      case: (arrivals_at arr_seq t) AT_t => // j' js AT_t.
+      case: (arr_seq t) AT_t => // j' js AT_t.
       apply /(pathP j') => i LT.
       rewrite /by_arrival_times !AT_t //;
         last by apply mem_nth; auto.
@@ -447,21 +447,21 @@ Section ArrivalSequencePrefix.
       case: (leqP t1 t2) => T1T2;
         last by rewrite big_geq.
       rewrite (big_cat_nat T1T2) //=.
-      case A1: (\cat_(t1<=t<t2)arrivals_at arr_seq t) => [|j js];
+      case A1: (\cat_(t1<=t<t2)arr_seq t) => [|j js];
         first by rewrite cat0s big_nat1; exact: arrivals_at_sorted.
-      have CAT : path by_arrival_times j (\cat_(t1<=t<t2)arrivals_at arr_seq t ++ \cat_(t2<=i<t2.+1)arrivals_at arr_seq i).
+      have CAT : path by_arrival_times j (\cat_(t1<=t<t2)arr_seq t ++ \cat_(t2<=i<t2.+1)arr_seq i).
       { rewrite cat_path; apply /andP; split.
         { move: SORTED. rewrite /sorted A1 => PATH_js.
           by rewrite /path -/(path _ _ js) /by_arrival_times; apply /andP; split. }
         { rewrite big_nat1.
-          case A2: (arrivals_at arr_seq t2) => // [j' js'].
+          case A2: (arr_seq t2) => // [j' js'].
           apply path_le with (x' := j').
           { by rewrite /transitive/by_arrival_times; lia. }
           { rewrite /by_arrival_times.
             have -> : job_arrival j' = t2
               by apply job_arrival_at; rewrite A2; apply mem_head.
-            set L := (last j (\cat_(t1<=t<t2)arrivals_at arr_seq t)).
-            have EX : exists t', L \in arrivals_at arr_seq t' /\ t1 <= t' < t2
+            set L := (last j (\cat_(t1<=t<t2)arr_seq t)).
+            have EX : exists t', L \in arr_seq t' /\ t1 <= t' < t2
               by apply mem_bigcat_nat_exists; rewrite /L A1 last_cons; exact: mem_last.
             move: EX => [t' [IN /andP [t1t' t't2]]].
             have -> : job_arrival L = t' by apply job_arrival_at.

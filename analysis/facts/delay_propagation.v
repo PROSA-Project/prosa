@@ -71,7 +71,7 @@ Section ACPropFacts.
     consistent_arrival_times arr_seq2.
   Proof.
     move=> j2 t.
-    rewrite /arrives_at/arrivals_at/arr_seq2/propagated_arrival_sequence.
+    rewrite /arrives_at/arr_seq2/propagated_arrival_sequence.
     rewrite mem_filter => /andP[/eqP <- _].
     by move: H_arr_seq_mapping => [_ _ _ {}].
   Qed.
@@ -82,7 +82,7 @@ Section ACPropFacts.
     arrival_sequence_uniq arr_seq2.
   Proof.
     move=> VALID t.
-    rewrite /arrivals_at/arr_seq2/propagated_arrival_sequence.
+    rewrite /arr_seq2/propagated_arrival_sequence.
     apply: filter_uniq.
     rewrite /flatten foldrE big_map big_seq.
     apply: bigcat_uniq.
@@ -116,7 +116,7 @@ Section ACPropFacts.
   Proof.
     move=> j2 CAT1 IN; move: (IN) => [t IN'].
     exists (t + arrival_delay j2).
-    rewrite /arrivals_at/arr_seq2/propagated_arrival_sequence.
+    rewrite /arr_seq2/propagated_arrival_sequence.
     rewrite mem_filter; apply/andP; split;
       first by rewrite (CAT1 _ t).
     apply/flatten_mapP.
@@ -134,7 +134,7 @@ Section ACPropFacts.
       arrives_in arr_seq2 j2 -> arrives_in arr_seq1 (job1_of j2).
   Proof.
     move=> j2 [t2 {}].
-    rewrite /arrivals_at/arr_seq2/propagated_arrival_sequence.
+    rewrite /arr_seq2/propagated_arrival_sequence.
     rewrite mem_filter => /andP[/eqP DEF /flatten_mapP[j1 IN1 {}]].
     move: H_arr_seq_mapping => [-> _ _ _] ->.
     by apply/in_arrivals_implies_arrived/IN1.

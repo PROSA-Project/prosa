@@ -71,7 +71,7 @@ Section TaskArrivals.
     split; first by apply /eqP => //.
     move : ARR => [t ARR]; move : (ARR) => EQ.
     apply H_consistent_arrivals in EQ.
-    rewrite (mem_bigcat_nat _ (fun t => arrivals_at arr_seq t) j 0 _ (job_arrival j)) // EQ //.
+    rewrite (mem_bigcat_nat _ (fun t => arr_seq t) j 0 _ (job_arrival j)) // EQ //.
     now lia.
   Qed.
 
@@ -85,7 +85,6 @@ Section TaskArrivals.
     intros j ARR.
     rewrite mem_filter; apply /andP.
     split; first by apply /eqP => //.
-    rewrite /arrivals_at.
     move : ARR => [t ARR].
     now rewrite (H_consistent_arrivals j t ARR).
   Qed.
