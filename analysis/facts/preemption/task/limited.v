@@ -105,10 +105,23 @@ Section LimitedPreemptionsModel.
     - by apply fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions.
   Qed.
 
+  (** We show that, under the fixed-preemption-points model, the
+      maximum non-preemptive segment of each task in [ts] does not
+      exceed the task's WCET. *)
+  Lemma task_max_nps_le_task_cost :
+    forall tsk, tsk \in ts -> task_max_nonpreemptive_segment tsk <= task_cost tsk.
+  Proof.
+    move=> tsk IN.
+    move: H_valid_fixed_preemption_points_model => [_ [_ [END [NDEC _]]]].
+    rewrite /task_max_nonpreemptive_segment /task_max_nonpr_segment -(END tsk IN).
+    exact: max_distance_in_seq_le_last_element_of_seq (NDEC tsk IN).
+  Qed.
+
 End LimitedPreemptionsModel.
 
-(** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)
 Global Hint Resolve
      valid_fixed_preemption_points_model_lemma
      fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions
-     fixed_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions : basic_rt_facts.
+     fixed_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions
+     task_max_nps_le_task_cost : basic_rt_facts.

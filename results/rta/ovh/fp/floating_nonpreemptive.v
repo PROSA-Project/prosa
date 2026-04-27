@@ -82,7 +82,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
       job is divided into a number of non-preemptive segments by inserting
       preemption points. *)
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :
-    valid_model_with_floating_nonpreemptive_regions arr_seq.
+    valid_model_with_floating_nonpreemptive_regions arr_seq ts.
 
   (** Additionally, we assume that all jobs in [arr_seq] have positive execution
       costs. This requirement is not fundamental to the analysis approach itself

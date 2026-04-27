@@ -89,10 +89,17 @@ Section FullyNonPreemptiveModel.
     - by apply fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions.
   Qed.
 
+  (** In the fully non-preemptive model, [task_max_nonpreemptive_segment]
+      equals [task_cost] by definition, so the bound holds trivially. *)
+  Lemma task_max_nps_le_task_cost :
+    forall tsk : Task, task_max_nonpreemptive_segment tsk <= task_cost tsk.
+  Proof. by move=> tsk. Qed.
+
 End FullyNonPreemptiveModel.
 
-(** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)
 Global Hint Resolve
      valid_fully_nonpreemptive_model
      fully_nonpreemptive_model_is_model_with_bounded_nonpreemptive_regions
-     fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions : basic_rt_facts.
+     fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions
+     task_max_nps_le_task_cost : basic_rt_facts.

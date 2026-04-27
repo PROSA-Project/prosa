@@ -41,8 +41,6 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
       inserting preemption points. *)
   Context `{JobPreemptionPoints Job}
           `{TaskMaxNonpreemptiveSegment Task}.
-  Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :
-    valid_model_with_floating_nonpreemptive_regions arr_seq.
 
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.
@@ -53,6 +51,13 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   (** ... and the cost of a job cannot be larger than the task cost. *)
   Hypothesis H_valid_job_cost :
     arrivals_have_valid_job_costs arr_seq.
+
+  (** Assume a model with floating non-preemptive regions. I.e., for each task
+      only the length of the maximal non-preemptive segment is known and each
+      job is divided into a number of non-preemptive segments by inserting
+      preemption points. *)
+  Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :
+    valid_model_with_floating_nonpreemptive_regions arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
       any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
@@ -123,7 +128,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Theorem uniprocessor_response_time_bound_edf_with_floating_nonpreemptive_regions :
     task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move: (H_valid_task_model_with_floating_nonpreemptive_regions) => [LIMJ JMLETM].
+    move: (H_valid_task_model_with_floating_nonpreemptive_regions) => [LIMJ [JMLETM _]].
     move: (LIMJ) => [BEG [END _]].
     eapply uniprocessor_response_time_bound_edf_with_bounded_nonpreemptive_segments with (L := L) => //.
     rewrite subnn.

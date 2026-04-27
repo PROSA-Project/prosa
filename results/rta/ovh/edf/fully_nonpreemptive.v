@@ -141,9 +141,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
       length. To this end, let [L] be any positive solution of the busy-interval
-      "recurrences" (i.e., set of inequalities) [overhead_bound L +
-      total_request_bound_function ts L <= L] and [overhead_bound L +
-      longest_busy_interval_with_pi ts tsk <= L], as defined below.
+      "recurrence" (i.e., inequality) [overhead_bound L +
+      total_request_bound_function ts L <= L], as defined below.
 
       As the lemma [busy_intervals_are_bounded_rs_edf] shows, under [EDF]
       scheduling, this condition is sufficient to guarantee that the maximum
@@ -151,8 +150,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       is bounded by [L]. *)
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
-    /\ L >= overhead_bound L + total_request_bound_function ts L
-    /\ L >= overhead_bound L + longest_busy_interval_with_pi ts tsk.
+    /\ L >= overhead_bound L + total_request_bound_function ts L.
 
   (** ** Response-Time Bound *)
 
@@ -186,7 +184,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
         rta_recurrence_solution L R ->
         task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> L [BW_POS [BW_SOL1 BW_SOL2]] R SOL js ARRs TSKs; set (sSBF := jlfp_ovh_sbf_slow ts DB CSB CRPDB).
+    move=> L [BW_POS BW_SOL1] R SOL js ARRs TSKs; set (sSBF := jlfp_ovh_sbf_slow ts DB CSB CRPDB).
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have VMBNS : valid_model_with_bounded_nonpreemptive_segments arr_seq sched
       by apply fully_nonpreemptive_model_is_valid_model_with_bounded_nonpreemptive_regions => //.
@@ -200,7 +198,6 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - apply: busy_intervals_are_bounded_rs_edf => //.
       + by apply: instantiated_i_and_w_are_coherent_with_schedule.
-      + by apply bound_preserved_under_slowed; unfold jlfp_blackout_bound, overhead_bound in *; lia.
       + by apply bound_preserved_under_slowed; unfold jlfp_blackout_bound, overhead_bound in *; lia.
     - apply: valid_pred_sbf_switch_predicate; last (eapply overheads_sbf_busy_valid) => //=.
       by move => ? ? ? ? [? ?]; split => //; apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.

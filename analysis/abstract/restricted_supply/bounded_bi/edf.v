@@ -1,27 +1,18 @@
 Require Export prosa.model.priority.edf.
 Require Export prosa.model.task.absolute_deadline.
-Require Export prosa.analysis.definitions.busy_interval.edf_pi_bound.
+Require Export prosa.model.task.preemption.parameters.
+Require Export prosa.analysis.definitions.request_bound_function.
 Require Export prosa.analysis.abstract.restricted_supply.abstract_rta.
 Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.aux.
 Require Export prosa.analysis.definitions.sbf.busy.
 
 (** * Sufficient Condition for Bounded Busy Intervals for RS EDF *)
 
-(** In this section, we show that the existence of [L] such that
-    [total_rbf L <= SBF L /\ longest_busy_interval_with_pi <= SBF L],
-    where [longest_busy_interval_with_pi] is the length of the longest
-    busy interval starting with a priority inversion (w.r.t. a job of
-    a task under analysis) and [SBF] is a supply-bound function, is a
-    sufficient condition for the existence of bounded busy intervals
-    under EDF scheduling with a restricted-supply processor model.
-
-    The proof uses the following observation. Consider the beginning
-    of a busy interval of a job [j] to be analyzed. If there is
-    service inversion, one can derive an upper bound on the relative
-    arrival of job [j], which in turn can be used to derive a bound on
-    the total higher-or-equal priority workload
-    ([longest_busy_interval_with_pi]). If there is no service
-    inversion, we use the standard fixpoint approach with [total_rbf L]. *)
+(** In this section, we show that the existence of [L] such that [total_rbf L <=
+    SBF L], where [SBF] is a supply-bound function, is a sufficient condition
+    for the existence of bounded busy intervals under EDF scheduling with a
+    restricted-supply processor model. The proof proceeds by case analysis on
+    whether the busy interval of [j] starts with service inversion. *)
 Section BoundedBusyIntervals.
 
   (** Consider any type of tasks ... *)
@@ -115,9 +106,13 @@ Section BoundedBusyIntervals.
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
   Hypothesis H_unit_SBF : unit_supply_bound_function SBF.
 
-  (** First, we show that the constant [longest_busy_interval_with_pi
-      ts tsk] indeed bounds the cumulative interference incurred by
-      job [j]. *)
+  (** The proof of busy-interval boundedness proceeds by case analysis on
+      whether the cumulative service inversion of [j] is positive or zero. The
+      zero case is handled by the standard [total_rbf L] fixpoint argument. The
+      positive case, however, requires a different approach: we introduce an
+      auxiliary function [longest_busy_interval_with_pi δ] and establish here
+      that it is a valid upper bound on the cumulative interference in any
+      interval of length [δ] with positive service inversion. *)
   Section LongestBusyIntervalWithPIIsValid.
 
     (** Consider any job [j] of task [tsk] that has a positive job
@@ -131,45 +126,87 @@ Section BoundedBusyIntervals.
     Variable t1 t2 : instant.
     Hypothesis H_busy_prefix : busy_interval_prefix arr_seq sched j t1 t2.
 
-    (** Consider an interval <<[t1, t1 + δ) ⊆ [t1, t2)>>. *)
-    Variable δ : duration.
-    Hypothesis H_interval_in_busy_prefix : t1 + δ <= t2.
+    (** Consider an interval <<[t1, t1 + Δ) ⊆ [t1, t2)>>. *)
+    Variable Δ : duration.
+    Hypothesis H_interval_in_busy_prefix : t1 + Δ <= t2.
 
     (** Assume that cumulative service inversion of job [j] in this
         interval is positive. *)
     Hypothesis H_positive_service_inversion :
-      cumulative_service_inversion arr_seq sched j t1 (t1 + δ) > 0.
+      cumulative_service_inversion arr_seq sched j t1 (t1 + Δ) > 0.
 
-    (** The LHS of the following inequality represents all possible
-        interference as well as the cost of the job itself in a prefix
-        of length [δ]. On the RHS of the inequality, there is a
-        constant [longest_busy_interval_with_pi]. We prove that this
-        inequality is indeed true. This implies that if the cumulative
-        service inversion of job [j] is positive, its busy interval
-        cannot possibly be longer than
-        [longest_busy_interval_with_pi]. *)
+    (** Under the above assumptions, we define a function [δ ↦
+        longest_busy_interval_with_pi δ] as an upper bound on the cumulative
+        interference incurred by [j] in an interval <<[t1, t1 + δ)>>. *)
+    Definition longest_busy_interval_with_pi δ :=
+
+      (** Let [lp_interference tsk_lp] denote the maximum service inversion
+          caused by a task [tsk_lp]. *)
+      let lp_interference tsk_lp :=
+        task_max_nonpreemptive_segment tsk_lp - ε in
+
+      (** Let [hp_interference tsk_lp] denote the total RBF workload of
+          tasks with a strictly shorter deadline than [tsk_lp].
+
+          The interference on [j] comes from jobs [jo] with [hep_job jo j],
+          i.e., [job_deadline jo <= job_deadline j]. Since the outer
+          condition requires [D tsk_lp > D tsk] (strict), we have
+          [job_deadline j < job_deadline jlp]. Therefore:
+<<
+                job_deadline jo ≤ job_deadline j < job_deadline jlp
+>>
+          No (HEP) job with [job_deadline = D tsk_lp] ever interferes with
+          [j], so [D tsk_hp < D tsk_lp] captures precisely the right set of
+          tasks:
+<<
+                 D tsk_hp   ≤     D tsk    <    D tsk_lp
+                     |              |             |
+          0 ─────────●──────────────●─────────────●──────→ deadline
+                     │<──── hp_interference ─────>│
+                         (D tsk_hp < D tsk_lp)
+>>
+*)
+      let hp_interference tsk_lp :=
+        \sum_(tsk_hp <- ts | D tsk_hp < D tsk_lp)
+         task_request_bound_function tsk_hp δ in
+
+      (** Then, the amount of interfering workload incurred by a job of task
+          [tsk] is bounded by the maximum of [lp_interference tsk_lp +
+          hp_interference tsk_lp], where [tsk_lp] is such that [D tsk_lp > D
+          tsk]. *)
+      \max_(tsk_lp <- ts | (D tsk_lp > D tsk) && (0 < max_arrivals tsk_lp ε))
+       (lp_interference tsk_lp + hp_interference tsk_lp).
+
+    (** We show that the cumulative service inversion, together with the interfering
+        workload and the cost of [j] itself in the interval <<[t1, t1 + δ)>>, does
+        not exceed [longest_busy_interval_with_pi δ]. *)
     Lemma longest_bi_with_pi_bound_is_valid :
-      cumulative_service_inversion arr_seq sched j t1 (t1 + δ)
-      + (cumulative_other_hep_jobs_interfering_workload arr_seq j t1 (t1 + δ)
-         + workload_of_job arr_seq j t1 (t1 + δ))
-      <= longest_busy_interval_with_pi ts tsk.
+      cumulative_service_inversion arr_seq sched j t1 (t1 + Δ)
+      + (cumulative_other_hep_jobs_interfering_workload arr_seq j t1 (t1 + Δ)
+         + workload_of_job arr_seq j t1 (t1 + Δ))
+      <= longest_busy_interval_with_pi Δ.
     Proof.
       move: (H_positive_service_inversion) => PP.
       eapply cumulative_service_inversion_from_one_job in H_positive_service_inversion => //.
       move: H_positive_service_inversion => [jlp [ARR [LP EQs]]].
       move: (H_job_of_tsk) => /eqP TSK; unfold longest_busy_interval_with_pi, D in *; subst tsk.
       move: (H_busy_prefix) => [_ [_ [_ /andP [ARRj _]]]].
-      have [t_sched [_ SCHEDjlp]]: exists t, t1 <= t < t1 + δ /\ scheduled_at sched jlp t
+      have [t_sched [_ SCHEDjlp]]: exists t, t1 <= t < t1 + Δ /\ scheduled_at sched jlp t
           by apply cumulative_service_implies_scheduled; rewrite -EQs.
       apply leq_bigmax_sup; exists (job_task jlp); split; last split.
       { by apply H_all_jobs_from_taskset. }
-      {  move_neq_up LP'; move: LP => /negP LP; apply: LP.
-         by rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline; lia. }
+      { move_neq_up LP'; move: LP => /negP LP; apply: LP.
+        move: LP' => /negP; rewrite negb_and => /orP [/negPn | ].
+        { by rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline; lia. }
+        { have ARRlp: arrives_in arr_seq jlp by apply: arrives_in_jobs_come_from_arrival_sequence; eauto 2.
+          by move=>/negP NEG; exfalso; apply: NEG;
+            by eapply non_pathological_max_arrivals with (j := jlp) => //; unfold job_of_task. }
+      }
       apply leq_add.
       - rewrite EQs (leqRW (lp_job_bounded_service _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _)) => //.
         by rewrite leq_sub2r //; apply H_valid_model_with_bounded_nonpreemptive_segments.
       - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
-        apply leq_trans with (workload_of_jobs (hep_job^~ jlp) (arrivals_between arr_seq t1 (t1 + δ))).
+        apply leq_trans with (workload_of_jobs (hep_job^~ jlp) (arrivals_between arr_seq t1 (t1 + Δ))).
         { apply workload_of_jobs_weaken => jo; move: LP; clear.
           by rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline; lia. }
         erewrite workload_of_jobs_partitioned_by_tasks with (ts := undup ts).
@@ -177,14 +214,6 @@ Section BoundedBusyIntervals.
           apply leq_sum_seq => tsk_o INo HEP.
           set P := (fun j' : Job => hep_job j' jlp && (job_task j' == tsk_o)).
           rewrite -(leqRW (rbf_spec' _ _ P _ _ _ _ _)) /P //; last by move=> ? /andP[].
-          have [A | B] := (leqP δ (task_deadline (job_task jlp) - task_deadline tsk_o)).
-          { by apply workload_of_jobs_reduce_range; lia. }
-          { have EQt: forall a b, a = b -> a <= b; [by lia | apply: EQt].
-            apply workload_of_jobs_nil_tail => //; [lia | move => jo IN LE].
-            have [EQ|NEQ] := (@eqP _ (job_task jo) (tsk_o)); last by rewrite andbF.
-            rewrite andbT /hep_job /EDF /job_deadline /job_deadline_from_task_deadline -ltnNge.
-            by subst tsk_o; rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline in LP; lia.
-          }
         + by move=> jo IN; rewrite in_seq_equiv_undup;
             apply: H_all_jobs_from_taskset; apply: in_arrivals_implies_arrived.
         + move=> jo IN.
@@ -197,28 +226,45 @@ Section BoundedBusyIntervals.
 
   End LongestBusyIntervalWithPIIsValid.
 
-  (** We introduce the main assumption of this section. Let [L]
-      be any positive constant that satisfies two properties. *)
+  (** Let [L] be any positive constant satisfying the total-RBF fixpoint
+      condition. When there is no service inversion at the beginning of a busy
+      interval, one can show that there is no carry-in workload (including the
+      lower-priority workload). This allows us to bound the interfering workload
+      within a busy interval with [total_RBF L] without adding an extra [+
+      blocking_bound] as in the case of the general JLFP bound. For the case
+      when there is service inversion, we show that
+      [longest_busy_interval_with_pi L] is bounded by [SBF L]. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
-
-  (** First, we assume that [SBF L] bounds
-      [longest_busy_interval_with_pi ts tsk]. As discussed, when a
-      busy interval starts with service inversion, one can upper-bound
-      the total interfering workload that a job under analysis incurs
-      via [longest_busy_interval_with_pi ts tsk]. The time to consume
-      this workload is [SBF L]. *)
-  Hypothesis H_L_bounds_bi_with_pi : longest_busy_interval_with_pi ts tsk <= SBF L.
-
-  (** And second, we assume that [total_RBF L <= SBF L]. When there is
-      no service inversion at the beginning of a busy interval, one
-      can show that there is no carry-in workload (including the
-      lower-priority workload). This allows us to bound interfering
-      workload within a busy interval with [total_RBF L] without
-      adding an extra [+ blocking_bound] as in the case of the general
-      JLFP bound. *)
   Hypothesis H_fixed_point : total_request_bound_function ts L <= SBF L.
 
+  (** We additionally require that the maximum non-preemptive segment
+      of each task in [ts] does not exceed its WCET. *)
+  Hypothesis H_task_max_nps_le_task_cost :
+    forall tsk, tsk \in ts -> task_max_nonpreemptive_segment tsk <= task_cost tsk.
+
+  (** We establish that [SBF L] bounds [longest_busy_interval_with_pi L]. This
+      follows from the fixpoint condition, which dominates the higher-or-equal
+      priority workload component, and from [H_task_max_nps_le_task_cost], which
+      bounds the service-inversion component. *)
+  Lemma longest_bi_with_pi_bounded_by_sbf :
+    longest_busy_interval_with_pi L <= SBF L.
+  Proof.
+    eapply leq_trans; last by apply H_fixed_point.
+    unfold longest_busy_interval_with_pi.
+    apply/bigmax_leq_seqP => tskl IN DLT.
+    unfold total_request_bound_function.
+    rewrite [leqRHS](bigID (fun tskh => task_deadline tskh < task_deadline tskl)) //=.
+    rewrite addnC leq_add //.
+    eapply leq_trans; last by apply bigmax_leq_sum.
+    apply: bigmax_sup_seq.
+    { apply IN. }
+    { by rewrite -leqNgt leqnn. }
+    { apply: leq_trans; last apply task_rbf_ge_task_cost => //.
+      - by apply: leq_trans; [ | by apply H_task_max_nps_le_task_cost]; lia.
+      - by move: DLT => /andP [_ DLT]; apply: DLT.
+    }
+  Qed.
 
   (** In the following, we prove busy-interval boundedness via a case
       analysis on two cases: (1) when the busy-interval prefix is at
@@ -244,9 +290,9 @@ Section BoundedBusyIntervals.
       Hypothesis H_arrives : t1 <= job_arrival j.
       Hypothesis H_busy_prefix_arr : busy_interval_prefix arr_seq sched j t1 (job_arrival j).+1.
 
-      (** From the properties of the workload (defined by hypotheses
-          [H_L_bounds_bi_with_pi] and [H_fixed_point]), we show that
-          [j]'s arrival time is necessarily less than [t1 + L]. *)
+      (** From [longest_bi_with_pi_bounded_by_sbf] and [H_fixed_point],
+          we show that [j]'s arrival time is necessarily less than
+          [t1 + L]. *)
       Local Lemma job_arrival_is_bounded :
         job_arrival j < t1 + L.
       Proof.
@@ -265,9 +311,9 @@ Section BoundedBusyIntervals.
         have [ZERO|POS] := (posnP (cumulative_service_inversion arr_seq sched j t1 (t1 + L))).
         { rewrite ZERO add0n -(leqRW H_fixed_point).
           rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
-          have DD := hep_workload_le_total_rbf.
           by apply hep_workload_le_total_rbf. }
-        { by rewrite -(leqRW H_L_bounds_bi_with_pi); apply: longest_bi_with_pi_bound_is_valid. }
+        { by rewrite -(leqRW longest_bi_with_pi_bounded_by_sbf);
+            apply: longest_bi_with_pi_bound_is_valid. }
       Qed.
 
     End RelativeArrivalIsBounded.
@@ -285,7 +331,7 @@ Section BoundedBusyIntervals.
       (** The crucial point to note is that the sum of the job's cost
           (represented as [workload_of_job]) and the interfering
           workload in the interval <<[t1, t1 + L)>> is bounded by [L]
-          due to hypotheses [H_L_bounds_bi_with_pi] and
+          due to [longest_bi_with_pi_bounded_by_sbf] and
           [H_fixed_point]. *)
       Local Lemma workload_is_bounded :
         workload_of_job arr_seq j t1 (t1 + L) + cumulative_interfering_workload j t1 (t1 + L) <= L.
@@ -300,7 +346,8 @@ Section BoundedBusyIntervals.
         { rewrite ZERO add0n -(leqRW H_fixed_point).
           rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
           by apply hep_workload_le_total_rbf => //; move: (H_busy_prefix_arr) => [LE _]; rewrite -ltnS. }
-        { by rewrite -(leqRW H_L_bounds_bi_with_pi); apply: longest_bi_with_pi_bound_is_valid => //;
+        { by rewrite -(leqRW longest_bi_with_pi_bounded_by_sbf);
+            apply: longest_bi_with_pi_bound_is_valid => //;
             move: (H_busy_prefix_arr) => [LE _]; rewrite -ltnS. }
       Qed.
 
@@ -385,7 +432,7 @@ Section BoundedBusyIntervals.
   Proof.
     move => j ARR TSK POS.
     have PEND : pending sched j (job_arrival j) by apply job_pending_at_arrival => //.
-    edestruct ( busy_interval_prefix_exists) as [t1 [GE PREFIX]]; eauto 2; first by apply EDF_is_reflexive.
+    edestruct (busy_interval_prefix_exists) as [t1 [GE PREFIX]]; eauto 2; first by apply EDF_is_reflexive.
     exists t1.
     enough(exists t2, job_arrival j < t2 /\ t2 <= t1 + L /\ busy_interval arr_seq sched j t1 t2) as BUSY.
     { move: BUSY => [t2 [LT [LE BUSY]]]; eexists; split; last first.

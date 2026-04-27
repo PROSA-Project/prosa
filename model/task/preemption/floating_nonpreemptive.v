@@ -17,8 +17,9 @@ Section ValidModelWithFloatingNonpreemptiveRegions.
 
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
-  (** ... with a bound on the maximum non-preemptive segment length ... *)
+  (** ... with a bound on the maximum non-preemptive segment length and a WCET bound ... *)
   Context `{TaskMaxNonpreemptiveSegment Task}.
+  Context `{TaskCost Task}.
 
   (**  ... and any type of limited-preemptive jobs associated with these tasks ... *)
   Context {Job : JobType}.
@@ -33,6 +34,9 @@ Section ValidModelWithFloatingNonpreemptiveRegions.
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 
+  (** Consider an arbitrary task set [ts]. *)
+  Variable ts : seq Task.
+
   (** We require [task_max_nonpreemptive_segment (job_task j)] to be an upper
       bound of the length of the maximum nonpreemptive segment of job [j]. *)
   Definition job_respects_task_max_np_segment :=
@@ -40,11 +44,20 @@ Section ValidModelWithFloatingNonpreemptiveRegions.
       arrives_in arr_seq j ->
       job_max_nonpreemptive_segment j <= task_max_nonpreemptive_segment (job_task j).
 
+  (** We require the maximum non-preemptive segment of each task to be
+      bounded by its WCET. *)
+  Definition task_max_nps_le_task_cost :=
+    forall (tsk : Task),
+      tsk \in ts ->
+      task_max_nonpreemptive_segment tsk <= task_cost tsk.
+
   (** A model with floating nonpreemptive regions is valid if it is both valid
-      a the job level and jobs respect the upper bound of their task. *)
+      at the job level, jobs respect the upper bound of their task, and each
+      task's maximum non-preemptive segment does not exceed the task's WCET. *)
   Definition valid_model_with_floating_nonpreemptive_regions :=
     valid_limited_preemptions_job_model arr_seq
-    /\ job_respects_task_max_np_segment.
+    /\ job_respects_task_max_np_segment
+    /\ task_max_nps_le_task_cost.
 
 End ValidModelWithFloatingNonpreemptiveRegions.
 

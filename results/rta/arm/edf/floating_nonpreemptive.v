@@ -83,12 +83,12 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_task_arrival_sequence : valid_task_arrival_sequence ts arr_seq.
 
-  (** Assume a model with floating non-preemptive regions. I.e., for each task
+  (** Assume a model with floating non-preemptive regions, i.e., for each task
       only the length of the maximal non-preemptive segment is known and each
       job is divided into a number of non-preemptive segments by inserting
       preemption points. *)
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :
-    valid_model_with_floating_nonpreemptive_regions arr_seq.
+    valid_model_with_floating_nonpreemptive_regions arr_seq ts.
 
   (** *** Absence of Self-Suspensions *)
 
@@ -129,9 +129,8 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
       length. To this end, let [L] be any positive solution of the busy-interval
-      "recurrences" (i.e., set of inequalities) [arm_sbf Π Θ ν L >=
-      total_request_bound_function ts L] and [arm_sbf Π Θ ν L >=
-      longest_busy_interval_with_pi ts tsk], as defined below.
+      "recurrence" (i.e., inequality) [arm_sbf Π Θ ν L >=
+      total_request_bound_function ts L], as defined below.
 
       As the lemma [busy_intervals_are_bounded_rs_edf] shows, under [EDF]
       scheduling, this condition is sufficient to guarantee that the maximum
@@ -139,8 +138,8 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       is bounded by [L]. *)
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
-    /\ arm_sbf Π Θ ν L >= total_request_bound_function ts L
-    /\ arm_sbf Π Θ ν L >= longest_busy_interval_with_pi ts tsk.
+    /\ arm_sbf Π Θ ν L >= total_request_bound_function ts L.
+
 
   (** ** Response-Time Bound *)
 
@@ -172,7 +171,8 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
         rta_recurrence_solution L R ->
         task_response_time_bound arr_seq sched tsk R.
   Proof.
-    move=> L [BW_POS [BW_SOL1 BW_SOL2]] R SOL js ARRs TSKs.
+    move=> L [BW_POS BW_SOL1] R SOL js ARRs TSKs.
+    have [_ [_ H_task_max_nps_le_task_cost]] := H_valid_task_model_with_floating_nonpreemptive_regions.
     have VAL1 : valid_preemption_model arr_seq sched
       by apply valid_fixed_preemption_points_model_lemma, H_valid_task_model_with_floating_nonpreemptive_regions.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.

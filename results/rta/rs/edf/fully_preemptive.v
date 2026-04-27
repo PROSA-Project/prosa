@@ -147,7 +147,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       is bounded by [L]. *)
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
-    /\ SBF L >=  total_request_bound_function ts L.
+    /\ SBF L >= total_request_bound_function ts L.
 
   (** ** Response-Time Bound *)
 

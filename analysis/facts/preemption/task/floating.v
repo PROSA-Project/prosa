@@ -43,10 +43,13 @@ Section FloatingNonPreemptiveRegionsModel.
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
+  (** Consider an arbitrary task set [ts]. *)
+  Variable ts : seq Task.
+
   (** Next, we assume that preemption points are defined by the model
       with floating non-preemptive regions. *)
   Hypothesis H_valid_model_with_floating_nonpreemptive_regions :
-    valid_model_with_floating_nonpreemptive_regions arr_seq.
+    valid_model_with_floating_nonpreemptive_regions arr_seq ts.
 
   (** Then, we prove that the [job_preemptable and
       task_max_nonpreemptive_segment] functions define
@@ -55,7 +58,7 @@ Section FloatingNonPreemptiveRegionsModel.
     model_with_bounded_nonpreemptive_segments arr_seq.
   Proof.
     move: (H_valid_model_with_floating_nonpreemptive_regions) (H_valid_model_with_floating_nonpreemptive_regions)
-        => [LIM L] [[BEG [END NDEC]] MAX] j ARR.
+        => [LIM [L _]] [[BEG [END NDEC]] [MAX _]] j ARR.
     case: (posnP (job_cost j)) => [ZERO|POS].
     - split.
       + rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment

@@ -85,7 +85,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       job is divided into a number of non-preemptive segments by inserting
       preemption points. *)
   Hypothesis H_valid_task_model_with_floating_nonpreemptive_regions :
-    valid_model_with_floating_nonpreemptive_regions arr_seq.
+    valid_model_with_floating_nonpreemptive_regions arr_seq ts.
 
   (** Additionally, we assume that all jobs in [arr_seq] have positive execution
       costs. This requirement is not fundamental to the analysis approach itself
@@ -150,9 +150,8 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
 
   (** In order to apply aRSA, we require a bound on the maximum busy-window
       length. To this end, let [L] be any positive solution of the busy-interval
-      "recurrences" (i.e., a set of inequalities) [overhead_bound L +
-      total_request_bound_function ts L <= L] and [overhead_bound L +
-      longest_busy_interval_with_pi ts tsk <= L], as defined below.
+      "recurrence" (i.e., inequality) [overhead_bound L +
+      total_request_bound_function ts L <= L], as defined below.
 
       As the lemma [busy_intervals_are_bounded_rs_edf] shows, under [EDF]
       scheduling, this condition is sufficient to guarantee that the maximum
@@ -160,8 +159,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       is bounded by [L]. *)
   Definition busy_window_recurrence_solution (L : duration) :=
     L > 0
-    /\ L >= overhead_bound L + total_request_bound_function ts L
-    /\ L >= overhead_bound L + longest_busy_interval_with_pi ts tsk.
+    /\ L >= overhead_bound L + total_request_bound_function ts L.
 
   (** ** Response-Time Bound *)
 
@@ -195,7 +193,8 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
         task_response_time_bound arr_seq sched tsk R.
   Proof.
     set (sSBF := jlfp_ovh_sbf_slow ts DB CSB CRPDB).
-    move=> L [BW_POS [BW_SOL1 BW_SOL2]] R SOL js ARRs TSKs.
+    move=> L [BW_POS BW_SOL1] R SOL js ARRs TSKs.
+    have [_ [_ H_task_max_nps_le_task_cost]] := H_valid_task_model_with_floating_nonpreemptive_regions.
     have VAL1 : valid_preemption_model arr_seq sched
       by apply valid_fixed_preemption_points_model_lemma, H_valid_task_model_with_floating_nonpreemptive_regions.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
@@ -209,7 +208,6 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - apply: busy_intervals_are_bounded_rs_edf => //.
       + by apply: instantiated_i_and_w_are_coherent_with_schedule.
-      + by apply bound_preserved_under_slowed; unfold jlfp_blackout_bound, overhead_bound in *; lia.
       + by apply bound_preserved_under_slowed; unfold jlfp_blackout_bound, overhead_bound in *; lia.
     - apply: valid_pred_sbf_switch_predicate; last (eapply overheads_sbf_busy_valid) => //=.
       move => ? ? ? ? [? ?]; split => //.
