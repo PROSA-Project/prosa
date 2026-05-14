@@ -59,11 +59,9 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   #[local] Instance sequential_readiness : JobReady _ _ :=
     sequential_ready_instance arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence ... *)
+  (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_jobs_come_from_arrival_sequence :
-    jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
      and assume that the relation is reflexive and transitive. *)

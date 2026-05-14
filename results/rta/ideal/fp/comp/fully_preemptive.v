@@ -65,8 +65,6 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_jobs_come_from_arrival_sequence :
-    jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Finally, we assume that the schedule is work-conserving ... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.

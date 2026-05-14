@@ -60,11 +60,10 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** Next, consider any valid ideal uniprocessor schedule of the arrival sequence ... *)
+  (** Next, consider any valid ideal uniprocessor schedule of the arrival
+      sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_jobs_come_from_arrival_sequence :
-    jobs_come_from_arrival_sequence sched arr_seq.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
