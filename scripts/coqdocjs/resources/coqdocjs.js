@@ -247,7 +247,6 @@ function foldProofs() {
         if (e.target.parentNode.tagName.toLowerCase() === "a")
           return;
         proof.setAttribute("show", proof.getAttribute("show") === "true" ? "false" : "true");
-        proof.setAttribute("animate", "");
         updateView();
       };}(proof));
       proof.setAttribute("show", "false");
@@ -259,7 +258,6 @@ function toggleProofs(){
   var someProofsHidden = proofStatus() === "some-hidden";
   toArray(document.getElementsByClassName("proof")).forEach(function(proof){
     proof.setAttribute("show", someProofsHidden);
-    proof.setAttribute("animate", "");
   });
   updateView();
 }

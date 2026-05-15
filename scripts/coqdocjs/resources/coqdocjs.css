@@ -53,16 +53,6 @@
   opacity: 0;
 }
 
-.proof[show="false"][animate] {
-  animation-name: hide-proof;
-  animation-duration: 0.25s;
-}
-
-.proof[show=true] {
-  animation-name: show-proof;
-  animation-duration: 10s;
-}
-
 .proof[show="false"]:before {
   position: absolute;
   visibility: visible;
