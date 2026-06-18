@@ -66,7 +66,7 @@ Section  MaxNPSegmentIsBounded.
     apply: (@leq_trans (\max_(j_lp <- arrivals_between arr_seq 0 t
                              | (~~ hep_task (job_task j_lp) tsk) && (0 < job_cost j_lp))
                          (task_max_nonpreemptive_segment (job_task j_lp) - ε))).
-    { rewrite /hep_job /FP_to_JLFP TSK.
+    { rewrite /hep_job /fp_to_jlfp TSK.
       apply: leq_big_max => j' JINB NOTHEP.
       by rewrite leq_sub2r //. }
     { apply /bigmax_leq_seqP => j' JINB /andP[NOTHEP POS].

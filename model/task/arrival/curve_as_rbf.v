@@ -28,8 +28,8 @@ Section ArrivalCurveToRBF.
   Definition task_min_rbf (arrivals :  Task -> duration -> nat) task Δ := task_min_cost task * arrivals task Δ.
 
   (** Finally, we show that the newly defined functions are indeed request-bound functions. *)
-  Global Program Instance MaxArrivalsRBF : MaxRequestBound Task := task_max_rbf max_arrivals.
-  Global Program Instance MinArrivalsRBF : MinRequestBound Task := task_min_rbf min_arrivals.
+  Global Program Instance max_arrivals_rbf : MaxRequestBound Task := task_max_rbf max_arrivals.
+  Global Program Instance min_arrivals_rbf : MinRequestBound Task := task_min_rbf min_arrivals.
 
   (** In the following section, we prove that the transformation yields a request-bound
       function that conserves correctness properties in both the upper-bounding
@@ -127,7 +127,7 @@ Section ArrivalCurveToRBF.
         the upper-bounding case ... *)
     Corollary valid_taskset_arrival_curve_to_max_rbf :
       valid_taskset_arrival_curve ts MaxArr ->
-      valid_taskset_request_bound_function ts MaxArrivalsRBF.
+      valid_taskset_request_bound_function ts max_arrivals_rbf.
     Proof.
       move=> VALID tsk IN.
       specialize (VALID tsk IN).
@@ -137,7 +137,7 @@ Section ArrivalCurveToRBF.
     (** ... and in the lower-bounding case. *)
     Corollary valid_taskset_arrival_curve_to_min_rbf :
       valid_taskset_arrival_curve ts MinArr ->
-      valid_taskset_request_bound_function ts MinArrivalsRBF.
+      valid_taskset_request_bound_function ts min_arrivals_rbf.
     Proof.
       move=> VALID tsk IN.
       specialize (VALID tsk IN).

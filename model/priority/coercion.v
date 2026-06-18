@@ -13,7 +13,7 @@ Require Export prosa.model.priority.definitions.
     The priority is lowered to 10 in order to avoid conflict with other instances
     of JLFP policies which take FP policies as argument.*)
 #[global]
-Instance FP_to_JLFP {Job : JobType} {Task : TaskType} {tasks : JobTask Job Task}
+Instance fp_to_jlfp {Job : JobType} {Task : TaskType} {tasks : JobTask Job Task}
     (FP : FP_policy Task) : JLFP_policy Job | 10 :=
   fun j1 j2 => hep_task (job_task j1) (job_task j2).
 
@@ -21,15 +21,15 @@ Instance FP_to_JLFP {Job : JobType} {Task : TaskType} {tasks : JobTask Job Task}
     parameter. Analogously, priority is lowered to 10 in order to avoid conflict
     with other instances of JLDP policies which take JLFP policies as argument.*)
 #[global]
-Instance JLFP_to_JLDP {Job : JobType}
+Instance jlfp_to_jldp {Job : JobType}
     (JLFP : JLFP_policy Job) : JLDP_policy Job | 10 :=
   fun _ j1 j2 => hep_job j1 j2.
 
 (** We add coercions to enable automatic conversion from [JLFP] to [JLDP]... *)
-Coercion JLFP_to_JLDP : JLFP_policy >-> JLDP_policy.
+Coercion jlfp_to_jldp : JLFP_policy >-> JLDP_policy.
 (** ...and from [FP] to [JLFP]. *)
 #[warning="-uniform-inheritance"]
-Coercion FP_to_JLFP : FP_policy >-> JLFP_policy.
+Coercion fp_to_jlfp : FP_policy >-> JLFP_policy.
 
 (** We now prove lemmas about conversions between the properties of these
     priority classes. *)
@@ -50,7 +50,7 @@ Section PriorityRelationsConversion.
   Remark hep_job_at_jlfp :
     forall `{JLFP_policy Job} j j' t,
       hep_job_at t j j' = hep_job j j'.
-  Proof. by move=> ? j j' t; rewrite /hep_job_at/JLFP_to_JLDP. Qed.
+  Proof. by move=> ? j j' t; rewrite /hep_job_at/jlfp_to_jldp. Qed.
 
   (** Second, when considering an FP policy, [hep_job_at] and [hep_task] are by
       definition equivalent. *)
@@ -58,7 +58,7 @@ Section PriorityRelationsConversion.
     forall `{FP_policy Task} j j' t,
       hep_job_at t j j' = hep_task (job_task j) (job_task j').
   Proof.
-    by move=> ? j j' t; rewrite hep_job_at_jlfp/hep_job/FP_to_JLFP.
+    by move=> ? j j' t; rewrite hep_job_at_jlfp/hep_job/fp_to_jlfp.
   Qed.
 
   (** We observe that lifting an [FP_policy] to a [JLFP_policy] trivially maintains
@@ -66,21 +66,21 @@ Section PriorityRelationsConversion.
   Lemma reflexive_priorities_FP_implies_JLFP :
     forall (fp : FP_policy  Task),
       reflexive_task_priorities fp ->
-        reflexive_job_priorities (FP_to_JLFP fp).
+        reflexive_job_priorities (fp_to_jlfp fp).
   Proof. by move=> ? refl_fp ?; apply: refl_fp. Qed.
 
   (** ...transitivity,... *)
   Lemma transitive_priorities_FP_implies_JLFP :
     forall (fp : FP_policy  Task),
       transitive_task_priorities fp ->
-        transitive_job_priorities (FP_to_JLFP fp).
+        transitive_job_priorities (fp_to_jlfp fp).
   Proof. by move=> ? tran_jlfp ? ? ?; apply: tran_jlfp. Qed.
 
   (** ...and totality of priorities. *)
   Lemma total_priorities_FP_implies_JLFP :
     forall (fp : FP_policy  Task),
       total_task_priorities fp ->
-        total_job_priorities (FP_to_JLFP fp).
+        total_job_priorities (fp_to_jlfp fp).
   Proof. by move=> ? tran_fp ? ?; apply: tran_fp. Qed.
 
   (** Analogously, lifting a [JLFP_policy] to a [JLDP_policy] also maintains
@@ -88,21 +88,21 @@ Section PriorityRelationsConversion.
   Lemma reflexive_priorities_JLFP_implies_JLDP :
     forall (jlfp : JLFP_policy Job),
       reflexive_job_priorities jlfp ->
-        reflexive_priorities (JLFP_to_JLDP jlfp).
+        reflexive_priorities (jlfp_to_jldp jlfp).
   Proof. by move=> ? refl_fp ?; apply: refl_fp. Qed.
 
   (** ...transitivity,... *)
   Lemma transitive_priorities_JLFP_implies_JLDP :
   forall (jlfp : JLFP_policy Job),
     transitive_job_priorities jlfp ->
-      transitive_priorities (JLFP_to_JLDP jlfp).
+      transitive_priorities (jlfp_to_jldp jlfp).
   Proof. by move=> ? tran_jlfp ? ? ?; apply: tran_jlfp. Qed.
 
   (** ...and totality of priorities. *)
   Lemma total_priorities_JLFP_implies_JLDP :
     forall (jlfp : JLFP_policy Job),
       total_job_priorities jlfp ->
-        total_priorities (JLFP_to_JLDP jlfp).
+        total_priorities (jlfp_to_jldp jlfp).
   Proof. by move=> ? tran_fp ? ?; apply: tran_fp. Qed.
 
 End PriorityRelationsConversion.

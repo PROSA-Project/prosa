@@ -4,7 +4,7 @@ Require Export prosa.implementation.refinements.arrival_bound.
 
 
 (** Throughout this file, we work with Prosa's fixed-priority policy implementation. *)
-#[local] Existing Instance NumericFPAscending.
+#[local] Existing Instance numeric_fp_ascending.
 
 (** We begin by defining a generic version of the functions we seek to define. *)
 Section Definitions.
@@ -107,8 +107,8 @@ Global Instance refine_hep_task :
   refines ( Rtask ==> Rtask ==> bool_R )%rel hep_task hep_task_T.
 Proof.
   apply refines_abstr2.
-  rewrite /hep_task /hep_task_T /NumericFPAscending
-          /numeric_fixed_priority.task_priority /TaskPriority.
+  rewrite /hep_task /hep_task_T /numeric_fp_ascending
+          /numeric_fixed_priority.task_priority /concrete_task_priority_instance.
   move=> tsk1 tsk1' Rtsk1 tsk2 tsk2' Rtsk2.
   by refines_apply.
 Qed.
@@ -150,9 +150,9 @@ Qed.
 
 (** Next, we provide equality comparisons between different pairs of objects
     manipulated in Poet's certificates. *)
-Global Instance eq_listN : eq_of (seq N) := fun x y => x == y.
-Global Instance eq_listNN : eq_of (seq (prod N N)) := fun x y => x == y.
-Global Instance eq_NlistNN : eq_of (prod N (seq (prod N N))) := fun x y => x == y.
+Global Instance eq_list_n : eq_of (seq N) := fun x y => x == y.
+Global Instance eq_list_nn : eq_of (seq (prod N N)) := fun x y => x == y.
+Global Instance eq_n_list_nn : eq_of (prod N (seq (prod N N))) := fun x y => x == y.
 Global Instance eq_taskab : eq_of (@task_arrivals_bound_T N) := taskab_eqdef_T.
 Global Instance eq_task : eq_of (@task_T N) := task_eqdef_T.
 
@@ -171,8 +171,8 @@ Global Instance refine_ohep_task :
   refines ( Rtask ==> Rtask ==> bool_R )%rel ohep_task ohep_task_T.
 Proof.
   apply refines_abstr2.
-  rewrite /ohep_task /ohep_task_T /NumericFPAscending
-          /numeric_fixed_priority.task_priority /TaskPriority.
+  rewrite /ohep_task /ohep_task_T /numeric_fp_ascending
+          /numeric_fixed_priority.task_priority /concrete_task_priority_instance.
   move=> tsk1 tsk1' Rtsk1 tsk2 tsk2' Rtsk2.
   by refines_apply.
 Qed.
@@ -246,7 +246,7 @@ Proof.
 Qed.
 
 (** Next, we prove a refinement for the [check_point_NP] function. *)
-Global Instance refine_check_point_NP :
+Global Instance refine_check_point_np :
   refines (list_R Rtask ==> Rtask ==> Rnat ==> prod_R Rnat Rnat ==> bool_R)%rel
           check_point_NP check_point_NP_T.
 Proof.
@@ -257,7 +257,7 @@ Qed.
 (** Finally, we prove a special-case refinement for the [check_point_NP] function
     when applied to a refined task set and a refined task. This special case
     is required to guide the typeclass engine. *)
-Global Instance refine_check_point_NP' :
+Global Instance refine_check_point_np' :
   forall ts tsk,
     refines (Rnat ==> prod_R Rnat Rnat ==> bool_R)%rel
             (check_point_NP (map taskT_to_task ts) (taskT_to_task tsk))

@@ -89,7 +89,7 @@ Definition search_space_emax_EDF_N (ts : seq task_T) (tsk : task_T) (L : N) :=
 (** We now establish the desired refinements. *)
 
 (** First, we prove a refinement for the [task_search_space_emax_EDF_h] function. *)
-Local Instance refine_task_search_space_emax_EDF_h :
+Local Instance refine_task_search_space_emax_edf_h :
   refines (Rtask ==> Rtask ==> Rnat ==> Rnat ==> list_R Rnat)%rel
           task_search_space_emax_EDF_h
           task_search_space_emax_EDF_h_N.
@@ -100,7 +100,7 @@ Proof.
 Qed.
 
 (** Next, we prove a refinement for the [task_search_space_emax_EDF] function. *)
-Global Instance refine_task_search_space_emax_EDF :
+Global Instance refine_task_search_space_emax_edf :
   forall tsk tsko,
     refines (Rnat ==> list_R Rnat)%rel
             (task_search_space_emax_EDF (taskT_to_task tsk) (taskT_to_task tsko))
@@ -115,7 +115,7 @@ Proof.
 Qed.
 
 (** Next, we prove a refinement for the [search_space_emax_EDF] function. *)
-Global Instance refine_search_space_emax_EDF :
+Global Instance refine_search_space_emax_edf :
   forall ts tsk,
     refines (Rnat ==> list_R Rnat)%rel
             (search_space_emax_EDF (map taskT_to_task ts) (taskT_to_task tsk))
@@ -135,7 +135,7 @@ Proof.
   4: exact (list_R Rtask).
   - rewrite refinesE => f f' Rf xs xs' Rxs; apply refinesP.
     by eapply refine_map; [rewrite refinesE; exact Rxs | rewrite refinesE ].
-  - move: refine_task_search_space_emax_EDF=> R; rewrite refinesE in R.
+  - move: refine_task_search_space_emax_edf=> R; rewrite refinesE in R.
     by rewrite refinesE => tsko tsko' Rtsko; rewrite -Rtsko; apply R.
   - move: refine_task_set' => RTS.
     rewrite refinesE; rewrite refinesE in RTS.
@@ -148,7 +148,7 @@ Local Instance refine_total_rbf :
 Proof.
   apply refines_abstr2;
     rewrite /total_request_bound_function /total_rbf_T /total_request_bound_function
-            /concept.task_cost /TaskCost /max_arrivals /MaxArrivals => t t' Rt y y' Ry.
+            /concept.task_cost /concrete_task_cost_instance /max_arrivals /MaxArrivals => t t' Rt y y' Ry.
   eapply refine_uncond_foldr; first exact Rt.
   by rewrite refinesE => tsko tsko' Rtsko; apply refinesP; refines_apply.
 Qed.
@@ -176,8 +176,8 @@ Qed.
 
 (** Next, we provide equality comparisons between different pairs of objects
     manipulated in Poet's certificates. *)
-Global Instance eq_listN : eq_of (seq N) := fun x y => x == y.
-Global Instance eq_NlistNN : eq_of (prod N (seq (prod N N))) := fun x y => x == y.
+Global Instance eq_list_n : eq_of (seq N) := fun x y => x == y.
+Global Instance eq_n_list_nn : eq_of (prod N (seq (prod N N))) := fun x y => x == y.
 Global Instance eq_taskab : eq_of (@task_arrivals_bound_T N) := taskab_eqdef_T.
 Global Instance eq_task : eq_of (@task_T N) := task_eqdef_T.
 
@@ -204,7 +204,7 @@ Proof.
 Qed.
 
 (** Next, we prove a refinement for the [check_point_FP] function. *)
-Global Instance refine_check_point_FP :
+Global Instance refine_check_point_fp :
   refines (list_R Rtask ==> Rtask ==> Rnat ==> prod_R Rnat Rnat ==> bool_R)%rel
           check_point_FP check_point_FP_T.
 Proof.
@@ -216,7 +216,7 @@ Qed.
 (** Next, we prove a special-case refinement for the [check_point_FP] function
     when applied to a refined task set and a refined task. This special case
     is required to guide the typeclass engine. *)
-Global Instance refine_check_point_FP' :
+Global Instance refine_check_point_fp' :
   forall ts tsk,
     refines (Rnat ==> prod_R Rnat Rnat ==> bool_R)%rel
             (check_point_FP (map taskT_to_task ts) (taskT_to_task tsk))
@@ -242,7 +242,7 @@ Proof.
   - rewrite refinesE => tsk1 tsk1' Rtsk1.
     apply andb_R; first apply andb_R.
     + apply refine_ltn; first by done.
-      by apply refinesP; rewrite /max_arrivals; refines_apply; apply refine_ConcreteMaxArrivals.
+      by apply refinesP; rewrite /max_arrivals; refines_apply; apply refine_concrete_max_arrivals.
     + by apply refine_ltn; [done | apply refinesP; refines_apply].
     + move: refine_task_deadline => Ra.
       rewrite refinesE in Ra; specialize (Ra _ _ Rtsk1).
@@ -255,7 +255,7 @@ Proof.
 Qed.
 
 (** Next, we prove a refinement for the [check_point_NP] function. *)
-Global Instance refine_check_point_NP :
+Global Instance refine_check_point_np :
   refines (list_R Rtask ==> Rtask ==> Rnat ==> prod_R Rnat Rnat ==> bool_R)%rel
           check_point_NP check_point_NP_T.
 Proof.
@@ -267,7 +267,7 @@ Qed.
 (** Finally, we prove a special-case refinement for the [check_point_NP] function
     when applied to a refined task set and a refined task. This special case
     is required to guide the typeclass engine. *)
-Global Instance refine_check_point_NP' :
+Global Instance refine_check_point_np' :
   forall ts tsk,
     refines (Rnat ==> prod_R Rnat Rnat ==> bool_R)%rel
             (check_point_NP (map taskT_to_task ts) (taskT_to_task tsk))

@@ -2,7 +2,7 @@ Require Export prosa.results.rta.ideal.fp.bounded_nps.
 Require Export prosa.implementation.refinements.fast_search_space_computation.
 
 (** Throughout this file, we work with Prosa's fixed-priority policy implementation. *)
-#[local] Existing Instance NumericFPAscending.
+#[local] Existing Instance numeric_fp_ascending.
 
 (** First, we define the concept of higher-or-equal-priority and different task, ...  *)
 Definition ohep_task (tsk1 : Task) (tsk2 : Task) :=

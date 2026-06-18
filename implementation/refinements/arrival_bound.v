@@ -194,7 +194,7 @@ Section Refinements.
   Qed.
 
   (** Next, we prove the refinement for the [ACPrefixT_to_ACPrefix] function. *)
-  Local Instance refine_ACPrefixT_to_ACPrefix :
+  Local Instance refine_ac_prefix_t_to_ac_prefix :
     refines (unify (A:=N * seq (N * N)) ==> prod_R Rnat (list_R (prod_R Rnat Rnat)))%rel ACPrefixT_to_ACPrefix id.
   Proof.
     rewrite refinesE => evec evec' Revec.
@@ -287,7 +287,7 @@ Section Refinements.
   Qed.
 
   (** Next, we prove the refinement for the [ArrivalCurvePrefix] function. *)
-  Global Instance refine_ArrivalPrefix :
+  Global Instance refine_arrival_prefix :
     refines (prod_R Rnat (list_R (prod_R Rnat Rnat)) ==> Rtask_ab)%rel ArrivalPrefix ArrivalPrefix_T.
   Proof.
     rewrite refinesE => arrival_curve_prefix arrival_curve_prefix' Rarrival_curve_prefix.
@@ -306,8 +306,8 @@ Section Refinements.
   Qed.
 
   (** Next, we define some useful equality functions to guide the typeclass engine. *)
-  Global Instance eq_listN : eq_of (seq N) := fun x y => x == y.
-  Global Instance eq_NlistNN : eq_of (prod N (seq (prod N N))) := fun x y => x == y.
+  Global Instance eq_list_n : eq_of (seq N) := fun x y => x == y.
+  Global Instance eq_n_list_nn : eq_of (prod N (seq (prod N N))) := fun x y => x == y.
   Global Instance eq_taskab : eq_of (@task_arrivals_bound_T N) := taskab_eqdef_T.
 
   (** Finally, we prove the refinement for the [ArrivalCurvePrefix] function. *)

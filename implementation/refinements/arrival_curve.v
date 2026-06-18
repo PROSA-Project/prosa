@@ -261,11 +261,11 @@ Section Theory.
   Qed.
 
   (** Next, we prove a refinement for the arrival bound definition. *)
-  Local Instance refine_ConcreteMaxArrivals :
-    refines ( Rtask ==> Rnat ==> Rnat )%rel ConcreteMaxArrivals ConcreteMaxArrivals_T.
+  Local Instance refine_concrete_max_arrivals :
+    refines ( Rtask ==> Rnat ==> Rnat )%rel concrete_max_arrivals_instance ConcreteMaxArrivals_T.
   Proof.
     apply refines_abstr2.
-    rewrite /ConcreteMaxArrivals /concrete_max_arrivals /ConcreteMaxArrivals_T.
+    rewrite /concrete_max_arrivals_instance /concrete_max_arrivals /ConcreteMaxArrivals_T.
     move => tsk tsk' Rtsk δ δ' Rδ.
     have Rab := refine_task_arrival.
     rewrite refinesE in Rab; rewrite refinesE in Rtsk.
@@ -281,13 +281,13 @@ Section Theory.
 
   (** Next, we prove a refinement for the arrival bound definition applied to the
       task conversion function. *)
-  Global Instance refine_ConcreteMaxArrivals' :
+  Global Instance refine_concrete_max_arrivals' :
     forall tsk,
-      refines (Rnat ==> Rnat)%rel (ConcreteMaxArrivals (taskT_to_task tsk))
+      refines (Rnat ==> Rnat)%rel (concrete_max_arrivals_instance (taskT_to_task tsk))
               (ConcreteMaxArrivals_T tsk) | 0.
   Proof.
     intros tsk; apply refines_abstr.
-    rewrite /ConcreteMaxArrivals /concrete_max_arrivals
+    rewrite /concrete_max_arrivals_instance /concrete_max_arrivals
             /ConcreteMaxArrivals_T => δ δ' Rδ.
     have Rtsk := refine_task'.
     rewrite refinesE in Rtsk.
@@ -370,7 +370,7 @@ Section Theory.
   Proof.
     apply refines_abstr2.
     rewrite /task_rbf /task_rbf_T /task_request_bound_function
-            /concept.task_cost /TaskCost
+            /concept.task_cost /concrete_task_cost_instance
             /max_arrivals /MaxArrivals => t t' Rt y y' Ry.
     by refines_apply.
   Qed.

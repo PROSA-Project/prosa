@@ -207,7 +207,7 @@ Section ProofRequestBoundFunction.
     Proof.
       move => j t1 Δ POS TSK _.
       rewrite /workload_of_jobs /total_ohep_request_bound_function_FP.
-      rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
+      rewrite /another_task_hep_job /hep_job /fp_to_jlfp.
       apply: workload_of_jobs_bounded.
       by move: TSK => /eqP ->.
     Qed.
@@ -227,7 +227,7 @@ Section ProofRequestBoundFunction.
     Proof.
       move=> t Δ.
       apply workload_of_jobs_bounded.
-      rewrite /hep_job /FP_to_JLFP.
+      rewrite /hep_job /fp_to_jlfp.
       by move: H_job_of_tsk => /eqP <-.
     Qed.
 
@@ -648,7 +648,7 @@ Section RBFFOrFP.
   Proof.
     move => Δ t1.
     rewrite /workload_of_jobs /total_ohep_request_bound_function_FP.
-    rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
+    rewrite /another_task_hep_job /hep_job /fp_to_jlfp.
     set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
     rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
       last by move=> j'; rewrite /pred_task; move: H_job_of_task => /eqP ->.

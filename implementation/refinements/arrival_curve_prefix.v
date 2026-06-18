@@ -21,7 +21,7 @@ Section ValidArrivalCurvePrefixFacts.
   Proof.
     move: (H_valid_task_set tsk H_tsk_in_ts); rewrite /valid_arrivals => VALID.
     destruct (arrival_cases tsk) as [[p EQ] | [[m EQ] | [evec EQ]]].
-    all: rewrite /has_valid_arrival_curve_prefix /max_arrivals /MaxArrivals /ConcreteMaxArrivals /get_arrival_curve_prefix EQ //=.
+    all: rewrite /has_valid_arrival_curve_prefix /max_arrivals /MaxArrivals /concrete_max_arrivals_instance /get_arrival_curve_prefix EQ //=.
     all: rewrite EQ in VALID.
     { exists (inter_arrival_to_prefix p).
       split;[|split;[|split;[|split;[|split]]]] => //=.

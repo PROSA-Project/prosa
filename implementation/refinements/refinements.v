@@ -92,7 +92,7 @@ Proof.
 Qed.
 
 (** Second, we prove a refinement for the predecessor function. *)
-Global Instance Rnat_pred :
+Global Instance rnat_pred :
   refines (Rnat ==> Rnat)%rel predn predn_T.
 Proof.
   rewrite !refinesE => a a' Ra.

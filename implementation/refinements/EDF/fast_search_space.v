@@ -30,7 +30,7 @@ Definition check_point_NP (ts : seq Task) (tsk : Task) (R : nat) (P : nat * nat)
 Section SearchSpaceDefinition.
 
   (** Assume that an arrival curve based on a concrete prefix is given ... *)
-  #[local] Existing Instance ConcreteMaxArrivals.
+  #[local] Existing Instance concrete_max_arrivals_instance.
   Definition Task := concrete_task : eqType.
   Definition Job := concrete_job : eqType.
 
@@ -154,7 +154,7 @@ Section FastSearchSpaceComputationSubset.
         have LTB : B < L + (task_deadline tsk - task_deadline tsko) by unfold B; lia.
         by apply IN_RTO; last by eapply task_search_space_subset; eauto. }
       { apply ltnW in EE.
-        rewrite -subnBA//-subnBA//-addnBAC in NEQ; last by rewrite /concept.task_deadline /TaskDeadline; lia.
+        rewrite -subnBA//-subnBA//-addnBAC in NEQ; last by rewrite /concept.task_deadline /concrete_task_deadline_instance; lia.
         rewrite -subnBA // -addn1 -addnBAC //; last by lia.
         set (B := A - (task_deadline tsko - task_deadline tsk)) in *.
         have  CH : task_rbf_changes_at tsko B; [ done | clear NEQ ].

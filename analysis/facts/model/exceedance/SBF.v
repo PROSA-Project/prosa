@@ -43,7 +43,7 @@ Section SBFFacts.
 
   (** Let us state the exceedance using [Instance] to make it locally available
       to the typeclasses database. *)
-  #[local] Instance EPS_SBF_inst : SupplyBoundFunction := eps_sbf e.
+  #[local] Instance eps_sbf_inst : SupplyBoundFunction := eps_sbf e.
 
   (** Let us formally state the assumption that the total exceedance inside
       the busy interval of [tsk] is bounded by [e]. *)
@@ -77,9 +77,9 @@ Section SBFFacts.
   Qed.
 
   (** Using the above, we can prove that our definition of SBF is valid. *)
-  Lemma eps_sbf_is_valid : valid_busy_sbf arr_seq sched tsk EPS_SBF_inst.
+  Lemma eps_sbf_is_valid : valid_busy_sbf arr_seq sched tsk eps_sbf_inst.
   Proof.
-    rewrite /valid_busy_sbf /valid_pred_sbf /EPS_SBF_inst /eps_sbf //=.
+    rewrite /valid_busy_sbf /valid_pred_sbf /eps_sbf_inst /eps_sbf //=.
     split; first lia.
     rewrite /pred_sbf_respected => j t1 t2 ARRIN [TSK BUSYPREFIX] t LEQ.
     have Hsplit : t = t1 + (t - t1) by lia.
@@ -93,10 +93,10 @@ Section SBFFacts.
   Qed.
 
   (** Finally, we prove that our SBF only takes steps of one unit. *)
-  Lemma eps_sbf_is_unit : unit_supply_bound_function EPS_SBF_inst.
+  Lemma eps_sbf_is_unit : unit_supply_bound_function eps_sbf_inst.
   Proof.
     rewrite /unit_supply_bound_function => Δ.
-    rewrite /EPS_SBF_inst /eps_sbf //=.
+    rewrite /eps_sbf_inst /eps_sbf //=.
     by lia.
   Qed.
 

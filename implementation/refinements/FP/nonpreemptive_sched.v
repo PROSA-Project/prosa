@@ -28,7 +28,7 @@ Section Schedule.
 
   (** ... and consider any fully-nonpreemptive, fixed-priority schedule. *)
   #[local] Existing Instance fully_nonpreemptive_job_model.
-  #[local] Existing Instance NumericFPAscending.
+  #[local] Existing Instance numeric_fp_ascending.
   Definition sched := uni_schedule arr_seq.
 
   (** First, we show that only ready jobs execute. *)
@@ -115,7 +115,7 @@ Section Schedule.
 
   (** Finally, we show that the fixed-priority policy is respected at each preemption point. *)
   Lemma respects_policy_at_preemption_point_np :
-    respects_FP_policy_at_preemption_point arr_seq sched (NumericFPAscending Task).
+    respects_FP_policy_at_preemption_point arr_seq sched (numeric_fp_ascending Task).
   Proof.
     apply schedule_respects_policy => //.
     by apply sequential_readiness_nonclairvoyance.

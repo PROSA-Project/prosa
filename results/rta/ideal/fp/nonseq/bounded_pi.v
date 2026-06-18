@@ -203,7 +203,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       -  rewrite /task_workload_between /task_workload.
          move : H_job_of_task => TSK.
          move : TSK => /eqP TSK.
-         rewrite  /hep_job /FP_to_JLFP H_priority_is_reflexive andTb TSK eq_refl //=.
+         rewrite  /hep_job /fp_to_jlfp H_priority_is_reflexive andTb TSK eq_refl //=.
          apply leq_sub; last by done.
          apply workload_of_jobs_weaken.
          move => ? /andP[_  /eqP EQ].
@@ -243,7 +243,7 @@ Section AbstractRTAforFPwithArrivalCurves.
             case (hep_job j j && (job_task j == tsk)) eqn: EQ1; try done.
             contradict EQ1.
             move : H_job_of_task => /eqP TSK.
-            by rewrite /hep_job /FP_to_JLFP H_priority_is_reflexive TSK eq_refl  //=.
+            by rewrite /hep_job /fp_to_jlfp H_priority_is_reflexive TSK eq_refl  //=.
           * rewrite /task_workload_between /task_workload addnA.
             have ->  :t1 + (job_arrival j - t1) + ε = job_arrival j + ε by lia.
             apply workload_of_jobs_weaken.

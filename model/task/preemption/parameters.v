@@ -53,7 +53,7 @@ End MaxAndLastNonpreemptiveSegment.
     automatically infer a task's maximum non-preemptive segment length if its
     preemption points are known. *)
 #[global]
-Instance TaskPreemptionPoints_to_TaskMaxNonpreemptiveSegment_conversion
+Instance task_preemption_points_to_task_max_nonpreemptive_segment_conversion
          (Task : TaskType) `{TaskPreemptionPoints Task} : TaskMaxNonpreemptiveSegment Task := task_max_nonpr_segment.
 
 

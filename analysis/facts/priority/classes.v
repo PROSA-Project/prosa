@@ -258,10 +258,10 @@ Section FPRemarks.
       ones. *)
   Remark respects_sequential_tasks :
     reflexive_task_priorities FP ->
-    policy_respects_sequential_tasks (FP_to_JLFP FP).
+    policy_respects_sequential_tasks (fp_to_jlfp FP).
   Proof.
     move => REFL j1 j2 /eqP EQ LT.
-    by rewrite /hep_job /FP_to_JLFP EQ.
+    by rewrite /hep_job /fp_to_jlfp EQ.
   Qed.
 
 End FPRemarks.

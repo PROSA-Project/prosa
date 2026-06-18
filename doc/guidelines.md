@@ -38,7 +38,7 @@ Examples: `job_cost`, `job_arrival`, `job_deadline`.
 7. Task parameters are always prefixed with `task_`.
 Examples: `task_cost`, `task_deadline`.
 8. We do not follow ssreflect's concise but not so self-explanatory naming scheme.
-9. Section and typeclass names should use [camel case](https://en.wikipedia.org/wiki/Camel_case) and lemma and definition names should use [snake case](https://en.wikipedia.org/wiki/Snake_case).
+9. Section and typeclass names should use [camel case](https://en.wikipedia.org/wiki/Camel_case) and lemma, definition, and instance names should use [snake case](https://en.wikipedia.org/wiki/Snake_case). Acronyms in instance names should be lowercase. As an exception, established scheduling-policy instances may keep their conventional policy names, such as `EDF` or `FIFO`; local `Let` aliases that specialize such policy instances may do the same.
 
 ## Use of Spaces
 1. Avoid trailing white-space characters in all files. (Use `M-x delete-trailing-whitespace` in `emacs` to delete trailing white-space characters. Add `(add-hook 'before-save-hook 'delete-trailing-whitespace)` to your `~/.emacs` file to automate this.)

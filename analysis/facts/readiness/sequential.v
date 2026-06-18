@@ -111,7 +111,7 @@ Section SequentialTasksReadiness.
         destruct IHk as [j'' [ARR'' [READY'' HEP'']]].
         exists j''; repeat split; auto.
         clear EQ; apply arrives_in_task_arrivals_implies_job_task in IN; move: IN => /eqP EQ.
-        by rewrite /hep_job /FP_to_JLFP -EQ.
+        by rewrite /hep_job /fp_to_jlfp -EQ.
       }
     }
   Qed.

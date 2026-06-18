@@ -5,7 +5,7 @@ Require Export prosa.implementation.definitions.job_constructor.
 Section JobConstructor.
 
   (** Assume that an arrival curve based on a concrete prefix is given. *)
-  #[local] Existing Instance ConcreteMaxArrivals.
+  #[local] Existing Instance concrete_max_arrivals_instance.
 
   (** Consider a task set [ts] with non-duplicate tasks. *)
   Variable ts : seq Task.

@@ -79,7 +79,7 @@ Section FastSearchSpaceComputation.
   Proof.
     move: (has_valid_arrival_curve_prefix_tsk ts H_valid_task_set tsk H_tsk_in_ts).
     move=> [evec [EQ [POSh [LARGEh [NOINF [BUR SORT]]]]]] A LT_L NEQ.
-    rewrite eqn_pmul2l // /max_arrivals /MaxArrivals /ConcreteMaxArrivals
+    rewrite eqn_pmul2l // /max_arrivals /MaxArrivals /concrete_max_arrivals_instance
             /concrete_max_arrivals EQ in NEQ.
     rewrite /get_horizon_of_task EQ.
     move: (sorted_ltn_steps_imply_sorted_leq_steps_steps _ SORT NOINF) => SORT_LEQ.
@@ -171,7 +171,7 @@ Section FastSearchSpaceComputation.
   Proof.
     move: (has_valid_arrival_curve_prefix_tsk ts H_valid_task_set tsk H_tsk_in_ts).
     move=> [evec [EMAX [POSh [LARGEh [NOINF [BUR SORT]]]]]] A LTH DIV.
-    rewrite /max_arrivals /ConcreteMaxArrivals /concrete_max_arrivals EMAX.
+    rewrite /max_arrivals /concrete_max_arrivals_instance /concrete_max_arrivals EMAX.
     rewrite /get_horizon_of_task EMAX in DIV; move: (DIV) => /eqP MOD0.
     rewrite /extrapolated_arrival_curve.
     set (h := horizon_of evec) in *; set (vec := value_at evec) in *.
@@ -225,13 +225,13 @@ Section FastSearchSpaceComputation.
       move: (has_valid_arrival_curve_prefix_tsk ts H_valid_task_set tsk H_tsk_in_ts).
       move => [evec [EMAXeq [POSh [LARGEh [NOINF [BUR SORT]]]]]].
       rewrite /task_rbf /task_request_bound_function /max_arrivals
-              /MaxArrivals /ConcreteMaxArrivals /concrete_max_arrivals
+              /MaxArrivals /concrete_max_arrivals_instance /concrete_max_arrivals
               EMAXeq eqn_mul2l negb_or in IN.
       move: IN => /andP [_ NEQ].
       move: (sorted_ltn_steps_imply_sorted_leq_steps_steps _ SORT NOINF) => SORT_LEQ.
       move: (constant_max_arrivals A LTh) => EQmax.
       feed EQmax; first by rewrite EQ; apply dvdn_mull, dvdnn.
-      rewrite /max_arrivals /MaxArrivals /ConcreteMaxArrivals
+      rewrite /max_arrivals /MaxArrivals /concrete_max_arrivals_instance
               /concrete_max_arrivals EMAXeq in EQmax.
       by rewrite EQmax in NEQ; move: NEQ => /eqP. }
     { replace A with (A + ε - ε); last by lia.

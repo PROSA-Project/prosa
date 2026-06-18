@@ -217,7 +217,7 @@ Section ScheduleChangesBoundedHelper.
     apply scheduled_at_precedes_completes_at in COMPL; last by lia.
     eapply completion_monotonic; last first.
     { apply: early_hep_job_is_scheduled => //.
-      by intros ?; rewrite /JLFP_to_JLDP /hep_job_at !FIFO; lia. }
+      by intros ?; rewrite /jlfp_to_jldp /hep_job_at !FIFO; lia. }
     { by lia. }
   Qed.
 

@@ -207,7 +207,7 @@ Section AbstractRTAforFPwithArrivalCurves.
     { intros; rewrite {2}H_fixed_point leq_add //.
       rewrite /workload_of_hep_jobs /total_hep_rbf
         /total_hep_request_bound_function_FP
-        /workload_of_jobs /hep_job /FP_to_JLFP.
+        /workload_of_jobs /hep_job /fp_to_jlfp.
       move: (TSK) =>  /eqP ->.
       exact: workload_of_jobs_bounded. }
   Qed.
@@ -251,7 +251,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
         by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). }
       { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
-        rewrite /another_task_hep_job /hep_job /FP_to_JLFP.
+        rewrite /another_task_hep_job /hep_job /fp_to_jlfp.
         set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
         rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
           last by move=> j'; rewrite /pred_task; move: TSK => /eqP ->.

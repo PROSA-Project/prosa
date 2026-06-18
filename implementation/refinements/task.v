@@ -188,7 +188,7 @@ Section Theory.
   Qed.
 
   (** Next, we prove a refinement for the task period. *)
-  Global Instance refine_Periodic :
+  Global Instance refine_periodic :
     refines (Rnat ==> Rtask_ab)%rel Periodic Periodic_T.
   Proof.
     rewrite refinesE => t t' Rt.
@@ -197,7 +197,7 @@ Section Theory.
   Qed.
 
   (** Next, we prove a refinement for the task minimum inter-arrival time. *)
-  Global Instance refine_Sporadic :
+  Global Instance refine_sporadic :
     refines (Rnat ==> Rtask_ab)%rel Sporadic Sporadic_T.
   Proof.
     rewrite refinesE => t t' Rt.

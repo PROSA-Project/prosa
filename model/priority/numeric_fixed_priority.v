@@ -23,9 +23,9 @@ Class TaskPriority (Task : TaskType) := task_priority : Task -> nat.
     about this interpretation of priority values. *)
 Section PropertiesNFPA.
 
-  (** The instance [NumericFPAscending] assigns higher priority to tasks with
+  (** The instance [numeric_fp_ascending] assigns higher priority to tasks with
       higher numeric [task_priority] value. *)
-  #[local] Instance NumericFPAscending (Task : TaskType) `{TaskPriority Task} : FP_policy Task :=
+  #[local] Instance numeric_fp_ascending (Task : TaskType) `{TaskPriority Task} : FP_policy Task :=
     {
       hep_task (tsk1 tsk2 : Task) := task_priority tsk1 >= task_priority tsk2
     }.
@@ -39,18 +39,18 @@ Section PropertiesNFPA.
   Context `{JobTask Job Task}.
 
   (** The resulting priority policy is reflexive. *)
-  Lemma NFPA_is_reflexive : reflexive_task_priorities (NumericFPAscending Task).
-  Proof.  by move=> ?; rewrite /hep_task /NumericFPAscending. Qed.
+  Lemma NFPA_is_reflexive : reflexive_task_priorities (numeric_fp_ascending Task).
+  Proof.  by move=> ?; rewrite /hep_task /numeric_fp_ascending. Qed.
 
   (** The resulting priority policy is transitive. *)
-  Lemma NFPA_is_transitive : transitive_task_priorities (NumericFPAscending Task).
+  Lemma NFPA_is_transitive : transitive_task_priorities (numeric_fp_ascending Task).
   Proof.
     move=> y x z.
-    by rewrite /hep_task /NumericFPAscending => PRIO_yx PRIO_xy; lia.
+    by rewrite /hep_task /numeric_fp_ascending => PRIO_yx PRIO_xy; lia.
   Qed.
 
   (** The resulting priority policy is total. *)
-  Lemma NFPA_is_total : total_task_priorities (NumericFPAscending Task).
+  Lemma NFPA_is_total : total_task_priorities (numeric_fp_ascending Task).
   Proof. by move=> j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPA.
@@ -60,9 +60,9 @@ End PropertiesNFPA.
     alternate interpretation of priority values. *)
 Section PropertiesNFPD.
 
-  (** The instance [NumericFPDescending] assigns lower priority to tasks with
+  (** The instance [numeric_fp_descending] assigns lower priority to tasks with
       higher numeric [task_priority] value. *)
-  #[local] Instance NumericFPDescending (Task : TaskType) `{TaskPriority Task} : FP_policy Task :=
+  #[local] Instance numeric_fp_descending (Task : TaskType) `{TaskPriority Task} : FP_policy Task :=
     {
       hep_task (tsk1 tsk2 : Task) := task_priority tsk1 <= task_priority tsk2
     }.
@@ -76,18 +76,18 @@ Section PropertiesNFPD.
   Context `{JobTask Job Task}.
 
   (** The resulting priority policy is reflexive. *)
-  Lemma NFPD_is_reflexive : reflexive_task_priorities (NumericFPDescending Task).
-  Proof. by  move=> ?; rewrite /hep_task /NumericFPDescending. Qed.
+  Lemma NFPD_is_reflexive : reflexive_task_priorities (numeric_fp_descending Task).
+  Proof. by  move=> ?; rewrite /hep_task /numeric_fp_descending. Qed.
 
   (** The resulting priority policy is transitive. *)
-  Lemma NFPD_is_transitive : transitive_task_priorities (NumericFPDescending Task).
+  Lemma NFPD_is_transitive : transitive_task_priorities (numeric_fp_descending Task).
   Proof.
     move=> y x z.
-    by rewrite /hep_task /NumericFPDescending => PRIO_yx PRIO_xy; lia.
+    by rewrite /hep_task /numeric_fp_descending => PRIO_yx PRIO_xy; lia.
   Qed.
 
   (** The resulting priority policy is total. *)
-  Lemma NFPD_is_total : total_task_priorities (NumericFPDescending Task).
+  Lemma NFPD_is_total : total_task_priorities (numeric_fp_descending Task).
   Proof. by move=> j1 j2; apply: leq_total. Qed.
 
 End PropertiesNFPD.
