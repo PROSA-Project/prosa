@@ -5,7 +5,7 @@ Require Export prosa.model.readiness.jitter.
 
 (** We define a task-level parameter that expresses that the release jitter
     experienced by any of the task's jobs is bounded by a known constant. *)
-Class TaskJitter (Task : TaskType) := task_jitter : Task -> duration.
+Class TaskJitter (Task : TaskType) := { task_jitter : Task -> duration }.
 
 (** In the following, we connect the task-level bound to the job-level release
     jitter in the obvious way. *)
@@ -31,4 +31,3 @@ Section ValidTaskJitter.
   Definition valid_jitter_bounds := forall tsk, tsk \in ts -> valid_jitter tsk.
 
 End ValidTaskJitter.
-

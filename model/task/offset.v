@@ -8,7 +8,7 @@ Require Export prosa.analysis.facts.behavior.all.
 
 (** We define a task-model parameter [task_offset] that maps each task
     to its corresponding offset, that is the instant when its first job arrives. *)
-Class TaskOffset (Task : TaskType) := task_offset : Task -> instant.
+Class TaskOffset (Task : TaskType) := { task_offset : Task -> instant }.
 
 (** In the following section, we define two important properties
     that an offset of any task should satisfy. *)
@@ -68,4 +68,3 @@ Section MaxTaskOffset.
   Definition max_task_offset := max0 task_offsets.
 
 End MaxTaskOffset.
-

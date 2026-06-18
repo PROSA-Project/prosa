@@ -296,7 +296,7 @@ Section JLFPInstantiation.
       have [/eqP EQt|NEQt] := eqVneq (job_task s) (job_task j).
       { apply/eqP; move: (EQt) => /eqP <-.
         by rewrite /job_of_task eq_refl //= andbF addn0 eq_sym eqb0; apply/negP => LPs. }
-      { by rewrite /job_of_task NEQt //= andbT; case: hep_job. }
+      { by rewrite /job_of_task NEQt //= andbT; case: (hep_job s j). }
     }
   Qed.
 

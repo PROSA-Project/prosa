@@ -183,7 +183,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
     have READ : work_bearing_readiness arr_seq sched by done.
     have BLOCK: forall tsk A, blocking_bound ts tsk A = 0.
     { by move=> A tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-                               /fully_preemptive_task_model subnn big1_eq. }
+                               /fully_preemptive_task_model /constant subnn big1_eq. }
     eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - exact: EDF_implies_sequential_tasks.
@@ -204,7 +204,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
       move: (SOL A) => [].
       + by apply: search_space_sub => //.
       + move => F [FIX LE]; exists F; split => //.
-        rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
+        rewrite /task_intra_IBF /fully_preemptive_rtc_threshold /task_rtct.
         by rewrite BLOCK subnn //= add0n addn0 subn0.
   Qed.
 

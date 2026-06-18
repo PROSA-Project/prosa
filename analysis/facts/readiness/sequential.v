@@ -88,7 +88,8 @@ Section SequentialTasksReadiness.
     destruct EX as [k LE]; move: j LE.
     elim: k => [|k IHk] j LE t ARR PEND.
     { destruct (boolP (job_ready sched j t)) as [READY | NREADY].
-      { by exists j; repeat split; eauto using H_priority_is_reflexive. }
+      { exists j; repeat split => //.
+        by rewrite /hep_job /fp_to_jlfp; apply: H_priority_is_reflexive. }
       { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [jhp IN NCOMP].
         apply arrives_in_task_arrivals_before_implies_arrives_before in IN => [|//].
         by exfalso; move: LE; rewrite leqn0 => /eqP EQ; rewrite EQ in IN.
@@ -96,7 +97,8 @@ Section SequentialTasksReadiness.
     }
     { move: LE; rewrite leq_eqVlt ltnS => /orP [/eqP EQ | LE]; last by apply IHk.
       destruct (boolP (job_ready sched j t)) as [READY | NREADY].
-      { by exists j; repeat split; eauto using H_priority_is_reflexive. }
+      { exists j; repeat split => //.
+        by rewrite /hep_job /fp_to_jlfp; apply: H_priority_is_reflexive. }
       { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [j' IN NCOMP].
         have LE' : job_arrival j' <= k.
         { by apply arrives_in_task_arrivals_before_implies_arrives_before in IN; rewrite // -ltnS -EQ. }

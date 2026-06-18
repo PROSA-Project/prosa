@@ -12,13 +12,13 @@ Require Export prosa.util.list.
 (** As a convention, we use "hep" to mean "higher or equal priority." *)
 
 (** We define an FP policy as a relation among tasks, ... *)
-Class FP_policy (Task: TaskType) := hep_task : rel Task.
+Class FP_policy (Task: TaskType) := { hep_task : rel Task }.
 
 (** ... a JLFP policy as a relation among jobs, and ... *)
-Class JLFP_policy (Job: JobType) := hep_job : rel Job.
+Class JLFP_policy (Job: JobType) := { hep_job : rel Job }.
 
 (** ... a JLDP policy as a relation among jobs that may vary over time. *)
-Class JLDP_policy (Job: JobType) := hep_job_at : instant -> rel Job.
+Class JLDP_policy (Job: JobType) := { hep_job_at : instant -> rel Job }.
 
 (** NB: The preceding definitions currently make it difficult to express
         priority policies in which the priority of a job at a given time varies

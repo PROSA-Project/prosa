@@ -43,7 +43,10 @@ Section SBFFacts.
 
   (** Let us state the exceedance using [Instance] to make it locally available
       to the typeclasses database. *)
-  #[local] Instance eps_sbf_inst : SupplyBoundFunction := eps_sbf e.
+  #[local] Instance eps_sbf_inst : SupplyBoundFunction :=
+  {
+    supply_bound_function := eps_sbf e
+  }.
 
   (** Let us formally state the assumption that the total exceedance inside
       the busy interval of [tsk] is bounded by [e]. *)

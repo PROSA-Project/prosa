@@ -190,9 +190,11 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
     - by exact: instantiated_interference_and_workload_consistent_with_sequential_tasks => //.
     - eapply busy_intervals_are_bounded_rs_fp with (SBF := prm_sbf Π γ) => //=.
       by eapply instantiated_i_and_w_are_coherent_with_schedule.
-    - apply: valid_pred_sbf_switch_predicate; last first.
-      + by apply prm_sbf_valid.
-      + by move => ? ? ? ? [? ?]; split => //.
+    - have [ZERO SBF] : valid_supply_bound_function arr_seq sched (prm_sbf Π γ)
+        by apply prm_sbf_valid.
+      split => //.
+      move => j t1 t2 ARR _ t NEQ.
+      by apply: SBF.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
@@ -202,9 +204,18 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
       + apply: search_space_sub => //=.
         by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
       + move => F [FIX1 [FIX2 FIX3]]; exists F; split => //; split.
-        * erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ].
-          by rewrite /task_intra_IBF; lia.
-        * by erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ]; lia.
+        * have LAST: task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk = task_last_nonpr_segment tsk - ε
+            by eapply last_segment_eq_cost_minus_rtct; eauto.
+          move: FIX1; rewrite /prm_sbf /supply_bound_function addnA => FIX1.
+          rewrite /task_intra_IBF.
+          change (task_cost tsk - task_rtct tsk) with (task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk).
+          rewrite LAST [(_ - _) + blocking_bound ts tsk]addnC.
+          by apply FIX1.
+        * have LAST: task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk = task_last_nonpr_segment tsk - ε
+            by eapply last_segment_eq_cost_minus_rtct; eauto.
+          move: FIX2; rewrite /prm_sbf /supply_bound_function => FIX2.
+          change (task_cost tsk - task_rtct tsk) with (task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk).
+          by rewrite LAST.
   Qed.
 
 End RTAforLimitedPreemptiveFPModelwithArrivalCurves.

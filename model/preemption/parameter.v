@@ -10,7 +10,7 @@ Require Export prosa.model.priority.classes.
     given a job and a given degree of progress, whether the job is preemptable
     at its current point of execution. *)
 Class JobPreemptable (Job : JobType) :=
-  job_preemptable : Job -> work -> bool.
+  { job_preemptable : Job -> work -> bool }.
 
 (** * Maximum and Last Non-preemptive Segment of a Job *)
 (** In the following section we define the notions of the maximal and the last

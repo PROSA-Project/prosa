@@ -14,7 +14,7 @@ Require Export prosa.model.task.concept.
     inter-arrival time, which we denote as [task_min_inter_arrival_time]. *)
 
 Class SporadicModel (Task : TaskType) :=
-  task_min_inter_arrival_time : Task -> duration.
+  { task_min_inter_arrival_time : Task -> duration }.
 
 (** ** Model Validity *)
 

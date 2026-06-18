@@ -38,7 +38,9 @@ Section OverheadResourceModelValidSBF.
   (** First, we define the JLFP SBF as the interval length minus the JLFP
       blackout bound. *)
   #[local] Instance jlfo_ovh_sbf : SupplyBoundFunction :=
-    fun Δ => Δ - jlfp_blackout_bound Δ.
+  {
+    supply_bound_function Δ := Δ - jlfp_blackout_bound Δ
+  }.
 
   (** Next, we define the "slowed-down" version of the JLFP SBF as the
       interval length minus the slowed-down blackout bound. The
@@ -48,7 +50,9 @@ Section OverheadResourceModelValidSBF.
       analysis, while the unmodified JLFP SBF is used to state the
       top-level analysis result. *)
   Definition jlfp_ovh_sbf_slow : SupplyBoundFunction :=
-    fun Δ => Δ - slowed jlfp_blackout_bound Δ.
+  {|
+    supply_bound_function Δ := Δ - slowed jlfp_blackout_bound Δ
+  |}.
 
 End OverheadResourceModelValidSBF.
 
@@ -159,7 +163,7 @@ Section OverheadResourceModelValidSBF.
   Lemma overheads_sbf_unit :
     unit_supply_bound_function (jlfp_ovh_sbf_slow ts DB CSB CRPDB).
   Proof.
-    move=> δ; rewrite/jlfp_ovh_sbf_slow.
+    move=> δ; rewrite /jlfp_ovh_sbf_slow /supply_bound_function.
     have LE:
       slowed (jlfp_blackout_bound ts DB CSB CRPDB) δ
       <= slowed (jlfp_blackout_bound ts DB CSB CRPDB) δ.+1.

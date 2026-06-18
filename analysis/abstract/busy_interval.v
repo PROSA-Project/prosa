@@ -198,7 +198,7 @@ Section LemmasAboutAbstractBusyInterval.
     feed_n 4 Workj => //.
     { by move: H_busy_interval => [PREF QT]. }
     { by apply/andP; split; lia. }
-    rewrite /cond_interference //=; move: Workj; case: interference => Workj.
+    rewrite /cond_interference //=; move: Workj; case: (interference j t) => Workj.
     - by rewrite addn1 ltnS; move_neq_up NE; apply Workj.
     - by rewrite addn0; apply: H_unit_service_proc_model.
   Qed.
@@ -402,7 +402,7 @@ Section AbstractBusyIntervalExists.
           { move: (H_work_conserving j t1 t_busy.+1 x) => Workj.
             feed_n 4 Workj; try done.
             { by apply/andP; split; eapply leq_trans; eauto. }
-            destruct interference.
+            destruct (interference j x).
             - by lia.
             - by rewrite //= addn0; apply Workj.
           }
@@ -414,7 +414,7 @@ Section AbstractBusyIntervalExists.
               + move => t /andP [A3 A4]; apply H_no_quiet_time.
                 by apply/andP; split; lia.
             - by apply/andP; split; eapply leq_trans; eauto 2.
-            - destruct interference.
+            - destruct (interference j x).
               + by lia.
               + by rewrite //= addn0; apply Workj.
           }

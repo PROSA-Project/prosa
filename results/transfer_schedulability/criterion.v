@@ -70,23 +70,29 @@ Section TransferSchedulability.
   Variable online_sched : schedule PState.
 
   (** We need to consider two different job costs: the one _planned for_ in the
-      reference schedule, called [ref_job_cost], and the one _actually
-      exhibited_ in the online schedule, called [online_job_cost]. *)
+      reference schedule, called [reference_job_cost_param], and the one _actually
+      exhibited_ in the online schedule, called [actual_job_cost_param]. *)
 
-  Variable ref_job_cost online_job_cost : JobCost Job.
+  Variable reference_job_cost_param actual_job_cost_param : JobCost Job.
 
-  (** When we say that a job is complete in the reference schedule, it is a
-      statement w.r.t. the reference cost [job_cost_ref]. Conversely, when we
-      say that a job is complete in the online schedule, it is a statement
-      w.r.t. the online cost [job_cost_online]. For ease of reference, we define
-      respective local abbreviations.
+  (** For convenience, we define shorthand notation to refer to two respective
+      cost functions.
 
       Syntax hint: The "@" notation allows us to explicitly specify parameters
       that are usually implicitly inferred, such as the job-cost parameter in
       our case here. *)
 
-  Let ref_completed_by := (@completed_by _ _ ref_sched ref_job_cost).
-  Let online_completed_by := (@completed_by _ _ online_sched online_job_cost).
+  Let ref_job_cost := (@job_cost _ reference_job_cost_param).
+  Let online_job_cost := (@job_cost _ actual_job_cost_param).
+
+  (** When we say that a job is complete in the reference schedule, it is a
+      statement w.r.t. the reference cost [ref_job_cost]. Conversely, when we
+      say that a job is complete in the online schedule, it is a statement
+      w.r.t. the online cost [online_job_cost]. For ease of reference, we define
+      respective local abbreviations. *)
+
+  Let ref_completed_by := (@completed_by _ _ ref_sched reference_job_cost_param).
+  Let online_completed_by := (@completed_by _ _ online_sched actual_job_cost_param).
 
   (** ** Well-Formedness of the Schedules *)
 
@@ -114,12 +120,12 @@ Section TransferSchedulability.
       that executes must have arrived and not yet completed. *)
 
   Hypothesis H_jobs_must_arrive_ref : jobs_must_arrive_to_execute ref_sched.
-  Hypothesis H_jobs_exec_ref : (@completed_jobs_dont_execute _ _ ref_sched ref_job_cost).
+  Hypothesis H_jobs_exec_ref : (@completed_jobs_dont_execute _ _ ref_sched reference_job_cost_param).
 
   (** Finally, we also require that completed jobs don't execute past their
       completion in the online schedule. *)
 
-  Hypothesis H_jobs_exec_on : (@completed_jobs_dont_execute _ _ online_sched online_job_cost).
+  Hypothesis H_jobs_exec_on : (@completed_jobs_dont_execute _ _ online_sched actual_job_cost_param).
 
 
   (** * Definition of Schedulability Transfer *)
@@ -138,8 +144,8 @@ Section TransferSchedulability.
       deadlines. As before, we need to be careful to refer to the appropriate
       job-cost parameter. *)
 
-  Let ref_job_meets_deadline :=  (@job_meets_deadline _ _ ref_sched ref_job_cost _).
-  Let online_job_meets_deadline := (@job_meets_deadline _ _ online_sched online_job_cost _).
+  Let ref_job_meets_deadline :=  (@job_meets_deadline _ _ ref_sched reference_job_cost_param _).
+  Let online_job_meets_deadline := (@job_meets_deadline _ _ online_sched actual_job_cost_param _).
 
   (** We can now re-state the schedulability-transfer property in terms of job
       deadlines: Assuming that the [schedulability_transferred] property holds,
@@ -166,7 +172,7 @@ Section TransferSchedulability.
         as [online_job_cost] and once as [ref_job_cost], but technically it
         could be any bound in between the two extremes. *)
 
-    Variable job_cost_bound : JobCost Job.
+    Variable job_cost_bound : Job -> work.
 
     (** We require that [job_cost_bound] indeed upper-bounds the online cost of
         any job. *)
@@ -296,7 +302,7 @@ Section TransferSchedulability.
         remaining online cost. The definition used here, [remaining_cost], is a
         standard Prosa construct. *)
 
-    Let online_remaining_cost := (@remaining_cost _ _ online_sched online_job_cost).
+    Let online_remaining_cost := (@remaining_cost _ _ online_sched actual_job_cost_param).
 
     (** As intended, the remaining job-cost bound indeed upper-bounds the
         remaining online cost. *)
@@ -627,12 +633,13 @@ Section TransferSchedulability.
       have [ZERO|POS] := (posnP (ref_job_cost j)).
       { exfalso.
         have := ref_cost_bounds_online_cost j.
-        by move: NCOMP; rewrite /online_completed_by/completed_by/job_cost; lia. }
+        by move: NCOMP; rewrite /online_completed_by/completed_by/online_job_cost; lia. }
       { rewrite mem_filter.
         repeat (apply/andP; split => //).
         have [t' [/andP[ARR LT] SCHED]]: exists t' : nat, job_arrival j <= t' < t /\ scheduled_at ref_sched j t'.
         { apply: positive_service_implies_scheduled_since_arrival => //.
-          by move: COMP; rewrite /ref_completed_by/completed_by/job_cost; lia. }
+          move: COMP; rewrite /ref_completed_by/completed_by.
+          by move: POS; rewrite /ref_job_cost; lia. }
         rewrite /arrivals_up_to.
         by apply: job_in_arrivals_between => //; lia. }
     Qed.
@@ -649,9 +656,9 @@ Section TransferSchedulability.
       move=> j t COMP NCOMP.
       apply: (contraNltn _ NCOMP).
       rewrite leqn0 => /eqP ZERO.
-      move: COMP; rewrite /ref_completed_by/online_completed_by/completed_by/job_cost.
+      move: COMP; rewrite /ref_completed_by/online_completed_by/completed_by.
       rewrite ZERO !service0.
-      by move: (ref_cost_bounds_online_cost j); lia.
+      by move: (ref_cost_bounds_online_cost j); rewrite /ref_job_cost/online_job_cost; lia.
     Qed.
 
     (** ** Intervals of Non-Positive Slack *)
@@ -1166,7 +1173,7 @@ Section TransferSchedulability.
     { rewrite sum_nat_gt0 => /hasP [j IN NZ].
       exists j; first by move: IN; rewrite filter_predT.
       rewrite /online_completed_by/completed_by -ltnNge.
-      move: NZ; rewrite /remaining_cost_bound/job_cost.
+      move: NZ; rewrite /remaining_cost_bound/online_job_cost.
       by lia. }
     (** Hence we proceed to show that the total remaining job cost is non-zero
         at time [t2]. *)

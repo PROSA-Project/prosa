@@ -9,7 +9,7 @@ Require Export prosa.model.priority.classes.
 
 (** First, we define a new task parameter [task_priority] that maps each task
     to a numeric priority value. *)
-Class TaskPriority (Task : TaskType) := task_priority : Task -> nat.
+Class TaskPriority (Task : TaskType) := { task_priority : Task -> nat }.
 
 (** Based on this parameter, we define two corresponding FP policies. In one
     instance, a lower numeric value indicates lower priority, while in the other
@@ -102,4 +102,3 @@ Global Hint Resolve
      NFPD_is_transitive
      NFPD_is_total
   : basic_rt_facts.
-

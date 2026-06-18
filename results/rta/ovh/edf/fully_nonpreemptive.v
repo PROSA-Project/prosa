@@ -212,14 +212,14 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
         have [δ [LEδ EQ]]:= slowed_subtraction_value_preservation
                               (jlfp_blackout_bound ts DB CSB CRPDB) F (ltac:(apply jlfp_blackout_bound_monotone => //)).
         exists δ; split; [lia | split].
-        * rewrite /sSBF /jlfp_ovh_sbf_slow -EQ.
+        * rewrite /sSBF /jlfp_ovh_sbf_slow /supply_bound_function -EQ.
           apply: leq_trans; last by apply leq_subRL_impl; rewrite -!addnA in FIX1; apply FIX1.
           have NEQ: bound_on_athep_workload ts tsk A δ <= bound_on_athep_workload ts tsk A F
             by apply bound_on_athep_workload_monotone.
           by move: FIX1; rewrite /task_intra_IBF; set (c := _ _ (A +1) - ( _ )); lia.
-        * rewrite /sSBF /jlfp_ovh_sbf_slow -EQ.
+        * rewrite /sSBF /jlfp_ovh_sbf_slow /supply_bound_function -EQ.
           apply bound_preserved_under_slowed, leq_subRL_impl; apply: leq_trans; last by apply FIX2.
-          move: FIX1; rewrite /task_rtct /fully_nonpreemptive_rtc_threshold /constant
+          move: FIX1; rewrite /fully_nonpreemptive_rtc_threshold /task_rtct /constant
                               /jlfp_blackout_bound /overhead_bound; lia.
   Qed.
 

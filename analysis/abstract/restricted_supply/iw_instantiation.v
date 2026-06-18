@@ -124,7 +124,7 @@ Section JLFPInstantiation.
                   /another_hep_job.
           have [EQ|NEQ] := eqVneq s j.
           { by rewrite andbF orbF addn0. }
-          { by unfold hep_job_at, jlfp_to_jldp, hep_job; rewrite andbT; case (JLFP s j) => //. }
+          { by unfold hep_job_at, jlfp_to_jldp; rewrite andbT; case (hep_job s j) => //. }
         }
       }
     }
@@ -183,8 +183,8 @@ Section JLFPInstantiation.
         have [/eqP EQt|NEQt] := eqVneq (job_task s) (job_task j).
         { rewrite /job_of_task; move: TSK => /eqP <-; rewrite EQt.
           by apply/eqP; rewrite andbF andFb addn0 //=. }
-        { unfold hep_job_at, jlfp_to_jldp, hep_job.
-          by rewrite /job_of_task; move: TSK => /eqP <-; rewrite NEQt //= andbT; case: JLFP. }
+        { unfold hep_job_at, jlfp_to_jldp.
+          by rewrite /job_of_task; move: TSK => /eqP <-; rewrite NEQt //= andbT; case: (hep_job s j). }
       }
     }
   Qed.

@@ -31,7 +31,7 @@ Require Export prosa.model.task.concept.
     but here we do not require this for the sake of simplicity and
     generality. *)
 Class Interference (Job : JobType) :=
-  interference : Job -> instant -> bool.
+  { interference : Job -> instant -> bool }.
 
 (** ** b) Interfering Workload *)
 (** In addition to interference, the analysis assumes that at any time
@@ -48,7 +48,7 @@ Class Interference (Job : JobType) :=
     potential interference on job [j] that "arrives" in the system at
     time [t]. *)
 Class InterferingWorkload (Job : JobType) :=
-  interfering_workload : Job -> instant -> duration.
+  { interfering_workload : Job -> instant -> duration }.
 
 (** Next we introduce all the abstract notions required by the analysis. *)
 Section AbstractRTADefinitions.

@@ -68,7 +68,7 @@ Section Schedule.
     have SZ: 0 < service sched j t.+1.
     { apply scheduled_implies_nonzero_service; last  by simpl; exists t; split.
       by apply ideal_proc_model_ensures_ideal_progress. }
-    have SC: service sched j t.+1 < job_cost j by apply less_service_than_cost_is_incomplete.
+    have SC: service sched j t.+1 < job_cost j by move: NCOMP; rewrite /completed_by -ltnNge.
     move: SCHED NCOMP; rewrite !scheduled_at_def /sched /uni_schedule /pmc_uni_schedule
                                /generic_schedule => /eqP SCHED NCOMP.
     rewrite schedule_up_to_def {1}/allocation_at ifT; first by rewrite SCHED.

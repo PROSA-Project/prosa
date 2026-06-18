@@ -60,6 +60,7 @@ Lemma foo_lower_bound : foo + 1 >= 4.
 ## Coq Features
 
 - We use type classes sparingly. Primarily, type classes are used to introduce new job and task parameters, and to express key modeling assumptions (e.g., whether jobs can self-suspend or not).
+- When a type class exposes functions or relations, put them in record fields, even if there is only one member. For example, use `Class JobCost Job := { job_cost : Job -> work }`, not `Class JobCost Job := job_cost : Job -> work`. This gives typeclass inference a class-shaped head symbol and avoids confusing unrelated singleton classes with generic function types. Add a `Coercion ... : ... >-> Funclass` only when applying class values as functions is an intentional part of the interface.
 - We rely heavily on type inference. Top-level definitions do *not* require type annotations if the semantics are clear from context and Coq can figure out the specific types.
 - We tend to not use a lot of custom syntax/notation. Heavy use of custom syntax reduces readability because readers are forced to remember all local syntax definitions.
 - We rely heavily on ssreflect notation.

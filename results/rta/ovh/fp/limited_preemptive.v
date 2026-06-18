@@ -206,43 +206,39 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
   Proof.
     set (sSBF := fp_ovh_sbf_slow ts DB CSB CRPDB tsk).
     move=> L [BW_POS BW_SOL] R SOL js ARRs TSKs.
-    have VAL1 : valid_preemption_model arr_seq sched
-      by apply valid_fixed_preemption_points_model_lemma, H_valid_model_with_fixed_preemption_points.
+    have VAL1 : valid_preemption_model arr_seq sched by apply valid_fixed_preemption_points_model_lemma, H_valid_model_with_fixed_preemption_points.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have VBSBF : valid_busy_sbf arr_seq sched tsk (sSBF) by apply overheads_sbf_busy_valid => //=.
     have USBF : unit_supply_bound_function (sSBF) by apply overheads_sbf_unit => //=.
-    have POStsk: 0 < task_cost tsk
-      by move: TSKs => /eqP <-; apply: leq_trans; [apply POS | apply H_valid_task_arrival_sequence].
+    have POStsk: 0 < task_cost tsk by move: TSKs => /eqP <-; apply: leq_trans; [apply POS | apply H_valid_task_arrival_sequence].
     eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) (SBF := sSBF) => //=.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - by exact: instantiated_interference_and_workload_consistent_with_sequential_tasks => //.
-    - eapply busy_intervals_are_bounded_rs_fp with (SBF := sSBF); try done.
-      + by eapply instantiated_i_and_w_are_coherent_with_schedule.
-      + by apply bound_preserved_under_slowed; unfold fp_blackout_bound, overhead_bound in *; lia.
+    - eapply busy_intervals_are_bounded_rs_fp with (SBF := sSBF); try done; first by eapply instantiated_i_and_w_are_coherent_with_schedule.
+      by apply bound_preserved_under_slowed; unfold fp_blackout_bound, overhead_bound in *; lia.
     - apply: valid_pred_sbf_switch_predicate; last (eapply overheads_sbf_busy_valid) => //=.
       by move => ? ? ? ? [? ?]; split => //; apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
-        unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //.
-        by instantiate (1 := fun _ => blocking_bound ts tsk).
+        by unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //; instantiate (1 := fun _ => blocking_bound ts tsk).
     - move => A SP; move: (SOL A) => [].
       + apply: search_space_sub => //=.
         by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
       + move => F [FIX1 FIX2].
-        have [δ [LEδ EQ]]:= slowed_subtraction_value_preservation
-                              (fp_blackout_bound ts DB CSB CRPDB tsk) F (ltac:(apply fp_blackout_bound_monotone => //)).
+        have [δ [LEδ EQ]]:= slowed_subtraction_value_preservation (fp_blackout_bound ts DB CSB CRPDB tsk) F (ltac:(apply fp_blackout_bound_monotone => //)).
         exists δ; split; [lia | split].
-        * rewrite /sSBF /fp_ovh_sbf_slow -EQ.
+        * rewrite /sSBF /fp_ovh_sbf_slow /supply_bound_function -EQ.
           apply: leq_trans; last by apply leq_subRL_impl; rewrite -!addnA in FIX1; apply FIX1.
-          have NEQ: total_ohep_request_bound_function_FP ts tsk δ <= total_ohep_request_bound_function_FP ts tsk F
-            by apply total_ohep_rbf_monotone => //.
-          erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ].
-          by move: FIX1; rewrite /task_intra_IBF; set (c := _ _ (A +1) - ( _ )); lia.
-        * rewrite /sSBF /fp_ovh_sbf_slow -EQ.
+          have NEQ: total_ohep_request_bound_function_FP ts tsk δ <= total_ohep_request_bound_function_FP ts tsk F by apply total_ohep_rbf_monotone => //.
+          have LAST: task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk = task_last_nonpr_segment tsk - ε by eapply last_segment_eq_cost_minus_rtct; eauto.
+          move: FIX1; rewrite /task_intra_IBF.
+          change (task_cost tsk - task_rtct tsk) with (task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk).
+          rewrite LAST.
+          by set (c := _ _ (A +1) - ( _ )); lia.
+        * rewrite /sSBF /fp_ovh_sbf_slow /supply_bound_function -EQ.
           apply bound_preserved_under_slowed, leq_subRL_impl; apply: leq_trans; last by apply FIX2.
-          erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ].
-          rewrite /task_rtct /constant /fp_blackout_bound /overhead_bound.
+          rewrite /limited_preemptions_rtc_threshold /task_rtct /fp_blackout_bound /overhead_bound.
           by unfold overhead_bound in *; lia.
   Qed.
 

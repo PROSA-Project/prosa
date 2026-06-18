@@ -86,7 +86,7 @@ Section ATHEPWorkloadBoundIsValidForEDF.
     (** We define a predicate [EDF_from tsk]. Predicate [EDF_from tsk]
         holds true for any job [jo] of task [tsk] such that
         [job_deadline jo <= job_deadline j]. *)
-    Let EDF_from (tsk : Task) (jo : Job) := EDF Job jo j && (job_task jo == tsk).
+    Let EDF_from (tsk : Task) (jo : Job) := @hep_job _ (EDF Job) jo j && (job_task jo == tsk).
 
     (** Now, consider the case where [A + ε + D tsk - D tsk_o ≤ Δ]. *)
     Section ShortenRange.
@@ -116,7 +116,7 @@ Section ATHEPWorkloadBoundIsValidForEDF.
         case: (eqVneq (job_task j') tsk_o) => TSK';
                                              last by rewrite andbF.
         rewrite andbT; apply: contraT  => /negPn.
-        rewrite /EDF/edf.EDF/job_deadline/job_deadline_from_task_deadline.
+        rewrite /hep_job/EDF/edf.EDF/job_deadline/job_deadline_from_task_deadline.
         move: H_job_of_tsk; rewrite TSK' /job_of_task => /eqP -> HEP.
         have LATEST: job_arrival j' <= t1 + A + D tsk - D tsk_o by rewrite /D/A; lia.
         have EARLIEST: t1 <= job_arrival j' by apply: job_arrival_between_ge.

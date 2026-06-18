@@ -70,7 +70,7 @@ Section Schedule.
     set chp:= choose_highest_prio_job.
     have SERV_ZERO: 0 < service sched j t.+1.
     { exact: scheduled_implies_nonzero_service. }
-    have SERV_COST: service sched j t.+1 < job_cost j by apply less_service_than_cost_is_incomplete.
+    have SERV_COST: service sched j t.+1 < job_cost j by move: NCOMP; rewrite /completed_by -ltnNge.
     move: SCHED NCOMP.
     rewrite !scheduled_at_def /sched /uni_schedule
             /pmc_uni_schedule /generic_schedule => /eqP SCHED NCOMP.

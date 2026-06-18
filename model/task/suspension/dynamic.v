@@ -6,7 +6,8 @@ Require Export prosa.model.task.concept.
 (** Under the dynamic self-suspension model, for each task, there is a bound on
     the maximum total self-suspension duration exhibited by any job of the
     task. *)
-Class TaskTotalSuspension (Task : TaskType) := task_total_suspension : Task -> duration.
+Class TaskTotalSuspension (Task : TaskType) :=
+  { task_total_suspension : Task -> duration }.
 
 (** * Validity *)
 

@@ -14,19 +14,19 @@ Require Export prosa.model.task.concept.
 (** First, we define [task_max_nonpreemptive_segment] to denote a bound on the
     maximum length of a task's non-preemptive segment. *)
 Class TaskMaxNonpreemptiveSegment (Task : TaskType) :=
-  task_max_nonpreemptive_segment : Task -> work.
+  { task_max_nonpreemptive_segment : Task -> work }.
 
 (** Second, run-to-completion threshold (RTCT) indicates a progress
     bound with the interpretation that, once a job of a task [tsk] has
     received at least [task_rtct tsk] time units of service, it will
     remain nonpreemptive until the end and run to completion. *)
 Class TaskRunToCompletionThreshold (Task : TaskType) :=
-  task_rtct : Task -> work.
+  { task_rtct : Task -> work }.
 
 (** Third, the parameter [task_preemption_points] indicates the non-preemptive
     segments of a task. Obviously, not all preemption models use this parameter. *)
 Class TaskPreemptionPoints (Task : TaskType) :=
-  task_preemption_points : Task -> seq work.
+  { task_preemption_points : Task -> seq work }.
 
 (** ** Derived Properties *)
 (** In this section, we define the notions of the maximal and the last
@@ -54,7 +54,10 @@ End MaxAndLastNonpreemptiveSegment.
     preemption points are known. *)
 #[global]
 Instance task_preemption_points_to_task_max_nonpreemptive_segment_conversion
-         (Task : TaskType) `{TaskPreemptionPoints Task} : TaskMaxNonpreemptiveSegment Task := task_max_nonpr_segment.
+         (Task : TaskType) `{TaskPreemptionPoints Task} : TaskMaxNonpreemptiveSegment Task :=
+{
+  task_max_nonpreemptive_segment := task_max_nonpr_segment
+}.
 
 
 (** ** Preemption Model Validity *)

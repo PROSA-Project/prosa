@@ -11,7 +11,8 @@ Require Export prosa.util.nat.
     0]. Note that a job may self-suspend before having received any service,
     which is equivalent to release jitter. (Suspensions after a job has
     completed are meaningless and irrelevant.) *)
-Class JobSuspension (Job : JobType) := job_suspension : Job -> work -> duration.
+Class JobSuspension (Job : JobType) :=
+  { job_suspension : Job -> work -> duration }.
 
 (** * Readiness of Self-Suspending Jobs *)
 

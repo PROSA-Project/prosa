@@ -65,8 +65,8 @@ Section JitterPropagationFacts.
   (** If the arrival curve is structurally valid, then so is the induced release
       curve. *)
   Corollary valid_release_curve :
-    valid_taskset_arrival_curve ts max_arrivals ->
-    valid_taskset_arrival_curve ts release_curve.
+    valid_taskset_arrival_curve ts (@max_arrivals _ arrival_curve) ->
+    valid_taskset_arrival_curve ts (@max_arrivals _ release_curve).
   Proof.
     move=> VALID.
     apply: propagated_arrival_curve_valid => tsk IN.
@@ -278,4 +278,3 @@ Section JitterPropagationFacts.
 
 
 End JitterPropagationFacts.
-

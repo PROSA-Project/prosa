@@ -30,6 +30,8 @@ Example: `JobJitter` is introduced in `model.readiness.jitter`, not in `behavior
 
 - Each job/task parameter is introduced as a separate type class. For example, there are separate type classes for `JobArrival`, `JobCost`, and `JobDeadline` so that parameters can be selected and mixed as needed (e.g.,  not every type of job has necessarily a deadline). 
 
+- Define parameter operations as record fields, including singleton function classes. For example, write `Class JobArrival Job := { job_arrival : Job -> instant }` and instantiate it with record syntax. Do not use `Class JobArrival Job := job_arrival : Job -> instant`, since that makes unrelated singleton classes look like plain functions to typeclass inference.
+
 - For certain general concepts it can be very useful (or even essential) to state invariants that any reasonable choice must satisfy. This can be expressed as proof terms within a type class expressing the general concept. For instance, this is used in the `ProcessorState` and `JobReady` type classes, to specify their fundamental semantics. Introducing such proof terms is okay if it is truly required, or if it yields great benefits in readability elsewhere, but generally speaking **use proof terms sparingly and document their use profusely**. 
 
 - When in doubt, avoid proof terms and instead opt for the regular Prosa way of defining a `valid_...` predicate to concisely express all properties that any reasonable interpretation of a given general concept must satisfy.

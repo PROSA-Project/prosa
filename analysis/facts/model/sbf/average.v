@@ -40,7 +40,7 @@ Section AverageResourceModelValidSBF.
   (** We show that [sbf] is monotone. *)
   Lemma arm_sbf_monotone : sbf_is_monotone (arm_sbf Π Θ ν).
   Proof.
-    move => δ1 δ2 LE; rewrite /arm_sbf.
+    move => δ1 δ2 LE; rewrite /arm_sbf /supply_bound_function.
     interval_to_duration δ1 δ2 Δ.
     apply leq_div2r, leq_mul; lia.
   Qed.
@@ -49,7 +49,7 @@ Section AverageResourceModelValidSBF.
   Lemma arm_sbf_unit : unit_supply_bound_function (arm_sbf Π Θ ν).
   Proof.
     move: H_average_resource_model => [LEΠ _].
-    move => δ; rewrite /arm_sbf.
+    move => δ; rewrite /arm_sbf /supply_bound_function.
     have [Z|POS] := posnP Π; first by subst; lia.
     have [LEν|LEν] := leqP δ ν.
     { move: (LEν); rewrite -subn_eq0 => /eqP ->.
@@ -71,11 +71,11 @@ Section AverageResourceModelValidSBF.
     valid_supply_bound_function arr_seq sched (arm_sbf Π Θ ν).
   Proof.
     have FS: forall a, 0 - a = 0 by lia.
-    split; first by rewrite /arm_sbf !FS mul0n div0n.
+    split; first by rewrite /arm_sbf /supply_bound_function !FS mul0n div0n.
     move => j t1 t2 ARR _ t /andP [LE1 LE2].
     move: H_average_resource_model => [LE SUP].
     interval_to_duration t1 t Δ.
-    rewrite /arm_sbf -(leqRW (SUP _ _)) /arm_sbf.
+    rewrite /arm_sbf /supply_bound_function -(leqRW (SUP _ _)) /arm_sbf /supply_bound_function.
     rewrite addKn.
     lia.
   Qed.

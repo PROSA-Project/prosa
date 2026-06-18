@@ -122,7 +122,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
     move => A /andP [LT CHANGE].
     have BLOCK: forall A', edf.blocking_bound ts tsk A' = blocking_bound A'.
     { by move=> A'; rewrite /edf.blocking_bound /parameters.task_max_nonpreemptive_segment
-         /fully_preemptive_task_model subnn big1_eq. }
+         /fully_preemptive_task_model /constant subnn big1_eq. }
     specialize (H_R_is_maximum A); feed H_R_is_maximum; first by apply/andP; split; done.
     move: H_R_is_maximum => [F [FIX BOUND]].
     exists F; split.

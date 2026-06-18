@@ -14,7 +14,9 @@ Section FullyNonPreemptiveModel.
       completion. The maximal non-preemptive segment of a job [j] has length
       [job_cost j], which is bounded by [task_cost tsk].*)
   Definition fully_nonpreemptive_task_model : TaskMaxNonpreemptiveSegment Task :=
-    fun tsk : Task => task_cost tsk.
+  {|
+    task_max_nonpreemptive_segment := task_cost
+  |}.
 
 End FullyNonPreemptiveModel.
 
@@ -32,6 +34,8 @@ Section TaskRTCThresholdFullyNonPreemptive.
       to finish. Thus, we can set the task-level run-to-completion threshold
       to ε. *)
   #[local] Instance fully_nonpreemptive_rtc_threshold : TaskRunToCompletionThreshold Task :=
-    constant ε.
+  {
+    task_rtct := constant ε
+  }.
 
 End TaskRTCThresholdFullyNonPreemptive.

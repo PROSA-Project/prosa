@@ -206,7 +206,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     - move => A SP; move: (SOL A) => [].
       + by apply: search_space_sub => //.
       + move => F [FIX1 [FIX2 LE]]; exists F; split => //.
-        rewrite /task_intra_IBF /task_rtct /fully_nonpreemptive_rtc_threshold /constant.
+        rewrite /task_intra_IBF /fully_nonpreemptive_rtc_threshold /task_rtct /constant.
         split; [rewrite -(leqRW FIX1)| ]; lia.
   Qed.
 

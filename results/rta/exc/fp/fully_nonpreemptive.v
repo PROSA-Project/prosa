@@ -64,7 +64,10 @@ Section RTA.
 
   (** Let us locally recall the exceedance SBF using [Instance] to make
       it available to the typeclasses hints database. *)
-  #[local] Instance eps_sbf_inst : SupplyBoundFunction := eps_sbf e.
+  #[local] Instance eps_sbf_inst : SupplyBoundFunction :=
+  {
+    supply_bound_function := eps_sbf e
+  }.
 
   (** Let us formally state that the total exceedance inside the busy
       window is bounded. *)
@@ -119,7 +122,7 @@ Section RTA.
         exact: H_exceedance_in_busy_interval_bounded.
       + exact: eps_sbf_is_unit.
       + by move: BW_FIX; rewrite /eps_sbf; lia.
-      + by move: BW_FIX; rewrite /eps_sbf_inst /eps_sbf; lia.
+      + by move: BW_FIX; rewrite /eps_sbf_inst /supply_bound_function /eps_sbf; lia.
     - apply: valid_pred_sbf_switch_predicate; last by exact: eps_sbf_is_valid.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
@@ -133,8 +136,9 @@ Section RTA.
        + apply: search_space_sub => //; first lia.
          by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
       + move => F [FIX1 FIX2]; exists F; split => //; try lia.
-        rewrite /task_intra_IBF /task_rtct /fully_nonpreemptive_rtc_threshold /constant.
-        rewrite /eps_sbf_inst /eps_sbf.
+        move: FIX1 FIX2.
+        rewrite /task_intra_IBF /fully_nonpreemptive_rtc_threshold /task_rtct /constant.
+        rewrite /eps_sbf_inst /eps_sbf /supply_bound_function.
         by split; lia.
   Qed.
 

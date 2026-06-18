@@ -98,7 +98,7 @@ Section LowerBoundOnService.
       feed_n 4 Workj => //.
       { by apply/andP; split; lia. }
       rewrite /cond_interference //=.
-      destruct interference.
+      destruct (interference j x).
       - rewrite addn1 ltnS.
         by move_neq_up NE; apply Workj.
       - by rewrite addn0; apply UNIT.

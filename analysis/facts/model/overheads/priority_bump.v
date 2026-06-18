@@ -126,7 +126,7 @@ Section PriorityBump.
     { rewrite H_JLFP_is_FIFO -ltnNge in PB.
       apply scheduled_at_iff_scheduled_job in SCHED1.
       apply scheduled_at_iff_scheduled_job in SCHED2.
-      eapply early_hep_job_is_scheduled with (JLFP := hep_job) in PB => //; last first.
+      eapply early_hep_job_is_scheduled with (JLFP := JLFP) in PB => //; last first.
       { by intros ?; rewrite /hep_job_at /jlfp_to_jldp //= !H_JLFP_is_FIFO; lia. }
       eapply completion_monotonic in PB.
       { by apply completed_implies_not_scheduled in PB => //; erewrite SCHED2 in PB. }

@@ -226,9 +226,9 @@ Section EMSOFTModel.
       always produce well-formed schedules. *)
 
   Hypothesis H_well_formed_A :
-    @valid_schedule _ _ _ (algA omega_0) (job_cost omega_0) (job_ready omega_0) arr_seq.
+    @valid_schedule _ _ _ (algA omega_0) (evo_costs omega_0) (job_ready omega_0) arr_seq.
   Hypothesis H_well_formed_B :
-    forall omega, @valid_schedule _ _ _ (algB omega) (job_cost omega) (job_ready omega) arr_seq.
+    forall omega, @valid_schedule _ _ _ (algB omega) (evo_costs omega) (job_ready omega) arr_seq.
 
 
   (** For brevity, recall the notion of [schedulability_transferred]. We
@@ -237,7 +237,7 @@ Section EMSOFTModel.
 
   Definition schedulability_transferred_AB omega :=
     schedulability_transferred
-      (algA omega_0) (algB omega) (job_cost omega_0) (job_cost omega).
+      (algA omega_0) (algB omega) (evo_costs omega_0) (evo_costs omega).
 
   (** ** Clairvoyant Results *)
 
@@ -260,7 +260,7 @@ Section EMSOFTModel.
 
                 (** ... w.r.t. the respective job costs ... *)
 
-                (job_cost omega_0) (job_cost omega)
+                (evo_costs omega_0) (evo_costs omega)
 
                 (** ... for the given, fixed job arrival times ... *)
 
@@ -306,7 +306,7 @@ Section EMSOFTModel.
     forall omega,
       transfer_schedulability_criterion
         (algA omega_0)     (algB omega)
-        (job_cost omega_0) (job_cost omega)
+        (evo_costs omega_0) (evo_costs omega)
         arr_seq
         (job_cost omega_0).
 
@@ -358,7 +358,7 @@ Section EMSOFTModel.
     forall j,
       arrives_in arr_seq j ->
       { R : duration | @job_response_time_bound
-                         _ _ (algA omega_0) (job_cost omega_0) _  j R }.
+                         _ _ (algA omega_0) (evo_costs omega_0) _  j R }.
 
   (** ** Definition of Finish Times *)
 
@@ -400,7 +400,7 @@ Section EMSOFTModel.
         w.r.t. the online schedule. *)
 
     Lemma online_response_time_bound :
-      @job_response_time_bound _ _ (algB omega) (job_cost omega) _  jf R.
+      @job_response_time_bound _ _ (algB omega) (evo_costs omega) _  jf R.
     Proof. by apply/H_trans/ref_response_time_bound. Qed.
 
     (** Having established that the online schedule is starvation-free, too, we
@@ -486,7 +486,7 @@ Section EMSOFTModel.
     forall j,
       arrives_in arr_seq j ->
       forall omega,
-        { R | @job_response_time_bound _ _ (algB omega) (job_cost omega) _  j R }.
+        { R | @job_response_time_bound _ _ (algB omega) (evo_costs omega) _  j R }.
 
   (** *** Online Finish Times, Revisited *)
 
@@ -551,7 +551,7 @@ Section EMSOFTModel.
         by move: ZERO'; rewrite /job_cost /completed_by /job.job_cost => ->. }
       { have [t' [LT SCHED']] : exists t' : nat, t' < t /\ scheduled_at (algA omega_0) j t'.
         { apply: positive_service_implies_scheduled_before.
-          by move: POS COMP; rewrite /completed_by/service/job.job_cost/job_cost; lia. }
+          by move: POS COMP; rewrite /completed_by/job_cost/service; lia. }
         have IN : arrives_in arr_seq j by move: (H_well_formed_A) => [+ _]; apply.
         set RTB := proj2_sig (H_non_starvation' j IN omega).
         apply: completion_monotonic; last by apply/finished_at_finish_time/RTB.

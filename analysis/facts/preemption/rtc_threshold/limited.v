@@ -100,7 +100,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     split; first by rewrite /task_rtc_bounded_by_cost leq_subr.
     intros j ARR__j TSK__j. move: (H_valid_fixed_preemption_points_model) => [LJ LT].
     move: (LJ) (LT) => [ZERO__job [COST__job SORT__job]] [ZERO__task [COST__task [SORT__task [T4 [T5 T6]]]]].
-    rewrite /job_rtct /task_rtct /limited_preemptions_rtc_threshold
+    rewrite /job_rtct /limited_preemptions_rtc_threshold /task_rtct
             /job_last_nonpreemptive_segment /task_last_nonpr_segment /lengths_of_segments.
     case: (posnP (job_cost j)) => [Z|POS]; first by rewrite Z; compute.
     have J_RTCT__pos : 0 < job_last_nonpreemptive_segment j
@@ -145,7 +145,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     task_cost tsk - task_rtct tsk = task_last_nonpr_segment tsk - ε.
   Proof.
     move: (H_valid_fixed_preemption_points_model) => [MLP [BEG [END [INCR _]]]].
-    rewrite /task_last_nonpr_segment /task_rtct /limited_preemptions_rtc_threshold.
+    rewrite /task_last_nonpr_segment /limited_preemptions_rtc_threshold /task_rtct.
     rewrite subKn // -[leqRHS]subn0 leq_sub //.
     apply leq_trans with (task_max_nonpreemptive_segment tsk).
     - by apply last_of_seq_le_max_of_seq.

@@ -62,7 +62,9 @@ Section ValidJobCostsShifted.
 
   (** We assign the job costs as defined by the [job_costs_shifted] function. *)
   Instance job_costs_in_oi : JobCost Job :=
-    job_costs_shifted.
+  {
+    job_cost := job_costs_shifted
+  }.
 
   (** We show that the [job_costs_shifted] function is valid. *)
   Lemma job_costs_shifted_valid : arrivals_have_valid_job_costs arr_seq.

@@ -15,7 +15,7 @@ Require Export prosa.analysis.facts.job_index.
 (** Under the periodic task model, each task is characterized by its period,
     which we denote as [task_period]. *)
 
-Class PeriodicModel (Task : TaskType) := task_period : Task -> duration.
+Class PeriodicModel (Task : TaskType) := { task_period : Task -> duration }.
 
 (** ** Model Validity *)
 

@@ -1,3 +1,4 @@
+Require Export prosa.analysis.definitions.sbf.sbf.
 Require Export prosa.model.processor.supply.
 
 (** * Periodic Resource Model *)
@@ -34,11 +35,14 @@ Section PeriodicResourceModelSBF.
   (** ... we define the corresponding SBF as introduced in "Periodic Resource
       Model for Compositional Real-Time Guarantees" by Shin & Lee (RTSS
       2003). *)
-  Definition prm_sbf Δ :=
-    let blackout := Π - γ in
-    let n_full_periods := (Δ - blackout) %/ Π in
-    let supply_in_full_periods := n_full_periods * γ in
-    let duration_of_full_periods := n_full_periods * Π in
-    supply_in_full_periods + (Δ - 2 * blackout - duration_of_full_periods).
+  Definition prm_sbf : SupplyBoundFunction :=
+  {|
+    supply_bound_function Δ :=
+      let blackout := Π - γ in
+      let n_full_periods := (Δ - blackout) %/ Π in
+      let supply_in_full_periods := n_full_periods * γ in
+      let duration_of_full_periods := n_full_periods * Π in
+      supply_in_full_periods + (Δ - 2 * blackout - duration_of_full_periods)
+  |}.
 
 End PeriodicResourceModelSBF.

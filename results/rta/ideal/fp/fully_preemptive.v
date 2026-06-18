@@ -126,7 +126,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Proof.
     have BLOCK: blocking_bound ts tsk = 0.
     { by rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-               /fully_preemptive_task_model subnn big1_eq. }
+               /fully_preemptive_task_model /constant subnn big1_eq. }
     eapply uniprocessor_response_time_bound_fp_with_bounded_nonpreemptive_segments with (L:=L) => //
 .
     - exact: sequential_readiness_implies_work_bearing_readiness.

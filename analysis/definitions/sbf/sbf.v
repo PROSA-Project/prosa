@@ -6,4 +6,5 @@ Require Export prosa.behavior.job.
     (SBF), which can be used to reason about the minimum amount of supply
     provided in a given time interval. *)
 Class SupplyBoundFunction :=
-  supply_bound_function : duration -> work.
+  { supply_bound_function : duration -> work }.
+Coercion supply_bound_function : SupplyBoundFunction >-> Funclass.

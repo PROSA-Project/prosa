@@ -18,12 +18,14 @@ Require Export prosa.model.task.arrivals.
 (** We let [max_request_bound tsk Δ] denote a bound on the maximum
     cost of arrivals of jobs of task [tsk] in any interval of length
     [Δ]. *)
-Class MaxRequestBound (Task : TaskType) := max_request_bound : Task -> duration -> work.
+Class MaxRequestBound (Task : TaskType) :=
+  { max_request_bound : Task -> duration -> work }.
 
 (** Conversely, we let [min_request_bound tsk Δ] denote a bound on the
     minimum cost of arrivals of jobs of task [tsk] in any interval of
     length [Δ]. *)
-Class MinRequestBound (Task : TaskType) := min_request_bound : Task -> duration -> work.
+Class MinRequestBound (Task : TaskType) :=
+  { min_request_bound : Task -> duration -> work }.
 
 (** ** Parameter Semantics *)
 

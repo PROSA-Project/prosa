@@ -44,7 +44,7 @@ Section PeriodicResourceModelValidSBF.
   (** We show that [sbf] is monotone. *)
   Lemma prm_sbf_monotone : sbf_is_monotone (prm_sbf Π γ).
   Proof.
-    move => δ1 δ2 LE; rewrite /prm_sbf.
+    move => δ1 δ2 LE; rewrite /prm_sbf /supply_bound_function.
     interval_to_duration δ1 δ2 Δ.
     have [Z|POS] := posnP Π; first by subst; rewrite divn0 !mul0n !add0n !subn0 leq_addr.
     set (A := Π - γ); have ->: 2 * A = A + A by lia.
@@ -89,7 +89,7 @@ Section PeriodicResourceModelValidSBF.
   Lemma prm_sbf_unit : unit_supply_bound_function (prm_sbf Π γ).
   Proof.
     move: H_periodic_resource_model => [_ [LEΠ _]].
-    move => δ; rewrite /prm_sbf !subnDAC.
+    move => δ; rewrite /prm_sbf /supply_bound_function !subnDAC.
     have [Z|POS] := posnP Π; first by subst; lia.
     have [h [j [EQ LT2]]] : exists k q, δ = k * Π + q /\ q < Π.
     { by eexists; eexists; split; [ apply divn_eq | rewrite ltn_mod ]. }
@@ -185,7 +185,7 @@ Section PeriodicResourceModelValidSBF.
       prm_sbf Π γ (t2 - t1) <= supply_during sched t1 t2.
     Proof.
       move: (H_periodic_resource_model) => [POS [LE VAL]].
-      rewrite -(leqRW prm_sbf_valid_aux_11) // /prm_sbf.
+      rewrite -(leqRW prm_sbf_valid_aux_11) // /prm_sbf /supply_bound_function.
       have ->: forall a b, a - 2 * b = a - b - b by lia.
       have ->: k * Π + q2 - (k * Π + q1) = q2 - q1 by lia.
       rewrite subnBA //.
@@ -323,7 +323,7 @@ Section PeriodicResourceModelValidSBF.
     Lemma prm_sbf_valid_aux_2 :
       prm_sbf Π γ (t2 - t1) <= supply_during sched t1 t2.
     Proof.
-      rewrite /prm_sbf.
+      rewrite /prm_sbf /supply_bound_function.
       move: (H_periodic_resource_model) => [POS [LE VAL]].
       rewrite prm_sbf_valid_aux_21 //
               -(leqRW prm_sbf_valid_aux_22) //
@@ -369,7 +369,7 @@ Section PeriodicResourceModelValidSBF.
     valid_supply_bound_function arr_seq sched (prm_sbf Π γ).
   Proof.
     have FS: forall a, 0 - a = 0 by lia.
-    split; first by rewrite /prm_sbf !FS addn0 div0n mul0n.
+    split; first by rewrite /prm_sbf /supply_bound_function !FS addn0 div0n mul0n.
     move => j t1 t2 ARR _ t /andP [LE1 LE2].
     move: H_periodic_resource_model => [POSΠ [LE SUP]].
     have [k1 [q1 [EQ1 LT1]]] : exists k1 q1, t1 = k1 * Π + q1 /\ q1 < Π.

@@ -37,7 +37,9 @@ Section OverheadResourceModelValidSBF.
   (** First, we define the FIFO SBF as the interval length minus
       the FIFO blackout bound. *)
   #[local] Instance fifo_ovh_sbf : SupplyBoundFunction :=
-    fun Δ => Δ - fifo_blackout_bound Δ.
+  {
+    supply_bound_function Δ := Δ - fifo_blackout_bound Δ
+  }.
 
   (** Next, we define the "slowed-down" version of the FIFO SBF as the
       interval length minus the slowed-down blackout bound. The
@@ -47,7 +49,9 @@ Section OverheadResourceModelValidSBF.
       analysis, while the unmodified FIFO SBF is used to state the
       top-level analysis result. *)
   Definition fifo_ovh_sbf_slow : SupplyBoundFunction :=
-    fun Δ => Δ - slowed fifo_blackout_bound Δ.
+  {|
+    supply_bound_function Δ := Δ - slowed fifo_blackout_bound Δ
+  |}.
 
 End OverheadResourceModelValidSBF.
 
@@ -156,7 +160,7 @@ Section OverheadResourceModelValidSBF.
   Lemma overheads_sbf_unit :
     unit_supply_bound_function (fifo_ovh_sbf_slow ts DB CSB CRPDB).
   Proof.
-    move=> δ; rewrite /fifo_ovh_sbf_slow.
+    move=> δ; rewrite /fifo_ovh_sbf_slow /supply_bound_function.
     have LE:
       slowed (fifo_blackout_bound ts DB CSB CRPDB) δ
       <= slowed (fifo_blackout_bound ts DB CSB CRPDB) δ.+1.

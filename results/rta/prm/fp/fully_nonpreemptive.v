@@ -184,9 +184,11 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - eapply busy_intervals_are_bounded_rs_fp with (SBF := prm_sbf Π γ) => //=.
       by eapply instantiated_i_and_w_are_coherent_with_schedule.
-    - apply: valid_pred_sbf_switch_predicate; last first.
-      + by apply prm_sbf_valid.
-      + by move => ? ? ? ? [? ?]; split => //.
+    - have [ZERO SBF] : valid_supply_bound_function arr_seq sched (prm_sbf Π γ)
+        by apply prm_sbf_valid.
+      split => //.
+      move => j t1 t2 ARR _ t NEQ.
+      by apply: SBF.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
@@ -196,8 +198,12 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       + apply: search_space_sub => //=.
         by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
       + move => F [FIX1 [FIX2 FIX3]]; exists F; split => //; split.
-        * by rewrite /task_rtct /fully_nonpreemptive_rtc_threshold /constant /task_intra_IBF; lia.
-        * by rewrite /task_rtct /fully_nonpreemptive_rtc_threshold /constant; lia.
+        * move: FIX1; rewrite /fully_nonpreemptive_rtc_threshold /task_rtct /constant /task_intra_IBF
+                              /prm_sbf /supply_bound_function.
+          by lia.
+        * move: FIX2; rewrite /fully_nonpreemptive_rtc_threshold /task_rtct /constant
+                              /prm_sbf /supply_bound_function.
+          by lia.
   Qed.
 
 End RTAforFullyNonPreemptiveFPModelwithArrivalCurves.

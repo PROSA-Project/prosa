@@ -188,8 +188,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
       + apply: search_space_sub => //=.
         by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
       + move => F [FIX1 [FIX2 FIX3]]; exists F; split => //; split.
-        * by rewrite /task_rtct /fully_nonpreemptive_rtc_threshold /constant /task_intra_IBF; lia.
-        * by rewrite /task_rtct /fully_nonpreemptive_rtc_threshold /constant; lia.
+        * by rewrite /fully_nonpreemptive_rtc_threshold /task_rtct /constant /task_intra_IBF; lia.
+        * by rewrite /fully_nonpreemptive_rtc_threshold /task_rtct /constant; lia.
   Qed.
 
 End RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.

@@ -8,4 +8,6 @@ Require Export prosa.model.task.concept.
 #[global]
 Instance job_deadline_from_task_deadline (Job : JobType) (Task : TaskType)
          `{TaskDeadline Task} `{JobArrival Job} `{JobTask Job Task} : JobDeadline Job :=
-  fun (j : Job) => job_arrival j + task_deadline (job_task j).
+{
+  job_deadline (j : Job) := job_arrival j + task_deadline (job_task j)
+}.

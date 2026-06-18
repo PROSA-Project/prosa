@@ -6,7 +6,7 @@ Require Export prosa.model.task.arrivals.
 (** We define a task-model parameter [task_max_inter_arrival_time] as
     the maximum time difference between the arrivals of consecutive jobs. *)
 Class TaskMaxInterArrival (Task : TaskType) :=
-  task_max_inter_arrival_time : Task -> duration.
+  { task_max_inter_arrival_time : Task -> duration }.
 
 (** In the following section, we define two properties that a task must satisfy
 for its maximum inter-arrival time to be valid. *)

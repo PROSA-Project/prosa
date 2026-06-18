@@ -107,6 +107,8 @@ Section TaskRTCThresholdLimitedPreemptions.
       run-to-completion threshold to [task_cost tsk - (task_last_nonpr_seg tsk - ε)],
       which safely bounds [job_cost j - (job_last_nonpr_seg j - ε)]. *)
   #[local] Instance limited_preemptions_rtc_threshold : TaskRunToCompletionThreshold Task :=
-    fun tsk : Task => task_cost tsk - (task_last_nonpr_segment tsk - ε).
+  {
+    task_rtct tsk := task_cost tsk - (task_last_nonpr_segment tsk - ε)
+  }.
 
 End TaskRTCThresholdLimitedPreemptions.

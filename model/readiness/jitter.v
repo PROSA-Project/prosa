@@ -9,7 +9,7 @@ Require Import prosa.util.nat.
     occurs some (bounded) time after its arrival. We model this with the
     [job_jitter] parameter, which maps each job to its jitter duration. *)
 
-Class JobJitter (Job : JobType) := job_jitter : Job -> duration.
+Class JobJitter (Job : JobType) := { job_jitter : Job -> duration }.
 
 (** * Readiness of Jobs with Release Jitter *)
 

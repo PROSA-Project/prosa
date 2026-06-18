@@ -1,3 +1,4 @@
+Require Export prosa.analysis.definitions.sbf.sbf.
 Require Export prosa.model.processor.supply.
 
 (** * Average Resource Model *)
@@ -47,6 +48,9 @@ Section AverageResourceModelSBF.
       resource model itself. This is due to the fact that the guaranteed supply
       depends only on the interval length [Δ], not on its alignment. Therefore,
       the same bound can be used as an SBF. *)
-  Definition arm_sbf Δ := ((Δ - ν) * Θ) %/ Π.
+  Definition arm_sbf : SupplyBoundFunction :=
+  {|
+    supply_bound_function Δ := ((Δ - ν) * Θ) %/ Π
+  |}.
 
 End AverageResourceModelSBF.

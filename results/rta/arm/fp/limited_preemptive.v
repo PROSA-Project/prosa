@@ -185,14 +185,16 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
     have US : unit_supply_bound_function (arm_sbf Π Θ ν) by exact: arm_sbf_unit.
     have POStsk: 0 < task_cost tsk
       by move: TSKs => /eqP <-; apply: leq_trans; [apply POS | apply H_valid_task_arrival_sequence].
-    eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) (SBF := arm_sbf Π Θ ν) => //=.
+    eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) (SBF := arm_sbf Π Θ ν) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - by exact: instantiated_interference_and_workload_consistent_with_sequential_tasks => //.
     - eapply busy_intervals_are_bounded_rs_fp with (SBF := arm_sbf Π Θ ν) => //=.
       by eapply instantiated_i_and_w_are_coherent_with_schedule.
-    - apply: valid_pred_sbf_switch_predicate; last first.
-      + by apply arm_sbf_valid.
-      + by move => ? ? ? ? [? ?]; split => //.
+    - have [ZERO SBF] : valid_supply_bound_function arr_seq sched (arm_sbf Π Θ ν)
+        by apply arm_sbf_valid.
+      split => //.
+      move => j t1 t2 ARR _ t NEQ.
+      by apply: SBF.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.

@@ -141,16 +141,16 @@ Section BoundedBusyIntervalsAux.
   Proof.
     move=> δ POS LE; move: (H_busy_prefix) => PREF.
     apply leq_ltn_trans with (service_during sched j t1 (t1 + δ) + cumulative_interference j t1 (t1 + δ)).
-    { rewrite /service_during /cumulative_interference /cumul_cond_interference  /cond_interference /service_at.
-      rewrite -big_split //= -{1}(sum_of_ones t1 δ) big_nat [in X in _ <= X]big_nat.
+    { rewrite /service_during /cumulative_interference /cumul_cond_interference  /cond_interference.
+      rewrite -big_split // -{1}(sum_of_ones t1 δ) big_nat [in X in _ <= X]big_nat.
       apply leq_sum => x /andP[Lo Hi].
       { move: (H_work_conserving j t1 t2 x) => Workj.
         feed_n 4 Workj; try done.
         { by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix. }
         { by apply/andP; split; eapply leq_trans; eauto. }
-        destruct interference.
-        - by lia.
-        - by rewrite //= addn0; apply Workj.
+        case INT: (interference j x).
+        - by simpl; lia.
+        - by rewrite //= addn0; apply Workj; rewrite INT.
       }
     }
     rewrite cumulative_interfering_workload_split // cumulative_interference_split //.

@@ -21,7 +21,7 @@ Require Export prosa.model.priority.classes.
 Definition offset := int.
 
 (** We define a task-model parameter to express each task's relative priority point. *)
-Class PriorityPoint (Task : TaskType) := task_priority_point : Task -> offset.
+Class PriorityPoint (Task : TaskType) := { task_priority_point : Task -> offset }.
 
 (** Based on the task-level relative priority-point parameter, we
     define a job's absolute priority point in a straightforward manner.

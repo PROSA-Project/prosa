@@ -196,7 +196,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     move=> L [BW_POS BW_SOL] R SOL js ARRs TSKs.
     have BLOCK: forall tsk , blocking_bound ts tsk = 0.
     { by move=> tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-                 /fully_preemptive_task_model subnn big1_eq. }
+                 /fully_preemptive_task_model /constant subnn big1_eq. }
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have VBSBF : valid_busy_sbf arr_seq sched tsk sSBF by apply overheads_sbf_busy_valid => //=.
     have USBF : unit_supply_bound_function sSBF by apply overheads_sbf_unit => //=.
@@ -222,7 +222,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
         apply: search_space_switch_IBF; last by exact: SP.
         by move=> A1 Δ1; rewrite //= BLOCK.
       + move => F [FIX LE]; exists F; split => //.
-        rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
+        rewrite /task_intra_IBF /fully_preemptive_rtc_threshold /task_rtct.
         rewrite BLOCK subnn //= add0n addn0 subn0; split.
         * apply bound_preserved_under_slowed.
           move: FIX.

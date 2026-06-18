@@ -169,7 +169,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     move=> L [BW_POS BW_SOL] R SOL js ARRs TSKs.
     have BLOCK: forall tsk , blocking_bound ts tsk = 0.
     { by move=> tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
-                 /fully_preemptive_task_model subnn big1_eq. }
+                 /fully_preemptive_task_model /constant subnn big1_eq. }
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have VBSBF : valid_busy_sbf arr_seq sched tsk (prm_sbf Π γ).
     { by apply: valid_pred_sbf_switch_predicate; last apply prm_sbf_valid. }
@@ -182,9 +182,11 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     - eapply busy_intervals_are_bounded_rs_fp with (SBF := prm_sbf Π γ) => //=.
       + exact: instantiated_i_and_w_are_coherent_with_schedule.
       + by rewrite BLOCK add0n.
-    - apply: valid_pred_sbf_switch_predicate; last first.
-      + by apply prm_sbf_valid.
-      + by move => ? ? ? ? [? ?]; split => //.
+    - have [ZERO SBF] : valid_supply_bound_function arr_seq sched (prm_sbf Π γ)
+        by apply prm_sbf_valid.
+      split => //.
+      move => j t1 t2 ARR _ t NEQ.
+      by apply: SBF.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
       + by apply athep_workload_le_total_ohep_rbf.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
@@ -195,9 +197,9 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
         apply: search_space_switch_IBF; last by exact: SP.
         by move=> A1 Δ1; rewrite //= BLOCK.
       + move => F [FIX LE]; exists F; split => //.
-        rewrite /task_intra_IBF /task_rtct /fully_preemptive_rtc_threshold.
+        rewrite /task_intra_IBF /fully_preemptive_rtc_threshold /task_rtct.
         rewrite BLOCK subnn //= add0n addn0 subn0; split.
-        * by move: FIX; lia.
+        * by move: FIX; rewrite /prm_sbf /supply_bound_function; lia.
         * exact: prm_sbf_monotone.
   Qed.
 

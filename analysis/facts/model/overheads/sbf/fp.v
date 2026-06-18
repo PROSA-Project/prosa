@@ -43,7 +43,9 @@ Section OverheadResourceModelValidSBF.
   (** First, we define the FP SBF as the interval length minus the FP
       blackout bound. *)
   #[local] Instance fp_ovh_sbf : SupplyBoundFunction :=
-    fun Δ => Δ - fp_blackout_bound Δ.
+  {
+    supply_bound_function Δ := Δ - fp_blackout_bound Δ
+  }.
 
   (** Next, we define the "slowed-down" version of the FP SBF as the
       interval length minus the slowed-down blackout bound. The
@@ -53,7 +55,9 @@ Section OverheadResourceModelValidSBF.
       analysis, while the unmodified FP SBF is used to state the
       top-level analysis result. *)
   Definition fp_ovh_sbf_slow : SupplyBoundFunction :=
-    fun Δ => Δ - slowed fp_blackout_bound Δ.
+  {|
+    supply_bound_function Δ := Δ - slowed fp_blackout_bound Δ
+  |}.
 
 End OverheadResourceModelValidSBF.
 
@@ -167,7 +171,7 @@ Section OverheadResourceModelValidSBF.
     forall tsk,
       unit_supply_bound_function (fp_ovh_sbf_slow ts DB CSB CRPDB tsk).
   Proof.
-    move=> tsk δ; rewrite/fp_ovh_sbf_slow.
+    move=> tsk δ; rewrite /fp_ovh_sbf_slow /supply_bound_function.
     have LE:
       slowed (fp_blackout_bound ts DB CSB CRPDB tsk) δ
       <= slowed (fp_blackout_bound ts DB CSB CRPDB tsk) δ.+1.

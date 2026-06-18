@@ -65,7 +65,10 @@ Section ArrivalCurvePropagation.
 
   (** .. and register this definition with Coq as a type class instance. *)
   #[local]
-  Instance propagated_arrival_curve : MaxArrivals Task2 := propagated_max_arrivals.
+  Instance propagated_arrival_curve : MaxArrivals Task2 :=
+  {
+    max_arrivals := propagated_max_arrivals
+  }.
 
   (** ** Derived Arrival Sequence *)
 
@@ -158,7 +161,10 @@ Section ReleaseJitterPropagation.
 
   (** If we _reinterpret_ release times as the _effective_ arrival times ... *)
   #[local]
-  Instance release_as_arrival : JobArrival Job := job_release.
+  Instance release_as_arrival : JobArrival Job :=
+  {
+    job_arrival := job_release
+  }.
 
   (** ... then we obtain a valid "arrival" (= release) curve for this
       reinterpretation by propagating the original arrival curve while

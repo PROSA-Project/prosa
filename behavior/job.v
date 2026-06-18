@@ -15,10 +15,10 @@ Definition work  := nat.
 (** * Basic Job Parameters — Cost, Arrival Time, and Absolute Deadline *)
 
 (** Definition of a generic type of parameter relating jobs to a discrete cost. *)
-Class JobCost (Job : JobType) := job_cost : Job -> work.
+Class JobCost (Job : JobType) := { job_cost : Job -> work }.
 
 (** Definition of a generic type of parameter relating jobs to an arrival time. *)
-Class JobArrival (Job : JobType) := job_arrival : Job -> instant.
+Class JobArrival (Job : JobType) := { job_arrival : Job -> instant }.
 
 (** Definition of a generic type of parameter relating jobs to an absolute deadline. *)
-Class JobDeadline (Job : JobType) := job_deadline : Job -> instant.
+Class JobDeadline (Job : JobType) := { job_deadline : Job -> instant }.
