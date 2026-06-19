@@ -57,26 +57,64 @@ Section AutoArrivalModelConversion.
 
   (** ** Periodic Tasks as RBFs *)
 
-  (** Assuming that each task has a WCET... *)
-  Context `{TaskCost Task}.
+    (** RBFs combine information about job costs and job arrivals. We consider two
+        cases: tasks with (1) traditional scalar WCETs and (2) cumulative WCET(n)
+        bounds. *)
 
-  (** ... and that jobs are compliant with the WCET, ... *)
-  Context `{JobCost Job}.
-  Hypothesis H_valid_costs : jobs_have_valid_job_costs.
+  Section ScalarWCET.
 
-  (** ... the tasks satisfy the RBF validity constraint... *)
-  Goal valid_taskset_request_bound_function ts max_request_bound.
-  Proof. by []. Qed.
+    (** Assuming that each task has a WCET... *)
+    Context `{TaskCost Task}.
 
-  (** ... and the arrival sequence is legal under the RBF model. *)
-  Goal taskset_respects_max_request_bound arr_seq ts.
-  Proof. by []. Qed.
+    (** ... and that jobs are compliant with the WCET, ... *)
+    Context `{JobCost Job}.
+    Hypothesis H_valid_costs : arrivals_have_valid_job_costs arr_seq.
 
-  (** Thanks to type-class resolution, all conversions from more
-      restrictive to less restrictive task model happen transparently
-      and the and necessary proofs are found automatically.
+    (** ... the tasks satisfy the RBF validity constraint... *)
+    Goal valid_taskset_request_bound_function ts max_request_bound.
+    Proof. by []. Qed.
 
-      Of course, it is possible to start from sporadic tasks or tasks
-      with arrival curves, too. *)
+    (** ... and the arrival sequence is legal under the RBF model. *)
+    Goal taskset_respects_max_request_bound arr_seq ts.
+    Proof.
+      (* NB: Ideally, we would like this to be solved via [by done], too, but
+         Prosa's [done] tactic calls [eauto] with a search depth of 4, which is
+         not enough here. However, bumping the search depth of the default
+         [done] to 5 causes massive compilation slowdowns elsewhere, so we have
+         to call [eauto] explicitly here. *)
+      by eauto 5 with basic_rt_facts.
+    Qed.
+
+  End ScalarWCET.
+
+
+  (** The same upper-RBF conversion also works when tasks provide a native
+      WCET(n) bound rather than only a scalar WCET. *)
+  Section CumulativeWCET.
+
+    (** Assume that each task has a valid cumulative cost bound ... *)
+    Context `{TaskCumulativeCost Task}.
+    Hypothesis H_valid_cumulative_cost : taskset_has_valid_cumulative_cost_bounds ts.
+
+    (** ... that upper-bounds the cost of consecutive jobs. *)
+    Context `{JobCost Job}.
+    Hypothesis H_respects_cumulative_cost : taskset_respects_cumulative_cost_bounds arr_seq ts.
+
+    (** Then the tasks satisfy the RBF validity constraint. *)
+    Goal valid_taskset_request_bound_function ts max_request_bound.
+    Proof. by []. Qed.
+
+    (** And the arrival sequence is legal under the RBF model. *)
+    Goal taskset_respects_max_request_bound arr_seq ts.
+    Proof. by []. Qed.
+
+  End CumulativeWCET.
+
+  (** Thanks to type-class resolution, all conversions from more restrictive to
+      less restrictive task models happen transparently and the necessary proofs
+      are found automatically.
+
+      Of course, it is possible to start from sporadic tasks or tasks with
+      arrival curves, too. *)
 
 End AutoArrivalModelConversion.

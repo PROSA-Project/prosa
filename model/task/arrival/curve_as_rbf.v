@@ -1,4 +1,5 @@
 Require Export prosa.util.all.
+Require Export prosa.analysis.facts.model.cumulative_cost.
 Require Export prosa.model.task.arrival.request_bound_functions.
 Require Export prosa.model.task.arrival.curves.
 
@@ -10,8 +11,9 @@ Require Export prosa.model.task.arrival.curves.
     curves. *)
 Section ArrivalCurveToRBF.
 
-  (** Consider any type of tasks with a given cost ... *)
-  Context {Task : TaskType} `{TaskCost Task} `{TaskMinCost Task}.
+  (** Consider any type of tasks with a given cumulative cost and minimum
+      scalar cost. *)
+  Context {Task : TaskType} `{TaskCumulativeCost Task} `{TaskMinCost Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobCost Job}.
@@ -20,11 +22,12 @@ Section ArrivalCurveToRBF.
       the possible number or arrivals for a given task, whereas [MinArr] lower-bounds it. *)
   Context `{MaxArr : MaxArrivals Task} `{MinArr : MinArrivals Task}.
 
-  (** We define the conversion to a request-bound function as the product of the task cost and the
-      number of arrivals during [Δ]. In the upper-bounding case, the cost of a task will represent
-      the WCET of its jobs. Symmetrically, in the lower-bounding case, the cost of a task will
-      represent the BCET of its jobs. *)
-  Definition task_max_rbf (arrivals :  Task -> duration -> nat) task Δ := task_cost task * arrivals task Δ.
+  (** We define the upper-bounding conversion as the cumulative cost of the
+      maximum number of arrivals during [Δ]. Symmetrically, in the
+      lower-bounding case, the cumulative cost of the jobs is derived from the
+      task's BCET via scalar multiplication. *)
+  Definition task_max_rbf (arrivals :  Task -> duration -> nat) task Δ :=
+    task_cumulative_cost task (arrivals task Δ).
   Definition task_min_rbf (arrivals :  Task -> duration -> nat) task Δ := task_min_cost task * arrivals task Δ.
 
   (** Finally, we show that the newly defined functions are indeed request-bound functions. *)
@@ -52,70 +55,63 @@ Section ArrivalCurveToRBF.
 
     (** First, note that any valid upper-bounding arrival curve, after being
         converted, is a valid request-bound function. *)
-    Theorem valid_arrival_curve_to_max_rbf :
-      forall (arrivals : Task -> duration -> nat),
-        valid_arrival_curve (arrivals tsk) ->
-        valid_request_bound_function ((task_max_rbf arrivals) tsk).
+    Fact valid_arrival_curve_to_max_rbf :
+      valid_task_cumulative_cost tsk ->
+      valid_arrival_curve (max_arrivals tsk) ->
+      valid_request_bound_function (max_request_bound tsk).
     Proof.
-      move => ARR [ZERO MONO].
-      split.
-      - by rewrite /task_max_rbf ZERO muln0.
-      - move => x y LEQ.
-        rewrite /task_max_rbf.
-        destruct (task_cost tsk); first by rewrite mul0n.
-        by rewrite leq_pmul2l //; apply MONO.
+      move => [CZERO CMONO] [AZERO AMONO].
+      rewrite /max_request_bound //=; split.
+      - by rewrite /task_max_rbf AZERO CZERO.
+      - by move => x y LEQ; apply/CMONO/AMONO.
     Qed.
 
     (** The same idea can be applied in the lower-bounding case. *)
-    Theorem valid_arrival_curve_to_min_rbf :
-      forall (arrivals : Task -> duration -> nat),
-        valid_arrival_curve (arrivals tsk) ->
-        valid_request_bound_function ((task_min_rbf arrivals) tsk).
+    Fact valid_arrival_curve_to_min_rbf :
+      valid_arrival_curve (min_arrivals tsk) ->
+      valid_request_bound_function (min_request_bound tsk).
     Proof.
-      move => ARR [ZERO MONO].
-      split.
+      move => [ZERO MONO].
+      rewrite /min_request_bound //=; split.
       - by rewrite /task_min_rbf ZERO muln0.
-      - move => x y LEQ.
-        rewrite /task_min_rbf.
-        destruct (task_min_cost tsk); first by rewrite mul0n.
-        by rewrite leq_pmul2l //; apply MONO.
+      - move => x y LEQ; rewrite /task_min_rbf.
+        case: (task_min_cost tsk) => [|c].
+        * by rewrite mul0n.
+        * by rewrite leq_pmul2l.
     Qed.
 
     (** Next, we prove that the task respects the request-bound function in
         the upper-bounding case. Note that, for this to work, we assume that the
         cost of tasks upper-bounds the cost of the jobs belonging to them (i.e.,
-        the task cost is the worst-case). *)
-    Theorem respects_arrival_curve_to_max_rbf :
-      jobs_have_valid_job_costs ->
+        the task cost is the worst case). *)
+    Fact respects_arrival_curve_to_max_rbf :
+      valid_task_cumulative_cost tsk ->
+      respects_task_cumulative_cost arr_seq tsk ->
       respects_max_arrivals arr_seq tsk (max_arrivals tsk) ->
-      respects_max_request_bound arr_seq tsk ((task_max_rbf max_arrivals) tsk).
+      respects_max_request_bound arr_seq tsk (max_request_bound tsk).
     Proof.
-      move=> TASK_COST RESPECT t1 t2 LEQ.
-      specialize (RESPECT t1 t2).
-      apply leq_trans with (n := task_cost tsk * number_of_task_arrivals arr_seq tsk t1 t2) => //.
-      - rewrite /max_arrivals /number_of_task_arrivals -sum1_size big_distrr //= muln1 leq_sum_seq // => j.
-        rewrite mem_filter => /andP [/eqP TSK _] _.
-        rewrite -TSK.
-        by apply TASK_COST.
-      - by destruct (task_cost tsk) eqn:C; rewrite /task_max_rbf C // leq_pmul2l.
+      move=> [_ MONO] COST RESPECT t1 t2 LEQ.
+      apply leq_trans with (n := task_cumulative_cost tsk (number_of_task_arrivals arr_seq tsk t1 t2)) => //=.
+      rewrite /cost_of_task_arrivals /number_of_task_arrivals.
+      by apply/COST/task_arrivals_between_is_consecutive_task_arrival.
     Qed.
 
     (** Finally, we prove that the task respects the request-bound function also in
         the lower-bounding case. This time, we assume that the cost of tasks lower-bounds
         the cost of the jobs belonging to them. (i.e., the task cost is the best-case). *)
-    Theorem respects_arrival_curve_to_min_rbf :
+    Fact respects_arrival_curve_to_min_rbf :
       jobs_have_valid_min_job_costs ->
       respects_min_arrivals arr_seq tsk (min_arrivals tsk) ->
-      respects_min_request_bound arr_seq tsk ((task_min_rbf min_arrivals) tsk).
+      respects_min_request_bound arr_seq tsk (min_request_bound tsk).
     Proof.
-      move=> TASK_COST RESPECT t1 t2 LEQ.
-      specialize (RESPECT t1 t2 LEQ).
+      move=> COST RESPECT t1 t2 LEQ.
+      rewrite /min_request_bound //=.
       apply leq_trans with (n := task_min_cost tsk * number_of_task_arrivals arr_seq tsk t1 t2) => //.
       - by destruct (task_min_cost tsk) eqn:C; rewrite /task_min_rbf C // leq_pmul2l.
       - rewrite /min_arrivals /number_of_task_arrivals -sum1_size big_distrr //= muln1 leq_sum_seq // => j.
         rewrite mem_filter => /andP [/eqP TSK _] _.
         rewrite -TSK.
-        by apply TASK_COST.
+        by apply COST.
     Qed.
 
   End SingleTask.
@@ -123,7 +119,7 @@ Section ArrivalCurveToRBF.
   (** Next, we lift the results to the previous section to an arbitrary task set. *)
   Section TaskSet.
 
-    (** Let [ts] be an arbitrary task set... *)
+    (** Let [ts] be an arbitrary task set ... *)
     Variable ts : TaskSet Task.
 
     (** ... and consider any job arrival sequence. *)
@@ -132,12 +128,12 @@ Section ArrivalCurveToRBF.
     (** First, we generalize the validity of the transformation to a task set both in
         the upper-bounding case ... *)
     Corollary valid_taskset_arrival_curve_to_max_rbf :
+      taskset_has_valid_cumulative_cost_bounds ts ->
       valid_taskset_arrival_curve ts max_arrivals ->
       valid_taskset_request_bound_function ts max_request_bound.
     Proof.
-      move=> VALID tsk IN.
-      specialize (VALID tsk IN).
-      by apply valid_arrival_curve_to_max_rbf.
+      move=> WCET VALID tsk IN.
+      by apply: valid_arrival_curve_to_max_rbf.
     Qed.
 
     (** ... and in the lower-bounding case. *)
@@ -154,12 +150,13 @@ Section ArrivalCurveToRBF.
         the produced request-bound function, lifting the result obtained in the single-task
         case. The result is valid in the upper-bounding case... *)
     Corollary taskset_respects_arrival_curve_to_max_rbf :
-      jobs_have_valid_job_costs ->
+      taskset_has_valid_cumulative_cost_bounds ts ->
+      taskset_respects_cumulative_cost_bounds arr_seq ts ->
       taskset_respects_max_arrivals arr_seq ts ->
       taskset_respects_max_request_bound arr_seq ts.
     Proof.
-      move=> TASK_COST SET_RESPECTS tsk IN.
-      by apply respects_arrival_curve_to_max_rbf, SET_RESPECTS.
+      move=> VALID BOUND RESP tsk IN.
+      by apply: respects_arrival_curve_to_max_rbf.
     Qed.
 
     (** ...as well as in the lower-bounding case. *)
@@ -184,3 +181,4 @@ Global Hint Resolve
   valid_taskset_arrival_curve_to_max_rbf
   taskset_respects_arrival_curve_to_max_rbf
   : basic_rt_facts.
+
