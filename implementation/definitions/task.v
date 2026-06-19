@@ -19,20 +19,20 @@ Require Export prosa.model.priority.numeric_fixed_priority.
     and a priority. The ID is required to ensure uniqueness. *)
 Structure concrete_task :=
   { task_id: nat
-  ; task_cost: nat
-  ; task_arrival: task_arrivals_bound
-  ; task_deadline: instant
-  ; task_priority : nat
+  ; concrete_task_cost: nat
+  ; concrete_task_arrival: task_arrivals_bound
+  ; concrete_task_deadline: instant
+  ; concrete_task_priority : nat
   }.
 
 (** To make it compatible with ssreflect, we define a decidable
     equality for concrete tasks. *)
 Definition task_eqdef (t1 t2 : concrete_task) :=
   (task_id t1 == task_id t2)
-  && (task_cost t1 == task_cost t2)
-  && (task_arrival t1 == task_arrival t2)
-  && (task_deadline t1 == task_deadline t2)
-  && (task_priority t1 == task_priority t2).
+  && (concrete_task_cost t1 == concrete_task_cost t2)
+  && (concrete_task_arrival t1 == concrete_task_arrival t2)
+  && (concrete_task_deadline t1 == concrete_task_deadline t2)
+  && (concrete_task_priority t1 == concrete_task_priority t2).
 
 (** Next, we prove that [task_eqdef] is indeed an equality, ... *)
 Lemma eqn_task : Equality.axiom task_eqdef.
@@ -65,17 +65,17 @@ HB.instance Definition _  := hasDecEq.Build concrete_task eqn_task.
     task it belongs to. *)
 Record concrete_job :=
   { job_id: nat
-  ; job_arrival: instant
-  ; job_cost: nat
-  ; job_deadline: instant
-  ; job_task: concrete_task : eqType
+  ; concrete_job_arrival: instant
+  ; concrete_job_cost: nat
+  ; concrete_job_deadline: instant
+  ; concrete_job_task: concrete_task : eqType
   }.
 
 (** For convenience, we define a function that converts each possible arrival
     bound (periodic, sporadic, and arrival-curve prefix) into an arrival-curve
     prefix... *)
 Definition get_arrival_curve_prefix tsk :=
-  match task_arrival tsk with
+  match concrete_task_arrival tsk with
   | Periodic p => inter_arrival_to_prefix p
   | Sporadic m => inter_arrival_to_prefix m
   | ArrivalPrefix steps => steps
@@ -89,10 +89,10 @@ Definition concrete_max_arrivals tsk Δ :=
     equality for concrete jobs. *)
 Definition job_eqdef (j1 j2 : concrete_job) :=
   (job_id j1 == job_id j2)
-  && (job_arrival j1 == job_arrival j2)
-  && (job_cost j1 == job_cost j2)
-  && (job_deadline j1 == job_deadline j2)
-  && (job_task j1 == job_task j2).
+  && (concrete_job_arrival j1 == concrete_job_arrival j2)
+  && (concrete_job_cost j1 == concrete_job_cost j2)
+  && (concrete_job_deadline j1 == concrete_job_deadline j2)
+  && (concrete_job_task j1 == concrete_job_task j2).
 
 (** Next, we prove that [job_eqdef] is indeed an equality, ... *)
 Lemma eqn_job : Equality.axiom job_eqdef.
@@ -134,15 +134,15 @@ Section Parameters.
   Let Task := concrete_task : eqType.
   #[global,program] Instance concrete_task_cost_instance : TaskCost Task :=
   {
-    task_cost := task_cost
+    task_cost := concrete_task_cost
   }.
   #[global,program] Instance concrete_task_priority_instance : TaskPriority Task :=
   {
-    task_priority := task_priority
+    task_priority := concrete_task_priority
   }.
   #[global,program] Instance concrete_task_deadline_instance : TaskDeadline Task :=
   {
-    task_deadline := task_deadline
+    task_deadline := concrete_task_deadline
   }.
   #[global,program] Instance concrete_max_arrivals_instance : MaxArrivals Task :=
   {
@@ -153,15 +153,15 @@ Section Parameters.
   Let Job := concrete_job : eqType.
   #[global,program] Instance concrete_job_task_instance : JobTask Job Task :=
   {
-    job_task := job_task
+    job_task := concrete_job_task
   }.
   #[global,program] Instance concrete_job_arrival_instance : JobArrival Job :=
   {
-    job_arrival := job_arrival
+    job_arrival := concrete_job_arrival
   }.
   #[global,program] Instance concrete_job_cost_instance : JobCost Job :=
   {
-    job_cost := job_cost
+    job_cost := concrete_job_cost
   }.
 
 End Parameters.

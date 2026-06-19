@@ -31,7 +31,7 @@ Definition task_rbf (tsk : Task) (Δ : duration) :=
 (** Further, we define a valid arrival bound as (1) a positive
       minimum inter-arrival time/period, or (2) a valid arrival curve prefix. *)
 Definition valid_arrivals (tsk : Task) : bool :=
-  match task_arrival tsk with
+  match concrete_task_arrival tsk with
   | Periodic p => p >= 1
   | Sporadic m => m >= 1
   | ArrivalPrefix emax_vec => valid_arrival_curve_prefix_dec emax_vec
@@ -40,15 +40,15 @@ Definition valid_arrivals (tsk : Task) : bool :=
 (** Next, we define some helper functions, that indicate whether
       the given task is periodic, ... *)
 Definition is_periodic_arrivals (tsk : Task) : Prop :=
-  exists p, task_arrival tsk = Periodic p.
+  exists p, concrete_task_arrival tsk = Periodic p.
 
 (** ... sporadic, ... *)
 Definition is_sporadic_arrivals (tsk : Task) : Prop :=
-  exists m, task_arrival tsk = Sporadic m.
+  exists m, concrete_task_arrival tsk = Sporadic m.
 
 (** ... or bounded by an arrival curve. *)
 Definition is_etamax_arrivals (tsk : Task) : Prop :=
-  exists ac_prefix_vec, task_arrival tsk = ArrivalPrefix ac_prefix_vec.
+  exists ac_prefix_vec, concrete_task_arrival tsk = ArrivalPrefix ac_prefix_vec.
 
 (** Further, for convenience, we define the notion of task
       having a valid arrival curve. *)
@@ -77,7 +77,7 @@ Section Facts.
     \/ is_etamax_arrivals tsk.
   Proof.
     rewrite /is_periodic_arrivals /is_sporadic_arrivals /is_etamax_arrivals.
-    destruct (task_arrival tsk).
+    destruct (concrete_task_arrival tsk).
     - by left; eexists; reflexivity.
     - by right; left; eexists; reflexivity.
     - by right; right; eexists; reflexivity.
@@ -169,7 +169,7 @@ Section Theory.
     rewrite refinesE in Rab.
     specialize (Rab _ _ Rtsk).
     all: unfold valid_arrivals, valid_arrivals_T.
-    destruct (task_arrival (_ _)) as [?|?|arrival_curve_prefix], (task_arrival_T _) as [?|?|arrival_curve_prefixT].
+    destruct (concrete_task_arrival (_ _)) as [?|?|arrival_curve_prefix], (task_arrival_T _) as [?|?|arrival_curve_prefixT].
     all: try (inversion Rab; fail).
     all: try (refines_apply; rewrite refinesE; inversion Rab; subst; by done).
     { unfold ArrivalCurvePrefix in *.
@@ -199,7 +199,7 @@ Section Theory.
       have Rab := refine_task_arrival.
       rewrite refinesE in Rab; specialize (Rab _ _ Rtsk).
       rewrite /get_arrival_curve_prefix /get_extrapolated_arrival_curve_T.
-      destruct (task_arrival tsk) as [?|?|arrival_curve_prefix], (task_arrival_T tsk') as [?|?|arrival_curve_prefixT].
+      destruct (concrete_task_arrival tsk) as [?|?|arrival_curve_prefix], (task_arrival_T tsk') as [?|?|arrival_curve_prefixT].
       all: try (inversion Rab; fail).
       all: unfold inter_arrival_to_prefix, inter_arrival_to_extrapolated_arrival_curve_T.
       { apply refinesP; refines_apply.
@@ -228,7 +228,7 @@ Section Theory.
     have Rab := refine_task_arrival.
     rewrite refinesE in Rab; specialize (Rab _ _ Rtsk).
     rewrite /get_arrival_curve_prefix /get_extrapolated_arrival_curve_T.
-    destruct (task_arrival _) as [?|?|arrival_curve_prefix], (task_arrival_T _) as [?|?|arrival_curve_prefixT].
+    destruct (concrete_task_arrival _) as [?|?|arrival_curve_prefix], (task_arrival_T _) as [?|?|arrival_curve_prefixT].
     all: try (inversion Rab; fail).
     all: unfold inter_arrival_to_prefix, inter_arrival_to_extrapolated_arrival_curve_T.
     { apply refinesP; refines_apply.
@@ -271,7 +271,7 @@ Section Theory.
     rewrite refinesE in Rab; rewrite refinesE in Rtsk.
     specialize (Rab _ _ Rtsk).
     rewrite /get_arrival_curve_prefix /get_extrapolated_arrival_curve_T.
-    destruct (task_arrival tsk) as [?|?|arrival_curve_prefix], (task_arrival_T tsk') as [?|?|arrival_curve_prefixT].
+    destruct (concrete_task_arrival tsk) as [?|?|arrival_curve_prefix], (task_arrival_T tsk') as [?|?|arrival_curve_prefixT].
     all: try (inversion Rab; fail).
     all: unfold inter_arrival_to_prefix, inter_arrival_to_extrapolated_arrival_curve_T.
     { by refines_apply; rewrite refinesE; inversion Rab; subst. }
@@ -296,7 +296,7 @@ Section Theory.
     rewrite refinesE in Rab.
     specialize (Rab _ _ Rtsk).
     rewrite /get_arrival_curve_prefix /get_extrapolated_arrival_curve_T.
-    destruct (task_arrival (_ _)) as [?|?|arrival_curve_prefix], (task_arrival_T tsk) as [?|?|arrival_curve_prefixT].
+    destruct (concrete_task_arrival (_ _)) as [?|?|arrival_curve_prefix], (task_arrival_T tsk) as [?|?|arrival_curve_prefixT].
     all: try (inversion Rab; fail).
     all: unfold inter_arrival_to_prefix, inter_arrival_to_extrapolated_arrival_curve_T.
     { by refines_apply; rewrite refinesE; inversion Rab; subst. }
@@ -314,7 +314,7 @@ Section Theory.
     rewrite refinesE in Rab; specialize (Rab _ _ Rtsk).
     rewrite /get_arrival_curve_prefix /get_extrapolated_arrival_curve_T.
     unfold inter_arrival_to_prefix, inter_arrival_to_extrapolated_arrival_curve_T.
-    destruct (task_arrival _) as [?|?|e], (task_arrival_T _) as [?|?|eT].
+    destruct (concrete_task_arrival _) as [?|?|e], (task_arrival_T _) as [?|?|eT].
     all: try (inversion Rab; fail).
     all: try (inversion Rab; subst; apply refinesP; refines_apply; fail).
     destruct e as [h?], eT as [? st];[apply refinesP; refines_apply; inversion Rab; tc].
@@ -342,7 +342,7 @@ Section Theory.
     specialize (Rab _ _ Rtsk).
     rewrite /get_arrival_curve_prefix /get_extrapolated_arrival_curve_T.
     unfold inter_arrival_to_prefix, inter_arrival_to_extrapolated_arrival_curve_T.
-    destruct (task_arrival _) as [?|?|e], (task_arrival_T _) as [?|?|eT].
+    destruct (concrete_task_arrival _) as [?|?|e], (task_arrival_T _) as [?|?|eT].
     all: try (inversion Rab; fail).
     all: try (inversion Rab; subst; refines_apply; fail).
     destruct e as [h?], eT as [? st]; refines_apply; first by inversion Rab; subst; tc.

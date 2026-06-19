@@ -17,10 +17,10 @@ Definition Job := concrete_job : eqType.
     the given task, with the given job ID, arriving at the given time ... *)
 Definition generate_job_at tsk t id : Job :=
   {| task.job_id := id
-  ;  task.job_arrival := t
-  ;  task.job_cost := task_cost tsk
-  ;  task.job_deadline := t + task_deadline tsk
-  ;  task.job_task := tsk |}.
+  ;  task.concrete_job_arrival := t
+  ;  task.concrete_job_cost := task_cost tsk
+  ;  task.concrete_job_deadline := t + task_deadline tsk
+  ;  task.concrete_job_task := tsk |}.
 
 (** ... and then generalize the above function to an arbitrary number of
     jobs. *)

@@ -108,10 +108,10 @@ Definition taskT_to_task (tsk : @task_T N) : Task :=
        task_priority_T := priority |}
     =>
     {| task.task_id := nat_of_bin id;
-       task.task_cost := nat_of_bin cost;
-       task.task_arrival := task_abT_to_task_ab arrival_bound;
-       task.task_deadline := nat_of_bin deadline;
-       task.task_priority := nat_of_bin priority |}
+       task.concrete_task_cost := nat_of_bin cost;
+       task.concrete_task_arrival := task_abT_to_task_ab arrival_bound;
+       task.concrete_task_deadline := nat_of_bin deadline;
+       task.concrete_task_priority := nat_of_bin priority |}
   end.
 
 (** ... and its function relationship. *)
@@ -122,10 +122,10 @@ Definition Rtask := fun_hrel taskT_to_task.
 Definition task_to_taskT (tsk : Task) : @task_T N :=
   match tsk with
   | {| task.task_id := id;
-       task.task_cost := cost;
-       task.task_arrival := arrival_bound;
-       task.task_deadline := deadline;
-       task.task_priority := priority |}
+       task.concrete_task_cost := cost;
+       task.concrete_task_arrival := arrival_bound;
+       task.concrete_task_deadline := deadline;
+       task.concrete_task_priority := priority |}
     =>
     {| task_id_T := bin_of_nat id;
        task_cost_T := bin_of_nat cost;
@@ -165,7 +165,7 @@ Section Theory.
 
   (** Next, we prove a refinement for the task arrival. *)
   Global Instance refine_task_arrival :
-    refines (Rtask ==> Rtask_ab)%rel task_arrival task_arrival_T.
+    refines (Rtask ==> Rtask_ab)%rel concrete_task_arrival task_arrival_T.
   Proof.
     rewrite refinesE => _ tsk <-.
     by destruct tsk.
