@@ -257,7 +257,7 @@ Section BoundedBusyIntervals.
     rewrite [leqRHS](bigID (fun tskh => task_deadline tskh < task_deadline tskl)) //=.
     rewrite addnC leq_add //.
     eapply leq_trans; last by apply bigmax_leq_sum.
-    apply: bigmax_sup_seq.
+    apply: bigmaxn_sup_seq.
     { apply IN. }
     { by rewrite -leqNgt leqnn. }
     { apply: leq_trans; last apply task_rbf_ge_task_cost => //.

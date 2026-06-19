@@ -77,11 +77,6 @@ stages:
 
 ###################### The Jobs ######################
 
-2.4.0-rocq-prover-9.0:
-  extends:
-    - .build
-    - .not_in_wip_branches
-
 2.5.0-rocq-prover-9.0.0-rocq-core-9.1.0:
   extends:
     - .build
