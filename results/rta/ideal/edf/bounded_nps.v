@@ -183,7 +183,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     apply /hasP; exists tsk_o => //.
     apply /andP; split; first by rewrite eq_sym.
     move: EQ. rewrite /D => /eqP EQ.
-    rewrite /task_request_bound_function EQ.
+    rewrite !scalar_rbf_def EQ.
     move: REL; rewrite /blocking_relevant => /andP [ARRIVES COST].
     rewrite eqn_pmul2l //.
     have -> : A + task_deadline tsk - (task_deadline tsk + A)

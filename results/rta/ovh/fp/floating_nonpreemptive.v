@@ -237,7 +237,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
         exists F; split; last split.
         * lia.
         * apply bound_preserved_under_slowed; move: EQ1 EQ2.
-          by rewrite /task_intra_IBF /fp_blackout_bound /overhead_bound; lia.
+          by rewrite /task_intra_IBF /fp_blackout_bound /overhead_bound scalar_rbf_def; lia.
         * by rewrite subnn addn0; apply overheads_sbf_monotone; lia.
   Qed.
 

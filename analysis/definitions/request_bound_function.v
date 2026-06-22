@@ -1,26 +1,27 @@
-Require Export prosa.model.task.arrival.curves.
+Require Export prosa.model.task.arrival.curve_as_rbf.
 Require Export prosa.model.priority.classes.
 Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.util.sum.
 
 (** * Request Bound Function (RBF) *)
 
-(** We define the notion of a task's request-bound function (RBF), as well as
-    the total request bound function of a set of tasks. *)
+(** We recall the notion of a task's request-bound function (RBF), and
+    define the total request bound function of a set of tasks. *)
 
 Section TaskWorkloadBoundedByArrivalCurves.
 
-  (** Consider any type of task characterized by a WCET bound and an arrival curve. *)
+  (** Consider any type of task equipped with a maximum request-bound function. *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task} `{MaxArrivals Task}.
+  Context `{MaxRequestBound Task}.
 
   (** ** RBF of a Single Task *)
 
-  (** We define the classic notion of an RBF, which for a given task [tsk]
-      and interval length [Δ], bounds the maximum cumulative processor demand
-      of all jobs released by [tsk] in any interval of length [Δ]. *)
-  Definition task_request_bound_function (tsk : Task) (Δ : duration) :=
-    task_cost tsk * max_arrivals tsk Δ.
+  (** We define the task-level RBF as an alias for the canonical maximum
+      request-bound function provided by the RBF arrival model. This lets models
+      with cumulative bounds provide precise [WCET(n)] information, while
+      scalar-cost models can still recover the classic linear RBF through the
+      automatic scalar WCET -> linear WCET(n) -> RBF conversion. *)
+  Definition task_request_bound_function := max_request_bound.
 
   (** ** Total RBF of Multiple Tasks *)
 

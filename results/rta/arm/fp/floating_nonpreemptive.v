@@ -209,7 +209,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
       + move => F [EQ1 EQ2].
         exists F; split; last split.
         * lia.
-        * move: EQ1; rewrite /task_intra_IBF /arm_sbf /supply_bound_function subnn subn0.
+        * move: EQ1; rewrite /task_intra_IBF /arm_sbf /supply_bound_function subnn subn0 scalar_rbf_def.
           by lia.
         * by rewrite subnn addn0; exact: arm_sbf_monotone.
   Qed.

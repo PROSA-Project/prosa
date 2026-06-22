@@ -277,7 +277,7 @@ Section AbstractRTAforELFwithArrivalCurves.
           by move => tsk' /andP[]. }
         rewrite  big_seq_cond [leqRHS]big_seq_cond.
         apply: leq_sum =>tsk_other /andP[? /andP[_ /andP[MA _]]].
-        apply leq_trans with (task_request_bound_function tsk_other ε).
+        apply leq_trans with (task_request_bound_function tsk_other ε); rewrite !scalar_rbf_def.
         - by apply: leq_pmulr.
         - by apply/leq_mul/(H_valid_arrival_curve _ _).2. }
       { rewrite hep_hp_workload_hp =>//. rewrite /from_hp_task TSK'; exact: workload_of_jobs_bounded. }

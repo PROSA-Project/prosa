@@ -199,7 +199,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
         by apply: non_pathological_max_arrivals =>//; apply H_valid_task_arrival_sequence.
       + move => F [FIX1 [FIX2 FIX3]]; exists F; split => //; split.
         * move: FIX1; rewrite /fully_nonpreemptive_rtc_threshold /task_rtct /constant /task_intra_IBF
-                              /prm_sbf /supply_bound_function.
+                              /prm_sbf /supply_bound_function scalar_rbf_def.
           by lia.
         * move: FIX2; rewrite /fully_nonpreemptive_rtc_threshold /task_rtct /constant
                               /prm_sbf /supply_bound_function.

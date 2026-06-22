@@ -1,4 +1,5 @@
 Require Export prosa.implementation.refinements.arrival_curve_prefix.
+Require Import prosa.analysis.facts.model.rbf.
 
 (** In this section, we provide definitions and lemmas to show
     Abstract RTA' s search space can be rewritten in an equivalent,
@@ -79,7 +80,7 @@ Section FastSearchSpaceComputation.
   Proof.
     move: (has_valid_arrival_curve_prefix_tsk ts H_valid_task_set tsk H_tsk_in_ts).
     move=> [evec [EQ [POSh [LARGEh [NOINF [BUR SORT]]]]]] A LT_L NEQ.
-    rewrite eqn_pmul2l // /max_arrivals /MaxArrivals /concrete_max_arrivals_instance
+    rewrite /task_rbf !scalar_rbf_def eqn_pmul2l // /max_arrivals /MaxArrivals /concrete_max_arrivals_instance
             /concrete_max_arrivals EQ in NEQ.
     rewrite /get_horizon_of_task EQ.
     move: (sorted_ltn_steps_imply_sorted_leq_steps_steps _ SORT NOINF) => SORT_LEQ.
@@ -224,7 +225,7 @@ Section FastSearchSpaceComputation.
       move: (H_valid_task_set) => VALID; specialize (VALID _ H_tsk_in_ts).
       move: (has_valid_arrival_curve_prefix_tsk ts H_valid_task_set tsk H_tsk_in_ts).
       move => [evec [EMAXeq [POSh [LARGEh [NOINF [BUR SORT]]]]]].
-      rewrite /task_rbf /task_request_bound_function /max_arrivals
+      rewrite /task_rbf !scalar_rbf_def /max_arrivals
               /MaxArrivals /concrete_max_arrivals_instance /concrete_max_arrivals
               EMAXeq eqn_mul2l negb_or in IN.
       move: IN => /andP [_ NEQ].

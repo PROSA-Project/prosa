@@ -232,10 +232,9 @@ Section RTAforLimitedPreemptiveFPModelwithArrivalCurves.
           apply: leq_trans; last by apply leq_subRL_impl; rewrite -!addnA in FIX1; apply FIX1.
           have NEQ: total_ohep_request_bound_function_FP ts tsk δ <= total_ohep_request_bound_function_FP ts tsk F by apply total_ohep_rbf_monotone => //.
           have LAST: task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk = task_last_nonpr_segment tsk - ε by eapply last_segment_eq_cost_minus_rtct; eauto.
-          move: FIX1; rewrite /task_intra_IBF.
+          move: FIX1; rewrite /task_intra_IBF scalar_rbf_def.
           change (task_cost tsk - task_rtct tsk) with (task_cost tsk - (@task_rtct _ limited_preemptions_rtc_threshold) tsk).
-          rewrite LAST.
-          by set (c := _ _ (A +1) - ( _ )); lia.
+          by rewrite LAST; lia.
         * rewrite /sSBF /fp_ovh_sbf_slow /supply_bound_function -EQ.
           apply bound_preserved_under_slowed, leq_subRL_impl; apply: leq_trans; last by apply FIX2.
           rewrite /limited_preemptions_rtc_threshold /task_rtct /fp_blackout_bound /overhead_bound.

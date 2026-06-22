@@ -11,6 +11,32 @@ Require Export prosa.analysis.definitions.workload.bounded.
 
 (** In this file, we prove some lemmas about RBFs. *)
 
+
+(** As a "compatibility layer", for the common case of linear WCET(n)
+    approximations derived from a scalar WCET parameter, we establish a
+    rewriting lemma to express the RBF as a simple scalar multiplication of the
+    task's WCET and its arrival curve. *)
+
+Section LinearRBF.
+
+  (** Consider any type of tasks characterized by WCETs and arrival curves. *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task} `{MaxArrivals Task}.
+
+  (** For such tasks, the RBF definition reduces to a simple multiplication. *)
+  Lemma scalar_rbf_def :
+    forall tsk Δ,
+      task_request_bound_function tsk Δ = task_cost tsk * max_arrivals tsk Δ.
+  Proof.
+    move=> tsk delta.
+    by rewrite /task_request_bound_function/max_request_bound //= mulnC.
+  Qed.
+End LinearRBF.
+
+
+(** For the time being, the following lemmas all work on linear
+    RBFs. Generalization is left as a future cleanup step. *)
+
 (** ** RBF is a Bound on Workload *)
 
 Section ProofRequestBoundFunction.
@@ -71,7 +97,7 @@ Section ProofRequestBoundFunction.
     Proof.
       move=> t Δ.
       apply: leq_trans; first by apply: task_workload_between_bounded.
-      rewrite /task_request_bound_function.
+      rewrite scalar_rbf_def.
       rewrite leq_mul2l; apply/orP; right.
       rewrite -{2}[Δ](addKn t).
       exact: H_tsk_arrivals_bounded.
@@ -294,7 +320,7 @@ Section RequestBoundFunctions.
   Lemma task_rbf_0_zero :
     task_request_bound_function tsk 0 = 0.
   Proof.
-    rewrite /task_request_bound_function.
+    rewrite scalar_rbf_def.
     apply/eqP; rewrite muln_eq0; apply/orP; right; apply/eqP.
     by move: H_valid_arrival_curve => [T1 T2].
   Qed.
@@ -304,7 +330,7 @@ Section RequestBoundFunctions.
     monotone leq (task_request_bound_function tsk).
   Proof.
     rewrite /monotone => ? ? LE.
-    rewrite /task_request_bound_function leq_mul2l.
+    rewrite !scalar_rbf_def leq_mul2l.
     apply/orP; right.
     by move: H_valid_arrival_curve => [_ T]; apply T.
   Qed.
@@ -322,7 +348,7 @@ Section RequestBoundFunctions.
   Proof.
     have ALT: forall n, n = 0 \/ n > 0 by clear; intros n; destruct n; [left | right].
     specialize (ALT (task_cost tsk)); destruct ALT as [Z | POS]; first by rewrite Z.
-    rewrite -[task_cost tsk]muln1 /task_request_bound_function.
+    rewrite -[task_cost tsk]muln1 scalar_rbf_def.
     by rewrite leq_pmul2l //=.
   Qed.
 
@@ -443,7 +469,7 @@ Section DegenerateTotalRBFs.
   Proof.
     move=> tsk IN ZERO j ARR TASK.
     rewrite /job_response_time_bound/completed_by.
-    move: ZERO. rewrite /task_request_bound_function => /eqP.
+    move: ZERO. rewrite scalar_rbf_def => /eqP.
     rewrite muln_eq0 => /orP [/eqP COST|/eqP NEVER].
     { apply: leq_trans.
       - by apply: H_valid_job_cost.
@@ -746,6 +772,7 @@ Section TaskWorkload.
     task_workload_between arr_seq tsk t1 (t1 + Δ) - job_cost j
     <= task_request_bound_function tsk Δ - task_cost tsk.
   Proof.
+    rewrite scalar_rbf_def.
     apply leq_trans with
       (task_cost tsk * number_of_task_arrivals arr_seq tsk t1 (t1 + Δ) - task_cost tsk); last first.
     - rewrite leq_sub2r // leq_mul2l; apply/orP => //=; right.

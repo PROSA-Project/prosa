@@ -216,7 +216,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
         rewrite /task_intra_IBF /fully_preemptive_rtc_threshold /task_rtct.
         rewrite BLOCK subnn //= add0n addn0 subn0; split.
         * apply bound_preserved_under_slowed; move: FIX1.
-          by rewrite /task_intra_IBF /jlfp_blackout_bound /overhead_bound; lia.
+          by rewrite /task_intra_IBF /jlfp_blackout_bound /overhead_bound scalar_rbf_def; lia.
         * by apply overheads_sbf_monotone.
   Qed.
 

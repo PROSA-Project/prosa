@@ -226,7 +226,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
         rewrite BLOCK subnn //= add0n addn0 subn0; split.
         * apply bound_preserved_under_slowed.
           move: FIX.
-          by rewrite /sSBF /fp_blackout_bound /overhead_bound; lia.
+          by rewrite /sSBF /fp_blackout_bound /overhead_bound scalar_rbf_def; lia.
         * exact: overheads_sbf_monotone.
   Qed.
 

@@ -1,4 +1,5 @@
 Require Export prosa.analysis.definitions.request_bound_function.
+Require Import prosa.analysis.facts.model.rbf.
 Require Export prosa.implementation.refinements.task.
 
 (** ** Arrival Curve Refinements. *)
@@ -369,9 +370,10 @@ Section Theory.
     refines ( Rtask ==> Rnat ==> Rnat )%rel task_rbf task_rbf_T.
   Proof.
     apply refines_abstr2.
-    rewrite /task_rbf /task_rbf_T /task_request_bound_function
+    move => t t' Rt y y' Ry.
+    rewrite /task_rbf /task_rbf_T scalar_rbf_def
             /concept.task_cost /concrete_task_cost_instance
-            /max_arrivals /MaxArrivals => t t' Rt y y' Ry.
+            /max_arrivals /MaxArrivals.
     by refines_apply.
   Qed.
 

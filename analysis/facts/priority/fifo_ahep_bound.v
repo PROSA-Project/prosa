@@ -94,6 +94,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
     rewrite (workload_minus_job_cost j)//;
             last by apply job_in_arrivals_between => //; last by rewrite addn1.
     rewrite /workload_of_jobs (big_rem tsk) //=
+            [max_arrivals tsk (job_arrival j - t1 + ε) * task_cost tsk]mulnC -scalar_rbf_def
             (addnC (task_request_bound_function tsk (job_arrival j - t1 + ε))).
     rewrite -addnBA; last first.
     - apply leq_trans with (task_request_bound_function tsk ε).

@@ -199,7 +199,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       + move => F [FIX LE]; exists F; split => //.
         rewrite /task_intra_IBF /fully_preemptive_rtc_threshold /task_rtct.
         rewrite BLOCK subnn //= add0n addn0 subn0; split.
-        * by move: FIX; rewrite /arm_sbf /supply_bound_function; lia.
+        * by move: FIX; rewrite /arm_sbf /supply_bound_function scalar_rbf_def; lia.
         * exact: arm_sbf_monotone.
   Qed.
 
