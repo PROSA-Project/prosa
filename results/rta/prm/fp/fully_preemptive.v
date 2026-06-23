@@ -188,7 +188,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
       move => j t1 t2 ARR _ t NEQ.
       by apply: SBF.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
-      + by apply athep_workload_le_total_ohep_rbf.
+      + by apply athep_workload_le_total_ohep_rbf; eauto 5 with basic_rt_facts.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
         by unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //.
     - move => A SP; move: (SOL A) => [].

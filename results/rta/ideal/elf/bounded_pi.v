@@ -283,7 +283,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       { rewrite hep_hp_workload_hp =>//. rewrite /from_hp_task TSK'; exact: workload_of_jobs_bounded. }
       { apply leq_trans with (n := workload_of_jobs
           (fun j0 : Job => ep_task (job_task j0) tsk && is_ep_causing_intf j t (job_task j0))
-          (arrivals_between arr_seq t (t + L))); last by apply workload_of_jobs_bounded.
+          (arrivals_between arr_seq t (t + L))); last by apply: workload_of_jobs_bounded => //.
         rewrite /workload_of_jobs big_seq_cond [leqRHS]big_seq_cond.
         apply: sub_le_big => //; first by move => ? ?; apply: leq_addr.
         move=> j0; case eq: (_ \in _) =>//=.

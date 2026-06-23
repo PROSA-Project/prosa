@@ -99,7 +99,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
     rewrite -addnBA; last first.
     - apply leq_trans with (task_request_bound_function tsk ε).
       { by apply: task_rbf_1_ge_task_cost; exact: non_pathological_max_arrivals. }
-      { by apply task_rbf_monotone; [apply H_valid_arrival_curve | lia]. }
+      { by apply: task_rbf_monotone => //; clear; lia. }
     - eapply leq_trans; last first.
       { by erewrite leq_add2l; apply task_rbf_without_job_under_analysis; (try apply ARR1) => //; lia. }
       rewrite addnBA.
@@ -112,8 +112,9 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
           destruct (tsk' \in rem (T:=Task) tsk ts) eqn:IN; last by [].
           apply rem_in in IN.
           rewrite addnBAC //=.
-          apply: leq_trans; last by apply rbf_spec with (t := t1) (Δ := job_arrival j + 1 - t1).
-          by rewrite subnKC //= addn1; apply leqW.
+          apply: leq_trans;
+            last by apply: (rbf_spec arr_seq tsk' _ t1 (job_arrival j + 1 - t1)).
+          by rewrite subnKC //= addn1; exact: leqW.
       + move : H_job_of_task => TSKj.
         rewrite /task_workload_between /task_workload /workload_of_jobs (big_rem j) //=;
                 first by rewrite TSKj; apply leq_addr.

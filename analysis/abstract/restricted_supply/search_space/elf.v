@@ -98,9 +98,10 @@ Section SearchSpaceSubset.
   Proof.
     move => A [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]; apply/andP; split => //.
     { apply/orP; left; apply/orP; right.
-      rewrite /task_rbf_changes_at /task_rbf task_rbf_0_zero //=.
-      { rewrite eq_sym -lt0n add0n.
-        by apply task_rbf_epsilon_gt_0 => //. } }
+      rewrite /task_rbf_changes_at /task_rbf task_rbf_0_zero //=;
+        last by apply: valid_arrival_curve_to_max_rbf.
+      rewrite eq_sym -lt0n add0n.
+      by apply task_rbf_epsilon_gt_0 => //. }
     { apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].
       exfalso; apply INSP2.
       rewrite /intra_IBF subnK // RBF.

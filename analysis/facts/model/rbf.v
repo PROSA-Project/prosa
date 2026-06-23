@@ -11,111 +11,50 @@ Require Export prosa.analysis.definitions.workload.bounded.
 
 (** In this file, we prove some lemmas about RBFs. *)
 
+(** For convenience in subsequent proofs, we restate the RBF specification as
+    two simple lemmas. *)
+Section RBFSpec.
 
-(** As a "compatibility layer", for the common case of linear WCET(n)
-    approximations derived from a scalar WCET parameter, we establish a
-    rewriting lemma to express the RBF as a simple scalar multiplication of the
-    task's WCET and its arrival curve. *)
-
-Section LinearRBF.
-
-  (** Consider any type of tasks characterized by WCETs and arrival curves. *)
+  (** Consider any type of tasks characterized by RBFs ... *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task} `{MaxArrivals Task}.
+  Context `{MaxRequestBound Task}.
 
-  (** For such tasks, the RBF definition reduces to a simple multiplication. *)
-  Lemma scalar_rbf_def :
-    forall tsk Δ,
-      task_request_bound_function tsk Δ = task_cost tsk * max_arrivals tsk Δ.
-  Proof.
-    move=> tsk delta.
-    by rewrite /task_request_bound_function/max_request_bound //= mulnC.
-  Qed.
-End LinearRBF.
+  (**  ... and their associated jobs. *)
+  Context {Job : JobType} `{JobTask Job Task}
+          `{JobArrival Job} `{JobCost Job}.
 
-
-(** For the time being, the following lemmas all work on linear
-    RBFs. Generalization is left as a future cleanup step. *)
-
-(** ** RBF is a Bound on Workload *)
-
-Section ProofRequestBoundFunction.
-
-  (** Consider any type of tasks characterized by WCETs and arrival curves ... *)
-  Context {Task : TaskType}.
-  Context `{TaskCost Task} `{MaxArrivals Task}.
-
-  (**  ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-  Context `{JobCost Job}.
-
-  (** Consider any valid arrival sequence ... *)
+  (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any schedule corresponding to this arrival sequence. *)
-  Context {PState : ProcessorState Job}.
-  Variable sched : schedule PState.
-  Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
+  (** Consider a given task [tsk] ... *)
+  Variable tsk : Task.
 
-  (** Assume that the job costs are no larger than the task costs. *)
-  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
+  (** ... with a sound RBF. *)
+  Hypothesis H_rbf_respected :
+    respects_max_request_bound arr_seq tsk (max_request_bound tsk).
 
-  (** In this section, we establish that a task's RBF is indeed an upper bound
-      on the task's workload. *)
-  Section RBF.
+  (** From this assumption, we establish the RBF spec: in any interval of any
+      length, the RBF upper-bounds the task's actual workload. *)
+  Lemma rbf_spec :
+    forall t Δ,
+      task_workload_between arr_seq tsk t (t + Δ)
+      <= task_request_bound_function tsk Δ.
+  Proof.
+    move=> t Δ.
+    move: (H_rbf_respected t (t + Δ) ltac:(lia)); rewrite addKn.
+    rewrite /task_request_bound_function
+            /task_workload_between/task_workload/workload_of_jobs.
+    by rewrite /cost_of_task_arrivals/task_arrivals_between big_filter.
+  Qed.
 
-    (** Consider a given task [tsk]. *)
-    Variable tsk : Task.
-
-    (** First, as a stepping stone, we observe that any sequence of jobs of the
-        task jointly satisfy the task's WCET. *)
-    Lemma task_workload_between_bounded :
-      forall t1 t2,
-        task_workload_between arr_seq tsk t1 t2
-        <= task_cost tsk * number_of_task_arrivals arr_seq tsk t1 t2.
-    Proof.
-      move=> t Δ.
-      rewrite /number_of_task_arrivals/task_arrivals_between.
-      rewrite /task_workload_between/task_workload/workload_of_jobs -big_filter.
-      apply: sum_job_costs_bounded.
-      move=> j /[! mem_filter ] /andP [TSK IN]; apply /andP; split => //.
-      by apply/H_valid_job_cost/in_arrivals_implies_arrived.
-    Qed.
-
-    (** Next, suppose that task [tsk] respects its arrival curve [max_arrivals]. *)
-    Hypothesis H_tsk_arrivals_bounded : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
-
-    (** From this assumption, we establish the RBF spec: In any interval of any
-        length, the RBF upper-bounds the task's actual workload. *)
-    Lemma rbf_spec :
-      forall t Δ,
-        task_workload_between arr_seq tsk t (t + Δ)
-        <= task_request_bound_function tsk Δ.
-    Proof.
-      move=> t Δ.
-      apply: leq_trans; first by apply: task_workload_between_bounded.
-      rewrite scalar_rbf_def.
-      rewrite leq_mul2l; apply/orP; right.
-      rewrite -{2}[Δ](addKn t).
-      exact: H_tsk_arrivals_bounded.
-    Qed.
-
-  End RBF.
-
-  (** In this section, we prove a trivial corollary stating that the RBF still
+  (** We next establish a trivial corollary stating that the RBF still
       upper-bounds the workload when considering only a subset of a task's jobs
       (namely those satisfying a filter predicate). *)
   Section SubsetOfJobs.
 
     (** Consider any predicate [P] on jobs. *)
     Variable P : pred Job.
-
-    (** Consider any task [tsk] that respects its arrival curve [max_arrivals] *)
-    Variable tsk : Task.
-    Hypothesis H_tsk_arrivals_bounded : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
 
     (** Assume that all jobs that satisfy [P] come from task [tsk]. *)
     Hypothesis H_jobs_of_tsk : forall j, P j -> job_of_task tsk j.
@@ -131,21 +70,35 @@ Section ProofRequestBoundFunction.
       move=> t Δ.
       apply: leq_trans; last by apply: rbf_spec.
       rewrite /task_workload_between/task_workload/workload_of_jobs.
-      by apply leq_sum_seq_pred.
+      exact: leq_sum_seq_pred.
     Qed.
 
   End SubsetOfJobs.
 
+End RBFSpec.
+
+Section SumsOfRBFs.
+
+  (** Consider any type of tasks characterized by RBFs ... *)
+  Context {Task : TaskType}.
+  Context `{MaxRequestBound Task}.
+
+  (**  ... and their associated jobs. *)
+  Context {Job : JobType} `{JobTask Job Task}
+          `{JobArrival Job} `{JobCost Job}.
+
   (** Now, consider a task set [ts] ... *)
   Variable ts : seq Task.
 
-  (** ... and assume that all jobs come from the task set. *)
+  (** ... and a valid arrival sequence of this task set ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
-  (** Assume that all tasks in the task set respect [max_arrivals]. *)
-  Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
+  (** ... that respects the RBFs. *)
+  Hypothesis H_sound_RBF : taskset_respects_max_request_bound arr_seq ts.
 
-  (** Next, we prove that total workload is upper-bounded by the total RBF. *)
+  (** First, we observe that total workload is upper-bounded by the total RBF. *)
   Lemma total_workload_le_total_rbf :
     forall t Δ,
       total_workload_between arr_seq t (t + Δ) <= total_request_bound_function ts Δ.
@@ -205,15 +158,19 @@ Section ProofRequestBoundFunction.
 
   End SumRBF.
 
-
   (** Next, we establish bounds specific to fixed-priority scheduling. *)
   Section FP.
 
-    (** Consider an arbitrary fixed-priority policy ... *)
+    (** Consider an arbitrary fixed-priority policy, ... *)
     Context {FP : FP_policy Task}.
 
-    (** ... and any given task. *)
+    (** ... a given task, ... *)
     Variable tsk : Task.
+
+    (** ... and any schedule of the arriving jobs. *)
+    Context {PState : ProcessorState Job}.
+    Variable sched : schedule PState.
+    Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
     (** The [athep_workload_is_bounded] predicate used below allows the workload
         bound to depend on two arguments: the relative offset [A] (w.r.t. the
@@ -285,113 +242,34 @@ Section ProofRequestBoundFunction.
 
   End JLFP.
 
-End ProofRequestBoundFunction.
+End SumsOfRBFs.
 
 (** ** RBF Properties *)
-(** In this section, we prove simple properties and identities of RBFs. *)
+(** In this section, we restate two simple properties and identities of RBFs. *)
 Section RequestBoundFunctions.
 
-  (** Consider any type of tasks ... *)
+  (** Consider any type of tasks characterized by RBFs. *)
   Context {Task : TaskType}.
-  Context `{TaskCost Task}.
-
-  (** ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-  Context `{JobArrival Job}.
-
-  (** Consider any arrival sequence. *)
-  Variable arr_seq : arrival_sequence Job.
-  Hypothesis H_arrival_times_are_consistent :
-    consistent_arrival_times arr_seq.
+  Context `{MaxRequestBound Task}.
 
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
-      for any task [tsk] in [ts] [max_arrival tsk] is (1) an arrival
-      bound of [tsk], and (2) it is a monotonic function that equals 0
-      for the empty interval [Δ = 0]. *)
-  Context `{MaxArrivals Task}.
-  Hypothesis H_valid_arrival_curve : valid_arrival_curve (max_arrivals tsk).
-  Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
+  (** Assume that [tsk]'s RBF is a valid request-bound function. *)
+  Hypothesis H_valid_rbf :
+    valid_request_bound_function (max_request_bound tsk).
 
-  (** We prove that [task_request_bound_function 0] is equal to [0]. *)
+  (** By definition [task_request_bound_function 0] is equal to [0]. *)
   Lemma task_rbf_0_zero :
     task_request_bound_function tsk 0 = 0.
-  Proof.
-    rewrite scalar_rbf_def.
-    apply/eqP; rewrite muln_eq0; apply/orP; right; apply/eqP.
-    by move: H_valid_arrival_curve => [T1 T2].
-  Qed.
+  Proof. by move: H_valid_rbf => [ZERO _]. Qed.
 
-  (** We prove that [task_request_bound_function] is monotone. *)
+  (** By definition [task_request_bound_function] is monotone. *)
   Lemma task_rbf_monotone :
     monotone leq (task_request_bound_function tsk).
-  Proof.
-    rewrite /monotone => ? ? LE.
-    rewrite !scalar_rbf_def leq_mul2l.
-    apply/orP; right.
-    by move: H_valid_arrival_curve => [_ T]; apply T.
-  Qed.
-
-
-  (** In the following, we assume that [tsk] has a positive cost ... *)
-  Hypothesis H_positive_cost : 0 < task_cost tsk.
-
-  (** ... and [max_arrivals tsk ε] is positive. *)
-  Hypothesis H_arrival_curve_positive : max_arrivals tsk ε > 0.
-
-  (** Then we prove that [task_request_bound_function] at [ε] is greater than or equal to the task's WCET. *)
-  Lemma task_rbf_1_ge_task_cost :
-    task_request_bound_function tsk ε >= task_cost tsk.
-  Proof.
-    have ALT: forall n, n = 0 \/ n > 0 by clear; intros n; destruct n; [left | right].
-    specialize (ALT (task_cost tsk)); destruct ALT as [Z | POS]; first by rewrite Z.
-    rewrite -[task_cost tsk]muln1 scalar_rbf_def.
-    by rewrite leq_pmul2l //=.
-  Qed.
-
-  (** As a corollary, we prove that the [task_request_bound_function] at any point [A] greater than
-      [0] is no less than the task's WCET. *)
-  Lemma task_rbf_ge_task_cost :
-    forall A,
-      A > 0 ->
-      task_request_bound_function tsk A >= task_cost tsk.
-  Proof.
-    case => // A GEQ.
-    apply: (leq_trans task_rbf_1_ge_task_cost).
-    exact: task_rbf_monotone.
-  Qed.
-
-  (** Then, we prove that [task_request_bound_function] at [ε] is greater than [0]. *)
-  Lemma task_rbf_epsilon_gt_0 : 0 < task_request_bound_function tsk ε.
-  Proof.
-    apply leq_trans with (task_cost tsk) => [//|].
-    exact: task_rbf_1_ge_task_cost.
-  Qed.
-
-  (** Consider a set of tasks [ts] containing the task [tsk]. *)
-  Variable ts : seq Task.
-  Hypothesis H_tsk_in_ts : tsk \in ts.
-
-  (** Next, we prove that cost of [tsk] is less than or equal to the
-      [total_request_bound_function]. *)
-  Lemma task_cost_le_sum_rbf :
-    forall t,
-      t > 0 ->
-      task_cost tsk <= total_request_bound_function ts t.
-  Proof.
-    case=> [//|t] GE.
-    eapply leq_trans; first exact: task_rbf_1_ge_task_cost.
-    rewrite /total_request_bound_function.
-    erewrite big_rem; last by exact H_tsk_in_ts.
-    apply leq_trans with (task_request_bound_function tsk t.+1); last by apply leq_addr.
-    by apply task_rbf_monotone.
-  Qed.
+  Proof. by move: H_valid_rbf => [_ MONO]. Qed.
 
 End RequestBoundFunctions.
-
 
 (** ** Monotonicity of the Total RBF *)
 
@@ -399,10 +277,10 @@ End RequestBoundFunctions.
     of various total RBF variants. *)
 Section TotalRBFMonotonic.
 
-  (** Consider a set of tasks characterized by WCETs and arrival curves. *)
-  Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task}.
+  (** Consider a set of tasks characterized by RBFs. *)
+  Context {Task : TaskType} `{MaxRequestBound Task}.
   Variable ts : seq Task.
-  Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
+  Hypothesis H_valid_rbf : valid_taskset_request_bound_function ts task_request_bound_function.
 
   (** We observe that the total RBF is monotonically increasing. *)
   Lemma total_rbf_monotone :
@@ -440,19 +318,17 @@ End TotalRBFMonotonic.
     the pathological case of an RBF that yields zero for duration ε. *)
 Section DegenerateTotalRBFs.
 
-  (** Consider a set of tasks characterized by WCETs and arrival curves ... *)
-  Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task}.
+  (** Consider a set of tasks characterized by RBFs ... *)
+  Context {Task : TaskType} `{MaxRequestBound Task}.
   Variable ts : seq Task.
 
-  (** ... and any consistent arrival sequence of valid jobs of these tasks. *)
+  (** ... and any consistent arrival sequence of jobs of these tasks. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job} `{JobCost Job}.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
-  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
-  (** Suppose the arrival curves are correct. *)
-  Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
-  Hypothesis H_is_arrival_curve :  taskset_respects_max_arrivals arr_seq ts.
+  (** Suppose the RBFs are correct. *)
+  Hypothesis H_sound_rbf : taskset_respects_max_request_bound arr_seq ts.
 
   (** Consider any valid schedule corresponding to this arrival sequence. *)
   Context {PState : ProcessorState Job}.
@@ -468,17 +344,20 @@ Section DegenerateTotalRBFs.
       task_response_time_bound arr_seq sched tsk 0.
   Proof.
     move=> tsk IN ZERO j ARR TASK.
+    move: ZERO; rewrite /task_request_bound_function => ZERO.
     rewrite /job_response_time_bound/completed_by.
-    move: ZERO. rewrite scalar_rbf_def => /eqP.
-    rewrite muln_eq0 => /orP [/eqP COST|/eqP NEVER].
-    { apply: leq_trans.
-      - by apply: H_valid_job_cost.
-      - move: TASK. rewrite /job_of_task => /eqP ->.
-        by rewrite COST. }
-    { exfalso.
-      have: 0 < max_arrivals tsk ε
-        by apply: (non_pathological_max_arrivals tsk arr_seq _ j).
-      by rewrite NEVER. }
+    have COST : job_cost j = 0.
+    { have LE : job_arrival j <= job_arrival j + ε by lia.
+      have LEN : job_arrival j + ε - job_arrival j = ε by lia.
+      move: (H_sound_rbf tsk IN (job_arrival j) (job_arrival j + ε) LE).
+      rewrite LEN ZERO /cost_of_task_arrivals => BOUND.
+      have INj : j \in task_arrivals_between arr_seq tsk (job_arrival j) (job_arrival j + ε).
+      { apply: job_in_task_arrivals_between => //.
+        - by move: TASK => /eqP.
+        - by rewrite /arrived_between; apply/andP; split; lia. }
+      rewrite (big_rem j) //= in BOUND.
+      by move: BOUND; rewrite leqn0 addn_eq0 => /andP [/eqP -> _]. }
+    by rewrite COST.
   Qed.
 
   (** Second, given a fixed-priority policy with reflexive priorities, ... *)
@@ -522,12 +401,8 @@ End DegenerateTotalRBFs.
     total RBFs of multiple tasks. *)
 Section FP_RBF_partitioning.
 
-  (** Consider any type of tasks ... *)
-  Context {Task : TaskType} `{TaskCost Task}.
-
-  (** ... and any type of jobs associated with these tasks, where each task has
-      a cost and an associated arrival curve. *)
-  Context {Job : JobType} `{JobTask Job Task} `{JobCost Job} `{MaxArrivals Task}.
+  (** Consider any type of tasks characterized by RBFs. *)
+  Context {Task : TaskType} `{MaxRequestBound Task}.
 
   (** Consider an FP policy that indicates a higher-or-equal priority
       relation. *)
@@ -618,10 +493,10 @@ End FP_RBF_partitioning.
     fixed-priority policy. *)
 Section RBFFOrFP.
 
-  (** Consider a set of tasks characterized by WCETs and arrival curves. *)
-  Context {Task : TaskType} `{TaskCost Task} `{MaxArrivals Task}.
+  (** Consider a set of tasks characterized by RBFs. *)
+  Context {Task : TaskType} `{MaxRequestBound Task}.
   Variable ts : seq Task.
-  Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
+  Hypothesis H_valid_rbf : valid_taskset_request_bound_function ts max_request_bound.
 
   (** For any fixed-priority policy, ... *)
   Context `{FP_policy Task}.
@@ -637,7 +512,7 @@ Section RBFFOrFP.
     apply /allP => tsk' IN.
     apply /eqP.
     apply task_rbf_0_zero => //=.
-    apply H_valid_arrival_curve.
+    apply H_valid_rbf.
     rewrite mem_filter in IN.
     by move : IN => /andP[_ ->].
   Qed.
@@ -648,16 +523,12 @@ Section RBFFOrFP.
   (** Consider any types of jobs. *)
   Context `{Job : JobType} `{JobTask Job Task} `{JobCost Job}.
 
-  (** Consider any arrival sequence that only has jobs from the task set and
-      where all arrivals have a valid job cost. *)
+  (** Consider any arrival sequence that only has jobs from the task set. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
-  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
-  (** Assume there exists an arrival curve and that the arrival sequence
-      respects this curve. *)
-  Context `{MaxArrivals Task}.
-  Hypothesis H_respects_max_arrivals : taskset_respects_max_arrivals arr_seq ts.
+  (** Assume that the arrival sequence respects the RBFs. *)
+  Hypothesis H_respects_max_request_bound : taskset_respects_max_request_bound arr_seq ts.
 
   (** Consider any task [tsk] and any job [j] of the task [tsk]. *)
   Variable j : Job.
@@ -683,6 +554,117 @@ Section RBFFOrFP.
   Qed.
 
 End RBFFOrFP.
+
+
+(** ** Properties of Scalar RBFs *)
+
+(** As a "compatibility layer", for the common case of linear WCET(n)
+    approximations derived from a scalar WCET parameter, we establish a
+    rewriting lemma to express the RBF as a simple scalar multiplication of the
+    task's WCET and its arrival curve. *)
+
+Section LinearRBF.
+
+  (** Consider any type of tasks characterized by WCETs and arrival curves. *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task} `{MaxArrivals Task}.
+
+  (** For such tasks, the RBF definition reduces to a simple multiplication. *)
+  Lemma scalar_rbf_def :
+    forall tsk Δ,
+      task_request_bound_function tsk Δ = task_cost tsk * max_arrivals tsk Δ.
+  Proof.
+    move=> tsk delta.
+    by rewrite /task_request_bound_function/max_request_bound //= mulnC.
+  Qed.
+
+End LinearRBF.
+
+
+(** In this section, we prove simple properties and identities of RBFs obtained
+    from scalar WCETs. *)
+Section ScalarRequestBoundFunctions.
+
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
+  Context `{TaskCost Task}.
+
+  (** ... and any type of jobs associated with these tasks. *)
+  Context {Job : JobType}.
+  Context `{JobTask Job Task}.
+  Context `{JobArrival Job}.
+
+  (** Consider any arrival sequence. *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_arrival_times_are_consistent :
+    consistent_arrival_times arr_seq.
+
+  (** Let [tsk] be any task. *)
+  Variable tsk : Task.
+
+  (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
+      for any task [tsk] in [ts] [max_arrival tsk] is (1) an arrival
+      bound of [tsk], and (2) it is a monotonic function that equals 0
+      for the empty interval [Δ = 0]. *)
+  Context `{MaxArrivals Task}.
+  Hypothesis H_valid_arrival_curve : valid_arrival_curve (max_arrivals tsk).
+  Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
+
+  (** In the following, we assume that [tsk] has a positive cost ... *)
+  Hypothesis H_positive_cost : 0 < task_cost tsk.
+
+  (** ... and [max_arrivals tsk ε] is positive. *)
+  Hypothesis H_arrival_curve_positive : max_arrivals tsk ε > 0.
+
+  (** Then we prove that [task_request_bound_function] at [ε] is greater than or equal to the task's WCET. *)
+  Lemma task_rbf_1_ge_task_cost :
+    task_request_bound_function tsk ε >= task_cost tsk.
+  Proof.
+    have ALT: forall n, n = 0 \/ n > 0 by clear; intros n; destruct n; [left | right].
+    specialize (ALT (task_cost tsk)); destruct ALT as [Z | POS]; first by rewrite Z.
+    rewrite -[task_cost tsk]muln1 scalar_rbf_def.
+    by rewrite leq_pmul2l //=.
+  Qed.
+
+  (** As a corollary, we prove that the [task_request_bound_function] at any point [A] greater than
+      [0] is no less than the task's WCET. *)
+  Lemma task_rbf_ge_task_cost :
+    forall A,
+      A > 0 ->
+      task_request_bound_function tsk A >= task_cost tsk.
+  Proof.
+    case => // A GEQ.
+    apply: (leq_trans task_rbf_1_ge_task_cost).
+    exact: task_rbf_monotone.
+  Qed.
+
+  (** Then, we prove that [task_request_bound_function] at [ε] is greater than [0]. *)
+  Lemma task_rbf_epsilon_gt_0 : 0 < task_request_bound_function tsk ε.
+  Proof.
+    apply leq_trans with (task_cost tsk) => [//|].
+    exact: task_rbf_1_ge_task_cost.
+  Qed.
+
+  (** Consider a set of tasks [ts] containing the task [tsk]. *)
+  Variable ts : seq Task.
+  Hypothesis H_tsk_in_ts : tsk \in ts.
+
+  (** Next, we prove that cost of [tsk] is less than or equal to the
+      [total_request_bound_function]. *)
+  Lemma task_cost_le_sum_rbf :
+    forall t,
+      t > 0 ->
+      task_cost tsk <= total_request_bound_function ts t.
+  Proof.
+    case=> [//|t] GE.
+    eapply leq_trans; first exact: task_rbf_1_ge_task_cost.
+    rewrite /total_request_bound_function.
+    erewrite big_rem; last by exact H_tsk_in_ts.
+    apply leq_trans with (task_request_bound_function tsk t.+1); last by apply leq_addr.
+    by apply task_rbf_monotone.
+  Qed.
+
+End ScalarRequestBoundFunctions.
 
 (** We know that the workload of a task in any interval must be
     bounded by the task's RBF in that interval. However, in the proofs
@@ -730,6 +712,21 @@ Section TaskWorkload.
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_arrival_curve (max_arrivals tsk).
   Hypothesis H_is_arrival_curve : respects_max_arrivals arr_seq tsk (max_arrivals tsk).
+
+  (** First, as a stepping stone, we observe that any sequence of jobs of the
+      task jointly satisfy the task's WCET. *)
+  Lemma task_workload_between_bounded :
+    forall t1 t2,
+      task_workload_between arr_seq tsk t1 t2
+      <= task_cost tsk * number_of_task_arrivals arr_seq tsk t1 t2.
+  Proof.
+    move=> t Δ.
+    rewrite /number_of_task_arrivals/task_arrivals_between.
+    rewrite /task_workload_between/task_workload/workload_of_jobs -big_filter.
+    apply: sum_job_costs_bounded.
+    move=> j /[! mem_filter ] /andP [TSK IN]; apply /andP; split => //.
+    by apply/H_arrivals_have_valid_job_costs/in_arrivals_implies_arrived.
+  Qed.
 
   (** Consider any job [j] of [tsk] ... *)
   Variable j : Job.

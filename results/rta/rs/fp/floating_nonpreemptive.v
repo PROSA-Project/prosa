@@ -210,7 +210,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
       move => ? ? ? ? [? ?]; split => //.
       by apply instantiated_busy_interval_prefix_equivalent_busy_interval_prefix.
     - apply: instantiated_task_intra_interference_is_bounded; eauto 1 => //; first last.
-      + by apply athep_workload_le_total_ohep_rbf.
+      + by apply athep_workload_le_total_ohep_rbf; eauto 5 with basic_rt_facts.
       + apply: service_inversion_is_bounded => // => jo t1 t2 ARRo TSKo BUSYo.
         unshelve rewrite (leqRW (nonpreemptive_segments_bounded_by_blocking _ _ _ _ _ _ _ _ _)) => //.
         by instantiate (1 := fun _ => blocking_bound ts tsk).

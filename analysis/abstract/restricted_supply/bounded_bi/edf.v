@@ -213,7 +213,8 @@ Section BoundedBusyIntervals.
         + eapply leq_trans; first by apply sum_le_subseq, undup_subseq.
           apply leq_sum_seq => tsk_o INo HEP.
           set P := (fun j' : Job => hep_job j' jlp && (job_task j' == tsk_o)).
-          rewrite -(leqRW (rbf_spec' _ _ P _ _ _ _ _)) /P //; last by move=> ? /andP[].
+          rewrite -(leqRW (rbf_spec' _ _ _ P _ _ _)) /P //.
+          by move=> ? /andP[].
         + by move=> jo IN; rewrite in_seq_equiv_undup;
             apply: H_all_jobs_from_taskset; apply: in_arrivals_implies_arrived.
         + move=> jo IN.
