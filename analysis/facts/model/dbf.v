@@ -60,9 +60,8 @@ Section ProofDemandBoundDefinition.
     by rewrite task_arrivals_with_deadline_within_eq.
   Qed.
 
-  (** In the following, assume we are given a valid WCET bound for each task. *)
-  Context `{TaskCost Task} `{JobCost Job}.
-  Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
+  (** In the following, let us consider the execution costs of the jobs. *)
+  Context `{JobCost Job}.
 
   (** A task's _demand_ in a given interval is the sum of the execution costs (i.e., the workload) of the task's jobs
       that both arrive in the interval and have a deadline within it. *)
@@ -72,14 +71,14 @@ Section ProofDemandBoundDefinition.
     in
       workload_of_jobs causing_demand (arrivals_between arr_seq t1 t2).
 
-  (** Consider a task set [ts]. *)
+  (** Consider a task set [ts] ... *)
   Variable ts : seq Task.
 
-  (** Let [max_arrivals] be any arrival curve. *)
-  Context `{MaxArrivals Task}.
-  Hypothesis H_is_arrival_bound : taskset_respects_max_arrivals arr_seq ts.
+  (** ... characterized by sound RBFs. *)
+  Context `{MaxRequestBound Task}.
+  Hypothesis H_sound_rbf : taskset_respects_max_request_bound arr_seq ts.
 
-  (** The task's processor demand  [task_demand_within] is upper-bounded by the task's DBF [task_demand_bound_function]. *)
+  (** The task's processor demand [task_demand_within] is upper-bounded by the task's DBF [task_demand_bound_function]. *)
   Lemma task_demand_within_le_task_dbf :
     forall (tsk : Task) t delta,
       tsk \in ts ->
@@ -94,7 +93,6 @@ Section ProofDemandBoundDefinition.
       move: (task_arrivals_with_deadline_within_eq tsk t delta).
       rewrite /task_arrivals_with_deadline_within/task_arrivals_between => ->.
       by rewrite big_filter. }
-    rewrite /task_demand_bound_function/task_workload.
     by apply: rbf_spec.
   Qed.
 

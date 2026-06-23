@@ -2,13 +2,13 @@ Require Export prosa.analysis.definitions.request_bound_function.
 
 (** * Demand Bound Function (DBF) *)
 (** Here we define Baruah et al.'s classic notion of a demand bound function,
-    generalized to arbitrary arrival curves. *)
+    generalized to arbitrary request-bound functions. *)
 Section DemandBoundFunction.
   (** Consider any type of tasks. *)
   Context {Task : TaskType}.
 
-  (** Suppose each task is characterized by a WCET, a relative deadline, and an arrival curve. *)
-  Context `{TaskCost Task} `{TaskDeadline Task} `{MaxArrivals Task}.
+  (** Suppose each task is characterized by a relative deadline and an RBF. *)
+  Context `{TaskDeadline Task} `{MaxRequestBound Task}.
 
   (** A task's DBF is its request-bound function (RBF) shifted by [task_deadline tsk - 1] time units. *)
   Definition task_demand_bound_function (tsk : Task) (delta : duration) :=
