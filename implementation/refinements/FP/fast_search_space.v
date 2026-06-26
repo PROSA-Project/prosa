@@ -1,5 +1,6 @@
 Require Export prosa.results.rta.ideal.fp.bounded_nps.
 Require Export prosa.implementation.refinements.fast_search_space_computation.
+Require Export prosa.implementation.priority.numeric_fixed_priority.
 
 (** Throughout this file, we work with Prosa's fixed-priority policy implementation. *)
 #[local] Existing Instance numeric_fp_ascending.

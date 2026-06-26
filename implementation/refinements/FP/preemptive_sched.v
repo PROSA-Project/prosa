@@ -4,6 +4,7 @@ Require Export prosa.analysis.facts.readiness.sequential.
 Require Export prosa.analysis.definitions.tardiness.
 Require Export prosa.implementation.facts.ideal_uni.prio_aware.
 Require Export prosa.implementation.definitions.task.
+Require Export prosa.implementation.priority.numeric_fixed_priority.
 
 (** ** Fully-Preemptive Fixed-Priority Schedules  *)
 
