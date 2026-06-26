@@ -18,29 +18,23 @@ Section PriorityFacts.
   (** Consider any type of jobs. *)
   Context `{Job : JobType} {Arrival : JobArrival Job}.
 
-  (** Under FIFO scheduling, [hep_job] is simply a statement about arrival
-      times. *)
-  Fact hep_job_arrival_FIFO :
-    forall j j',
-      hep_job j j' = (job_arrival j <= job_arrival j').
-  Proof.
-    move=> j j'.
-    by rewrite /hep_job /FIFO.
-  Qed.
+  (** Under FIFO scheduling, ... *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_FIFO : policy_is_FIFO JLFP.
 
-  (** Similarly, [~~ hep_job] implies a strict inequality on arrival times. *)
+  (** ... [~~ hep_job] implies a strict inequality on arrival times. *)
   Fact not_hep_job_arrival_FIFO :
     forall j j',
       ~~ hep_job j j' = (job_arrival j' < job_arrival j).
-  Proof. by move=> j j'; rewrite hep_job_arrival_FIFO -ltnNge. Qed.
+  Proof. by move=> j j'; rewrite H_policy_is_FIFO -ltnNge. Qed.
 
-  (** Combining the above two facts, we get that, trivially, [~~ hep_job j j']
-      implies [hep_job j' j], ... *)
+  (** Combining the above fact with the definition of FIFO scheduling, we get
+      that, trivially, [~~ hep_job j j'] implies [hep_job j' j], ... *)
   Fact not_hep_job_FIFO :
     forall j j',
       ~~ hep_job j j' -> hep_job j' j.
   Proof.
-    move=> j j'; rewrite not_hep_job_arrival_FIFO hep_job_arrival_FIFO.
+    move=> j j'; rewrite not_hep_job_arrival_FIFO H_policy_is_FIFO.
     exact: ltnW.
   Qed.
 
@@ -54,7 +48,43 @@ Section PriorityFacts.
     exact: not_hep_job_FIFO.
   Qed.
 
+  (** A FIFO policy is reflexive since a job arrives no later than itself. *)
+  Fact FIFO_policy_is_reflexive :
+    reflexive_job_priorities JLFP.
+  Proof.
+    move=> j.
+    by rewrite H_policy_is_FIFO.
+  Qed.
+
+  (** A FIFO policy is transitive since arrival order is transitive. *)
+  Fact FIFO_policy_is_transitive :
+    transitive_job_priorities JLFP.
+  Proof.
+    move=> y x z.
+    rewrite !H_policy_is_FIFO.
+    exact: leq_trans.
+  Qed.
+
+  (** Next, we note that FIFO priorities are compatible with sequential task
+      models. *)
+
+  (** Consider the tasks corresponding to the jobs under consideration. *)
+  Context {Task : TaskType} `{JobTask Job Task}.
+
+  (** FIFO priorities respect sequential tasks because jobs of the same task
+      inherit priority from their arrival order. *)
+  Fact FIFO_policy_respects_sequential_tasks :
+    policy_respects_sequential_tasks JLFP.
+  Proof. by move=> j1 j2 SAME ARRLE; rewrite H_policy_is_FIFO. Qed.
+
 End PriorityFacts.
+
+(** We add the following lemmas to the basic facts database *)
+Global Hint Resolve
+  FIFO_policy_is_reflexive
+  FIFO_policy_is_transitive
+  FIFO_policy_respects_sequential_tasks
+  : basic_rt_facts.
 
 (** In this section, we prove some fundamental properties of the FIFO policy. *)
 Section BasicLemmas.
@@ -65,6 +95,8 @@ Section BasicLemmas.
 
   (** Consider any type of jobs with arrival times and execution costs. *)
   Context `{Job : JobType} {Arrival : JobArrival Job} {Cost : JobCost Job}.
+
+  (** Assume FIFO scheduling. *)
 
   (** Consider any valid arrival sequence of such jobs ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -87,7 +119,9 @@ Section BasicLemmas.
 
   (** Assume that the schedule respects the FIFO scheduling policy whenever jobs
       are preemptable. *)
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_FIFO : policy_is_FIFO JLFP.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** We observe that there is no priority inversion in a
       FIFO-compliant schedule. *)
@@ -137,7 +171,7 @@ Section BasicLemmas.
 
     (** Assume that the schedule follows the FIFO policy at preemption time. *)
     Hypothesis H_respects_policy_at_preemption_point :
-      respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
+      respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
     (** Assume the schedule is valid. *)
     Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
@@ -162,7 +196,7 @@ Section BasicLemmas.
       { exfalso; apply: busy_interval_prefix_no_quiet_time => // [|? ARR HEP ARRB];
           first by apply/andP; split; [|exact: T2].
         apply: (scheduled_implies_higher_priority_completed j') => //.
-        move: NHEP; rewrite !not_hep_job_arrival_FIFO.
+        move: NHEP; rewrite !not_hep_job_arrival_FIFO //=.
         by apply: leq_trans. }
     Qed.
 
@@ -176,30 +210,6 @@ Section BasicLemmas.
     Qed.
 
   End PriorityInversionBounded.
-
-
-  (** The next lemma considers FIFO schedules in the context of tasks. *)
-  Section SequentialTasks.
-
-    (** If the scheduled jobs stem from a set of tasks, ... *)
-    Context {Task : TaskType}.
-    Context `{JobTask Job Task}.
-
-    (** ... then the tasks in a FIFO-compliant schedule necessarily
-        execute sequentially.  *)
-    Lemma tasks_execute_sequentially : sequential_tasks arr_seq sched.
-    Proof.
-      move => j1 j2 t ARRj1 ARRj2 SAME_TASKx LT => //.
-      apply: (early_hep_job_is_scheduled) => //.
-      apply: not_hep_job_always_higher_priority_FIFO.
-      by rewrite not_hep_job_arrival_FIFO.
-    Qed.
-
-    (** We also note that the [FIFO] policy respects sequential tasks. *)
-    Fact fifo_respects_sequential_tasks : policy_respects_sequential_tasks (FIFO Job).
-    Proof. by move => j1 j2 SAME ARRLE; rewrite hep_job_arrival_FIFO. Qed.
-
-  End SequentialTasks.
 
   (** Finally, let us further assume that there are no needless
       preemptions among jobs of equal priority. *)
@@ -218,11 +228,14 @@ Section BasicLemmas.
       have: ~~ hep_job j j'.
       { apply: H_no_superfluous_preemptions; last exact: SCHED'.
         by repeat (apply /andP ; split). }
-      rewrite /hep_job /fifo.FIFO -ltnNge => EARLIER.
-      eapply (early_hep_job_is_scheduled arr_seq) with (JLFP:=FIFO Job) in SCHED1 => //.
+      rewrite H_policy_is_FIFO -ltnNge => EARLIER.
+      eapply (early_hep_job_is_scheduled arr_seq) with (JLFP:=JLFP) in SCHED1 => //.
       - apply scheduled_implies_not_completed in SCHED' => //.
         by eapply (incompletion_monotonic sched j' t.-1 t) in SCHED'; [move: SCHED' => /negP|lia].
-      - by move=> ?; apply /andP; split; [apply ltnW | rewrite -ltnNge //=]. }
+      - rewrite always_higher_priority_jlfp.
+        apply/andP; split.
+        + by rewrite H_policy_is_FIFO; apply: ltnW.
+        + by rewrite H_policy_is_FIFO -ltnNge. }
     { move: SJA; rewrite scheduled_job_at_none => // NSCHED.
       have [j' SCHED']: exists j', scheduled_at sched j' t.
       { apply: (H_work_conservation j t) => //.
@@ -242,9 +255,3 @@ Section BasicLemmas.
   Qed.
 
 End BasicLemmas.
-
-(** We add the following lemmas to the basic facts database *)
-Global Hint Resolve
-  fifo_respects_sequential_tasks
-  tasks_execute_sequentially
-  : basic_rt_facts.

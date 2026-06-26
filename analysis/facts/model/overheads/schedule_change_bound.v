@@ -3,6 +3,7 @@ Require Export prosa.analysis.facts.completes_at.
 Require Export prosa.analysis.facts.model.overheads.priority_bump.
 Require Export prosa.analysis.facts.model.overheads.schedule_change.
 Require Export prosa.analysis.facts.model.arrival_curves.
+Require Export prosa.model.priority.fifo.
 
 (** In this file, we prove upper bounds on the total number of
     schedule changes that can occur within a busy-interval prefix

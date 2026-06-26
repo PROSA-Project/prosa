@@ -107,8 +107,10 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... and assume that the schedule respects the FIFO policy. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_FIFO : policy_is_FIFO JLFP.
   Hypothesis H_respects_policy :
-    respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** We assume a valid preemption model with bounded non-preemptive
       segments. *)

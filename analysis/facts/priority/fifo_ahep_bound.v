@@ -24,6 +24,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
 
+ 
   (** Consider any kind of unit-supply uniprocessor model. *)
   Context `{PState : ProcessorState Job}.
   Hypothesis H_uniprocessor_proc_model : uniprocessor_model PState.
@@ -71,6 +72,10 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
   Hypothesis H_j_in_arrivals : arrives_in arr_seq j.
   Hypothesis H_job_cost_positive : job_cost_positive j.
 
+  (** Assume FIFO scheduling.  *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_FIFO : policy_is_FIFO JLFP.
+
   (** Consider the busy window of [j] and denote it as <<[t1, t2)>>. *)
   Variable t1 t2 : instant.
   Hypothesis H_busy_window : classical.busy_interval arr_seq sched j t1 t2.
@@ -90,6 +95,9 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
     rewrite (cumulative_i_ohep_eq_service_of_ohep _ arr_seq) => //; last  eauto 6 with basic_rt_facts; last first.
     { by move: (H_busy_window) => [[_ [Q _]] _]. }
     eapply leq_trans; first by apply service_of_jobs_le_workload => //.
+    rewrite (workload_of_jobs_equiv_pred _ _
+               (fun jhp : Job => (job_arrival jhp <= job_arrival j) && (jhp != j)));
+      last by (move => jhp IN; rewrite /another_hep_job H_policy_is_FIFO).
     rewrite (leqRW (workload_equal_subset _ _ _ _ _ _  _)) => //.
     rewrite (workload_minus_job_cost j)//;
             last by apply job_in_arrivals_between => //; last by rewrite addn1.

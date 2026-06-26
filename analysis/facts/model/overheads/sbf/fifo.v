@@ -2,6 +2,7 @@ Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.model.overheads.blackout_bound.
 Require Export prosa.analysis.facts.model.overheads.schedule_change_bound.
 Require Export prosa.analysis.definitions.sbf.busy.
+Require Export prosa.model.priority.fifo.
 
 (** In this section, we define an SBF for the FIFO scheduling policy
     in the presence of overheads. *)

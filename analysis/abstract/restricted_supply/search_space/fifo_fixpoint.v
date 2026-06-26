@@ -61,6 +61,7 @@ Section ConcreteToAbstractFixpointReduction.
       intervals (w.r.t. task [tsk]) in [sched]. That is, (1) [SBF 0 =
       0] and (2) for any duration [Δ], at least [SBF Δ] supply is
       available in any busy-interval prefix of length [Δ]. *)
+  Context {JLFP : JLFP_policy Job}.
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
   (** We assume that [tsk] is described by a valid task

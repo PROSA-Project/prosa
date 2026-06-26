@@ -107,8 +107,10 @@ Section RTAforFIFOModelwithArrivalCurves.
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** We assume that the schedule respects the FIFO scheduling policy. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_FIFO : policy_is_FIFO JLFP.
   Hypothesis H_respects_policy :
-    respects_JLFP_policy_at_preemption_point arr_seq sched (FIFO Job).
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** *** Periodic Resource Model *)
 
