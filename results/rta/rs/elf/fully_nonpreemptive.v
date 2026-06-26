@@ -127,8 +127,10 @@ Section RTAforFullyNonPreemptiveELFModelwithArrivalCurves.
   Hypothesis H_total_priorities : total_task_priorities FP.
 
   (** Assume that the schedule respects the ELF policy. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_ELF : policy_is_ELF FP JLFP.
   Hypothesis H_respects_policy :
-    respects_JLFP_policy_at_preemption_point arr_seq sched (ELF FP).
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** *** Supply-Bound Function *)
 

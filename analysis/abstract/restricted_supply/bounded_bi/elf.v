@@ -40,6 +40,10 @@ Section BoundedBusyIntervals.
   Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
   Hypothesis H_total_priorities : total_task_priorities FP.
 
+  (** Assume ELF scheduling. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_ELF : policy_is_ELF FP JLFP.
+
   (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
@@ -63,7 +67,7 @@ Section BoundedBusyIntervals.
 
   (** Further assume that the schedule follows the ELF scheduling policy. *)
   Hypothesis H_respects_policy :
-    respects_JLFP_policy_at_preemption_point arr_seq sched (ELF FP).
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** Recall that [busy_intervals_are_bounded_by] is an abstract
       notion. Hence, we need to introduce interference and interfering

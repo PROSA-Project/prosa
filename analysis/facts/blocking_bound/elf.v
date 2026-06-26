@@ -74,6 +74,10 @@ Section MaxNPSegmentIsBounded.
   Hypothesis H_transitive_priorities : transitive_task_priorities FP.
   Hypothesis H_total_priorities : total_task_priorities FP.
 
+  (** Assume ELF scheduling. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_ELF : policy_is_ELF FP JLFP.
+
   (** Then, the maximum length of a nonpreemptive segment among all
       lower-priority jobs (w.r.t. the given job [j]) arrived so far is
       bounded by [blocking_bound]. *)
@@ -100,7 +104,8 @@ Section MaxNPSegmentIsBounded.
       { move: NOTHEP => /andP [_ NZ].
         move: (H_valid_job_cost j' ARR'); rewrite /valid_job_cost.
         by lia. } }
-    { move: NOTHEP => /andP [/norP [NOTHP NOTEP] JCOST].
+    { move: NOTHEP => /andP [NOTHEP JCOST].
+      move: NOTHEP; rewrite H_policy_is_ELF => /norP [NOTHP NOTEP].
       rewrite ?andbT.
       move: H_job_of_tsk; rewrite /job_of_task => /eqP <-.
       case: (boolP (hep_task (job_task j') (job_task j))) => NOTHEP_Tsk'.
@@ -108,7 +113,7 @@ Section MaxNPSegmentIsBounded.
         rewrite andbF orFb /ep_task.
         rewrite not_hp_hep_task in NOTHP => //.
         rewrite NOTHP NOTHEP_Tsk' //=.
-        rewrite NOTHEP_Tsk' Bool.andb_true_l /hep_job /GEL /job_priority_point -ltNge in NOTEP.
+        rewrite NOTHEP_Tsk' Bool.andb_true_l /job_priority_point -ltNge in NOTEP.
         have LT: ((job_arrival j)%:R + task_priority_point (job_task j)
                 < (t1)%:R + task_priority_point (job_task j'))%R by lia.
         rewrite natrB; first by lia.

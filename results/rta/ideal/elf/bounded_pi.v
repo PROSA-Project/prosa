@@ -122,7 +122,9 @@ Section AbstractRTAforELFwithArrivalCurves.
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** ... and finally, that it respects the [ELF] scheduling policy. *)
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (ELF FP).
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_ELF : policy_is_ELF FP JLFP.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** ** B. Interference and Interfering Workload *)
 
@@ -258,7 +260,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     busy_intervals_are_bounded_by arr_seq sched tsk L.
   Proof.
     move => j ARR TSK POS; move: (TSK) => /eqP TSK'.
-    edestruct (exists_busy_interval) with (delta := L) (JLFP := ELF (FP)) as [t1 [t2 [T1 [T2 BI]]]] => //.
+    edestruct (exists_busy_interval) with (delta := L) (JLFP := JLFP) as [t1 [t2 [T1 [T2 BI]]]] => //.
     { by apply: priority_inversion_is_bounded. }
     { rewrite {2}H_fixed_point => t.
       apply leq_trans with (priority_inversion_lp_tasks_bound
@@ -289,8 +291,9 @@ Section AbstractRTAforELFwithArrivalCurves.
         move=> j0; case eq: (_ \in _) =>//=.
         move=> /andP[HEPj EP]; rewrite -TSK'; apply/andP; split =>//.
         move: HEPj.
-        have -> : hep_job j0 j = (@hep_job _ (GEL Job Task) j0 j) by apply: hep_job_elf_gel.
-        rewrite /is_ep_causing_intf lerBrDl addrAC lerBrDl addr0 -TSK'.
+        have -> : hep_job j0 j = (job_priority_point j0 <= job_priority_point j)%R
+          by apply: hep_job_elf_priority_point.
+        rewrite /is_ep_causing_intf /job_priority_point TSK' lerBrDl addrAC lerBrDl addr0.
         apply: le_trans; rewrite lerD2r ler_nat.
         apply: job_arrival_between_ge=>//. }}
     { exists t1, t2; split=> [//|]; split=> [//|].
@@ -430,12 +433,14 @@ Section AbstractRTAforELFwithArrivalCurves.
       Proof.
         have BOUNDED: `|Num.max 0%R (t1%:R + (ep_task_intf_interval tsk_o A))%R| <= t1 + Δ
           by clear - H_Δ_ge; lia.
-        rewrite /hep_jobs_from /hep_job /ELF.
+        rewrite /hep_jobs_from.
         rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
-        apply/contraT => /negPn /andP [/andP [/orP[/andP [_ /negP+]|/andP [_ HEP]] /andP [_ _]] /eqP TSKo] //.
+        apply/contraT => /negPn.
+        rewrite H_policy_is_ELF.
+        move=> /andP [/andP [/orP[/andP [_ /negP+]|/andP [_ HEP]] /andP [_ _]] /eqP TSKo] //.
         move: ARR'; rewrite /ep_task_intf_interval  -TSKo.
         move: H_job_of_task => /eqP <-.
-        move: HEP; rewrite /hep_job /GEL /job_priority_point.
+        move: HEP; rewrite /job_priority_point.
         by clear; lia.
       Qed.
 
@@ -498,7 +503,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       rewrite /hp_task_hep_job  => j'.
       rewrite andb_idl => [|?].
       - by move: H_job_of_task => /eqP ->.
-      - by apply/orP; left.
+      - by rewrite H_policy_is_ELF; apply/orP; left.
     Qed.
 
   End BoundingIBF.

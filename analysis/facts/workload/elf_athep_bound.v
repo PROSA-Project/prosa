@@ -1,3 +1,4 @@
+Require Import prosa.util.int.
 Require Export prosa.model.priority.elf.
 Require Export prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.definitions.workload.bounded.
@@ -61,6 +62,10 @@ Section ATHEPWorkloadBoundIsValidForELF.
   (** Consider any fixed-priority scheduling policy. *)
   Context (FP : FP_policy Task).
 
+  (** Assume ELF scheduling. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_ELF : policy_is_ELF FP JLFP.
+
   (** Before we prove the main result, we establish some auxiliary lemmas. *)
   Section HepWorkloadBound.
 
@@ -114,10 +119,12 @@ Section ATHEPWorkloadBoundIsValidForELF.
         move => EP_tsk.
         have BOUNDED: `|Num.max 0%R (t1%:R + (ep_task_interfering_interval_length tsk tsk_o A))%R| <= t1 + delta
           by clear - H_delta_ge; lia.
-        rewrite /hep_job_from_tsk /hep_job /ELF.
+        rewrite /hep_job_from_tsk.
         rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) //.
         move => j' IN' ARR'.
-        apply /contraT => /negPn /andP [/orP [/negP+ | /andP [_ HEP]] /eqP TSKo].
+        apply /contraT => /negPn.
+        rewrite H_policy_is_ELF.
+        move=> /andP [/orP [/negP+ | /andP [_ HEP]] /eqP TSKo].
         { rewrite /ep_task in EP_tsk.
           rewrite /hp_task TSKo.
           move: H_job_of_tsk.
@@ -125,7 +132,7 @@ Section ATHEPWorkloadBoundIsValidForELF.
           by move: EP_tsk => /andP [-> ->]. }
         move: ARR'; rewrite /ep_task_interfering_interval_length -TSKo.
         move: H_job_of_tsk => /eqP <-.
-        move: HEP; rewrite /hep_job /GEL /job_priority_point.
+        move: HEP; rewrite /job_priority_point.
         by clear; lia.
       Qed.
 
@@ -190,7 +197,7 @@ Section ATHEPWorkloadBoundIsValidForELF.
           rewrite /workload_of_jobs.
           under big_pred0.
           { move=> j'.
-            rewrite /hep_job_from_tsk /hep_job /ELF /hp_task.
+            rewrite /hep_job_from_tsk H_policy_is_ELF /hp_task.
             elim Tsk_j' : (job_task j' == tsk'); last by rewrite andbF.
             move: Tsk_j' => /eqP ->.
             move: H_job_of_tsk.
