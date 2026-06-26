@@ -1,4 +1,4 @@
-Require Export prosa.model.priority.edf.
+Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.model.task.absolute_deadline.
 Require Export prosa.model.task.preemption.parameters.
 Require Export prosa.analysis.definitions.request_bound_function.
@@ -25,6 +25,10 @@ Section BoundedBusyIntervals.
   Context `{JobTask Job Task}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
+
+  (** Assume EDF scheduling. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
   (** For brevity, let's denote the relative deadline of a task as [D]. *)
   Let D tsk := task_deadline tsk.
@@ -58,7 +62,8 @@ Section BoundedBusyIntervals.
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.
 
   (** Furthermore, assume that the schedule respects the scheduling policy. *)
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** Recall that [busy_intervals_are_bounded_by] is an abstract
       notion. Hence, we need to introduce interference and interfering
@@ -197,7 +202,7 @@ Section BoundedBusyIntervals.
       { by apply H_all_jobs_from_taskset. }
       { move_neq_up LP'; move: LP => /negP LP; apply: LP.
         move: LP' => /negP; rewrite negb_and => /orP [/negPn | ].
-        { by rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline; lia. }
+        { by rewrite H_policy_is_EDF /job_deadline /job_deadline_from_task_deadline; lia. }
         { have ARRlp: arrives_in arr_seq jlp by apply: arrives_in_jobs_come_from_arrival_sequence; eauto 2.
           by move=>/negP NEG; exfalso; apply: NEG;
             by eapply non_pathological_max_arrivals with (j := jlp) => //; unfold job_of_task. }
@@ -207,8 +212,8 @@ Section BoundedBusyIntervals.
         by rewrite leq_sub2r //; apply H_valid_model_with_bounded_nonpreemptive_segments.
       - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
         apply leq_trans with (workload_of_jobs (hep_job^~ jlp) (arrivals_between arr_seq t1 (t1 + Δ))).
-        { apply workload_of_jobs_weaken => jo; move: LP; clear.
-          by rewrite /hep_job /EDF /job_deadline /job_deadline_from_task_deadline; lia. }
+        { apply workload_of_jobs_weaken => jo; move: LP.
+          by rewrite !H_policy_is_EDF /job_deadline /job_deadline_from_task_deadline; lia. }
         erewrite workload_of_jobs_partitioned_by_tasks with (ts := undup ts).
         + eapply leq_trans; first by apply sum_le_subseq, undup_subseq.
           apply leq_sum_seq => tsk_o INo HEP.
@@ -219,7 +224,7 @@ Section BoundedBusyIntervals.
             apply: H_all_jobs_from_taskset; apply: in_arrivals_implies_arrived.
         + move=> jo IN.
           have ARRjo : t1 <= job_arrival jo by apply: job_arrival_between_ge.
-          rewrite /hep_job /D /EDF => T; move_neq_up LEQ; move_neq_down T.
+          rewrite H_policy_is_EDF /D => T; move_neq_up LEQ; move_neq_down T.
           by rewrite /job_deadline /job_deadline_from_task_deadline; lia.
         + by apply arrivals_uniq.
         + by apply undup_uniq.
@@ -433,7 +438,7 @@ Section BoundedBusyIntervals.
   Proof.
     move => j ARR TSK POS.
     have PEND : pending sched j (job_arrival j) by apply job_pending_at_arrival => //.
-    edestruct (busy_interval_prefix_exists) as [t1 [GE PREFIX]]; eauto 2; first by apply EDF_is_reflexive.
+    edestruct (busy_interval_prefix_exists) as [t1 [GE PREFIX]]; eauto 2; first by apply EDF_policy_is_reflexive.
     exists t1.
     enough(exists t2, job_arrival j < t2 /\ t2 <= t1 + L /\ busy_interval arr_seq sched j t1 t2) as BUSY.
     { move: BUSY => [t2 [LT [LE BUSY]]]; eexists; split; last first.

@@ -2,7 +2,7 @@ Require Export prosa.util.int.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.model.priority.gel.
 Require Export prosa.implementation.priority.fifo.
-Require Export prosa.model.priority.edf.
+Require Export prosa.implementation.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.facts.model.sequential.
@@ -58,8 +58,8 @@ Section GeneralityOfGEL.
          ; split => RESPECTED j j' t ARR PT BL SCHED
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
          ; rewrite !hep_job_at_jlfp
-                   hep_job_task_deadline
                    hep_job_priority_point !H_priority_point
+                   (hep_job_task_deadline EDF_is_EDF_policy)
          ; lia.
     Qed.
   End GELGeneralizesEDF.

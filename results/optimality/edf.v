@@ -3,7 +3,7 @@ Require Import prosa.model.preemption.fully_preemptive.
 Require Export prosa.analysis.facts.transform.edf_opt.
 Require Export prosa.analysis.facts.transform.edf_wc.
 Require Export prosa.analysis.facts.edf_definitions.
-Require prosa.model.priority.edf.
+Require prosa.implementation.priority.edf.
 
 (** * Optimality of EDF on Ideal Uniprocessors *)
 

@@ -11,14 +11,36 @@ Section PriorityFacts.
   (** First, consider the general case where jobs have arbitrary deadlines. *)
   Section JobDeadline.
 
-    (** If jobs have arbitrary deadlines ... *)
-    Context `{JobDeadline Job}.
+    (** Assume EDF priorities based on (arbitrary) [job_deadline] parameters. *)
+    Context `{JobDeadline Job} {JLFP : JLFP_policy Job}.
+    Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
-    (** ... then [hep_job] is a statement about these deadlines. *)
-    Fact hep_job_deadline :
-      forall j j',
-        hep_job j j' = (job_deadline j <= job_deadline j').
-    Proof. by move=> j j'; rewrite /hep_job /EDF. Qed.
+    (** EDF priorities are reflexive since a job's deadline is no later than
+        itself. *)
+    Fact EDF_policy_is_reflexive :
+      reflexive_job_priorities JLFP.
+    Proof.
+      move=> j.
+      by rewrite H_policy_is_EDF.
+    Qed.
+
+    (** EDF priorities are transitive since deadline order is transitive. *)
+    Fact EDF_policy_is_transitive :
+      transitive_job_priorities JLFP.
+    Proof.
+      move=> y x z.
+      rewrite !H_policy_is_EDF.
+      exact: leq_trans.
+    Qed.
+
+    (** EDF priorities are total since any two deadlines are comparable. *)
+    Fact EDF_policy_is_total :
+      total_job_priorities JLFP.
+    Proof.
+      move=> j1 j2.
+      rewrite !H_policy_is_EDF.
+      exact: leq_total.
+    Qed.
 
   End JobDeadline.
 
@@ -31,6 +53,10 @@ Section PriorityFacts.
     Context `{TaskDeadline Task}.
     Context `{JobTask Job Task}.
 
+    (** If EDF priorities are derived from [task_deadline], ... *)
+    Context {JLFP : JLFP_policy Job}.
+    Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
+
     (** ... then [hep_job] is a statement about job arrival times and relative
         deadlines. *)
     Fact hep_job_task_deadline :
@@ -39,7 +65,7 @@ Section PriorityFacts.
                         <= job_arrival j' + task_deadline (job_task j')).
     Proof.
       move=> j j'.
-      by rewrite hep_job_deadline /job_deadline/job_deadline_from_task_deadline.
+      by rewrite H_policy_is_EDF /job_deadline/job_deadline_from_task_deadline.
     Qed.
 
       (** Furthermore, if we are looking at two jobs of the same task, then
@@ -52,9 +78,9 @@ Section PriorityFacts.
       by move=> j j' /eqP SAME; rewrite hep_job_task_deadline SAME leq_add2r.
     Qed.
 
-    (** EDF respects the sequential-tasks hypothesis. *)
-    Lemma EDF_respects_sequential_tasks :
-      policy_respects_sequential_tasks (EDF Job).
+    (** EDF scheduling respects the sequential-tasks hypothesis. *)
+    Fact EDF_policy_respects_sequential_tasks :
+      policy_respects_sequential_tasks JLFP.
     Proof.
       by move => j j' /eqP TSK ?; rewrite hep_job_arrival_edf // /same_task TSK.
     Qed.
@@ -64,14 +90,19 @@ End PriorityFacts.
 
 (** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq
     will be able to apply it automatically. *)
-Global Hint Resolve EDF_respects_sequential_tasks : basic_rt_facts.
+Global Hint Resolve
+  EDF_policy_is_reflexive
+  EDF_policy_is_transitive
+  EDF_policy_is_total
+  EDF_policy_respects_sequential_tasks
+  : basic_rt_facts.
 
 Require Export prosa.model.task.sequentiality.
 Require Export prosa.analysis.facts.priority.inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.model.sequential.
 
-(** In this section, we prove that the EDF priority policy implies that tasks
+(** In this section, we prove that EDF scheduling implies that tasks
     are executed sequentially. *)
 Section SequentialEDF.
 
@@ -103,6 +134,10 @@ Section SequentialEDF.
   (** Next, consider any schedule of this arrival sequence, ... *)
   Variable sched : schedule PState.
 
+  (** Assume EDF scheduling. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
+
   (** ... allow for any work-bearing notion of job readiness, ... *)
   Context `{@JobReady Job PState Cost Arrival}.
   Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
@@ -121,7 +156,7 @@ Section SequentialEDF.
 
   (** Assume an EDF schedule. *)
   Hypothesis H_respects_policy :
-    respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** To prove sequentiality, we use lemma
       [early_hep_job_is_scheduled]. Clearly, under the EDF priority
@@ -130,7 +165,7 @@ Section SequentialEDF.
       arrives earlier than [j2], then [j1] always has a higher
       priority than job [j2], and hence completes before [j2]);
       therefore EDF implies sequential tasks. *)
-  Lemma EDF_implies_sequential_tasks :
+  Lemma EDF_policy_implies_sequential_tasks :
     sequential_tasks arr_seq sched.
   Proof.
     move => j1 j2 t ARR1 ARR2 SAME LT.

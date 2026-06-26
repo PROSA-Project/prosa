@@ -1,7 +1,6 @@
 Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.analysis.definitions.schedulability.
 Require Import prosa.model.readiness.basic.
-Require Import prosa.model.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
 Require Import prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Import prosa.analysis.facts.busy_interval.carry_in.
@@ -15,7 +14,7 @@ Require Export prosa.analysis.facts.workload.edf_athep_bound.
     (aRTA) to EDF-schedulers for ideal uni-processor model of
     real-time tasks with arbitrary arrival models. *)
 
-(** Given EDF priority policy and an ideal uni-processor scheduler
+(** Given EDF scheduling and an ideal uni-processor scheduler
     model, we can explicitly specify [interference],
     [interfering_workload], and [interference_bound_function]. In this
     setting, we can define natural notions of service, workload, busy
@@ -51,13 +50,6 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** For clarity, let's denote the relative deadline of a task as D. *)
   Let D tsk := task_deadline tsk.
 
-  (** Consider the EDF policy that indicates a higher-or-equal
-      priority relation. Note that we do not relate the EDF policy
-      with the scheduler. However, we define functions for
-      Interference and Interfering Workload that actively use the
-      concept of priorities. *)
-  Let EDF := EDF Job.
-
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
@@ -66,7 +58,10 @@ Section AbstractRTAforEDFwithArrivalCurves.
       that follows the scheduling policy. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched EDF.
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** To use the theorem [uniprocessor_response_time_bound_seq] from
       the Abstract RTA module, we need to specify functions of
@@ -327,7 +322,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
     eapply uniprocessor_response_time_bound_seq with
       (task_IBF := task_IBF) (L := L) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
-    - exact: EDF_implies_sequential_tasks.
+    - exact: EDF_policy_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - exact: instantiated_busy_intervals_are_bounded.
     - exact: instantiated_task_interference_is_bounded.

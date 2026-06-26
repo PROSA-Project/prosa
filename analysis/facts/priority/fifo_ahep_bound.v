@@ -24,7 +24,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
 
- 
+
   (** Consider any kind of unit-supply uniprocessor model. *)
   Context `{PState : ProcessorState Job}.
   Hypothesis H_uniprocessor_proc_model : uniprocessor_model PState.

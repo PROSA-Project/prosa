@@ -43,12 +43,6 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   (** For clarity, let's denote the relative deadline of a task as [D]. *)
   Let D tsk := task_deadline tsk.
 
-  (** Consider the EDF policy that indicates a higher-or-equal priority relation.
-     Note that we do not relate the EDF policy with the scheduler. However, we
-     define functions for Interference and Interfering Workload that actively use
-     the concept of priorities. *)
-  Let EDF := EDF Job.
-
   (** Consider any arrival sequence with consistent, non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
@@ -70,7 +64,10 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... and the schedule respects the scheduling policy at every preemption point. *)
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched EDF.
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** Consider an arbitrary task set ts, ... *)
   Variable ts : list Task.

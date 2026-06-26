@@ -2,44 +2,19 @@ Require Export prosa.model.priority.classes.
 
 (** * EDF Priority Policy *)
 
-(** We introduce the classic EDF priority policy, under which jobs are
-    scheduled in order of their urgency, i.e., jobs are ordered according to
-    their absolute deadlines. The EDF policy belongs to the class of JLFP
-    policies. *)
-#[export] Instance EDF (Job : JobType) `{JobDeadline Job} : JLFP_policy Job :=
-{
-  hep_job (j1 j2 : Job) := job_deadline j1 <= job_deadline j2
-}.
+(** We define what it means for an abstract job-level fixed-priority policy to
+    behave as EDF. *)
+Section EDFPolicy.
 
-(** In this section, we prove a few properties about EDF policy. *)
-Section PropertiesOfEDF.
+  (** Consider jobs with absolute deadlines. *)
+  Context {Job : JobType} `{JobDeadline Job}.
 
-  (**  Consider any type of jobs with deadlines. *)
-  Context {Job : JobType}.
-  Context `{JobDeadline Job}.
+  (** A JLFP policy is EDF if it assigns higher priority to jobs with earlier
+      absolute deadlines. That is, job [j1] has higher or equal priority than
+      job [j2] if and only if [j1]'s deadline is no later than [j2]'s
+      deadline. *)
+  Definition policy_is_EDF (JLFP : JLFP_policy Job) :=
+    forall j1 j2,
+      hep_job j1 j2 = (job_deadline j1 <= job_deadline j2).
 
-  (** Consider any arrival sequence. *)
-  Variable arr_seq : arrival_sequence Job.
-
-  (** EDF is reflexive. *)
-  Lemma EDF_is_reflexive : reflexive_job_priorities (EDF Job).
-  Proof. by move=> j; apply:leqnn. Qed.
-
-  (** EDF is transitive. *)
-  Lemma EDF_is_transitive : transitive_job_priorities (EDF Job).
-  Proof. by move=> y x z; apply: leq_trans. Qed.
-
-  (** EDF is total. *)
-  Lemma EDF_is_total : total_job_priorities (EDF Job).
-  Proof. by move=> j1 j2; apply: leq_total. Qed.
-
-End PropertiesOfEDF.
-
-(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
-    will be able to apply them automatically. *)
-Global Hint Resolve
-     EDF_is_reflexive
-     EDF_is_transitive
-     EDF_is_total
-  : basic_rt_facts.
-
+End EDFPolicy.

@@ -1,0 +1,50 @@
+Require Export prosa.model.priority.edf.
+
+(** * EDF Priority Policy *)
+
+(** We introduce the classic EDF priority policy, under which jobs are
+    scheduled in order of their urgency, i.e., jobs are ordered according to
+    their absolute deadlines. The EDF policy belongs to the class of JLFP
+    policies. *)
+#[local] Instance EDF (Job : JobType) `{JobDeadline Job} : JLFP_policy Job :=
+{
+  hep_job (j1 j2 : Job) := job_deadline j1 <= job_deadline j2
+}.
+
+(** In this section, we prove a few properties about EDF policy. *)
+Section PropertiesOfEDF.
+
+  (**  Consider any type of jobs with deadlines. *)
+  Context {Job : JobType}.
+  Context `{JobDeadline Job}.
+
+  (** Consider any arrival sequence. *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** The concrete [EDF] implementation is indeed an EDF policy. *)
+  Fact EDF_is_EDF_policy :
+    policy_is_EDF (EDF Job).
+  Proof. by []. Qed.
+
+  (** EDF is reflexive. *)
+  Fact EDF_is_reflexive : reflexive_job_priorities (EDF Job).
+  Proof. by move=> j; apply:leqnn. Qed.
+
+  (** EDF is transitive. *)
+  Fact EDF_is_transitive : transitive_job_priorities (EDF Job).
+  Proof. by move=> y x z; apply: leq_trans. Qed.
+
+  (** EDF is total. *)
+  Fact EDF_is_total : total_job_priorities (EDF Job).
+  Proof. by move=> j1 j2; apply: leq_total. Qed.
+
+End PropertiesOfEDF.
+
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
+    will be able to apply them automatically. *)
+Global Hint Resolve
+     EDF_is_EDF_policy
+     EDF_is_reflexive
+     EDF_is_transitive
+     EDF_is_total
+  : basic_rt_facts.

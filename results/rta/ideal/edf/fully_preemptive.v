@@ -4,7 +4,6 @@ Require Export prosa.analysis.facts.preemption.task.preemptive.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.preemptive.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Import prosa.model.task.preemption.fully_preemptive.
-Require Import prosa.model.priority.edf.
 
 (** * RTA for Fully Preemptive EDF *)
 (** In this section we prove the RTA theorem for the fully preemptive EDF model *)
@@ -69,7 +68,10 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... and the schedule respects the scheduling policy. *)
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** ** Total Workload and Length of Busy Interval *)
 

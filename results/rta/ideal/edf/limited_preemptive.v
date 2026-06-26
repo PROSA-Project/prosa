@@ -3,7 +3,6 @@ Require Export prosa.results.rta.ideal.edf.bounded_nps.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.limited.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.model.task.preemption.limited_preemptive.
-Require Export prosa.model.priority.edf.
 Require Export prosa.analysis.definitions.blocking_bound.edf.
 
 (** * RTA for EDF with Fixed Preemption Points *)
@@ -78,7 +77,10 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... and the schedule respects the scheduling policy. *)
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** ** Total Workload and Length of Busy Interval *)
 

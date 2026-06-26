@@ -1,6 +1,6 @@
 Require Export prosa.analysis.definitions.blocking_bound.edf.
 Require Export prosa.analysis.facts.busy_interval.pi.
-Require Export prosa.model.priority.edf.
+Require Export prosa.analysis.facts.priority.edf.
 Require Export prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.facts.model.arrival_curves.
 
@@ -32,8 +32,9 @@ Section  MaxNPSegmentIsBounded.
   (** Consider any kind of processor state model. *)
   Context `{PState : ProcessorState Job}.
 
-  (** Consider the EDF policy. *)
-  Let EDF := EDF Job.
+  (** Assume EDF scheduling. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
   (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
@@ -85,7 +86,7 @@ Section  MaxNPSegmentIsBounded.
     apply in_arrivals_implies_arrived_between in JINB => [|//].
     move: JINB => /andP [_ TJ'].
     repeat (apply/andP; split); last first.
-    { rewrite /hep_job -ltnNge in NOTHEP.
+    { rewrite H_policy_is_EDF -ltnNge in NOTHEP.
       move: H_job_of_tsk => /eqP <-.
       have ARRLE: job_arrival j' < job_arrival j.
       { by apply: (@leq_trans t1) => //; move: BUSY => [ _  [ _ [ _ /andP [F G]]] ]. }

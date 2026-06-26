@@ -107,9 +107,11 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
   Hypothesis H_schedule_with_limited_preemptions :
     schedule_respects_preemption_model arr_seq sched.
 
-  (** We assume that the schedule respects the given [EDF] scheduling policy. *)
+  (** We assume that the schedule respects the EDF policy. *)
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
   Hypothesis H_respects_policy :
-    respects_JLFP_policy_at_preemption_point arr_seq sched (EDF Job).
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** *** Average Resource Model *)
 
@@ -132,7 +134,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       "recurrence" (i.e., inequality) [arm_sbf Π Θ ν L >=
       total_request_bound_function ts L], as defined below.
 
-      As the lemma [busy_intervals_are_bounded_rs_edf] shows, under [EDF]
+      As the lemma [busy_intervals_are_bounded_rs_edf] shows, under EDF
       scheduling, this condition is sufficient to guarantee that the maximum
       busy-window length is at most [L], i.e., the length of any busy interval
       is bounded by [L]. *)
@@ -183,7 +185,7 @@ Section RTAforFloatingEDFModelwithArrivalCurves.
       by move: TSKs => /eqP <-; apply: leq_trans; [apply POS | apply H_valid_task_arrival_sequence].
     eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) (SBF := arm_sbf Π Θ ν) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
-    - exact: EDF_implies_sequential_tasks.
+    - exact: EDF_policy_implies_sequential_tasks.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
     - apply: busy_intervals_are_bounded_rs_edf => //.
       by apply: instantiated_i_and_w_are_coherent_with_schedule.
