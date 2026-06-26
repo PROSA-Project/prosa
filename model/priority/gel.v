@@ -3,19 +3,22 @@ Require Export prosa.model.priority.classes.
 
 (** * GEL Priority Policy  *)
 
-(** We define the class of "Global-EDF-like" (GEL) priority policies,
-    as first introduced by Leontyev et al. ("Multiprocessor Extensions
-    to Real-Time Calculus", Real-Time Systems, 2011).
+(** We define the class of "Global-EDF-like" (GEL) priority policies, as first
+    introduced by Leontyev et al. ("Multiprocessor Extensions to Real-Time
+    Calculus", Real-Time Systems, 2011).
 
-    GEL scheduling is a (large) subset of the class of JLFP policies,
-    which structurally resembles EDF scheduling, hence the name. Under
-    GEL scheduling, each task has a constant "priority point offset."
-    Each job's priority point is given by its arrival time plus its
-    task's offset, with the interpretation that an earlier priority
-    point implies higher priority.
+    Later work focused on uniprocessor systems also refers to this policy as
+    "EDF-like" (EL) --- for example, see Guenzel et al. ("EDF-like scheduling for
+    self-suspending real-time tasks", RTSS, 2022).
 
-    EDF and FIFO are both special cases of GEL with the offset
-    respectively being the relative deadline and zero. *)
+    GEL scheduling is a (large) subset of the class of JLFP policies, which
+    structurally resembles EDF scheduling, hence the name. Under GEL scheduling,
+    each task has a constant "priority point offset."  Each job's priority point
+    is given by its arrival time plus its task's offset, with the interpretation
+    that an earlier priority point implies higher priority.
+
+    EDF and FIFO are both special cases of GEL with the offset respectively
+    being the relative deadline and zero. *)
 
 (** To begin, we define the offset type. Note that an offset may be negative. *)
 Definition offset := int.
@@ -28,52 +31,30 @@ Class PriorityPoint (Task : TaskType) := { task_priority_point : Task -> offset 
     To this end, we need to introduce some context first. *)
 Section AbsolutePriorityPoint.
   (** For any type of tasks with relative priority points, ... *)
-  Context {Job : JobType} {Task : TaskType} `{JobTask Job Task} `{PriorityPoint Task} `{JobArrival Job}.
+  Context {Job : JobType} {Task : TaskType} `{JobTask Job Task}
+    `{PriorityPoint Task} `{JobArrival Job}.
 
   (** ... a job's absolute priority point is given by its arrival time
           plus its task's relative priority point. *)
   Definition job_priority_point (j : Job) :=
     ((job_arrival j)%:R + task_priority_point (job_task j))%R.
+
 End AbsolutePriorityPoint.
 
-(** The resulting definition of GEL is straightforward: a job [j1]'s
-    priority is higher than or equal to a job [j2]'s priority iff
-    [j1]'s absolute priority point is no later than [j2]'s absolute
-    priority point.  *)
-#[export] Instance GEL (Job : JobType) (Task : TaskType)
-          `{PriorityPoint Task} `{JobArrival Job} `{JobTask Job Task} : JLFP_policy Job :=
-{
-  hep_job (j1 j2 : Job) := (job_priority_point j1 <= job_priority_point j2)%R
-}.
+(** We define what it means for an abstract job-level fixed-priority policy to
+    behave as a GEL policy. *)
+Section GELPolicy.
 
-(** In this section, we note three basic properties of the GEL policy:
-    the priority relation is reflexive, transitive, and total.  *)
-Section PropertiesOfGEL.
+  (** Consider jobs of tasks with relative priority points. *)
+  Context {Job : JobType} {Task : TaskType} `{JobTask Job Task}
+    `{PriorityPoint Task} `{JobArrival Job}.
 
-  (** Consider any type of tasks with relative priority points...*)
-  Context {Task : TaskType} `{PriorityPoint Task}.
+  (** A JLFP policy is GEL if it assigns higher priority to jobs with earlier
+      absolute priority points. That is, job [j1] has higher or equal priority
+      than job [j2] if and only if [j1]'s priority point is no later than
+      [j2]'s priority point. *)
+  Definition policy_is_GEL (JLFP : JLFP_policy Job) :=
+    forall j1 j2,
+      hep_job j1 j2 = (job_priority_point j1 <= job_priority_point j2)%R.
 
-  (** ...and jobs of these tasks. *)
-  Context {Job : JobType} `{JobArrival Job} `{JobTask Job Task}.
-
-  (** GEL is reflexive. *)
-  Fact GEL_is_reflexive : reflexive_job_priorities (GEL Job Task).
-  Proof. move=> j; exact: lexx. Qed.
-
-  (** GEL is transitive. *)
-  Fact GEL_is_transitive : transitive_job_priorities (GEL Job Task).
-  Proof. move=> x y z; exact: le_trans. Qed.
-
-  (** GEL is total. *)
-  Fact GEL_is_total : total_job_priorities (GEL Job Task).
-  Proof. move=> j1 j2; exact: le_total. Qed.
-
-End PropertiesOfGEL.
-
-(** We add the above facts into a "Hint Database" basic_rt_facts, so Coq
-    will be able to apply them automatically where needed. *)
-Global Hint Resolve
-     GEL_is_reflexive
-     GEL_is_transitive
-     GEL_is_total
-  : basic_rt_facts.
+End GELPolicy.

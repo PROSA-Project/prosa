@@ -1,6 +1,7 @@
 Require Export prosa.util.int.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.model.priority.gel.
+Require Export prosa.implementation.priority.gel.
 Require Export prosa.implementation.priority.fifo.
 Require Export prosa.implementation.priority.edf.
 Require Import prosa.model.task.absolute_deadline.
@@ -58,7 +59,8 @@ Section GeneralityOfGEL.
          ; split => RESPECTED j j' t ARR PT BL SCHED
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
          ; rewrite !hep_job_at_jlfp
-                   hep_job_priority_point !H_priority_point
+                   (hep_job_priority_point GEL_is_GEL_policy)
+                   !H_priority_point
                    (hep_job_task_deadline EDF_is_EDF_policy)
          ; lia.
     Qed.
@@ -84,7 +86,8 @@ Section GeneralityOfGEL.
          ; split => RESPECTED j j' t ARR PT BL SCHED
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
          ; rewrite !hep_job_at_jlfp
-                   hep_job_priority_point !H_priority_point FIFO_is_FIFO_policy
+                   (hep_job_priority_point GEL_is_GEL_policy)
+                   !H_priority_point FIFO_is_FIFO_policy
          ; lia.
     Qed.
   End GELGeneralizesFIFO.
@@ -242,7 +245,7 @@ Section GeneralityOfGEL.
         have FIN: completed_by sched j (job_arrival j + `|pp_delta (job_task j') (job_task j)|);
           first by exact: H_hp_delta_rtb.
         move: (RESPECTED j' j t ARR PT BL SCHED).
-        rewrite hep_job_at_jlfp hep_job_priority_point => PRIO.
+        rewrite hep_job_at_jlfp hep_job_priority_point // => PRIO.
         have POS: (pp_delta (job_task j') (job_task j) >= 0)%R
           by exact: H_hp_delta_pos.
         have: completed_by sched j t; last first.

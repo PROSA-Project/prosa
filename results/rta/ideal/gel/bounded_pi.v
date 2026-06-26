@@ -44,7 +44,9 @@ Section AbstractRTAforGELwithArrivalCurves.
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** ... that respects the GEL policy at every preemption point. *)
-  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched (GEL Job Task).
+  Context {JLFP : JLFP_policy Job}.
+  Hypothesis H_policy_is_GEL : policy_is_GEL JLFP.
+  Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** We assume that all arrivals have valid job costs. *)
   Hypothesis H_valid_job_cost :
@@ -191,8 +193,8 @@ Section AbstractRTAforGELwithArrivalCurves.
         rewrite /GEL_from.
         case: (eqVneq (job_task j') tsk_o) => TSK'; last by rewrite andbF.
         rewrite andbT; apply: contraT  => /negPn HEP.
-        move: (hep_job_arrives_after_zero _ j' HEP) => GT0.
-        move: (hep_job_arrives_before _ j' HEP) => EARLIEST.
+        move: (hep_job_arrives_after_zero H_policy_is_GEL j j' HEP) => GT0.
+        move: (hep_job_arrives_before H_policy_is_GEL j j' HEP) => EARLIEST.
         move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
         move: ARR'; rewrite /interval  => LATEST.
         have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk

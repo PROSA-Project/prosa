@@ -1,6 +1,7 @@
 Require Export prosa.util.int.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.model.priority.elf.
+Require Export prosa.implementation.priority.gel.
 Require Export prosa.analysis.facts.priority.gel.
 Require Export prosa.analysis.facts.priority.elf.
 Require Export prosa.analysis.facts.priority.classes.
