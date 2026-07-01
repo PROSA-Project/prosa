@@ -16,9 +16,11 @@ Section Properties.
   (**  Consider any type of jobs with arrival times. *)
   Context {Job : JobType} `{JobArrival Job}.
 
-  (** The concrete [FIFO] implementation is indeed a FIFO policy. *)
-  Fact FIFO_is_FIFO_policy :
-    policy_is_FIFO (FIFO Job).
+  (** Under the concrete [FIFO] implementation, [hep_job] is exactly arrival
+      order. *)
+  Fact FIFO_hep_job :
+    forall j1 j2,
+      @hep_job Job (FIFO Job) j1 j2 = (job_arrival j1 <= job_arrival j2).
   Proof. by []. Qed.
 
   (** FIFO is reflexive. *)
@@ -35,6 +37,17 @@ Section Properties.
   Fact FIFO_is_total :
     total_job_priorities (FIFO Job).
   Proof. by move=> j1 j2; apply: leq_total. Qed.
+
+  (** The concrete [FIFO] implementation is indeed a FIFO policy. *)
+  Fact FIFO_is_FIFO_policy :
+    policy_is_FIFO (FIFO Job).
+  Proof.
+    repeat split.
+    - by move=> j1 j2; rewrite FIFO_hep_job.
+    - exact: FIFO_is_reflexive.
+    - exact: FIFO_is_transitive.
+    - exact: FIFO_is_total.
+  Qed.
 
 End Properties.
 

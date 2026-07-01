@@ -50,12 +50,12 @@ Section SequentialJLFP.
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
 
   (** We show that, given two jobs [j1] and [j2], if job [j1] arrives
-      earlier than job [j2] and [j1] always has higher priority than
+      no later than job [j2] and [j1] always has higher priority than
       [j2], then [j2] is scheduled only after [j1] is completed. *)
-  Lemma early_hep_job_is_scheduled :
+  Lemma no_later_arrival_hep_job_is_scheduled :
     forall j1 j2,
       arrives_in arr_seq j1 ->
-      job_arrival j1 < job_arrival j2 ->
+      job_arrival j1 <= job_arrival j2 ->
       always_higher_priority j1 j2 ->
       forall t,
         scheduled_at sched j2 t ->
@@ -80,5 +80,20 @@ Section SequentialJLFP.
     have EQ: j2 = j3 by apply: H_uniproc; eauto.
     by subst j2.
   Qed.
+
+  (** In particular, this applies to strictly earlier-arriving jobs. *)
+  Corollary early_hep_job_is_scheduled :
+    forall j1 j2,
+      arrives_in arr_seq j1 ->
+      job_arrival j1 < job_arrival j2 ->
+      always_higher_priority j1 j2 ->
+      forall t,
+        scheduled_at sched j2 t ->
+        completed_by sched j1 t.
+  Proof.
+    move=> j1 j2 ARR LT AHP t SCHED.
+    exact: (no_later_arrival_hep_job_is_scheduled j1 j2 ARR (ltnW LT) AHP t SCHED).
+  Qed.
+
 
 End SequentialJLFP.

@@ -3,7 +3,7 @@ Require Export prosa.analysis.facts.completes_at.
 Require Export prosa.analysis.facts.model.overheads.priority_bump.
 Require Export prosa.analysis.facts.model.overheads.schedule_change.
 Require Export prosa.analysis.facts.model.arrival_curves.
-Require Export prosa.model.priority.fifo.
+Require Export prosa.analysis.facts.priority.fifo.
 
 (** In this file, we prove upper bounds on the total number of
     schedule changes that can occur within a busy-interval prefix
@@ -210,16 +210,15 @@ Section ScheduleChangesBoundedHelper.
     rewrite big_seq; apply big1 => to; rewrite mem_index_iota => NEQ.
     apply big1 => jlp LP.
     apply/eqP; rewrite eqb0; apply/negP => COMPL.
-    rewrite FIFO -ltnNge in LP.
     move: (H_busy_interval_prefix) => [_ [_ [NQT _]]].
     move: (NQT t2.-1 ltac:(lia)); apply => jhp ARR HEP _.
-    rewrite FIFO in HEP.
-    have HEP2 : job_arrival jhp < job_arrival jlp; [ by lia | clear HEP LP].
     apply scheduled_at_precedes_completes_at in COMPL; last by lia.
-    eapply completion_monotonic; last first.
-    { apply: early_hep_job_is_scheduled => //.
-      by intros ?; rewrite /jlfp_to_jldp /hep_job_at !FIFO; lia. }
-    { by lia. }
+    apply: completion_monotonic
+      ; last eapply no_later_arrival_hep_job_is_scheduled with (j2 := jlp) (t := to.-1) => //
+      ; [by lia | exact: FIFO_policy_arrival_order |].
+    rewrite always_higher_priority_jlfp.
+    apply/andP; split => //.
+    by move: LP; apply: contraNN.
   Qed.
 
   (** A higher-or-equal-priority job can complete at most once. Thus,
@@ -332,7 +331,7 @@ Section ScheduleChangesBoundedHelper.
     move: POS; rewrite -has_predT => /hasP [pb]; rewrite mem_filter => /andP [PB IN] _.
     move: IN; rewrite mem_index_iota => IN.
     eapply no_priority_bumps_in_fifo with (t := pb) in FIFO => //; last by lia.
-    by erewrite PB in FIFO.
+    by move: FIFO; rewrite PB.
   Qed.
 
   (** ** Putting bounds together *)
@@ -667,10 +666,6 @@ Section FIFO.
       - by rewrite /index_iota addn0 subnS subnn //=.
       - by rewrite /index_iota addn1 subnn //=.
     }
-    have REFL : reflexive_job_priorities JLFP.
-    { by move=> ?; rewrite H_FIFO; lia. }
-    have TRNS : transitive_job_priorities JLFP.
-    { by move => ? ? ?; rewrite !H_FIFO; lia. }
     apply: leq_trans.
     { by apply: schedule_changes_bounded_by_bumps_or_completions => //; lia. }
     { apply: leq_trans.

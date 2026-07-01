@@ -87,7 +87,7 @@ Section GeneralityOfGEL.
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
          ; rewrite !hep_job_at_jlfp
                    (hep_job_priority_point GEL_is_GEL_policy)
-                   !H_priority_point FIFO_is_FIFO_policy
+                   !H_priority_point FIFO_hep_job
          ; lia.
     Qed.
   End GELGeneralizesFIFO.
