@@ -111,11 +111,12 @@ Section GeneralityOfELF.
       move: (RESPECTED j j' t ARR PT BL SCHED);
         rewrite hep_job_at_fp => HEP.
       rewrite /ELF; apply /orP.
-      have [/eqP EQ|NEQ] := eqVneq (job_task j') (job_task j); [right|left].
+      have [EQ|NEQ] := eqVneq (job_task j') (job_task j); [right|left].
       { apply/andP; split => //.
         have [LEQ|LT] := leqP (job_arrival j') (job_arrival j);
-          first by rewrite hep_job_arrival_gel.
+          first by rewrite GEL_hep_job /job_priority_point EQ; lia.
         exfalso.
+        move: EQ => /eqP EQ.
         have COMP: completed_by sched j t
           by apply: (H_sequential j j') => //; rewrite same_task_sym.
         move: BL; rewrite /backlogged => /andP [INCOMP _].

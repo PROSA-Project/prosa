@@ -49,12 +49,15 @@ Section GELPolicy.
   Context {Job : JobType} {Task : TaskType} `{JobTask Job Task}
     `{PriorityPoint Task} `{JobArrival Job}.
 
-  (** A JLFP policy is GEL if it assigns higher priority to jobs with earlier
-      absolute priority points. That is, job [j1] has higher or equal priority
-      than job [j2] if and only if [j1]'s priority point is no later than
-      [j2]'s priority point. *)
+  (** A JLFP policy is GEL if it never assigns higher priority to a job with a
+      later absolute priority point. Ties among jobs with equal priority points
+      may be resolved by any reflexive, transitive, and total tie-breaking
+      rule. *)
   Definition policy_is_GEL (JLFP : JLFP_policy Job) :=
-    forall j1 j2,
-      hep_job j1 j2 = (job_priority_point j1 <= job_priority_point j2)%R.
+    (forall j1 j2, hep_job j1 j2 ->
+                   (job_priority_point j1 <= job_priority_point j2)%R)
+    /\ reflexive_job_priorities JLFP
+    /\ transitive_job_priorities JLFP
+    /\ total_job_priorities JLFP.
 
 End GELPolicy.

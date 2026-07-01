@@ -21,9 +21,12 @@ Section PropertiesOfGEL.
   (** Consider any type of jobs of these tasks. *)
   Context {Job : JobType} `{JobArrival Job} `{JobTask Job Task}.
 
-  (** The concrete [GEL] implementation is indeed a GEL policy. *)
-  Fact GEL_is_GEL_policy :
-    policy_is_GEL (GEL Job Task).
+  (** Under the concrete [GEL] implementation, [hep_job] is exactly
+      priority-point order. *)
+  Fact GEL_hep_job :
+    forall j1 j2,
+      @hep_job Job (GEL Job Task) j1 j2
+      = (job_priority_point j1 <= job_priority_point j2)%R.
   Proof. by []. Qed.
 
   (** GEL is reflexive. *)
@@ -37,6 +40,17 @@ Section PropertiesOfGEL.
   (** GEL is total. *)
   Fact GEL_is_total : total_job_priorities (GEL Job Task).
   Proof. move=> j1 j2; exact: le_total. Qed.
+
+  (** The concrete [GEL] implementation is indeed a GEL policy. *)
+  Fact GEL_is_GEL_policy :
+    policy_is_GEL (GEL Job Task).
+  Proof.
+    repeat split.
+    - by move=> j1 j2; rewrite GEL_hep_job.
+    - exact: GEL_is_reflexive.
+    - exact: GEL_is_transitive.
+    - exact: GEL_is_total.
+  Qed.
 
 End PropertiesOfGEL.
 

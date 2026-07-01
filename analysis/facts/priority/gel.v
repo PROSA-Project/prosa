@@ -16,49 +16,61 @@ Section GELBasicFacts.
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_GEL : policy_is_GEL JLFP.
 
-  (** Under GEL, [hep_job] is a statement about absolute priority points. *)
-  Fact hep_job_priority_point :
+  (** Under GEL, higher-or-equal priority implies no later absolute priority
+      point. *)
+  Fact GEL_policy_priority_point_order :
     forall j j',
-      hep_job j j' = ((job_arrival j)%:R + task_priority_point (job_task j)
-                      <= (job_arrival j')%:R + task_priority_point (job_task j'))%R.
-  Proof. by move=> j j'; rewrite H_policy_is_GEL /job_priority_point. Qed.
+      hep_job j j' -> (job_priority_point j <= job_priority_point j')%R.
+  Proof. by move: H_policy_is_GEL => [GEL _] j j'; exact: GEL. Qed.
 
-  (** GEL priorities are reflexive since a job's priority point is no later than
-      itself. *)
+  (** The GEL policy is reflexive by assumption. *)
   Fact GEL_policy_is_reflexive :
     reflexive_job_priorities JLFP.
-  Proof.
-    move=> j.
-    by rewrite H_policy_is_GEL.
-  Qed.
+  Proof. by move: H_policy_is_GEL => [_ [REFL _]]. Qed.
 
-  (** GEL priorities are transitive since priority-point order is transitive. *)
+  (** The GEL policy is transitive by assumption. *)
   Fact GEL_policy_is_transitive :
     transitive_job_priorities JLFP.
-  Proof.
-    move=> x y z.
-    rewrite !H_policy_is_GEL.
-    exact: le_trans.
-  Qed.
+  Proof. by move: H_policy_is_GEL => [_ [_ [TRANS _]]]. Qed.
 
-  (** GEL priorities are total since any two priority points are comparable. *)
+  (** The GEL policy is total by assumption. *)
   Fact GEL_policy_is_total :
     total_job_priorities JLFP.
+  Proof. by move: H_policy_is_GEL => [_ [_ [_ TOTAL]]]. Qed.
+
+  (** Hence, a job with a strictly earlier priority point has higher-or-equal
+      priority. *)
+  Fact GEL_policy_earlier_priority_point :
+    forall j j',
+      (job_priority_point j < job_priority_point j')%R -> hep_job j j'.
   Proof.
-    move=> j1 j2.
-    rewrite !H_policy_is_GEL.
-    exact: le_total.
+    move=> j j' PP.
+    move: (GEL_policy_is_total j j') => /orP [//|HEP].
+    move: (GEL_policy_priority_point_order _ _ HEP).
+    by lia.
   Qed.
 
-  (** If we are looking at two jobs of the same task, then [hep_job] is a
-      statement about their respective arrival times. *)
-  Fact hep_job_arrival_gel :
+  (** Conversely, if a job does not have higher-or-equal priority, then the
+      other job has no later priority point. *)
+  Fact GEL_policy_not_hep_priority_point_order :
     forall j j',
-      same_task j j' ->
-      hep_job j j' = (job_arrival j <= job_arrival j').
+      ~~ hep_job j j' -> (job_priority_point j' <= job_priority_point j)%R.
   Proof.
-    move=> j j' /eqP SAME.
-    by rewrite hep_job_priority_point SAME; lia.
+    move=> j j' NHEP.
+    apply: GEL_policy_priority_point_order.
+    move: (GEL_policy_is_total j j').
+    by rewrite (negbTE NHEP).
+  Qed.
+
+  (** In this case, totality also gives the priority relation in the opposite
+      direction. *)
+  Fact GEL_policy_not_hep_job :
+    forall j j',
+      ~~ hep_job j j' -> hep_job j' j.
+  Proof.
+    move=> j j' NHEP.
+    move: (GEL_policy_is_total j j').
+    by rewrite (negbTE NHEP).
   Qed.
 
   Section HEPJobArrival.
@@ -75,7 +87,10 @@ Section GELBasicFacts.
        <= (job_arrival j)%:R
          + task_priority_point (job_task j)
          - task_priority_point (job_task j'))%R.
-    Proof. by move : H_j'_hep; rewrite hep_job_priority_point; lia. Qed.
+    Proof.
+      move: (GEL_policy_priority_point_order _ _ H_j'_hep).
+      by rewrite /job_priority_point; lia.
+    Qed.
 
     (** Using the above lemma, we prove that for any
         higher-or-equal priority job [j'], the term
@@ -89,10 +104,16 @@ Section GELBasicFacts.
 
   End HEPJobArrival.
 
-  (** Next, we prove that the GEL policy respects sequential tasks. *)
+  (** Next, we prove that the GEL policy respects sequential tasks: within a
+      task, a strictly earlier-arriving job has a strictly earlier priority
+      point. *)
   Lemma GEL_respects_sequential_tasks :
     policy_respects_sequential_tasks JLFP.
-  Proof. by move =>  j1 j2 TSK ARR; rewrite hep_job_arrival_gel. Qed.
+  Proof.
+    move=> j1 j2 /eqP SAME LT.
+    apply: GEL_policy_earlier_priority_point => //.
+    by rewrite /job_priority_point SAME; lia.
+  Qed.
 
 End GELBasicFacts.
 
@@ -101,6 +122,8 @@ Global Hint Resolve
   GEL_policy_is_reflexive
   GEL_policy_is_transitive
   GEL_policy_is_total
+  GEL_policy_not_hep_priority_point_order
+  GEL_policy_not_hep_job
   GEL_respects_sequential_tasks
   : basic_rt_facts.
 
@@ -163,11 +186,15 @@ Section SequentialTasks.
   Lemma GEL_implies_sequential_tasks :
     sequential_tasks arr_seq sched.
   Proof.
-    move => j1 j2 t ARR1 ARR2 SAME LT.
+    move => j1 j2 t ARR1 ARR2 /eqP SAME LT.
     apply: early_hep_job_is_scheduled => //.
-    rewrite always_higher_priority_jlfp !hep_job_arrival_gel //.
-    - by rewrite -ltnNge; apply/andP; split => //.
-    - by rewrite same_task_sym.
+    rewrite always_higher_priority_jlfp.
+    apply/andP; split.
+    - apply: GEL_policy_earlier_priority_point => //.
+      by rewrite /job_priority_point SAME; lia.
+    - apply/negP => HEP.
+      apply GEL_policy_priority_point_order in HEP => //.
+      by move: HEP; rewrite /job_priority_point SAME; lia.
   Qed.
-End SequentialTasks.
 
+End SequentialTasks.

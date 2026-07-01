@@ -59,7 +59,8 @@ Section GeneralityOfGEL.
          ; split => RESPECTED j j' t ARR PT BL SCHED
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
          ; rewrite !hep_job_at_jlfp
-                   (hep_job_priority_point GEL_is_GEL_policy)
+                   GEL_hep_job
+                   /job_priority_point
                    !H_priority_point
                    (hep_job_task_deadline EDF_is_EDF_policy)
          ; lia.
@@ -86,7 +87,8 @@ Section GeneralityOfGEL.
          ; split => RESPECTED j j' t ARR PT BL SCHED
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
          ; rewrite !hep_job_at_jlfp
-                   (hep_job_priority_point GEL_is_GEL_policy)
+                   GEL_hep_job
+                   /job_priority_point
                    !H_priority_point FIFO_hep_job
          ; lia.
     Qed.
@@ -232,7 +234,9 @@ Section GeneralityOfGEL.
             have DIFF: ~ same_task j' j; last by contradiction.
             apply/negP/sequential_tasks_different_tasks => //.
             exact: backlogged_implies_incomplete. }
-          { by rewrite hep_job_at_jlfp hep_job_arrival_gel // same_task_sym. }}
+          { rewrite hep_job_at_jlfp GEL_hep_job.
+            move: SAME => /eqP SAME.
+            by rewrite /job_priority_point SAME; lia. }}
         { have HFP: hp_task (job_task j) (job_task j').
           { apply: H_unique_fixed_priorities => //.
             - by rewrite same_task_sym.
@@ -245,7 +249,7 @@ Section GeneralityOfGEL.
         have FIN: completed_by sched j (job_arrival j + `|pp_delta (job_task j') (job_task j)|);
           first by exact: H_hp_delta_rtb.
         move: (RESPECTED j' j t ARR PT BL SCHED).
-        rewrite hep_job_at_jlfp hep_job_priority_point // => PRIO.
+        rewrite hep_job_at_jlfp GEL_hep_job /job_priority_point => PRIO.
         have POS: (pp_delta (job_task j') (job_task j) >= 0)%R
           by exact: H_hp_delta_pos.
         have: completed_by sched j t; last first.
