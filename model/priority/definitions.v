@@ -103,12 +103,12 @@ Section Priorities.
         priorities in a way that is consistent with sequential tasks.
 
         To this end, we say that a policy respects sequential tasks if, for any
-        two jobs [j1], [j2] of the same task, [job_arrival j1 <= job_arrival j2]
+        two jobs [j1], [j2] of the same task, [job_arrival j1 < job_arrival j2]
         implies [π j1 j2 = true]. *)
     Definition policy_respects_sequential_tasks :=
       forall j1 j2,
         job_task j1 == job_task j2 ->
-        job_arrival j1 <= job_arrival j2 ->
+        job_arrival j1 < job_arrival j2 ->
         hep_job j1 j2.
 
   End JLFP.

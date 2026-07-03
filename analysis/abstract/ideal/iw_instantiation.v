@@ -622,7 +622,7 @@ Section JLFPInstantiation.
       move: (BUSY) => [[ _ [QT [_ /andP [JAj _]]] _]].
       apply QT => //; first exact: in_arrivals_implies_arrived.
       apply H_policy_respects_sequential_tasks; first by rewrite  TSK TSKs.
-      by apply leq_trans with t1; [lia |].
+      by lia.
     Qed.
 
     (** Since interfering and interfering workload are sufficient to define the busy window,
