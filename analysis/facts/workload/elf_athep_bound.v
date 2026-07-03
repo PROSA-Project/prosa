@@ -2,6 +2,7 @@ Require Import prosa.util.int.
 Require Export prosa.model.priority.elf.
 Require Export prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.definitions.workload.bounded.
+Require Export prosa.analysis.facts.priority.elf.
 Require Export prosa.analysis.facts.model.workload.
 Require Export prosa.analysis.definitions.workload.elf_athep_bound.
 Require Export prosa.analysis.facts.model.rbf.
@@ -122,17 +123,13 @@ Section ATHEPWorkloadBoundIsValidForELF.
         rewrite /hep_job_from_tsk.
         rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) //.
         move => j' IN' ARR'.
-        apply /contraT => /negPn.
-        rewrite H_policy_is_ELF.
-        move=> /andP [/orP [/negP+ | /andP [_ HEP]] /eqP TSKo].
-        { rewrite /ep_task in EP_tsk.
-          rewrite /hp_task TSKo.
-          move: H_job_of_tsk.
-          rewrite /job_of_task => /eqP ->.
-          by move: EP_tsk => /andP [-> ->]. }
-        move: ARR'; rewrite /ep_task_interfering_interval_length -TSKo.
+        apply /contraT => /negPn /andP [HEP /eqP TSKo].
+        have: (job_priority_point j' <= job_priority_point j)%R.
+        { apply: ELF_policy_priority_point_order => //.
+          rewrite TSKo ep_task_sym.
+          by move: H_job_of_tsk; rewrite /job_of_task => /eqP ->. }
+        move: ARR'; rewrite /job_priority_point /ep_task_interfering_interval_length -TSKo.
         move: H_job_of_tsk => /eqP <-.
-        move: HEP; rewrite /job_priority_point.
         by clear; lia.
       Qed.
 
@@ -197,12 +194,10 @@ Section ATHEPWorkloadBoundIsValidForELF.
           rewrite /workload_of_jobs.
           under big_pred0.
           { move=> j'.
-            rewrite /hep_job_from_tsk H_policy_is_ELF /hp_task.
-            elim Tsk_j' : (job_task j' == tsk'); last by rewrite andbF.
-            move: Tsk_j' => /eqP ->.
-            move: H_job_of_tsk.
-            rewrite /job_of_task => /eqP ->.
-            by move: HEP => /negbTE ->. }
+            apply/negP => /andP [HEPJOB /eqP TSK'].
+            move: HEP => /negP; apply.
+            move: H_job_of_tsk; rewrite -TSK' /job_of_task => /eqP <-.
+            by apply: ELF_policy_task_priority_order. }
           over. }
         apply /eqP.
         by rewrite big_const_idem.

@@ -76,7 +76,7 @@ Section GeneralityOfELF.
       move=> sched arr_seq RESPECTED j j' t ARR PT BL SCHED.
       rewrite hep_job_at_fp.
       by move: (RESPECTED j j' t ARR PT BL SCHED)
-         ; rewrite hep_job_at_jlfp /hep_job
+         ; rewrite hep_job_at_jlfp ELF_hep_job
             => /orP[/andP[HEP NOTHEP] //| /andP[HEP GEL] //].
     Qed.
 
@@ -110,11 +110,11 @@ Section GeneralityOfELF.
       move=> RESPECTED j j' t ARR PT BL SCHED.
       move: (RESPECTED j j' t ARR PT BL SCHED);
         rewrite hep_job_at_fp => HEP.
-      rewrite /ELF; apply /orP.
+      rewrite hep_job_at_jlfp ELF_hep_job; apply /orP.
       have [EQ|NEQ] := eqVneq (job_task j') (job_task j); [right|left].
       { apply/andP; split => //.
         have [LEQ|LT] := leqP (job_arrival j') (job_arrival j);
-          first by rewrite GEL_hep_job /job_priority_point EQ; lia.
+          first by rewrite /job_priority_point EQ; lia.
         exfalso.
         move: EQ => /eqP EQ.
         have COMP: completed_by sched j t

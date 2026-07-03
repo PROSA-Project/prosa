@@ -290,9 +290,8 @@ Section AbstractRTAforELFwithArrivalCurves.
         apply: sub_le_big => //; first by move => ? ?; apply: leq_addr.
         move=> j0; case eq: (_ \in _) =>//=.
         move=> /andP[HEPj EP]; rewrite -TSK'; apply/andP; split =>//.
-        move: HEPj.
-        have -> : hep_job j0 j = (job_priority_point j0 <= job_priority_point j)%R
-          by apply: hep_job_elf_priority_point.
+        have: (job_priority_point j0 <= job_priority_point j)%R
+          by apply: ELF_policy_priority_point_order.
         rewrite /is_ep_causing_intf /job_priority_point TSK' lerBrDl addrAC lerBrDl addr0.
         apply: le_trans; rewrite lerD2r ler_nat.
         apply: job_arrival_between_ge=>//. }}
@@ -436,11 +435,14 @@ Section AbstractRTAforELFwithArrivalCurves.
         rewrite /hep_jobs_from.
         rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
         apply/contraT => /negPn.
-        rewrite H_policy_is_ELF.
-        move=> /andP [/andP [/orP[/andP [_ /negP+]|/andP [_ HEP]] /andP [_ _]] /eqP TSKo] //.
-        move: ARR'; rewrite /ep_task_intf_interval  -TSKo.
+        move=> /andP [/andP [HEP _] /eqP TSKo].
+        move: ARR'; rewrite /ep_task_intf_interval -TSKo.
+        have: (job_priority_point j' <= job_priority_point j)%R.
+        { apply: ELF_policy_priority_point_order => //.
+          rewrite TSKo ep_task_sym.
+          by move: H_job_of_task => /eqP ->. }
+        rewrite /job_priority_point.
         move: H_job_of_task => /eqP <-.
-        move: HEP; rewrite /job_priority_point.
         by clear; lia.
       Qed.
 
@@ -503,7 +505,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       rewrite /hp_task_hep_job  => j'.
       rewrite andb_idl => [|?].
       - by move: H_job_of_task => /eqP ->.
-      - by rewrite H_policy_is_ELF; apply/orP; left.
+      - by apply: ELF_policy_higher_priority_task.
     Qed.
 
   End BoundingIBF.

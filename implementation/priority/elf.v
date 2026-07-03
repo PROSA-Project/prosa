@@ -46,10 +46,16 @@ Section PropertiesOfELF.
   (** Consider any fixed-priority policy. *)
   Variable FP : FP_policy Task.
 
-  (** The concrete [ELF] implementation is indeed an ELF policy. *)
-  Fact ELF_is_ELF_policy :
-    policy_is_ELF FP (ELF FP).
-  Proof. by []. Qed.
+  (** Under the concrete [ELF] implementation, [hep_job] reduces exactly to
+      fixed-priority order, and priority-point order for jobs of
+      equal-priority tasks. *)
+  Fact ELF_hep_job :
+    forall j1 j2,
+      @hep_job _ (ELF FP) j1 j2
+      = (hp_task (job_task j1) (job_task j2)
+         || (hep_task (job_task j1) (job_task j2)
+             && (job_priority_point j1 <= job_priority_point j2)%R)).
+  Proof. by rewrite /hep_job /ELF /GEL. Qed.
 
   (** By construction, ELF reduces to GEL when the two tasks have equal
       priority under the underlying FP policy. *)
@@ -59,10 +65,70 @@ Section PropertiesOfELF.
       (@hep_job _ (ELF FP) j j') = (@hep_job _ (GEL Job Task) j j').
   Proof.
     move=> j j' EP.
-    rewrite /hep_job /ELF /GEL.
+    rewrite ELF_hep_job GEL_hep_job.
     have -> : hep_task (job_task j) (job_task j') = true by apply: ep_hep_task.
     have -> : hp_task (job_task j) (job_task j') = false by apply/negbTE/ep_not_hp_task.
     by rewrite andTb orFb.
+  Qed.
+
+  (** Assume the underlying task priorities are reflexive, transitive, and total. *)
+  Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
+  Hypothesis H_transitive_priorities : transitive_task_priorities FP.
+  Hypothesis H_total_priorities : total_task_priorities FP.
+
+  (** ELF is reflexive. *)
+  Fact ELF_is_reflexive : reflexive_job_priorities (ELF FP).
+  Proof.
+    move=> j; rewrite ELF_hep_job.
+    apply/orP; right; apply/andP; split; first exact: H_reflexive_priorities.
+    exact: lexx.
+  Qed.
+
+  (** ELF is transitive. *)
+  Fact ELF_is_transitive : transitive_job_priorities (ELF FP).
+  Proof.
+    move=> y x z.
+    rewrite !ELF_hep_job.
+    move=> /orP [HPxy| /andP[HPxy PPxy]] => /orP[HPyz| /andP [HEPyz PPyz]]
+      ; apply/orP.
+    - by left; exact: hp_trans.
+    - by left; exact: hp_hep_trans.
+    - by left; exact: hep_hp_trans HPyz.
+    - right; apply /andP; split.
+      * exact: H_transitive_priorities.
+      * exact: le_trans PPxy PPyz.
+  Qed.
+
+  (** ELF is total. *)
+  Fact ELF_is_total : total_job_priorities (ELF FP).
+  Proof.
+    move=> x y.
+    rewrite !ELF_hep_job.
+    rewrite -implyNb; apply/implyP => /norP [NHP /nandP [NHEP|NPP] ].
+    { by apply /orP; left; rewrite -not_hep_hp_task. }
+    { move: NHP => /nandP [NHEP'| NHEP']; apply/orP.
+      - by left; rewrite -not_hep_hp_task.
+      - right; move: NHEP' => /negbNE -> /=.
+        by move: NPP; lia. }
+  Qed.
+
+  (** The concrete [ELF] implementation is indeed an ELF policy. *)
+  Fact ELF_is_ELF_policy :
+    policy_is_ELF FP (ELF FP).
+  Proof.
+    repeat split.
+    - move=> j1 j2.
+      rewrite ELF_hep_job => /orP [HP|/andP [HEP _]] //.
+      exact: hp_hep_task.
+    - move=> j1 j2 EP.
+      rewrite ELF_hep_job.
+      have -> : hep_task (job_task j1) (job_task j2) by apply: ep_hep_task.
+      have -> : hp_task (job_task j1) (job_task j2) = false
+        by apply/negbTE/ep_not_hp_task.
+      by rewrite andTb orFb.
+    - exact: ELF_is_reflexive.
+    - exact: ELF_is_transitive.
+    - exact: ELF_is_total.
   Qed.
 
 End PropertiesOfELF.
@@ -71,4 +137,7 @@ End PropertiesOfELF.
     Coq can apply it automatically where needed. *)
 Global Hint Resolve
   ELF_is_ELF_policy
+  ELF_is_reflexive
+  ELF_is_transitive
+  ELF_is_total
   : basic_rt_facts.

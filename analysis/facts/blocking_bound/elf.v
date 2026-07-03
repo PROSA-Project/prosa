@@ -95,33 +95,31 @@ Section MaxNPSegmentIsBounded.
       first by apply H_all_jobs_from_taskset.
     apply in_arrivals_implies_arrived_between in JINB => //.
     move: JINB => /andP [_ TJ'].
-    have ->: (max_arrivals (job_task j') ε > 0) && (task_cost (job_task j') > 0) = true.
+    have ->: (max_arrivals (job_task j') ε > 0) && (task_cost (job_task j') > 0).
     { apply /andP; split.
-      { apply: non_pathological_max_arrivals; last first.
-        - exact: ARR'.
-        - by rewrite /job_of_task.
-        - by apply H_is_arrival_curve, H_all_jobs_from_taskset, ARR'. }
+      { apply: non_pathological_max_arrivals; last exact: ARR'; try done.
+        by rewrite /job_of_task. }
       { move: NOTHEP => /andP [_ NZ].
         move: (H_valid_job_cost j' ARR'); rewrite /valid_job_cost.
         by lia. } }
-    { move: NOTHEP => /andP [NOTHEP JCOST].
-      move: NOTHEP; rewrite H_policy_is_ELF => /norP [NOTHP NOTEP].
-      rewrite ?andbT.
+    { rewrite ?andbT.
+      move: NOTHEP => /andP [NOTHEP _].
       move: H_job_of_tsk; rewrite /job_of_task => /eqP <-.
-      case: (boolP (hep_task (job_task j') (job_task j))) => NOTHEP_Tsk'.
-      { rewrite /hp_task NOTHEP_Tsk' => //=.
-        rewrite andbF orFb /ep_task.
-        rewrite not_hp_hep_task in NOTHP => //.
-        rewrite NOTHP NOTHEP_Tsk' //=.
-        rewrite NOTHEP_Tsk' Bool.andb_true_l /job_priority_point -ltNge in NOTEP.
-        have LT: ((job_arrival j)%:R + task_priority_point (job_task j)
-                < (t1)%:R + task_priority_point (job_task j'))%R by lia.
-        rewrite natrB; first by lia.
-        move: BUSY; rewrite /busy_interval_prefix.
-        move=> [? [? [? J_ARR]]].
-        by lia. }
-      { rewrite not_hep_hp_task in NOTHEP_Tsk' => //.
-        by rewrite NOTHEP_Tsk'. } }
+      case: (boolP (hep_task (job_task j') (job_task j))) => HEP'
+        ; rewrite /hp_task HEP' //=
+        ; last by have ->: hep_task (job_task j) (job_task j')
+                    by apply: ELF_policy_not_hep_task_priority_order.
+      rewrite andbF orFb /ep_task; repeat (apply/andP; split) => //.
+      have EP : ep_task (job_task j') (job_task j)
+        by rewrite /ep_task; apply/andP; split.
+      have: (job_priority_point j <= job_priority_point j')%R
+        by apply: ELF_policy_not_hep_priority_point_order.
+      rewrite /job_priority_point => PP.
+      have LT: ((job_arrival j)%:R + task_priority_point (job_task j)
+               < (t1)%:R + task_priority_point (job_task j'))%R by lia.
+      by rewrite natrB
+         ; [|move: BUSY; rewrite /busy_interval_prefix]
+         ; lia. }
   Qed.
 
 End MaxNPSegmentIsBounded.

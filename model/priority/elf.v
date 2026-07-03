@@ -27,15 +27,21 @@ Section ELFPolicy.
   (** ... and jobs of these tasks. *)
   Context {Job : JobType} `{JobArrival Job} `{JobTask Job Task}.
 
-  (** Given an underlying FP policy, a JLFP policy is ELF if it gives a job
-      priority whenever its task has strictly higher priority, or whenever the
-      tasks have equal priority and the job has an earlier absolute priority
-      point. *)
+  (** Given an underlying FP policy, a JLFP policy is ELF if it never inverts
+      task-level priority, and, among equal-priority tasks, never inverts
+      priority-point order. Ties among jobs with equal task priority and equal
+      priority points may be resolved by any reflexive, transitive, and total
+      tie-breaking rule. *)
   Definition policy_is_ELF (FP : FP_policy Task) (JLFP : JLFP_policy Job) :=
-    forall j1 j2,
-      hep_job j1 j2
-      = (hp_task (job_task j1) (job_task j2)
-         || (hep_task (job_task j1) (job_task j2)
-             && (job_priority_point j1 <= job_priority_point j2)%R)).
+    (forall j1 j2,
+        hep_job j1 j2 ->
+        hep_task (job_task j1) (job_task j2))
+    /\ (forall j1 j2,
+          ep_task (job_task j1) (job_task j2) ->
+          hep_job j1 j2 ->
+          (job_priority_point j1 <= job_priority_point j2)%R)
+    /\ reflexive_job_priorities JLFP
+    /\ transitive_job_priorities JLFP
+    /\ total_job_priorities JLFP.
 
 End ELFPolicy.
