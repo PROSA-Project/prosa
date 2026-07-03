@@ -119,12 +119,11 @@ Section ATHEPWorkloadBoundIsValidForEDF.
         rewrite /EDF_from  => ARR'.
         case: (eqVneq (job_task j') tsk_o) => TSK';
                                              last by rewrite andbF.
-        rewrite andbT; apply: contraT  => /negPn.
-        rewrite H_policy_is_EDF /job_deadline/job_deadline_from_task_deadline.
-        move: H_job_of_tsk; rewrite TSK' /job_of_task => /eqP -> HEP.
-        have LATEST: job_arrival j' <= t1 + A + D tsk - D tsk_o by rewrite /D/A; lia.
-        have EARLIEST: t1 <= job_arrival j' by apply: job_arrival_between_ge.
-        by case: (leqP (A + 1 + D tsk) (D tsk_o)); [rewrite /D/A|]; lia.
+        rewrite andbT; apply: contraT  => /negPn HEP.
+        move: (EDF_policy_task_deadline_order H_policy_is_EDF _ _ HEP) => DL.
+        move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
+        move: ARR' DL; rewrite TSK' -TSK /D/A.
+        by case: (leqP (job_arrival j - t1 + task_deadline (job_task j)) (task_deadline tsk_o)); lia.
       Qed.
 
     End ShortenRange.

@@ -154,15 +154,14 @@ Section BoundedBusyIntervals.
           tasks with a strictly shorter deadline than [tsk_lp].
 
           The interference on [j] comes from jobs [jo] with [hep_job jo j],
-          i.e., [job_deadline jo <= job_deadline j]. Since the outer
-          condition requires [D tsk_lp > D tsk] (strict), we have
-          [job_deadline j < job_deadline jlp]. Therefore:
-<<
-                job_deadline jo ≤ job_deadline j < job_deadline jlp
->>
-          No (HEP) job with [job_deadline = D tsk_lp] ever interferes with
-          [j], so [D tsk_hp < D tsk_lp] captures precisely the right set of
-          tasks:
+          which under EDF implies [job_deadline jo <= job_deadline j]. In the
+          proof below, [tsk_lp] is instantiated by the task of a lower-priority
+          job [jlp] that arrived before the busy-window prefix. Since jobs
+          counted in the workload arrive within the prefix, any such job with
+          a deadline no later than [jlp]'s must have a strictly shorter
+          relative deadline than [tsk_lp]. In particular, this recovers the
+          relative-deadline separation shown below, and [D tsk_hp < D tsk_lp]
+          captures the right set of tasks:
 <<
                  D tsk_hp   ≤     D tsk    <    D tsk_lp
                      |              |             |
@@ -173,14 +172,73 @@ Section BoundedBusyIntervals.
 *)
       let hp_interference tsk_lp :=
         \sum_(tsk_hp <- ts | D tsk_hp < D tsk_lp)
-         task_request_bound_function tsk_hp δ in
+          task_request_bound_function tsk_hp δ in
 
       (** Then, the amount of interfering workload incurred by a job of task
           [tsk] is bounded by the maximum of [lp_interference tsk_lp +
           hp_interference tsk_lp], where [tsk_lp] is such that [D tsk_lp > D
           tsk]. *)
       \max_(tsk_lp <- ts | (D tsk_lp > D tsk) && (0 < max_arrivals tsk_lp ε))
-       (lp_interference tsk_lp + hp_interference tsk_lp).
+        (lp_interference tsk_lp + hp_interference tsk_lp).
+
+    (** We next establish two stepping-stone lemmas that we will use to
+        establish the validity of the bound [longest_busy_interval_with_pi].
+
+        First, we observe that a lower-priority job that arrived before the
+        busy-window prefix is captured by the filter predicate used in the EDF
+        service-inversion bound. *)
+    Local Lemma lower_priority_job_accounted_for :
+      forall jlp,
+        arrives_in arr_seq jlp ->
+        job_arrival jlp < t1 ->
+        ~~ hep_job jlp j ->
+        (D (job_task jlp) > D (job_task j)) && (0 < max_arrivals (job_task jlp) ε).
+    Proof.
+      move=> jlp ARRlp ARR LP; apply/andP; split.
+      { apply/negPn/negP => DL.
+        move: LP => /negP; apply.
+        apply: EDF_policy_earlier_task_deadline => //.
+        move: DL; rewrite -leqNgt /D.
+        move: (H_busy_prefix) => [_ [_ [_ /andP [ARRj _]]]].
+        by lia. }
+      { apply: non_pathological_max_arrivals => //.
+        by rewrite /job_of_task. }
+    Qed.
+
+    (** Next, we note that the cumulative execution requirement of jobs that can
+        interfere with [j] and have a deadline no later than a lower-priority
+        job [jlp] are bounded by the request-bound functions of tasks with
+        strictly shorter relative deadlines than [jlp]'s task. *)
+    Local Lemma hep_workload_bound :
+      forall jlp,
+        job_arrival jlp < t1 ->
+        ~~ hep_job jlp j ->
+        cumulative_other_hep_jobs_interfering_workload arr_seq j t1 (t1 + Δ)
+        + workload_of_job arr_seq j t1 (t1 + Δ)
+        <= \sum_(tsk_hp <- ts | D tsk_hp < D (job_task jlp))
+            task_request_bound_function tsk_hp Δ.
+    Proof.
+      move=> jlp ARR LP.
+      rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+      apply leq_trans with (workload_of_jobs (fun jo => job_deadline jo <= job_deadline jlp) (arrivals_between arr_seq t1 (t1 + Δ))).
+      { apply workload_of_jobs_weaken => jo HEP.
+        move: (EDF_policy_deadline_order H_policy_is_EDF _ _ HEP).
+        move: (EDF_policy_not_hep_deadline_order H_policy_is_EDF _ _ LP).
+        by rewrite /job_deadline /job_deadline_from_task_deadline; lia. }
+      erewrite workload_of_jobs_partitioned_by_tasks with (ts := undup ts).
+      + eapply leq_trans; first by apply sum_le_subseq, undup_subseq.
+        apply leq_sum_seq => tsk_o INo HEP.
+        set P := (fun j' : Job => (job_deadline j' <= job_deadline jlp) && (job_task j' == tsk_o)).
+        rewrite -(leqRW (rbf_spec' _ _ _ P _ _ _)) /P //.
+        by move=> ? /andP[].
+      + by move=> jo IN; rewrite in_seq_equiv_undup;
+          apply: H_all_jobs_from_taskset; apply: in_arrivals_implies_arrived.
+      + move=> jo IN.
+        have ARRjo : t1 <= job_arrival jo by apply: job_arrival_between_ge.
+        by rewrite /job_deadline /job_deadline_from_task_deadline /D; lia.
+      + by apply arrivals_uniq.
+      + by apply undup_uniq.
+    Qed.
 
     (** We show that the cumulative service inversion, together with the interfering
         workload and the cost of [j] itself in the interval <<[t1, t1 + δ)>>, does
@@ -192,42 +250,21 @@ Section BoundedBusyIntervals.
       <= longest_busy_interval_with_pi Δ.
     Proof.
       move: (H_positive_service_inversion) => PP.
-      eapply cumulative_service_inversion_from_one_job in H_positive_service_inversion => //.
-      move: H_positive_service_inversion => [jlp [ARR [LP EQs]]].
-      move: (H_job_of_tsk) => /eqP TSK; unfold longest_busy_interval_with_pi, D in *; subst tsk.
+      have INV := H_positive_service_inversion.
+      eapply cumulative_service_inversion_from_one_job in INV => //.
+      move: INV => [jlp [ARR [LP EQs]]].
       move: (H_busy_prefix) => [_ [_ [_ /andP [ARRj _]]]].
       have [t_sched [_ SCHEDjlp]]: exists t, t1 <= t < t1 + Δ /\ scheduled_at sched jlp t
           by apply cumulative_service_implies_scheduled; rewrite -EQs.
-      apply leq_bigmax_sup; exists (job_task jlp); split; last split.
-      { by apply H_all_jobs_from_taskset. }
-      { move_neq_up LP'; move: LP => /negP LP; apply: LP.
-        move: LP' => /negP; rewrite negb_and => /orP [/negPn | ].
-        { by rewrite H_policy_is_EDF /job_deadline /job_deadline_from_task_deadline; lia. }
-        { have ARRlp: arrives_in arr_seq jlp by apply: arrives_in_jobs_come_from_arrival_sequence; eauto 2.
-          by move=>/negP NEG; exfalso; apply: NEG;
-            by eapply non_pathological_max_arrivals with (j := jlp) => //; unfold job_of_task. }
-      }
-      apply leq_add.
-      - rewrite EQs (leqRW (lp_job_bounded_service _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _)) => //.
-        by rewrite leq_sub2r //; apply H_valid_model_with_bounded_nonpreemptive_segments.
-      - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
-        apply leq_trans with (workload_of_jobs (hep_job^~ jlp) (arrivals_between arr_seq t1 (t1 + Δ))).
-        { apply workload_of_jobs_weaken => jo; move: LP.
-          by rewrite !H_policy_is_EDF /job_deadline /job_deadline_from_task_deadline; lia. }
-        erewrite workload_of_jobs_partitioned_by_tasks with (ts := undup ts).
-        + eapply leq_trans; first by apply sum_le_subseq, undup_subseq.
-          apply leq_sum_seq => tsk_o INo HEP.
-          set P := (fun j' : Job => hep_job j' jlp && (job_task j' == tsk_o)).
-          rewrite -(leqRW (rbf_spec' _ _ _ P _ _ _)) /P //.
-          by move=> ? /andP[].
-        + by move=> jo IN; rewrite in_seq_equiv_undup;
-            apply: H_all_jobs_from_taskset; apply: in_arrivals_implies_arrived.
-        + move=> jo IN.
-          have ARRjo : t1 <= job_arrival jo by apply: job_arrival_between_ge.
-          rewrite H_policy_is_EDF /D => T; move_neq_up LEQ; move_neq_down T.
-          by rewrite /job_deadline /job_deadline_from_task_deadline; lia.
-        + by apply arrivals_uniq.
-        + by apply undup_uniq.
+      apply leq_bigmax_sup; exists (job_task jlp); split => //; last split; rewrite /D.
+      { move: (H_job_of_tsk) => /eqP <-.
+        by apply: lower_priority_job_accounted_for. }
+      { apply leq_add; last by apply: hep_workload_bound.
+        have BOUND: service_during sched jlp t1 (t1 + Δ)
+                    <= job_max_nonpreemptive_segment jlp - ε
+          by apply: lp_job_bounded_service.
+        rewrite EQs (leqRW BOUND) leq_sub2r //.
+        by apply H_valid_model_with_bounded_nonpreemptive_segments. }
     Qed.
 
   End LongestBusyIntervalWithPIIsValid.

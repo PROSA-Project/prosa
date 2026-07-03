@@ -15,31 +15,67 @@ Section PriorityFacts.
     Context `{JobDeadline Job} {JLFP : JLFP_policy Job}.
     Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
-    (** EDF priorities are reflexive since a job's deadline is no later than
-        itself. *)
+    (** Under EDF, higher-or-equal priority implies no later absolute
+        deadline. *)
+    Fact EDF_policy_deadline_order :
+      forall j j',
+        hep_job j j' -> job_deadline j <= job_deadline j'.
+    Proof. by move: H_policy_is_EDF => [EDF _] j j'; exact: EDF. Qed.
+
+    (** The EDF policy is reflexive by assumption. *)
     Fact EDF_policy_is_reflexive :
       reflexive_job_priorities JLFP.
     Proof.
-      move=> j.
-      by rewrite H_policy_is_EDF.
+      by move: H_policy_is_EDF => [_ [REFL _]].
     Qed.
 
-    (** EDF priorities are transitive since deadline order is transitive. *)
+    (** The EDF policy is transitive by assumption. *)
     Fact EDF_policy_is_transitive :
       transitive_job_priorities JLFP.
     Proof.
-      move=> y x z.
-      rewrite !H_policy_is_EDF.
-      exact: leq_trans.
+      by move: H_policy_is_EDF => [_ [_ [TRANS _]]].
     Qed.
 
-    (** EDF priorities are total since any two deadlines are comparable. *)
+    (** The EDF policy is total by assumption. *)
     Fact EDF_policy_is_total :
       total_job_priorities JLFP.
     Proof.
-      move=> j1 j2.
-      rewrite !H_policy_is_EDF.
-      exact: leq_total.
+      by move: H_policy_is_EDF => [_ [_ [_ TOTAL]]].
+    Qed.
+
+    (** A job with a strictly earlier deadline has higher-or-equal
+        priority. *)
+    Fact EDF_policy_earlier_deadline :
+      forall j j',
+        job_deadline j < job_deadline j' -> hep_job j j'.
+    Proof.
+      move=> j j' DL.
+      move: (EDF_policy_is_total j j') => /orP [//|HEP].
+      move: (EDF_policy_deadline_order _ _ HEP).
+      by move=> LE; move: DL; rewrite ltnNge LE.
+    Qed.
+
+    (** Conversely, if a job does not have higher-or-equal priority, then the
+        other job has no later deadline. *)
+    Fact EDF_policy_not_hep_deadline_order :
+      forall j j',
+        ~~ hep_job j j' -> job_deadline j' <= job_deadline j.
+    Proof.
+      move=> j j' NHEP.
+      apply: EDF_policy_deadline_order.
+      move: (EDF_policy_is_total j j').
+      by rewrite (negbTE NHEP).
+    Qed.
+
+    (** In this case, totality also gives the priority relation in the
+        opposite direction. *)
+    Fact EDF_policy_not_hep_job :
+      forall j j',
+        ~~ hep_job j j' -> hep_job j' j.
+    Proof.
+      move=> j j' NHEP.
+      move: (EDF_policy_is_total j j').
+      by rewrite (negbTE NHEP).
     Qed.
 
   End JobDeadline.
@@ -57,32 +93,49 @@ Section PriorityFacts.
     Context {JLFP : JLFP_policy Job}.
     Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
-    (** ... then [hep_job] is a statement about job arrival times and relative
-        deadlines. *)
-    Fact hep_job_task_deadline :
+    (** ... then a higher-or-equal priority job's arrival time is constrained. *)
+    Fact EDF_policy_task_deadline_order :
       forall j j',
-        hep_job j j' = (job_arrival j + task_deadline (job_task j)
-                        <= job_arrival j' + task_deadline (job_task j')).
+        hep_job j j' ->
+        job_arrival j + task_deadline (job_task j)
+        <= job_arrival j' + task_deadline (job_task j').
     Proof.
-      move=> j j'.
-      by rewrite H_policy_is_EDF /job_deadline/job_deadline_from_task_deadline.
+      move=> j j' HEP.
+      by move: (EDF_policy_deadline_order H_policy_is_EDF j j' HEP)
+         ; rewrite /job_deadline/job_deadline_from_task_deadline.
     Qed.
 
-      (** Furthermore, if we are looking at two jobs of the same task, then
-          [hep_job] is a statement about their respective arrival times. *)
-    Fact hep_job_arrival_edf :
+    (** Conversely, a strictly earlier arrival time plus relative deadline
+        implies higher-or-equal priority. *)
+    Fact EDF_policy_earlier_task_deadline :
+      forall j j',
+        job_arrival j + task_deadline (job_task j)
+        < job_arrival j' + task_deadline (job_task j') ->
+        hep_job j j'.
+    Proof.
+      move=> j j' DL.
+      apply: (EDF_policy_earlier_deadline H_policy_is_EDF).
+      by rewrite /job_deadline/job_deadline_from_task_deadline.
+    Qed.
+
+    (** For jobs of the same task, a strictly earlier arrival implies an
+        earlier absolute deadline. *)
+    Fact EDF_policy_earlier_arrival :
       forall j j',
         same_task j j' ->
-        hep_job j j' = (job_arrival j <= job_arrival j').
+        job_arrival j < job_arrival j' ->
+        hep_job j j'.
     Proof.
-      by move=> j j' /eqP SAME; rewrite hep_job_task_deadline SAME leq_add2r.
+      move=> j j' /eqP SAME LT.
+      apply: EDF_policy_earlier_task_deadline.
+      by rewrite SAME ltn_add2r.
     Qed.
 
     (** EDF scheduling respects the sequential-tasks hypothesis. *)
     Fact EDF_policy_respects_sequential_tasks :
       policy_respects_sequential_tasks JLFP.
     Proof.
-      by move => j j' /eqP TSK ?; rewrite hep_job_arrival_edf // /same_task TSK.
+      by move=> j j' SAME; exact: EDF_policy_earlier_arrival.
     Qed.
   End TaskDeadline.
 
@@ -94,11 +147,12 @@ Global Hint Resolve
   EDF_policy_is_reflexive
   EDF_policy_is_transitive
   EDF_policy_is_total
+  EDF_policy_not_hep_deadline_order
+  EDF_policy_not_hep_job
   EDF_policy_respects_sequential_tasks
   : basic_rt_facts.
 
 Require Export prosa.model.task.sequentiality.
-Require Export prosa.analysis.facts.priority.inversion.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.model.sequential.
 
@@ -170,9 +224,12 @@ Section SequentialEDF.
   Proof.
     move => j1 j2 t ARR1 ARR2 SAME LT.
     apply: early_hep_job_is_scheduled => //.
-    rewrite always_higher_priority_jlfp !hep_job_arrival_edf //.
-    - by rewrite -ltnNge; apply/andP; split => //.
-    - by rewrite same_task_sym.
+    rewrite always_higher_priority_jlfp.
+    apply/andP; split; first exact: EDF_policy_earlier_arrival.
+    apply/negP => HEP.
+    apply EDF_policy_task_deadline_order in HEP => //.
+    move: HEP; rewrite -(eqP SAME) leq_add2r => LE.
+    by move: LT; rewrite ltnNge LE.
   Qed.
 
 End SequentialEDF.

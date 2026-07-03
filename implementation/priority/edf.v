@@ -21,9 +21,12 @@ Section PropertiesOfEDF.
   (** Consider any arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** The concrete [EDF] implementation is indeed an EDF policy. *)
-  Fact EDF_is_EDF_policy :
-    policy_is_EDF (EDF Job).
+  (** Under the concrete [EDF] implementation, [hep_job] is exactly deadline
+      order. *)
+  Fact EDF_hep_job :
+    forall j1 j2,
+      @hep_job Job (EDF Job) j1 j2
+      = (job_deadline j1 <= job_deadline j2).
   Proof. by []. Qed.
 
   (** EDF is reflexive. *)
@@ -37,6 +40,17 @@ Section PropertiesOfEDF.
   (** EDF is total. *)
   Fact EDF_is_total : total_job_priorities (EDF Job).
   Proof. by move=> j1 j2; apply: leq_total. Qed.
+
+  (** The concrete [EDF] implementation is indeed an EDF policy. *)
+  Fact EDF_is_EDF_policy :
+    policy_is_EDF (EDF Job).
+  Proof.
+    repeat split.
+    - by move=> j1 j2; rewrite EDF_hep_job.
+    - exact: EDF_is_reflexive.
+    - exact: EDF_is_transitive.
+    - exact: EDF_is_total.
+  Qed.
 
 End PropertiesOfEDF.
 

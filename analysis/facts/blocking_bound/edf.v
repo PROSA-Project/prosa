@@ -86,11 +86,12 @@ Section  MaxNPSegmentIsBounded.
     apply in_arrivals_implies_arrived_between in JINB => [|//].
     move: JINB => /andP [_ TJ'].
     repeat (apply/andP; split); last first.
-    { rewrite H_policy_is_EDF -ltnNge in NOTHEP.
+    { move: NOTHEP => /andP [NHEP _].
+      move: (EDF_policy_not_hep_deadline_order H_policy_is_EDF _ _ NHEP) => DL.
       move: H_job_of_tsk => /eqP <-.
       have ARRLE: job_arrival j' < job_arrival j.
       { by apply: (@leq_trans t1) => //; move: BUSY => [ _  [ _ [ _ /andP [F G]]] ]. }
-      move: NOTHEP; rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline.
+      move: DL; rewrite /job_deadline /absolute_deadline.job_deadline_from_task_deadline.
       by lia. }
     { move: NOTHEP => /andP [_ NZ].
       move: (H_valid_job_cost j' ARR'); rewrite /valid_job_cost.

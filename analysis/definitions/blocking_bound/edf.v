@@ -30,7 +30,7 @@ Section MaxNPSegmentBlockingBound.
 
   (** For a job of a given task [tsk], the relative arrival offset [A]
       within its busy window, we define the following blocking
-      bound. This bound assumes that task are independent (i.e., it
+      bound. This bound assumes that tasks are independent (i.e., it
       does not account for possible blocking due to locking
       protocols). *)
   Definition blocking_bound (tsk : Task) (A : duration)  :=

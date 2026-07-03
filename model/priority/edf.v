@@ -9,12 +9,14 @@ Section EDFPolicy.
   (** Consider jobs with absolute deadlines. *)
   Context {Job : JobType} `{JobDeadline Job}.
 
-  (** A JLFP policy is EDF if it assigns higher priority to jobs with earlier
-      absolute deadlines. That is, job [j1] has higher or equal priority than
-      job [j2] if and only if [j1]'s deadline is no later than [j2]'s
-      deadline. *)
+  (** A JLFP policy is EDF if it never assigns higher priority to a job with a
+      later absolute deadline. Ties among jobs with equal deadlines may be
+      resolved by any reflexive, transitive, and total tie-breaking rule. *)
   Definition policy_is_EDF (JLFP : JLFP_policy Job) :=
-    forall j1 j2,
-      hep_job j1 j2 = (job_deadline j1 <= job_deadline j2).
+    (forall j1 j2, hep_job j1 j2 ->
+                   job_deadline j1 <= job_deadline j2)
+    /\ reflexive_job_priorities JLFP
+    /\ transitive_job_priorities JLFP
+    /\ total_job_priorities JLFP.
 
 End EDFPolicy.

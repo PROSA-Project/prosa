@@ -60,9 +60,11 @@ Section GeneralityOfGEL.
          ; move: (RESPECTED j j' t ARR PT BL SCHED)
          ; rewrite !hep_job_at_jlfp
                    GEL_hep_job
+                   EDF_hep_job
                    /job_priority_point
                    !H_priority_point
-                   (hep_job_task_deadline EDF_is_EDF_policy)
+                   /job_deadline
+                   /job_deadline_from_task_deadline
          ; lia.
     Qed.
   End GELGeneralizesEDF.
