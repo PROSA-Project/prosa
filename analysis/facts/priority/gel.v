@@ -62,17 +62,6 @@ Section GELBasicFacts.
     by rewrite (negbTE NHEP).
   Qed.
 
-  (** In this case, totality also gives the priority relation in the opposite
-      direction. *)
-  Fact GEL_policy_not_hep_job :
-    forall j j',
-      ~~ hep_job j j' -> hep_job j' j.
-  Proof.
-    move=> j j' NHEP.
-    move: (GEL_policy_is_total j j').
-    by rewrite (negbTE NHEP).
-  Qed.
-
   Section HEPJobArrival.
     (** Consider a job [j]... *)
     Variable j : Job.
@@ -123,7 +112,6 @@ Global Hint Resolve
   GEL_policy_is_transitive
   GEL_policy_is_total
   GEL_policy_not_hep_priority_point_order
-  GEL_policy_not_hep_job
   GEL_respects_sequential_tasks
   : basic_rt_facts.
 

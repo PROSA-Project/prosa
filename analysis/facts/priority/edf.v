@@ -67,17 +67,6 @@ Section PriorityFacts.
       by rewrite (negbTE NHEP).
     Qed.
 
-    (** In this case, totality also gives the priority relation in the
-        opposite direction. *)
-    Fact EDF_policy_not_hep_job :
-      forall j j',
-        ~~ hep_job j j' -> hep_job j' j.
-    Proof.
-      move=> j j' NHEP.
-      move: (EDF_policy_is_total j j').
-      by rewrite (negbTE NHEP).
-    Qed.
-
   End JobDeadline.
 
   (** Second, consider the case where job (absolute) deadlines are derived from
@@ -148,7 +137,6 @@ Global Hint Resolve
   EDF_policy_is_transitive
   EDF_policy_is_total
   EDF_policy_not_hep_deadline_order
-  EDF_policy_not_hep_job
   EDF_policy_respects_sequential_tasks
   : basic_rt_facts.
 

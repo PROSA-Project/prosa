@@ -78,6 +78,30 @@ Section BasicLemmas.
 
 End BasicLemmas.
 
+(** In this section, we prove a basic consequence of total job-level
+    fixed-priority relations. *)
+Section TotalJLFPProperties.
+
+  (** Consider any type of jobs ... *)
+  Context {Job : JobType}.
+
+  (** ... and any JLFP policy. *)
+  Context {JLFP : JLFP_policy Job}.
+
+  (** If a job does not have higher-or-equal priority than another job, then
+      totality gives the priority relation in the opposite direction. *)
+  Lemma total_priority_not_hep_job :
+    total_job_priorities JLFP ->
+    forall j j',
+      ~~ hep_job j j' -> hep_job j' j.
+  Proof.
+    move=> TOTAL j j' NHEP.
+    move: (TOTAL j j').
+    by rewrite (negbTE NHEP).
+  Qed.
+
+End TotalJLFPProperties.
+
 (** In the following section, we establish properties of [hp_task] and [ep_task ]auxiliary
     priority relations defined for FP policies. They are useful in proving properties of the
     ELF scheduling policy. *)
@@ -295,6 +319,9 @@ Section JLFPFP.
 
 End JLFPFP.
 
-(** We add a lemma into the "Hint Database" basic_rt_facts, so Coq will be able
-    to apply it automatically. *)
-Global Hint Resolve respects_sequential_tasks : basic_rt_facts.
+(** We add some lemmas into the "Hint Database" basic_rt_facts, so Coq will be
+    able to apply it automatically. *)
+Global Hint Resolve
+  respects_sequential_tasks
+  total_priority_not_hep_job
+  : basic_rt_facts.

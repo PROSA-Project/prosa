@@ -3,6 +3,7 @@ Require Export prosa.model.task.sequentiality.
 Require Export prosa.model.priority.fifo.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.definitions.priority_inversion.
+Require Export prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.facts.priority.sequential.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.busy_interval.all.
@@ -66,18 +67,7 @@ Section PriorityFacts.
     by rewrite (negbTE NHEP).
   Qed.
 
-  (** In this case, totality also gives the priority relation in the opposite
-      direction, ... *)
-  Fact FIFO_policy_not_hep_job :
-    forall j j',
-      ~~ hep_job j j' -> hep_job j' j.
-  Proof.
-    move=> j j' NHEP.
-    move: (FIFO_policy_is_total j j').
-    by rewrite (negbTE NHEP).
-  Qed.
-
-  (** ... which some proofs expect to be expressed in terms of
+  (** This opposite priority relation is sometimes needed in terms of
      [always_higher_priority]. *)
   Fact FIFO_policy_always_higher_priority :
     forall j j',
@@ -86,7 +76,8 @@ Section PriorityFacts.
   Proof.
     move=> j j' NHEP.
     rewrite always_higher_priority_jlfp; apply/andP; split => //.
-    exact: FIFO_policy_not_hep_job.
+    apply: total_priority_not_hep_job => //.
+    exact: FIFO_policy_is_total.
   Qed.
 
 End PriorityFacts.
@@ -97,7 +88,6 @@ Global Hint Resolve
   FIFO_policy_is_transitive
   FIFO_policy_is_total
   FIFO_policy_not_hep_job_arrival_order
-  FIFO_policy_not_hep_job
   FIFO_policy_always_higher_priority
   : basic_rt_facts.
 
@@ -239,7 +229,7 @@ Section BasicLemmas.
       have NHEP: ~~ hep_job j j'.
       { apply: H_no_superfluous_preemptions; last exact: SCHED'.
         by repeat (apply /andP ; split). }
-      have HEP: hep_job j' j by apply: FIFO_policy_not_hep_job.
+      have HEP: hep_job j' j by apply: total_priority_not_hep_job.
       have /negP NCOMP': ~~ completed_by sched j' t.-1.
       { apply: incompletion_monotonic; first exact: leq_pred.
         exact: scheduled_implies_not_completed => //. }

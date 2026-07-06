@@ -84,17 +84,6 @@ Section ELFBasicFacts.
     by lia.
   Qed.
 
-  (** If a job does not have higher-or-equal priority, then totality gives the
-      priority relation in the opposite direction. *)
-  Fact ELF_policy_not_hep_job :
-    forall j j',
-      ~~ hep_job j j' -> hep_job j' j.
-  Proof.
-    move=> j j' NHEP.
-    move: (ELF_policy_is_total j j').
-    by rewrite (negbTE NHEP).
-  Qed.
-
   (** Consequently, lack of higher-or-equal job priority reveals the opposite
       task-priority order. *)
   Fact ELF_policy_not_hep_task_priority_order :
@@ -102,7 +91,8 @@ Section ELFBasicFacts.
       ~~ hep_job j j' -> hep_task (job_task j') (job_task j).
   Proof.
     move=> j j' NHEP.
-    by apply: ELF_policy_task_priority_order; apply: ELF_policy_not_hep_job.
+    apply/ELF_policy_task_priority_order/total_priority_not_hep_job => //.
+    exact: ELF_policy_is_total.
   Qed.
 
   (** If two jobs stem from equal-priority tasks and the first does not have
@@ -115,7 +105,8 @@ Section ELFBasicFacts.
     move=> j j' EP NHEP.
     apply: ELF_policy_priority_point_order;
       first by rewrite ep_task_sym.
-    by apply: ELF_policy_not_hep_job.
+    apply: total_priority_not_hep_job => //.
+    exact ELF_policy_is_total.
   Qed.
 
   (** For jobs of the same task, a strictly earlier arrival implies a strictly
@@ -204,7 +195,6 @@ Global Hint Resolve
     ELF_policy_is_transitive
     ELF_policy_is_total
     ELF_policy_is_JLFP_FP_compatible
-    ELF_policy_not_hep_job
     ELF_policy_not_hep_task_priority_order
     ELF_policy_not_hep_priority_point_order
     ELF_respects_sequential_tasks
