@@ -1,6 +1,6 @@
 Require Export prosa.analysis.facts.priority.classes.
+Require Export prosa.analysis.facts.priority.fp.
 Require Export prosa.analysis.definitions.interference.
-Require Export prosa.analysis.definitions.priority.classes.
 Require Export prosa.analysis.facts.model.service_of_jobs.
 
 (** * Auxiliary Lemmas about Interference *)
@@ -34,9 +34,9 @@ Section InterferenceProperties.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
-  (** Consider a reflexive FP-policy and a JLFP policy compatible with it. *)
+  (** Consider a reflexive FP policy and a JLFP policy that behaves like it. *)
   Context {FP : FP_policy Task} {JLFP : JLFP_policy Job}.
-  Hypothesis H_compatible : JLFP_FP_compatible JLFP FP.
+  Hypothesis H_policy_is_FP : policy_is_FP FP JLFP.
   Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
 
   (** We observe that any higher-priority job must come from a task with
@@ -49,7 +49,7 @@ Section InterferenceProperties.
     move=> j1 j2; rewrite -[X in _ || X]andbA -andb_orr /another_task_hep_job.
     have [hepj1j2/=|//] := boolP (hep_job j1 j2).
     rewrite -[hp_task _ _](@andb_idr _ (job_task j1 != job_task j2)).
-    - by rewrite -andb_orl -hep_hp_ep_task hep_job_implies_hep_task.
+    - by rewrite -andb_orl -hep_hp_ep_task FP_policy_task_priority_order.
     - by apply: contraTN => /eqP->; rewrite hp_task_irrefl.
   Qed.
 

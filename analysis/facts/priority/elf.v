@@ -1,6 +1,7 @@
 Require Export prosa.model.priority.elf.
 Require Export prosa.model.aggregate.workload.
 Require Export prosa.analysis.facts.priority.classes.
+Require Export prosa.analysis.facts.priority.fp.
 Require Export prosa.model.schedule.priority_driven.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.facts.priority.sequential.
@@ -121,13 +122,17 @@ Section ELFBasicFacts.
     - by rewrite /job_priority_point SAME; lia.
   Qed.
 
-  (** The ELF policy is [JLFP_FP_compatible]. *)
-  Lemma ELF_policy_is_JLFP_FP_compatible :
-    JLFP_FP_compatible JLFP FP.
+  (** Every ELF policy behaves as an FP policy with respect to the underlying
+      task-level priority relation. *)
+  Lemma ELF_policy_is_FP_policy :
+    policy_is_FP FP JLFP.
   Proof.
-    split => j1 j2.
+    repeat split.
     - exact: ELF_policy_task_priority_order.
     - exact: ELF_policy_higher_priority_task.
+    - exact: ELF_policy_is_reflexive.
+    - exact: ELF_policy_is_transitive.
+    - exact: ELF_policy_is_total.
   Qed.
 
   (** ** Sequentiality under ELF *)
@@ -194,7 +199,7 @@ Global Hint Resolve
     ELF_policy_is_reflexive
     ELF_policy_is_transitive
     ELF_policy_is_total
-    ELF_policy_is_JLFP_FP_compatible
+    ELF_policy_is_FP_policy
     ELF_policy_not_hep_task_priority_order
     ELF_policy_not_hep_priority_point_order
     ELF_respects_sequential_tasks

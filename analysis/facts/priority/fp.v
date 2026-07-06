@@ -1,5 +1,4 @@
 Require Export prosa.model.priority.fp.
-Require Export prosa.analysis.definitions.priority.classes.
 
 (** In this section, we state and prove some basic facts about job-level
     policies that behave as fixed-priority policies. *)

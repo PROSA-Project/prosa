@@ -181,7 +181,7 @@ Section BoundedBusyIntervals.
           apply workload_of_jobs_bounded => //.
           move=> j'.
           move: H_job_of_tsk => /eqP <-.
-          by apply hep_job_implies_hep_task.
+          by apply: FP_policy_task_priority_order.
       Qed.
 
       (** It follows that [t1 + L] is a quiet time, which means that
@@ -249,7 +249,7 @@ Section BoundedBusyIntervals.
             apply workload_of_jobs_bounded => //.
             move=> j'.
             move: H_job_of_tsk => /eqP <-.
-            by apply hep_job_implies_hep_task. }
+            by apply: FP_policy_task_priority_order. }
         }
       Qed.
 

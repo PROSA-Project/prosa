@@ -83,16 +83,6 @@ Section GeneralityOfELF.
       exact: RESPECTED.
     Qed.
 
-    (** Equivalently at the policy level, every ELF policy behaves as an FP
-        policy with respect to the underlying task-level priority relation. *)
-    Lemma ELF_policy_is_FP_policy :
-      policy_is_FP FP JLFP.
-    Proof.
-      repeat split => //.
-      - exact: ELF_policy_task_priority_order.
-      - exact: ELF_policy_higher_priority_task.
-    Qed.
-
     (** Additionally, if each task has a distinct priority, or equivalently, no
         two tasks have equal priority according to the [FP] fixed-priority
         policy, then the reverse also holds: the ELF policy reduces to the

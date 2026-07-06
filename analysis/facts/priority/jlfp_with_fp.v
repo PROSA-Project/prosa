@@ -1,6 +1,6 @@
 Require Import prosa.model.priority.elf.
 Require Export prosa.analysis.facts.priority.classes.
-Require Export prosa.analysis.definitions.priority.classes.
+Require Export prosa.analysis.facts.priority.fp.
 Require Export prosa.analysis.facts.model.workload.
 
 (** In this file, we prove lemmas that are useful when both an FP policy and
@@ -16,10 +16,10 @@ Section WorkloadTaskSum.
   (** ...and jobs of these tasks. *)
   Context {Job : JobType} `{JobArrival Job} `{JobTask Job Task} `{JobCost Job} .
 
-  (** Let us consider an FP policy and a compatible JLFP policy present in context. *)
+  (** Let us consider an FP policy and a JLFP policy that behaves like it. *)
   Context {FP : FP_policy Task}.
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis JLFP_FP_is_compatible : JLFP_FP_compatible JLFP FP.
+  Hypothesis H_policy_is_FP : policy_is_FP FP JLFP.
 
   (** Consider any valid arrival sequence [arr_seq]. *)
   Variable arr_seq : arrival_sequence Job.
@@ -95,7 +95,7 @@ Section WorkloadTaskSum.
     apply/eq_bigl =>j0; apply /idP/idP.
     - by move=> /andP[].
     - move=> Hp; apply/andP; split =>//.
-      by apply: (hp_task_implies_hep_job JLFP FP).
+      by apply: FP_policy_higher_priority_task.
   Qed.
 
   (** We then establish that the cumulative workload of higher-or-equal priority jobs
@@ -110,7 +110,7 @@ Section WorkloadTaskSum.
     rewrite /workload_of_hep_jobs /workload_of_jobs.
     rewrite (bigID from_hp_task) /=; congr (_ + _); apply: eq_bigl => j0.
     apply: andb_id2l => HEPj.
-    have HEPt : hep_task (job_task j0) (job_task j) by apply (hep_job_implies_hep_task JLFP).
+    have HEPt : hep_task (job_task j0) (job_task j) by apply: FP_policy_task_priority_order.
     apply/idP/idP; rewrite negb_and.
     - move =>/orP[nHEPt| /negPn ?].
       + exfalso; by move: nHEPt; rewrite HEPt.

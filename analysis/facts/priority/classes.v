@@ -1,5 +1,4 @@
 Require Export prosa.model.priority.classes.
-Require Export prosa.analysis.definitions.priority.classes.
 
 (** In this section, we prove some basic properties about priority relations. *)
 Section BasicLemmas.
@@ -289,35 +288,6 @@ Section FPRemarks.
   Qed.
 
 End FPRemarks.
-
-Section JLFPFP.
-   (** Consider any type of tasks ... *)
-  Context {Task : TaskType}.
-
-  (**  ... and any type of jobs associated with these tasks. *)
-  Context {Job : JobType}.
-  Context `{JobTask Job Task}.
-
-  (** Consider any pair of JLFP and FP policies that are compatible. *)
-  Context (JLFP : JLFP_policy Job) (FP : FP_policy Task).
-  Hypothesis H_compatible : JLFP_FP_compatible JLFP FP.
-
-  (** We restate [JLFP_FP_compatible] to make it easier to discover
-      with [Search]. Here is the first part... *)
-  Lemma hep_job_implies_hep_task :
-    forall j1 j2,
-      hep_job j1 j2 ->
-      hep_task (job_task j1) (job_task j2).
-  Proof. exact: H_compatible.1. Qed.
-
-  (** ...and second part. *)
-  Lemma hp_task_implies_hep_job :
-    forall j1 j2,
-      hp_task (job_task j1) (job_task j2) ->
-      hep_job j1 j2.
-  Proof. exact: H_compatible.2. Qed.
-
-End JLFPFP.
 
 (** We add some lemmas into the "Hint Database" basic_rt_facts, so Coq will be
     able to apply it automatically. *)

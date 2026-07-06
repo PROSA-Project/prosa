@@ -225,7 +225,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     rewrite scheduled_jobs_at_iff in jlp_at_t1 =>//.
     have [lp | ep]: ~~ hep_task (job_task jlp) (job_task j)
                     \/ ep_task (job_task jlp) (job_task j)
-      by apply/orP; rewrite -nhp_ep_nhep_task =>//; move: nHEPj; apply /contra/hp_task_implies_hep_job.
+      by apply/orP; rewrite -nhp_ep_nhep_task =>//; move: nHEPj; apply /contra/FP_policy_higher_priority_task.
     { have -> : cumulative_priority_inversion arr_seq sched j t1 t2
                 = cumulative_priority_inversion_cond arr_seq sched j is_lower_priority t1 t2
         by apply: cum_task_pi_eq => //; rewrite /is_lower_priority -not_hep_hp_task //; by move: (TSK) => /eqP <-.
