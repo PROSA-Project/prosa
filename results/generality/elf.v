@@ -132,7 +132,7 @@ Section GeneralityOfELF.
       { move: LEQ; rewrite leq_eqVlt => /orP [/eqP EQ|LT];
           last exact: ELF_policy_earlier_arrival.
         apply: H_no_tiebreak => //.
-        rewrite /job_priority_point EQ.
+        rewrite /job_priority_point/jpp_from_tpp EQ.
         by move: SAME; rewrite /same_task => /eqP ->. }
       { exfalso.
         move: BL; rewrite /backlogged => /andP [INCOMP _].

@@ -78,7 +78,7 @@ Section GELBasicFacts.
          - task_priority_point (job_task j'))%R.
     Proof.
       move: (GEL_policy_priority_point_order _ _ H_j'_hep).
-      by rewrite /job_priority_point; lia.
+      by rewrite /job_priority_point/jpp_from_tpp; lia.
     Qed.
 
     (** Using the above lemma, we prove that for any
@@ -101,7 +101,7 @@ Section GELBasicFacts.
   Proof.
     move=> j1 j2 /eqP SAME LT.
     apply: GEL_policy_earlier_priority_point => //.
-    by rewrite /job_priority_point SAME; lia.
+    by rewrite /job_priority_point/jpp_from_tpp SAME; lia.
   Qed.
 
 End GELBasicFacts.
@@ -179,10 +179,10 @@ Section SequentialTasks.
     rewrite always_higher_priority_jlfp.
     apply/andP; split.
     - apply: GEL_policy_earlier_priority_point => //.
-      by rewrite /job_priority_point SAME; lia.
+      by rewrite /job_priority_point/jpp_from_tpp SAME; lia.
     - apply/negP => HEP.
       apply GEL_policy_priority_point_order in HEP => //.
-      by move: HEP; rewrite /job_priority_point SAME; lia.
+      by move: HEP; rewrite /job_priority_point/jpp_from_tpp SAME; lia.
   Qed.
 
 End SequentialTasks.

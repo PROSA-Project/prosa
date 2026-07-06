@@ -21,11 +21,11 @@ Require Export prosa.model.priority.gel.
     behave as an ELF policy. *)
 Section ELFPolicy.
 
-  (** Consider any type of tasks with relative priority points ... *)
-  Context {Task : TaskType} `{PriorityPoint Task}.
+  (** Consider any type of tasks ... *)
+  Context {Task : TaskType}.
 
-  (** ... and jobs of these tasks. *)
-  Context {Job : JobType} `{JobArrival Job} `{JobTask Job Task}.
+  (** ... and jobs of these tasks with absolute priority points. *)
+  Context {Job : JobType} `{JobTask Job Task} `{JobPriorityPoint Job}.
 
   (** Given an underlying FP policy, a JLFP policy is ELF if it never inverts
       task-level priority, and, among equal-priority tasks, never inverts

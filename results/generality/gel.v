@@ -53,12 +53,12 @@ Section GeneralityOfGEL.
       move=> JLFP; split => [GEL|EDF]; (repeat split => //) => j j' PRIO.
       { have: (job_priority_point j <= job_priority_point j')%R
           by apply: GEL_policy_priority_point_order.
-        rewrite /job_priority_point !H_priority_point
+        rewrite /job_priority_point/jpp_from_tpp !H_priority_point
                 /job_deadline /job_deadline_from_task_deadline.
         by lia. }
       { have: job_deadline j <= job_deadline j'
           by apply: EDF_policy_deadline_order.
-        rewrite /job_priority_point !H_priority_point
+        rewrite /job_priority_point/jpp_from_tpp !H_priority_point
                 /job_deadline /job_deadline_from_task_deadline.
         by lia. }
     Qed.
@@ -83,12 +83,12 @@ Section GeneralityOfGEL.
       move=> JLFP; split => [GEL|FIFO]; (repeat split => //) => j j' PRIO.
       { have: (job_priority_point j <= job_priority_point j')%R
           by apply: GEL_policy_priority_point_order.
-        rewrite /job_priority_point !H_priority_point
+        rewrite /job_priority_point/jpp_from_tpp !H_priority_point
                 /job_deadline /job_deadline_from_task_deadline.
         by lia. }
       { have: job_arrival j <= job_arrival j'
           by apply: FIFO_policy_arrival_order.
-        rewrite /job_priority_point !H_priority_point.
+        rewrite /job_priority_point/jpp_from_tpp !H_priority_point.
         by lia. }
     Qed.
 
@@ -154,7 +154,7 @@ Section GeneralityOfGEL.
       Proof.
         move=> ARRIVED BL'.
         apply: GEL_policy_earlier_priority_point => //.
-        rewrite /job_priority_point.
+        rewrite /job_priority_point/jpp_from_tpp.
         have [|ARR'] := ltnP (job_arrival j)
                              (job_arrival j' + `|pp_delta tsk tsk'|)
           ; first by move: H_delta_pos; rewrite /pp_delta/tsk/tsk'; lia.
@@ -247,11 +247,11 @@ Section GeneralityOfGEL.
             exact: backlogged_implies_incomplete. }
           { rewrite hep_job_at_jlfp leq_eqVlt => /orP [/eqP EQ|LT].
             - apply: H_no_tiebreak=> //; first by rewrite same_task_sym.
-              rewrite /job_priority_point EQ.
+              rewrite /job_priority_point/jpp_from_tpp EQ.
               by move: SAME => /eqP ->.
             - apply: GEL_policy_earlier_priority_point => //.
               move: SAME => /eqP SAME.
-              by rewrite /job_priority_point SAME; lia. }}
+              by rewrite /job_priority_point/jpp_from_tpp SAME; lia. }}
         { have HFP: hp_task (job_task j) (job_task j').
           { apply: H_unique_fixed_priorities => //.
             - by rewrite same_task_sym.
@@ -272,7 +272,7 @@ Section GeneralityOfGEL.
         { apply: completion_monotonic; last exact: FIN.
           move: POS; rewrite /pp_delta.
           apply GEL_policy_priority_point_order in HEP => //.
-          move: HEP; rewrite /job_priority_point => HEP.
+          move: HEP; rewrite /job_priority_point/jpp_from_tpp => HEP.
           have: job_arrival j' <= t; last lia.
           by rewrite -/(has_arrived j' t). } }
     Qed.

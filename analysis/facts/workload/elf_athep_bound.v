@@ -128,7 +128,7 @@ Section ATHEPWorkloadBoundIsValidForELF.
         { apply: ELF_policy_priority_point_order => //.
           rewrite TSKo ep_task_sym.
           by move: H_job_of_tsk; rewrite /job_of_task => /eqP ->. }
-        move: ARR'; rewrite /job_priority_point /ep_task_interfering_interval_length -TSKo.
+        move: ARR'; rewrite /job_priority_point/jpp_from_tpp /ep_task_interfering_interval_length -TSKo.
         move: H_job_of_tsk => /eqP <-.
         by clear; lia.
       Qed.

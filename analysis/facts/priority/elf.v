@@ -119,7 +119,7 @@ Section ELFBasicFacts.
     move=> j j' /eqP SAME LT.
     apply: ELF_policy_earlier_priority_point.
     - by rewrite SAME; exact: eq_reflexive.
-    - by rewrite /job_priority_point SAME; lia.
+    - by rewrite /job_priority_point/jpp_from_tpp SAME; lia.
   Qed.
 
   (** Every ELF policy behaves as an FP policy with respect to the underlying
@@ -184,7 +184,7 @@ Section ELFBasicFacts.
       apply/andP; split; first exact: ELF_policy_earlier_arrival.
       apply/negP => HEP; move: SAME => /eqP SAME.
       have: (job_priority_point j2 <= job_priority_point j1)%R;
-        last by rewrite /job_priority_point SAME; lia.
+        last by rewrite /job_priority_point/jpp_from_tpp SAME; lia.
       apply: ELF_policy_priority_point_order => //.
       by rewrite SAME; exact: eq_reflexive.
     Qed.

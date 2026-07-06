@@ -26,28 +26,27 @@ Definition offset := int.
 (** We define a task-model parameter to express each task's relative priority point. *)
 Class PriorityPoint (Task : TaskType) := { task_priority_point : Task -> offset }.
 
-(** Based on the task-level relative priority-point parameter, we
-    define a job's absolute priority point in a straightforward manner.
-    To this end, we need to introduce some context first. *)
-Section AbsolutePriorityPoint.
-  (** For any type of tasks with relative priority points, ... *)
-  Context {Job : JobType} {Task : TaskType} `{JobTask Job Task}
-    `{PriorityPoint Task} `{JobArrival Job}.
+(** We define a job-model parameter to express each job's absolute priority point. *)
+Class JobPriorityPoint (Job : JobType) := { job_priority_point : Job -> offset }.
 
-  (** ... a job's absolute priority point is given by its arrival time
-          plus its task's relative priority point. *)
-  Definition job_priority_point (j : Job) :=
-    ((job_arrival j)%:R + task_priority_point (job_task j))%R.
-
-End AbsolutePriorityPoint.
+(** Based on a task-level relative priority-point parameter, we provide the
+    canonical definition of each job's absolute priority point. *)
+#[global]
+Instance jpp_from_tpp
+         (Job : JobType) (Task : TaskType)
+         `{PriorityPoint Task} `{JobArrival Job} `{JobTask Job Task} :
+  JobPriorityPoint Job :=
+{
+  job_priority_point (j : Job) :=
+    ((job_arrival j)%:R + task_priority_point (job_task j))%R
+}.
 
 (** We define what it means for an abstract job-level fixed-priority policy to
     behave as a GEL policy. *)
 Section GELPolicy.
 
-  (** Consider jobs of tasks with relative priority points. *)
-  Context {Job : JobType} {Task : TaskType} `{JobTask Job Task}
-    `{PriorityPoint Task} `{JobArrival Job}.
+  (** Consider jobs with absolute priority points. *)
+  Context {Job : JobType} `{JobPriorityPoint Job}.
 
   (** A JLFP policy is GEL if it never assigns higher priority to a job with a
       later absolute priority point. Ties among jobs with equal priority points

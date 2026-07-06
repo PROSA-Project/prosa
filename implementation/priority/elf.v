@@ -25,7 +25,7 @@ Section ELF.
   #[local] Instance ELF (fp : FP_policy Task) : JLFP_policy Job :=
   {
     hep_job (j1 j2 : Job) :=
-      let gel_hep_job := @hep_job _ (GEL Job Task) in
+      let gel_hep_job := @hep_job _ (GEL Job) in
       hp_task (job_task j1) (job_task j2)
       || (hep_task (job_task j1) (job_task j2)
           && gel_hep_job j1 j2)
@@ -62,7 +62,7 @@ Section PropertiesOfELF.
   Fact hep_job_elf_gel :
     forall j j',
       ep_task (job_task j) (job_task j') ->
-      (@hep_job _ (ELF FP) j j') = (@hep_job _ (GEL Job Task) j j').
+      (@hep_job _ (ELF FP) j j') = (@hep_job _ (GEL Job) j j').
   Proof.
     move=> j j' EP.
     rewrite ELF_hep_job GEL_hep_job.
@@ -109,7 +109,13 @@ Section PropertiesOfELF.
     { move: NHP => /nandP [NHEP'| NHEP']; apply/orP.
       - by left; rewrite -not_hep_hp_task.
       - right; move: NHEP' => /negbNE -> /=.
-        by move: NPP; lia. }
+        move: NPP; rewrite /job_priority_point/jpp_from_tpp => NPP.
+        have: (((job_arrival x)%:R + task_priority_point (job_task x))%R
+               <= ((job_arrival y)%:R + task_priority_point (job_task y))%R)%R
+              || (((job_arrival y)%:R + task_priority_point (job_task y))%R
+                  <= ((job_arrival x)%:R + task_priority_point (job_task x))%R)%R
+          by exact: le_total.
+        by rewrite (negbTE NPP). }
   Qed.
 
   (** The concrete [ELF] implementation is indeed an ELF policy. *)

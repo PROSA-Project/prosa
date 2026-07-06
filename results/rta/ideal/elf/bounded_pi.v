@@ -292,7 +292,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         move=> /andP[HEPj EP]; rewrite -TSK'; apply/andP; split =>//.
         have: (job_priority_point j0 <= job_priority_point j)%R
           by apply: ELF_policy_priority_point_order.
-        rewrite /is_ep_causing_intf /job_priority_point TSK' lerBrDl addrAC lerBrDl addr0.
+        rewrite /is_ep_causing_intf /job_priority_point/jpp_from_tpp TSK' lerBrDl addrAC lerBrDl addr0.
         apply: le_trans; rewrite lerD2r ler_nat.
         apply: job_arrival_between_ge=>//. }}
     { exists t1, t2; split=> [//|]; split=> [//|].
@@ -441,7 +441,7 @@ Section AbstractRTAforELFwithArrivalCurves.
         { apply: ELF_policy_priority_point_order => //.
           rewrite TSKo ep_task_sym.
           by move: H_job_of_task => /eqP ->. }
-        rewrite /job_priority_point.
+        rewrite /job_priority_point/jpp_from_tpp.
         move: H_job_of_task => /eqP <-.
         by clear; lia.
       Qed.

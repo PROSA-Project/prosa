@@ -114,7 +114,7 @@ Section MaxNPSegmentIsBounded.
         by rewrite /ep_task; apply/andP; split.
       have: (job_priority_point j <= job_priority_point j')%R
         by apply: ELF_policy_not_hep_priority_point_order.
-      rewrite /job_priority_point => PP.
+      rewrite /job_priority_point/jpp_from_tpp => PP.
       have LT: ((job_arrival j)%:R + task_priority_point (job_task j)
                < (t1)%:R + task_priority_point (job_task j'))%R by lia.
       by rewrite natrB
