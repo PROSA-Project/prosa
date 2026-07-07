@@ -75,8 +75,8 @@ Section RTAforFloatingFPModelwithArrivalCurves.
   (** We assume the sequential model of readiness without jitter or
       self-suspensions, wherein a pending job [j] is ready as soon as
       all prior jobs from the same task completed. *)
-  #[local] Instance sequential_readiness : JobReady _ _ :=
-    sequential_ready_instance arr_seq.
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_basic_sequential_readiness : basic_sequential_readiness RM arr_seq.
 
   (** We further require that a job's cost cannot exceed its task's stated WCET. *)
   Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.

@@ -94,7 +94,8 @@ Section RTAforFIFOModelwithArrivalCurves.
 
   (** We assume the classic (i.e., Liu & Layland) model of readiness without
       jitter or self-suspensions, wherein pending jobs are always ready. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** *** The Schedule *)
 

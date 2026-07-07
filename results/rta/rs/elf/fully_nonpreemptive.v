@@ -80,7 +80,8 @@ Section RTAforFullyNonPreemptiveELFModelwithArrivalCurves.
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** We further require that a job's cost cannot exceed its task's stated WCET. *)
   Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.

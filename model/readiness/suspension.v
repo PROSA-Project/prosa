@@ -38,28 +38,23 @@ Section ReadinessOfSelfSuspendingJobs.
       [delay] time units, then a self-suspension of length [delay] has
       necessarily ended at time [t]. *)
   Definition suspension_has_passed (sched : schedule PState) (j : Job) (t : instant) :=
-    let delay := job_suspension j (service sched j t) in
-    (job_arrival j + delay <= t) && no_progress_for sched j t delay.
+    let
+      delay := job_suspension j (service sched j t)
+    in
+      (job_arrival j + delay <= t) && no_progress_for sched j t delay.
 
   (** Further, we say a job [j] is suspended if [j] is pending and
       [suspension_has_passed] is false. *)
   Definition suspended (sched : schedule PState) (j : Job) (t : instant) :=
     ~~ suspension_has_passed sched j t && pending sched j t.
 
-  (** Based on [suspension_has_passed], we state the notion of readiness for
-      self-suspending jobs: a job [t] is ready at time [t] in a schedule
-      [sched] only if it is not self-suspended or complete at time [t]. *)
-  #[local,program] Instance suspension_ready_instance : JobReady Job PState :=
-  {
-    job_ready sched j t := suspension_has_passed sched j t
-                             && ~~ completed_by sched j t
-  }.
-  Next Obligation.
-    move=> sched j t /andP[PASSED UNFINISHED].
-    rewrite /pending. apply /andP. split => //.
-    move: PASSED. rewrite /suspension_has_passed /has_arrived => /andP [ARR _].
-    by apply: leq_trans ARR; rewrite leq_addr.
-  Qed.
+  (** Based on [suspension_has_passed], we specify the notion of readiness for
+      self-suspending jobs: a job [j] is ready at time [t] in a schedule
+      [sched] iff it is not self-suspended or complete at time [t]. *)
+  Definition self_suspension_readiness (RM : JobReady Job PState) :=
+    forall sched j t,
+      job_ready sched j t = suspension_has_passed sched j t
+                            && ~~ completed_by sched j t.
 
 End ReadinessOfSelfSuspendingJobs.
 

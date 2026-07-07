@@ -5,10 +5,6 @@ Require Export prosa.analysis.definitions.work_bearing_readiness.
 
 Section LiuAndLaylandReadiness.
 
-  (** We assume the basic (i.e., Liu & Layland)
-      readiness model under which any pending job is ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any kind of jobs ... *)
   Context {Job : JobType}.
 
@@ -18,12 +14,17 @@ Section LiuAndLaylandReadiness.
   (** Suppose jobs have an arrival time and a cost. *)
   Context `{JobArrival Job} `{JobCost Job}.
 
+  (** Assume a basic (i.e., Liu & Layland) readiness model under which any
+      pending job is ready. *)
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
+
   (** The Liu & Layland readiness model is trivially non-clairvoyant. *)
   Fact basic_readiness_nonclairvoyance :
-    nonclairvoyant_readiness basic_ready_instance.
+    nonclairvoyant_readiness RM.
   Proof.
     move=> sched sched' j h PREFIX t IN.
-    rewrite /job_ready /basic_ready_instance.
+    rewrite !H_basic_readiness.
     now apply (identical_prefix_pending _ _ h).
   Qed.
 
@@ -43,7 +44,7 @@ Section LiuAndLaylandReadiness.
   Proof.
     move=> ARR COMP.
     rewrite /jobs_must_be_ready_to_execute =>  j t SCHED.
-    rewrite /job_ready /basic_ready_instance /pending.
+    rewrite H_basic_readiness /pending.
     apply /andP; split.
     - by apply ARR.
     - rewrite -less_service_than_cost_is_incomplete.

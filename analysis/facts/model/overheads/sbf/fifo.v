@@ -60,11 +60,6 @@ End OverheadResourceModelValidSBF.
     indeed a valid SBF. *)
 Section OverheadResourceModelValidSBF.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any type of tasks ... *)
   Context {Task : TaskType}.
   Context `{MaxArrivals Task}.
@@ -75,6 +70,12 @@ Section OverheadResourceModelValidSBF.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobPreemptable Job}.
+
+  (** We assume the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready. *)
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** Consider a FIFO priority policy that indicates a higher-or-equal
       priority relation. *)

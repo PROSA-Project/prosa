@@ -5,6 +5,7 @@ Require Export prosa.analysis.definitions.tardiness.
 Require Export prosa.implementation.facts.ideal_uni.prio_aware.
 Require Export prosa.implementation.definitions.task.
 Require Export prosa.implementation.priority.numeric_fixed_priority.
+Require Export prosa.implementation.readiness.sequential.
 
 (** ** Fully-Preemptive Fixed-Priority Schedules  *)
 
@@ -26,7 +27,7 @@ Section Schedule.
 
   (** ... assume sequential readiness, ... *)
   Instance sequential_ready_instance : JobReady Job (ideal.processor_state Job) :=
-    sequential_ready_instance arr_seq.
+    sequential.sequential_ready_instance arr_seq.
 
   (** ... and consider any fully-preemptive, fixed-priority schedule. *)
   #[local] Existing Instance fully_preemptive_job_model.
@@ -38,7 +39,7 @@ Section Schedule.
     valid_schedule sched arr_seq.
   Proof.
     apply uni_schedule_valid => //.
-    by apply sequential_readiness_nonclairvoyance.
+    by apply: sequential_readiness_nonclairvoyance.
   Qed.
 
   (** Finally, we show that the fixed-priority policy is respected at each preemption point. *)
@@ -46,7 +47,7 @@ Section Schedule.
     respects_FP_policy_at_preemption_point arr_seq sched (numeric_fp_ascending Task).
   Proof.
     apply schedule_respects_policy => //.
-    by apply sequential_readiness_nonclairvoyance.
+    by apply: sequential_readiness_nonclairvoyance.
   Qed.
 
 End Schedule.

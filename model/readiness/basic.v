@@ -2,8 +2,8 @@ Require Export prosa.behavior.all.
 
 (** * Liu & Layland Readiness Model *)
 
-(** In this module, we define the notion of job readiness for the classic Liu &
-    Layland model without jitter or self-suspensions, where pending jobs are
+(** In this module, we specify the notion of job readiness for the classic Liu
+    & Layland model without jitter or self-suspensions, where pending jobs are
     simply always ready. *)
 
 Section LiuAndLaylandReadiness.
@@ -16,11 +16,10 @@ Section LiuAndLaylandReadiness.
   (** Suppose jobs have an arrival time and a cost. *)
   Context `{JobArrival Job} `{JobCost Job}.
 
-  (** In the basic Liu & Layland model, a job is ready iff it is pending. *)
-  #[local,program] Instance basic_ready_instance : JobReady Job PState :=
-  {
-    job_ready sched j t := pending sched j t
-  }.
-  Next Obligation. by done. Qed.
+  (** A readiness model is basic iff a job is ready exactly when it is
+      pending. *)
+  Definition basic_readiness (RM : JobReady Job PState) :=
+    forall sched j t,
+      job_ready sched j t = pending sched j t.
 
 End LiuAndLaylandReadiness.

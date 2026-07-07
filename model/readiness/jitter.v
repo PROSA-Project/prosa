@@ -13,8 +13,8 @@ Class JobJitter (Job : JobType) := { job_jitter : Job -> duration }.
 
 (** * Readiness of Jobs with Release Jitter *)
 
-(** Based on the job model's jitter parameter, we define the readiness
-   predicate for jogs with release jitter (and no self-suspensions). *)
+(** Based on the job model's jitter parameter, we specify the readiness
+   predicate for jobs with release jitter (and no self-suspensions). *)
 
 Section ReadinessOfJitteryJobs.
   (** Consider any kind of jobs... *)
@@ -30,18 +30,10 @@ Section ReadinessOfJitteryJobs.
       job's release jitter has passed. *)
   Definition is_released (j : Job) (t : instant) := job_arrival j + job_jitter j <= t.
 
-  (** Based on the predicate [is_released], it is easy to state the notion of
-      readiness for jobs subject to release jitter: a job is ready only if it
-      is released and not yet complete. *)
-  #[local,program] Instance jitter_ready_instance : JobReady Job PState :=
-  {
-    job_ready sched j t := is_released j t && ~~ completed_by sched j t
-  }.
-  Next Obligation.
-    move=> sched j t /andP[REL UNFINISHED].
-    rewrite /pending. apply /andP. split => //.
-    move: REL. rewrite /is_released /has_arrived.
-    by apply: leq_trans; rewrite leq_addr.
-  Qed.
+  (** A readiness model satisfies jitter readiness iff a job is ready exactly
+      when it is released and not yet complete. *)
+  Definition jitter_readiness (RM : JobReady Job PState) :=
+    forall sched j t,
+      job_ready sched j t = is_released j t && ~~ completed_by sched j t.
 
 End ReadinessOfJitteryJobs.

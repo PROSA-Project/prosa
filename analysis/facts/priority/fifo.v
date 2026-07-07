@@ -94,10 +94,6 @@ Global Hint Resolve
 (** In this section, we prove some fundamental properties of the FIFO policy. *)
 Section BasicLemmas.
 
-  (** We assume the basic (i.e., Liu & Layland)
-      readiness model under which any pending job is ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any type of jobs with arrival times and execution costs. *)
   Context `{Job : JobType} {Arrival : JobArrival Job} {Cost : JobCost Job}.
 
@@ -111,6 +107,12 @@ Section BasicLemmas.
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniproc : uniprocessor_model PState.
   Variable sched : schedule PState.
+
+  (** We assume the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready. *)
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
+
   (** We assume that the schedule is valid and work-conserving. *)
   Hypothesis H_schedule_is_valid : valid_schedule sched arr_seq.
   Hypothesis H_work_conservation : work_conserving arr_seq sched.
@@ -239,7 +241,7 @@ Section BasicLemmas.
       have [j' SCHED']: exists j', scheduled_at sched j' t.
       { apply: (H_work_conservation j t) => //.
         apply/andP; split => //.
-        rewrite /job_ready/basic_ready_instance/pending.
+        rewrite H_basic_readiness /pending.
         apply/andP; split => //.
         have: has_arrived j t.-1; last by rewrite /has_arrived; lia.
         exact: has_arrived_scheduled. }

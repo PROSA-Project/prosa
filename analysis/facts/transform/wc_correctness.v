@@ -21,15 +21,16 @@ Section AuxiliaryLemmasWorkConservingTransformation.
   (** We assume ideal uni-processor schedules. *)
   #[local] Existing Instance ideal.processor_state.
 
-  (** We assume the basic (i.e., Liu & Layland)
-      readiness model under which any pending job is ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** Consider any type of jobs with arrival times, costs, and deadlines... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobDeadline Job}.
+
+  (** ... following the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ...and an arbitrary arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
@@ -115,7 +116,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       have ORDER: t1<=t2 by apply swap_candidate_is_in_future.
       have READY: job_ready sched j t1.
       { by apply: job_scheduled_implies_ready; rewrite // -SCHED_AT'. }
-      rewrite /job_ready /basic_ready_instance /pending /completed_by in READY.
+      rewrite H_basic_readiness /pending /completed_by in READY.
       move: READY => /andP [ARR _].
       rewrite EQ_T2.
       exact: (leq_trans ARR).
@@ -129,7 +130,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       move=> j t SCHED_AT.
       rewrite /sched'.
       set t2 := find_swap_candidate arr_seq sched t1.
-      rewrite /job_ready /basic_ready_instance /pending.
+      rewrite H_basic_readiness /pending.
       apply /andP; split; first by apply swap_jobs_must_arrive_to_execute.
       rewrite /completed_by; rewrite -ltnNge.
       apply swapped_completed_jobs_dont_execute => //.
@@ -183,9 +184,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Lemma mwa_ready_job_also_ready_in_original_schedule :
       forall j t, job_ready sched' j t -> job_ready sched j t.
     Proof.
-      intros j t'.
-      rewrite /job_ready /basic_ready_instance /pending.
-      move=> /andP [ARR COMP_BY].
+      move=> j t'.
+      rewrite !H_basic_readiness /pending => /andP [ARR COMP_BY].
       rewrite ARR Bool.andb_true_l //.
       move: COMP_BY; apply contra.
       rewrite /completed_by.
@@ -287,8 +287,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         Proof.
           have READY_ORIG: job_ready sched j t
             by apply (mwa_ready_job_also_ready_in_original_schedule _ _); apply H_job_ready_sched'.
-          rewrite /job_ready /basic_ready_instance /pending.
-          move:READY_ORIG => /andP [ARR_ NOT_COMPL_ORIG].
+          move: READY_ORIG; rewrite H_basic_readiness /pending => /andP [ARR_ NOT_COMPL_ORIG].
           rewrite /completed_by in NOT_COMPL_ORIG.
             by rewrite leqNgt; apply NOT_COMPL_ORIG.
         Qed.
@@ -309,7 +308,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
             service. *)
         Lemma equal_service_t_max_dl : service sched j t = service sched j max_dl.
         Proof.
-          move:(H_job_ready_sched') => /andP [ARR NOT_COMPL_sched'].
+          move: H_job_ready_sched'; rewrite H_basic_readiness /pending => /andP [ARR NOT_COMPL_sched'].
           rewrite -(service_cat sched j t max_dl);
             last by apply (leq_trans t_is_less_than_deadline_of_j), max_dl_is_greatest_dl.
           have ZERO_SERVICE: service_during sched j t max_dl = 0.
@@ -326,7 +325,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         (** Combining the previous lemmas, we can deduce that [j] misses its deadline. *)
         Lemma j_misses_deadline : service sched j (job_deadline j) < job_cost j.
         Proof.
-          move:(H_job_ready_sched') => /andP [ARR NOT_COMPL_sched'].
+          move: H_job_ready_sched'; rewrite H_basic_readiness /pending => /andP [ARR NOT_COMPL_sched'].
           have J_LESS := service_of_j_is_less_than_cost.
           rewrite equal_service_t_max_dl in J_LESS.
           specialize (H_all_deadlines_of_arrivals_met j H_arrives_in).
@@ -566,17 +565,18 @@ End AuxiliaryLemmasWorkConservingTransformation.
     work-conservation transformation. *)
 Section WorkConservingTransformation.
 
-  (** We assume the basic (i.e., Liu & Layland)
-      readiness model under which any pending job is ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
-  (** Consider any type of jobs with arrival times, costs, and deadlines... *)
+  (** Consider any type of jobs with arrival times, costs, and deadlines, ... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
   Context `{JobDeadline Job}.
 
-  (** ...an arbitrary valid arrival sequence... *)
+  (** ... following the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
+
+  (** ...an arbitrary valid arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
@@ -610,8 +610,7 @@ Section WorkConservingTransformation.
     have READY': job_ready (wc_transform_prefix arr_seq sched t.+1) j t by
                    exact: wc_prefix_jobs_must_be_ready_to_execute.
     move: READY'.
-    rewrite /job_ready /basic.basic_ready_instance
-            /pending /completed_by /service.
+    rewrite !H_basic_readiness /pending /completed_by /service.
     rewrite (equal_prefix_implies_same_service_during sched_wc (wc_transform_prefix arr_seq sched t.+1)) //.
     move=> t' /andP [_ BOUND_t'].
     rewrite /sched_wc /wc_transform.
@@ -646,8 +645,7 @@ Section WorkConservingTransformation.
       split; first by apply ARR_IN.
       have EQ: job_ready sched_wc j t = job_ready (prefix_map sched (make_wc_at arr_seq) (succn t)) j t.
       {
-        rewrite /sched_wc /wc_transform /job_ready
-                /basic_ready_instance /pending /completed_by
+        rewrite /sched_wc /wc_transform !H_basic_readiness /pending /completed_by
                 /service /service_during /service_at /wc_transform_prefix.
         destruct has_arrived; last by rewrite Bool.andb_false_l.
         have EQ_SUM: \sum_(0 <= t0 < t) service_in j (prefix_map sched (make_wc_at arr_seq) (succn t0) t0)

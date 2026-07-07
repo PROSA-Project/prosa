@@ -59,8 +59,8 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
 
   (** Recall that we assume sequential readiness, i.e., jobs of the same task
       are executed in order of their arrival. *)
-  #[local] Instance sequential_readiness : JobReady _ _ :=
-    sequential_ready_instance arr_seq.
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_sequential_readiness : basic_sequential_readiness RM arr_seq.
 
   (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).

@@ -29,7 +29,8 @@ Section AbstractRTAforGELwithArrivalCurves.
     {Cost : JobCost Job} `{JobPreemptable Job} `{PriorityPoint Task}.
 
   (** We assume the basic readiness model. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ** A. Defining the System Model *)
 

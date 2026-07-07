@@ -31,11 +31,12 @@ Section TotalSuspensionBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and assume the notion of readiness for self-suspending jobs. *)
-  #[local] Existing Instance suspension_ready_instance.
-
-  (** Consider any kind of processor model. *)
+  (** ... and any kind of processor model. *)
   Context `{PState : ProcessorState Job}.
+
+  (** Assume self-suspending jobs. *)
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_self_suspension_readiness : self_suspension_readiness RM.
 
   (** Consider any valid schedule. *)
   Variable sched : schedule PState.

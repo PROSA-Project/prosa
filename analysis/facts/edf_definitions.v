@@ -30,16 +30,17 @@ Require Import prosa.model.preemption.fully_preemptive.
 
 Section Equivalence.
 
-  (** We assume the basic (i.e., Liu & Layland)
-      readiness model under which any pending job is ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** We assume that jobs are fully preemptive. *)
   #[local] Existing Instance fully_preemptive_job_model.
 
   (** For any given type of jobs, each characterized by an arrival time,
       an execution cost, and an absolute deadline, ... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+
+  (** ... following the basic (i.e., Liu & Layland)
+      readiness model under which any pending job is ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ...consider a given valid job arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -90,7 +91,8 @@ Section Equivalence.
     move /neqP => NEQ.
     exploit (H_priority_driven j j_hp t) => //.
     { by rewrite /preemption_time scheduled_job_at_def //; destruct (sched t). }
-    { apply /andP; split => //.
+    { rewrite /backlogged H_basic_readiness.
+      apply /andP; split => //.
       - apply /andP; split => //.
         apply (incompletion_monotonic _ j _ _ LEQ).
         by apply scheduled_implies_not_completed.

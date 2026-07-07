@@ -1,12 +1,8 @@
+Require Export prosa.model.readiness.sequential.
 Require Export prosa.analysis.definitions.readiness.
 Require Export prosa.analysis.definitions.work_bearing_readiness.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.facts.model.task_arrivals.
-
-(** Throughout this file, we assume the sequential task readiness model, which
-    means that a job is ready to execute only if all prior jobs of the same task
-    have completed. *)
-Require Export prosa.model.readiness.sequential.
 
 (** In this section, we show some useful properties of the sequential
     task readiness model. *)
@@ -26,15 +22,18 @@ Section SequentialTasksReadiness.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arrival_times_are_consistent : consistent_arrival_times arr_seq.
 
-  (** Recall that we assume sequential tasks. *)
-  #[local] Instance sequential_readiness_instance : JobReady Job PState :=
-    sequential_ready_instance arr_seq.
+  (** Assume a basic sequential readiness model, wherein a pending job is ready
+      exactly when all prior jobs from the same task have completed. *)
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_basic_sequential_readiness : basic_sequential_readiness RM arr_seq.
 
   (** First, we observe that the sequential readiness model indeed lives up to
       its name. *)
   Fact sequential_readiness_is_sequential :
-    sequential_readiness sequential_readiness_instance arr_seq.
-  Proof. by move=> sched j t; rewrite /job_ready //= => /andP [_ PRIO_COMP]. Qed.
+    sequential_readiness RM arr_seq.
+  Proof.
+    by move=> sched j t; rewrite H_basic_sequential_readiness => /andP [_ PRIOR].
+  Qed.
 
   (** Consider any valid schedule of [arr_seq]. *)
   Variable sched : schedule PState.
@@ -45,11 +44,12 @@ Section SequentialTasksReadiness.
   Context {FP : FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
 
-  (** We show that the sequential readiness model is non-clairvoyant. *)
+  (** We show that a sequential readiness model is non-clairvoyant. *)
   Fact sequential_readiness_nonclairvoyance :
-    nonclairvoyant_readiness sequential_readiness_instance.
+    nonclairvoyant_readiness RM.
   Proof.
-    intros sched1 sched2 j h ID t LE; rewrite //=.
+    intros sched1 sched2 j h ID t LE.
+    rewrite !H_basic_sequential_readiness.
     erewrite identical_prefix_pending; eauto 2.
     destruct (boolP (pending sched2 j t)) as [_ | _] => //=.
     destruct (boolP (prior_jobs_complete arr_seq sched2 j t)) as [ALL | NOT_ALL]; apply/eqP.
@@ -69,7 +69,8 @@ Section SequentialTasksReadiness.
   Proof.
     intros j1 j2 t ARR1 ARR2 SAME LT SCHED.
     destruct (boolP (job_ready sched j2 t)) as [READY | NREADY].
-    - move: READY => /andP [PEND /allP ALL]; apply: ALL.
+    - move: READY; rewrite H_basic_sequential_readiness => /andP [PEND /allP ALL].
+      apply: ALL.
       rewrite mem_filter; apply/andP; split=> [//|].
       exact: arrived_between_implies_in_arrivals.
     - by exfalso; apply/(negP NREADY)/job_scheduled_implies_ready.
@@ -90,7 +91,7 @@ Section SequentialTasksReadiness.
     { destruct (boolP (job_ready sched j t)) as [READY | NREADY].
       { exists j; repeat split => //.
         by rewrite /hep_job /fp_to_jlfp; apply: H_priority_is_reflexive. }
-      { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [jhp IN NCOMP].
+      { move: NREADY; rewrite H_basic_sequential_readiness PEND Bool.andb_true_l => /allPn [jhp IN NCOMP].
         apply arrives_in_task_arrivals_before_implies_arrives_before in IN => [|//].
         by exfalso; move: LE; rewrite leqn0 => /eqP EQ; rewrite EQ in IN.
       }
@@ -99,7 +100,7 @@ Section SequentialTasksReadiness.
       destruct (boolP (job_ready sched j t)) as [READY | NREADY].
       { exists j; repeat split => //.
         by rewrite /hep_job /fp_to_jlfp; apply: H_priority_is_reflexive. }
-      { move: NREADY; rewrite //= PEND Bool.andb_true_l => /allPn [j' IN NCOMP].
+      { move: NREADY; rewrite H_basic_sequential_readiness PEND Bool.andb_true_l => /allPn [j' IN NCOMP].
         have LE' : job_arrival j' <= k.
         { by apply arrives_in_task_arrivals_before_implies_arrives_before in IN; rewrite // -ltnS -EQ. }
         have ARR' : arrives_in arr_seq j'.

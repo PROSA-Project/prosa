@@ -17,11 +17,12 @@ Section Suspensions.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and assume the notion of readiness for self-suspending jobs. *)
-  #[local] Existing Instance suspension_ready_instance.
-
-  (** Consider any kind of processor model. *)
+  (** ... and any kind of processor model. *)
   Context `{PState : ProcessorState Job}.
+
+  (** Assume self-suspending jobs. *)
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_self_suspension_readiness : self_suspension_readiness RM.
 
   (** Consider any valid schedule. *)
   Variable sched : schedule PState.
@@ -38,7 +39,7 @@ Section Suspensions.
       ~~ job_ready sched j t.
   Proof.
     move=> j t /andP[SUS PEND].
-    rewrite /job_ready /suspension_ready_instance.
+    rewrite H_self_suspension_readiness.
     by rewrite negb_and; apply /orP; left.
   Qed.
 
@@ -91,7 +92,7 @@ Section Suspensions.
     move=> j t; rewrite /suspended => PEND NOTSUS.
     rewrite PEND andbT negbK in NOTSUS.
     move: PEND => /andP [ARR NOTCOMP].
-    by rewrite /job_ready /suspension_ready_instance; apply /andP; split.
+    by rewrite H_self_suspension_readiness; apply /andP; split.
   Qed.
 
   (** ** Self-Suspension Bound at any Point During a Job's Execution *)

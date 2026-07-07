@@ -27,7 +27,8 @@ Section Optimality.
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** We assume that jobs are fully preemptive. *)
   #[local] Existing Instance fully_preemptive_job_model.
@@ -116,7 +117,7 @@ Section Optimality.
   Proof.
     move /EDF_WC_optimality => [edf_sched [[ARR READY] [DL_MET [WC EDF]]]].
     exists edf_sched.
-    apply  (EDF_schedule_equiv arr_seq) in EDF => //.
+    apply (EDF_schedule_equiv H_basic_readiness arr_seq) in EDF => //.
     exact: (completed_jobs_are_not_ready edf_sched READY).
   Qed.
 

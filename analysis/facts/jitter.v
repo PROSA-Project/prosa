@@ -114,6 +114,14 @@ Section JitterPropagationFacts.
   (** Let us now consider the execution costs. *)
   Context `{JobCost Job} `{TaskCost Task}.
 
+  (** Assume a release-jitter readiness model for the original-arrival view. *)
+  Context {JitterRM : @JobReady Job PState _ original_arrival}.
+  Hypothesis H_jitter_readiness : jitter_readiness JitterRM.
+
+  (** Assume a basic readiness model for the release-as-arrival view. *)
+  Context {BasicRM : @JobReady Job PState _ release_as_arrival}.
+  Hypothesis H_basic_readiness : @basic_readiness Job PState release_as_arrival _ BasicRM.
+
   (** Since the set of jobs didn't change, and since release jitter propagation
       does not change execution costs, job costs remain trivially valid. *)
   Lemma jitter_prop_valid_costs :
@@ -128,29 +136,34 @@ Section JitterPropagationFacts.
   (** If the given schedule respects release jitter, then it continues to do so
       after we've reinterpreted the release times to be the arrival times. *)
   Lemma jitter_ready_to_execute :
-    @jobs_must_be_ready_to_execute _ original_arrival _ sched _ jitter_ready_instance ->
-    @jobs_must_be_ready_to_execute _ release_as_arrival _ sched _ basic_ready_instance.
-  Proof. move=> RDY j t SCHED; by move: (RDY j t SCHED). Qed.
+    @jobs_must_be_ready_to_execute _ original_arrival _ sched _ JitterRM ->
+    @jobs_must_be_ready_to_execute _ release_as_arrival _ sched _ BasicRM.
+  Proof.
+    move=> RDY j t SCHED.
+    rewrite H_basic_readiness /pending.
+    by move: (RDY j t SCHED); rewrite H_jitter_readiness.
+  Qed.
 
   (** If the schedule is work-conserving, then it continues to be so after we've
       "hidden" release jitter by reinterpreting release times as arrival
       times. *)
   Theorem jitter_work_conservation :
-    @work_conserving _ original_arrival _ _ jitter_ready_instance arr_seq sched ->
-    @work_conserving _ release_as_arrival _ _ basic_ready_instance rel_seq sched.
+    @work_conserving _ original_arrival _ _ JitterRM arr_seq sched ->
+    @work_conserving _ release_as_arrival _ _ BasicRM rel_seq sched.
   Proof.
     move=> WC_jit j t ARR_rel /andP [R_rel NSCHED].
     have ARR_arr: arrives_in arr_seq j by rewrite jitter_arrives_in_iff.
     apply: WC_jit; first exact: ARR_arr.
-    by apply/andP; split.
+    apply/andP; split=> //.
+    by move: R_rel; rewrite H_basic_readiness /pending.
   Qed.
 
   (** If the given schedule is valid w.r.t. to original arrivals, then it
       continues to be valid after reinterpreting release times as arrival
       times. *)
   Lemma jitter_valid_schedule :
-    @valid_schedule _ original_arrival _ sched _ jitter_ready_instance arr_seq ->
-    @valid_schedule _ release_as_arrival _ sched _ basic_ready_instance rel_seq.
+    @valid_schedule _ original_arrival _ sched _ JitterRM arr_seq ->
+    @valid_schedule _ release_as_arrival _ sched _ BasicRM rel_seq.
   Proof.
     move => [SRC RDY].
     split.
@@ -161,7 +174,7 @@ Section JitterPropagationFacts.
   (** In the following, suppose the given schedule is valid w.r.t. the original
       arrival times and jitter-affected readiness. *)
   Hypothesis H_valid_schedule :
-    @valid_schedule _ original_arrival _ sched _ jitter_ready_instance arr_seq.
+    @valid_schedule _ original_arrival _ sched _ JitterRM arr_seq.
 
   (** As one would think, the set of scheduled jobs remains unchanged. For
       technical reasons (dependence of the definition of [scheduled_jobs_at] on
@@ -174,13 +187,13 @@ Section JitterPropagationFacts.
   Proof.
     move=> j t.
     have SRC := @valid_schedule_jobs_come_from_arrival_sequence _ _ sched _
-                  original_arrival jitter_ready_instance arr_seq H_valid_schedule.
+                  original_arrival JitterRM arr_seq H_valid_schedule.
     rewrite [RHS]scheduled_jobs_at_iff; [| |exact: SRC|] => //.
     rewrite (@scheduled_jobs_at_iff _ release_as_arrival); first by done.
     - exact: valid_release_sequence.
     - exact: jitter_prop_same_jobs'.
     - exact
-        /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival basic_ready_instance)
+        /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival BasicRM)
         /jitter_ready_to_execute.
   Qed.
 
@@ -194,7 +207,7 @@ Section JitterPropagationFacts.
   Proof.
     move=> t UNI.
     have SRC := @valid_schedule_jobs_come_from_arrival_sequence _ _ sched _
-                  original_arrival jitter_ready_instance arr_seq H_valid_schedule.
+                  original_arrival JitterRM arr_seq H_valid_schedule.
     (* Note: there is a lot of repetition here because the automation chokes on
        the multiple available type-class instances and/or promptly picks the
        wrong ones. Not pretty, but it works. *)
@@ -207,8 +220,8 @@ Section JitterPropagationFacts.
       - exact: valid_release_sequence.
       - exact: jitter_prop_same_jobs'.
       - exact
-          /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival basic_ready_instance)
-            /jitter_ready_to_execute.
+          /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival BasicRM)
+          /jitter_ready_to_execute.
       - by [].
     }
     { exfalso.
@@ -218,8 +231,8 @@ Section JitterPropagationFacts.
       - exact: valid_release_sequence.
       - exact: jitter_prop_same_jobs'.
       - exact
-          /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival basic_ready_instance)
-            /jitter_ready_to_execute. }
+          /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival BasicRM)
+          /jitter_ready_to_execute. }
 
     { exfalso.
       move: SCHED; rewrite scheduled_job_at_none; [| |exact: SRC|] => // NSCHED.
@@ -228,8 +241,8 @@ Section JitterPropagationFacts.
       - exact: valid_release_sequence.
       - exact: jitter_prop_same_jobs'.
       - exact
-          /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival basic_ready_instance)
-            /jitter_ready_to_execute.
+          /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival BasicRM)
+          /jitter_ready_to_execute.
       - by []. }
   Qed.
 
@@ -238,14 +251,16 @@ Section JitterPropagationFacts.
   Theorem jitter_FP_compliance `{FP : FP_policy Task} `{JobPreemptable Job} :
     uniprocessor_model PState ->
     @respects_FP_policy_at_preemption_point
-      _ _ _ original_arrival _ _ _ jitter_ready_instance arr_seq sched FP ->
+      _ _ _ original_arrival _ _ _ JitterRM arr_seq sched FP ->
     @respects_FP_policy_at_preemption_point
-      _ _ _ release_as_arrival _ _ _ basic_ready_instance rel_seq sched FP.
+      _ _ _ release_as_arrival _ _ _ BasicRM rel_seq sched FP.
   Proof.
     move=> UNI COMP j j_hp t ARR_rel PT_rel BL  SCHED_hp.
     have ARR_arr: arrives_in arr_seq j by rewrite jitter_arrives_in_iff.
     apply: COMP => //.
-    by rewrite /preemption_time jitter_scheduled_job_at_eq.
+    - by rewrite /preemption_time (jitter_scheduled_job_at_eq t UNI).
+    - move: BL; rewrite /backlogged H_basic_readiness /pending => /andP [PEND NSCHED].
+      apply/andP; split=> //.
   Qed.
 
   (** ** Transferred Response-Time Bound *)

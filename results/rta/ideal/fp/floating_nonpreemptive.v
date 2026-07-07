@@ -66,8 +66,8 @@ Section RTAforFloatingModelwithArrivalCurves.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Recall that we assume sequential readiness. *)
-  #[local] Instance sequential_readiness : JobReady _ _ :=
-    sequential_ready_instance arr_seq.
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_sequential_readiness : basic_sequential_readiness RM arr_seq.
 
   (** Next, consider any valid ideal uni-processor schedule with
       limited preemptions of this arrival sequence ... *)

@@ -25,8 +25,8 @@ Section RTA.
   Variable arr_seq : arrival_sequence Job.
 
   (** We assume sequential readiness. *)
-   #[local] Instance sequential_readiness : JobReady _ _ :=
-    sequential_ready_instance arr_seq.
+  Context {RM : JobReady Job (exceedance_proc_state Job)}.
+  Hypothesis H_basic_sequential_readiness : basic_sequential_readiness RM arr_seq.
 
   (** We assume that all tasks are fully non-preemptive. *)
   #[local] Existing Instance fully_nonpreemptive_job_model.

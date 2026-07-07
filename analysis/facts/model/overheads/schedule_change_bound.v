@@ -31,7 +31,8 @@ Section ScheduleChangesBoundedHelper.
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** Consider any valid arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
@@ -310,7 +311,7 @@ Section ScheduleChangesBoundedHelper.
         apply scheduled_at_iff_scheduled_job in SCHEDo.
         eapply priority_higher_than_pending_job_priority with (t1 := to1) (t2 := to2) (t := to2.-1) => //.
         { by apply scheduled_at_iff_scheduled_job in SCHED2. }
-        { intros; rewrite /job_ready //=; apply/andP; split.
+        { intros; rewrite H_basic_readiness /pending; apply/andP; split.
           - rewrite /has_arrived; eapply has_arrived_scheduled in SCHED1 => //.
             by rewrite /has_arrived in SCHED1; lia.
           - clear SCHEDo SCHED1; apply scheduled_at_iff_scheduled_job in SCHED2.
@@ -412,7 +413,8 @@ Section JLFP.
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** Consider any valid arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
@@ -513,7 +515,8 @@ Section FP.
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** Consider any valid arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
@@ -603,7 +606,8 @@ Section FIFO.
   (** We assume the classic (i.e., Liu & Layland) model of readiness
       without jitter or self-suspensions, wherein pending jobs are
       always ready. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** Consider any valid arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.

@@ -15,10 +15,6 @@ Require Export prosa.analysis.facts.readiness.basic.
     which is a problem-specific wrapper around [search_arg]. *)
 Section FindSwapCandidateFacts.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
 
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
@@ -844,13 +840,14 @@ End EDFTransformFacts.
 (** Finally, we state the theorems that jointly make up the EDF optimality claim. *)
 Section Optimality.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+
+  (** ... following the classic (i.e., Liu & Layland) model of readiness
+      without jitter or self-suspensions, wherein pending jobs are
+      always ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ... consider an arbitrary valid job arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -878,7 +875,7 @@ Section Optimality.
     Proof.
       rewrite /valid_schedule; split;
         first by apply edf_transform_jobs_come_from_arrival_sequence.
-      apply basic_readiness_compliance.
+      apply: basic_readiness_compliance => //.
       - exact: edf_transform_jobs_must_arrive.
       - exact: edf_transform_completed_jobs_dont_execute.
     Qed.

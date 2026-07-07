@@ -20,15 +20,15 @@ Require Export prosa.analysis.facts.readiness.backlogged.
     swapped are not idle. *)
 Section NonIdleSwapWorkConservationLemmas.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
 
-  (** ... and any valid job arrival sequence. *)
+  (** ... following the classic (i.e., Liu & Layland) model of readiness without
+      jitter or self-suspensions, wherein pending jobs are always ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
+
+  (** ... and any valid job arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
@@ -36,8 +36,8 @@ Section NonIdleSwapWorkConservationLemmas.
   Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved (i.e., in which jobs execute only after having
-     arrived and only if they are not yet complete, and in which all jobs come
-     from the arrival sequence). *)
+      arrived and only if they are not yet complete, and in which all jobs come
+      from the arrival sequence). *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
   Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
@@ -107,7 +107,7 @@ Section NonIdleSwapWorkConservationLemmas.
     case: (boolP(t == t2)) => [/eqP EQ'| /eqP NEQ']; first by apply non_idle_swap_maintains_work_conservation_t2.
     have [j_other j_other_scheduled] : exists j_other, scheduled_at sched j_other t.
     { rewrite /work_conserving in WC_sched. apply (WC_sched j) => //; move :H_backlogged_j_t.
-      rewrite /backlogged/job_ready/basic_ready_instance/pending/completed_by.
+      rewrite /backlogged !H_basic_readiness /pending /completed_by.
       move /andP => [ARR_INCOMP scheduled]; move :ARR_INCOMP; move /andP => [arrive not_comp].
       apply /andP; split; first (apply /andP; split) => //.
       + by rewrite (service_before_swap_invariant sched t1 t2 _ t).
@@ -127,7 +127,7 @@ Section NonIdleSwapWorkConservationLemmas.
     case: (boolP(t == t2)) => [/eqP EQ'| /eqP NEQ']; first by apply non_idle_swap_maintains_work_conservation_t2.
     have [j_other j_other_scheduled] : exists j_other, scheduled_at sched j_other t.
     { rewrite /work_conserving in WC_sched. apply (WC_sched j) => //; move :H_backlogged_j_t.
-      rewrite /backlogged/job_ready/basic_ready_instance/pending/completed_by.
+      rewrite /backlogged !H_basic_readiness /pending /completed_by.
       move /andP => [ARR_INCOMP scheduled]; move :ARR_INCOMP; move /andP => [arrive not_comp].
       apply /andP; split; first (apply /andP; split) => //.
       + by rewrite (service_after_swap_invariant sched t1 t2 _ t) // /t2; apply fsc_range1.
@@ -151,7 +151,7 @@ Section NonIdleSwapWorkConservationLemmas.
     - have [j_other j_other_scheduled] : exists j_other, scheduled_at sched j_other t.
       { rewrite /work_conserving in WC_sched. apply (WC_sched j2).
         - by unfold jobs_come_from_arrival_sequence in H_from_arr_seq; apply (H_from_arr_seq _ t2) => //.
-        - rewrite/backlogged/job_ready/basic_ready_instance/pending/completed_by.
+        - rewrite /backlogged !H_basic_readiness /pending /completed_by.
           apply /andP; split=> [|//]; apply /andP; split=> //.
           + by rewrite /has_arrived; apply (leq_trans H_arrival_j2); apply ltnW.
           + rewrite -ltnNge. apply (leq_ltn_trans) with (service sched j2 t2).
@@ -168,13 +168,13 @@ End NonIdleSwapWorkConservationLemmas.
     of [edf_transform], which is [find_swap_candidate]. *)
 Section FSCWorkConservationLemmas.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+
+  (** ... following the classic (i.e., Liu & Layland) model of readiness without
+      jitter or self-suspensions, wherein pending jobs are always ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ...and any valid job arrival sequence,... *)
   Variable arr_seq : arrival_sequence Job.
@@ -221,11 +221,11 @@ Section FSCWorkConservationLemmas.
       + by apply (non_idle_swap_maintains_work_conservation_t2 arr_seq _ _ _ j1).
       + case: (boolP((t <= t1) || (t2 < t))) => [NOT_BET | BET]. (* t <> t2 *)
         * move: NOT_BET; move/orP => [] => NOT_BET.
-          { by apply (non_idle_swap_maintains_work_conservation_LEQ_t1 arr_seq _ _ _ H_range _ _ H_not_idle t2_not_idle j).  }
-          { by apply (non_idle_swap_maintains_work_conservation_GT_t2 arr_seq _ _ _ H_range _ _ H_not_idle t2_not_idle j). }
+          { by apply: non_idle_swap_maintains_work_conservation_LEQ_t1. }
+          { by apply: non_idle_swap_maintains_work_conservation_GT_t2. }
         * move: BET; rewrite negb_or. move /andP. case; rewrite <- ltnNge => range1; rewrite <- leqNgt => range2.
           have BET: (t1 < t) && (t <= t2) by apply /andP.
-          now apply (non_idle_swap_maintains_work_conservation_BET_t1_t2 arr_seq _ H_completed_jobs_dont_execute H_from_arr_seq _ _ _ _ t2_arrival H_not_idle t2_not_idle ).
+          by apply: non_idle_swap_maintains_work_conservation_BET_t1_t2.
   Qed.
 
 End FSCWorkConservationLemmas.
@@ -236,13 +236,13 @@ End FSCWorkConservationLemmas.
     next level of [edf_transform], which is [make_edf_at]. *)
 Section MakeEDFWorkConservationLemmas.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** For any given type of jobs... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+
+  (** ... following the classic (i.e., Liu & Layland) model of readiness without
+      jitter or self-suspensions, wherein pending jobs are always ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ... and any valid job arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -292,14 +292,14 @@ End MakeEDFWorkConservationLemmas.
     core of the EDF transformation maintains work conservation *)
 Section EDFPrefixWorkConservationLemmas.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** For any given type of jobs, each characterized by execution
       costs, an arrival time, and an absolute deadline,... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+
+  (** ... following the classic (i.e., Liu & Layland) model of readiness without
+      jitter or self-suspensions, wherein pending jobs are always ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ... and any valid job arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -354,14 +354,14 @@ End EDFPrefixWorkConservationLemmas.
     conservation, too. *)
 Section EDFTransformWorkConservationLemmas.
 
-  (** We assume the classic (i.e., Liu & Layland) model of readiness
-      without jitter or self-suspensions, wherein pending jobs are
-      always ready. *)
-  #[local] Existing Instance basic_ready_instance.
-
   (** For any given type of jobs, each characterized by execution
       costs, an arrival time, and an absolute deadline,... *)
   Context {Job : JobType} `{JobCost Job} `{JobDeadline Job} `{JobArrival Job}.
+
+  (** ... following the classic (i.e., Liu & Layland) model of readiness without
+      jitter or self-suspensions, wherein pending jobs are always ready, ... *)
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** ... and any valid job arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
@@ -392,9 +392,9 @@ Section EDFTransformWorkConservationLemmas.
     have IDENT:  identical_prefix sched_edf (edf_transform_prefix sched t.+1) t.+1
       by rewrite /sched_edf/edf_transform => t' LE_t; apply (edf_prefix_inclusion) => //; apply sched_satisfies_behavior_premises.
     rewrite (backlogged_prefix_invariance _ _ (edf_transform_prefix sched t.+1) t.+1) // => BL;
-            last by apply basic_readiness_nonclairvoyance.
+            last by apply: basic_readiness_nonclairvoyance.
     have WC_trans: work_conserving arr_seq  (edf_transform_prefix sched (succn t))
-      by apply edf_transform_prefix_maintains_work_conservation; split => //; apply sched_satisfies_behavior_premises.
+      by eapply edf_transform_prefix_maintains_work_conservation; eauto; split => //; apply sched_satisfies_behavior_premises.
     move: (WC_trans _ _ ARR BL) => [j_other SCHED_AT].
     exists j_other.
     now rewrite (identical_prefix_scheduled_at _ (edf_transform_prefix sched t.+1) t.+1) //.

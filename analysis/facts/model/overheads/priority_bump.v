@@ -23,7 +23,8 @@ Section PriorityBump.
   Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** We assume the basic model of readiness. *)
-  #[local] Existing Instance basic_ready_instance.
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** Consider any valid arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
