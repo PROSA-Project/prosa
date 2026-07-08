@@ -5,7 +5,7 @@ Require Export prosa.behavior.all.
     system with jobs possibly exhibiting exceedance. *)
 Section State.
 
-  (** For a give type of jobs ...*)
+  (** For any given type of jobs ...*)
   Context `{Job : JobType}.
 
   (** ... the exceedance processor state is defined as follows.
@@ -50,27 +50,27 @@ Section State.
       processor state under consideration. *)
   Section ExceedanceService.
 
-    (** Consider any job [j]. *)
+    (** Consider any job [j] ... *)
     Variable j : Job.
 
-    (** [j] is considered to be "scheduled" if the processor state is either
-        [NominalExecution j] or [ExceedanceExecution j] *)
-    Definition exceedance_scheduled_on (proc_state : exceedance_processor_state) (_ : unit)
-      : bool :=
+    (** ... and any processor state [proc_state].  *)
+    Variable proc_state : exceedance_processor_state.
+
+    (** We define which job, if any, is scheduled in a given processor state.
+        A job is scheduled whether it executes nominally or in exceedance. *)
+    Definition exceedance_job_on (_ : unit) : option Job :=
       match proc_state with
-      | NominalExecution j'
-      | ExceedanceExecution j' => j' == j
-      | _ => false
+      | NominalExecution j' | ExceedanceExecution j' => Some j'
+      | _ => None
       end.
 
     (** Next, we need to define in which states the processor is offering supply.
         This is required to specify in which states a processor can offer
         productive work to a job. Note that when analysing a schedule of the
         [exceedance_processor_state], we want to model all instances of
-        [ExceedanceExecution] as blackouts w.r.t. to nominal service and, therefore, the supply in this
-        processor state is defined to be [0]. *)
-    Definition exceedance_supply_on (proc_state :  exceedance_processor_state)
-      (_ : unit) : work :=
+        [ExceedanceExecution] as blackouts w.r.t. to nominal service and,
+        therefore, the supply in this processor state is defined to be [0]. *)
+    Definition exceedance_supply_on (_ : unit) : work :=
       match proc_state with
       | NominalExecution _ => 1
       | ExceedanceExecution _ => 0
@@ -80,7 +80,7 @@ Section State.
     (** Finally we need to define in which states a job actually receives
         nominal service. In our case, a job [j] receives nominal service only when the system
         is in the [NominalExecution j] state. *)
-    Definition exceedance_service_on (proc_state : exceedance_processor_state) (_ : unit) : work :=
+    Definition exceedance_service_on (_ : unit) : work :=
       match proc_state with
       | NominalExecution j' => j' == j
       | ExceedanceExecution _ => 0
@@ -93,16 +93,16 @@ Section State.
         [ProcessorState] typeclass. *)
   Global Program Instance exceedance_proc_state : ProcessorState Job :=
     {|
-      State := exceedance_processor_state;
-      scheduled_on := exceedance_scheduled_on;
-      supply_on := exceedance_supply_on;
-      service_on := exceedance_service_on
+      State        := exceedance_processor_state;
+      job_on       := exceedance_job_on;
+      supply_on    := exceedance_supply_on;
+      service_on   := exceedance_service_on
     |}.
   Next Obligation.
     by move => j [] // s [] /=; case: eqP; lia.
   Qed.
   Next Obligation.
-    by move => j [] // s [] /=; case: eqP; lia.
+    by move => j [] // j' [] /=; rewrite (inj_eq Some_inj) => /negbTE ->.
   Qed.
 
 End State.

@@ -33,12 +33,13 @@ Section State.
     (** Let [j] denote any job. *)
     Variable j : Job.
 
-    (** It is scheduled in a given state [s] iff [j] is the job mentioned
-        in the state. *)
-    Definition rs_scheduled_on (s : processor_state) : bool :=
+    (** A job is scheduled in state [s] both when the processor is
+        executing it and when it is scheduled but receives no service
+        because the processor is unavailable. *)
+    Definition rs_job_on (s : processor_state) : option Job :=
       match s with
-      | Idle | Inactive => false
-      | Active j' | Unavailable j' => j' == j
+      | Idle | Inactive => None
+      | Active j' | Unavailable j' => Some j'
       end.
 
     (** Processor states [Idle] and [Active _] indicate that the
@@ -65,11 +66,14 @@ Section State.
   Program Definition rs_processor_state : ProcessorState Job :=
     {|
       State                       := processor_state;
-      scheduled_on j s (_ : unit) := rs_scheduled_on j s;
-      supply_on s (_ : unit)      := rs_supply_on s;
+      job_on       s (_ : unit)   := rs_job_on s;
+      supply_on    s (_ : unit)   := rs_supply_on s;
       service_on j s (_ : unit)   := rs_service_on j s
     |}.
   Next Obligation. by move=> j s r; case s, r => //=; case: (_ == _). Qed.
-  Next Obligation. by move=> j s r; case s, r => //=; case: (_ == _). Qed.
+  Next Obligation.
+    move=> j s r; case s, r => //=.
+    by rewrite (inj_eq Some_inj) => /negbTE ->.
+  Qed.
 
 End State.

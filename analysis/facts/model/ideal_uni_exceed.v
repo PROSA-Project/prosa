@@ -19,7 +19,7 @@ Section ExceedanceProcStateProperties.
 
   (** The usually opaque predicates are made transparent for this section
       to enable us to prove some processor properties. *)
-  Local Transparent scheduled_in scheduled_on service_on.
+  Local Transparent job_on service_on.
 
   (** A job [j] is said to be [scheduled_at] some time [t] if and only if the
       processor state at that time is [NominalExecution j] or
@@ -31,12 +31,11 @@ Section ExceedanceProcStateProperties.
     split.
     - move => /existsP [c SCHEDON].
       destruct (sched t); try done.
-      + by left; move : SCHEDON => /eqP <-.
-      + by right; move : SCHEDON => /eqP <-.
+      + by left; move : SCHEDON => /eqP /Some_inj <-.
+      + by right; move : SCHEDON => /eqP /Some_inj <-.
     - rewrite /scheduled_at.
       by move => [-> | -> ]; rewrite /scheduled_in /scheduled_on //=; apply /existsP.
   Qed.
-
 
   (** Next we prove that the processor model under consideration is a uniprocessor
       model i.e., only one job can be scheduled at any time instant. *)
@@ -44,8 +43,8 @@ Section ExceedanceProcStateProperties.
   Proof.
     move => j1 j2 sched t /existsP [? SCHED1] /existsP [? SCHED2].
     destruct (sched t) eqn: EQ; try done.
-    - by move : SCHED1 => /eqP <-; move : SCHED2 => /eqP <-.
-    - by move : SCHED1 => /eqP <-; move : SCHED2 => /eqP <-.
+    - by move : SCHED1 => /eqP /Some_inj <-; move : SCHED2 => /eqP /Some_inj <-.
+    - by move : SCHED1 => /eqP /Some_inj <-; move : SCHED2 => /eqP /Some_inj <-.
   Qed.
 
   (** Next, we prove that the processor model under consideration is fully

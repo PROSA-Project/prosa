@@ -26,23 +26,26 @@ Section State.
           [Job]) or [None] (which we use to indicate an idle
           instant). *)
       State := option Job;
+
       (** As this is a uniprocessor model, cores are implicitly defined
           as the [unit] type containing a single element as a placeholder. *)
-      (** We say that a given job [j] is scheduled in a
-          given state [s] iff [s] is [Some j]. *)
-      scheduled_on j s (_ : unit) := s == Some j;
+      (** In an ideal uniprocessor state [s], the job running on the (single) core
+          is precisely the job identified by [s]. *)
+      job_on s (_ : unit) := s;
+
       (** Any state of an ideal processor provides exactly one unit of
           supply. *)
       supply_on s (_ : unit) := 1;
+
       (** We say that a given job [j] receives service in a given
           state [s] iff [s] is [Some j]. *)
       service_on j s (_ : unit) := if s == Some j then 1 else 0;
     |}.
   Next Obligation.
-    by move=> j s ?; rewrite /nat_of_bool; case: ifP => // ? /negP[].
+    by move=> j s ?; rewrite /=; case: ifP.
   Qed.
   Next Obligation.
-    by move=> j s ?; rewrite /nat_of_bool; case: ifP => // ? /negP[].
+    by move=> j s ?; rewrite /=; case: ifP.
   Qed.
 
 End State.

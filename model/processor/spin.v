@@ -22,16 +22,16 @@ Section State.
   (** Next, we define the semantics of the processor state with spinning. *)
   Section Service.
 
-    (** Let [j] denote any job. *)
+    (** Consider any job [j]. *)
     Variable j : Job.
 
-    (** It is scheduled in a given state [s] iff the state is not idle and [j]
-        is the job mentioned in the state. *)
-    Definition spin_scheduled_on (s : processor_state) (_ : unit) : bool :=
+    (** The job scheduled in a given state [s] is the job recorded in [s] as
+        either spinning or progressing. *)
+    Definition spin_job_on (s : processor_state) (_ : unit) : option Job :=
       match s with
-      | Idle        => false
-      | Spin j'     => j' == j
-      | Progress j' => j' == j
+      | Idle        => None
+      | Spin j'     => Some j'
+      | Progress j' => Some j'
       end.
 
     (** If the processor is idle, we assume that the supply equals 1,
@@ -63,11 +63,15 @@ Section State.
   Program Definition pstate_instance : ProcessorState Job :=
     {|
       State        := processor_state;
-      scheduled_on := spin_scheduled_on;
+      job_on       := spin_job_on;
       supply_on    := spin_supply_on;
       service_on   := spin_service_on
     |}.
-  Next Obligation. by move => j [] // s [] /=; case: eqP. Qed.
-  Next Obligation. by move => j [] // s [] /=; case: eqP. Qed.
+  Next Obligation.
+    by move=> j [] // j' [] /=; case: eqP.
+  Qed.
+  Next Obligation.
+    by move=> j [] //= j' _; rewrite (inj_eq Some_inj) => /negbTE ->.
+  Qed.
 
 End State.

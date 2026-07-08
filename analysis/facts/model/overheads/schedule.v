@@ -5,7 +5,10 @@ Require Export prosa.analysis.facts.busy_interval.pi.
     model with explicit overheads. *)
 Section OverheadsProceProperties.
 
-  Local Transparent scheduled_in scheduled_on service_in service_on.
+  (** We assume schedules with explicit overheads. *)
+  #[local] Existing Instance overheads.processor_state.
+
+  Local Transparent scheduled_on service_on.
 
   (** Consider any type of jobs. *)
   Context {Job : JobType}.
@@ -17,21 +20,18 @@ Section OverheadsProceProperties.
   Lemma overheads_proc_model_is_a_uniprocessor_model :
     uniprocessor_model (overheads.processor_state Job).
   Proof.
-    intros j1 j2 sched t; rewrite /scheduled_at /scheduled_in/ scheduled_on/=.
-    rewrite /overheads_scheduled_on => /existsP [[] OH1] /existsP [[] OH2].
-    destruct (sched t) as [ | j3 j4 | j3 | j3 | ] eqn:EQ => //.
-    { by destruct j3, j4 => //; move: OH1 OH2 => /eqP OH1 /eqP OH2; subst. }
-    { by destruct j3 => //; move: OH1 OH2 => /eqP OH1 /eqP OH2; subst. }
-    { by move: OH1 OH2 => /eqP OH1 /eqP OH2; subst. }
-    { by move: OH1 OH2 => /eqP OH1 /eqP OH2; subst. }
+    move=> j1 j2 sched t; rewrite /scheduled_at /scheduled_in/ scheduled_on/=.
+    move=> /existsP [[] /eqP H1] /existsP [[] /eqP H2].
+    by apply: Some_inj; rewrite -H1 -H2.
   Qed.
 
   (** The processor model with overheads is a unit-supply model. *)
   Lemma overheads_proc_model_provides_unit_supply :
     unit_supply_proc_model (overheads.processor_state Job).
   Proof.
-    rewrite /unit_supply_proc_model /supply_in.
-    by move => []; rewrite //= sum_unit1.
+    rewrite /unit_supply_proc_model.
+    move=> s; rewrite /supply_in sum_unit1.
+    by case: s.
   Qed.
 
   (** We also show that the processor model is fully consuming. That
@@ -43,10 +43,11 @@ Section OverheadsProceProperties.
     move=> j sched t.
     rewrite /service_at /supply_at /service_in /supply_in.
     rewrite /scheduled_at /scheduled_in /scheduled_on /=.
-    rewrite /overheads_scheduled_on => /existsP [[] /eqP OH1]; subst.
-    apply eq_big => // => [[]] _.
-    destruct (sched t) eqn:SCHED => //=.
-    by move: OH1 => /eqP; rewrite eq_sym => EQ; rewrite EQ.
+    move=> /existsP [[] /eqP OH1].
+    apply: eq_bigr => r _.
+    move: OH1; case: (sched t) => [| oj1 oj2 | oj | j'' | j'] //= OH1.
+    move: OH1; rewrite /overheads_job_on /= => /Some_inj ->.
+    by rewrite eqxx /overheads_supply_on.
   Qed.
 
 End OverheadsProceProperties.
@@ -63,7 +64,10 @@ Global Hint Resolve
     explicit overheads. *)
 Section OverheadScheduleProperties.
 
-  Local Transparent scheduled_in scheduled_on.
+  (** We assume schedules with explicit overheads. *)
+  #[local] Existing Instance overheads.processor_state.
+
+  Local Transparent scheduled_on.
 
   (** Consider any type of jobs. *)
   Context {Job : JobType}.
@@ -76,7 +80,7 @@ Section OverheadScheduleProperties.
   (** At any time [t], either the processor is idle (no job is
       scheduled), or some job is scheduled at that time. *)
   Lemma scheduled_job_dec :
-    forall  t,
+    forall t,
       scheduled_job sched t = None \/ exists j, scheduled_job sched t = Some j.
   Proof.
     by intros; destruct (scheduled_job _).
@@ -88,26 +92,10 @@ Section OverheadScheduleProperties.
     forall j t,
       scheduled_at sched j t <-> scheduled_job sched t = Some j.
   Proof.
-    move=> j t; split; intros SCHED.
-    { move: SCHED. rewrite /scheduled_at /scheduled_job /scheduled_in.
-      move => /existsP [[]].
-      rewrite /scheduled_on. simpl.
-      destruct (sched t) as [ | j3 j4 | j3 | j3 | ] eqn:EQ.
-      { by rewrite /overheads_scheduled_on. }
-      { rewrite /overheads_scheduled_on.
-        by destruct j3, j4; (try done) => /eqP E; subst.
-      }
-      { by rewrite /overheads_scheduled_on; destruct j3; (try done) => /eqP E; subst. }
-      { by rewrite /overheads_scheduled_on; (try done) => /eqP E; subst. }
-      { by rewrite /overheads_scheduled_on; (try done) => /eqP E; subst. }
-    }
-    { move: SCHED. rewrite /scheduled_at /scheduled_job /scheduled_in.
-      destruct (sched t) as [ | j3 j4 | j3 | j3 | ] => SCHED; first by done.
-      { by destruct j3, j4; try done; inversion SCHED; subst; apply/existsP; exists tt => //=. }
-      { by destruct j3; try done; inversion SCHED; subst; apply/existsP; exists tt => //=. }
-      { by inversion SCHED; subst; apply/existsP; exists tt => //=. }
-      { by inversion SCHED; subst; apply/existsP; exists tt => //=. }
-    }
+    move=> j t; rewrite /scheduled_at /scheduled_job /scheduled_in /scheduled_on.
+    split.
+    - by move=> /existsP [[]] /eqP.
+    - by move=> EQ; apply/existsP; exists tt; rewrite -EQ.
   Qed.
 
 End OverheadScheduleProperties.

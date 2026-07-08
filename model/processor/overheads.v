@@ -33,19 +33,18 @@ Section State.
     (** Let [j] denote any job. *)
     Variable j : Job.
 
-    (** A job [j] is considered scheduled in a state [s] if [s]
-        represents activity tied to [j], such as being dispatched, in
-        a context switch involving [j], delayed due to preemption, or
-        making progress. *)
-    Definition overheads_scheduled_on (s : proc_state) (_ : unit) : bool :=
+    (** The job scheduled in a given state [s] is the job tied to the
+        activity recorded in [s], such as being dispatched, involved in
+        a context switch, delayed by cache-related preemption delay, or making progress.*)
+    Definition overheads_job_on (s : proc_state) (_ : unit) : option Job :=
       match s with
-      | Idle                           => false
-      | ContextSwitch  _ None          => false
-      | ContextSwitch  _ (Some j')     => j == j'
-      | Dispatch None                  => false
-      | Dispatch (Some j')             => j == j'
-      | CacheRelatedPreemptionDelay j' => j == j'
-      | Progress j'                    => j == j'
+      | Idle                           => None
+      | ContextSwitch _ None           => None
+      | ContextSwitch _ (Some j')      => Some j'
+      | Dispatch None                  => None
+      | Dispatch (Some j')             => Some j'
+      | CacheRelatedPreemptionDelay j' => Some j'
+      | Progress j'                    => Some j'
       end.
 
     (** The processor provides one unit of supply in states where it
@@ -74,22 +73,26 @@ Section State.
   Program Definition processor_state : ProcessorState Job :=
     {|
       State        := proc_state;
-      scheduled_on := overheads_scheduled_on;
+      job_on       := overheads_job_on;
       supply_on    := overheads_supply_on;
       service_on   := overheads_service_on
     |}.
-  Next Obligation. by move => j [] // s [] /=; case: eqP. Qed.
-  Next Obligation. by move => j [] // s [] //=; rewrite [s == j]eq_sym; case (j == s). Qed.
+  Next Obligation.
+    by move => j [] // j' [] //=; case: eqP.
+  Qed.
+  Next Obligation.
+    by move => j [] // j' [] //=; rewrite (inj_eq Some_inj) => /negbTE ->.
+  Qed.
 
 End State.
 
 (** In this section, we provide some useful definitions for schedule inspection. *)
 Section ScheduleInspection.
 
-  (** Consider any type of jobs... *)
+  (** Consider any type of jobs, ... *)
   Context {Job : JobType}.
 
-  (** ... and a schedule with overheads. *)
+  (** ... and any schedule with explicit overheads. *)
   Variable sched : schedule (overheads.processor_state Job).
 
   (** Function [scheduled_job] returns the job (if any) that is
@@ -97,13 +100,7 @@ Section ScheduleInspection.
       jobs being dispatched, involved in context switches, delayed due
       to preemption, or making progress. *)
   Definition scheduled_job (t : instant) : option Job :=
-    match sched t with
-    | Idle => None
-    | Dispatch oj => oj
-    | ContextSwitch _ oj => oj
-    | CacheRelatedPreemptionDelay oj => Some oj
-    | Progress oj => Some oj
-    end.
+    overheads_job_on _ (sched t) tt.
 
   (** Indicates whether the scheduled job is making progress at time [t]. *)
   Definition is_progress (t : instant) :=

@@ -308,7 +308,7 @@ Section RelationToScheduled.
   Proof.
     move=> s.
     move=> /existsP Hsched; apply/eqP; rewrite sum_nat_eq0; apply/forallP => c.
-    rewrite service_on_implies_scheduled_on//.
+    rewrite service_on_implies_job_on//.
     by apply/negP => ?; apply: Hsched; exists c.
   Qed.
 

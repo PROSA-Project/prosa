@@ -27,12 +27,12 @@ Section State.
     (** Consider any job [j]. *)
     Variable j : Job.
 
-    (** Job [j] is scheduled in a given state [s] if [s] is not idle
-        and [j] matches the job recorded in [s]. *)
-    Definition varspeed_scheduled_on (s : processor_state) (_ : unit) : bool :=
+    (** The job scheduled in a given state [s] is the job recorded as
+        progressing in [s]. *)
+    Definition varspeed_job_on (s : processor_state) (_ : unit) : option Job :=
       match s with
-      | Idle _ => false
-      | Progress j' _  => j' == j
+      | Idle _ => None
+      | Progress j' _ => Some j'
       end.
 
     (** The processor state [Idle k] indicates that the processor is
@@ -60,11 +60,15 @@ Section State.
   Program Definition pstate_instance : ProcessorState Job :=
     {|
       State        := processor_state;
-      scheduled_on := varspeed_scheduled_on;
+      job_on       := varspeed_job_on;
       supply_on    := varspeed_supply_on;
       service_on   := varspeed_service_on
     |}.
-  Next Obligation. by move=> j [] //= s ; case: eqP. Qed.
-  Next Obligation. by move=> j [] //= j' v _; case: ifP. Qed.
+  Next Obligation.
+    by move=> j [] //= s; case: eqP.
+  Qed.
+  Next Obligation.
+    by move=> j [] //= j' v _; rewrite (inj_eq Some_inj); case: ifP.
+  Qed.
 
 End State.

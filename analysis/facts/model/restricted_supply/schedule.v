@@ -5,7 +5,7 @@ Require Export prosa.model.processor.restricted_supply.
     restricted-supply schedule belongs. *)
 Section ScheduleClass.
 
-  Local Transparent scheduled_in scheduled_on service_on.
+  Local Transparent job_on service_on.
 
   (** We assume a restricted-supply uni-processor schedule. *)
   #[local] Existing Instance rs_processor_state.
@@ -20,8 +20,8 @@ Section ScheduleClass.
   Lemma rs_proc_model_is_a_uniprocessor_model :
     uniprocessor_model (rs_processor_state Job).
   Proof.
-    move=> j1 j2 sched t  /existsP[[]/eqP E1] /existsP[[]/eqP E2].
-    by move: E1 E2; case (sched t) => //= => j /eqP /eqP -> /eqP /eqP ->.
+    move=> j1 j2 sched t /existsP[[]/eqP E1] /existsP[[]/eqP E2].
+    by apply: Some_inj; rewrite -E1 -E2.
   Qed.
 
   (** Restricted-supply processor model is unit-supply. *)
@@ -38,10 +38,10 @@ Section ScheduleClass.
     fully_consuming_proc_model (rs_processor_state Job).
   Proof.
     move=> j S t.
-    rewrite /scheduled_at /scheduled_in /service_at /supply_at /supply_in /service_in !sum_unit1.
+    rewrite /scheduled_at /scheduled_in /scheduled_on /service_at /supply_at /supply_in /service_in !sum_unit1.
     case (S t) => //=.
-    - by move => /existsP [] => //.
-    - by move => jo /existsP [_ /eqP ->]; rewrite eq_refl.
+    - by move => /existsP [_] /eqP.
+    - by move => j0 /existsP [_]; rewrite (inj_eq Some_inj) => /eqP ->; rewrite eqxx.
   Qed.
 
 End ScheduleClass.

@@ -13,7 +13,7 @@ Section ScheduleClass.
   (** We assume ideal uni-processor schedules. *)
   #[local] Existing Instance ideal.processor_state.
 
-  Local Transparent scheduled_in scheduled_on.
+  Local Transparent job_on service_on.
   (** Consider any job type and the ideal processor model. *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
@@ -57,8 +57,8 @@ Section ScheduleClass.
   Lemma ideal_proc_model_ensures_ideal_progress :
     ideal_progress_proc_model (processor_state Job).
   Proof.
-    move=> j s /existsP[[]/eqP->] /=.
-    by rewrite service_in_def /= eqxx /nat_of_bool.
+    move=> j s /existsP[[]/eqP]; rewrite service_in_def /= => ->.
+    by rewrite eqxx.
   Qed.
 
   (** The ideal processor model is a unit-service model. *)

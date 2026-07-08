@@ -30,42 +30,51 @@ Class ProcessorState (Job : JobType) :=
         with finitely many values, i.e., it is possible to enumerate all cores
         of a multi-processor.)  *)
     Core : finType;
-    (** For a given processor state and core, the [scheduled_on] predicate
-        checks whether a given job is running on the given core. *)
-    scheduled_on : Job -> State -> Core -> bool;
+
+    (** For a given processor state and core, the [job_on] function
+        determines the job running on the given core, if any. *)
+    job_on : State -> Core -> option Job;
+
     (** For a given processor state and core, the [supply_on] function
         determines how much supply the core produces in the given
         state). *)
     supply_on : State -> Core -> work;
+
     (** For a given processor state and core, the [service_on]
         function determines how much service a given job receives on
         the given core). *)
     service_on : Job -> State -> Core -> work;
+
     (** We require [service_on] and [supply_on] to be consistent in
         the sense that a job cannot receive more service on a given
         core in a given state than there is supply on the core in this
         state. *)
     service_on_le_supply_on :
       forall j s r, service_on j s r <= supply_on s r;
+
     (** In addition, a job can receive service (on a given core) only
         if it is also scheduled (on that core). *)
-    service_on_implies_scheduled_on :
-      forall j s r, ~~ scheduled_on j s r -> service_on j s r = 0
+    service_on_implies_job_on :
+      forall j s r, job_on s r != Some j -> service_on j s r = 0;
   }.
 Coercion State : ProcessorState >-> Sortclass.
 
-(** The above definition of the [ProcessorState] interface provides
-    the predicate [scheduled_on] and the function [service_on], which
-    relate a given job to a given core in a given state. This level of
-    detail is required for generality, but in many situations it
-    suffices and is more convenient to elide the information about
-    individual cores, instead referring to all cores at once. To this
-    end, we next define the short-hand functions [scheduled_in] and
-    [service_in] to directly check whether a job is scheduled at all
-    (i.e., on any core), and how much service the job receives
-    anywhere (i.e., across all cores). *)
-Section ProcessorIn.
+(** For a given processor state and core, the [scheduled_on] predicate
+    checks whether a given job is running on the given core. *)
+Definition scheduled_on {Job : JobType} {State : ProcessorState Job}
+  (j : Job) (s : State) (c : Core) : bool := job_on s c == Some j.
 
+(** The above definition of the [ProcessorState] interface provides the
+    function [job_on] and the function [service_on], which relate a given
+    job to a given core in a given state. This level of detail is required
+    for generality, but in many situations it suffices and is more convenient
+    to elide the information about individual cores, instead referring to all
+    cores at once. To this end, we next define the short-hand functions
+    [scheduled_in], [jobs_scheduled_in] and [service_in] to directly check whether a job is
+    scheduled at all (i.e., on any core), determine the list of jobs running
+    (i.e., across all cores), and how much service the job receives anywhere
+    (i.e., across all cores). *)
+Section ProcessorIn.
   (** Consider any type of jobs... *)
   Context {Job : JobType}.
 
@@ -76,6 +85,11 @@ Section ProcessorIn.
       whether a given job is running on any core in that state. *)
   Definition scheduled_in (j : Job) (s : State) : bool :=
     [exists c : Core, scheduled_on j s c].
+
+  (** For a given processor state, the [jobs_scheduled_in] function determines
+      the list of jobs running on all cores in that state. *)
+  Definition jobs_scheduled_in (s : State) : seq Job :=
+    pmap (job_on s) (enum Core).
 
   (** For a given processor state, the [supply_in] function determines
       how much supply the processor provides (across all cores) in the given state. *)
@@ -101,6 +115,6 @@ Definition schedule {Job : JobType} (PState : ProcessorState Job) :=
   instant -> PState.
 
 (** The following line instructs Coq to not let proofs use knowledge of how
-    [scheduled_on] and [service_on] are defined. Instead,
+    [job_on] and [service_on] are defined. Instead,
     proofs must rely on basic lemmas about processor state classes. *)
-Global Opaque scheduled_on service_on.
+Global Opaque job_on service_on supply_on.
