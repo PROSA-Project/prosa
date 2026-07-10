@@ -133,7 +133,6 @@ Note: We employ an automatic proof-length checker that runs as part of continuou
 Set Bullet Behavior "Strict Subproofs".
 Set Default Goal Selector "!".
 ```
-5. Make proofs "step-able." This means preferring `.` over `;` (within reason). This makes it easier for novices to learn from existing proofs.
 
 ### Maintainability
 
