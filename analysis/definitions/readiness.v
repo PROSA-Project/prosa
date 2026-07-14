@@ -6,7 +6,7 @@ Require Export prosa.model.task.sequentiality.
 
 (** * Properties of Readiness Models *)
 
-(** In this file, we define commonsense properties of readiness models. *)
+(** In this file, we define common properties of readiness models. *)
 Section ReadinessModelProperties.
 
   (** For any type of jobs with costs and arrival times ... *)
@@ -58,6 +58,25 @@ Section ReadinessModelProperties.
     forall sched j t,
       job_ready sched j t -> prior_jobs_complete arr_seq sched j t.
 
+  (** Finally, consider a JLFP policy that indicates a higher-or-equal
+      priority relation. *)
+  Context `{JLFP_policy Job}.
+
+(** We introduce a property of readiness models called _work-bearing readiness_,
+    which extracts the useful property of the classic readiness model stating
+    that, if there is some job _pending_ at a time instant [t], then there also
+    exists a job that is _ready_ at time [t]. In other words, we say that a
+    readiness model is work-bearing if for every job [j] that is pending but not
+    ready at some instant [t], there exists a job with higher or equal priority
+    [j_hp] that is both pending _and_ ready at time [t]. *)
+  Definition work_bearing_readiness
+    (arr_seq : arrival_sequence Job) (sched : schedule PState) :=
+    forall (j : Job) (t : instant),
+      arrives_in arr_seq j ->
+      pending sched j t ->
+      exists j_hp,
+        arrives_in arr_seq j_hp
+        /\ job_ready sched j_hp t
+        /\ hep_job j_hp j.
+
 End ReadinessModelProperties.
-
-

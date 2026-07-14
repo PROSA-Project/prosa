@@ -2,7 +2,7 @@ Require Export prosa.analysis.facts.model.workload.
 Require Export prosa.analysis.facts.model.ideal.service_of_jobs.
 Require Export prosa.analysis.facts.busy_interval.quiet_time.
 Require Export prosa.analysis.facts.busy_interval.existence.
-Require Export prosa.analysis.definitions.work_bearing_readiness.
+Require Export prosa.analysis.definitions.readiness.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.util.tactics.
 
@@ -47,8 +47,8 @@ Section BusyIntervalExistence.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
   (** Further, allow for any work-bearing notion of job readiness ... *)
-  Context `{!JobReady Job PState}.
-  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
   (** ... and assume that the schedule is work-conserving. *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.

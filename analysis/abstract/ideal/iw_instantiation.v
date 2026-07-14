@@ -511,8 +511,8 @@ Section JLFPInstantiation.
   Section I_IW_correctness.
 
     (** Consider work-bearing readiness. *)
-    Context `{!JobReady Job (ideal.processor_state Job)}.
-    Hypothesis H_work_bearing_readiness : work_bearing_readiness arr_seq sched.
+    Context {RM : JobReady Job (ideal.processor_state Job)}.
+    Hypothesis H_work_bearing_readiness : work_bearing_readiness RM arr_seq sched.
 
     (** Assume that the schedule is valid and work-conserving. *)
     Hypothesis H_sched_valid : valid_schedule sched arr_seq.

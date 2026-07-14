@@ -38,7 +38,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** We allow for any _work-bearing_ readiness model.
       (The [work_bearing_readiness] restriction is introduced further down
       because it requires a schedule to be introduced first; see [H_job_ready] below.) *)
-  Context `{!JobReady Job (ideal.processor_state Job)}.
+  Context {RM : JobReady Job (ideal.processor_state Job)}.
 
   (** ** A. Defining the System Model *)
 
@@ -58,7 +58,7 @@ Section AbstractRTAforFPwithArrivalCurves.
       work-bearing readiness model. *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
 
   (** We model the tasks in the system using a task set [ts].

@@ -192,7 +192,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
     move=> L [BW_POS BW_FIX] R SOL js ARRs TSKs.
     have [ZERO|POS] := posnP (job_cost js).
     { by rewrite /job_response_time_bound /completed_by ZERO. }
-    have READ : work_bearing_readiness arr_seq sched by done.
+    have READ : work_bearing_readiness RM arr_seq sched by done.
     eapply uniprocessor_response_time_bound_restricted_supply
       with (L := L)
            (intra_IBF  := fun A Δ => (\sum_(tsko <- ts) task_request_bound_function tsko (A + ε)) - task_cost tsk) => //.

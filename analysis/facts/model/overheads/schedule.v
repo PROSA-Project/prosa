@@ -136,8 +136,8 @@ Section ScheduledInBusyPrefix.
   Variable sched : schedule (overheads.processor_state Job).
 
   (** ... allow for any work-bearing notion of job readiness, ... *)
-  Context `{!JobReady Job (overheads.processor_state Job)}.
-  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
   (** ... and assume that the schedule is valid and work-conserving. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.

@@ -158,8 +158,8 @@ Section ELFBasicFacts.
     Variable sched : schedule PState.
 
     (** ... allow for any work-bearing notion of job readiness, ... *)
-    Context `{@JobReady Job PState _ AR}.
-    Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+    Context {RM : JobReady Job PState}.
+    Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
     (** ... and assume that the schedule is valid. *)
     Hypothesis H_sched_valid : valid_schedule sched arr_seq.

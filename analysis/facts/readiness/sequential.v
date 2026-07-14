@@ -1,6 +1,5 @@
 Require Export prosa.model.readiness.sequential.
 Require Export prosa.analysis.definitions.readiness.
-Require Export prosa.analysis.definitions.work_bearing_readiness.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.facts.model.task_arrivals.
 
@@ -82,7 +81,7 @@ Section SequentialTasksReadiness.
      (earlier) job of the same task that is pending and ready at time
      [t]. *)
   Lemma sequential_readiness_implies_work_bearing_readiness :
-    work_bearing_readiness arr_seq sched.
+    work_bearing_readiness RM arr_seq sched.
   Proof.
     intros j.
     have EX: exists k, job_arrival j <= k by (exists (job_arrival j)).

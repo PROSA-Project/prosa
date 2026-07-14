@@ -213,7 +213,7 @@ Section RTAforFloatingELFModelwithArrivalCurves.
       by apply H_valid_task_model_with_floating_nonpreemptive_regions. }
     have [ZERO|POS] := posnP (job_cost js);
       first by rewrite /job_response_time_bound /completed_by ZERO.
-    have READ : work_bearing_readiness arr_seq sched by done.
+    have READ : work_bearing_readiness RM arr_seq sched by done.
     eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.

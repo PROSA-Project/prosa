@@ -37,8 +37,8 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Context `{JobPreemptable Job}.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job PState Cost Arrival}.
-  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
   (** We assume that the schedule is valid and that all jobs come from the arrival sequence. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
@@ -262,8 +262,8 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{!JobReady Job PState}.
-  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
   (** We assume that the schedule is valid. *)
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.

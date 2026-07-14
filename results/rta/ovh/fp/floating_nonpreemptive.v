@@ -211,7 +211,7 @@ Section RTAforFloatingFPModelwithArrivalCurves.
     have VAL1 : valid_preemption_model arr_seq sched
       by apply valid_fixed_preemption_points_model_lemma, H_valid_task_model_with_floating_nonpreemptive_regions.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
-    have READ : work_bearing_readiness arr_seq sched by apply basic_readiness_is_work_bearing_readiness.
+    have READ : work_bearing_readiness RM arr_seq sched by apply basic_readiness_is_work_bearing_readiness.
     have FC: fully_consuming_proc_model (overheads.processor_state Job) by apply overheads_proc_model_fully_consuming.
     have VBSBF : valid_busy_sbf arr_seq sched tsk (sSBF) by apply overheads_sbf_busy_valid => //=.
     have USBF : unit_supply_bound_function sSBF by apply overheads_sbf_unit => //=.

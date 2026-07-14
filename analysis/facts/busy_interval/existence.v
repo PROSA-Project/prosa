@@ -1,7 +1,7 @@
 Require Export prosa.model.job.properties.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.analysis.facts.model.service_of_jobs.
-Require Export prosa.analysis.definitions.work_bearing_readiness.
+Require Export prosa.analysis.definitions.readiness.
 Require Export prosa.analysis.facts.priority.inversion.
 
 (** * Existence of Busy Interval for JLFP-models *)
@@ -37,8 +37,8 @@ Section ExistsBusyIntervalJLFP.
   Context {JLFP : JLFP_policy Job}.
 
   (** Further, allow for any work-bearing notion of job readiness. *)
-  Context `{@JobReady Job PState Cost Arrival}.
-  Hypothesis H_job_ready : work_bearing_readiness arr_seq sched.
+  Context {RM : JobReady Job PState}.
+  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
   (** For simplicity, let's define some local names. *)
   Let job_pending_at := pending sched.

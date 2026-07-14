@@ -1,7 +1,6 @@
 Require Export prosa.model.readiness.basic.
 Require Export prosa.analysis.facts.behavior.completion.
 Require Export prosa.analysis.definitions.readiness.
-Require Export prosa.analysis.definitions.work_bearing_readiness.
 
 Section LiuAndLaylandReadiness.
 
@@ -61,7 +60,7 @@ Section LiuAndLaylandReadiness.
       is pending, then there exists a job (namely [j] itself) with
       higher-or-equal priority that is ready at time [t]. *)
   Fact basic_readiness_is_work_bearing_readiness :
-    work_bearing_readiness arr_seq sched.
+    work_bearing_readiness RM arr_seq sched.
   Proof.
     intros j ? ARR PEND.
     exists j; repeat split => //.

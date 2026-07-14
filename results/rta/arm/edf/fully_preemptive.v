@@ -169,7 +169,7 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
     have [ZERO|POS] := posnP (job_cost js); first by rewrite /job_response_time_bound /completed_by ZERO.
     have POStsk: 0 < task_cost tsk
       by move: TSKs => /eqP <-; apply: leq_trans; [apply POS | apply H_valid_task_arrival_sequence].
-    have READ : work_bearing_readiness arr_seq sched by done.
+    have READ : work_bearing_readiness RM arr_seq sched by done.
     have BLOCK: forall tsk A, blocking_bound ts tsk A = 0.
     { by move=> A tsk2; rewrite /blocking_bound /parameters.task_max_nonpreemptive_segment
                                /fully_preemptive_task_model /constant subnn big1_eq. }

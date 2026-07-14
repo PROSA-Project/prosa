@@ -210,7 +210,7 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
     have VAL1 : valid_preemption_model arr_seq sched.
     { apply valid_fixed_preemption_points_model_lemma => //.
       by apply H_valid_model_with_fixed_preemption_points. }
-    have READ : work_bearing_readiness arr_seq sched by done.
+    have READ : work_bearing_readiness RM arr_seq sched by done.
     eapply uniprocessor_response_time_bound_restricted_supply_seq with (L := L) => //.
     - exact: instantiated_i_and_w_are_coherent_with_schedule.
     - exact: instantiated_interference_and_workload_consistent_with_sequential_tasks.
