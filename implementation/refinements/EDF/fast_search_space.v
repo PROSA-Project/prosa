@@ -38,13 +38,13 @@ Section SearchSpaceDefinition.
   Context (TMNSP : TaskMaxNonpreemptiveSegment Task).
 
   (** First, we recall the notion of correct search space as defined by
-    abstract RTA. *)
+      abstract RTA. *)
   Definition correct_search_space ts (tsk : Task) L :=
     [seq A <- iota 0 L | is_in_search_space ts tsk L A].
 
   (** Next, we provide a computation-oriented way to compute abstract RTA's search space for
-    fixed-priority schedules, as we will prove that earliest-deadline-first is equivalent.
-    We start with a function that computes the search space in a generic
+      fixed-priority schedules, as we will prove that earliest-deadline-first is equivalent.
+      We start with a function that computes the search space in a generic
     interval <<[l,r)>>, ... *)
   Definition search_space_emax_FP_h (tsk : Task) l r :=
     let h := get_horizon_of_task tsk in
@@ -74,7 +74,7 @@ Section SearchSpaceDefinition.
                                  0 ((L + (task_deadline tsk - task_deadline tsko)) %/ h).+1.
 
   (** Finally, we define the overall search space as the concatenation of per-task search
-    spaces. *)
+      spaces. *)
   Definition search_space_emax_EDF ts (tsk : Task) (L : nat) :=
     \cat_(tsko <- ts) task_search_space_emax_EDF tsk tsko L.
 

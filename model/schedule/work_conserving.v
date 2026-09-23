@@ -30,9 +30,9 @@ Section WorkConserving.
   Variable sched : schedule PState.
 
   (** ... we say that a scheduler is _work-conserving_ iff whenever a job [j]
-     is backlogged, the processor is always busy executing another job
-     [j_other]. Note that this definition is intentionally silent on matters of
-     priority. *)
+      is backlogged, the processor is always busy executing another job
+      [j_other]. Note that this definition is intentionally silent on matters of
+      priority. *)
   Definition work_conserving :=
     forall j t,
       arrives_in arr_seq j ->

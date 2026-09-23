@@ -264,7 +264,7 @@ Section Abstract_RTA.
 
     (** First, we consider the case where the solution [F] is so large
         that the value of [t1 + F] goes beyond the busy
-        interval. Depending on the pessimism of [IBF_P] and [IBP_NP]
+        interval. Depending on the pessimism of [IBF_P] and [IBF_NP]
         this might be either possible or impossible. Regardless, the
         response-time bound can be easily proven, since any job that
         completes by the end of the busy interval remains

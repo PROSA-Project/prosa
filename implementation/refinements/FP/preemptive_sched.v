@@ -13,7 +13,7 @@ Require Export prosa.implementation.readiness.sequential.
     under fixed-priority schedules is valid, and that the scheduling policy is
     respected at each preemption point.
 
-    This file does not contain novel facts; it is used to uniform POET's certificates
+    This file does not contain novel facts; it is used to unify POET's certificates
     and minimize their verbosity. *)
 Section Schedule.
 

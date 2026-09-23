@@ -44,7 +44,7 @@ Section SporadicArrivalBound.
 
     (** We observe that the <<i-th>> job to arrive in an interval <<[t1,t2)>>
         arrives no earlier than [(task_min_inter_arrival_time tsk) *i]
-        time units after the beginning of the interval due the minimum
+        time units after the beginning of the interval due to the minimum
         inter-arrival time of the sporadic task. *)
     Lemma arrival_of_nth_job :
       forall t1 t2 n i j,

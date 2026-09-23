@@ -28,7 +28,7 @@ Section EDFWorkloadBound.
   Let rbf := task_request_bound_function.
 
   (** Finally, we define an upper bound on workload received from jobs
-      with higher-than-or-equal priority that come from other
+      with higher-or-equal priority that come from other
       tasks. *)
   Definition bound_on_athep_workload A Δ :=
     \sum_(tsk_o <- ts | tsk_o != tsk)

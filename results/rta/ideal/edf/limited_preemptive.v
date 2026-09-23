@@ -48,17 +48,17 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     arrivals_have_valid_job_costs arr_seq.
 
   (** Next, we assume we have the model with fixed preemption points.
-     I.e., each task is divided into a number of non-preemptive segments
-     by inserting statically predefined preemption points. *)
+      I.e., each task is divided into a number of non-preemptive segments
+      by inserting statically predefined preemption points. *)
   Context `{JobPreemptionPoints Job}.
   Context `{TaskPreemptionPoints Task}.
   Hypothesis H_valid_model_with_fixed_preemption_points :
     valid_fixed_preemption_points_model arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-     any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
-     [tsk], and (2) it is a monotonic function that equals 0 for the
-     empty interval delta = 0. *)
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of
+      [tsk], and (2) it is a monotonic function that equals 0 for the
+      empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
@@ -74,7 +74,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Hypothesis H_schedule_with_limited_preemptions :
     schedule_respects_preemption_model arr_seq sched.
 
-  (** Next, we assume that the schedule is a work-conserving schedule... *)
+  (** ... Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** ... and the schedule respects the scheduling policy. *)
@@ -86,15 +86,15 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   (** ** Total Workload and Length of Busy Interval *)
 
   (** We introduce the abbreviation [rbf] for the task request bound function,
-     which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
+      which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
   Let rbf := task_request_bound_function.
 
   (** Next, we introduce [task_rbf] as an abbreviation
-     for the task request bound function of task [tsk]. *)
+      for the task request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
 
   (** Using the sum of individual request bound functions, we define the request bound
-     function of all tasks (total request bound function). *)
+      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
   (** Let L be any positive fixed point of the busy interval recurrence. *)

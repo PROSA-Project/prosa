@@ -21,7 +21,7 @@ Definition superadditive_until f h :=
     x < h ->
     superadditive_at f x.
 
-(** Finally, give a definition of subadditive function: [f] is subadditive
+(** Finally, we give a definition of a subadditive function: [f] is subadditive
     when it is subadditive at any point [h].*)
 Definition superadditive f :=
   forall h,
@@ -125,7 +125,7 @@ Section Facts.
 
 End Facts.
 
-(** In this section, we present the define and prove facts about the minimal
+(** In this section, we define and prove facts about the minimal
     superadditive extension of superadditive functions. Given a prefix of a
     function, there are many ways to continue the function in order to maintain
     superadditivity. Among these possible extrapolations, there always exists

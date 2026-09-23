@@ -106,7 +106,7 @@ Section ProofDemandBoundDefinition.
     by apply task_demand_within_le_task_dbf.
   Qed.
 
-  (** Next, we define the total workload of all jobs that arrives in a given interval that also have a
+  (** Next, we define the total workload of all jobs that arrive in a given interval that also have a
       deadline within the interval. *)
   Definition total_demand_within (t1 t2 : instant) :=
     let

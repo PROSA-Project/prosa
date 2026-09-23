@@ -75,7 +75,7 @@ Section ReadinessInterference.
 
     (** We say [B] is a bound on _readiness interference_ if for any job [j] and any
         interval <<[t1, t1 + Δ)>> that is inside the busy interval <<[t1, t2]>> of [j],
-        [B] is a upper bounds the total interference due to the absence of higher-or-equal priority
+        [B] is an upper bound on the total interference due to the absence of higher-or-equal priority
         ready jobs in the interval <<[t1, t1 + Δ)>>. *)
     Definition readiness_interference_is_bounded (B : duration -> duration -> duration) :=
       forall j t1 t2 Δ,

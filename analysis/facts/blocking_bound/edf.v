@@ -36,7 +36,7 @@ Section  MaxNPSegmentIsBounded.
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
-  (** Consider any valid arrival sequence. *)
+  (** Consider any valid arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 

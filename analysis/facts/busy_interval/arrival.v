@@ -59,7 +59,7 @@ Section Facts.
   (** Consider any processor state model. *)
   Context {PState : ProcessorState Job}.
 
-  (** Consider any arrival sequence with consistent non-duplicate arrivals *)
+  (** Consider any arrival sequence with consistent non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 

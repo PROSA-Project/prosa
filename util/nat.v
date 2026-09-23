@@ -7,7 +7,7 @@ Require Export prosa.util.tactics.
     natural numbers. *)
 
 (** Given [m >= p] and [n >= q], an expression [(m + n) - (p + q)] can be
-    rewritten as expression [(m - p) + (n - q)]. *)
+    rewritten as an expression [(m - p) + (n - q)]. *)
 Fact subnACA {m n p q} :
   p <= m -> q <= n ->
   (m + n) - (p + q) = (m - p) + (n - q).

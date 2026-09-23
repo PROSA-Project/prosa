@@ -12,7 +12,7 @@ Section State.
 
   (** We define the state of a processor at a given time to be one of three
       possible cases: either a specific job is scheduled and makes progress
-      [Progress j], a specific job is scheduled but makes not useful progress
+      [Progress j], a specific job is scheduled but does not make useful progress
       [Spin j], or the processor is idle [Idle]. *)
   Inductive processor_state :=
     Idle

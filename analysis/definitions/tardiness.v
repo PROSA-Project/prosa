@@ -33,7 +33,7 @@ Section Tardiness.
   Variable B : duration.
 
   (** ... iff any job [j] of [tsk] in the arrival sequence has
-         completed no more that [B] time units after its deadline. *)
+         completed no more than [B] time units after its deadline. *)
   Definition task_tardiness_is_bounded arr_seq sched tsk B :=
     task_response_time_bound arr_seq sched tsk (task_deadline tsk + B).
 

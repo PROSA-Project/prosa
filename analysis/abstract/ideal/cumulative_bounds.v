@@ -56,7 +56,7 @@ Section BusyIntervalInequalities.
   Variable  Δ : duration.
   Hypothesis H_Δ_in_busy : t1 + Δ <= t2.
 
-  (** First, we prove that if the priority inversion is bounded then,
+  (** First, we prove that if the priority inversion is bounded, then
       the cumulative priority inversion is also bounded. *)
   Section PIBound.
 

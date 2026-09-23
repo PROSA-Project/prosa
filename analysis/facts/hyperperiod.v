@@ -26,7 +26,7 @@ Section Hyperperiod.
 End Hyperperiod.
 
 (** In this section we show a property of hyperperiod in context
-   of task sets with valid periods. *)
+    of task sets with valid periods. *)
 Section ValidPeriodsImplyPositiveHP.
 
   (** Consider any type of periodic tasks ... *)
@@ -39,7 +39,7 @@ Section ValidPeriodsImplyPositiveHP.
   Hypothesis H_valid_periods : valid_periods ts.
 
   (** We show that the hyperperiod of task set [ts]
-   is positive. *)
+      is positive. *)
   Lemma valid_periods_imply_pos_hp :
     hyperperiod ts > 0.
   Proof.
@@ -84,12 +84,12 @@ Section PeriodicLemmas.
   Hypothesis H_infinite_jobs : infinite_jobs arr_seq.
 
   (** Let [O_max] denote the maximum task offset in [ts] and let
-   [HP] denote the hyperperiod of all tasks in [ts]. *)
+      [HP] denote the hyperperiod of all tasks in [ts]. *)
   Let O_max := max_task_offset ts.
   Let HP := hyperperiod ts.
 
   (** We show that the job corresponding to any job [j1] in any other
-      hyperperiod is of the same task as [j1]. *)
+      hyperperiod is a job of the same task as [j1]. *)
   Lemma corresponding_jobs_have_same_task :
     forall j1 j2,
       job_task (corresponding_job_in_hyperperiod ts arr_seq j1
@@ -125,8 +125,8 @@ Section PeriodicLemmas.
   Qed.
 
   (** We show that the number of jobs in a hyperperiod starting at [n1 * HP + O_max]
-   is the same as the number of jobs in a hyperperiod starting at [n2 * HP + O_max] given
-   that [n1] is less than or equal to [n2]. *)
+      is the same as the number of jobs in a hyperperiod starting at [n2 * HP + O_max] given
+      that [n1] is less than or equal to [n2]. *)
   Lemma eq_size_hyp_lt :
     forall n1 n2,
       n1 <= n2 ->
@@ -147,7 +147,7 @@ Section PeriodicLemmas.
   Qed.
 
   (** We generalize the above lemma by lifting the condition on
-   [n1] and [n2]. *)
+      [n1] and [n2]. *)
   Lemma eq_size_of_arrivals_in_hyperperiod :
     forall n1 n2,
       size (jobs_in_hyperperiod ts arr_seq (n1 * HP + O_max) tsk)
@@ -162,7 +162,7 @@ Section PeriodicLemmas.
   Qed.
 
   (** Consider any two jobs [j1] and [j2] that stem from the arrival sequence
-   [arr_seq] such that [j1] is of task [tsk]. *)
+      [arr_seq] such that [j1] is of task [tsk]. *)
   Variable j1 : Job.
   Variable j2 : Job.
   Hypothesis H_j1_from_arr_seq : arrives_in arr_seq j1.
@@ -213,7 +213,7 @@ Section PeriodicLemmas.
   Qed.
 
   (** We show that the [corresponding_job_in_hyperperiod] of [j1] in [j2]'s hyperperiod
-   arrives in task arrivals up to [job_arrival j2 + HP]. *)
+      arrives in task arrivals up to [job_arrival j2 + HP]. *)
   Lemma corr_job_in_task_arrivals_up_to :
     corresponding_job_in_hyperperiod ts arr_seq j1 (starting_instant_of_corresponding_hyperperiod ts j2) tsk \in
       task_arrivals_up_to arr_seq tsk (job_arrival j2 + HP).
@@ -231,7 +231,7 @@ Section PeriodicLemmas.
   Qed.
 
   (** Finally, we show that the [corresponding_job_in_hyperperiod] of [j1] in [j2]'s hyperperiod
-   arrives in the arrival sequence [arr_seq]. *)
+      arrives in the arrival sequence [arr_seq]. *)
   Lemma corresponding_job_arrives :
       arrives_in arr_seq (corresponding_job_in_hyperperiod ts arr_seq j1 (starting_instant_of_corresponding_hyperperiod ts j2) tsk).
   Proof.

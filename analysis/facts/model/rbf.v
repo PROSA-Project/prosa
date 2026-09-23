@@ -413,7 +413,7 @@ Section FP_RBF_partitioning.
   Variable ts : seq Task.
 
   (** ...and let [tsk] be any task that serves as the reference point for
-     "higher or equal priority" (usually, but not necessarily, from [ts]). *)
+      "higher or equal priority" (usually, but not necessarily, from [ts]). *)
   Variable tsk : Task.
 
   (** We establish that the bound on the total workload due to
@@ -466,7 +466,7 @@ Section FP_RBF_partitioning.
       by rewrite H_priority_is_reflexive //=.
   Qed.
 
-  (** If the task set may contain duplicates, then the we can only say that
+  (** If the task set may contain duplicates, then we can only say that
       the sum of other higher-or-equal-priority [RBF] and task [tsk]'s [RBF]
       is at most the total higher-or-equal-priority workload. *)
   Lemma split_hep_rbf_weaken :
@@ -604,7 +604,7 @@ Section ScalarRequestBoundFunctions.
   Variable tsk : Task.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
-      for any task [tsk] in [ts] [max_arrival tsk] is (1) an arrival
+      for any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and (2) it is a monotonic function that equals 0
       for the empty interval [Δ = 0]. *)
   Context `{MaxArrivals Task}.

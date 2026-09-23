@@ -12,14 +12,14 @@ Require Export prosa.model.task.arrival.curves.
 Section ArrivalCurveToRBF.
 
   (** Consider any type of tasks with a given cumulative cost and minimum
-      scalar cost. *)
+      scalar cost ... *)
   Context {Task : TaskType} `{TaskCumulativeCost Task} `{TaskMinCost Task}.
 
   (**  ... and any type of jobs associated with these tasks. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobCost Job}.
 
-  (** Let [MaxArr] and [MinArr] represent two arrivals curves. [MaxArr] upper-bounds
-      the possible number or arrivals for a given task, whereas [MinArr] lower-bounds it. *)
+  (** Let [MaxArr] and [MinArr] represent two arrival curves. [MaxArr] upper-bounds
+      the possible number of arrivals for a given task, whereas [MinArr] lower-bounds it. *)
   Context `{MaxArr : MaxArrivals Task} `{MinArr : MinArrivals Task}.
 
   (** We define the upper-bounding conversion as the cumulative cost of the
@@ -116,7 +116,7 @@ Section ArrivalCurveToRBF.
 
   End SingleTask.
 
-  (** Next, we lift the results to the previous section to an arbitrary task set. *)
+  (** Next, we lift the results from the previous section to an arbitrary task set. *)
   Section TaskSet.
 
     (** Let [ts] be an arbitrary task set ... *)

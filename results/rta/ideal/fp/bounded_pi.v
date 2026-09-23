@@ -7,10 +7,10 @@ Require Export prosa.analysis.facts.model.task_cost.
 
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
-    (aRTA) to FP-schedulers for ideal uniprocessor model of
+    (aRTA) to FP-schedulers for the ideal uniprocessor model of
     real-time tasks with arbitrary arrival models. *)
 
-(** Given FP priority policy and an ideal uniprocessor scheduler
+(** Given an FP priority policy and an ideal uniprocessor scheduler
     model, we can explicitly specify [interference],
     [interfering_workload], and [interference_bound_function]. In this
     setting, we can define natural notions of service, workload, busy
@@ -36,11 +36,11 @@ Section AbstractRTAforFPwithArrivalCurves.
   Context `{JobPreemptable Job}.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
-     and assume that the relation is reflexive. Note that we do not relate
-     the FP policy with the scheduler. However, we define functions for
-     Interference and Interfering Workload that actively use the concept of
-     priorities. We require the FP policy to be reflexive, so a job cannot
-     cause lower-priority interference (i.e. priority inversion) to itself. *)
+      and assume that the relation is reflexive. Note that we do not relate
+      the FP policy with the scheduler. However, we define functions for
+      Interference and Interfering Workload that actively use the concept of
+      priorities. We require the FP policy to be reflexive, so a job cannot
+      cause lower-priority interference (i.e. priority inversion) to itself. *)
   Context {FP : FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
 
@@ -97,7 +97,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound
       of [tsk], and (2) it is a monotonic function that equals 0 for
       the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.

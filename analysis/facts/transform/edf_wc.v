@@ -261,7 +261,7 @@ Section MakeEDFWorkConservationLemmas.
   Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** We analyze [make_edf_at] applied to an arbitrary point in time,
-     which we denote [t_edf] in the following. *)
+      which we denote [t_edf] in the following. *)
   Variable t_edf : instant.
 
   (** For brevity, let [sched'] denote the schedule obtained from
@@ -314,7 +314,7 @@ Section EDFPrefixWorkConservationLemmas.
       [sched] up to the horizon. *)
   Let sched_trans := edf_transform_prefix sched horizon.
 
-  (** Let [schedule_behavior_premises] define the premise that a schedule is:
+  (** Let [scheduled_behavior_premises] define the premise that a schedule is:
       1) well-behaved,
       2) has all jobs coming from the arrival sequence [arr_seq], and
       3) in which no scheduled job misses its deadline *)

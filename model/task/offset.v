@@ -32,7 +32,7 @@ Section ValidTaskOffset.
       job_task j = tsk ->
       job_arrival j >= task_offset tsk.
 
-  (** Furthermore for a task [tsk], there exists a job that
+  (** Furthermore, for a task [tsk], there exists a job that
       arrives exactly at the offset. *)
   Definition job_released_at_offset (tsk : Task) :=
     exists j',

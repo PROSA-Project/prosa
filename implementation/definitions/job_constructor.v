@@ -3,12 +3,12 @@ Require Export prosa.implementation.definitions.task.
 
 (** * Job Constructor *)
 
-(** In this file, we define a job-generation function to use in pair with a
+(** In this file, we define a job-generation function to use together with a
     concrete arrival sequence. These facts sit at the basis of POET's
     assumption-less certificates, used to prove the absence of contradicting
     hypotheses in abstract RTA. *)
 
-(** The generated jobs to belong to the concrete task type. *)
+(** The generated jobs belong to the concrete task type. *)
 Definition Task := concrete_task : eqType.
 Definition Job := concrete_job : eqType.
 

@@ -2,7 +2,7 @@ Require Export prosa.model.priority.classes.
 Require Export prosa.analysis.facts.behavior.completion.
 
 (** * Busy Interval for JLFP-models *)
-(** In this file we define the notion of busy intervals for uniprocessor for JLFP schedulers. *)
+(** In this file we define the notion of busy intervals for uniprocessor JLFP schedulers. *)
 Section BusyIntervalJLFP.
 
   (** Consider any type of jobs. *)

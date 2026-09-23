@@ -41,8 +41,8 @@ Section TaskArrivals.
   Qed.
 
   (** We show that [task_arrivals_up_to_job_arrival j1] is a prefix
-   of [task_arrivals_up_to_job_arrival j2] if [j2] arrives at the same time
-   or after [j1]. *)
+      of [task_arrivals_up_to_job_arrival j2] if [j2] arrives at the same time
+      or after [j1]. *)
   Lemma task_arrivals_up_to_prefix_cat :
     forall j1 j2,
       arrives_in arr_seq j1 ->
@@ -60,7 +60,7 @@ Section TaskArrivals.
   Variable tsk : Task.
 
   (** Any job [j] from the arrival sequence is contained in
-   [task_arrivals_up_to_job_arrival j]. *)
+      [task_arrivals_up_to_job_arrival j]. *)
   Lemma arrives_in_task_arrivals_up_to :
     forall j,
       arrives_in arr_seq j ->
@@ -76,7 +76,7 @@ Section TaskArrivals.
   Qed.
 
   (** Also, any job [j] from the arrival sequence is contained in
-   [task_arrivals_at_job_arrival j]. *)
+      [task_arrivals_at_job_arrival j]. *)
   Lemma arrives_in_task_arrivals_at :
     forall j,
       arrives_in arr_seq j ->
@@ -185,7 +185,7 @@ Section TaskArrivals.
     by move: JT; rewrite /job_of_task => /eqP.
   Qed.
 
-  (** If a job arrives between to points in time, then the corresponding interval is nonempty... *)
+  (** If a job arrives between two points in time, then the corresponding interval is nonempty... *)
   Lemma task_arrivals_nonempty :
     forall t1 t2 j,
       j \in task_arrivals_between arr_seq tsk t1 t2 ->
@@ -218,7 +218,7 @@ Section TaskArrivals.
       uniq (task_arrivals_between arr_seq tsk t1 t2).
   Proof. move=> t1 t2 UNIQ. by apply/filter_uniq/arrivals_uniq. Qed.
 
-  (** A job cannot arrive before it's arrival time. *)
+  (** A job cannot arrive before its arrival time. *)
   Lemma job_notin_task_arrivals_before :
     forall j t,
       arrives_in arr_seq j ->
@@ -254,10 +254,10 @@ Section TaskArrivals.
   Qed.
 
   (** For any job [j2] with [job_index] equal to [n], the nth job
-   in the sequence [task_arrivals_up_to arr_seq tsk t] is [j2], given that
-   [t] is not less than [job_arrival j2]. *)
+      in the sequence [task_arrivals_up_to arr_seq tsk t] is [j2], given that
+      [t] is not less than [job_arrival j2]. *)
   (** Note that [j_def] is used as a default job for the access function and
-   has nothing to do with the lemma. *)
+      has nothing to do with the lemma. *)
   Lemma nth_job_of_task_arrivals :
     forall n j_def j t,
       arrives_in arr_seq j ->

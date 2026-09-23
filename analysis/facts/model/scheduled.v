@@ -37,7 +37,7 @@ Section ScheduledJobs.
   (** ** The Set of Jobs Scheduled at a Given Time *)
 
   (** Under these assumptions, [scheduled_jobs_at] is correct: a job is included
-      in the sequence if and only if it scheduled. *)
+      in the sequence if and only if it is scheduled. *)
   Lemma scheduled_jobs_at_iff :
     forall j t,
       j \in scheduled_jobs_at arr_seq sched t = scheduled_at sched j t.

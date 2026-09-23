@@ -12,7 +12,7 @@ Section BusySupplyBoundFunctions.
   (** Consider any type of tasks, ... *)
   Context {Task : TaskType}.
 
-  (** ... and any type of jobs. *)
+  (** ... and any type of jobs, ... *)
   Context {Job : JobType}.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.

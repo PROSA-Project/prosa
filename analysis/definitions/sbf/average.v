@@ -38,7 +38,7 @@ End AverageResourceModel.
 (** In this section, we define an SBF for the average resource model. *)
 Section AverageResourceModelSBF.
 
-  (** Given, the average resource model with a resource period [Π], resource
+  (** Given the average resource model with a resource period [Π], resource
       allocation time [Θ], and supply delay [ν],... *)
   Variable Π Θ ν : duration.
 

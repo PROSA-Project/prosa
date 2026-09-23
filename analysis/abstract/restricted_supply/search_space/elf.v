@@ -57,9 +57,8 @@ Section SearchSpaceSubset.
       Since the bound on workload from higher priority task does not depend
       on the arrival offset [A], we are only concerned about the workload from
       equal priority tasks.
-      For this, we ask whether there exists a task [tsko ≠ tsk] in task set [ts]
-      such that
-     [ep_task_interfering_interval_length tsk tsko (A - ε) != ep_task_interfering_interval_length tsk tsko A]. *)
+      For this, we ask whether there exists a task [tsko ≠ tsk] in task set [ts] such that
+      [ep_task_interfering_interval_length tsk tsko (A - ε) != ep_task_interfering_interval_length tsk tsko A]. *)
   Let bound_on_ep_task_workload_changes_at (A : duration) :=
     let new_hep_job_released_by tsko :=
       (ep_task tsk tsko) && (tsko != tsk)

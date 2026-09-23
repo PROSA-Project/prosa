@@ -3,7 +3,7 @@ Require Import prosa.analysis.facts.model.rbf.
 
 
 (** In this section, we provide definitions and lemmas to show
-    Abstract RTA' s search space can be rewritten in an equivalent,
+    Abstract RTA's search space can be rewritten in an equivalent,
     computation-oriented way. *)
 Section FastSearchSpaceComputation.
 
@@ -30,13 +30,13 @@ Section FastSearchSpaceComputation.
     map predn arrival_curve_prefix_offsets.
 
   (** By using the above definition, we give a concrete definition of
-    the search space for fixed-priority tasks. *)
+      the search space for fixed-priority tasks. *)
   Definition search_space_arrival_curve_prefix_FP (tsk : Task) L :=
     let h := get_horizon_of_task tsk in
     search_space_arrival_curve_prefix_FP_h (tsk : Task) 0 (L %/h).+1.
 
-  (** We begin by showing that either each time step of an arrival curve prefix
-      is either strictly less than the horizon, or it is the horizon. *)
+  (** We begin by showing that each time step of an arrival curve prefix
+      is strictly less than the horizon, or it is the horizon. *)
   Lemma steps_lt_horizon_last_eq_horizon :
     (forall s, s \in get_time_steps_of_task tsk -> s < get_horizon_of_task tsk)
     \/ (last0 (get_time_steps_of_task tsk) = get_horizon_of_task tsk).
@@ -164,7 +164,7 @@ Section FastSearchSpaceComputation.
   Qed.
 
   (** Next, we show that if the horizon of the arrival curve prefix divides [A+ε],
-   then [A] is not contained in the search space for fixed-priority tasks.  *)
+      then [A] is not contained in the search space for fixed-priority tasks.  *)
   Lemma constant_max_arrivals :
     forall A,
       (forall s, s \in get_time_steps_of_task tsk -> s < get_horizon_of_task tsk) ->

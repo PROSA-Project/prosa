@@ -38,7 +38,7 @@ Section State.
     (** The processor state [Idle k] indicates that the processor is
         ready to produce [k] units of supply; however, no job is
         scheduled. If the processor is in state [Progress j k], it
-        produces [k] unit of work at a given time instant. *)
+        produces [k] units of work at a given time instant. *)
     Definition varspeed_supply_on (s : processor_state) (_ : unit) : work :=
       match s with
       | Idle k => k

@@ -49,9 +49,9 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-     any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
-     [tsk], and (2) it is a monotonic function that equals 0 for the
-     empty interval delta = 0. *)
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of
+      [tsk], and (2) it is a monotonic function that equals 0 for the
+      empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
@@ -65,10 +65,10 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
 
-  (** Next, we assume that the schedule is a work-conserving schedule... *)
+  (** ... assume that the schedule is work-conserving,... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-  (** ... and the schedule respects the scheduling policy. *)
+  (** ... and that it respects the scheduling policy. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
   Hypothesis H_respects_policy :
@@ -85,7 +85,7 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
   Let task_rbf := rbf tsk.
 
   (** Using the sum of individual request bound functions, we define the request bound
-     function of all tasks (total request bound function). *)
+      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
   (** We also define a bound for the priority inversion caused by jobs with lower priority. *)

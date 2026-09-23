@@ -54,7 +54,7 @@ Section WorkloadOfJobs.
         higher or equal priority. *)
     Context `{JLFP_policy Job}.
 
-    (** We extend the prior notion to define the workload all jobs
+    (** We extend the prior notion to define the workload of all jobs
         with higher-or-equal priority than [j] in a given interval. *)
     Definition workload_of_hep_jobs (j : Job) (t1 t2 : instant) :=
       let is_hep j' := hep_job j' j in

@@ -11,7 +11,7 @@ Require Export prosa.implementation.definitions.extrapolated_arrival_curve.
 
 (** A task's arrival bound is an inductive type comprised of three types of
     arrival patterns: (a) periodic, characterized by a period between consequent
-    activation of a task, (b) sporadic, characterized by a minimum inter-arrival
+    activations of a task, (b) sporadic, characterized by a minimum inter-arrival
     time, or (c) arrival-curve prefix, characterized by a finite prefix of an
     arrival curve. *)
 Inductive task_arrivals_bound :=

@@ -158,7 +158,7 @@ Section JitterPropagationFacts.
     by move: R_rel; rewrite H_basic_readiness /pending.
   Qed.
 
-  (** If the given schedule is valid w.r.t. to original arrivals, then it
+  (** If the given schedule is valid w.r.t. original arrivals, then it
       continues to be valid after reinterpreting release times as arrival
       times. *)
   Lemma jitter_valid_schedule :

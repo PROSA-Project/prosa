@@ -8,7 +8,7 @@ Require Export prosa.analysis.facts.model.preemption.
 
 (** In this file, we show that, given a busy interval of a job [j],
     the processor is always busy scheduling a higher-or-equal-priority
-    job at any preemptive point inside the busy interval. *)
+    job at any preemption point inside the busy interval. *)
 Section ProcessorBusyWithHEPJobAtPreemptionPoints.
 
   (** Consider any type of jobs associated with these tasks. *)

@@ -20,7 +20,7 @@ Definition subadditive_until f h :=
     x < h ->
     subadditive_at f x.
 
-(** Finally, give a definition of subadditive function: [f] is subadditive
+(** Finally, we give a definition of a subadditive function: [f] is subadditive
     when it is subadditive at any point [h].*)
 Definition subadditive f :=
   forall h,

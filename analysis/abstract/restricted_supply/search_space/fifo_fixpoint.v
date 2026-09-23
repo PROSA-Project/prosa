@@ -65,7 +65,7 @@ Section ConcreteToAbstractFixpointReduction.
   Hypothesis H_valid_SBF : valid_busy_sbf arr_seq sched tsk SBF.
 
   (** We assume that [tsk] is described by a valid task
-      run-to-completion threshold_ *)
+      run-to-completion threshold *)
   Hypothesis H_valid_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
 
@@ -104,13 +104,13 @@ Section ConcreteToAbstractFixpointReduction.
       next. *)
 
   (** We know that:
-     - if [A] is in the abstract search space, then it is also in the
-       concrete search space; and
-     - if [A] is in the concrete search space, then there exists a
-       solution that satisfies the inequalities stated in
-       [H_R_is_maximum]. Using these facts, we prove that, if [A] is
-       in the abstract search space, then there also exists a solution
-       [F] to the response-time equation as expected by aRSA. *)
+      - if [A] is in the abstract search space, then it is also in the
+        concrete search space; and
+      - if [A] is in the concrete search space, then there exists a
+        solution that satisfies the inequalities stated in
+        [H_R_is_maximum]. Using these facts, we prove that, if [A] is
+        in the abstract search space, then there also exists a solution
+        [F] to the response-time equation as expected by aRSA. *)
   Lemma soln_abstract_response_time_recurrence :
     forall A : duration,
       abstract.search_space.is_in_search_space L (fifo.IBF ts tsk) A ->

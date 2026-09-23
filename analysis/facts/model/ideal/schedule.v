@@ -5,7 +5,7 @@ Require Export prosa.analysis.facts.model.scheduled.
 Require Import prosa.model.processor.ideal.
 
 (** Note: we do not re-export the basic definitions to avoid littering the global
-   namespace with type class instances. *)
+    namespace with type class instances. *)
 
 (** In this section we establish the classes to which an ideal schedule belongs. *)
 Section ScheduleClass.
@@ -20,7 +20,7 @@ Section ScheduleClass.
   Context `{JobCost Job}.
 
   (** We note that the ideal processor model is indeed a uni-processor
-     model. *)
+      model. *)
   Lemma ideal_proc_model_is_a_uniprocessor_model :
     uniprocessor_model (processor_state Job).
   Proof.
@@ -52,8 +52,8 @@ Section ScheduleClass.
   Qed.
 
   (** We observe that the ideal processor model falls into the category
-     of ideal-progress models, i.e., a scheduled job always receives
-     service. *)
+      of ideal-progress models, i.e., a scheduled job always receives
+      service. *)
   Lemma ideal_proc_model_ensures_ideal_progress :
     ideal_progress_proc_model (processor_state Job).
   Proof.
@@ -88,7 +88,7 @@ Section ScheduleClass.
     by exists.
   Qed.
 
-  (** ... and also the definitions of [scheduled_at], *)
+  (** ... and also the definitions of [scheduled_at], ... *)
   Lemma scheduled_at_def sched (j : Job) t :
     scheduled_at sched j t = (sched t == Some j).
   Proof.

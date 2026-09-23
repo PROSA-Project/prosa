@@ -70,7 +70,7 @@ Section JobArrivalSeparation.
     Hypothesis H_j2_of_task : job_task j2 = tsk.
 
     (** We'll assume that job [j1] arrives before [j2] and that
-     their indices differ by an integer [k]. *)
+        their indices differ by an integer [k]. *)
     Variable k : nat.
     Hypothesis H_index_difference_k : job_index arr_seq j1 + k = job_index arr_seq j2 .
     Hypothesis H_job_arrival_lt : job_arrival j1 < job_arrival j2.

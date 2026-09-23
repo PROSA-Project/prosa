@@ -9,7 +9,7 @@ Require Import prosa.behavior.service.
 Section CompletionSequence.
 
   (** Consider any kind of jobs with a cost
-     and any kind of processor state. *)
+      and any kind of processor state. *)
   Context {Job : JobType} `{JobCost Job} {PState : ProcessorState Job}.
 
   (** Consider any job arrival sequence. *)
@@ -19,7 +19,7 @@ Section CompletionSequence.
   Variable sched : schedule PState.
 
   (** For each instant [t], the completion sequence returns all
-     arrived jobs that have completed at [t]. *)
+      arrived jobs that have completed at [t]. *)
   Definition completion_sequence : arrival_sequence Job :=
     fun t => [seq j <- arrivals_up_to arr_seq t | completes_at sched j t].
 

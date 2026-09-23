@@ -40,7 +40,7 @@ Section Task.
       job_of_task tsk j ->
       job_response_time_bound sched j R.
 
-  (** We say that a task is schedulable if all its jobs meet their deadline *)
+  (** We say that a task is schedulable if all its jobs meet their deadline. *)
   Definition schedulable_task :=
     forall j,
       arrives_in arr_seq j ->
@@ -117,28 +117,28 @@ Section AllDeadlinesMet.
   Context {PState : ProcessorState Job}.
 
   (** We say that all deadlines are met if every job scheduled at some
-     point in the schedule meets its deadline. Note that this is a
-     relatively weak definition since an "empty" schedule that is idle
-     at all times trivially satisfies it (since the definition does
-     not require any kind of work conservation). *)
+      point in the schedule meets its deadline. Note that this is a
+      relatively weak definition since an "empty" schedule that is idle
+      at all times trivially satisfies it (since the definition does
+      not require any kind of work conservation). *)
   Definition all_deadlines_met (sched : schedule PState) :=
     forall j t,
       scheduled_at sched j t ->
       job_meets_deadline sched j.
 
   (** To augment the preceding definition, we also define an alternate
-     notion of "all deadlines met" based on all jobs included in a
-     given arrival sequence.  *)
+      notion of "all deadlines met" based on all jobs included in a
+      given arrival sequence.  *)
   Section DeadlinesOfArrivals.
 
     (** Given an arbitrary job arrival sequence ... *)
     Variable arr_seq : arrival_sequence Job.
 
     (** ... we say that all arrivals meet their deadline if every job
-       that arrives at some point in time meets its deadline. Note
-       that this definition does not preclude the existence of jobs in
-       a schedule that miss their deadline (e.g., if they stem from
-       another arrival sequence). *)
+        that arrives at some point in time meets its deadline. Note
+        that this definition does not preclude the existence of jobs in
+        a schedule that miss their deadline (e.g., if they stem from
+        another arrival sequence). *)
     Definition all_deadlines_of_arrivals_met (sched : schedule PState) :=
       forall j,
         arrives_in arr_seq j ->

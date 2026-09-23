@@ -42,7 +42,7 @@ Section Sequential_Abstract_RTA.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any ideal schedule of this arrival sequence. *)
+  (** ... and any ideal schedule of this arrival sequence ... *)
   Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
@@ -70,7 +70,7 @@ Section Sequential_Abstract_RTA.
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
-      for any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival
+      for any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and (2) it is a monotonic function that equals
       [0] for the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.

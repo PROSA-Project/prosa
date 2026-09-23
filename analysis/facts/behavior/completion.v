@@ -205,8 +205,8 @@ Section ServiceAndCompletionFacts.
   Proof. exact: H_unit_service. Qed.
 
   (** To begin with, we establish that the cumulative service never exceeds a
-     job's total cost if service increases only by one at each step since
-     completed jobs don't execute. *)
+      job's total cost if service increases only by one at each step since
+      completed jobs don't execute. *)
   Lemma service_at_most_cost :
     forall t,
       service sched j t <= job_cost j.
@@ -223,14 +223,14 @@ Section ServiceAndCompletionFacts.
   Qed.
 
   (** This lets us conclude that [service] and [remaining_cost] are complements
-     of one another. *)
+      of one another. *)
   Lemma service_cost_invariant :
     forall t,
       (service sched j t) + (remaining_cost sched j t) = job_cost j.
   Proof. by move=> ?; rewrite subnKC// service_at_most_cost. Qed.
 
   (** We show that the service received by job [j] in any interval is no larger
-     than its cost. *)
+      than its cost. *)
   Lemma cumulative_service_le_job_cost :
     forall t t',
       service_during sched j t t' <= job_cost j.
@@ -242,7 +242,7 @@ Section ServiceAndCompletionFacts.
   Qed.
 
   (** If a job isn't complete at time [t], it can't be completed at time [t +
-     remaining_cost j t - 1]. *)
+      remaining_cost j t - 1]. *)
   Lemma job_doesnt_complete_before_remaining_cost :
     forall t,
       ~~ completed_by sched j t ->
@@ -307,7 +307,7 @@ Section PositiveCost.
   Variable j : Job.
 
   (** We assume that job [j] has positive cost, from which we can
-     infer that there always is a time in which [j] is pending, ... *)
+      infer that there always is a time in which [j] is pending, ... *)
   Hypothesis H_positive_cost : job_cost j > 0.
 
   (** ...and that jobs must arrive to execute. *)
@@ -315,7 +315,7 @@ Section PositiveCost.
     jobs_must_arrive_to_execute sched.
 
   (** Then, we prove that the job with a positive cost
-     must be scheduled to be completed. *)
+      must be scheduled to be completed. *)
   Lemma completed_implies_scheduled_before :
     forall t,
       completed_by sched j t ->
@@ -347,7 +347,7 @@ Section CompletedJobs.
   Variable sched : schedule PState.
 
   (** ... and suppose that jobs have a cost, an arrival time, and a notion of
-     readiness. *)
+      readiness. *)
   Context `{JobCost Job}.
   Context `{JobArrival Job}.
   Context {jr : JobReady Job PState}.
@@ -374,8 +374,8 @@ Section CompletedJobs.
   Proof. move=> ? [? ?]; exact: completed_jobs_are_not_ready. Qed.
 
   (** We further observe that completed jobs don't execute if scheduled jobs
-     always receive non-zero service and cumulative service never exceeds job
-     costs. *)
+      always receive non-zero service and cumulative service never exceeds job
+      costs. *)
   Lemma ideal_progress_completed_jobs :
     ideal_progress_proc_model PState ->
     (forall j t, service sched j t <= job_cost j) ->

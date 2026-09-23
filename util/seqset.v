@@ -35,7 +35,7 @@ Section Lemmas.
   Context {T : eqType}.
   Variable s : {set T}.
 
-  (** Then we show that element of [s] are unique. *)
+  (** Then we show that the elements of [s] are unique. *)
   Lemma set_uniq : uniq s.
   Proof. by destruct s. Qed.
 

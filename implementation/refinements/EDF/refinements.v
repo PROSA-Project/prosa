@@ -14,13 +14,13 @@ Section Definitions.
   Context `{!eq_of (seq T)}.
   Context {eq_of2 : eq_of (@task_T T)}.
 
-  (** We define a generic version of total request-bound function of
-      higher-or-equal priority task, ... *)
+  (** We define a generic version of the total request-bound function of a
+      higher-or-equal priority task ... *)
   Definition total_rbf_T (ts : seq task_T) (Δ : T) : T :=
     let work_ts := map (fun tsk' => task_rbf_T tsk' Δ) ts in
     foldr +%C 0%C work_ts.
 
-  (** ... of bound on total higher-or-equal priority workload, ...  *)
+  (** ... and of the bound on total higher-or-equal priority workload.  *)
   Definition bound_on_total_hep_workload_T (ts : seq task_T) (tsk : task_T) (A Δ : T) : T :=
     let o_ts := filter (fun tsk_o => ~~ (eq_of2 tsk_o tsk)) ts in
     let o_work := map (fun tsk_o => task_rbf_T tsk_o (minn_T ((A + 1) + task_deadline_T tsk - task_deadline_T tsk_o) Δ))%C o_ts in

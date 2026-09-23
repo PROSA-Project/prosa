@@ -3,11 +3,11 @@ Require Export prosa.behavior.service.
 (** * Readiness of a Job *)
 
 (** We define a general notion of readiness of a job: a job can be
-   scheduled only when it is ready, as determined by the predicate
-   [job_ready]. This notion of readiness is a general concept that is
-   used to model jitter, self-suspensions, etc.  Crucially, we require
-   that any sensible notion of readiness is a refinement of the notion
-   of a pending job, i.e., any ready job must also be pending. *)
+    scheduled only when it is ready, as determined by the predicate
+    [job_ready]. This notion of readiness is a general concept that is
+    used to model jitter, self-suspensions, etc. Crucially, we require
+    that any sensible notion of readiness is a refinement of the notion
+    of a pending job, i.e., any ready job must also be pending. *)
 Class JobReady (Job : JobType) (PState : ProcessorState Job)
       {jc : JobCost Job} {ja : JobArrival Job} :=
   {
@@ -22,7 +22,7 @@ Class JobReady (Job : JobType) (PState : ProcessorState Job)
 (** * Backlogged Jobs *)
 
 (** Based on the general notion of readiness, we define what it means to be
-   backlogged, i.e., ready to run but not executing. *)
+    backlogged, i.e., ready to run but not executing. *)
 Section Backlogged.
   (** Consider any kinds of jobs and any kind of processor state. *)
   Context {Job : JobType} {PState : ProcessorState Job}.
@@ -68,14 +68,14 @@ Section ValidSchedule.
     forall j t, scheduled_at sched j t -> service sched j t < job_cost j.
 
   (** We say that the schedule is valid iff
-     - jobs come from some arrival sequence
-     - a job is scheduled if it is ready *)
+      - jobs come from some arrival sequence, and
+      - a job is scheduled if it is ready. *)
   Definition valid_schedule (arr_seq : arrival_sequence Job) :=
     jobs_come_from_arrival_sequence arr_seq
     /\ jobs_must_be_ready_to_execute.
 
   (** Note that we do not explicitly require that a valid schedule satisfies
-     [jobs_must_arrive_to_execute] or [completed_jobs_dont_execute] because these
-     properties are implied by jobs_must_be_ready_to_execute. *)
+      [jobs_must_arrive_to_execute] or [completed_jobs_dont_execute] because these
+      properties are implied by jobs_must_be_ready_to_execute. *)
 
 End ValidSchedule.

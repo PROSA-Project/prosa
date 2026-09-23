@@ -60,7 +60,7 @@ Section EDFTransformation.
 
   (** Finally, a full EDF schedule (i.e., one that satisfies [EDF_at] at any
       time) is obtained by first computing an EDF prefix up to and including
-      the requested time [t], and by then looking at the last point of the
+      the requested time [t], and then looking at the last point of the
       prefix. *)
   Definition edf_transform (sched : SchedType) (t : instant) : ideal.processor_state Job :=
     let

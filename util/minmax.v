@@ -179,7 +179,7 @@ Proof.
   { by exfalso; move: LT; rewrite !big_hasC. }
 Qed.
 
-(** Conversely, we observe that if one predicates implies another, then the
+(** Conversely, we observe that if one predicate implies another, then the
     corresponding maxima are related. *)
 Corollary bigmax_subset {T : eqType} :
   forall {xs : seq T} {P1 P2 : pred T} {F},

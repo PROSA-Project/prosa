@@ -68,7 +68,7 @@ Section PriorityFacts.
   Qed.
 
   (** This opposite priority relation is sometimes needed in terms of
-     [always_higher_priority]. *)
+      [always_higher_priority]. *)
   Fact FIFO_policy_always_higher_priority :
     forall j j',
       ~~ hep_job j j' ->

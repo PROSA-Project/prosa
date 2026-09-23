@@ -431,7 +431,7 @@ Section BoundedBusyIntervals.
       (** Lemma [job_arrival_is_bounded] implies that the
           busy-interval prefix starts at time [t1], continues until
           [job_arrival j + 1], and then terminates before [t1 + L].
-          Or, in other words, there is point in time [t2] such that
+          Or, in other words, there is a point in time [t2] such that
           (1) [j]'s arrival is bounded by [t2], (2) [t2] is bounded by
           [t1 + L], and (3) <<[t1, t2)>> is busy interval of job
           [j]. *)

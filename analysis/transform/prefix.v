@@ -13,11 +13,11 @@ Section SchedulePrefixMap.
   Context {PState : ProcessorState Job}.
 
   (** ... we define a procedure that applies a given function to every
-     point in a given finite prefix of the schedule.
+      point in a given finite prefix of the schedule.
 
-     The point-wise transformation f is given a schedule and the point
-     to transform, and must yield a transformed schedule that is used
-     in subsequent operations. *)
+      The point-wise transformation f is given a schedule and the point
+      to transform, and must yield a transformed schedule that is used
+      in subsequent operations. *)
   Fixpoint prefix_map
            (sched : schedule PState)
            (f : schedule PState -> instant -> schedule PState)

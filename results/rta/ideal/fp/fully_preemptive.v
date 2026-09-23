@@ -44,7 +44,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e., for
-      any task [tsk] in ts [max_arrivals tsk] is (1) an arrival bound of
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of
       [tsk], and (2) it is a monotonic function that equals 0 for the
       empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
@@ -64,7 +64,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
-     and assume that the relation is reflexive and transitive. *)
+      and assume that the relation is reflexive and transitive. *)
   Context {FP : FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
   Hypothesis H_priority_is_transitive : transitive_task_priorities FP.

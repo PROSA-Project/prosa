@@ -53,7 +53,7 @@ Section Progress.
 
   End NotionsOfProgress.
 
-  (** For convenience, we define a lack of progress also in terms of given
+  (** For convenience, we define a lack of progress also in terms of a given
       reference point [t] and the length of the preceding interval of
       inactivity [delta], meaning that no progress has been made for at least
       [delta] time units. *)

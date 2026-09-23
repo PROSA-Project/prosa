@@ -17,14 +17,14 @@ Export Refinements.Op.
 (** ** Brief Introduction *)
 
 (** Consider the refinement [refines (Rnat ==> Rnat ==> Rnat)%rel maxn maxn_T.]
-    This statements uses the relation [Rnat], which relates each unary number
+    This statement uses the relation [Rnat], which relates each unary number
     with its binary counterpart.
 
     Proving this statement shows that the [maxn] function is isomorphic to
     [maxn_T], i.e., given two unary numbers [(a,b)] and two binary numbers [(a',
     b')], [Rnat a b -> Rnat a' b' -> Rnat (maxn a b) (maxn_T a' b')].  In other
     words, if [a] is related to [a'] and [b] to [b'], then [maxn a b] is related
-    to [maxn_T a' b')].  This statement is encoded in a succinct way via the [==>]
+    to [maxn_T a' b'].  This statement is encoded in a succinct way via the [==>]
     notation.
 
     For more information, refer to

@@ -6,8 +6,8 @@ Require Export prosa.util.list.
 
 (** In this module, we define the three well-known classes of priority
     relations: (1) fixed-priority (FP) policies, (2) job-level fixed-priority
-    (JLFP) polices, and (3) job-level dynamic-priority (JLDP) policies, where
-    (2) is a subset of (3), and (1) a subset of (2). *)
+    (JLFP) policies, and (3) job-level dynamic-priority (JLDP) policies, where
+    (2) is a subset of (3), and (1) is a subset of (2). *)
 
 (** As a convention, we use "hep" to mean "higher or equal priority." *)
 
@@ -44,7 +44,7 @@ Section Priorities.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
 
-  (** .. and assume that jobs have a cost and an arrival time. *)
+  (** ... and assume that jobs have a cost and an arrival time. *)
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
@@ -63,7 +63,7 @@ Section Priorities.
     Definition reflexive_priorities := forall t, reflexive (hep_job_at t).
 
      (** A JLDP policy is transitive if the relation among "jobs" is transitive at
-        "every point in time." *)
+         "every point in time." *)
     Definition transitive_priorities := forall t, transitive (hep_job_at t).
 
     (** A JLDP policy is total if the relation among "jobs" is total at

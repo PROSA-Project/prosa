@@ -68,7 +68,7 @@ Section State.
         This is required to specify in which states a processor can offer
         productive work to a job. Note that when analysing a schedule of the
         [exceedance_processor_state], we want to model all instances of
-        [ExceedanceExecution] as blackouts w.r.t. to nominal service and,
+        [ExceedanceExecution] as blackouts w.r.t. nominal service and,
         therefore, the supply in this processor state is defined to be [0]. *)
     Definition exceedance_supply_on (_ : unit) : work :=
       match proc_state with

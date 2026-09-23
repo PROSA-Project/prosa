@@ -6,7 +6,7 @@ Require Export prosa.analysis.transform.swap.
     making a decision on what to schedule at each point in time. *)
 
 (** To begin with, we define the notion of a pointwise scheduling policy that
-    makes a decision at a given time [t] based on given prefix up to time
+    makes a decision at a given time [t] based on a given prefix up to time
     [t.-1]. *)
 Section PointwisePolicy.
   (** Consider any type of jobs and type of schedule. *)

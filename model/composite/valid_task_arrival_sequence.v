@@ -44,7 +44,7 @@ Section ValidTaskArrivalSequence.
     valid_task_arrival_sequence -> valid_arrival_sequence arr_seq.
   Proof. by move=> //= []. Qed.
 
-  (** All arriving jobs have valid costs.. *)
+  (** All arriving jobs have valid costs. *)
   Lemma valid_task_arrival_sequence_valid_costs :
     valid_task_arrival_sequence -> arrivals_have_valid_job_costs arr_seq.
   Proof. by move=> [_ []]. Qed.

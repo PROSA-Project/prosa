@@ -72,7 +72,7 @@ Section TotalSuspensionTime.
   Context `{JobCost Job} `{JobSuspension Job}.
 
   (** A job's total self-suspension length is simply the sum of the lengths of
-     all its suspensions. *)
+      all its suspensions. *)
   Definition total_suspension (j : Job) := \sum_(0 <= ρ < job_cost j) job_suspension j ρ.
 
 End TotalSuspensionTime.

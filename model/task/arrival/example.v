@@ -5,11 +5,11 @@ Require Import prosa.model.task.arrival.curve_as_rbf.
 
 (** * Arrival Model Conversion
 
-  This file demonstrates the automatic conversion of arrival
-  models. In particular, we show how a set of periodic tasks can be
-  interpreted also as (1) sporadic tasks with minimum inter-arrival
-  times, (2) sporadic tasks with arrival curves, and (3) request-bound
-  functions.  *)
+    This file demonstrates the automatic conversion of arrival
+    models. In particular, we show how a set of periodic tasks can be
+    interpreted also as (1) sporadic tasks with minimum inter-arrival
+    times, (2) sporadic tasks with arrival curves, and (3) request-bound
+    functions.  *)
 
 Section AutoArrivalModelConversion.
 
@@ -39,7 +39,7 @@ Section AutoArrivalModelConversion.
   Goal valid_taskset_inter_arrival_times ts.
   Proof. by []. Qed.
 
-  (** ... and arrival sequence is legal under the sporadic task
+  (** ... and the arrival sequence is legal under the sporadic task
       model. *)
   Goal taskset_respects_sporadic_task_model ts arr_seq.
   Proof. by []. Qed.

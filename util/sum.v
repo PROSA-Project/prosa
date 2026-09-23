@@ -100,7 +100,7 @@ Section SumsOverSequences.
     Variable (P1 P2 : pred I).
 
     (** Assume that [E2] dominates [E1] in all the points contained in the set [r] and respecting
-        the predicate [P]. We prove that, if we sum both function over those points, then the sum
+        the predicate [P]. We prove that, if we sum both functions over those points, then the sum
         of [E2] will dominate the sum of [E1]. *)
     Lemma leq_sum_seq :
       (forall i, i \in r -> P i -> E1 i <= E2 i) ->
@@ -158,7 +158,7 @@ Qed.
 (** Second, we repeat the above observation that summing a superset of natural
     numbers cannot yield a lesser sum, but phrase the claim differently.
 
-    Requiring the absence of duplicate in [r] is a simple way to guarantee that
+    Requiring the absence of duplicates in [r] is a simple way to guarantee that
     the set inclusion [r <= rs] implies the actually required multiset
     inclusion. *)
 Lemma leq_sum_sub_uniq (I : eqType) (r : seq I) (F : I -> nat) (rs : seq I) :
@@ -177,7 +177,7 @@ Proof.
 Qed.
 
 (** We continue establishing properties of sums over sequences, but start a new
-    section here because some of the below proofs depend lemmas in the preceding
+    section here because some of the below proofs depend on lemmas in the preceding
     section in their full generality. *)
 Section SumsOverSequences.
 
@@ -286,7 +286,7 @@ Section SumOfTwoIntervals.
       in their respective interval. *)
   Hypothesis equal_before_d : forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
 
-  (** The then summations of [F1] over <<[t1, t1 + d)>> and [F2] over
+  (** Then the summations of [F1] over <<[t1, t1 + d)>> and [F2] over
       <<[t2, t2 + d)>> are equal. *)
   Lemma big_sum_eq_in_eq_sized_intervals :
     \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
@@ -376,7 +376,7 @@ Section SumOverPartitions.
     Hypothesis H_ys_unique : uniq ys.
 
     (** We prove that summation of [f x] over all [x] is equal to the summation of
-      [sum_of_partition] over all partitions. *)
+        [sum_of_partition] over all partitions. *)
     Lemma sum_over_partitions_eq :
       \sum_(x <- xs | P x) f x
       = \sum_(y <- ys) sum_of_partition y.

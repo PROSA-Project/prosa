@@ -185,7 +185,7 @@ Section JLFPInstantiation.
         from a task other than [j]'s task is scheduled. *)
     Section FromDifferentTask.
 
-      (** Consider a job [j'] that _does_ _not_ comes from task
+      (** Consider a job [j'] that _does_ _not_ come from task
           [tsk] and is scheduled at time instant [t].  *)
       Variable j' : Job.
       Hypothesis H_j'_not_tsk : ~~ job_of_task tsk j'.
@@ -194,7 +194,7 @@ Section JLFPInstantiation.
       (** Hence, if we assume that [j'] has higher-or-equal priority, ... *)
       Hypothesis H_j'_hep : hep_job j' j.
 
-      (** Moreover, in this case, task [tsk] also incurs interference. *)
+      (** ... then task [tsk] also incurs interference in this case. *)
       Lemma sched_athep_implies_task_interference :
         task_interference arr_seq sched j t.
       Proof.
@@ -258,7 +258,7 @@ Section JLFPInstantiation.
   Qed.
 
   (** Let [j] be any job of task [tsk]. Then the cumulative task
-      interference received by job [j] is bounded to the sum of the
+      interference received by job [j] is bounded by the sum of the
       cumulative priority inversion of job [j] and the cumulative
       interference incurred by job [j] due to higher-or-equal
       priority jobs from other tasks. *)
@@ -644,7 +644,7 @@ Section JLFPInstantiation.
       (** ... [L] is greater than [0], and... *)
       Hypothesis H_L_positive : L > 0.
 
-      (** [L] is the fixed point of the following equation. *)
+      (** ... [L] is the fixed point of the following equation. *)
       Hypothesis H_fixed_point : L = total_request_bound_function ts L.
 
       (** Assume all jobs have a valid job cost. *)

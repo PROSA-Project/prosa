@@ -239,7 +239,7 @@ Section NondecreasingSequence.
 
   (** Alternatively, consider an arbitrary natural number x that is
       bounded by the first and the last element of a sequence
-      [xs]. Then there is an index n such that [xs[n] <= x < x[n+1]]. *)
+      [xs]. Then there is an index n such that [xs[n] <= x] and [x < xs[n+1]]. *)
   Lemma belonging_to_segment_of_seq_is_total :
     forall (xs : seq nat) (x : nat),
       2 <= size xs ->

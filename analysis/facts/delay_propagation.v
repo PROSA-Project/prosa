@@ -49,7 +49,7 @@ Section ACPropFacts.
   #[local] Instance  max_arrivals2 : MaxArrivals Task2 :=
     propagated_arrival_curve task1_of delay_bound.
 
-  (** Additionally, given an arbitrary arrival sequence of type-one jobs, *)
+  (** Additionally, given an arbitrary arrival sequence of type-one jobs, ... *)
   Variable arr_seq1 : arrival_sequence Job1.
 
   (** ... if the mapping of type-two jobs to type-one jobs is valid, ... *)
@@ -221,7 +221,7 @@ Section ACPropFacts.
       - exact/arrives_in_propagated_only_if/in_arrivals_implies_arrived.
     Qed.
 
-    (** Let [tsk1] denote the associated type-one task of [tsk1]... *)
+    (** Let [tsk1] denote the associated type-one task of [tsk2]... *)
     Let tsk1 := task1_of tsk2.
 
     (** ... and let [tsk1_arrivals] denote its jobs in the window during which
@@ -290,7 +290,7 @@ Section ACPropFacts.
 
   (** Assuming that the given arrival sequence for type-one tasks correctly
       bounds the arrivals of triggering jobs, [trigger_job_size] implies that
-      the derived arrival curve correctly bounds the arrivals of type-two job
+      the derived arrival curve correctly bounds the arrivals of type-two jobs
       since [size tsk1_arrivals] is then bounded by the given arrival curve
       [max_arrivals1]. *)
   Theorem propagated_arrival_curve_respected :

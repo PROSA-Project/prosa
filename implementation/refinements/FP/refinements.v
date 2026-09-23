@@ -26,7 +26,7 @@ Section Definitions.
     let work_ts := map (fun tsk' => task_rbf_T tsk' Δ) hep_ts in
     foldr +%C 0%C work_ts.
 
-  (** ... an analogous version of [hep_task] in without symmetry, ... *)
+  (** ... an analogous version of [hep_task] without symmetry, ... *)
   Definition ohep_task_T tsk_o tsk :=
     (hep_task_T tsk_o tsk) && (~~ (eq_of2 tsk_o tsk)%C).
 

@@ -8,7 +8,7 @@ Require Export prosa.analysis.facts.model.uniprocessor.
 (** In this file, we establish basic facts about the service received by _sets_ of jobs. *)
 
 (** To begin with, we provide some basic properties of service
-   of a set of jobs in case of a generic scheduling model. *)
+    of a set of jobs in case of a generic scheduling model. *)
 Section GenericModelLemmas.
 
   (** Consider any type of tasks ... *)
@@ -345,8 +345,8 @@ Section UnitServiceModelLemmas.
     Variable t_compl : instant.
 
     (** And state the proposition that all jobs are completed by time
-       [t_compl]. Next we show that this proposition is equivalent to
-       the fact that [workload of jobs = service of jobs]. *)
+        [t_compl]. Next we show that this proposition is equivalent to
+        the fact that [workload of jobs = service of jobs]. *)
     Let all_jobs_completed_by t_compl :=
       forall j, j \in jobs -> P j -> completed_by sched j t_compl.
 
@@ -381,7 +381,7 @@ Section UnitServiceModelLemmas.
     Qed.
 
     (** And vice versa, the fact that any job in [jobs] is completed by time [t_compl]
-       implies that the workload of [jobs] is equal to the service of [jobs]. *)
+        implies that the workload of [jobs] is equal to the service of [jobs]. *)
     Lemma all_jobs_have_completed_impl_workload_eq_service :
       all_jobs_completed_by t_compl ->
       workload_of_jobs P jobs = service_of_jobs sched P jobs t1 t_compl.

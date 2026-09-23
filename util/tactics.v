@@ -85,7 +85,7 @@ Ltac rewrite_neg H :=
                             ____
                             Q
 >>
-   After completing this proof, [Q] becomes a hypothesis in the context.
+    After completing this proof, [Q] becomes a hypothesis in the context.
  *)
 Ltac feed H :=
   match type of H with
@@ -135,7 +135,7 @@ Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
     depend on automatically generated names.  *)
 #[global] Obligation Tactic := idtac.
 
-(** The mathematical components library turns off Coq' s support for the enforcement
+(** The mathematical components library turns off Coq's support for the enforcement
     of structured sub-proofs. We do want structured sub-proofs in Prosa, however, so
     here we turn strict checking back on. *)
 #[global] Set Bullet Behavior "Strict Subproofs".

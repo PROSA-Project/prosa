@@ -136,11 +136,11 @@ Section SequentialTasks.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** Allow for any uniprocessor model ... *)
+  (** Allow for any uniprocessor model, ... *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniproc : uniprocessor_model PState.
 
-  (** Next, consider any schedule of the arrival sequence, ... *)
+  (** ... consider any schedule of the arrival sequence, ... *)
   Variable sched : schedule PState.
 
   (** ...allow for any work-bearing notion of job readiness, ... *)

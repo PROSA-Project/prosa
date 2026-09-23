@@ -7,7 +7,7 @@ Require Export prosa.model.priority.classes.
     is preemptable, i.e., where it can be forced to relinquish the processor on
     which it is executing. In Prosa, the various preemption models are
     represented with a single predicate [job_preemptable] that indicates, for
-    given a job and a given degree of progress, whether the job is preemptable
+    a given job and a given degree of progress, whether the job is preemptable
     at its current point of execution. *)
 Class JobPreemptable (Job : JobType) :=
   { job_preemptable : Job -> work -> bool }.

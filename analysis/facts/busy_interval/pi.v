@@ -323,7 +323,7 @@ Section PriorityInversionIsBounded.
       (job_max_nonpreemptive_segment j_lp - ε).
 
   (** Note that any bound on the [max_lp_nonpreemptive_segment]
-      function is also be a bound on the maximum priority inversion
+      function can also be a bound on the maximum priority inversion
       (assuming there are no other mechanisms that could cause
       priority inversion). This bound may be different for different
       scheduler and/or task models. Thus, we don't define such a bound

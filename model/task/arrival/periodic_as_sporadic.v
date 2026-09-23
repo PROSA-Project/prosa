@@ -32,7 +32,7 @@ Section PeriodicTasksAsSporadicTasks.
     forall tsk, valid_period tsk -> valid_task_min_inter_arrival_time tsk.
   Proof. trivial. Qed.
 
-  (** ... and, in a given valid arrival sequence,  ... *)
+  (** ... and, in a given valid arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 

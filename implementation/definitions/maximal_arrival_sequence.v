@@ -7,7 +7,7 @@ Require Export prosa.util.supremum.
     Given an arbitrary arrival curve, the defined arrival sequence tries to
     generate as many jobs as possible at any time instant by adopting a greedy
     strategy: at each time [t], the arrival sequence contains the maximum possible
-    number of jobs that does not violate the given arrival curve's constraints. *)
+    number of jobs that do not violate the given arrival curve's constraints. *)
 Section MaximalArrivalSequence.
 
   (** Consider any type of tasks ... *)
@@ -52,7 +52,7 @@ Section MaximalArrivalSequence.
     (** Further, we define the function [next_max_arrival] to handle a special
         case: when the arrival prefix is empty, the function returns the value
         of the arrival curve with a window length of [1]. Otherwise, it returns
-        the number the number of jobs that can additionally be generated.  *)
+        the number of jobs that can additionally be generated.  *)
     Definition next_max_arrival (arr_prefix : seq nat) :=
       match jobs_remaining arr_prefix with
       | None => max_arrivals tsk 1

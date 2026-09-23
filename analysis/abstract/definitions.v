@@ -121,7 +121,7 @@ Section AbstractRTADefinitions.
   (** ** Definition of Busy Interval *)
   (** Further analysis will be based on the notion of a busy
       interval. The overall idea of the busy interval is to take into
-      account the workload that cause a job under consideration to
+      account the workload that causes a job under consideration to
       incur interference. In this section, we provide a definition of
       an abstract busy interval. *)
 

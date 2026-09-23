@@ -67,7 +67,7 @@ Section AbstractRTARestrictedSupplySequential.
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
-      for any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival
+      for any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and (2) it is a monotonic function that equals
       [0] for the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
@@ -196,7 +196,7 @@ Section AbstractRTARestrictedSupplySequential.
         In other words, a solution to the response-time recurrence for
         restricted-supply processor models with sequential tasks can
         be translated to a solution for the same processor model with
-        non-necessarily sequential tasks. *)
+        not necessarily sequential tasks. *)
     Lemma sol_seq_rs_equation_impl_sol_rs_equation :
       forall (A : duration),
         is_in_search_space L IBF  A ->

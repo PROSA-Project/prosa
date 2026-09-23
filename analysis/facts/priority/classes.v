@@ -101,7 +101,7 @@ Section TotalJLFPProperties.
 
 End TotalJLFPProperties.
 
-(** In the following section, we establish properties of [hp_task] and [ep_task ]auxiliary
+(** In the following section, we establish properties of [hp_task] and [ep_task] auxiliary
     priority relations defined for FP policies. They are useful in proving properties of the
     ELF scheduling policy. *)
 Section FPRelationsProperties.
@@ -270,7 +270,7 @@ Section FPRemarks.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
 
-  (** .. and assume that jobs have a cost and an arrival time. *)
+  (** ... and assume that jobs have a cost and an arrival time. *)
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 

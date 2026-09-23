@@ -15,7 +15,7 @@ Require Export prosa.model.priority.numeric_fixed_priority.
 (** ** Implementation of a Concrete Task *)
 
 
-(** A task comprises of an ID, a cost, an arrival bound, a deadline
+(** A task comprises an ID, a cost, an arrival bound, a deadline
     and a priority. The ID is required to ensure uniqueness. *)
 Structure concrete_task :=
   { task_id: nat
@@ -61,7 +61,7 @@ HB.instance Definition _  := hasDecEq.Build concrete_task eqn_task.
 (** ** Implementation of a Concrete Job *)
 
 
-(** A job comprises of an id, an arrival time, a cost, a deadline and the
+(** A job comprises an id, an arrival time, a cost, a deadline and the
     task it belongs to. *)
 Record concrete_job :=
   { job_id: nat

@@ -111,7 +111,7 @@ Section AbstractRTAIdeal.
       how can we bound the job's interference in an interval <<[t1, t1 + R)>>?
       Note that this interval starts with the beginning of the
       busy interval. We know that the job receives [F - task_rtct tsk]
-      units of interference, and there will no more
+      units of interference, and there will be no more
       interference. Hence, [IBF_NP tsk F Δ := F - task_rtct tsk]. *)
   Lemma nonpreemptive_interference_is_bounded :
     job_interference_is_bounded_by

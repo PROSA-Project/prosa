@@ -1,7 +1,7 @@
 Require Export prosa.analysis.definitions.request_bound_function.
 Require Import prosa.model.priority.elf.
 
-(** * Bound on Higher-or-Equal Priority Workload under ELF Scheduling  *)
+(** * Bound on Higher-or-Equal Priority Workload under ELF Scheduling *)
 
 (** In this file, we define an upper bound on workload incurred by a
     job from jobs with higher-or-equal priority that come from other
@@ -24,8 +24,8 @@ Section ELFWorkloadBound.
   Context {FP : FP_policy Task}.
 
   (** Now we define, given the arrival offset [A], the length of the interval in which
-     a higher or equal priority job from a task [tsk_o] in the same priority band as [tsk]
-     may arrive. *)
+      a higher or equal priority job from a task [tsk_o] in the same priority band as [tsk]
+      may arrive. *)
   Definition ep_task_interfering_interval_length (tsk tsk_o : Task) (A : duration) :=
     ((A + ε)%:R + task_priority_point tsk - task_priority_point tsk_o)%R.
 
@@ -42,7 +42,7 @@ Section ELFWorkloadBound.
     total_hp_request_bound_function_FP ts tsk delta.
 
   (** Finally, we define an upper bound on the workload received from jobs
-      with higher-than-or-equal priority that come from other
+      with higher-or-equal priority that come from other
       tasks. *)
   Definition bound_on_athep_workload tsk A delta :=
     bound_on_hp_task_workload tsk delta + bound_on_ep_task_workload tsk A delta.

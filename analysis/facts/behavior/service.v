@@ -24,10 +24,10 @@ Section Composition.
   Variable j : Job.
 
   (** ... we establish a number of useful rewriting rules that decompose
-     the service received during an interval into smaller intervals. *)
+      the service received during an interval into smaller intervals. *)
 
   (** As a trivial base case, no job receives any service during an empty
-     interval. *)
+      interval. *)
   Lemma service_during_geq :
     forall t1 t2,
       t1 >= t2 -> service_during sched j t1 t2 = 0.
@@ -51,16 +51,16 @@ Section Composition.
   Proof. by rewrite /service service_during_geq. Qed.
 
   (** Trivially, an interval consisting of one time unit is equivalent to
-     [service_at].  *)
+      [service_at].  *)
   Lemma service_during_instant :
     forall t,
       service_during sched j t t.+1 = service_at sched j t.
   Proof. by move=> ?; rewrite /service_during big_nat_recr// big_geq. Qed.
 
   (** Next, we observe that we can look at the service received during an
-     interval <<[t1, t3)>> as the sum of the service during <<[t1, t2)>> and <<[t2, t3)>>
-     for any <<t2 \in [t1, t3]>>. (The <<_cat>> suffix denotes the concatenation of
-     the two intervals.) *)
+      interval <<[t1, t3)>> as the sum of the service during <<[t1, t2)>> and <<[t2, t3)>>
+      for any <<t2 \in [t1, t3]>>. (The <<_cat>> suffix denotes the concatenation of
+      the two intervals.) *)
   Lemma service_during_cat :
     forall t1 t2 t3,
       t1 <= t2 <= t3 ->
@@ -69,7 +69,7 @@ Section Composition.
   Proof. by move => ? ? ? /andP[? ?]; rewrite -big_cat_nat. Qed.
 
   (** Since [service] is just a special case of [service_during], the same holds
-     for [service]. *)
+      for [service]. *)
   Lemma service_cat :
     forall t1 t2,
       t1 <= t2 ->
@@ -78,7 +78,7 @@ Section Composition.
   Proof. move=> ? ? ?; exact: service_during_cat. Qed.
 
   (** As a special case, we observe that the service during an interval can be
-     decomposed into the first instant and the rest of the interval. *)
+      decomposed into the first instant and the rest of the interval. *)
   Lemma service_during_first_plus_later :
     forall t1 t2,
       t1 < t2 ->
@@ -107,8 +107,8 @@ Section Composition.
   Proof. move=> ?; exact: service_during_last_plus_before. Qed.
 
   (** Finally, we deconstruct the service received during an interval <<[t1, t3)>>
-     into the service at a midpoint t2 and the service in the intervals before
-     and after. *)
+      into the service at a midpoint t2 and the service in the intervals before
+      and after. *)
   Lemma service_split_at_point :
     forall t1 t2 t3,
       t1 <= t2 < t3 ->
@@ -204,13 +204,13 @@ Section UnitService.
     Qed.
 
     (** To restate this observation in terms of [service], let [s] be any value
-       less than the service received by job [j] by time [t]. *)
+        less than the service received by job [j] by time [t]. *)
     Variable t : instant.
     Variable s : duration.
     Hypothesis H_less_than_s : s < service sched j t.
 
     (** There necessarily exists an earlier time [t'] where job [j] had [s]
-       units of service. *)
+        units of service. *)
     Corollary exists_intermediate_service :
       exists t',
         t' < t
@@ -349,7 +349,7 @@ Section RelationToScheduled.
   Qed.
 
   (** We observe that a job receives cumulative service during some interval iff
-     it receives service at some specific time in the interval. *)
+      it receives service at some specific time in the interval. *)
   Lemma service_during_service_at :
     forall t1 t2,
       service_during sched j t1 t2 > 0
@@ -380,7 +380,7 @@ Section RelationToScheduled.
   Qed.
 
   (** ... which implies that any job with positive cumulative service must have
-     been scheduled at some point. *)
+      been scheduled at some point. *)
   Corollary positive_service_implies_scheduled_before :
     forall t,
       service sched j t > 0 -> exists t', (t' < t /\ scheduled_at sched j t').
@@ -435,7 +435,7 @@ Section RelationToScheduled.
     Hypothesis H_scheduled_implies_serviced : ideal_progress_proc_model PState.
 
     (** In other words, not being scheduled is equivalent to receiving zero
-       service. *)
+        service. *)
     Lemma no_service_not_scheduled :
       forall t,
         ~~ scheduled_at sched j t <-> service_at sched j t = 0.
@@ -447,7 +447,7 @@ Section RelationToScheduled.
     Qed.
 
     (** Then, if a job does not receive any service during an interval, it
-       is not scheduled. *)
+        is not scheduled. *)
     Lemma no_service_during_implies_not_scheduled :
       forall t1 t2,
         service_during sched j t1 t2 = 0 ->
@@ -459,7 +459,7 @@ Section RelationToScheduled.
     Qed.
 
     (** If a job is scheduled at some point in an interval, it receives
-       positive cumulative service during the interval ... *)
+        positive cumulative service during the interval ... *)
     Lemma scheduled_implies_cumulative_service :
       forall t1 t2,
         (exists t, t1 <= t < t2 /\ scheduled_at sched j t) ->
@@ -544,7 +544,7 @@ Section RelationToScheduled.
     Qed.
 
     (** Hence, one can ignore the service received by a job before its arrival
-       time ... *)
+        time ... *)
     Lemma ignore_service_before_arrival :
       forall t1 t2,
         t1 <= job_arrival j ->
@@ -587,7 +587,7 @@ Section RelationToScheduled.
     Qed.
 
     (** ... which of course implies that it does not receive service at any
-       point, either. *)
+        point, either. *)
     Lemma constant_service_implies_not_scheduled :
       forall t,
         t1 <= t < t2 -> service_at sched j t = 0.
@@ -598,7 +598,7 @@ Section RelationToScheduled.
     Qed.
 
     (** We show that job [j] receives service at some point [t < t1]
-       iff [j] receives service at some point [t' < t2]. *)
+        iff [j] receives service at some point [t' < t2]. *)
     Lemma same_service_implies_serviced_at_earlier_times :
       [exists t : 'I_t1, service_at sched j t > 0]
       = [exists t' : 'I_t2, service_at sched j t' > 0].
@@ -618,7 +618,7 @@ Section RelationToScheduled.
     Hypothesis H_scheduled_implies_serviced : ideal_progress_proc_model PState.
 
     (** We show that job [j] is scheduled at some point [t < t1] iff [j] is scheduled
-       at some point [t' < t2].  *)
+        at some point [t' < t2].  *)
     Lemma same_service_implies_scheduled_at_earlier_times :
       [exists t : 'I_t1, scheduled_at sched j t]
       = [exists t' : 'I_t2, scheduled_at sched j t'].
@@ -781,8 +781,8 @@ Section IncrementalService.
 
   (** We prove that if in some time interval <<[t1,t2)>> a job [j] receives [k]
       units of service, then there exists a time instant <<t ∈ [t1,t2)>> such
-      that [j] is scheduled at time [t] and service of job [j] within interval
-      <<[t1,t)>> is equal to [k]. *)
+      that [j] is scheduled at time [t] and service of job [j] within the
+      interval <<[t1,t)>> is equal to [k]. *)
   Lemma incremental_service_during :
     forall j t1 t2 k,
       service_during sched j t1 t2 > k ->

@@ -51,8 +51,8 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     valid_fixed_preemption_points_model arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for any task [tsk] in ts
-     [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function
-     that equals 0 for the empty interval [delta = 0]. *)
+      [max_arrivals tsk] is (1) an arrival bound of [tsk], and (2) it is a monotonic function
+      that equals 0 for the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
@@ -65,14 +65,15 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Context {RM : JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_basic_sequential_readiness : basic_sequential_readiness RM arr_seq.
 
-  (** Next, consider any valid ideal uni-processor schedule  with limited preemptions of this arrival sequence ... *)
+  (** Next, consider any valid ideal uni-processor schedule
+      with limited preemptions of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_schedule_respects_preemption_model :
     schedule_respects_preemption_model arr_seq sched.
 
-  (** Consider an FP policy that indicates a higher-or-equal priority relation,
-     and assume that the relation is reflexive and transitive. *)
+  (** ... and an FP policy that indicates a higher-or-equal priority relation,
+      and assume that the relation is reflexive and transitive. *)
   Context {FP : FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
   Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
@@ -103,7 +104,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Let total_ohep_rbf := total_ohep_request_bound_function_FP ts tsk.
 
   (** Let L be any positive fixed point of the busy interval recurrence, determined by
-     the sum of blocking and higher-or-equal-priority workload. *)
+      the sum of blocking and higher-or-equal-priority workload. *)
   Variable L : duration.
   Hypothesis H_L_positive : L > 0.
   Hypothesis H_fixed_point : L = blocking_bound ts tsk + total_hep_rbf L.
@@ -114,7 +115,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
   Let is_in_search_space := is_in_search_space tsk L.
 
   (** Next, consider any value [R], and assume that for any given
-      arrival [A] from search space there is a solution of the
+      arrival [A] from the search space there is a solution of the
       response-time bound recurrence which is bounded by [R]. *)
   Variable R : nat.
   Hypothesis H_R_is_maximum :

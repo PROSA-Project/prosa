@@ -46,7 +46,7 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Hypothesis H_valid_job_cost : arrivals_have_valid_job_costs arr_seq.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e., for any task
-      [tsk] in [ts], [max_arrival tsk] is (1) an arrival bound for [tsk], and
+      [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound for [tsk], and
       (2) it is a monotonic function that equals 0 for the empty interval [delta
       = 0]. *)
   Context `{MaxArrivals Task}.

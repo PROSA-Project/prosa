@@ -23,7 +23,7 @@ Section BackloggedJobs.
   Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
 
   (** ... we observe that any backlogged job is indeed in the set of backlogged
-     jobs. *)
+      jobs. *)
   Lemma mem_backlogged_jobs :
     forall j t,
       arrives_in arr_seq j ->
@@ -81,7 +81,7 @@ Section NonClairvoyance.
 
   (** We observe that a job is backlogged at a time in the prefix in one
       schedule iff it is backlogged in the other schedule due to the
-      non-clairvoyance of the notion of job readiness ... *)
+      non-clairvoyance of the notion of job readiness. *)
   Lemma backlogged_prefix_invariance :
     forall t j,
       t < h ->
@@ -94,7 +94,7 @@ Section NonClairvoyance.
   Qed.
 
   (** As a corollary, if we further know that j is not scheduled at time [h],
-      we can expand the previous lemma to [t <= h]. *)
+      we can expand the previous lemma to [t <= h] ... *)
   Corollary backlogged_prefix_invariance' :
     forall t j,
       ~~ scheduled_at sched  j t ->

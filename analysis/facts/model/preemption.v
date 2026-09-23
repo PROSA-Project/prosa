@@ -353,7 +353,7 @@ Section PreemptionFacts.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
   Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
-  (** Assume that the scheduled is valid... *)
+  (** Assume that the schedule is valid... *)
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
   (** ... and that the schedule respects the JLFP policy. *)

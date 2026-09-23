@@ -50,7 +50,7 @@ Section PeriodicArrivalTimes.
   Qed.
 
   (** We show that for every job [j] of task [tsk] there exists a number
-   [n] such that [j] arrives at the instant [task_offset tsk + n * task_period tsk]. *)
+      [n] such that [j] arrives at the instant [task_offset tsk + n * task_period tsk]. *)
   Lemma job_arrival_times :
     forall j,
       arrives_in arr_seq j ->
@@ -64,7 +64,7 @@ Section PeriodicArrivalTimes.
   Qed.
 
   (** If a job [j] of task [tsk] arrives at [task_offset tsk + n * task_period tsk]
-   then the [job_index] of [j] is equal to [n]. *)
+      then the [job_index] of [j] is equal to [n]. *)
   Lemma job_arr_index :
     forall n j,
       arrives_in arr_seq j ->

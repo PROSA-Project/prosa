@@ -6,7 +6,7 @@ Require Export prosa.analysis.facts.priority.inversion.
 
 (** * Existence of Busy Interval for JLFP-models *)
 (** In this module we derive a sufficient condition for existence of
-    busy intervals for uni-processor for JLFP schedulers. *)
+    busy intervals for uni-processor JLFP schedulers. *)
 Section ExistsBusyIntervalJLFP.
 
   (** Consider any type of tasks ... *)
@@ -368,7 +368,7 @@ Section ExistsBusyIntervalJLFP.
       (** First, we show that there must exist a busy interval prefix. *)
 
       (** Since job [j] is pending, there is a (potentially unbounded)
-          busy interval that starts no later than with the arrival of [j]. *)
+          busy interval that starts no later than at the arrival of [j]. *)
       Lemma exists_busy_interval_prefix :
         exists t1,
           busy_interval_prefix t1 t_busy.+1
@@ -627,7 +627,7 @@ Section ExistsBusyIntervalJLFP.
           can infer that there is a time in which j is pending. *)
       Hypothesis H_positive_cost : job_cost j > 0.
 
-      (** Therefore there must exists a busy interval <<[t1, t2)>> that contains the arrival time of [j]. *)
+      (** Therefore there must exist a busy interval <<[t1, t2)>> that contains the arrival time of [j]. *)
       Corollary exists_busy_interval :
         exists t1 t2,
           t1 <= job_arrival j < t2

@@ -77,7 +77,7 @@ Section ValidTDMAPolicy.
 
 End ValidTDMAPolicy.
 
- (** ** TDMA Cycles, Sots, and Offsets *)
+ (** ** TDMA Cycles, Slots, and Offsets *)
 
 (** In this section, we define key TDMA concepts. *)
 Section TDMADefinitions.
@@ -136,13 +136,14 @@ Section TDMASchedule.
     task_in_time_slot ts (job_task job) t.
 
   (** We say that a TDMA policy is respected by the schedule iff
-       1. when a job is scheduled at time [t], then the corresponding task
-          is also in its own time slot... *)
+      1. when a job is scheduled at time [t], then the corresponding task
+         is also in its own time slot... *)
   Definition sched_implies_in_slot j t :=
     scheduled_at sched j t -> job_in_time_slot j t.
 
-  (** 2. when a job is backlogged at time [t], the corresponding task
-          isn't in its own time slot or another previous job of the same task is scheduled *)
+  (** ... and further,
+      2. when a job is backlogged at time [t], the corresponding task
+         isn't in its own time slot or another previous job of the same task is scheduled. *)
   Definition backlogged_implies_not_in_slot_or_other_job_sched j t :=
     backlogged sched j t ->
     ~ job_in_time_slot j t

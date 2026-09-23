@@ -117,7 +117,7 @@ Section Suspensions.
 
         Additionally, it is also important to note that the job may self-suspend multiple
         times within an interval, and these self-suspension intervals are separated by an
-        interval where the job gets serviced. We can refer each such self-suspension interval as
+        interval where the job gets serviced. We can refer to each such self-suspension interval as
         a segment, and each such segment is characterized by the amount of service received by the job.
 
         Essentially here we are establishing a bound on the length of the self-suspension segment of [j]
@@ -134,7 +134,7 @@ Section Suspensions.
       Hypothesis INtf : t1 <= tf < t2.
 
       (** Let [tf] be the first point in the interval <<[t1, t2)>> that is also inside
-         the self-suspension segment. *)
+          the self-suspension segment. *)
       Hypothesis H_suspended_tf : suspended sched j tf.
       Hypothesis H_service_at_tf : service sched j tf = ρ.
       Hypothesis H_before_tf :

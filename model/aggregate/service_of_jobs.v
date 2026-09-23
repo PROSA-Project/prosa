@@ -45,7 +45,7 @@ Section ServiceOfJobs.
   End ServiceOfSetOfJobs.
 
   (** Next, we define the service received by jobs with higher or
-     equal priority under JLFP policies. *)
+      equal priority under JLFP policies. *)
   Section PerJobPriority.
 
     (** Consider any JLDP policy. *)
@@ -75,7 +75,7 @@ Section ServiceOfJobs.
         (arrivals_between arr_seq t1 t2) t1 t2.
 
     (** ... (2) notion of service of higher-or-equal priority jobs
-      from other tasks, ... *)
+        from other tasks, ... *)
     Definition service_of_other_task_hep_jobs (t1 t2 : instant) :=
       service_of_jobs
         (fun jhp => another_task_hep_job jhp j)
@@ -101,7 +101,7 @@ Section ServiceOfJobs.
     Variable jobs : seq Job.
 
     (** We define the cumulative task service received by the jobs of
-        task [tsk] within time interval <<[t1, t2)>>. *)
+        task [tsk] within the time interval <<[t1, t2)>>. *)
     Definition task_service_of_jobs_in t1 t2 :=
       service_of_jobs (job_of_task tsk) jobs t1 t2.
 
@@ -114,7 +114,7 @@ Section ServiceOfJobs.
     Variable jobs : seq Job.
 
     (** We define the total service of [jobs] in an interval <<[t1,t2)>> simply
-        as a sum of the service of individual jobs in interval <<[t1,t2)>>.
+        as a sum of the service of individual jobs in the interval <<[t1,t2)>>.
 
         (The predicate [predT] is the trivial predicate that always evaluates to
         [true], meaning that no jobs are filtered, and hence all jobs are

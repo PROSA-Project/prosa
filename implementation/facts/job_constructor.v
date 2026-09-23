@@ -1,7 +1,7 @@
 Require Export prosa.implementation.definitions.job_constructor.
 
-(** In this file, we prove facts about the job-constructor function when used in
-    pair with the concrete arrival sequence. *)
+(** In this file, we prove facts about the job-constructor function when
+    used together with the concrete arrival sequence. *)
 Section JobConstructor.
 
   (** Assume that an arrival curve based on a concrete prefix is given. *)

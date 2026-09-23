@@ -60,7 +60,7 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
     valid_model_with_floating_nonpreemptive_regions arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-      any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of
       [tsk], and (2) it is a monotonic function that equals 0 for the
       empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
@@ -72,16 +72,16 @@ Section RTAforModelWithFloatingNonpreemptiveRegionsWithArrivalCurves.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Next, consider any valid ideal uni-processor schedule with limited
-      preemptions of this arrival sequence ... *)
+      preemptions of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_schedule_with_limited_preemptions :
     schedule_respects_preemption_model arr_seq sched.
 
-  (** Next, we assume that the schedule is a work-conserving schedule... *)
+  (** ... assume that the schedule is work-conserving, ... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-  (** ... and the schedule respects the scheduling policy. *)
+  (** ... and that it respects the scheduling policy. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
   Hypothesis H_respects_policy :

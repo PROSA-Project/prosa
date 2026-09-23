@@ -4,7 +4,7 @@ Require Import prosa.util.tactics.
 
 
 (** This file introduces a function called [search_arg] that allows finding the
-    argument within a given range for which a function is minimal w.r.t. to a
+    argument within a given range for which a function is minimal w.r.t. a
     given order while satisfying a given predicate, along with lemmas
     establishing the basic properties of [search_arg].
 
@@ -18,7 +18,7 @@ Require Import prosa.util.tactics.
 
 
 (** First, we show that, given an interval <<[t1, t2)>> and a
-    predicate [P], either no element in the interval satisfy [P] or
+    predicate [P], either no element in the interval satisfies [P] or
     there is an element that satisfies [P]. *)
 Lemma earliest_pred_element_exists_case :
   forall (P : pred nat) (t1 t2 : nat),
@@ -175,7 +175,7 @@ Section ArgSearch.
   Hypothesis R_transitive : transitive R.
   Hypothesis R_total : total R.
 
-  (** ...then [search_arg] yields an extremum w.r.t. to <<[a, b)>>, that is, if
+  (** ...then [search_arg] yields an extremum w.r.t. <<[a, b)>>, that is, if
       [search_arg] yields a point x, then [R (f x) (f y)] holds for any [y] in the
       search range <<[a, b)>> that satisfies [P]. *)
   Lemma search_arg_extremum :

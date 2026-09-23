@@ -83,7 +83,7 @@ Section BusyIntervalExistence.
     by move: (IDLE j_other) => /negP.
   Qed.
 
-  (** Second, an idle time implies no carry in at this time instant. *)
+  (** Second, an idle time implies no carry-in at this time instant. *)
   Lemma idle_instant_no_carry_in :
     forall t,
       is_idle arr_seq sched t ->
@@ -95,7 +95,7 @@ Section BusyIntervalExistence.
     by apply/andP; split; rewrite // /has_arrived ltnW.
   Qed.
 
-  (** Moreover, an idle time implies no carry in at the next time instant, too. *)
+  (** Moreover, an idle time implies no carry-in at the next time instant, too. *)
   Lemma idle_instant_next_no_carry_in :
     forall t,
       is_idle arr_seq sched t ->

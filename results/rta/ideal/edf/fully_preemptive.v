@@ -49,9 +49,9 @@ Section RTAforFullyPreemptiveEDFModelwithArrivalCurves.
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-     any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
-     [tsk], and (2) it is a monotonic function that equals 0 for the
-     empty interval delta = 0. *)
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of
+      [tsk], and (2) it is a monotonic function that equals 0 for the
+      empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.

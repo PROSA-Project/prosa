@@ -213,9 +213,9 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Qed.
 
     (** Next, we want to show that, if a job arriving from the arrival
-       sequence is ready at some instant, then the point-wise transformation
-       is guaranteed to find a job to swap with. We will proceed by doing a case
-       analysis, and show that it is impossible that a swap candidate is not found. *)
+        sequence is ready at some instant, then the point-wise transformation
+        is guaranteed to find a job to swap with. We will proceed by doing a case
+        analysis, and show that it is impossible that a swap candidate is not found. *)
     Section MakeWCAtFindsReadyJobs.
 
       (** We need to assume that, in the original schedule, all the deadlines of
@@ -274,7 +274,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         Hypothesis H_search_result_none : search_result = None.
 
         (** First, note that, since nothing was found, it means there is no relevant
-           processor state between [t] and [max_dl]. *)
+            processor state between [t] and [max_dl]. *)
         Lemma no_relevant_state_in_range :
           forall t',
             t <= t' < max_dl ->

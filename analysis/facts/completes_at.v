@@ -15,7 +15,7 @@ Section CompletesAtLemmas.
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniprocessor_proc_model : uniprocessor_model PState.
 
-  (** Consider any arrival sequence with consistent non-duplicate arrivals *)
+  (** Consider any arrival sequence with consistent non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 

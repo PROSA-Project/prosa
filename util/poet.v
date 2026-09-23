@@ -6,7 +6,7 @@ Require Export prosa.util.list.
     required for legacy versions of POET. They will eventually be removed from
     Prosa. *)
 
-(** This lemma allows us to check proposition of the form
+(** This lemma allows us to check a proposition of the form
     [forall x ∈ xs, exists y ∈ ys, P x y] using a boolean expression
     [all P (zip xs ys)]. *)
 Lemma forall_exists_implied_by_forall_in_zip :

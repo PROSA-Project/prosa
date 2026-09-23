@@ -5,12 +5,12 @@ Require Export prosa.implementation.priority.numeric_fixed_priority.
 (** Throughout this file, we work with Prosa's fixed-priority policy implementation. *)
 #[local] Existing Instance numeric_fp_ascending.
 
-(** First, we define the concept of higher-or-equal-priority and different task, ...  *)
+(** First, we define the concept of higher-or-equal-priority and different task, ... *)
 Definition ohep_task (tsk1 : Task) (tsk2 : Task) :=
   hep_task tsk1 tsk2 && (tsk1 != tsk2).
 
 (** ... cumulative request-bound function for higher-or-equal-priority tasks
-        (including the task under analysis), ...  *)
+        (including the task under analysis), ... *)
 Definition total_hep_rbf (ts : seq Task) (tsk : Task) (Δ : duration) :=
   total_hep_request_bound_function_FP ts tsk Δ.
 

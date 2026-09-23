@@ -7,7 +7,7 @@ Require Export prosa.behavior.all.
     an ideal uniprocessor state. The word "ideal" here refers to the complete
     absence of runtime overheads or any other complications. In an ideal
     uniprocessor schedule, there are only two possible cases: at a given time,
-    either a specific job is scheduled and makes unit-progress, or the
+    either a specific job is scheduled and makes unit progress, or the
     processor is idle. To model this, we simply reuse the standard [option]
     type from the Coq standard library. *)
 

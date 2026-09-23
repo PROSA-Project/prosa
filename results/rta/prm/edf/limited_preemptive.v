@@ -47,7 +47,7 @@ Section RTAforLimitedPreemptiveEDFModelwithArrivalCurves.
 
   (** ... and their associated jobs, where each job has a corresponding task
       [job_task], an execution time [job_cost], an arrival time [job_arrival],
-      and a list of job's preemption points [job_preemptive_points]. *)
+      and a list of the job's preemption points [job_preemptive_points]. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobCost Job} `{JobArrival Job}
           `{JobPreemptionPoints Job}.
 

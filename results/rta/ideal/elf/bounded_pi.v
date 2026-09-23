@@ -82,8 +82,8 @@ Section AbstractRTAforELFwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** Furthermore, we assume that [max_arrivals] is a family of valid arrival
-      curves that constrains the arrival sequence [arr_seq], i.e., for any task
-      [tsk] in [ts], [max_arrival tsk] is (1) an arrival bound of [tsk], and ... *)
+      curves that constrain the arrival sequence [arr_seq], i.e., for any task
+      [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of [tsk], and ... *)
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 
   (** ... (2) a monotonic function that equals [0] for the empty interval [delta = 0]. *)
@@ -156,11 +156,11 @@ Section AbstractRTAforELFwithArrivalCurves.
   (** ** D. The Priority Inversion Bound and its Validity *)
 
     (** In this file, we break the priority inversion experienced by any job into two
-      categories :
-      - (1) priority inversion caused by jobs belonging to tasks with lower priority than [tsk]
-      - (2) priority inversion caused by jobs belonging to tasks with equal priority as [tsk]
-    Note that, by definition of the ELF policy, no job from a task with higher priority than [tsk]
-    can cause priority inversion. *)
+        categories:
+        - (1) priority inversion caused by jobs belonging to tasks with lower priority than [tsk]
+        - (2) priority inversion caused by jobs belonging to tasks with equal priority as [tsk]
+        Note that, by definition of the ELF policy, no job from a task with higher priority than [tsk]
+        can cause priority inversion. *)
 
   (** We define a predicate to identify jobs from lower-priority tasks,
       or tasks for which [tsk] has higher priority. *)

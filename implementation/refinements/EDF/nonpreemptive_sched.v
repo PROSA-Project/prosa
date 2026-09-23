@@ -14,7 +14,7 @@ Require Export prosa.implementation.readiness.basic.
     under earliest-deadline-first schedules is valid, and that the scheduling policy is
     respected at each preemption point.
 
-    Some lemmas in this file are not novel facts; they are used to uniform
+    Some lemmas in this file are not novel facts; they are used to unify
     POET's certificates and minimize their verbosity. *)
 Section Schedule.
 

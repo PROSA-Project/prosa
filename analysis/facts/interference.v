@@ -325,7 +325,7 @@ Section InterferencePropertiesJLFP.
         from a task other than [j]'s task is scheduled. *)
     Section FromDifferentTask.
 
-      (** Consider a job [j'] that _does_ _not_ comes from task
+      (** Consider a job [j'] that _does_ _not_ come from task
             [tsk] and is scheduled at time instant [t].  *)
       Variable j' : Job.
       Hypothesis H_j'_not_tsk : ~~ job_of_task tsk j'.

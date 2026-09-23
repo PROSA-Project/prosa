@@ -80,7 +80,7 @@ Section ModelValidity.
     Variable arr_seq : arrival_sequence Job.
 
     (** The cost of a job from the arrival sequence cannot
-       be larger than the task cost. *)
+        be larger than the task cost. *)
     Definition arrivals_have_valid_job_costs :=
       forall j,
         arrives_in arr_seq j ->
@@ -110,7 +110,7 @@ Section ModelValidity.
     Variable arr_seq : arrival_sequence Job.
 
     (** The cost of a job from the arrival sequence cannot
-       be less than the task cost. *)
+        be less than the task cost. *)
     Definition arrivals_have_valid_min_job_costs :=
       forall j,
         arrives_in arr_seq j ->

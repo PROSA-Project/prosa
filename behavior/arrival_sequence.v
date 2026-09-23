@@ -49,17 +49,17 @@ Section ValidArrivalSequence.
   Variable arr_seq : arrival_sequence Job.
 
   (** We say that arrival times are consistent if any job that arrives in the
-     sequence has the corresponding arrival time. *)
+      sequence has the corresponding arrival time. *)
   Definition consistent_arrival_times :=
     forall j t,
       arrives_at arr_seq j t -> job_arrival j = t.
 
   (** We say that the arrival sequence is a set iff it doesn't contain duplicate
-     jobs at any given time. *)
+      jobs at any given time. *)
   Definition arrival_sequence_uniq := forall t, uniq (arr_seq t).
 
   (** We say that the arrival sequence is valid iff it is a set and arrival times
-     are consistent *)
+      are consistent *)
   Definition valid_arrival_sequence :=
     consistent_arrival_times /\ arrival_sequence_uniq.
 
@@ -78,15 +78,15 @@ Section ArrivalTimeProperties.
   Variable j : Job.
 
   (** We say that job j has arrived at time t iff it arrives at some time t_0
-     with t_0 <= t. *)
+      with t_0 <= t. *)
   Definition has_arrived (t : instant) := job_arrival j <= t.
 
   (** Next, we say that job j arrived before t iff it arrives at some time t_0
-     with t_0 < t. *)
+      with t_0 < t. *)
   Definition arrived_before (t : instant) := job_arrival j < t.
 
   (** Finally, we say that job j arrives between t1 and t2 iff it arrives at
-     some time t with t1 <= t < t2. *)
+      some time t with t1 <= t < t2. *)
   Definition arrived_between (t1 t2 : instant) := t1 <= job_arrival j < t2.
 
 End ArrivalTimeProperties.
@@ -94,7 +94,7 @@ End ArrivalTimeProperties.
 (** * Finite Arrival Sequence Prefixes *)
 
 (** In this section, we define arrival sequence prefixes, which are useful to
-   define (computable) properties over sets of jobs in the schedule. *)
+    define (computable) properties over sets of jobs in the schedule. *)
 Section ArrivalSequencePrefix.
 
   (** Assume that job arrival times are known. *)
@@ -116,7 +116,7 @@ Section ArrivalSequencePrefix.
   Definition arrivals_before (t : instant) := arrivals_between 0 t.
 
   (** ... and the list of jobs that arrive in the interval <<[t1, t2)>> and
-   satisfy a certain predicate [P]. *)
+      satisfy a certain predicate [P]. *)
   Definition arrivals_between_P (P : Job -> bool) (t1 t2 : instant) :=
     [seq j <- arrivals_between t1 t2 | P j].
 

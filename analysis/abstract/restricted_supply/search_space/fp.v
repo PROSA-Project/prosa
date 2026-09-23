@@ -35,7 +35,7 @@ Section SearchSpaceSubset.
   Variable ts : list Task.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
-      for any task [tsk] in [ts] [max_arrival tsk] is (1) an arrival
+      for any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and (2) it is a monotonic function that equals
       [0] for the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.

@@ -76,10 +76,10 @@ Section SequentialTasksReadiness.
   Qed.
 
   (** Finally, we show that the sequential readiness model is a
-     work-bearing readiness model. That is, if a job [j] is pending
-     but not ready at a time instant [t], then there exists another
-     (earlier) job of the same task that is pending and ready at time
-     [t]. *)
+      work-bearing readiness model. That is, if a job [j] is pending
+      but not ready at a time instant [t], then there exists another
+      (earlier) job of the same task that is pending and ready at time
+      [t]. *)
   Lemma sequential_readiness_implies_work_bearing_readiness :
     work_bearing_readiness RM arr_seq sched.
   Proof.

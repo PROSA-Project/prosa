@@ -117,7 +117,7 @@ Section GeneralityOfGEL.
       (task_priority_point tsk' - task_priority_point tsk)%R.
 
     (** Before we tackle the conditional equivalence, we first establish a
-        helper lemma on the priority of backlogged jobs that sits at the core of
+        helper lemma on the priority of backlogged jobs that sit at the core of
         the argument. *)
     Section GELPrioOfBackloggedJob.
 

@@ -41,7 +41,7 @@ Section PrioAwareUniprocessorScheduler.
     valid_nonpreemptive_readiness RM schedule.
 
   (** First, we note that the priority-aware job selection policy obviously
-     maintains work-conservation. *)
+      maintains work-conservation. *)
   Corollary uni_schedule_work_conserving :
     work_conserving arr_seq schedule.
   Proof.
@@ -94,7 +94,7 @@ Section PrioAwareUniprocessorScheduler.
   Let prefix t := if t is t'.+1 then schedule_up_to policy idle_state t' else empty_schedule idle_state.
 
   (** To start, we observe that, at preemption times, the scheduled job is a
-      supremum w.r.t. to the priority order and the set of backlogged
+      supremum w.r.t. the priority order and the set of backlogged
       jobs. *)
   Lemma scheduled_job_is_supremum :
     forall j t,

@@ -358,7 +358,7 @@ Section TransferSchedulability.
     (** ** The Set of Critical Jobs *)
 
     (** The second major element in the proof is the notion of the set of
-        _critical jobs_ at a given time [t1] w.r.t. to a _reference time_ [t2].
+        _critical jobs_ at a given time [t1] w.r.t. a _reference time_ [t2].
         Intuitively, the critical jobs are those that must be scheduled
         immediately in order to avoid a deadline miss. *)
 

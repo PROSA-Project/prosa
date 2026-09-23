@@ -55,7 +55,7 @@ Section RTAforFloatingModelwithArrivalCurves.
     valid_model_with_floating_nonpreemptive_regions arr_seq ts.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for any task
-      [tsk] in ts [max_arrival tsk] is (1) an arrival bound of [tsk], and (2) it
+      [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of [tsk], and (2) it
       is a monotonic function that equals [0] for the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
@@ -75,7 +75,7 @@ Section RTAforFloatingModelwithArrivalCurves.
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
   Hypothesis H_schedule_with_limited_preemptions : schedule_respects_preemption_model arr_seq sched.
 
-  (** Consider an FP policy that indicates a higher-or-equal priority relation,
+  (** ... and an FP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
   Context {FP :FP_policy Task}.
   Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
@@ -117,9 +117,9 @@ Section RTAforFloatingModelwithArrivalCurves.
   (** To reduce the time complexity of the analysis, recall the notion of search space. *)
   Let is_in_search_space := is_in_search_space tsk L.
 
-  (** Next, consider any value R, and assume that for any given
-      arrival A from search space there is a solution of the
-      response-time bound recurrence which is bounded by R. *)
+  (** Next, consider any value [R], and assume that for any given
+      arrival [A] from the search space there is a solution of the
+      response-time bound recurrence which is bounded by [R]. *)
   Variable R : duration.
   Hypothesis H_R_is_maximum :
     forall (A : duration),

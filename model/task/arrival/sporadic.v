@@ -54,7 +54,7 @@ Section ValidSporadicTaskModel.
       (** ... and that stem from the given task, ... *)
       job_task j = tsk ->
       job_task j' = tsk ->
-      (** ... if the arrival of j precedes the arrival of j' ...,  *)
+      (** ... if the arrival of j precedes the arrival of j' ..., *)
       job_arrival j <= job_arrival j' ->
       (** then the arrival of j and the arrival of j' are separated by at least
           one period. *)

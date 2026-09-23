@@ -76,7 +76,7 @@ Section ValidJobCosts.
   (** Let [task_cost] be defined by WCET(1). *)
   #[local] Existing Instance task_cost_from_cumulative_cost.
 
-  (** Given a task that with a valid cumulative cost bound [tsk], every arriving
+  (** Given a task with a valid cumulative cost bound [tsk], every arriving
       job [j] of the task has a valid scalar job cost. *)
   Lemma valid_job_cost_from_cumulative_cost_bound :
     forall tsk,

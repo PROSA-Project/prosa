@@ -9,7 +9,7 @@ Definition JobType := eqType.
 (** * Notion of Work *)
 
 (** We define 'work' to denote the amount of service received or needed. In a
-   real system, this corresponds to the number of processor cycles. *)
+    real system, this corresponds to the number of processor cycles. *)
 Definition work  := nat.
 
 (** * Basic Job Parameters — Cost, Arrival Time, and Absolute Deadline *)

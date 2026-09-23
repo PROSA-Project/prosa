@@ -6,10 +6,10 @@ Require Export prosa.analysis.facts.model.overheads.schedule.
     of schedule changes in a given interval. *)
 Section ScheduleChange.
 
-  (** Consider any type of jobs.. *)
+  (** Consider any type of jobs... *)
   Context {Job : JobType}.
 
-  (** ... and any schedule with explicit overheads. *)
+  (** ...and any schedule with explicit overheads. *)
   Variable sched : schedule (overheads.processor_state Job).
 
   (** The number of schedule changes over <<[t1, t2)>> is equal to the

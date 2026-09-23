@@ -83,7 +83,7 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** Furthermore, we assume that [max_arrivals] is a family of valid arrival
-      curves that constrains the arrival sequence [arr_seq], i.e., for any task
+      curves that constrain the arrival sequence [arr_seq], i.e., for any task
       [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of [tsk], and ... *)
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
 

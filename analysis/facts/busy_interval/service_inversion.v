@@ -129,7 +129,7 @@ Section ServiceInversion.
     Hypothesis H_sched : scheduled_at sched j t.
 
     (** Then the predicate "is there service inversion for job [j'] at
-        time [t]?" is equal to the predicate "is job [j] has lower
+        time [t]?" is equal to the predicate "does job [j] have lower
         priority than job [j']?" *)
     Lemma service_inversion_supply_sched :
       service_inversion arr_seq sched j' t = ~~ hep_job_at t j j'.

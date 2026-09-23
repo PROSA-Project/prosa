@@ -47,7 +47,7 @@ Section ServiceInversion.
       arr_seq sched (busy_interval_prefix sched) j B.
 
   (** We say that task [tsk] has bounded service inversion if all its
-      jobs have cumulative service inversion bounded by function [B :
+      jobs have cumulative service inversion bounded by a function [B :
       duration -> duration], where [B] may depend on jobs' relative
       arrival times w.r.t. the beginning of an abstract busy interval
       prefix. *)

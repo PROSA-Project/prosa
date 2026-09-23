@@ -51,12 +51,12 @@ Section HyperperiodDefinitions.
     (t - O_max) %/ HP.
 
   (** Given an instant [t], we define the starting instant of the hyperperiod
-   that contains [t]. *)
+      that contains [t]. *)
   Definition starting_instant_of_hyperperiod (t : instant) :=
     hyperperiod_index t * HP + O_max.
 
   (** Given a job [j], we define the starting instant of the hyperperiod
-   in which [j] arrives. *)
+      in which [j] arrives. *)
   Definition starting_instant_of_corresponding_hyperperiod (j : Job) :=
     starting_instant_of_hyperperiod (job_arrival j).
 
@@ -70,7 +70,7 @@ Section HyperperiodDefinitions.
     index j (jobs_in_hyperperiod h tsk).
 
   (** Given a job [j] of task [tsk] and the hyperperiod starting at [h], we define a
-      [corresponding_job_in_hyperperiod] which is the job that arrives in given hyperperiod
+      [corresponding_job_in_hyperperiod] which is the job that arrives in this hyperperiod
       and has the same [job_index] as [j]. *)
   Definition corresponding_job_in_hyperperiod (j : Job) (h : instant) (tsk : Task) :=
     nth j (jobs_in_hyperperiod h tsk) (job_index_in_hyperperiod j (starting_instant_of_corresponding_hyperperiod j) tsk).

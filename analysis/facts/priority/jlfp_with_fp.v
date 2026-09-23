@@ -36,7 +36,7 @@ Section WorkloadTaskSum.
   Variable tsk : Task.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
-  (** We define a predicate to identify others tasks which have equal priority as [tsk]. *)
+  (** We define a predicate to identify other tasks which have equal priority to [tsk]. *)
   Definition other_ep_task := fun tsk_o => (ep_task tsk tsk_o) && (tsk_o != tsk).
 
   (** We consider a job [j] belonging to this task ... *)
@@ -81,7 +81,7 @@ Section WorkloadTaskSum.
   Definition hep_from_hp_task (j' : Job) :=
     hep_job j' j && hp_task (job_task j') (job_task j).
 
-  (** ... (2) tasks having equal priority as [tsk]. *)
+  (** ... (2) tasks having equal priority to [tsk]. *)
   Definition hep_from_ep_task (j' : Job) :=
     hep_job j' j && ep_task (job_task j') (job_task j).
 

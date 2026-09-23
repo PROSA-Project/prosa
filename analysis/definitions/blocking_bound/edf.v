@@ -7,7 +7,7 @@ Require Export prosa.model.task.arrival.curves.
     [tsk]) under EDF scheduling. *)
 Section MaxNPSegmentBlockingBound.
 
-  (** Consider any type of tasks ... *)
+  (** Consider any type of tasks with relative deadlines and non-preemptive segments. *)
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
   Context `{TaskDeadline Task}.
@@ -28,7 +28,7 @@ Section MaxNPSegmentBlockingBound.
   Definition blocking_relevant (tsk_o : Task) :=
     (max_arrivals tsk_o ε > 0) && (task_cost tsk_o > 0).
 
-  (** For a job of a given task [tsk], the relative arrival offset [A]
+  (** For a job of a given task [tsk], at the relative arrival offset [A]
       within its busy window, we define the following blocking
       bound. This bound assumes that tasks are independent (i.e., it
       does not account for possible blocking due to locking

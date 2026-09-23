@@ -146,7 +146,7 @@ Section JLFPInstantiation.
 
   (** Let <<[t1, t2)>> be a time interval and let [j] be any job of
       task [tsk] that is not completed by time [t2]. Then cumulative
-      interference received due jobs of other tasks executing can be
+      interference received due to jobs of other tasks executing can be
       bounded by the sum of the cumulative service inversion of job
       [j] and the cumulative interference incurred by task [tsk] due
       to other tasks. *)

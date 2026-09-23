@@ -63,7 +63,7 @@ Section RTA.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Let us locally recall the exceedance SBF using [Instance] to make
-      it available to the typeclasses hints database. *)
+      it available to the typeclass hints database. *)
   #[local] Instance eps_sbf_inst : SupplyBoundFunction :=
   {
     supply_bound_function := eps_sbf e

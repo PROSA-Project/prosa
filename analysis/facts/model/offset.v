@@ -48,8 +48,8 @@ Section OffsetLemmas.
   Variable ts : TaskSet Task.
 
   (** If task [tsk] is in [ts], then its offset
-   is less than or equal to the maximum offset of all tasks
-   in [ts]. *)
+      is less than or equal to the maximum offset of all tasks
+      in [ts]. *)
   Lemma max_offset_g :
     tsk \in ts ->
     task_offset tsk <= max_task_offset ts.

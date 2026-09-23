@@ -56,7 +56,7 @@ Section ServiceInversion.
       satisfies a given predicate (e.g., <<[t1, t2)>> is a busy
       interval prefix). To this end, we say that the cumulative
       service inversion of job [j] is bounded by a function [B :
-      duration -> duration] w.r.t. to predicate [P] iff, for any
+      duration -> duration] w.r.t. predicate [P] iff, for any
       interval <<[t1, t2)>> that satisfies [P j], the cumulative
       priority inversion in <<[t1, t2)>> is bounded by [B (job_arrival
       j - t1)]. *)
@@ -100,7 +100,7 @@ Section TaskServiceInversionBound.
   Variable tsk : Task.
 
   (** We say that task [tsk] has bounded service inversion if all its
-      jobs have cumulative service inversion bounded by function [B :
+      jobs have cumulative service inversion bounded by a function [B :
       duration -> duration]. *)
   Definition pred_service_inversion_is_bounded_by (B : duration -> duration) :=
     forall (j : Job),

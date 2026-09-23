@@ -33,7 +33,7 @@ Section PIIdealProcessorModelLemmas.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Consider a JLFP-policy that indicates a higher-or-equal priority relation,
-     and assume that this relation is reflexive. *)
+      and assume that this relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
@@ -65,7 +65,7 @@ Section PIIdealProcessorModelLemmas.
   Variable j' : Job.
   Hypothesis H_j'_sched : scheduled_at sched j' t.
 
-  (** Then, we prove that from point of view of job [j], priority
+  (** Then, we prove that from the point of view of job [j], priority
       inversion appears iff [s] has lower priority than job [j]. *)
   Lemma priority_inversion_equiv_sched_lower_priority :
     priority_inversion arr_seq sched j t = ~~ hep_job j' j.

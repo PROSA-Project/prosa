@@ -266,7 +266,7 @@ Section EMSOFTModel.
 
                 arr_seq
 
-                (** with regard to online job costs. This last parameter is the
+                (** ... with regard to online job costs. This last parameter is the
                     "clairvoyant" part. *)
 
                 (job_cost omega)).

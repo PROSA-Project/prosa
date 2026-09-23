@@ -51,7 +51,7 @@ Section ValidModelWithFixedPreemptionPoints.
 
   (** (4) We also require the number of nonpreemptive segments of a job to be
           equal to the number of nonpreemptive segments of its task. Note that
-          some of nonpreemptive segments of a job can have zero length;
+          some nonpreemptive segments of a job can have zero length;
           nonetheless the number of segments should match. *)
   Definition consistent_job_segment_count :=
     forall j,
@@ -84,7 +84,7 @@ Section ValidModelWithFixedPreemptionPoints.
     /\ task_segments_are_nonempty.
 
   (** Finally, a model with fixed preemption points is valid if it is both valid
-      a the job and task levels. *)
+      at the job and task levels. *)
   Definition valid_fixed_preemption_points_model :=
     valid_limited_preemptions_job_model arr_seq
     /\ valid_fixed_preemption_points_task_model.

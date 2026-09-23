@@ -20,7 +20,7 @@ Section Definitions.
 
   (** A task's arrival bound is an inductive type comprised of three types of
       arrival patterns: (a) periodic, characterized by a period between consequent
-      activation of a task, (b) sporadic, characterized by a minimum inter-arrival
+      activations of a task, (b) sporadic, characterized by a minimum inter-arrival
       time, or (c) arrival-curve prefix, characterized by a finite prefix of an
       arrival curve. *)
   Inductive task_arrivals_bound_T :=
@@ -170,7 +170,7 @@ Proof.
 Qed.
 
 (** In this fairly technical section, we prove a series of refinements
-    aimed to be able to convert between a standard natural-number task
+    aimed at being able to convert between a standard natural-number task
     and a generic task. *)
 Section Refinements.
 

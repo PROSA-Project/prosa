@@ -21,7 +21,7 @@ Section ReplaceAtFacts.
   Variable nstate : PState.
 
   (** In the following, let [sched'] denote the schedule with replacement at time
-     t'. *)
+      [t']. *)
   Let sched' := replace_at sched t' nstate.
 
   (** We begin with the trivial observation that [replace_at sched t' nstate]

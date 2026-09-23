@@ -37,7 +37,7 @@ Section TaskSchedule.
   (** Let [tsk] be any task. *)
   Variable tsk : Task.
 
-  (** First, we show that a task is served at time [t], then the task
+  (** First, we show that if a task is served at time [t], then the task
       is scheduled at time [t]. *)
   Lemma task_served_task_scheduled :
     forall t,

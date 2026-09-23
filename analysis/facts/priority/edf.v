@@ -78,7 +78,7 @@ Section PriorityFacts.
     Context `{TaskDeadline Task}.
     Context `{JobTask Job Task}.
 
-    (** If EDF priorities are derived from [task_deadline], ... *)
+    (** ... and EDF priorities are derived from [task_deadline], ... *)
     Context {JLFP : JLFP_policy Job}.
     Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
@@ -176,7 +176,7 @@ Section SequentialEDF.
   (** Next, consider any schedule of this arrival sequence, ... *)
   Variable sched : schedule PState.
 
-  (** Assume EDF scheduling. *)
+  (** ... assume EDF scheduling, ... *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 

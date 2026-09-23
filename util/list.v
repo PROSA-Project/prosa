@@ -315,8 +315,8 @@ Proof.
 Qed.
 
 (** We prove that a sequence [xs] of size [n.+1] can be destructed
-   into a sequence [xs_l] of size [n] and an element [x] such that
-   [x = xs ++ [::x]]. *)
+    into a sequence [xs_l] of size [n] and an element [x] such that
+    [x = xs ++ [::x]]. *)
 Lemma seq_elim_last :
   forall {X : Type} (n : nat) (xs : seq X),
     size xs = n.+1 ->
@@ -338,7 +338,7 @@ Proof.
 Qed.
 
 (** Next, we prove that [x ∈ xs] implies that [xs] can be split
-   into two parts such that [xs = xsl ++ [::x] ++ [xsr]]. *)
+    into two parts such that [xs = xsl ++ [::x] ++ [xsr]]. *)
 Lemma in_cat :
   forall {X : eqType} (x : X) (xs : list X),
     x \in xs -> exists xsl xsr, xs = xsl ++ [::x] ++ xsr.
@@ -352,7 +352,7 @@ Proof.
 Qed.
 
 (** We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence
-   of [ys] implies that the size of [xs] is at most the size of [ys]. *)
+    of [ys] implies that the size of [xs] is at most the size of [ys]. *)
 Lemma subseq_leq_size :
   forall {X : eqType} (xs ys : seq X),
     uniq xs ->
@@ -416,8 +416,8 @@ Proof.
 Qed.
 
 (** We prove that if no element of a sequence [xs] satisfies a
-   predicate [P], then [filter P xs] is equal to an empty
-   sequence. *)
+    predicate [P], then [filter P xs] is equal to an empty
+    sequence. *)
 Lemma filter_in_pred0 :
   forall {X : eqType} (xs : seq X) (P : pred X),
     (forall x, x \in xs -> ~~ P x) ->
@@ -882,7 +882,7 @@ Definition strict_prefix_of {T : eqType} (xs ys : seq T) :=
 
 (** We define a helper function that shifts a sequence of numbers "forward" by a
     constant offset, and an analogous version that shifts them "backwards,"
-    removing any number that, in the absence of Coq' s saturating subtraction,
+    removing any number that, in the absence of Coq's saturating subtraction,
     would become negative. These functions are useful in transforming abstract RTA's
     search space. *)
 Definition shift_points_pos (xs : seq nat) (s : nat) : seq nat :=

@@ -5,7 +5,7 @@ Require Export prosa.model.task.preemption.fully_preemptive.
 
 (** In this section, we prove that the instantiations of the functions
     [job_preemptable] and [task_max_nonpreemptive_segment] for the fully
-    preemptive model indeed defines a valid preemption model with
+    preemptive model indeed define a valid preemption model with
     bounded non-preemptive regions. *)
 Section FullyPreemptiveModel.
 

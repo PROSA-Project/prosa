@@ -3,7 +3,7 @@ Require Export prosa.model.task.preemption.limited_preemptive.
 
 (** * Platform for Models with Limited Preemptions *)
 (** In this section, we prove that instantiation of functions
-    [job_preemptable and task_preemption_points] to the
+    [job_preemptable] and [task_preemption_points] to the
     limited preemptions model indeed defines a valid preemption model
     with bounded non-preemptive regions. *)
 Section LimitedPreemptionsModel.
@@ -95,7 +95,7 @@ Section LimitedPreemptionsModel.
 
   (** Which together with lemma [valid_fixed_preemption_points_model]
       gives us the fact that functions [job_preemptable and
-      task_preemption_points] defines a valid preemption model with
+      task_preemption_points] define a valid preemption model with
       bounded non-preemptive regions. *)
   Corollary fixed_preemption_points_model_is_valid_model_with_bounded_nonpreemptive_regions :
     valid_model_with_bounded_nonpreemptive_segments arr_seq sched.

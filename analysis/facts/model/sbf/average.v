@@ -4,7 +4,7 @@ Require Export prosa.model.processor.platform_properties.
 Require Export prosa.analysis.definitions.sbf.plain.
 Require Export prosa.analysis.definitions.sbf.average.
 
-(** * SBF for Average Resource Model in Valid *)
+(** * SBF for Average Resource Model is Valid *)
 
 (** In this file, we prove that the SBF defined in the file
     [prosa.analysis.definitions.sbf.average] is valid under the

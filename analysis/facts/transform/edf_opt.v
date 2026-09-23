@@ -23,7 +23,7 @@ Section FindSwapCandidateFacts.
   Variable sched : schedule (ideal.processor_state Job).
 
   (** ...that is well-behaved (i.e., in which jobs execute only after
-     having arrived and only if they are not yet complete). *)
+      having arrived and only if they are not yet complete). *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
@@ -40,9 +40,9 @@ Section FindSwapCandidateFacts.
   Hypothesis H_deadline_not_missed : t1 < job_deadline j1.
 
   (** First, we observe that under these assumptions the processor
-     state at time [t1] is "relevant" according to the notion of
-     relevance underlying the EDF transformation, namely
-     [relevant_pstate]. *)
+      state at time [t1] is "relevant" according to the notion of
+      relevance underlying the EDF transformation, namely
+      [relevant_pstate]. *)
   Lemma t1_relevant : relevant_pstate t1 (sched t1).
   Proof.
     move: H_not_idle. rewrite scheduled_at_def => /eqP ->.
@@ -52,7 +52,7 @@ Section FindSwapCandidateFacts.
   Qed.
 
   (** Since [t1] is relevant, we conclude that a search for a relevant
-     state succeeds (if nothing else, it finds [t1]). *)
+      state succeeds (if nothing else, it finds [t1]). *)
   Lemma fsc_search_successful :
     exists t, search_arg sched (relevant_pstate t1) earlier_deadline t1 (job_deadline j1) = Some t.
   Proof.
@@ -63,8 +63,8 @@ Section FindSwapCandidateFacts.
   Qed.
 
   (** For rewriting purposes, we observe that the [search_arg]
-     operation within [find_swap_candidate] yields the final result of
-     [find_swap_candidate]. *)
+      operation within [find_swap_candidate] yields the final result of
+      [find_swap_candidate]. *)
   Corollary fsc_search_result :
     search_arg sched (relevant_pstate t1) earlier_deadline t1 (job_deadline j1) = Some (find_swap_candidate sched t1 j1).
   Proof.
@@ -73,8 +73,8 @@ Section FindSwapCandidateFacts.
   Qed.
 
   (** There is a job that is scheduled at the time that
-     [find_swap_candidate] returns, and that job arrives no later than
-     at time [t1]. *)
+      [find_swap_candidate] returns, and that job arrives no later than
+      at time [t1]. *)
   Lemma fsc_not_idle :
     exists j', (scheduled_at sched j' (find_swap_candidate sched t1 j1))
                /\ job_arrival j' <= t1.
@@ -90,9 +90,9 @@ Section FindSwapCandidateFacts.
   Qed.
 
   (** Since we are considering a uniprocessor model, only one job is
-     scheduled at a time. Hence once we know that a job is scheduled
-     at the time that [find_swap_candidate] returns, we can conclude
-     that it arrives not later than at time t1. *)
+      scheduled at a time. Hence once we know that a job is scheduled
+      at the time that [find_swap_candidate] returns, we can conclude
+      that it arrives not later than at time t1. *)
   Corollary fsc_found_job_arrival :
     forall j2,
       scheduled_at sched j2 (find_swap_candidate sched t1 j1) ->
@@ -104,22 +104,22 @@ Section FindSwapCandidateFacts.
   Qed.
 
   (** We observe that [find_swap_candidate] returns a value within a
-     known finite interval. *)
+      known finite interval. *)
   Lemma fsc_range :
     t1 <= find_swap_candidate sched t1 j1 < job_deadline j1.
   Proof. move: fsc_search_result. by apply search_arg_in_range. Qed.
 
   (** For convenience, since we often only require the lower bound on
-     the interval, we re-state it as a corollary. *)
+      the interval, we re-state it as a corollary. *)
   Corollary fsc_range1 :
     t1 <= find_swap_candidate sched t1 j1.
   Proof. by move: fsc_range => /andP [LE _]. Qed.
 
   (** The following lemma is a key step of the overall proof: the job
-     scheduled at the time found by [find_swap_candidate] has the
-     property that it has a deadline that is no later than that of any
-     other job in the window given by time [t1] and the deadline of
-     the job scheduled at time [t1]. *)
+      scheduled at the time found by [find_swap_candidate] has the
+      property that it has a deadline that is no later than that of any
+      other job in the window given by time [t1] and the deadline of
+      the job scheduled at time [t1]. *)
   Lemma fsc_found_job_deadline :
     forall j2,
       scheduled_at sched j2 (find_swap_candidate sched t1 j1) ->
@@ -148,9 +148,9 @@ Section FindSwapCandidateFacts.
   Qed.
 
   (** As a special case of the above lemma, we observe that the job
-     scheduled at the time given by [find_swap_candidate] in
-     particular has a deadline no later than the job scheduled at time
-     [t1]. *)
+      scheduled at the time given by [find_swap_candidate] in
+      particular has a deadline no later than the job scheduled at time
+      [t1]. *)
   Corollary fsc_no_later_deadline :
     forall j2,
       scheduled_at sched j2 (find_swap_candidate sched t1 j1) ->
@@ -182,9 +182,9 @@ Section MakeEDFAtFacts.
   Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** Since we will require this fact repeatedly, we briefly observe
-     that, since no scheduled job misses its deadline, if a job is
-     scheduled at some time [t], then its deadline is later than
-     [t]. *)
+      that, since no scheduled job misses its deadline, if a job is
+      scheduled at some time [t], then its deadline is later than
+      [t]. *)
   Fact scheduled_job_in_sched_has_later_deadline :
     forall j t,
       scheduled_at sched j t ->
@@ -194,15 +194,15 @@ Section MakeEDFAtFacts.
   Qed.
 
   (** We analyze [make_edf_at] applied to an arbitrary point in time,
-     which we denote [t_edf] in the following. *)
+      which we denote [t_edf] in the following. *)
   Variable t_edf : instant.
 
   (** For brevity, let [sched'] denote the schedule obtained from
-     [make_edf_at] applied to [sched] at time [t_edf]. *)
+      [make_edf_at] applied to [sched] at time [t_edf]. *)
   Let sched' := make_edf_at sched t_edf.
 
   (** First, we observe that in [sched'] jobs still don't execute past
-     completion. *)
+      completion. *)
   Lemma mea_completed_jobs :
     completed_jobs_dont_execute sched'.
   Proof.
@@ -218,8 +218,8 @@ Section MakeEDFAtFacts.
   Qed.
 
   (** Importantly, [make_edf_at] does not introduce any deadline
-     misses, which is a crucial step in the EDF optimality
-     argument. *)
+      misses, which is a crucial step in the EDF optimality
+      argument. *)
   Lemma mea_no_deadline_misses :
     all_deadlines_met sched'.
   Proof.
@@ -267,9 +267,9 @@ Section MakeEDFAtFacts.
   Qed.
 
   (** Next comes a big step in the optimality proof: we observe that
-     [make_edf_at] indeed ensures that [EDF_at] holds at time [t_edf] in
-     [sched']. As this is a larger argument, we proceed by case analysis and
-     first establish a couple of helper lemmas in the following section. *)
+      [make_edf_at] indeed ensures that [EDF_at] holds at time [t_edf] in
+      [sched']. As this is a larger argument, we proceed by case analysis and
+      first establish a couple of helper lemmas in the following section. *)
   Section GuaranteeCaseAnalysis.
 
     (** Let [j_orig] denote the job scheduled in [sched] at time
@@ -418,8 +418,8 @@ Section MakeEDFAtFacts.
   Qed.
 
   (** We connect the fact that a job is scheduled in [sched'] to the
-     fact that it must be scheduled somewhere in [sched], too, since
-     [make_edf_at] does not introduce any new jobs.  *)
+      fact that it must be scheduled somewhere in [sched], too, since
+      [make_edf_at] does not introduce any new jobs.  *)
   Lemma mea_job_scheduled :
     forall j t,
       scheduled_at sched' j t ->
@@ -433,8 +433,8 @@ Section MakeEDFAtFacts.
   Qed.
 
   (** Conversely, if a job is scheduled in [sched], it is also
-     scheduled somewhere in [sched'] since [make_edf_at] does not lose
-     any jobs. *)
+      scheduled somewhere in [sched'] since [make_edf_at] does not lose
+      any jobs. *)
   Lemma mea_job_scheduled' :
     forall j t,
       scheduled_at sched j t ->
@@ -449,7 +449,7 @@ Section MakeEDFAtFacts.
   Qed.
 
   (** Next, we observe that if all jobs in [sched] come from a given
-     arrival sequence, then that's still the case in [sched'], too. *)
+      arrival sequence, then that's still the case in [sched'], too. *)
   Section ArrivalSequence.
 
     (** For given arrival sequence,... *)
@@ -470,14 +470,14 @@ Section MakeEDFAtFacts.
   End ArrivalSequence.
 
   (** For the final claim, assume that [EDF_at] already holds
-     everywhere prior to time [t_edf], i.e., that [sched] consists of
-     an EDF prefix. *)
+      everywhere prior to time [t_edf], i.e., that [sched] consists of
+      an EDF prefix. *)
   Hypothesis H_EDF_prefix : forall t, t < t_edf -> EDF_at sched t.
 
   (** We establish a key property of [make_edf_at]: not only does it
-     ensure [EDF_at] at time [t_edf], it also maintains the fact that
-     the schedule has an EDF prefix prior to time [t_edf]. In other
-     words, it grows the EDF prefix by one time unit. *)
+      ensure [EDF_at] at time [t_edf], it also maintains the fact that
+      the schedule has an EDF prefix prior to time [t_edf]. In other
+      words, it grows the EDF prefix by one time unit. *)
   Lemma mea_EDF_widen :
     forall t, t <= t_edf -> EDF_at sched' t.
   Proof.
@@ -530,11 +530,11 @@ Section EDFPrefixFacts.
   Variable horizon : instant.
 
   (** ...let [sched'] denote the schedule obtained by transforming
-     [sched] up to the horizon. *)
+      [sched] up to the horizon. *)
   Let sched' := edf_transform_prefix sched horizon.
 
   (** To start, we observe that [sched'] is still well-behaved and
-     without deadline misses. *)
+      without deadline misses. *)
   Lemma edf_prefix_well_formedness :
     completed_jobs_dont_execute sched'
     /\ jobs_must_arrive_to_execute sched'
@@ -550,14 +550,14 @@ Section EDFPrefixFacts.
   Qed.
 
   (** Because it is needed frequently, we extract the second clause of
-     the above conjunction as a corollary. *)
+      the above conjunction as a corollary. *)
   Corollary edf_prefix_jobs_must_arrive :
     jobs_must_arrive_to_execute sched'.
   Proof. by move: edf_prefix_well_formedness => [_ [ARR _]]. Qed.
 
   (** We similarly observe that the absence of deadline misses implies
-     that any scheduled job must have a deadline at a time later then
-     when it is scheduled. *)
+      that any scheduled job must have a deadline at a time later than
+      when it is scheduled. *)
   Corollary edf_prefix_scheduled_job_has_later_deadline :
     forall j t,
       scheduled_at sched' j t ->
@@ -569,9 +569,9 @@ Section EDFPrefixFacts.
   Qed.
 
   (** Since no jobs are lost or added to the schedule by
-     [edf_transform_prefix], we if a job is scheduled in the
-     transformed schedule, then it is also scheduled at some point in
-     the original schedule. *)
+      [edf_transform_prefix], then if a job is scheduled in the
+      transformed schedule, then it is also scheduled at some point in
+      the original schedule. *)
   Lemma edf_prefix_job_scheduled :
     forall j t,
       scheduled_at sched' j t ->
@@ -587,7 +587,7 @@ Section EDFPrefixFacts.
   Qed.
 
   (** Conversely, if a job is scheduled in the original schedule, it is
-     also scheduled at some point in the transformed schedule. *)
+      also scheduled at some point in the transformed schedule. *)
   Lemma edf_prefix_job_scheduled' :
     forall j t,
       scheduled_at sched j t ->
@@ -602,7 +602,7 @@ Section EDFPrefixFacts.
   Qed.
 
   (** Next, we note that [edf_transform_prefix] maintains the
-     property that all jobs stem from a given arrival sequence. *)
+      property that all jobs stem from a given arrival sequence. *)
   Section ArrivalSequence.
 
     (** For any arrival sequence,... *)
@@ -612,7 +612,7 @@ Section EDFPrefixFacts.
     Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
     (** ...then all jobs in the transformed schedule still come from
-       the same arrival sequence. *)
+        the same arrival sequence. *)
     Lemma edf_prefix_jobs_come_from_arrival_sequence :
       jobs_come_from_arrival_sequence sched' arr_seq.
     Proof.
@@ -625,8 +625,8 @@ Section EDFPrefixFacts.
   End ArrivalSequence.
 
   (** We establish the key property of [edf_transform_prefix]: that it indeed
-     ensures that the resulting schedule ensures the EDF invariant up to the
-     given [horizon].  *)
+      ensures that the resulting schedule ensures the EDF invariant up to the
+      given [horizon].  *)
   Lemma edf_prefix_guarantee :
     forall t,
       t < horizon ->
@@ -713,7 +713,7 @@ Section EDFTransformFacts.
   Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
   (** In the following, let [sched_edf] denote the EDF schedule obtained by
-     transforming the given reference schedule. *)
+      transforming the given reference schedule. *)
   Let sched_edf := edf_transform sched.
 
   (** We begin with a simple lemma relating [sched_edf] to its definition that
@@ -769,7 +769,7 @@ Section EDFTransformFacts.
   Qed.
 
   (** We next establish the second key property: in the transformed EDF
-     schedule, no scheduled job misses a deadline. *)
+      schedule, no scheduled job misses a deadline. *)
   Theorem edf_transform_deadlines_met :
     all_deadlines_met sched_edf.
   Proof.
@@ -788,7 +788,7 @@ Section EDFTransformFacts.
   Qed.
 
   (** We observe that no new jobs are introduced: any job scheduled in the EDF
-     schedule were also present in the reference schedule. *)
+      schedule was also present in the reference schedule. *)
   Lemma edf_transform_job_scheduled :
     forall j t, scheduled_at sched_edf j t -> exists t', scheduled_at sched j t'.
   Proof.
@@ -798,7 +798,7 @@ Section EDFTransformFacts.
   Qed.
 
   (** Conversely, we observe that no jobs are lost: any job scheduled in the
-     reference schedule is also present in the EDF schedule. *)
+      reference schedule is also present in the EDF schedule. *)
   Lemma edf_transform_job_scheduled' :
     forall j t, scheduled_at sched j t -> exists t', scheduled_at sched_edf j t'.
   Proof.
@@ -813,7 +813,7 @@ Section EDFTransformFacts.
   Qed.
 
   (** Next, we note that [edf_transform] maintains the property that all jobs
-     stem from a given arrival sequence. *)
+      stem from a given arrival sequence. *)
   Section ArrivalSequence.
 
     (** For any arrival sequence,... *)
@@ -823,7 +823,7 @@ Section EDFTransformFacts.
     Hypothesis H_from_arr_seq : jobs_come_from_arrival_sequence sched arr_seq.
 
     (** ...then all jobs in the transformed EDF schedule still come from the
-       same arrival sequence. *)
+        same arrival sequence. *)
     Lemma edf_transform_jobs_come_from_arrival_sequence :
       jobs_come_from_arrival_sequence sched_edf arr_seq.
     Proof.
@@ -860,7 +860,7 @@ Section Optimality.
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In the following, let [equivalent_edf_schedule] denote the schedule that
-     results from the EDF transformation. *)
+      results from the EDF transformation. *)
   Let equivalent_edf_schedule := edf_transform sched.
 
   Section AllDeadlinesMet.
@@ -869,7 +869,7 @@ Section Optimality.
     Hypothesis H_no_deadline_misses : all_deadlines_met sched.
 
     (** Then the resulting EDF schedule is a valid schedule for the given
-       arrival sequence... *)
+        arrival sequence... *)
     Theorem edf_schedule_is_valid :
       valid_schedule equivalent_edf_schedule arr_seq.
     Proof.
@@ -888,16 +888,16 @@ Section Optimality.
   End AllDeadlinesMet.
 
   (** Next, we strengthen the above "no deadline misses" claim by relating it
-     not just to all scheduled jobs, but to all jobs in the given arrival
-     sequence. *)
+      not just to all scheduled jobs, but to all jobs in the given arrival
+      sequence. *)
   Section AllDeadlinesOfArrivalsMet.
 
     (** Suppose no job that's part of the arrival sequence misses a deadline in
-       the given reference schedule. *)
+        the given reference schedule. *)
     Hypothesis H_no_deadline_misses_of_arrivals : all_deadlines_of_arrivals_met arr_seq sched.
 
     (** Then no job that's part of the arrival sequence misses a deadline in the
-       EDF schedule, either. *)
+        EDF schedule, either. *)
     Theorem edf_schedule_meets_all_deadlines_wrt_arrivals :
       all_deadlines_of_arrivals_met arr_seq equivalent_edf_schedule.
     Proof.

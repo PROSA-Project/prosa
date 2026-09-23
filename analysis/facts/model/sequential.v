@@ -17,7 +17,7 @@ Section ExecutionOrder.
   (** ... and any kind of processor state model. *)
   Context {PState : ProcessorState Job}.
 
-  (** Consider any arrival sequence. *)
+  (** Consider any arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
 
   (** ... and any schedule of this arrival sequence ... *)

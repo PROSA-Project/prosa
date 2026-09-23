@@ -11,7 +11,7 @@ Require Export prosa.analysis.facts.workload.edf_athep_bound.
 (** * RTA for EDF  with Bounded Non-Preemptive Segments *)
 
 (** In this section we instantiate the Abstract RTA for EDF-schedulers
-    with Bounded Priority Inversion to EDF-schedulers for ideal
+    with Bounded Priority Inversion to EDF-schedulers for an ideal
     uni-processor model of real-time tasks with arbitrary
     arrival models _and_ bounded non-preemptive segments. *)
 
@@ -48,12 +48,12 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any valid ideal uni-processor schedule of this arrival sequence ... *)
+  (** Next, consider any valid ideal uni-processor schedule of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).
   Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
-  (** In addition, we assume the existence of a function mapping jobs
-      to their preemption points ... *)
+  (** ... assume the existence of a function mapping jobs
+      to their preemption points, ... *)
   Context `{JobPreemptable Job}.
 
   (** ... and assume that it defines a valid preemption model with
@@ -81,9 +81,9 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     arrivals_have_valid_job_costs arr_seq.
 
   (** Let max_arrivals be a family of valid arrival curves, i.e., for
-     any task [tsk] in ts [max_arrival tsk] is (1) an arrival bound of
-     [tsk], and (2) it is a monotonic function that equals 0 for the
-     empty interval delta = 0. *)
+      any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival bound of
+      [tsk], and (2) it is a monotonic function that equals 0 for the
+      empty interval delta = 0. *)
   Context `{MaxArrivals Task}.
   Hypothesis H_valid_arrival_curve : valid_taskset_arrival_curve ts max_arrivals.
   Hypothesis H_is_arrival_curve : taskset_respects_max_arrivals arr_seq ts.
@@ -97,21 +97,21 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
     valid_preemption_model arr_seq sched.
 
   (** ...and a valid task run-to-completion threshold function. That
-     is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
-     any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
+      is, [task_rtct tsk] is (1) no bigger than [tsk]'s cost, (2) for
+      any job of task [tsk] [job_rtct] is bounded by [task_rtct]. *)
   Hypothesis H_valid_run_to_completion_threshold :
     valid_task_run_to_completion_threshold arr_seq tsk.
 
   (** We introduce as an abbreviation [rbf] for the task request bound function,
-     which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
+      which is defined as [task_cost(T) × max_arrivals(T,Δ)] for a task T. *)
   Let rbf := task_request_bound_function.
 
   (** Next, we introduce [task_rbf] as an abbreviation for the task
-     request bound function of task [tsk]. *)
+      request bound function of task [tsk]. *)
   Let task_rbf := rbf tsk.
 
   (** Using the sum of individual request bound functions, we define the request bound
-     function of all tasks (total request bound function). *)
+      function of all tasks (total request bound function). *)
   Let total_rbf := total_request_bound_function ts.
 
   (** Let's define some local names for clarity. *)

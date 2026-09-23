@@ -75,7 +75,7 @@ Section RunToCompletionThreshold.
       by rewrite A2 in_cons eq_refl.
   Qed.
 
-  (** Therefore, for a positive-cost job size of the sequence of
+  (** Therefore, for a positive-cost job, the size of the sequence of
       preemption points is at least two. *)
   Lemma size_of_preemption_points :
     0 < job_cost j ->
@@ -152,7 +152,7 @@ Section RunToCompletionThreshold.
   Qed.
 
   (** Next we show that max nonpreemptive segment is at most the
-    cost of a job. *)
+      cost of a job. *)
   Lemma job_max_nonpreemptive_segment_le_job_cost :
     job_max_nonpreemptive_segment j <= job_cost j.
   Proof.

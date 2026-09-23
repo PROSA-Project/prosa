@@ -102,7 +102,7 @@ Section TaskIBFtoJobIBF.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any ideal schedule of this arrival sequence. *)
+  (** ... and any ideal schedule of this arrival sequence ... *)
   Variable sched : schedule PState.
   Hypothesis H_jobs_come_from_arrival_sequence : jobs_come_from_arrival_sequence sched arr_seq.
 
@@ -121,7 +121,7 @@ Section TaskIBFtoJobIBF.
   Hypothesis H_tsk_in_ts : tsk \in ts.
 
   (** Let [max_arrivals] be a family of valid arrival curves, i.e.,
-      for any task [tsk] in [ts], [max_arrival tsk] is (1) an arrival
+      for any task [tsk] in [ts], [max_arrivals tsk] is (1) an arrival
       bound of [tsk], and (2) it is a monotonic function that equals
       [0] for the empty interval [delta = 0]. *)
   Context `{MaxArrivals Task}.
@@ -156,7 +156,7 @@ Section TaskIBFtoJobIBF.
       Now, assuming that our priority policy ensures that tasks are
       sequential, the situation described above is impossible (job [j]
       will always have a higher-or-equal priority than job [j']).
-      Hence, we need to rule our interference and interfering workload
+      Hence, we need to rule out our interference and interfering workload
       instantiations that do not conform to the sequential tasks
       assumption.
 
@@ -191,7 +191,7 @@ Section TaskIBFtoJobIBF.
   Hypothesis H_task_interference_is_bounded :
     task_interference_is_bounded_by arr_seq sched tsk task_IBF.
 
-  (** Before proceed to the main proof, we first show a few simple
+  (** Before proceeding to the main proof, we first show a few simple
       lemmas about the completion of jobs from the task considering
       the busy interval of the job under consideration. *)
   Section CompletionOfJobsFromSameTask.

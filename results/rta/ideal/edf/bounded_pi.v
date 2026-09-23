@@ -11,7 +11,7 @@ Require Export prosa.analysis.facts.workload.edf_athep_bound.
 
 (** * Abstract RTA for EDF-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
-    (aRTA) to EDF-schedulers for ideal uni-processor model of
+    (aRTA) to EDF-schedulers for an ideal uni-processor model of
     real-time tasks with arbitrary arrival models. *)
 
 (** Given EDF scheduling and an ideal uni-processor scheduler
@@ -90,8 +90,8 @@ Section AbstractRTAforEDFwithArrivalCurves.
   Let work_conserving_cl := work_conserving.work_conserving arr_seq sched.
 
   (** We assume that the schedule is a work-conserving schedule
-     in the _classical_ sense, and later prove that the hypothesis
-     about abstract work-conservation also holds. *)
+      in the _classical_ sense, and later prove that the hypothesis
+      about abstract work-conservation also holds. *)
   Hypothesis H_work_conserving : work_conserving_cl.
 
   (** Assume that a job cost cannot be larger than a task cost. *)

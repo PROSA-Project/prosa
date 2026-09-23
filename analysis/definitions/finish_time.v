@@ -76,7 +76,7 @@ Section JobFinishTime.
     by lia.
   Qed.
 
-  (** Finally, we can define a job's precise response time as usual as the time
+  (** Finally, we can define a job's precise response time as usual, as the time
       from its arrival until its finish time. *)
   Definition response_time : duration := finish_time - job_arrival j.
 

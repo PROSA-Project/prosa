@@ -18,7 +18,7 @@ Section ValidTaskJitter.
   Context {Job : JobType} `{JobTask Job Task} `{JobJitter Job}.
 
   (** A jitter bound is valid iff it bounds the release jitter experienced by
-      any of job of the task. *)
+      any job of the task. *)
   Definition valid_jitter (tsk : Task) :=
     forall j,
       job_task j = tsk ->

@@ -21,7 +21,7 @@ Section ReplaceAt.
   Variable new_state : PState.
 
   (** Then the schedule with replacement is simply one that returns the given
-     [new_state] at [t'], and the original allocation at all other times. *)
+      [new_state] at [t'], and the original allocation at all other times. *)
   Definition replace_at : schedule PState :=
     fun t => if t' == t then new_state else (original_sched t).
 
@@ -42,7 +42,7 @@ Section Swapped.
   Variable t1 t2 : instant.
 
   (** ...we define the notion of a schedule in which the two allocations at [t1]
-     and [t2] have been swapped. *)
+      and [t2] have been swapped. *)
   Definition swapped : schedule PState :=
     let s1 := original_sched t1 in
     let s2 := original_sched t2 in

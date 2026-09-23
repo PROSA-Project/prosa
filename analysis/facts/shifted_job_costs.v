@@ -46,8 +46,8 @@ Section ValidJobCostsShifted.
   (** We now define a new function for job costs in the observation interval. *)
 
   (** Given that job [j] arrives after [O_max], the cost of a job [j']
-   that arrives in the interval <<[O_max + HP, O_max + 2HP)>> is defined to
-   be the same as the job cost of its corresponding job in [j]'s hyperperiod. *)
+      that arrives in the interval <<[O_max + HP, O_max + 2HP)>> is defined to
+      be the same as the job cost of its corresponding job in [j]'s hyperperiod. *)
   Definition job_costs_shifted (j' : Job) :=
     if (job_arrival j >= O_max) && (O_max + HP <= job_arrival j' < O_max + 2 * HP) then
       job_cost (corresponding_job_in_hyperperiod ts arr_seq j' (starting_instant_of_corresponding_hyperperiod ts j) (job_task j'))
@@ -57,7 +57,7 @@ Section ValidJobCostsShifted.
   Hypothesis H_infinite_jobs : infinite_jobs arr_seq.
 
   (** Assume all jobs in the arrival sequence [arr_seq] belong to some task
-   in [ts]. *)
+      in [ts]. *)
   Hypothesis H_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
   (** We assign the job costs as defined by the [job_costs_shifted] function. *)

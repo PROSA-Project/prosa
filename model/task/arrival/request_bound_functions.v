@@ -97,8 +97,8 @@ Section RequestBoundFunctionsModel.
   (** Let [ts] be an arbitrary task set. *)
   Variable ts : TaskSet Task.
 
-  (** We say that [request_bound] is a valid arrival curve for a task set
-      if it is valid for any task in the task set *)
+  (** We say that [request_bound] is a valid request bound function for a task set
+      if it is valid for any task in the task set. *)
   Definition valid_taskset_request_bound_function (request_bound : Task -> duration -> work) :=
     forall (tsk : Task), tsk \in ts -> valid_request_bound_function (request_bound tsk).
 

@@ -37,12 +37,12 @@ Class ProcessorState (Job : JobType) :=
 
     (** For a given processor state and core, the [supply_on] function
         determines how much supply the core produces in the given
-        state). *)
+        state. *)
     supply_on : State -> Core -> work;
 
     (** For a given processor state and core, the [service_on]
         function determines how much service a given job receives on
-        the given core). *)
+        the given core. *)
     service_on : Job -> State -> Core -> work;
 
     (** We require [service_on] and [supply_on] to be consistent in
@@ -108,7 +108,7 @@ End ProcessorIn.
 
 (** In Prosa, schedules are represented as functions, which allows us to model
     potentially infinite schedules. More specifically, a schedule simply maps
-    each instant to a processor state, which reflects state of the computing
+    each instant to a processor state, which reflects the state of the computing
     platform at the specific time (e.g., which job is presently scheduled). *)
 
 Definition schedule {Job : JobType} (PState : ProcessorState Job) :=

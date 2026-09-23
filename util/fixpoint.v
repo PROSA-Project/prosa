@@ -269,7 +269,7 @@ Section PredicateSearchSpace.
   (** ... and any predicate [P] on numbers. *)
   Variable P : pred nat.
 
-  (** We create a derive predicate that defines the search space as all values
+  (** We create a derived predicate that defines the search space as all values
       less than [L] that satisfy [P]. *)
   Let is_in_search_space A := (A < L) && P A.
 

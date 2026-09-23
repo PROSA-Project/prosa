@@ -142,7 +142,7 @@ Section ArrivalSequencePrefix.
   Proof. by move=> ? ? ? ? ?; rewrite -big_cat_nat. Qed.
 
   (** We also prove a stronger version of the above lemma
-   in the case of arrivals that satisfy a predicate [P]. *)
+      in the case of arrivals that satisfy a predicate [P]. *)
   Lemma arrivals_P_cat :
     forall P t t1 t2,
       t1 <= t < t2 ->
@@ -367,7 +367,7 @@ Section ArrivalSequencePrefix.
       by move=> /job_arrival_at <- /job_arrival_at <-.
     Qed.
 
-    (** Also note that there can't by any arrivals in an empty time interval. *)
+    (** Also note that there can't be any arrivals in an empty time interval. *)
     Lemma arrivals_between_geq :
       forall t1 t2,
         t1 >= t2 ->

@@ -52,7 +52,7 @@ Section ValidTaskMaxInterArrival.
     /\ arr_sep_task_max_inter_arrival tsk.
 
   (** A task set is said to respect the task max inter-arrival model iff all tasks
-   in the task set have valid task max inter-arrival times as defined above. *)
+      in the task set have valid task max inter-arrival times as defined above. *)
   Definition taskset_respects_task_max_inter_arrival_model (ts : TaskSet Task) :=
     forall tsk,
       tsk \in ts ->

@@ -13,7 +13,7 @@ Require Export prosa.analysis.facts.priority.classes.
 (** We begin with the general setup. *)
 Section GeneralityOfELF.
 
-  (** Consider any type of tasks with relative priority points,...*)
+  (** Consider any type of tasks with relative priority points,... *)
   Context {Task : TaskType} `{PriorityPoint Task}.
 
   (** ...jobs of these tasks, and ... *)

@@ -14,7 +14,7 @@ Class JobJitter (Job : JobType) := { job_jitter : Job -> duration }.
 (** * Readiness of Jobs with Release Jitter *)
 
 (** Based on the job model's jitter parameter, we specify the readiness
-   predicate for jobs with release jitter (and no self-suspensions). *)
+    predicate for jobs with release jitter (and no self-suspensions). *)
 
 Section ReadinessOfJitteryJobs.
   (** Consider any kind of jobs... *)

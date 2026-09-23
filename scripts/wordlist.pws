@@ -6,6 +6,7 @@ PROSA's
 Coq
 Rocq
 Rocq's
+Coq's
 Prover
 OCaml
 OPAM
@@ -74,6 +75,7 @@ WCET
 WCETs
 BCET
 BCETs
+activations
 Layland
 Liu
 linearize

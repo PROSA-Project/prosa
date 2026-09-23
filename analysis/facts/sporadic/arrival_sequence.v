@@ -56,8 +56,8 @@ Section SporadicArrivals.
   Qed.
 
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
-      the same time as [j1], and thus the task arrivals at [job arrival j1]
-      consists only of job [j1]. *)
+      the same time as [j1], and thus the task arrivals at [job_arrival j1]
+      consist only of job [j1]. *)
   Lemma only_j_in_task_arrivals_at_j :
     task_arrivals_at_job_arrival arr_seq j1 = [::j1].
   Proof.
@@ -77,8 +77,8 @@ Section SporadicArrivals.
   Qed.
 
   (** We show that no jobs of the task [tsk] other than [j1] arrive at
-      the same time as [j1], and thus the task arrivals at [job arrival j1]
-      consists only of job [j1]. *)
+      the same time as [j1], and thus the task arrivals at [job_arrival j1]
+      consist only of job [j1]. *)
   Lemma only_j_at_job_arrival_j :
     forall t,
       job_arrival j1 = t ->
@@ -117,7 +117,7 @@ Section SporadicArrivals.
       by lia.
   Qed.
 
-  (** We show that task arrivals at [job_arrival j1] is the
+  (** We show that task arrivals at [job_arrival j1] are the
       same as task arrivals that arrive between [job_arrival j1]
       and [job_arrival j1 + 1]. *)
   Lemma task_arrivals_at_as_task_arrivals_between :
@@ -128,7 +128,7 @@ Section SporadicArrivals.
   Qed.
 
   (** We show that the task arrivals up to the previous job [j1] concatenated with
-      the sequence [::j1] (the sequence containing only the job [j1]) is same as
+      the sequence [::j1] (the sequence containing only the job [j1]) is the same as
       task arrivals up to [job_arrival j1]. *)
   Lemma prev_job_cat :
     job_index arr_seq j1 > 0 ->

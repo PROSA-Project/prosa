@@ -3,7 +3,7 @@ Require Export prosa.analysis.facts.busy_interval.pi.
 (** * Bounded Priority Inversion Due to Non-Preemptive Sections *)
 
 (** In the following, we relate the maximum cumulative priority inversion with a
-    given blocking bound, assuming that priority version is caused (only) by
+    given blocking bound, assuming that priority inversion is caused (only) by
     non-preemptive segments. *)
 Section PriorityInversionIsBounded.
 
@@ -11,8 +11,8 @@ Section PriorityInversionIsBounded.
   Context {Task : TaskType}.
   Context `{TaskCost Task}.
 
-  (** In addition, we assume that each task has a maximal non-preemptive
-    segment ... *)
+  (** ... where each task has a maximal non-preemptive
+      segment ... *)
   Context `{TaskMaxNonpreemptiveSegment Task}.
 
   (**  ... and any type of preemptable jobs associated with these tasks. *)
@@ -51,7 +51,7 @@ Section PriorityInversionIsBounded.
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-  (** ...,it respects the scheduling policy at every preemption point,... *)
+  (** ..., it respects the scheduling policy at every preemption point,... *)
   Hypothesis H_respects_policy :
     respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 

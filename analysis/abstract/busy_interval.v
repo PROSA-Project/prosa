@@ -312,7 +312,7 @@ Section AbstractBusyIntervalExists.
 
     (** Since job [j] is pending at time [t_busy], there is a
         (potentially unbounded) busy interval that starts no later
-        than with the arrival of [j]. *)
+        than the arrival of [j]. *)
     Lemma exists_busy_interval_prefix :
       exists t1,
         busy_interval_prefix t1 t_busy.+1

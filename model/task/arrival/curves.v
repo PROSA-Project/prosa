@@ -74,7 +74,7 @@ Section ArrivalCurves.
     forall (t1 t2 : instant),
       number_of_task_arrivals arr_seq tsk t1 t2 <= max_arrivals (t2 - t1).
 
-  (** We analogously define the lower arrival bound.. *)
+  (** We analogously define the lower arrival bound. *)
   Definition respects_min_arrivals (tsk : Task) (min_arrivals : duration -> nat) :=
     forall (t1 t2 : instant),
       t1 <= t2 ->
@@ -94,7 +94,7 @@ Section ArrivalCurves.
       t1 <= t2 ->
       min_separation (number_of_task_arrivals arr_seq tsk t1 t2) <= t2 - t1.
 
-  (** We analogously define in upper separation bounds. *)
+  (** We analogously define the upper separation bounds. *)
   Definition respects_max_separation (tsk : Task) (max_separation : nat -> duration) :=
     forall t1 t2,
       t1 <= t2 ->
@@ -117,10 +117,10 @@ Section ArrivalCurvesModel.
   Context {Job : JobType}.
   Context `{JobTask Job Task}.
 
-  (** Consider any job arrival sequence... *)
+  (** Consider any job arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** ..and all kinds of arrival and separation curves. *)
+  (** ... and all kinds of arrival and separation curves. *)
   Context `{MaxArrivals Task}
           `{MinArrivals Task}
           `{MaxSeparation Task}
@@ -149,7 +149,7 @@ Section ArrivalCurvesModel.
   Definition taskset_respects_max_separation :=
     forall (tsk : Task), tsk \in ts -> respects_max_separation arr_seq tsk (max_separation tsk).
 
-  (**.. as well as for the minimum separation. *)
+  (** ... as well as for the minimum separation. *)
   Definition taskset_respects_min_separation :=
     forall (tsk : Task), tsk \in ts -> respects_min_separation arr_seq tsk (min_separation tsk).
 

@@ -72,7 +72,7 @@ Section BoundedBusyIntervalsAux.
 
   (** First, we note that, since job [j] is pending at time
       [job_arrival j], there is a (potentially unbounded) busy
-      interval that starts no later than with the arrival of [j]. *)
+      interval that starts no later than at the arrival of [j]. *)
   Lemma busy_interval_prefix_exists :
     exists t1,
       t1 <= job_arrival j

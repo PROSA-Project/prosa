@@ -37,7 +37,7 @@ Section TaskArrivals.
   Definition task_arrivals_at (tsk : Task) (t : instant) :=
     [seq j <- arr_seq t | job_of_task tsk j].
 
-  (** ... and finally count the number of job arrivals. *)
+  (** ... and finally count the number of job arrivals, ... *)
   Definition number_of_task_arrivals (t1 t2 : instant) :=
     size (task_arrivals_between t1 t2).
 
@@ -77,17 +77,17 @@ Section PriorArrivals.
   Variable j : Job.
 
   (** We first define a sequence of jobs of a task
-   that arrive before or at [job_arrival j]. *)
+      that arrive before or at [job_arrival j]. *)
   Definition task_arrivals_up_to_job_arrival :=
     task_arrivals_up_to arr_seq (job_task j) (job_arrival j).
 
   (** Next, we define a sequence of jobs of a task
-   that arrive strictly before [job_arrival j]. *)
+      that arrive strictly before [job_arrival j]. *)
   Definition task_arrivals_before_job_arrival :=
     task_arrivals_before arr_seq (job_task j) (job_arrival j).
 
   (** Finally, we define a sequence of jobs of a task
-   that arrive at [job_arrival j]. *)
+      that arrive at [job_arrival j]. *)
   Definition task_arrivals_at_job_arrival :=
     task_arrivals_at arr_seq (job_task j) (job_arrival j).
 
@@ -132,7 +132,7 @@ Section PreviousJob.
   Let prev_index j := job_index arr_seq j - 1.
 
   (** For any job [j] with a positive [job_index] we define the notion
-     of a previous job. *)
+      of a previous job. *)
   Definition prev_job (j : Job) := nth j (task_arrivals_up_to_job_arrival j) (prev_index j).
 
 End PreviousJob.

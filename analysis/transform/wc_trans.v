@@ -75,7 +75,7 @@ Section WCTransformation.
   (** Finally, a fully work-conserving schedule (i.e., one that is
       work-conserving at any time) is obtained by first computing a
       work-conserving prefix up to and including the requested time [t],
-      and by then looking at the last point of the prefix. *)
+      and then looking at the last point of the prefix. *)
   Definition wc_transform sched t :=
     let
       wc_prefix := wc_transform_prefix sched t.+1

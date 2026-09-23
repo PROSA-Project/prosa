@@ -5,7 +5,7 @@ Require Export prosa.implementation.definitions.task.
 
 (** ** Task Refinement *)
 
-(** In this module, we define a generic version of concrete task and
+(** In this module, we define a generic version of a concrete task and
     prove that it is isomorphic to the standard, natural-number-based
     definition. *)
 
@@ -44,7 +44,7 @@ Section Definitions.
     && (task_deadline_T t1 == task_deadline_T t2)%C
     && (task_priority_T t1 == task_priority_T t2)%C.
 
-  (** Next, we define a helper function that convert a minimum inter-arrival time
+  (** Next, we define a helper function that converts a minimum inter-arrival time
         to an arrival curve prefix. *)
   Definition inter_arrival_to_extrapolated_arrival_curve_T (p : T) : T * seq (T * T) := (p, [::(1, 1)])%C.
 
@@ -135,7 +135,7 @@ Definition task_to_taskT (tsk : Task) : @task_T N :=
   end.
 
 (** In this fairly technical section, we prove a series of refinements
-      aimed to be able to convert between a standard natural-number task
+      aimed at being able to convert between a standard natural-number task
       and a generic task. *)
 Section Theory.
 

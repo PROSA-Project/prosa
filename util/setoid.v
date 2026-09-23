@@ -1,5 +1,5 @@
 (** Setoid Rewriting with boolean inequalities of ssreflect. Solution
-    suggested by Georges Gonthier (ssreflect mailinglist @ 18.12.2016) *)
+    suggested by Georges Gonthier (ssreflect mailing list @ 18.12.2016) *)
 
 From Stdlib Require Import Basics Setoid Morphisms.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.

@@ -25,7 +25,7 @@ Section FloatingNonPreemptiveRegionsModel.
       task to its maximal non-preemptive segment ... *)
   Context `{TaskMaxNonpreemptiveSegment Task}.
 
-  (** .. and the existence of functions mapping a
+  (** ... and the existence of functions mapping a
       job to the sequence of its preemption points, ... *)
   Context `{JobPreemptionPoints Job}.
   (** ... i.e., we assume limited-preemptive jobs. *)

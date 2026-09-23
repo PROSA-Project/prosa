@@ -175,7 +175,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
       offset [A] in the search space (w.r.t. the busy-window bound [L]), the
       response-time bound "recurrence" (i.e., inequality) has a solution [F] not
       exceeding [A + R] after accounting for overheads (i.e., [(overhead_bound
-      (A + R) - overhead_bound F]) and the benefit of non-preemptive execution
+      (A + R) - overhead_bound F)] and the benefit of non-preemptive execution
       of the job under analysis (i.e., [task_cost tsk - ε]). *)
   Definition rta_recurrence_solution L R :=
     forall (A : duration),
@@ -191,7 +191,7 @@ Section RTAforFullyNonPreemptiveFPModelwithArrivalCurves.
   (** Finally, using the sequential variant of abstract restricted-supply
       analysis, we establish that, given a bound on the maximum busy-window
       length [L], any such [R] is indeed a sound response-time bound for task
-      [tsk] under fully-non-preemptive fixed-priority scheduling on a unit-speed
+      [tsk] under fully non-preemptive fixed-priority scheduling on a unit-speed
       uniprocessor subject to scheduling overheads. *)
   Theorem uniprocessor_response_time_bound_fully_non_preemptive_fp :
     forall (L : duration),

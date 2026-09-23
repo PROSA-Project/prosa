@@ -17,7 +17,7 @@ Section UniprocessorScheduler.
   (** Consider any type of jobs with costs and arrival times, ... *)
   Context {Job : JobType} {JC : JobCost Job} {JA : JobArrival Job}.
 
-  (** .. in the context of an ideal uniprocessor model. *)
+  (** ... in the context of an ideal uniprocessor model. *)
   Let PState := ideal.processor_state Job.
   Let idle_state : PState := None.
 
@@ -43,8 +43,8 @@ Section UniprocessorScheduler.
     Variable choose_job : instant -> seq Job -> option Job.
 
     (** The next job is then chosen either by [policy] (if the current job is
-       preemptive or the processor is idle) or a non-preemptively executing job
-       continues to execute. *)
+        preemptive or the processor is idle) or a non-preemptively executing job
+        continues to execute. *)
     Section JobAllocation.
 
       (** Consider a finite schedule prefix ... *)

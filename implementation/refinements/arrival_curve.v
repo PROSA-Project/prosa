@@ -16,7 +16,7 @@ Definition get_horizon_of_task (tsk : Task) : duration :=
 Definition get_time_steps_of_task (tsk : Task) : seq duration :=
   time_steps_of (get_arrival_curve_prefix tsk).
 
-(** ... a function that yields the same time steps, offset by δ, ...**)
+(** ... a function that yields the same time steps, offset by δ, ... *)
 Definition time_steps_with_offset tsk δ := [seq t + δ | t <- get_time_steps_of_task tsk].
 
 (** ... and a generalization of the previous function that repeats the time
@@ -38,7 +38,7 @@ Definition valid_arrivals (tsk : Task) : bool :=
   | ArrivalPrefix emax_vec => valid_arrival_curve_prefix_dec emax_vec
   end.
 
-(** Next, we define some helper functions, that indicate whether
+(** Next, we define some helper functions that indicate whether
       the given task is periodic, ... *)
 Definition is_periodic_arrivals (tsk : Task) : Prop :=
   exists p, concrete_task_arrival tsk = Periodic p.
@@ -88,7 +88,7 @@ End Facts.
 
 
 (** In this fairly technical section, we prove a series of refinements
-    aimed to be able to convert between a standard natural-number task
+    aimed at being able to convert between a standard natural-number task
     arrival bound and an arrival bound that uses, instead of numbers,
     a generic type [T]. *)
 Section Theory.

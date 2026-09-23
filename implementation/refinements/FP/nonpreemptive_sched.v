@@ -13,7 +13,7 @@ Require Export prosa.implementation.readiness.sequential.
 (** In this section, we prove some facts about the fully-nonpreemptive
     preemption policy under fixed-priority schedules.
 
-    Some lemmas in this file are not novel facts; they are used to uniform
+    Some lemmas in this file are not novel facts; they are used to unify
     POET's certificates and minimize their verbosity. *)
 Section Schedule.
 
