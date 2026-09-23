@@ -199,6 +199,41 @@ def lint_file(opts, fpath):
                 )
             )
 
+    rocqdoc_comments = [
+        (s, e)
+        for s, e in comments.ranges
+        if s >= 3 and src[s - 3 : s] == "(**"
+    ]
+    for (previous_start, previous_end), (next_start, next_end) in zip(
+        rocqdoc_comments, rocqdoc_comments[1:]
+    ):
+        previous_ends_continuation = (
+            src[previous_start:previous_end].rstrip().endswith("...")
+        )
+        next_comment = src[next_start:next_end]
+        next_content_start = next_start + len(next_comment) - len(
+            next_comment.lstrip()
+        )
+        next_starts_continuation = src[next_content_start:next_end].startswith("...")
+        if previous_ends_continuation == next_starts_continuation:
+            continue
+
+        if next_starts_continuation:
+            issue = (next_content_start, next_content_start + 3)
+            msg = "unexpected '...' at the beginning of a coqdoc comment"
+        else:
+            issue = (next_content_start, next_content_start + 1)
+            msg = "coqdoc comment should start with '...' to continue the previous comment"
+        rule = f" [rule: {len(ISSUES) + 1}]" if opts.show_rule_number else ""
+        issues.append(
+            (
+                issue,
+                f"{fpath}:{lineno[issue[0]]}: coding style{rule}: {msg}",
+                0,
+                0,
+            )
+        )
+
     expected_indent = 0
     for m in matches_of(KEYWORDS_FOR_INDENTATION_CHECK):
         s, e = m.span("section")
