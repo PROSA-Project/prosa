@@ -4,6 +4,7 @@ Require Export prosa.model.task.absolute_deadline.
 Require Export prosa.analysis.definitions.workload.bounded.
 Require Export prosa.analysis.facts.priority.elf.
 Require Export prosa.analysis.facts.model.workload.
+
 Require Export prosa.analysis.definitions.workload.elf_athep_bound.
 Require Export prosa.analysis.facts.model.rbf.
 
@@ -151,7 +152,7 @@ Section ATHEPWorkloadBoundIsValidForELF.
       { eapply leq_trans; first by apply total_ep_tsk_workload_shorten_range => //; clear - GT H_delta_in_busy; lia.
         rewrite (workload_of_jobs_equiv_pred _ _ (fun jo : Job => hep_job jo j && (job_task jo == tsk_o))) => //.
         { case: (boolP (0 <= ep_task_interfering_interval_length tsk tsk_o A)%R) => EQ;
-              last by rewrite arrivals_between_geq; [rewrite workload_of_jobs0 | clear - EQ; lia].
+              last by rewrite arrivals_between_geq; [clear - EQ; lia | rewrite workload_of_jobs0].
           have -> : `|Num.max 0%R (t1%:R + ep_task_interfering_interval_length tsk tsk_o A)%R|
                      = t1 + `|Num.max 0%R (ep_task_interfering_interval_length tsk tsk_o A)| by clear -EQ; lia.
           by apply: rbf_spec' => // ? /andP[].

@@ -60,9 +60,9 @@ Section ArrivalCurvePrefixSortedLeq.
     { have steps_sorted := H_sorted_leq; clear H_sorted_leq.
       elim: steps steps_sorted => [//|[t__c v__c] steps IHsteps] steps_sorted.
       simpl; intros * => LEv /andP [LTN1 /allP ALL1] /andP [LTN2 /allP ALL2].
-      move: (steps_sorted); rewrite //= (@path_sorted_inE _ predT leq_steps); first last.
-      { by apply/allP. }
+      move: (steps_sorted); rewrite //= (@path_sorted_inE _ predT leq_steps).
       { by intros ? ? ? _ _ _; apply leq_steps_is_transitive. }
+      { by apply/allP. }
       move => /andP [ALL SORT].
       destruct (leqP (fst (t__c, v__c)) t1) as [R1 | R1], (leqP (fst (t__c, v__c)) t2) as [R2 | R2]; simpl in *.
       { by rewrite R1 R2 //=; apply: IHsteps. }
@@ -91,11 +91,11 @@ Section ArrivalCurvePrefixSortedLeq.
     move=> t LT /=.
     unfold value_at, step_at in LT.
     destruct ac_prefix as [h2 steps]; simpl in LT.
-    rewrite [in X in _ < X](sorted_split _ _ fst t) /= in LT.
-    { rewrite [in X in _ ++ X](eq_filter (a2 := fun x => fst x == t + ε)) in LT; last first.
+    rewrite [in X in _ < X](sorted_split _ _ fst t) /= in LT; last first.
+    { rewrite [in X in _ ++ X](eq_filter (a2 := fun x => fst x == t + ε)) in LT.
       { by move=> [a b] /=; lia. }
       { destruct ([seq x <- steps | fst x == t + ε]) as [|p l] eqn:LST => //=.
-        { rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT; last first.
+        { rewrite [in X in X ++ _](eq_filter (a2 := fun x => fst x <= t)) in LT.
           { clear; intros [a b]; simpl.
             destruct (leqP a t).
             - by rewrite Bool.andb_true_r; apply/eqP; lia.
@@ -114,7 +114,7 @@ Section ArrivalCurvePrefixSortedLeq.
       elim: steps SORT => [//|a steps IHsteps] /= SORT.
       move: SORT; rewrite path_sortedE; auto using leq_steps_is_transitive => /andP [LE SORT].
       apply IHsteps in SORT.
-      rewrite path_sortedE; last by intros ? ? ? LE1 LE2; lia.
+      rewrite path_sortedE; first by intros ? ? ? LE1 LE2; lia.
       apply/andP; split=> [|//].
       apply/allP; intros [x y] IN.
       by move: LE => /allP LE; specialize (LE _ IN); move: LE => /andP [LT _].
@@ -172,7 +172,7 @@ Section ArrivalCurvePrefixSortedLtn.
   Proof.
     case: ac_prefix H_sorted_ltn => [h steps] + //= ? ? IN.
     move: IN => /in_cat //= [steps__l [steps__r ->]] /sorted_cat //=; case => //= [|_ +]; first by apply ltn_steps_is_transitive.
-    rewrite /step_at filter_cat last_cat (nonnil_last _ _ (0,0)); last by rewrite //= leqnn.
+    rewrite /step_at filter_cat last_cat (nonnil_last _ _ (0,0)); first by rewrite //= leqnn.
     rewrite //= path_sortedE; auto using ltn_steps_is_transitive; rewrite //= leqnn => /andP [ALL SORT].
     replace (filter _ _ ) with (@nil (nat * nat)) => [//|].
     rewrite filter_in_pred0 // => x IN; rewrite -ltnNge.
@@ -222,7 +222,7 @@ Section ExtrapolatedArrivalCurve.
           move: LEk; rewrite leq_eqVlt => /orP [/eqP EQk | LTk].
           { by subst; rewrite divnn POS mul1n; apply value_at_monotone, ltnW, ltn_pmod. }
           { rewrite -[value_at _ (t1 %% h)]mul1n; apply leq_mul.
-            - by rewrite divn_gt0; [apply: ltnW|].
+            - by rewrite divn_gt0; [|apply: ltnW].
             - by apply value_at_monotone, ltnW, ltn_pmod.
           }
         }
@@ -247,7 +247,7 @@ Section ExtrapolatedArrivalCurve.
   Proof.
     intros t NEQ.
     have LT := ltn_neqAle (extrapolated_arrival_curve ac_prefix t) (extrapolated_arrival_curve ac_prefix (t + ε)).
-    rewrite NEQ in LT; rewrite extrapolated_arrival_curve_is_monotone in LT; last by apply leq_addr.
+    rewrite NEQ in LT; rewrite extrapolated_arrival_curve_is_monotone in LT; first by apply leq_addr.
     clear NEQ; simpl in LT.
     unfold extrapolated_arrival_curve in LT.
     replace (horizon_of _) with h in LT => [|//].

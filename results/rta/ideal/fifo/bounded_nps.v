@@ -428,14 +428,14 @@ Section AbstractRTAforFIFOwithArrivalCurves.
         by apply: task_cost_le_sum_rbf. }
       exists (R - (task_cost tsk - task_rtct tsk)); split.
       - rewrite /IBF.
-        rewrite (leqRW FIX) addnC -subnA; first last.
+        rewrite (leqRW FIX) addnC; first last; rewrite -subnA.
+        + by move : H_valid_run_to_completion_threshold => [TASKvalid JOBvalid].
         + rewrite -(leqRW FIX).
           apply: (task_cost_le_sum_rbf _ _ _ ) => //.
           by rewrite addn1.
-        + by move : H_valid_run_to_completion_threshold => [TASKvalid JOBvalid].
-        + rewrite addnBA; first by rewrite leq_sub2r // leq_add2l.
+        + rewrite addnBA; last by rewrite leq_sub2r // leq_add2l.
           by apply leq_trans with (task_cost tsk); [lia|].
-      - rewrite subnK; first by done.
+      - rewrite subnK; last by done.
         by apply leq_trans with (task_cost tsk); [lia| ].
     Qed.
 

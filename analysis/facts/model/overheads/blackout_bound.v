@@ -214,7 +214,7 @@ Section TotalBlackoutDueToOverheadsBounded.
     have [NEQ|LT] := leqP t2 t1.
     { by rewrite /blackout_during big_geq //. }
     apply no_sched_changes_bounded_overheads_blackout.
-    rewrite (number_schedule_changes_cat _ t1.+1) in EQ; last first.
+    rewrite (number_schedule_changes_cat _ t1.+1) in EQ.
     { lia. }
     { have EQ1: number_schedule_changes sched t1 t1.+1 = 1.
       { by rewrite /number_schedule_changes /index_iota -addn1 addKn //= SC. }
@@ -247,7 +247,7 @@ Section TotalBlackoutDueToOverheadsBounded.
       have [NEQ|LT] := leqP t2 t1; [by rewrite /blackout_during big_geq // | ].
       have [Z|POS] := posnP B; [by subst; rewrite muln1; apply sched_changes_start_busy_pref_bounded_overheads_blackout | ].
       have [t [LEQ DECt]]: exists t, t1 < t < t2 /\ schedule_change sched t.
-      { clear IHB; rewrite (number_schedule_changes_cat _ t1.+1) in EQ; last by lia.
+      { clear IHB; rewrite (number_schedule_changes_cat _ t1.+1) in EQ; first by lia.
         { have EQ1: number_schedule_changes sched t1 t1.+1 = 1
             by rewrite / number_schedule_changes /index_iota -addn1 addKn //= SC.
           rewrite EQ1 addnC addn1 in EQ; clear EQ1.
@@ -256,7 +256,7 @@ Section TotalBlackoutDueToOverheadsBounded.
           by rewrite mem_index_iota => NEQ DECto; exists to.
         }
       }
-      rewrite -(blackout_during_cat _ _ _ t); last by lia.
+      rewrite -(blackout_during_cat _ _ _ t); first by lia.
       have [nldp EQ1] : exists nldp, number_schedule_changes sched t1 t = nldp by eexists; reflexivity.
       have [nrdp EQ2] : exists nrdp, number_schedule_changes sched t t2 = nrdp by eexists; reflexivity.
       have EQ3: nldp + nrdp = B.+1 by subst; rewrite -EQ -number_schedule_changes_cat //; lia.
@@ -285,7 +285,7 @@ Section TotalBlackoutDueToOverheadsBounded.
     }
     { move => t1 t2 NSC.
       have [t [NEQ [SC [NSC1 NSC2]]]] := first_schedule_change_exists _ _ _ _ POS NSC.
-      rewrite mulnDr -(blackout_during_cat _ _ _ t); last by lia.
+      rewrite mulnDr -(blackout_during_cat _ _ _ t); first by lia.
       rewrite addnC leq_add //.
       { by apply fin_sched_changes_start_busy_pref_bounded_overheads_blackout. }
       { rewrite muln1; apply no_sched_changes_bounded_overheads_blackout.

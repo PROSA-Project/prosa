@@ -176,8 +176,8 @@ Section ArrivalSequencePrefix.
     move=> j t1 t1' t2 t2' t1'_le_t1 t2_le_t2' j_in.
     have /orP[t2_le_t1|t1_le_t2] := leq_total t2 t1.
     { by move: j_in; rewrite /arrivals_between big_geq. }
-    rewrite (arrivals_between_mem_cat _ _ t1)// ?mem_cat.
-    2:{ exact: leq_trans t2_le_t2'. }
+    rewrite (arrivals_between_mem_cat _ _ t1)// ?mem_cat;
+      first by apply: leq_trans t1_le_t2 t2_le_t2'.
     rewrite [X in _ || X](arrivals_between_mem_cat _ _ t2)// mem_cat.
     by rewrite j_in orbT.
   Qed.
@@ -272,7 +272,7 @@ Section ArrivalSequencePrefix.
         last by rewrite [LHS]/arrivals_between big_geq; try lia; rewrite arrivals_between_filter_nil.
       rewrite /arrivals_between bigcat_nat_filter_eq_filter_bigcat_nat.
       rewrite (big_cat_nat LE1 LE2) //=.
-      rewrite !big_nat [X in _ ++ X]big1; last first.
+      rewrite !big_nat [X in _ ++ X]big1.
       { move=> t' /andP[LO HI].
         rewrite filter_in_pred0 // => j IN.
         have -> : job_arrival j = t' by apply: job_arrival_at; eauto.
@@ -430,7 +430,7 @@ Section ArrivalSequencePrefix.
       case: (arr_seq t) AT_t => // j' js AT_t.
       apply /(pathP j') => i LT.
       rewrite /by_arrival_times !AT_t //;
-        last by apply mem_nth; auto.
+        first by apply mem_nth; auto.
       rewrite in_cons; apply /orP; right.
       by exact: mem_nth.
     Qed.

@@ -265,7 +265,7 @@ Section ExistsBusyIntervalJLFP.
       rewrite /service_received_by_hep_jobs_released_during
               /service_of_higher_or_equal_priority_jobs /service_of_jobs.
       rewrite [in X in _ = X](arrivals_between_cat _ _ t1);
-        [ | by [] | rewrite leq_addr//].
+        [ by [] | rewrite leq_addr// | ].
       rewrite big_cat //=.
       rewrite -{1}[\sum_(j <- arrivals_between arr_seq _ (t1 + Δ) | _)
                     service_during sched j t1 (t1 + Δ)]add0n.
@@ -469,8 +469,8 @@ Section ExistsBusyIntervalJLFP.
             apply negbT in KLEΔ; rewrite -ltnNge in KLEΔ.
             apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 (t1 + delta) + hp_service t1 (t1 + delta)).
             { rewrite /hp_service hep_jobs_receive_no_service_before_quiet_time // /service_of_higher_or_equal_priority_jobs.
-              rewrite service_of_jobs_negate_pred // addnBA; last by apply service_of_jobs_pred_impl; eauto 2.
-              rewrite addnC -addnBA; first by rewrite no_idle_time_within_non_quiet_time_interval // leq_addr.
+              rewrite service_of_jobs_negate_pred // addnBA; first by apply service_of_jobs_pred_impl; eauto 2.
+              rewrite addnC -addnBA; last by rewrite no_idle_time_within_non_quiet_time_interval // leq_addr.
               rewrite service_of_jobs_sum_over_time_interval //.
               apply leq_sum_seq => t II _; rewrite mem_index_iota in II; move: II => /andP [GEi LEt].
               have [IDLE|[j' SCHED]] := (scheduled_at_cases _ H_valid_arrival_time sched ltac:(auto) ltac:(auto) t).
@@ -640,7 +640,7 @@ Section ExistsBusyIntervalJLFP.
         { apply/andP; split; first by apply leqnn.
           rewrite /completed_by /service.
           rewrite ignore_service_before_arrival // /service_during.
-          rewrite big_geq; last by apply leqnn.
+          rewrite big_geq; first by apply leqnn.
             by rewrite -ltnNge.
         }
         move: PREFIX => [t1 [PREFIX /andP [GE1 GEarr]]].

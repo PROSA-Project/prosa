@@ -123,7 +123,7 @@ Section GenericModelLemmas.
     Proof.
       rewrite /total_service_of_jobs_in /service_of_jobs.
       rewrite big_mkcond [in X in _ = X - _]big_mkcond [in X in _ = _ - X]big_mkcond //=.
-      rewrite -sumnB; last by move=> j _; case: (P j).
+      rewrite -sumnB; first by move=> j _; case: (P j).
       apply: eq_big_seq => j IN.
       by case: (P j) => //=; lia.
     Qed.
@@ -372,9 +372,9 @@ Section UnitServiceModelLemmas.
         unfold completed_by, service.completed_by.
         by move: CZ => /eqP CZ; rewrite CZ.
       - unfold workload_of_jobs, service_of_jobs in EQ; unfold completed_by, service.completed_by.
-        rewrite /service -(service_during_cat _ _ _ t1); last by apply/andP; split.
+        rewrite /service -(service_during_cat _ _ _ t1); first by apply/andP; split.
         rewrite cumulative_service_before_job_arrival_zero // add0n.
-        apply: eq_leq; have /esym/eqP := EQ; rewrite eq_sum_leq_seq.
+        apply: eq_leq; have /esym/eqP := EQ; rewrite eq_sum_leq_seq; last first.
         { move=> /allP/(_ j) + /ltac:(apply/esym/eqP); apply.
           by rewrite mem_filter Pj. }
         by intros; apply cumulative_service_le_job_cost; eauto.
@@ -396,7 +396,7 @@ Section UnitServiceModelLemmas.
       destruct (t_compl <= t1) eqn:EQ.
       - unfold service_of_jobs. unfold service_during.
         rewrite exchange_big //=.
-        rewrite big_geq => [|//].
+        rewrite big_geq //.
         rewrite /workload_of_jobs big1_seq //.
         move => j /andP [Pj ARR].
         specialize (COMPL _ ARR Pj).
@@ -588,8 +588,8 @@ Section UnitServiceUniProcessorModelLemmas.
       have [LEQ|LT] := leqP t1 t2;
         last by rewrite service_of_jobs_geq; lia.
       rewrite service_of_jobs_cat_last // IH;
-        last by move=> t /andP[LO HI]; apply: SCHED; lia.
-      by rewrite service_of_jobs_at_scheduled1 //; [|apply: SCHED]; lia.
+        first by move=> t /andP[LO HI]; apply: SCHED; lia.
+      by rewrite service_of_jobs_at_scheduled1 //; [apply: SCHED|]; lia.
     Qed.
 
   End IdealProgress.
@@ -646,14 +646,14 @@ Section UnitServiceUniProcessorModelLemmas.
         { move=> /hasPn ALL; rewrite big1_seq // => jo /andP [Pjo IN].
           move: (ALL _ IN); rewrite negb_and => /orP [A | B]; first by rewrite Pjo in A.
           by move: B; rewrite /receives_service_at -leqNgt leqn0 => /eqP ->. } }
-      rewrite L; clear L; last by apply arrivals_uniq.
+      rewrite L; clear L; first by apply arrivals_uniq.
       have L :
         forall (X : Type) (P Q : pred X) (xs : seq X),
           has (fun x => P x && Q x) xs = has P ([ seq x <- xs | Q x]).
       { clear. move => X P Q xs; induction xs as [ | x xs IHxs]; first by done.
         by rewrite //= IHxs; destruct (P x) eqn:Px, (Q x) eqn:Qx; rewrite //= ?Px ?Qx. }
       rewrite -L; clear L; f_equal.
-      rewrite /arrivals_up_to (arrivals_between_cat _ _ t1); [ | lia | lia ].
+      rewrite /arrivals_up_to (arrivals_between_cat _ _ t1); try lia.
       rewrite has_cat -[RHS]orFb; f_equal.
       - apply/eqP; rewrite eqbF_neg; apply/hasPn => jo IN; apply/negP => /andP [Pjo SERV].
         apply service_at_implies_scheduled_at, scheduled_implies_not_completed in SERV => //.
@@ -661,7 +661,7 @@ Section UnitServiceUniProcessorModelLemmas.
         (eapply completion_monotonic; last apply: H_quiet_time) => //.
         + by apply: in_arrivals_implies_arrived.
         + by apply: job_arrival_between_lt.
-      - rewrite [in RHS](arrivals_between_cat _ _ x.+1); [ | lia | lia ].
+      - rewrite [in RHS](arrivals_between_cat _ _ x.+1); try lia.
         rewrite has_cat -[LHS]orbF; f_equal; symmetry.
         apply/eqP; rewrite eqbF_neg; apply/hasPn => jo IN; apply/negP => /andP [Pjo SERV].
         apply service_at_implies_scheduled_at in SERV.

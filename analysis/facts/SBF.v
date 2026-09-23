@@ -86,10 +86,10 @@ Section SupplyBoundFunctionLemmas.
     Proof.
       rewrite blackout_during_complement // leq_sub => //.
       rewrite -(leqRW (snd H_valid_SBF _ _ _ _ _ _ _)).
-      { by have -> : (t1 + Δ) - t1 = Δ by lia. }
       { by apply H_arrives_in. }
       { by eapply H_P_interval. }
       { lia. }
+      { by have -> : (t1 + Δ) - t1 = Δ by lia. }
     Qed.
 
   End BlackoutBound.

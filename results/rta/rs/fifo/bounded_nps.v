@@ -210,9 +210,9 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
       eapply leq_trans; first by eapply cumulative_intra_interference_split => //.
       rewrite -[leqRHS]add0n.
       rewrite leq_add//.
-      { rewrite (leqRW (service_inversion_widen _ _ _ _ _ _ _ _ _)).
-        - apply: FIFO_implies_no_service_inversion => //.
-          apply instantiated_busy_interval_equivalent_busy_interval => //.
+      { rewrite (leqRW (service_inversion_widen _ _ _ _ _ _ _ _ _)); last first.
+        { apply: FIFO_implies_no_service_inversion => //.
+          apply instantiated_busy_interval_equivalent_busy_interval => //. }
         - by done.
         - by done.
       }

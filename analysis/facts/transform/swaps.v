@@ -238,7 +238,7 @@ Section SwappedFacts.
     have TIME: 0 <= t1 < t by apply /andP; split; try apply ltn_trans with (n := t2).
     rewrite /service !service_in_replaced// /service_at// /replace_at //.
     rewrite ifT// ifT// ifF;
-      last by apply ltn_eqF; exact.
+      first by apply ltn_eqF; exact.
     have service_in_t1 : service_in j (sched t1) <= service_during sched j 0 t.
     { by rewrite -(service_split_at_point _ _ _ t1 _)// addnAC leq_addl. }
     by rewrite subnK ?(leq_trans service_in_t1) ?leq_addr// addnK.
@@ -257,8 +257,8 @@ Section SwappedFacts.
       first by apply trivial_swap_service_invariant.
     rewrite /service.
     rewrite -!service_during_of_others_invariant // !/replace_at //;
-            [rewrite ifT// | rewrite ifT// | rewrite ifF// ].
-      by apply ltn_eqF.
+            [rewrite ifT// | rewrite ifF// | rewrite ifT// ].
+    by apply ltn_eqF.
   Qed.
 
 End SwappedFacts.
@@ -409,7 +409,7 @@ Section EDFSwap.
       job_meets_deadline sched' j.
     Proof.
       rewrite /scheduled_at => NOT_t1 NOT_t2.
-      rewrite -service_invariant_implies_deadline_met; first by exact H_deadline_met.
+      rewrite -service_invariant_implies_deadline_met; last by exact H_deadline_met.
       by apply: service_of_others_invariant.
     Qed.
 
@@ -420,7 +420,7 @@ Section EDFSwap.
       job_meets_deadline sched' j.
     Proof.
       move=> AT_t2.
-      rewrite -service_invariant_implies_deadline_met; first by exact H_deadline_met.
+      rewrite -service_invariant_implies_deadline_met; last by exact H_deadline_met.
       apply service_after_swap_invariant => //.
       by apply scheduled_at_implies_later_deadline with (sched := sched) => //.
     Qed.
@@ -434,7 +434,7 @@ Section EDFSwap.
       move=> AT_t1.
       move: (H_no_idle_time_at_t2 j AT_t1) => [j2 [AT_t2 DL2]].
       move: (H_not_EDF j j2 AT_t1 AT_t2) => DL2_le_DL1.
-      rewrite -service_invariant_implies_deadline_met; first by exact H_deadline_met.
+      rewrite -service_invariant_implies_deadline_met; last by exact H_deadline_met.
       apply service_after_swap_invariant => //.
       apply leq_trans with (n := job_deadline j2) => //.
     Qed.

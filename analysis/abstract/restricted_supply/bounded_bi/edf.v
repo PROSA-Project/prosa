@@ -350,7 +350,7 @@ Section BoundedBusyIntervals.
         rewrite addnC -!addnA.
         have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
         apply: E; first by lia.
-        rewrite subKn; last by apply: sbf_bounded_by_duration => //.
+        rewrite subKn; first by apply: sbf_bounded_by_duration => //.
         have [ZERO|POS] := (posnP (cumulative_service_inversion arr_seq sched j t1 (t1 + L))).
         { rewrite ZERO add0n -(leqRW H_fixed_point).
           rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
@@ -384,7 +384,7 @@ Section BoundedBusyIntervals.
         rewrite // addnC -!addnA.
         have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
         apply: E; first by lia.
-        rewrite subKn; last by apply: sbf_bounded_by_duration => //.
+        rewrite subKn; first by apply: sbf_bounded_by_duration => //.
         have [ZERO|POS] := (posnP (cumulative_service_inversion arr_seq sched j t1 (t1 + L))).
         { rewrite ZERO add0n -(leqRW H_fixed_point).
           rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.

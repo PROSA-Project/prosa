@@ -271,10 +271,10 @@ Section AbstractRTARestrictedSupply.
     move=> t1 t2 Δ j ARR TSK BUSY LT NCOM A PAR; move: (PAR _ _ BUSY) => EQ.
     rewrite fold_cumul_interference.
     rewrite (leqRW (cumulative_job_interference_bound _ _ _ _ _ t2 _ _ _ _)) => //.
-    - rewrite leq_add2l /cumul_intra_interference.
-      by apply: H_intra_supply_interference_is_bounded => //.
     - by eapply incomplete_implies_positive_cost => //.
     - by apply BUSY.
+    - rewrite leq_add2l /cumul_intra_interference.
+      by apply: H_intra_supply_interference_is_bounded => //.
   Qed.
 
   (** Next, we prove that [IBF_NP] correctly bounds interference in
@@ -303,14 +303,14 @@ Section AbstractRTARestrictedSupply.
       interval_to_duration t1 t2 k.
       by rewrite addnC (leqRW (service_and_interference_bound _ _ _ _ _ _ _ _ _ _ _ _)) => //; lia. }
     { rewrite addnC -{1}(leqRW FIX) -addnA leq_add2l /IBF_P.
-      rewrite (@addnC (_ - _) _) -addnA subnKC; last by apply complement_SBF_monotone.
+      rewrite (@addnC (_ - _) _) -addnA subnKC; first by apply complement_SBF_monotone.
       rewrite -/(cumulative_interference _ _ _).
       erewrite <-blackout_plus_local_is_interference_cumul with (t2 := t2) => //; last by apply BUSY.
       rewrite addnC leq_add //; last first.
       { by eapply blackout_during_bound_SBF with (t2 := t2) => //; split; [ | apply BUSY]. }
-      rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; last by lia.
+      rewrite /cumul_intra_interference (cumulative_interference_cat _ j (t1 + F)) //=; first by lia.
       rewrite -!/(cumul_intra_interference _ _ _ _).
-      rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; last by move: BUSY => [].
+      rewrite (no_intra_interference_after_F _ _ _ _ _ t2) //; first by move: BUSY => [].
       rewrite addn0 //; eapply H_intra_supply_interference_is_bounded => //.
       - by move : NCOM; apply contra, completion_monotonic; lia.
       - move => t1' t2' BUSY'.
@@ -358,9 +358,9 @@ Section AbstractRTARestrictedSupply.
     { have JJ := IBF_P_sol_le_IBF_NP F (A + R); rewrite /IBF_NP in JJ.
       rewrite addnA; rewrite addnA in JJ.
       have T: forall a b c, c >= b -> (a <= c - b) -> (a + b <= c); [by lia | apply: T; first by lia].
-      rewrite subnA; [ | by apply complement_SBF_monotone | by lia].
+      rewrite subnA; [by apply complement_SBF_monotone | by lia | ].
       have LE : forall Δ, SBF Δ <= Δ by move => ?; eapply sbf_bounded_by_duration; eauto.
-      rewrite subKn; last by eauto.
+      rewrite subKn; first by eauto.
       have T: forall a b c d e, b >= e -> b >= c ->  e + (a - c) <= d -> a + (b - c) <= d + (b - e) by lia.
       apply : T => //.
       eapply leq_trans; last by apply LE.

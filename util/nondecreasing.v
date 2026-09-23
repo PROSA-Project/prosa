@@ -54,7 +54,7 @@ Section NondecreasingSequence.
       case: (leqP b a) => [N|N].
       - move: N; rewrite -subn_eq0 => /eqP EQ.
         by rewrite /index_iota EQ //= in LT.
-      - rewrite index_iota_lt_step; last by done.
+      - rewrite index_iota_lt_step; first by done.
         simpl; destruct (P a) eqn:PA.
         + destruct n1, n2; try done; simpl.
           * apply iota_filter_gt; first by done.
@@ -354,8 +354,8 @@ Section NondecreasingSequence.
       rewrite nodup_sort_2cons_eq IHxs //=.
       by eapply nondecreasing_sequence_cons; eauto 2.
     - rewrite nodup_sort_2cons_lt // last0_cons.
-      + rewrite IHxs //; eauto using nondecreasing_sequence_cons.
       + by move/undup_nil.
+      + rewrite IHxs //; eauto using nondecreasing_sequence_cons.
   Qed.
 
   (** Non-decreasing sequence remains non-decreasing after application of [undup]. *)
@@ -442,7 +442,7 @@ Section NondecreasingSequence.
       destruct xs as [ | x1 xs]; first by unfold distances.
       have -> : distances ([:: x0, x1 & xs] ++ [:: a; b]) =  x1 - x0 :: distances ((x1 :: xs) ++ [:: a; b]).
       { by simpl; rewrite distances_unfold_2cons. }
-      rewrite IHn; last by simpl in *; rewrite -(leq_add2r 1) !addn1.
+      rewrite IHn; first by simpl in *; rewrite -(leq_add2r 1) !addn1.
       have -> : distances ([:: x0, x1 & xs] ++ [:: a]) = x1 - x0 :: distances ((x1 :: xs) ++ [:: a]); last by done.
       by rewrite //= distances_unfold_2cons.
   Qed.
@@ -568,7 +568,7 @@ Section NondecreasingSequence.
     - by unfold index_iota, distances in IN.
     - destruct n; first by unfold distances, index_iota in IN.
       move: IN; rewrite -addn1 /index_iota subn0 iotaD add0n.
-      rewrite distances_unfold_1app_last; last by rewrite size_iota.
+      rewrite distances_unfold_1app_last; first by rewrite size_iota.
       rewrite mem_cat => /orP [IN|IN].
       + by apply IHn; rewrite /index_iota subn0; simpl.
       + by move: IN;
@@ -640,12 +640,12 @@ Section NondecreasingSequence.
     intros xs SIS.
     destruct xs as [ | x1 xs]; first by done.
     destruct xs as [ | x2 xs]; first by rewrite subn0.
-    rewrite {2}/last0 -[in X in _ - X]nth_last function_of_distances_is_correct prednK; last by done.
+    rewrite {2}/last0 -[in X in _ - X]nth_last function_of_distances_is_correct prednK; first by done.
     set [:: x1, x2 & xs] as X.
-    rewrite /last0 -nth_last size_of_seq_of_distances; last by done.
-    rewrite !addn1 -pred_Sn subKn; first by done.
+    rewrite /last0 -nth_last size_of_seq_of_distances; first by done.
+    rewrite !addn1 -pred_Sn subKn; last by done.
     rewrite /X; apply SIS; apply/andP; split; first by simpl.
-    by rewrite [in X in _ < X]size_of_seq_of_distances; first rewrite addn1.
+    by rewrite [in X in _ < X]size_of_seq_of_distances; last rewrite addn1.
   Qed.
 
   (** The max element of the distances-sequence of a sequence [xs]
@@ -676,7 +676,7 @@ Section NondecreasingSequence.
     { destruct (xs [|idx.+1|] == last0 xs) eqn:EQ.
       - by rewrite leq_eqVlt; apply/orP; left.
       - rewrite /last0 -nth_last. apply H.
-        rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; last by done.
+        rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; first by done.
         move: IN; rewrite leq_eqVlt => /orP [/eqP KK|KK].
         + move: EQ; rewrite /last0 -nth_last -{1}KK -[_.+2.-1]pred_Sn => /eqP; by done.
         + apply/andP; split; first rewrite -(ltn_add2r 1) !addn1 prednK //.
@@ -685,7 +685,7 @@ Section NondecreasingSequence.
     { destruct (first0 xs == xs [|idx|]) eqn:EQ.
       - by rewrite leq_eqVlt; apply/orP; left.
       - rewrite /first0 -nth0. apply H.
-        rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; last by done.
+        rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; first by done.
         destruct idx as [ |idx]; first by move: EQ; rewrite /first0 -nth0 => /eqP.
         apply/andP; split; first by done.
         by apply ltn_trans with idx.+2.
@@ -710,7 +710,7 @@ Section NondecreasingSequence.
     }
     { destruct xs as [ |x1 [ |x2 xs]].
       - by rewrite filter_pred0.
-      - by rewrite index_iota_filter_singl; last (rewrite ltnS; apply Bound; rewrite in_cons; apply/orP; left).
+      - by rewrite index_iota_filter_singl; first (rewrite ltnS; apply Bound; rewrite in_cons; apply/orP; left).
       - have LEx1: x1 <= k by apply Bound; rewrite in_cons eq_refl.
         have LEx2: x2 <= k by apply Bound; rewrite !in_cons eq_refl orbT.
         have M1: forall y : nat, y \in x2 :: xs -> x1 <= y by apply nondecreasing_sequence_cons_min.
@@ -729,7 +729,7 @@ Section NondecreasingSequence.
             with (x2 - x1 :: [seq x <- distances (x2 :: xs) | 0 < x]); last first.
           { simpl; replace (0 < x2 - x1) with true; first by done.
               by apply/eqP; rewrite eq_sym; rewrite eqb_id subn_gt0. }
-          rewrite -(IHn _ _ k) //; last eapply nondecreasing_sequence_cons; eauto 2.
+          rewrite -(IHn _ _ k) //; first eapply nondecreasing_sequence_cons; eauto 2.
           by rewrite {1}range_iota_filter_step // distances_unfold_2cons {1}range_iota_filter_step //.
     }
   Qed.
@@ -743,7 +743,7 @@ Section NondecreasingSequence.
       [seq d <- distances xs | 0 < d] = distances (undup xs).
   Proof.
     move=> xs NonDec.
-    rewrite -(distances_iota_filtered _ (max0 xs)); [ | by apply in_max0_le | by done].
+    rewrite -(distances_iota_filtered _ (max0 xs)); [by apply in_max0_le | by done | ].
     enough ([seq ρ <- index_iota 0 (max0 xs).+1 | ρ \in xs] = (undup xs)) as IN; first by rewrite IN.
     have EX: exists len, size xs <= len.
     { exists (size xs); now simpl. } destruct EX as [n BO].
@@ -757,14 +757,14 @@ Section NondecreasingSequence.
         * subst; rename x2 into x.
           rewrite nodup_sort_2cons_eq range_filter_2cons max0_2cons_eq.
           by apply IHn; [ eapply nondecreasing_sequence_cons; eauto | by done].
-        * rewrite nodup_sort_2cons_lt // max0_2cons_le; last by rewrite ltnW.
-          rewrite index_iota_filter_step; [ | | by apply nondecreasing_sequence_cons_min]; last first.
-          { apply/andP; split; first by done.
-            eapply leq_trans; first by eassumption.
-            rewrite ltnW // ltnS; apply in_max0_le.
-            by rewrite in_cons eq_refl.
-          }
-          rewrite rem_lt_id //; last by apply nondecreasing_sequence_cons_smin.
+        * rewrite nodup_sort_2cons_lt // max0_2cons_le; first by rewrite ltnW.
+          rewrite index_iota_filter_step; [
+            by apply/andP; split; [ by done
+               | rewrite ltnS; apply leq_trans with x2;
+               [ by rewrite ltnW | apply in_max0_le; by rewrite in_cons eq_refl]]
+          | by apply nondecreasing_sequence_cons_min
+          | ].
+          rewrite rem_lt_id //; first by apply nondecreasing_sequence_cons_smin.
           by rewrite IHn //; eauto using nondecreasing_sequence_cons.
   Qed.
 
@@ -802,8 +802,8 @@ Section NondecreasingSequence.
         rewrite leqNgt; apply/negP; intros NEQ.
         move: LE; rewrite leqNgt => /negP LE; apply: LE.
         rewrite -(ltn_add2r x1) subnK // addnBAC // -(ltn_add2r y1) subnK.
-        - by eapply leq_ltn_trans; [erewrite leq_add2l | erewrite ltn_add2r].
         - by apply leq_trans with y2; auto using leq_addr.
+        - by eapply leq_ltn_trans; [erewrite leq_add2l | erewrite ltn_add2r].
       }
       destruct xs as [ | x3 xs], ys as [ | y3 ys]; try by done.
       { by destruct n as [ |n]; [ | destruct n]. }

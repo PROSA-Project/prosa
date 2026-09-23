@@ -5,6 +5,7 @@ Require Export prosa.analysis.facts.model.arrival_curves.
 Require Import prosa.analysis.facts.priority.classes.
 Require Export prosa.analysis.facts.priority.elf.
 
+
 (** * Lower-Priority Non-Preemptive Segment is Bounded *)
 (** In this file, we prove that, under the ELF scheduling policy, the
     length of the maximum non-preemptive segment of a lower-priority
@@ -118,7 +119,7 @@ Section MaxNPSegmentIsBounded.
       have LT: ((job_arrival j)%:R + task_priority_point (job_task j)
                < (t1)%:R + task_priority_point (job_task j'))%R by lia.
       by rewrite natrB
-         ; [|move: BUSY; rewrite /busy_interval_prefix]
+         ; [move: BUSY; rewrite /busy_interval_prefix|]
          ; lia. }
   Qed.
 

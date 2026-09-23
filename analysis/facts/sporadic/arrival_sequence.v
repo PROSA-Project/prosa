@@ -1,5 +1,6 @@
 Require Export analysis.facts.sporadic.arrival_times.
 
+
 (** * Job Arrival Sequence in the Sporadic Model *)
 
 (** In this file, we prove basic facts about a task's arrival sequence
@@ -136,9 +137,9 @@ Section SporadicArrivals.
     intros JIND.
     rewrite -only_j_in_task_arrivals_at_j task_arrivals_at_as_task_arrivals_between.
     rewrite /task_arrivals_up_to_job_arrival prev_job_task => //.
-    rewrite [in X in _ = X] (task_arrivals_cat _ _ (job_arrival (prev_job arr_seq j1))); last by
+    rewrite [in X in _ = X] (task_arrivals_cat _ _ (job_arrival (prev_job arr_seq j1))); first by
         apply ltnW; apply prev_job_arr_lt.
-    rewrite [in X in _ = _ ++ X] (task_arrivals_between_cat _ _ _ (job_arrival j1) _) => //; last by apply prev_job_arr_lt.
+    rewrite [in X in _ = _ ++ X] (task_arrivals_between_cat _ _ _ (job_arrival j1) _) => //; first by apply prev_job_arr_lt.
     rewrite no_jobs_between_consecutive_jobs => //.
     by rewrite cat0s H_j1_task.
   Qed.

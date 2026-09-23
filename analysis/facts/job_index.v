@@ -106,7 +106,7 @@ Section JobIndexLemmas.
       + index j1 (task_arrivals_at_job_arrival arr_seq j1).
   Proof.
     rewrite /task_arrivals_at_job_arrival /job_index task_arrivals_up_to_cat //.
-    rewrite index_cat ifF; first by reflexivity.
+    rewrite index_cat ifF; last by reflexivity.
     apply Bool.not_true_is_false; intro T.
     move : T; rewrite mem_filter => /andP [/eqP SM_TSK JB_IN_ARR].
     apply mem_bigcat_nat_exists in JB_IN_ARR; move : JB_IN_ARR => [ind [JB_IN IND_INTR]].
@@ -146,13 +146,13 @@ Section JobIndexLemmas.
     intros * IN1 IN2 LE.
     move_neq_up LT; move_neq_down LE.
     rewrite -> arrivals_P_cat with (t := job_arrival j1); last by apply job_arrival_between_P in IN1 => //.
-    rewrite !index_cat ifT; last by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
+    rewrite !index_cat ifT; first by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
     rewrite ifF.
+    - apply Bool.not_true_is_false; intro T.
+      by apply job_arrival_between_P in T; try lia.
     - eapply leq_trans; [ | by erewrite leq_addr].
       rewrite index_mem.
       by eapply arrival_lt_implies_job_in_arrivals_between_P; eauto.
-    - apply Bool.not_true_is_false; intro T.
-      by apply job_arrival_between_P in T; try lia.
   Qed.
 
   (** We observe that index of job [j1] is same in the
@@ -190,10 +190,10 @@ Section JobIndexLemmas.
     rewrite -> task_arrivals_cat with (t_m := job_arrival j1); try lia.
     rewrite -H_same_task !index_cat ifT; try by apply arrives_in_task_arrivals_up_to => //.
     rewrite ifF.
-    - by eapply leq_trans;
-        [apply index_job_lt_size_task_arrivals_up_to_job | rewrite leq_addr].
     - apply Bool.not_true_is_false; intro T.
       by apply job_arrival_between_P in T; try lia.
+    - by eapply leq_trans;
+        [apply index_job_lt_size_task_arrivals_up_to_job | rewrite leq_addr].
   Qed.
 
   (** We show that if job [j1] arrives earlier than job [j2]
@@ -368,9 +368,9 @@ Section PreviousJob.
     repeat split => //.
     { rewrite -> diff_jobs_iff_diff_indices => //; eauto.
       rewrite /job_index; rewrite [in X in _ <> X] (job_index_same_in_task_arrivals _ _ jk j) => //.
-      - rewrite index_uniq -/(job_index arr_seq j)=> //; last by apply uniq_task_arrivals.
-        lia.
-      - by apply job_arrival_at in JK_IN => //; rewrite -JK_IN in I_INEQ. }
+      - by apply job_arrival_at in JK_IN => //; rewrite -JK_IN in I_INEQ.
+      - rewrite index_uniq -/(job_index arr_seq j)=> //; first by apply uniq_task_arrivals.
+        lia. }
     { rewrite /job_index; rewrite [in X in X = _] (job_index_same_in_task_arrivals _ _ jk j) => //.
       by apply job_arrival_at in JK_IN => //; rewrite -JK_IN in I_INEQ. }
   Qed.

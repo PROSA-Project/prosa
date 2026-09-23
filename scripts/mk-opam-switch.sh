@@ -3,10 +3,10 @@
 set -e
 
 # Main PROSA development dependencies
-ROCQ_VERSION=9.0.0
-ROCQ_CORE_VERSION=9.1.0
-MATHCOMP_VERSION=2.5.0
-OCAML_VERSION=4.14.2
+ROCQ_VERSION=9.2.0
+ROCQ_CORE_VERSION=9.2.0
+MATHCOMP_VERSION=2.6.0
+OCAML_VERSION=4.14.4
 
 # O'Caml variant
 OCAML_PKG=ocaml-variants.${OCAML_VERSION}+options
@@ -25,7 +25,6 @@ opam repo add rocq-released https://rocq-prover.org/opam/released
 opam update
 
 # Install the necessary packages
-opam pin -n rocq-prover ${ROCQ_VERSION}
 opam pin -n rocq-core ${ROCQ_CORE_VERSION}
 opam pin -n rocq-mathcomp-ssreflect ${MATHCOMP_VERSION}
 opam install -y -j `getconf _NPROCESSORS_ONLN` rocq-prover rocq-mathcomp-ssreflect coq-mathcomp-zify coq-coqeal

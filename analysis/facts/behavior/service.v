@@ -4,7 +4,6 @@ Require Export prosa.analysis.definitions.schedule_prefix.
 Require Export prosa.analysis.facts.behavior.supply.
 Require Export prosa.analysis.facts.model.scheduled.
 
-
 (** * Service *)
 
 (** In this file, we establish basic facts about the service received by
@@ -553,7 +552,7 @@ Section RelationToScheduled.
         service_during sched j t1 t2 = service_during sched j (job_arrival j) t2.
     Proof.
       move=> t1 t2 t1_le t2_ge.
-      rewrite -(service_during_cat sched _ _ (job_arrival j)); last exact/andP.
+      rewrite -(service_during_cat sched _ _ (job_arrival j)); first exact/andP.
       by rewrite cumulative_service_before_job_arrival_zero.
     Qed.
 
@@ -803,17 +802,17 @@ Section IncrementalService.
     { have: 0 < service_during sched j t' t2;
         last by rewrite service_during_service_at => [[t'' [IN'' SERVICED]]]
                 ; exists t''; apply/andP; split.
-      move: SERV; rewrite -(service_during_cat _ _ t1 t'.-1 t2); last by lia. move=> SERV.
+      move: SERV; rewrite -(service_during_cat _ _ t1 t'.-1 t2); first by lia. move=> SERV.
       have SERV2: service_during sched j t1 t'.-1 <= k
         by rewrite leqNgt; apply (LIMIT t'.-1); lia.
       have: service_during sched j t'.-1 t2 >= 2 by lia.
-      rewrite -service_during_first_plus_later; last by lia.
+      rewrite -service_during_first_plus_later; first by lia.
       move: (IN') => /andP [LE' _]; rewrite (ltn_predK LE').
       by case: (service_is_zero_or_one _ sched j t'.-1) =>  [//|->|->]; try lia. }
     have [t''' /andP [IN''' SCHED'''] MIN] := ex_minnP WITNESS.
     exists t'''; repeat split; [by lia|by apply: service_at_implies_scheduled_at|].
     have ->:  service_during sched j t1 t''' = service_during sched j t1 t'.
-    { rewrite -(service_during_cat _ _ t1 t' t'''); last by lia.
+    { rewrite -(service_during_cat _ _ t1 t' t'''); first by lia.
       have [Z|POS] := leqP (service_during sched j t' t''') 0; first by lia.
       exfalso.
       move: POS; rewrite service_during_service_at => [[x [xIN xSERV]]].
@@ -823,7 +822,7 @@ Section IncrementalService.
     exfalso. move: XL.
     have ->: service_during sched j t1 t' = service_during sched j t1 t'.-1.+1
       by move: (IN') => /andP [LE' _]; rewrite (ltn_predK LE').
-    rewrite -service_during_last_plus_before; last by lia. move=> ABOVE.
+    rewrite -service_during_last_plus_before; first by lia. move=> ABOVE.
     have BELOW: service_during sched j t1 t'.-1 <= k
       by rewrite leqNgt; apply (LIMIT t'.-1); lia.
     have: service_at sched j t'.-1 > 1 by lia.
@@ -848,11 +847,11 @@ Section IncrementalService.
     move=> j t t' σ SERVEQ GT.
     have LT : t <= t'.
     { move_neq_up LT.
-      rewrite -(service_cat _ _ t') in SERVEQ; last by lia.
+      rewrite -(service_cat _ _ t') in SERVEQ; first by lia.
       move_neq_down GT.
       by rewrite -SERVEQ leq_addr. }
     have POS : service_during sched j t t' > 0.
-    { rewrite -(service_cat _ _ t) in GT; last by done.
+    { rewrite -(service_cat _ _ t) in GT; first by done.
       by rewrite SERVEQ -addn1 leq_add2l in GT. }
     apply service_during_service_at_earliest in POS.
     move: POS => [st [/andP [NEQ1 NEQ2 ] [SERV SDZ]]].

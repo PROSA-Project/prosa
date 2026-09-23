@@ -185,13 +185,13 @@ Section AbstractRTAIdeal.
       destruct (leqP F (task_rtct tsk)) as [NEQ|NEQ].
       - eapply leq_trans; [apply NEQ | ].
         by eapply leq_trans; [apply H_valid_run_to_completion_threshold | lia].
-      - by rewrite addnBCA; [lia | apply H_valid_run_to_completion_threshold | lia].
+      - by rewrite addnBCA; [apply H_valid_run_to_completion_threshold | lia | lia].
     }
     { move => A SP; specialize (H_R_is_maximum_ideal A SP).
       destruct H_R_is_maximum_ideal as [F [EQ1 EQ2]].
       exists (A + F); split=> [//|].
       eapply leq_trans; [ | by erewrite leq_add2l; apply EQ2].
-      by rewrite addnBCA; [lia | apply H_valid_run_to_completion_threshold | lia].
+      by rewrite addnBCA; [apply H_valid_run_to_completion_threshold | lia | lia].
     }
   Qed.
 

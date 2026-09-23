@@ -35,7 +35,7 @@ Section ConsecutiveArrivals.
                        ++ [:: j] ++ drop (index j arrivals).+1 arrivals).
     have TAIL : drop (index j arrivals) arrivals
                 = [:: j] ++ drop (index j arrivals).+1 arrivals.
-    { rewrite /= (@drop_nth _ j); last by rewrite index_mem.
+    { rewrite /= (@drop_nth _ j); first by rewrite index_mem.
       by rewrite (nth_index j IN). }
     by rewrite -TAIL cat_take_drop.
   Qed.

@@ -250,7 +250,7 @@ Section ServiceAndCompletionFacts.
   Proof.
     move=> t; rewrite incomplete_is_positive_remaining_cost => rem_cost.
     rewrite -less_service_than_cost_is_incomplete -(service_cat sched j t);
-      last by rewrite -addnBA//; exact: leq_addr.
+      first by rewrite -addnBA//; exact: leq_addr.
     have: service sched j t + remaining_cost sched j t - 1 < job_cost j.
     { rewrite service_cost_invariant -subn_gt0 subKn//.
       exact/(leq_trans rem_cost)/leq_subr. }

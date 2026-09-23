@@ -496,12 +496,12 @@ Section TaskIBFtoJobIBF.
       }
       rewrite /task_service_of_jobs_in /service_of_jobs.task_service_of_jobs_in /service_of_jobs exchange_big //=.
       rewrite -(leq_add2r (\sum_(t1 <= t < (t1 + x)) service_at sched j t)).
-      rewrite [X in _ <= X]addnC addnA subnKC; last first.
-      { rewrite (exchange_big _ _ (arrivals_between _ _ _)) /= (big_rem j) //=.
-        by rewrite H_job_of_tsk leq_addr. }
-      rewrite -big_split -big_split //=.
-      rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum // => t /andP [NEQ _].
-      rewrite -(leqRW (interference_plus_sched_le_serv_of_task_plus_task_interference _ _ )) => //.
+      rewrite [X in _ <= X]addnC addnA subnKC.
+      - rewrite (exchange_big _ _ (arrivals_between _ _ _)) /= (big_rem j) //=.
+        by rewrite H_job_of_tsk leq_addr.
+      - rewrite -big_split -big_split //=.
+        rewrite big_nat_cond [X in _ <= X]big_nat_cond leq_sum // => t /andP [NEQ _].
+        rewrite -(leqRW (interference_plus_sched_le_serv_of_task_plus_task_interference _ _ )) => //.
     Qed.
 
     (** As the next step, the service terms in the inequality above

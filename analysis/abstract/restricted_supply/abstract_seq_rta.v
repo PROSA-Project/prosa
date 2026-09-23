@@ -170,7 +170,7 @@ Section AbstractRTARestrictedSupplySequential.
       { exfalso; move: NCOM => /negP NCOM; apply: NCOM.
         by rewrite /service.completed_by ZERO. }
       rewrite (cumul_cond_interference_ID _ (nonself arr_seq sched)).
-      rewrite /intra_IBF addnC leq_add; first by done.
+      rewrite /intra_IBF addnC leq_add; last by done.
       { rewrite -(leq_add2r (cumul_task_interference arr_seq sched j t1 (t1 + Δ))).
         eapply leq_trans; first last.
         { by rewrite EQ; apply: task.cumulative_job_interference_bound => //. }
@@ -213,13 +213,13 @@ Section AbstractRTARestrictedSupplySequential.
       have [F [EQ0 [EQ1 EQ2]]] := T; clear T.
       exists F; split => //; split => //.
       rewrite /intra_IBF -(leqRW EQ1) addnA leq_add2r.
-      rewrite addnBA; last first.
-      { apply leq_trans with (task_rbf 1).
-        - by apply: task_rbf_1_ge_task_cost => //.
-        - by eapply task_rbf_monotone => //; rewrite addn1. }
-      { rewrite subnBA.
-        - by rewrite addnC.
-        - by apply H_valid_run_to_completion_threshold. }
+      rewrite addnBA.
+      - apply leq_trans with (task_rbf 1).
+        + by apply: task_rbf_1_ge_task_cost => //.
+        + by eapply task_rbf_monotone => //; rewrite addn1.
+      - rewrite subnBA.
+        + by apply H_valid_run_to_completion_threshold.
+        + by rewrite addnC.
     Qed.
 
   End aRSAPremises.

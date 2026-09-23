@@ -275,8 +275,8 @@ Section WorkloadFacts.
       <= workload_of_jobs P (arrivals_between arr_seq t1 t3).
   Proof.
     move => t1 t2 t3 P ??.
-    rewrite (workload_of_jobs_cat t2 t1 t3 P _  ) //=; [| apply /andP; split; done].
-    by apply leq_addr.
+    rewrite (workload_of_jobs_cat t2 t1 t3 P _  ) //=; first by apply /andP; split.
+    by apply: leq_addr.
   Qed.
 
   (** Consider a job [j] ... *)

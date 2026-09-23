@@ -6,6 +6,7 @@ Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.jlfp.
 Require Export prosa.analysis.abstract.restricted_supply.search_space.fifo.
 Require Export prosa.analysis.abstract.restricted_supply.search_space.fifo_fixpoint.
 Require Export prosa.analysis.facts.priority.fifo.
+
 Require Export prosa.analysis.facts.priority.fifo_ahep_bound.
 Require Export prosa.analysis.facts.model.sbf.average.
 
@@ -191,11 +192,11 @@ Section RTAforFIFOModelwithArrivalCurves.
       { by exfalso; rewrite /completed_by ZERO in NCOMPL. }
       eapply leq_trans; first by eapply cumulative_intra_interference_split => //.
       rewrite -[leqRHS]add0n leq_add //.
-      + rewrite (leqRW (service_inversion_widen _ _ _ _ _ _ _ _ _)).
+      + rewrite (leqRW (service_inversion_widen arr_seq sched j t1 (t1 + Δ) t1 t2 _ _)).
+        * by done.
+        * by done.
         * apply: FIFO_implies_no_service_inversion => //.
-          by apply instantiated_busy_interval_equivalent_busy_interval => //.
-        * by done.
-        * by done.
+          by apply abstract_busy_interval_classic_busy_interval_prefix => //; apply BUSY.
       + unshelve apply: bound_on_hep_workload; (try apply H_fixed_point).
         all: try apply H_L_positive.
         all: try done.

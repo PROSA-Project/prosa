@@ -188,8 +188,8 @@ Section JitterPropagationFacts.
     move=> j t.
     have SRC := @valid_schedule_jobs_come_from_arrival_sequence _ _ sched _
                   original_arrival JitterRM arr_seq H_valid_schedule.
-    rewrite [RHS]scheduled_jobs_at_iff; [| |exact: SRC|] => //.
-    rewrite (@scheduled_jobs_at_iff _ release_as_arrival); first by done.
+    rewrite [RHS]scheduled_jobs_at_iff; [|exact: SRC| |] => //.
+    rewrite (@scheduled_jobs_at_iff _ release_as_arrival); last by done.
     - exact: valid_release_sequence.
     - exact: jitter_prop_same_jobs'.
     - exact
@@ -213,21 +213,21 @@ Section JitterPropagationFacts.
        wrong ones. Not pretty, but it works. *)
     case SCHED: scheduled_job_at => [j|];
       case SCHED': scheduled_job_at => [j'|]; last by done.
-    { move: SCHED => /eqP; rewrite scheduled_job_at_scheduled_at; [| |exact: SRC| |] => // SCHED.
+    { move: SCHED => /eqP; rewrite scheduled_job_at_scheduled_at; [|exact: SRC| | |] => // SCHED.
       move: SCHED' => /eqP; rewrite (@scheduled_job_at_scheduled_at _ release_as_arrival).
-      - move=> SCHED'.
-        by rewrite (UNI j j' sched t).
       - exact: valid_release_sequence.
       - exact: jitter_prop_same_jobs'.
       - exact
           /(@jobs_must_arrive_to_be_ready _ _ sched _ release_as_arrival BasicRM)
           /jitter_ready_to_execute.
       - by [].
+      - move=> SCHED'.
+        by rewrite (UNI j j' sched t).
     }
     { exfalso.
-      move: SCHED => /eqP; rewrite scheduled_job_at_scheduled_at; [| |exact: SRC| |] => //.
+      move: SCHED => /eqP; rewrite scheduled_job_at_scheduled_at; [|exact: SRC| | |] => //.
       move: SCHED'; rewrite (@scheduled_job_at_none _ release_as_arrival);
-        first by move=> NSCHED; apply/negP.
+        last by move=> NSCHED; apply/negP.
       - exact: valid_release_sequence.
       - exact: jitter_prop_same_jobs'.
       - exact
@@ -235,9 +235,9 @@ Section JitterPropagationFacts.
           /jitter_ready_to_execute. }
 
     { exfalso.
-      move: SCHED; rewrite scheduled_job_at_none; [| |exact: SRC|] => // NSCHED.
+      move: SCHED; rewrite scheduled_job_at_none; [|exact: SRC| |] => // NSCHED.
       move: SCHED' => /eqP; rewrite (@scheduled_job_at_scheduled_at _ release_as_arrival);
-        first by apply/negP.
+        last by apply/negP.
       - exact: valid_release_sequence.
       - exact: jitter_prop_same_jobs'.
       - exact

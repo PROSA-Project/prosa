@@ -1,6 +1,7 @@
 Require Export prosa.implementation.refinements.arrival_curve_prefix.
 Require Import prosa.analysis.facts.model.rbf.
 
+
 (** In this section, we provide definitions and lemmas to show
     Abstract RTA' s search space can be rewritten in an equivalent,
     computation-oriented way. *)
@@ -101,7 +102,7 @@ Section FastSearchSpaceComputation.
         by exists ((A+ε) %% h, v). }
       { case (extrapolated_arrival_curve_change _ POSh SORT_LEQ _ NEQ) as [EQs|[EQs LT]].
         { apply ltdivn_dvdn in EQs; move: EQs => /dvdnP [k EQs]; rewrite EQs.
-          by rewrite modnMl step_at_0_is_00; [rewrite addn0 mulnK | apply SORT |]. }
+          by rewrite modnMl step_at_0_is_00; [apply SORT | | rewrite addn0 mulnK]. }
         { subst h; set (h := horizon_of evec) in *.
           rewrite {1}[_ + _](divn_eq _ h).
           apply/eqP; rewrite eqn_add2l; apply/eqP.
@@ -182,7 +183,7 @@ Section FastSearchSpaceComputation.
       have -> : vec (A %% h) = vec h.
       { rewrite /vec /value_at.
         have -> : ((step_at evec (A %% h)) = (step_at evec h)) => //.
-        rewrite (pred_Sn A) -addn1 modn_pred; [|repeat destruct h as [|h]=> //|lia].
+        rewrite (pred_Sn A) -addn1 modn_pred; [repeat destruct h as [|h]=> //|lia|].
         rewrite /step_at DIV.
         have -> : [seq step <- steps_of evec | step.1 <= h] = steps_of evec.
         { apply /all_filterP /allP => [step IN]; apply ltnW; subst h.

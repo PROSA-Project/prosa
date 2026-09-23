@@ -1,5 +1,8 @@
 From mathcomp Require Import ssreflect ssrbool ssrnat eqtype bigop.
 
+(** Create the collection of facts used in Prosa's basic proof automation. *)
+Create HintDb basic_rt_facts.
+
 (** Lemmas & tactics adopted (with permission) from [V. Vafeiadis' Vbase.v]. *)
 
 Lemma neqP : forall (T : eqType) (x y : T), reflect (x <> y) (x != y).

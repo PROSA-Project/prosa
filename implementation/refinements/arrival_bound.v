@@ -219,13 +219,13 @@ Section Refinements.
     { destruct xs' as [ | x' xs']; first by tc.
       by rewrite refinesE in Rxs; inversion Rxs. }
     { destruct xs' as [ | x' xs']; first by rewrite refinesE in Rxs; inversion Rxs.
-      rewrite //= !path_sortedE; first last.
-      { by apply ltn_steps_is_transitive. }
-      { by apply ltn_stepsT_is_transitive. }
+      rewrite //= !path_sortedE; last first.
       { rewrite refinesE in Rxs; inversion Rxs; subst.
         rewrite refinesE; apply andb_R.
         - apply refinesP; refines_apply.
-        - by apply refinesP; apply IHxs; rewrite refinesE. } }
+        - by apply refinesP; apply IHxs; rewrite refinesE. }
+      { by apply ltn_stepsT_is_transitive. }
+      { by apply ltn_steps_is_transitive. } }
   Qed.
 
   (** Next, we prove the refinement for the [leq_steps_sorted] function. *)
@@ -238,13 +238,13 @@ Section Refinements.
     { destruct xs' as [ | x' xs']; first by tc.
       by rewrite refinesE in Rxs; inversion Rxs. }
     { destruct xs' as [ | x' xs']; first by rewrite refinesE in Rxs; inversion Rxs.
-      rewrite //= !path_sortedE; first last.
-      { by apply leq_steps_is_transitive. }
-      { by apply leq_stepsT_is_transitive. }
+      rewrite //= !path_sortedE; last first.
       { rewrite refinesE in Rxs; inversion Rxs; subst.
         rewrite refinesE; apply andb_R.
         - by apply refinesP; refines_apply.
-        - by apply refinesP; apply IHxs; rewrite refinesE. } }
+        - by apply refinesP; apply IHxs; rewrite refinesE. }
+      { by apply leq_stepsT_is_transitive. }
+      { by apply leq_steps_is_transitive. } }
   Qed.
 
   (** Next, we prove the refinement for the [value_at] function. *)

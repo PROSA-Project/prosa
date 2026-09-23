@@ -49,8 +49,8 @@ Section InterferenceProperties.
     move=> j1 j2; rewrite -[X in _ || X]andbA -andb_orr /another_task_hep_job.
     have [hepj1j2/=|//] := boolP (hep_job j1 j2).
     rewrite -[hp_task _ _](@andb_idr _ (job_task j1 != job_task j2)).
-    - by rewrite -andb_orl -hep_hp_ep_task FP_policy_task_priority_order.
     - by apply: contraTN => /eqP->; rewrite hp_task_irrefl.
+    - by rewrite -andb_orl -hep_hp_ep_task FP_policy_task_priority_order.
   Qed.
 
   (** We establish a higher-or-equal job of another task causing interference,
@@ -291,9 +291,9 @@ Section InterferencePropertiesJLFP.
         ~~ another_hep_job_interference arr_seq sched j t.
       Proof.
         apply/negP => INT.
-        rewrite (interference_ahep_def j) in INT => //; first last.
-        - by apply service_at_implies_scheduled_at.
+        rewrite (interference_ahep_def j) in INT => //; last first.
         - by move: INT => /andP [_ ]; rewrite eq_refl.
+        - by apply service_at_implies_scheduled_at.
       Qed.
 
     End JIsServed.
@@ -343,9 +343,6 @@ Section InterferencePropertiesJLFP.
           by move: AHEP => /andP[].
         - apply/hasP; exists j'; [rewrite !mem_filter|]; apply/andP; split => //.
           + by apply ideal_progress_inside_supplies => //.
-          + apply: arrived_between_implies_in_arrivals => //.
-            apply/andP; split=> [//|].
-            by apply H_jobs_must_arrive_to_execute in H_j'_sched; rewrite ltnS.
           + by apply: contraNN H_j'_not_tsk => /eqP; rewrite /job_of_task => ->.
       Qed.
 

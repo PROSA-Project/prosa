@@ -64,11 +64,12 @@ Section FullyNonPreemptiveModel.
       have POS: 0 < job_cost j by apply leq_trans with progr.
       split.
       { apply/andP; split; first by rewrite leq_maxl.
-        erewrite job_max_nps_is_job_cost; eauto 2; rewrite addnBA; last eauto 2.
-        rewrite geq_max; apply/andP; split.
-          - rewrite -addnBA; last by eauto 2.
+        erewrite job_max_nps_is_job_cost; eauto 2; rewrite addnBA.
+        - by eauto 2.
+        - rewrite geq_max; apply/andP; split.
+          + rewrite -addnBA; first by eauto 2.
               by rewrite leq_addr.
-          - by rewrite addnC -addnBA // leq_addr.
+          + by rewrite addnC -addnBA // leq_addr.
       }
       { apply/orP; right.
         rewrite eqn_leq; apply/andP; split.

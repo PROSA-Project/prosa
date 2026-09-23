@@ -154,8 +154,8 @@ Section FastSearchSpaceComputationSubset.
         have LTB : B < L + (task_deadline tsk - task_deadline tsko) by unfold B; lia.
         by apply IN_RTO; last by eapply task_search_space_subset; eauto. }
       { apply ltnW in EE.
-        rewrite -subnBA//-subnBA//-addnBAC in NEQ; last by lia.
-        rewrite -subnBA // -addn1 -addnBAC //; last by lia.
+        rewrite -subnBA//-subnBA//-addnBAC in NEQ; first by lia.
+        rewrite -subnBA // -addn1 -addnBAC //; first by lia.
         set (B := A - (task_deadline tsko - task_deadline tsk)) in *.
         have  CH : task_rbf_changes_at tsko B; [ done | clear NEQ ].
         replace (task_deadline tsk - task_deadline tsko) with 0; [rewrite addn0 addn1 |lia].

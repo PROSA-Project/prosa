@@ -154,7 +154,7 @@ Lemma leq_div_ceil_add1 :
 Proof.
   move=> Δ T POS LE. rewrite /div_ceil.
   have lkc: (Δ - T) %/ T < Δ %/ T.
-  { rewrite divnBr; last by auto.
+  { rewrite divnBr; first by rewrite dvdnn.
     rewrite divnn POS.
     rewrite ltn_psubCl //; lia.
   }
@@ -234,4 +234,3 @@ Proof.
     by rewrite -modnDmr modnn addn0 modn_small; auto; lia.
   - by rewrite modn_small; lia.
 Qed.
-

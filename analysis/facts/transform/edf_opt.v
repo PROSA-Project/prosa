@@ -750,9 +750,9 @@ Section EDFTransformFacts.
     move=> j t.
     set S := (edf_transform_prefix sched t.+1).
     rewrite (identical_prefix_scheduled_at _ S t.+1) //;
-            last by apply edf_finite_prefix.
+            first by apply edf_finite_prefix.
     rewrite (identical_prefix_service _ S t) //;
-            last by apply (identical_prefix_inclusion _ _ t.+1) => //; apply edf_finite_prefix.
+            first by apply (identical_prefix_inclusion _ _ t.+1) => //; apply edf_finite_prefix.
     move: (edf_prefix_well_formedness sched H_jobs_must_arrive_to_execute
                                       H_completed_jobs_dont_execute H_no_deadline_misses t.+1) => [COMP _].
     now apply COMP.
@@ -777,14 +777,14 @@ Section EDFTransformFacts.
     rewrite /sched_edf /job_meets_deadline.
     set t_dl := (job_deadline j).
     rewrite (identical_prefix_completed_by _ (edf_transform_prefix sched t_dl.+1) t_dl) //;
-            last by apply (identical_prefix_inclusion _ _ t_dl.+1) => //; apply edf_finite_prefix.
+            first by apply (identical_prefix_inclusion _ _ t_dl.+1) => //; apply edf_finite_prefix.
     move=> SCHED_AT; move: (SCHED_AT).
     rewrite (identical_prefix_scheduled_at _ (edf_transform_prefix sched t_dl.+1) t_dl).
+    - by apply (identical_prefix_inclusion _ _ t_dl.+1) => //; apply edf_finite_prefix.
+    - by apply edf_prefix_scheduled_job_has_later_deadline with (sched := sched) (horizon := t.+1).
     - move: (edf_prefix_well_formedness sched H_jobs_must_arrive_to_execute
                                         H_completed_jobs_dont_execute H_no_deadline_misses t_dl.+1) => [_ [_ DL]].
       now apply (DL j t).
-    - by apply (identical_prefix_inclusion _ _ t_dl.+1) => //; apply edf_finite_prefix.
-    - by apply edf_prefix_scheduled_job_has_later_deadline with (sched := sched) (horizon := t.+1).
   Qed.
 
   (** We observe that no new jobs are introduced: any job scheduled in the EDF

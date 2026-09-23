@@ -72,7 +72,7 @@ Section ReplaceAtFacts.
     move => t1 t2 TIMES j.
     rewrite -(service_split_at_point sched  _ _ t' _) //
             -(service_split_at_point sched' _ _ t' _) //.
-    by rewrite !service_at_other_times_invariant -/sched'; [lia | right | left].
+    by rewrite !service_at_other_times_invariant -/sched'; [left | right | lia].
   Qed.
 
   (** ...which we can also rewrite as follows. *)

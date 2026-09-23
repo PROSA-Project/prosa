@@ -27,7 +27,7 @@ Section JobConstructor.
   Proof.
     move=> tsk n t.
     rewrite /generate_jobs_at //= /generate_job_at map_inj_uniq //=;
-      first by apply iota_uniq.
+      last by apply iota_uniq.
     by move=> x1 x2 /eqP /andP [/andP [/andP [/andP [//= /eqP EQ _] _] _] _].
   Qed.
 

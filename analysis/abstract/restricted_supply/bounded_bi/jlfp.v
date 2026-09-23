@@ -4,7 +4,6 @@ Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.aux.
 Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.definitions.sbf.busy.
 
-
 (** * Sufficient Condition for Bounded Busy Intervals for RS JLFP *)
 
 (** In this section, we show that the existence of [L] such that [B +
@@ -170,7 +169,7 @@ Section BoundedBusyIntervals.
         rewrite // addnC -!addnA.
         have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
         apply: E; first by lia.
-        rewrite subKn; last by apply: sbf_bounded_by_duration => //.
+        rewrite subKn; first by apply: sbf_bounded_by_duration => //.
         rewrite -(leqRW H_fixed_point); apply leq_add.
         - by rewrite (leqRW (H_service_inversion_bounded _ _ _ _ _ _ _)) //=.
         - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
@@ -227,10 +226,10 @@ Section BoundedBusyIntervals.
           rewrite addnC -!addnA.
           have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
           apply: E; first by lia.
-          rewrite subKn; last by apply: sbf_bounded_by_duration => //.
+          rewrite subKn; first by apply: sbf_bounded_by_duration => //.
           rewrite -(leqRW H_fixed_point); apply leq_add.
-          { rewrite (leqRW (service_inversion_widen _ _ _ t1 _ _ (job_arrival j).+1 _ _ )).
-            - by rewrite (leqRW (H_service_inversion_bounded _ _ _ _ _ _ _)) //=.
+          { rewrite (leqRW (service_inversion_widen _ _ _ t1 _ _ (job_arrival j).+1 _ _ )); last first.
+            { by rewrite (leqRW (H_service_inversion_bounded _ _ _ _ _ _ _)) //=. }
             - by done.
             - by lia.
           }

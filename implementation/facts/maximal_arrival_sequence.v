@@ -210,7 +210,7 @@ Section MaximalArrivalSequence.
         rewrite /max_arrivals_at /maximal_arrival_prefix /extend_arrival_prefix
                 /next_max_arrival //= /suffix_sum subn0 unlock subn0.
         by apply MONO. }
-      { rewrite max_arrivals_at_next_max_arrivals_eq; last by done.
+      { rewrite max_arrivals_at_next_max_arrivals_eq; first by done.
         rewrite /next_max_arrival /jobs_remaining prefix_up_to_size.
         simpl (t.+1.-1).
         destruct supremum eqn:SUP; last by  move:(supremum_none _ _ SUP); rewrite map_cons.
@@ -249,13 +249,13 @@ Section MaximalArrivalSequence.
         specialize (IHt Δ).
         feed IHt; first by lia.
         rewrite number_of_task_arrivals_eq // in IHt.
-        rewrite big_nat_recr //=; last by lia.
-        rewrite -leq_subRL; first apply n_arrivals_at_leq; try lia.
+        rewrite big_nat_recr //=; first by lia.
+        rewrite -leq_subRL; last apply n_arrivals_at_leq; try lia.
         move: (H_valid_arrival_curve tsk IN) => [ZERO MONO].
         apply (leq_trans IHt).
         by apply MONO. }
     - rewrite /number_of_task_arrivals /task_arrivals_between.
-      rewrite arrivals_between_geq; last by lia.
+      rewrite arrivals_between_geq; first by lia.
       by [].
   Qed.
 

@@ -169,11 +169,11 @@ Proof.
   rewrite [X in _ <= X](bigID (fun x => x \in r))/=.
   apply: leq_trans (leq_addr _ _).
   rewrite (perm_big (undup [seq x <- rs | x \in r])).
-  - rewrite -filter_undup big_filter_cond/=.
-    under eq_bigl => ? do rewrite andbT; exact/leq_sum_subseq/undup_subseq.
   - apply: uniq_perm; rewrite ?undup_uniq// => x.
     rewrite mem_undup mem_filter.
     by case xinr: (x \in r); rewrite // (sub_r_rs _ xinr).
+  - rewrite -filter_undup big_filter_cond/=.
+    under eq_bigl => ? do rewrite andbT; exact/leq_sum_subseq/undup_subseq.
 Qed.
 
 (** We continue establishing properties of sums over sequences, but start a new
@@ -355,14 +355,14 @@ Section SumOverPartitions.
                 \sum_(y <- ys | y != y') sum_of_partition y.
   Proof.
     rewrite (exchange_big_dep (fun x =>P x && (x_to_y x != y'))) //=.
-    - rewrite  big_seq_cond [X in _ <= X]big_seq_cond.
-      apply leq_sum => x' /andP [ARRo /andP [Px' NEQ]].
-      rewrite (big_rem (x_to_y x')) //=.
-      by rewrite Px' eq_refl NEQ andTb andTb leq_addr.
     - move => y_of_x' x' /negP NEQ /andP [EQ1 /eqP EQ2].
       rewrite EQ1 Bool.andb_true_l; apply/negP; intros CONTR.
       apply: NEQ; clear EQ1.
       by rewrite -EQ2.
+    - rewrite  big_seq_cond [X in _ <= X]big_seq_cond.
+      apply leq_sum => x' /andP [ARRo /andP [Px' NEQ]].
+      rewrite (big_rem (x_to_y x')) //=.
+      by rewrite Px' eq_refl NEQ andTb andTb leq_addr.
   Qed.
 
   (** In this section, we prove a stronger result about the equality between
@@ -386,9 +386,11 @@ Section SumOverPartitions.
       rewrite //= in LE_TAIL; feed_n 2 LE_TAIL.
       { by move => ??; apply H_no_partition_missing; rewrite in_cons; apply /orP; right. }
       { by move: H_xs_unique; rewrite cons_uniq => /andP [??]. }
-      rewrite (exchange_big_dep P) //=; last by move=> ??? /andP[??].
+      have EXCHANGE_VALID: forall y x, true -> P x && (x_to_y x == y) -> P x
+        by move=> y x _ /andP [Px _].
+      rewrite (exchange_big_dep P EXCHANGE_VALID) //=.
       rewrite !big_cons.
-      case PX: (P x'); last by rewrite LE_TAIL (exchange_big_dep P) //=;  move=> ??? /andP[??].
+      case PX: (P x'); last by rewrite LE_TAIL (exchange_big_dep P EXCHANGE_VALID) //=.
       have -> : \sum_(i <- ys | true && ( x_to_y x' == i)) f x' = f x'.
       { rewrite //= -big_filter.
         have -> : [seq i <- ys | x_to_y x' == i] = [:: x_to_y x']; last by rewrite unlock //= addn0.
@@ -402,7 +404,7 @@ Section SumOverPartitions.
         by rewrite in_cons; apply /orP; left.
       }
       apply /eqP; rewrite eqn_add2l; apply /eqP.
-      by rewrite LE_TAIL (exchange_big_dep P) //=;  move=> ??? /andP[??].
+      by rewrite LE_TAIL (exchange_big_dep P EXCHANGE_VALID) //=.
     Qed.
 
   End Equality.
@@ -470,12 +472,12 @@ Proof.
   have -> : t1 + Δ - t1 = Δ by lia.
   induction Δ as [ | Δ IHΔ]; first by move=> n1 n2; rewrite !big_geq; lia.
   move=> n1 n2 LE1 LE2.
-  rewrite addnS big_nat_recr //=; last by apply leq_addr.
+  rewrite addnS big_nat_recr //=; first by apply leq_addr.
   specialize (IHΔ (n1 - P1 (t1 + Δ)) (n2 - P2 (t1 + Δ))).
   feed_n 2 IHΔ.
-  { rewrite addnS big_nat_recr //= in LE1; last by apply leq_addr.
+  { rewrite addnS big_nat_recr //= in LE1; first by apply leq_addr.
     by lia. }
-  { rewrite addnS big_nat_recr //= in LE2; last by apply leq_addr.
+  { rewrite addnS big_nat_recr //= in LE2; first by apply leq_addr.
     by lia. }
   by lia.
 Qed.

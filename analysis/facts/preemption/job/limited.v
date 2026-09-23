@@ -188,9 +188,9 @@ Section ModelWithLimitedPreemptions.
       destruct H_valid_limited_preemptions_job_model as [A1 [A2 A3]].
       unfold job_preemption_points, job_preemptable, limited_preemptive_job_model.
       intros; rewrite distances_iota_filtered; eauto 2.
-      - by rewrite max0_rem0 //.
       - rewrite -A2 //.
         by intros; apply last_is_max_in_nondecreasing_seq; eauto 2.
+      - by rewrite max0_rem0 //.
     Qed.
 
   End AuxiliaryLemmas.

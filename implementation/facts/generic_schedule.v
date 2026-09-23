@@ -60,7 +60,7 @@ Section GenericScheduleProperties.
     { rewrite /schedule_up_to rest_of_schedule_invariant // => ZERO.
       now subst. }
     { rewrite /schedule_up_to rest_of_schedule_invariant -/(schedule_up_to _ _ h t);
-        first by apply IH => //; apply ltn_trans with (n := h.+1).
+        last by apply IH => //; apply ltn_trans with (n := h.+1).
       move=> EQ. move: LT.
       now rewrite EQ ltnn. }
   Qed.

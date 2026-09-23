@@ -54,12 +54,13 @@ Section ValidArrivalCurvePrefixFacts.
       move: VAL => /valid_arrival_curve_prefix_P VAL.
       destruct VAL as [_ [_ [_ [_ SORT]]]].
       unfold sorted_ltn_steps in *; simpl in *.
-      rewrite (@path_sorted_inE _ predT) in SORT; last apply all_predT.
+      rewrite (@path_sorted_inE _ predT) in SORT.
+      + by intros ? ? ? _ _ _; apply ltn_steps_is_transitive.
+      + by apply all_predT.
       + move: SORT => /andP [/allP ALL _].
         specialize (ALL (t,v) IN); move: ALL.
         destruct st0; simpl in *.
-        by move => /andP //= => [[LT1 LT2]]; lia.
-      + by intros ? ? ? _ _ _; apply ltn_steps_is_transitive. }
+        by move => /andP //= => [[LT1 LT2]]; lia. }
   Qed.
 
   (** Next, we show that even shifting the time steps by a positive

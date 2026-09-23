@@ -238,12 +238,12 @@ Section BusyIntervalExistence.
       apply/eqP; rewrite eqn_leq; apply/andP; split;
         last by apply: service_of_jobs_le_workload.
       rewrite /total_workload_between/total_workload (workload_of_jobs_cat arr_seq t);
-        last by apply/andP; split; [|rewrite leq_addr].
+        first by apply/andP; split; [|rewrite leq_addr].
       - rewrite (service_of_jobs_cat_scheduling_interval _ _ _ _ _ _ _ t) //;
-          last by apply/andP; split; [|rewrite leq_addr].
+          first by apply/andP; split; [|rewrite leq_addr].
         + rewrite COMPL -addnA leq_add2l.
           rewrite -service_of_jobs_cat_arrival_interval;
-            last by apply/andP; split; [|rewrite leq_addr].
+            first by apply/andP; split; [|rewrite leq_addr].
           by evar (b : nat); rewrite -(leq_add2l b) EQserv.
     Qed.
 

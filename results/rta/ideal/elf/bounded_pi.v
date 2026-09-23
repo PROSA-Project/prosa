@@ -2,6 +2,7 @@ Require Import prosa.util.int.
 Require Export prosa.analysis.abstract.ideal.cumulative_bounds.
 Require Export prosa.analysis.facts.priority.elf.
 Require Export prosa.analysis.facts.interference.
+
 Require Export prosa.analysis.facts.busy_interval.carry_in.
 Require Export prosa.analysis.facts.readiness.basic.
 Require Export prosa.analysis.facts.priority.jlfp_with_fp.
@@ -478,16 +479,16 @@ Section AbstractRTAforELFwithArrivalCurves.
         { apply: leq_trans;
             first by apply: total_workload_shorten_range => //; clear - GT H_Δ_in_busy; lia.
           rewrite (workload_of_jobs_equiv_pred _ _ (fun jo : Job => hep_job jo j && (job_task jo == tsk_o))).
-          { case EQ: (0 <= ep_task_intf_interval tsk_o A)%R;
-              last by rewrite arrivals_between_geq; [rewrite workload_of_jobs0|clear - EQ; lia].
-            have -> : `|Num.max 0%R (t1%:R + ep_task_intf_interval tsk_o A)%R|
-                     = t1 + `|Num.max 0%R (ep_task_intf_interval tsk_o A)|
-              by clear -EQ; lia.
-            by apply: rbf_spec' => // ? /andP[]. }
           { move => j' IN1.
             have [TSK'|_] := (eqVneq  (job_task j') tsk_o).
             - by rewrite !andbT TSK TSK' ep_task_sym EP andbT.
-            - by rewrite !andbF. }}}
+            - by rewrite !andbF. }
+          { case EQ: (0 <= ep_task_intf_interval tsk_o A)%R;
+              last by rewrite arrivals_between_geq; [clear - EQ; lia | rewrite workload_of_jobs0].
+            have -> : `|Num.max 0%R (t1%:R + ep_task_intf_interval tsk_o A)%R|
+                     = t1 + `|Num.max 0%R (ep_task_intf_interval tsk_o A)|
+              by clear -EQ; lia.
+            by apply: rbf_spec' => // ? /andP[]. }}}
     Qed.
 
     (** ... and that the cumulative interference incurred by [j] due to all
@@ -502,11 +503,11 @@ Section AbstractRTAforELFwithArrivalCurves.
         first by apply: service_of_jobs_le_workload.
       rewrite /workload_of_jobs /total_hp_request_bound_function_FP.
       rewrite [X in X <= _](eq_big (fun j0 => hp_task (job_task j0) tsk) job_cost) //;
-        first by apply: workload_of_jobs_bounded; eauto.
+        last by apply: workload_of_jobs_bounded; eauto.
       rewrite /hp_task_hep_job  => j'.
-      rewrite andb_idl => [|?].
-      - by move: H_job_of_task => /eqP ->.
+      rewrite andb_idl => [?|].
       - by apply: ELF_policy_higher_priority_task.
+      - by move: H_job_of_task => /eqP ->.
     Qed.
 
   End BoundingIBF.

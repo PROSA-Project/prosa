@@ -379,7 +379,7 @@ Section Abstract_RTA.
             rewrite /definitions.cumulative_interference.
           rewrite -{2}(leqRW H_F_fixpoint).
           rewrite leq_add //.
-          rewrite -H_equivalent; [ | apply relative_rtc_time_is_bounded].
+          rewrite -H_equivalent; [apply relative_rtc_time_is_bounded | ].
           eapply H_job_interference_is_bounded_IBFP with t2 => //.
           + by rewrite -ltnNge.
           + move => t1' t2' BUSY.
@@ -409,7 +409,7 @@ Section Abstract_RTA.
           rewrite /definitions.cumulative_interference.
           erewrite leq_trans; last apply H_F_fixpoint; auto.
           rewrite leq_add //.
-          rewrite -H_equivalent; [ | apply relative_rtc_time_is_bounded].
+          rewrite -H_equivalent; [apply relative_rtc_time_is_bounded | ].
           eapply H_job_interference_is_bounded_IBFP with t2 => //.
           + by rewrite -ltnNge (leqRW NC).
           + intros t0 t3 BUSY.

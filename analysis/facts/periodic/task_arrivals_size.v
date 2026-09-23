@@ -193,8 +193,8 @@ Section TaskArrivalsSize.
       - rewrite !task_arrivals_size_at_non_arrival// => n';
         move=> /(f_equal (subn^~(task_offset tsk))); rewrite addKn;
         move=> /(f_equal (modn^~(task_period tsk))).
-        + by rewrite -addnBAC// addnC -[n' * _]addn0 !modnMDl mod0n.
         + by rewrite -[n' * _]addn0 modnMDl mod0n.
+        + by rewrite -addnBAC// addnC -[n' * _]addn0 !modnMDl mod0n.
     Qed.
 
   End TaskArrivalsInCaseOfInfiniteJobs.

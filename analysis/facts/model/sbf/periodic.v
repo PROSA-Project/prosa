@@ -60,20 +60,20 @@ Section PeriodicResourceModelValidSBF.
     have [h [j [EQ LT2]]] : exists k q, δ2 = k * Π + q /\ q < Π.
     { by eexists; eexists; split; [ apply divn_eq | rewrite ltn_mod ]. }
     subst δ2; rewrite !EQ; clear EQ.
-    rewrite divnDl; last by rewrite dvdn_mull // dvdnn.
+    rewrite divnDl; first by rewrite dvdn_mull // dvdnn.
     rewrite !mulnDl mulnK // subnDA.
     rewrite -![_ + j + q]addnA.
-    rewrite divnDl; last by rewrite dvdn_mull // dvdnn.
+    rewrite divnDl; first by rewrite dvdn_mull // dvdnn.
     rewrite !mulnDl mulnK // subnDA.
     replace (j %/ Π) with 0; last by symmetry; apply divn_small.
     replace (q %/ Π) with 0; last by symmetry; apply divn_small.
-    rewrite mul0n addn0 divnDl; last by rewrite dvdn_mull // dvdnn.
+    rewrite mul0n addn0 divnDl; first by rewrite dvdn_mull // dvdnn.
     rewrite !mulnDl mulnK // subnDA mul0n subn0.
     set (s := (j + q) %/ Π).
     have F: s <= 1.
     { rewrite /s; apply leq_trans with ((Π + q) %/ Π).
       { by apply leq_div2r; lia. }
-      { by rewrite divnDl; [rewrite divnn POS divn_small | apply dvdnn]. }
+      { by rewrite divnDl; [apply dvdnn | rewrite divnn POS divn_small]. }
     }
     rewrite [k*γ + _]addnC -!addnA leq_add2l.
     have ->: forall a b c, a + b - c - a = b - c by lia.
@@ -106,11 +106,11 @@ Section PeriodicResourceModelValidSBF.
         rewrite NEQ; have ->: 2 * Π - Π = Π by lia.
         by rewrite divnK ?dvdnn // divnn POS; lia. }
     { have -> : h * Π + j + 1 + γ - Π = (h - 1) * Π + j + 1 + γ.
-      { by rewrite mulnBl -!addnA addBnAC; [ lia | apply leq_mul ]. }
+      { by rewrite mulnBl -!addnA addBnAC; [ apply leq_mul | lia ]. }
       have -> : h * Π + j + γ - Π = (h - 1) * Π + j + γ.
-      { by rewrite mulnBl -!addnA addBnAC; [ lia | apply leq_mul ]. }
-      rewrite -!addnA divnDl; last by rewrite dvdn_mull //.
-      rewrite mulnK // !mulnDl [in leqRHS]divnDl; last by rewrite dvdn_mull //.
+      { by rewrite mulnBl -!addnA addBnAC; [ apply leq_mul | lia ]. }
+      rewrite -!addnA divnDl; first by rewrite dvdn_mull //.
+      rewrite mulnK // !mulnDl [in leqRHS]divnDl; first by rewrite dvdn_mull //.
       rewrite !mulnDl mulnK // -!addnA leq_add2l !addnA.
       move: ALT => [NEQ|[NEQ|[NEQ|NEQ]]].
       - by rewrite !divn_small //; lia.
@@ -119,7 +119,7 @@ Section PeriodicResourceModelValidSBF.
         have ->: (j + 1 + γ) %/ Π = 1 by apply divn_leq; lia.
         by rewrite mul1n; lia.
       - have ->: (j + γ) %/ Π = 1 by apply divn_leq; lia.
-        rewrite NEQ divnK; last by apply dvdn_mull, dvdnn.
+        rewrite NEQ divnK; first by apply dvdn_mull, dvdnn.
         by rewrite mulnK //; lia.
     }
   Qed.
@@ -171,7 +171,7 @@ Section PeriodicResourceModelValidSBF.
         rewrite mulnC [_ * ( _ + _ ) ]mulnC; apply leq_sum => t _.
         by move: (H_unit_supply_proc_model (sched t)); rewrite /has_supply /supply_at; case:(supply_in _); lia.
       }
-      by rewrite -(leqRW (pigeonhole_on_interval _ _ _ _ _ _ _ _)); [ | apply B |apply A]; lia.
+      by rewrite -(leqRW (pigeonhole_on_interval _ _ _ _ _ _ _ _)); [ apply B | apply A | lia ].
     Qed.
 
     (** Let <<[t1, t2)>> := <<[kΠ + q1, kΠ + q2)>> be the interval under analysis. *)
@@ -263,7 +263,7 @@ Section PeriodicResourceModelValidSBF.
         rewrite mulnC [_ * ( _ + _ ) ]mulnC; apply leq_sum => t _.
         by move: (H_unit_supply_proc_model (sched t)); rewrite /has_supply /supply_at; case:(supply_in _); lia.
       }
-      by rewrite -(leqRW (pigeonhole_on_interval _ _ _ _ _ _ _ _)); [ | apply B |apply A]; lia.
+      by rewrite -(leqRW (pigeonhole_on_interval _ _ _ _ _ _ _ _)); [ apply B | apply A | lia ].
     Qed.
 
     (** Supply in the interval <<[(k1 + 1) Π + q1, k2 Π)>> is
@@ -310,7 +310,7 @@ Section PeriodicResourceModelValidSBF.
         rewrite mulnC [_ * ( _ + _ ) ]mulnC; apply leq_sum => t _.
         by move: (H_unit_supply_proc_model (sched t)); rewrite /has_supply /supply_at; case:(supply_in _); lia.
       }
-      by rewrite -(leqRW (pigeonhole_on_interval _ _ _ _ _ _ _ _)); [ | apply B |apply A]; lia.
+      by rewrite -(leqRW (pigeonhole_on_interval _ _ _ _ _ _ _ _)); [ apply B | apply A | lia ].
     Qed.
 
     (** Let <<[t1, t2)>> := <<[k1 Π + q1, k2 Π + q2)>> be the interval under analysis. *)
@@ -344,7 +344,7 @@ Section PeriodicResourceModelValidSBF.
       { have ->: forall a b, a - 2 * b = a - b - b by lia.
         have ->: k2 * Π + q2 - (k1 * Π + q1) = (k2 - k1) * Π + q2 - q1 by lia.
         have ->: (k2 - k1) * Π + q2 - q1 - (Π - γ) = (k2 - (k1 + 1)) * Π + q2 - q1 + γ.
-        { rewrite subnBA // -addnBAC; first lia.
+        { rewrite subnBA // -addnBAC; last lia.
           apply leq_trans with (2 * Π + q2 - q1); first lia.
           by rewrite leq_sub2r // leq_add2r leq_mul //; lia.
         }

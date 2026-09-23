@@ -36,9 +36,7 @@ Section BackloggedJobs.
     apply /andP; split; first by exact.
     apply arrived_between_implies_in_arrivals => //.
     rewrite /arrived_between.
-    apply /andP; split => //.
-    rewrite ltnS -/(has_arrived _ _).
-    now apply (backlogged_implies_arrived sched).
+    by apply /andP; split => //.
   Qed.
 
   (** Trivially, it is also the case that any backlogged job comes from the
@@ -108,7 +106,7 @@ Section NonClairvoyance.
     rewrite leq_eqVlt => /orP [/eqP EQ | LT]; last by apply backlogged_prefix_invariance.
     rewrite /backlogged.
     rewrite (H_nonclairvoyant_job_readiness sched sched' j h) //;
-            last by rewrite EQ.
+            first by rewrite EQ.
     now rewrite NOT_SCHED NOT_SCHED'.
   Qed.
 

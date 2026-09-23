@@ -27,24 +27,24 @@ Section ProofDemandBoundDefinition.
     rewrite (@arrivals_between_cat _ _ _ (t + (delta - (task_deadline tsk - 1)))); try lia.
     rewrite filter_cat.
     rewrite (@eq_in_filter _ _ (fun j => job_of_task tsk j)).
-    { set nilS := [seq j <- arrivals_between arr_seq t (t + (delta - (task_deadline tsk - 1))) | job_of_task tsk j].
-      rewrite -[in RHS](@cats0 _ nilS).
-      apply /eqP; rewrite eqseq_cat => //=.
-      apply /andP; split => //=.
-      rewrite (@eq_in_filter _ _ pred0);
-        first by rewrite filter_pred0.
-      move=> j IN.
-      have [/eqP ->|] := boolP (job_of_task tsk j) => //=.
-      have GEQ: job_arrival j >= t + (delta - (task_deadline tsk - 1))
-        by apply: job_arrival_between_ge.
-      have LT := (arrivals_between_nonempty _ _ _ _ IN).
-      by lia. }
     { move=> j IN.
       have [/eqP ->|] := boolP (job_of_task tsk j) => //=.
       have -> : (job_arrival j + task_deadline tsk  <= t + delta) => //.
       have LT := (arrivals_between_nonempty _ _ _ _ IN).
       have LTj: job_arrival j < t + (delta - (task_deadline tsk - 1))
         by apply: job_arrival_between_lt.
+      by lia. }
+    { set nilS := [seq j <- arrivals_between arr_seq t (t + (delta - (task_deadline tsk - 1))) | job_of_task tsk j].
+      rewrite -[in RHS](@cats0 _ nilS).
+      apply /eqP; rewrite eqseq_cat => //=.
+      apply /andP; split => //=.
+      rewrite (@eq_in_filter _ _ pred0);
+        last by rewrite filter_pred0.
+      move=> j IN.
+      have [/eqP ->|] := boolP (job_of_task tsk j) => //=.
+      have GEQ: job_arrival j >= t + (delta - (task_deadline tsk - 1))
+        by apply: job_arrival_between_ge.
+      have LT := (arrivals_between_nonempty _ _ _ _ IN).
       by lia. }
   Qed.
 

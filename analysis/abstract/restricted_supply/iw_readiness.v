@@ -5,6 +5,7 @@ Require Export prosa.analysis.facts.busy_interval.service_inversion.
 Require Export prosa.analysis.definitions.service_inversion.readiness_aware.
 Require Export prosa.analysis.facts.readiness_interference.
 Require Export prosa.analysis.facts.model.uniprocessor.
+
 Require Export prosa.model.schedule.work_conserving.
 
 (** * Readiness-Aware JLFP Instantiation of Interference and Interfering Workload Functions for Restricted-Supply Uniprocessors *)
@@ -249,10 +250,10 @@ Section IWInstantiation.
         elim: k => [|k IHk].
         - rewrite !addn0 big_geq// /arrivals_between big_geq//.
           by rewrite /workload_of_jobs big_nil.
-        - rewrite addnS big_nat_recr //=; last by rewrite leq_addr.
+        - rewrite addnS big_nat_recr //=; first by rewrite leq_addr.
           rewrite IHk /arrivals_between big_nat_recr //=.
-          + by rewrite /workload_of_jobs big_cat.
-          + by rewrite leq_addr. }
+          + by rewrite leq_addr.
+          + by rewrite /workload_of_jobs big_cat. }
     Qed.
 
   End InstantiatedWorkloadEquivalence.

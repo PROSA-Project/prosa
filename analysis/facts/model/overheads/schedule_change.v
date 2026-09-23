@@ -67,10 +67,10 @@ Section ScheduleChange.
     rewrite /number_schedule_changes.
     have [/eqP LE|LT] := leqP t2' t1'.
     { by rewrite /index_iota LE. }
-    rewrite (index_iota_cat t1' t1 t2); last by lia.
+    rewrite (index_iota_cat t1' t1 t2); first by lia.
     move: LE2; rewrite leq_eqVlt => /orP [/eqP EQ|LT2].
     { by subst; rewrite count_cat; lia. }
-    { rewrite (index_iota_cat t2' t1' t2); last by lia.
+    { rewrite (index_iota_cat t2' t1' t2); first by lia.
       by rewrite !count_cat; lia.
     }
   Qed.

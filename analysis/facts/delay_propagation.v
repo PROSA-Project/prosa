@@ -267,7 +267,7 @@ Section ACPropFacts.
         is part of the valid arrival sequence [arr_seq1]. *)
     Lemma uniq_trigger_jobs : uniq trigger_jobs.
     Proof.
-      rewrite map_inj_in_uniq; last exact: job1_of_inj.
+      rewrite map_inj_in_uniq; first exact: job1_of_inj.
       rewrite filter_uniq //.
       apply: arrivals_uniq.
       - exact: consistent_propagated_arrival_sequence.

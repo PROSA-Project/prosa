@@ -81,9 +81,6 @@ Section LimitedPreemptionsModel.
              rewrite -addnA -leq_subLR -(leq_add2r 1).
              rewrite [in X in _ <= X]addnC -leq_subLR.
              rewrite !subn1 !addn1 prednK.
-             { rewrite -[_.+1.-1]pred_Sn. rewrite /lengths_of_segments.
-               erewrite job_parameters_max_np_to_job_limited; eauto.
-                 by apply distance_between_neighboring_elements_le_max_distance_in_seq. }
              { rewrite /lengths_of_segments; erewrite job_parameters_max_np_to_job_limited; eauto.
                apply max_distance_in_nontrivial_seq_is_positive; first by eauto 2.
                exists 0, (job_cost j); repeat split.
@@ -91,6 +88,9 @@ Section LimitedPreemptionsModel.
                - by eapply job_cost_in_nonpreemptive_points; eauto.
                - by apply/eqP; rewrite eq_sym -lt0n; apply POS.
              }
+             { rewrite -[_.+1.-1]pred_Sn. rewrite /lengths_of_segments.
+               erewrite job_parameters_max_np_to_job_limited; eauto.
+                 by apply distance_between_neighboring_elements_le_max_distance_in_seq. }
   Qed.
 
   (** Which together with lemma [valid_fixed_preemption_points_model]

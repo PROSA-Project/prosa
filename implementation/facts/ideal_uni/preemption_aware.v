@@ -226,7 +226,8 @@ Section NPUniprocessorScheduler.
     Proof.
       move=> t.
       rewrite /preemption_time scheduled_job_at_def//;
-        last by exact/jobs_must_arrive_to_be_ready/jobs_must_be_ready.
+        try by exact/jobs_must_arrive_to_be_ready/jobs_must_be_ready.
+      - exact: np_schedule_jobs_from_arrival_sequence.
       - elim: t => [|t _]; first by rewrite /prev_job_nonpreemptive.
         rewrite /schedule /pmc_uni_schedule /generic_schedule
           schedule_up_to_def /prefix /allocation_at => NP.
@@ -239,7 +240,6 @@ Section NPUniprocessorScheduler.
           apply equal_prefix_implies_same_service_during => t' /andP [_ BOUND].
           rewrite (schedule_up_to_prefix_inclusion _ _ t' t) //.
         + by move=> /andP [? ?].
-      - exact: np_schedule_jobs_from_arrival_sequence.
     Qed.
 
   End PreemptionTimes.
@@ -277,7 +277,7 @@ Section NPUniprocessorScheduler.
       rewrite !scheduled_at_def /schedule/pmc_uni_schedule/generic_schedule => /eqP SCHED.
       rewrite -SCHED (schedule_up_to_prefix_inclusion _ _ t' t'.+1) // np_job_remains_scheduled //.
       rewrite /prev_job_nonpreemptive SCHED.
-      rewrite (identical_prefix_service _ schedule); last by apply schedule_up_to_identical_prefix.
+      rewrite (identical_prefix_service _ schedule); first by apply schedule_up_to_identical_prefix.
       apply /andP; split => //.
       rewrite (H_nonclairvoyant_job_readiness _ schedule _ t'.+1) //.
       exact: schedule_up_to_identical_prefix.

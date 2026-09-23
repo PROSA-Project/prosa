@@ -4,6 +4,7 @@ Require Export prosa.analysis.facts.model.task_arrivals.
 Require Export prosa.analysis.facts.model.task_schedule.
 Require Export prosa.analysis.facts.model.sequential.
 Require Export prosa.analysis.abstract.ideal.abstract_rta.
+
 Require Export prosa.analysis.abstract.IBF.task.
 
 (** * Abstract Response-Time Analysis with sequential tasks *)
@@ -189,12 +190,11 @@ Section Sequential_Abstract_RTA.
       exists F; split=> [|//].
       rewrite -{2}(leqRW FIX).
       rewrite addnA leq_add2r.
-      rewrite addnBA; last first.
-      { apply leq_trans with (task_rbf 1).
-        - exact: task_rbf_1_ge_task_cost.
-        - by apply: task_rbf_monotone => //; rewrite addn1.
-      }
-      by rewrite subnBA; auto; rewrite addnC.
+      rewrite addnBA.
+      - apply leq_trans with (task_rbf 1).
+        + exact: task_rbf_1_ge_task_cost.
+        + by apply: task_rbf_monotone => //; rewrite addn1.
+      - by rewrite subnBA; auto; rewrite addnC.
     Qed.
 
   End MaxInSeqHypothesisImpMaxInNonseqHypothesis.

@@ -4,7 +4,6 @@ Require Export prosa.analysis.abstract.restricted_supply.iw_instantiation.
 Require Export prosa.analysis.abstract.restricted_supply.bounded_bi.aux.
 Require Export prosa.analysis.definitions.sbf.busy.
 
-
 (** * Sufficient Condition for Bounded Busy Intervals for RS FP *)
 
 (** In this section, we show that the existence of [L] such that [B +
@@ -158,7 +157,7 @@ Section BoundedBusyIntervals.
         rewrite // addnC -!addnA.
         have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
         apply: E; first by lia.
-        rewrite subKn; last by apply: sbf_bounded_by_duration => //.
+        rewrite subKn; first by apply: sbf_bounded_by_duration => //.
         rewrite -(leqRW H_fixed_point); apply leq_add.
         - apply: leq_trans; first apply: service_inversion_is_bounded => //.
           + instantiate (1 := fun _ => blocking_bound ts tsk) => //=.
@@ -218,14 +217,14 @@ Section BoundedBusyIntervals.
           rewrite addnC -!addnA.
           have E: forall a b c, a <= c -> b <= c - a -> a + b <= c by move => ? ? ? ? ?; lia.
           apply: E; first by lia.
-          rewrite subKn; last by apply: sbf_bounded_by_duration => //.
+          rewrite subKn; first by apply: sbf_bounded_by_duration => //.
           rewrite -(leqRW H_fixed_point); apply leq_add.
-          { rewrite (leqRW (service_inversion_widen _ _ _ t1 _ _ (job_arrival j).+1 _ _ )).
-            - apply: leq_trans.
+          { rewrite (leqRW (service_inversion_widen _ _ _ t1 _ _ (job_arrival j).+1 _ _ )); last first.
+            { apply: leq_trans.
               + apply: service_inversion_is_bounded => //.
                 move => *; instantiate (1 := fun _ => blocking_bound ts tsk) => //.
                 by apply: nonpreemptive_segments_bounded_by_blocking => //.
-              + by done.
+              + by done. }
             - by done.
             - lia.
           }

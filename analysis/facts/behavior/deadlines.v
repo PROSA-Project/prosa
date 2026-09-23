@@ -44,7 +44,7 @@ Section DeadlineFacts.
       move=> j t MET INCOMP.
       apply: cumulative_service_implies_scheduled.
       rewrite -(ltn_add2l (service sched j t)) addn0.
-      rewrite service_cat; last exact/ltnW/incomplete_implies_later_deadline.
+      rewrite service_cat; first exact/ltnW/incomplete_implies_later_deadline.
       by apply: leq_trans MET; rewrite less_service_than_cost_is_incomplete.
     Qed.
 

@@ -7,6 +7,7 @@ Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.tactics.
 Require Export prosa.analysis.definitions.workload.bounded.
 
+
 (** * Facts about Request-Bound Functions (RBFs) *)
 
 (** In this file, we prove some lemmas about RBFs. *)
@@ -138,13 +139,13 @@ Section SumsOfRBFs.
                 (\sum_(j <- arrivals_between arr_seq t (t + Δ) | (job_task j == tsk) && (pred1 j))
                     job_cost j))).
       { rewrite (exchange_big_dep pred1) //=;
-          last by move=> ? ? ? /andP[].
+          first by move=> ? ? ? /andP[].
         rewrite big_seq_cond [X in _ <= X]big_seq_cond.
         rewrite leq_sum //= => j' /andP [IN' Pj'].
         rewrite Pj'.
         under eq_bigl do [rewrite andbA; rewrite andbT].
         rewrite (big_rem (job_task j')) //=;
-          last by apply/H_all_jobs_from_taskset/in_arrivals_implies_arrived.
+          first by apply/H_all_jobs_from_taskset/in_arrivals_implies_arrived.
         rewrite (H_also_satisfied _  Pj') eq_refl //=.
         by apply leq_addr. }
       { rewrite leq_sum_seq //=.
@@ -236,7 +237,7 @@ Section SumsOfRBFs.
         <= total_request_bound_function ts Δ.
     Proof.
       move=> t Δ.
-      rewrite /workload_of_hep_jobs (leqRW (workload_of_jobs_weaken _ predT _ _ )); last by done.
+      rewrite /workload_of_hep_jobs (leqRW (workload_of_jobs_weaken _ predT _ _ )); first by done.
       by apply total_workload_le_total_rbf.
     Qed.
 
@@ -452,17 +453,17 @@ Section FP_RBF_partitioning.
     rewrite (bigID_idem _ _ (fun tsko => tsko != tsk)) //=.
     apply /eqP; rewrite eqn_add2l.
     rewrite (eq_bigl (fun i => i == tsk)); last first.
-    - move => tsko.
-      case (tsko == tsk) eqn: EQ; last by lia.
-      move : EQ => /eqP ->.
-      by rewrite H_priority_is_reflexive //=.
     - rewrite  (big_rem tsk) //= eq_refl.
-      rewrite big_seq_cond big_pred0; first by rewrite addn0 //=.
+      rewrite big_seq_cond big_pred0; last by rewrite addn0 //=.
       move => tsko.
       case (tsko == tsk) eqn: EQ; last by lia.
       move : EQ => /eqP ->.
       rewrite andbT.
       by apply mem_rem_uniqF => //=.
+    - move => tsko.
+      case (tsko == tsk) eqn: EQ; last by lia.
+      move : EQ => /eqP ->.
+      by rewrite H_priority_is_reflexive //=.
   Qed.
 
   (** If the task set may contain duplicates, then the we can only say that
@@ -479,12 +480,12 @@ Section FP_RBF_partitioning.
     rewrite [leqRHS](bigID_idem _ _ (fun tsko => tsko != tsk)) //=.
     apply leq_add; first by done.
     rewrite (eq_bigl (fun tsko => tsko == tsk)); last first.
+    - rewrite  (big_rem tsk) //= eq_refl.
+      by apply leq_addr.
     - move => tsko.
       case (tsko ==tsk) eqn: TSKEQ; last by lia.
       move : TSKEQ => /eqP ->.
       by rewrite (H_priority_is_reflexive tsk) //=.
-    - rewrite  (big_rem tsk) //= eq_refl.
-      by apply leq_addr.
   Qed.
 
 End FP_RBF_partitioning.
@@ -548,7 +549,7 @@ Section RBFFOrFP.
     rewrite /another_task_hep_job /hep_job /fp_to_jlfp.
     set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
     rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
-      last by move=> j'; rewrite /pred_task; move: H_job_of_task => /eqP ->.
+      first by move=> j'; rewrite /pred_task; move: H_job_of_task => /eqP ->.
     erewrite (eq_big pred_task); [|by done|by move=> tsk'; eauto].
     by apply: workload_of_jobs_bounded.
   Qed.
@@ -776,22 +777,22 @@ Section TaskWorkload.
       have POSE: Δ = (t1 + Δ - t1) by lia.
       rewrite [in leqRHS]POSE.
       exact: (H_is_arrival_curve t1 (t1 + Δ)).
-    - rewrite (@num_arrivals_of_task_cat _ _ _ _ _ (job_arrival j)); last by apply /andP; split.
+    - rewrite (@num_arrivals_of_task_cat _ _ _ _ _ (job_arrival j)); first by apply /andP; split.
       rewrite mulnDr.
       rewrite /task_workload_between /task_workload (workload_of_jobs_cat _ (job_arrival j) );
-        last by apply/andP; split; lia.
-      rewrite -!addnBA; first last.
-      + by rewrite /task_workload
-          /workload_of_jobs (big_rem j) //= H_job_of_task leq_addr.
+        first by apply/andP; split; lia.
+      rewrite -!addnBA; last first.
+      + rewrite leq_add //; last by apply: task_rbf_without_job_under_analysis_from_arrival.
+        rewrite -/(task_workload _ _) -/(task_workload_between _ _ _ _).
+        by apply: task_workload_between_bounded.
       + rewrite -{1}[task_cost tsk]muln1 leq_mul2l; apply/orP; right.
         rewrite /number_of_task_arrivals /task_arrivals_between.
         rewrite size_filter -has_count; apply/hasP; exists j; last by rewrite H_job_of_task.
         apply (mem_bigcat _ Job _ (job_arrival j) _); last by apply job_in_arrivals_at => //=.
         rewrite mem_index_iota.
         by apply /andP;split.
-      + rewrite leq_add //; last by apply: task_rbf_without_job_under_analysis_from_arrival.
-        rewrite -/(task_workload _ _) -/(task_workload_between _ _ _ _).
-        by apply: task_workload_between_bounded.
+      + by rewrite /task_workload
+          /workload_of_jobs (big_rem j) //= H_job_of_task leq_addr.
   Qed.
 
 End TaskWorkload.

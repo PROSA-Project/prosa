@@ -2,6 +2,7 @@ Require Export prosa.analysis.facts.preemption.task.limited.
 Require Export prosa.analysis.facts.preemption.rtc_threshold.job_preemptable.
 Require Export prosa.model.task.preemption.limited_preemptive.
 
+
 (** * Task's Run to Completion Threshold *)
 (** In this section, we prove that instantiation of function [task run
     to completion threshold] to the model with limited preemptions
@@ -65,7 +66,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     have Fact2: 0 < size (task_preemption_points tsk).
     { apply/negPn/negP; rewrite -eqn0Ngt; intros CONTR; move: CONTR => /eqP CONTR.
       move: (END _ H_tsk_in_ts) => EQ.
-      move: EQ; rewrite /last0 -nth_last nth_default; last by rewrite CONTR.
+      move: EQ; rewrite /last0 -nth_last nth_default; first by rewrite CONTR.
       by move=> EQ; move: (H_positive_cost); rewrite EQ ltnn.
     }
     have EQ: 2 = size [::0; task_cost tsk] by [].
@@ -111,7 +112,7 @@ Section TaskRTCThresholdLimitedPreemptions.
       have F: 1 <= size (distances (task_preemption_points tsk)).
       { apply leq_trans with (size (task_preemption_points tsk) - 1).
         - have F := number_of_preemption_points_in_task_at_least_two; lia.
-        - rewrite [in X in X - 1]size_of_seq_of_distances; [lia | apply number_of_preemption_points_in_task_at_least_two].
+        - rewrite [in X in X - 1]size_of_seq_of_distances; [apply number_of_preemption_points_in_task_at_least_two | lia].
       } lia.
     }
     have J_RTCT__le : job_last_nonpreemptive_segment j <= job_cost j
@@ -124,11 +125,11 @@ Section TaskRTCThresholdLimitedPreemptions.
     rewrite subnBA // subnBA // -addnBAC // -addnBAC // !addn1 ltnS.
     erewrite job_parameters_last_np_to_job_limited; eauto 2.
     rewrite distances_positive_undup//.
-    have -> : job_cost j = last0 (undup (job_preemptive_points j)) by rewrite last0_undup; [rewrite -COST__job | apply SORT__job].
-    rewrite last_seq_minus_last_distance_seq; last by apply nondecreasing_sequence_undup, SORT__job.
+    have -> : job_cost j = last0 (undup (job_preemptive_points j)) by rewrite last0_undup; [apply SORT__job | rewrite -COST__job].
+    rewrite last_seq_minus_last_distance_seq; first by apply nondecreasing_sequence_undup, SORT__job.
     apply leq_trans with( nth 0 (job_preemptive_points j) ((size (job_preemptive_points j)).-2)); first by apply undup_nth_le; eauto 2.
     have -> : task_cost tsk = last0 (task_preemption_points tsk) by rewrite COST__task.
-    rewrite last_seq_minus_last_distance_seq; last by apply SORT__task.
+    rewrite last_seq_minus_last_distance_seq; first by apply SORT__task.
     move: TSK__j => /eqP TSK__j; rewrite -TSK__j.
     rewrite T4//.
     apply domination_of_distances_implies_domination_of_seq; try eauto 2.
@@ -149,7 +150,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     rewrite subKn // -[leqRHS]subn0 leq_sub //.
     apply leq_trans with (task_max_nonpreemptive_segment tsk).
     - by apply last_of_seq_le_max_of_seq.
-    - rewrite -END; last by done.
+    - rewrite -END; first by done.
       by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
   Qed.
 

@@ -5,6 +5,7 @@ Require Export prosa.analysis.transform.wc_trans.
 Require Export prosa.analysis.facts.transform.swaps.
 Require Export prosa.analysis.definitions.schedulability.
 Require Export prosa.util.list.
+
 Require Export prosa.util.tactics.
 
 (** * Correctness of the work-conservation transformation *)
@@ -173,8 +174,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       move: SCHED_AT_T1 => /negbT NOT_AT_t1.
       destruct (scheduled_at sched j t2) eqn:SCHED_AT_T2;
         last by move: SCHED_AT_T2 => /negbT NOT_AT_t2; rewrite (service_of_others_invariant _ t t2).
-      rewrite /swapped /service -service_at_other_times_invariant; last by left.
-      rewrite service_in_replaced; last by apply /andP; split => //.
+      rewrite /swapped /service -service_at_other_times_invariant; first by left.
+      rewrite service_in_replaced; first by apply /andP; split => //.
       rewrite (not_scheduled_implies_no_service _ _ _  NOT_AT_t1) subn0.
         by apply leq_addr.
     Qed.
@@ -310,7 +311,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         Proof.
           move: H_job_ready_sched'; rewrite H_basic_readiness /pending => /andP [ARR NOT_COMPL_sched'].
           rewrite -(service_cat sched j t max_dl);
-            last by apply (leq_trans t_is_less_than_deadline_of_j), max_dl_is_greatest_dl.
+            first by apply (leq_trans t_is_less_than_deadline_of_j), max_dl_is_greatest_dl.
           have ZERO_SERVICE: service_during sched j t max_dl = 0.
           { apply not_scheduled_during_implies_zero_service.
             move=> t_at RANGE.
@@ -467,9 +468,9 @@ Section AuxiliaryLemmasWorkConservingTransformation.
         rewrite {1}/make_wc_at.
         destruct (prefix_map sched (make_wc_at arr_seq) i i) as [j|] eqn:SCHED => [//|].
         rewrite -(swap_before_invariant _ i (find_swap_candidate arr_seq (wc_transform_prefix arr_seq sched i) i)).
-        - by [].
         - exact: swap_candidate_is_in_future.
         - by apply leq_trans with (n := h1).
+        - by [].
       Qed.
 
     End PrefixInclusion.

@@ -31,8 +31,8 @@ Lemma last0_cat :
 Proof.
   elim=> [//|xs xs_l IHxs_l] n NEQ.
   simpl; rewrite last0_cons.
-  - by apply IHxs_l.
   - by intros C; apply: NEQ; destruct xs_l.
+  - by apply IHxs_l.
 Qed.
 
 (** We also prove that [last0 xs = xs [| size xs -1 |] ]. *)
@@ -52,7 +52,7 @@ Proof.
   move=> x; elim=> [//|a xs IHxs] NEQ LAST.
   destruct xs.
   - by exists [::]; move: LAST; rewrite /last0 /= => ->.
-  - feed_n 2 IHxs; try by done.
+  - feed_n 2 IHxs => //.
     destruct IHxs as [xsh EQ].
     by exists (a::xsh); rewrite //= EQ.
 Qed.
@@ -91,12 +91,12 @@ Proof.
   destruct xs as [|b xs].
   - rewrite /max0 //= max0n; apply ALL.
     by rewrite in_cons; apply/orP; left.
-  - rewrite max0_cons IHxs; [ | by done | ].
-    + by rewrite [a]ALL; [ rewrite maxnn | rewrite in_cons; apply/orP; left].
+  - rewrite max0_cons IHxs //.
     + move=> x H; apply ALL.
       rewrite in_cons; move: H => /orP [/eqP EQ | IN].
       * by subst x; rewrite !in_cons; apply/orP; right; apply/orP; left.
       * by rewrite !in_cons; apply/orP; right; apply/orP; right.
+    + by rewrite [a]ALL; [ rewrite in_cons; apply/orP; left | rewrite maxnn].
 Qed.
 
 (** We prove that no element in a sequence [xs] is greater than [max0 xs]. *)
@@ -118,7 +118,7 @@ Lemma max0_in_seq :
 Proof.
   elim=> [//|a xs IHxs] _.
   destruct xs as [|n xs].
-  - destruct a; simpl; first by done.
+  - destruct a => //=.
     by rewrite /max0 //= max0n in_cons eq_refl.
   - rewrite max0_cons.
     move: (leq_total a (max0 (n::xs))) => /orP [LE|LE].
@@ -203,7 +203,7 @@ Proof.
         - rewrite leqn0; apply/eqP; apply: IHxs.
           by move=> n; specialize (H n.+1); simpl in H.
       }
-      rewrite L; first by done.
+      rewrite L //.
       move=> n0; specialize (H n0).
       by destruct n0; simpl in *; apply/eqP; rewrite -leqn0.
     }
@@ -310,8 +310,8 @@ Proof.
   move=> x y.
   case: (eqVneq x y) => [-> //=|/eqP NEQ]; first by rewrite !eq_refl.
   apply/eqP; rewrite ifF.
-  - by move=> []EQ; apply: NEQ.
   - by apply/negbTE/eqP => -[].
+  - by move=> []EQ; apply: NEQ.
 Qed.
 
 (** We prove that a sequence [xs] of size [n.+1] can be destructed
@@ -425,11 +425,11 @@ Lemma filter_in_pred0 :
 Proof.
   move=> X xs P; elim: xs => [//|a xs IHxs] ALLF.
   rewrite //= IHxs; last first.
-  + by intros; apply ALLF; rewrite in_cons; apply/orP; right.
   + destruct (P a) eqn:EQ; last by done.
     move: EQ => /eqP; rewrite eqb_id -[P a]Bool.negb_involutive => /negP T.
     exfalso; apply: T.
     by apply ALLF; apply/orP; left.
+  + by intros; apply ALLF; rewrite in_cons; apply/orP; right.
 Qed.
 
 (** We show that any two elements having the same index in a
@@ -665,8 +665,9 @@ Lemma index_iota_cat :
     t1 <= t <= t2 ->
     index_iota t1 t2 = index_iota t1 t ++ index_iota t t2.
 Proof.
-  move=> t t1 t2 NEQ; rewrite /index_iota (iotaD_impl (t - t1)); last by lia.
-  by f_equal; f_equal; lia.
+  move=> t t1 t2 NEQ; rewrite /index_iota (iotaD_impl (t - t1)).
+  - by lia.
+  - by f_equal; f_equal; lia.
 Qed.
 
 (** We prove that one can remove duplicating element from the
@@ -703,13 +704,14 @@ Proof.
         by intros x; rewrite mem_index_iota -lt0n => /andP [T1 _].
       - by apply IHk; lia.
     }
-    rewrite index_iota_lt_step; last by lia.
-    simpl; destruct (a.+1 == x) eqn:EQ.
-    - move: EQ => /eqP EQ; subst x.
-      rewrite filter_in_pred0 //.
-      intros x; rewrite mem_index_iota => /andP [T1 _].
-      by rewrite neq_ltn; apply/orP; right.
-    - by rewrite IHk //; lia.
+    rewrite index_iota_lt_step.
+    - by lia.
+    - simpl; destruct (a.+1 == x) eqn:EQ.
+      + move: EQ => /eqP EQ; subst x.
+        rewrite filter_in_pred0 //.
+        intros x; rewrite mem_index_iota => /andP [T1 _].
+        by rewrite neq_ltn; apply/orP; right.
+      + by rewrite IHk //; lia.
   }
 Qed.
 
@@ -776,7 +778,7 @@ Proof.
       replace (@in_mem nat x (@mem nat (seq_predType _) (@rem_all _ x xs))) with false; first by reflexivity.
       apply/eqP; rewrite eq_sym eqbF_neg.
       apply/negP; apply nin_rem_all.
-    + rewrite index_iota_lt_step //; last by lia.
+    + rewrite index_iota_lt_step; [ by lia | ].
       replace ([seq ρ <- a :: index_iota a.+1 b | ρ \in x :: xs])
         with ([seq ρ <- index_iota a.+1 b | ρ \in x :: xs]); last first.
       { simpl; replace (@in_mem nat a (@mem nat (seq_predType _) (@cons nat x xs))) with false; first by done.
@@ -827,7 +829,7 @@ Proof.
     case: (leqP b a) => [N|N].
     + move: N; rewrite -subn_eq0 => /eqP EQ.
         by rewrite /index_iota EQ //= in LT2.
-    + rewrite index_iota_lt_step; last by done.
+    + rewrite index_iota_lt_step; [ by done | ].
       simpl in *; destruct (P a) eqn:PA.
       * destruct idx; simpl; first by done.
         apply IHk; try lia.

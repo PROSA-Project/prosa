@@ -123,22 +123,21 @@ Section RunToCompletionThreshold.
     intros COST. unfold job_last_nonpreemptive_segment.
     rewrite last0_nth function_of_distances_is_correct subn_gt0.
     rewrite [size _]pred_Sn -addn1-addn1.
-    rewrite -size_of_seq_of_distances ?addn1; last by apply size_of_preemption_points.
-    rewrite prednK; last first.
-    { rewrite -(leq_add2r 1) !addn1 prednK.
-      - apply size_of_preemption_points; eauto.
-      - rewrite ltnW //; apply size_of_preemption_points; eauto.
-    }
-    apply iota_is_increasing_sequence; apply/andP; split.
-    - rewrite -(leq_add2r 2) !addn2.
-      rewrite prednK//.
-      rewrite -(leq_add2r 1) !addn1.
-      rewrite prednK.
-      + by apply size_of_preemption_points.
-      + by rewrite ltnW //; apply size_of_preemption_points.
-    - rewrite -(leq_add2r 1) !addn1.
-      unfold job_preemption_points, range.
-      by rewrite prednK ?ltnS// ltnW// size_of_preemption_points.
+    rewrite -size_of_seq_of_distances ?addn1; first by apply size_of_preemption_points.
+    rewrite prednK.
+    - rewrite -(leq_add2r 1) !addn1 prednK.
+      + rewrite ltnW //; apply size_of_preemption_points; eauto.
+      + apply size_of_preemption_points; eauto.
+    - apply iota_is_increasing_sequence; apply/andP; split.
+      + rewrite -(leq_add2r 2) !addn2.
+        rewrite prednK//.
+        rewrite -(leq_add2r 1) !addn1.
+        rewrite prednK.
+        * by rewrite ltnW //; apply size_of_preemption_points.
+        * by apply size_of_preemption_points.
+      + rewrite -(leq_add2r 1) !addn1.
+        unfold job_preemption_points, range.
+        by rewrite prednK ?ltnS// ltnW// size_of_preemption_points.
   Qed.
 
   (** Max nonpreemptive segment of a positive-cost job has positive length. *)
@@ -215,18 +214,21 @@ Section RunToCompletionThreshold.
     move => ρ /andP [GE LT].
     apply/negP; intros C.
     have POS : 0 < job_cost j; first by lia.
-    rewrite /job_rtct subnBA in GE; last by apply job_last_nonpreemptive_segment_positive.
-    rewrite -addnBAC in GE; [rewrite addn1 in GE | by apply job_last_nonpreemptive_segment_le_job_cost].
+    rewrite /job_rtct subnBA in GE;
+      [ by apply job_last_nonpreemptive_segment_positive
+      | rewrite -addnBAC in GE;
+        [ by apply job_last_nonpreemptive_segment_le_job_cost
+        | rewrite addn1 in GE ] ].
     rewrite job_cost_is_last_element_of_preemption_points in LT, GE.
-    rewrite last_seq_minus_last_distance_seq in GE; last by apply preemption_points_nondecreasing.
+    rewrite last_seq_minus_last_distance_seq in GE; first by apply preemption_points_nondecreasing.
     have EQ := antidensity_of_nondecreasing_seq.
     specialize (EQ (job_preemption_points j) ρ (size (job_preemption_points j)).-2 ).
     feed_n 2 EQ; first by apply preemption_points_nondecreasing.
     { apply/andP; split=> [//|].
-      rewrite prednK; first by rewrite -last0_nth.
+      rewrite prednK; last by rewrite -last0_nth.
       rewrite -(leq_add2r 1) !addn1 prednK.
-      - exact: size_of_preemption_points.
       - by eapply leq_trans; last apply size_of_preemption_points.
+      - exact: size_of_preemption_points.
     }
     move: EQ => /negP EQ; apply: EQ.
     apply conversion_preserves_equivalence => //.

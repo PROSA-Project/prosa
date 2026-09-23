@@ -333,11 +333,11 @@ Section JLFPInstantiation.
           rewrite big_geq//.
           rewrite /arrivals_between /arrival_sequence.arrivals_between big_geq//.
           by rewrite /workload_of_jobs big_nil.
-        - rewrite addnS big_nat_recr //=; last by rewrite leq_addr.
+        - rewrite addnS big_nat_recr //=; first by rewrite leq_addr.
           rewrite IHk.
           rewrite /arrivals_between /arrival_sequence.arrivals_between big_nat_recr //=.
-          + by rewrite big_cat.
           + by rewrite leq_addr.
+          + by rewrite big_cat.
       }
     Qed.
 

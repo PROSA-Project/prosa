@@ -5,7 +5,6 @@ Require Export prosa.analysis.abstract.restricted_supply.busy_prefix.
 Require Export prosa.model.aggregate.service_of_jobs.
 Require Export prosa.analysis.facts.model.service_of_jobs.
 
-
 (** * Auxiliary Lemmas About Interference and Interfering Workload. *)
 
 (** In this file we provide a set of auxiliary lemmas about generic
@@ -89,7 +88,7 @@ Section InterferenceAndInterferingWorkloadAuxiliary.
       move => j al ar bl br LE1 LE2.
       rewrite !cumul_cond_interference_alt.
       case: (leqP al ar) => [LEQ|LT]; last by rewrite big_geq.
-      rewrite [leqRHS](@big_cat_nat _ _ _ al) //=; last by lia.
+      rewrite [leqRHS](@big_cat_nat _ _ _ al) //=; first by lia.
       by rewrite [in X in _ <= _ + X](@big_cat_nat _ _ _ ar) //=; lia.
     Qed.
 

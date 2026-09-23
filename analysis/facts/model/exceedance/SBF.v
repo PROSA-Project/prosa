@@ -69,14 +69,14 @@ Section SBFFacts.
     move => ARRIN TSK PRE /andP[INEQ1 INEQ2].
     rewrite /blackout_during.
     rewrite (eq_sum_seq _ _ _ _ (fun t => is_exceedance_exec (sched t))).
+    - move => t' /[!mem_index_iota]IN _.
+       rewrite blackout_implies_exceedance_execution.
+       by apply /eqP.
     - specialize ( H_exceedance_in_busy_interval_bounded j t1 t2 ).
       feed_n 3 H_exceedance_in_busy_interval_bounded => //=.
       apply: leq_trans; last by apply H_exceedance_in_busy_interval_bounded.
       rewrite (big_cat_nat _ INEQ2) //=.
       by lia.
-    -  move => t' /[!mem_index_iota]IN _.
-       rewrite blackout_implies_exceedance_execution.
-       by apply /eqP.
   Qed.
 
   (** Using the above, we can prove that our definition of SBF is valid. *)

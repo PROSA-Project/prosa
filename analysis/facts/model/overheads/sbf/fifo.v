@@ -4,6 +4,7 @@ Require Export prosa.analysis.facts.model.overheads.schedule_change_bound.
 Require Export prosa.analysis.definitions.sbf.busy.
 Require Export prosa.model.priority.fifo.
 
+
 (** In this section, we define an SBF for the FIFO scheduling policy
     in the presence of overheads. *)
 Section OverheadResourceModelValidSBF.
@@ -182,9 +183,9 @@ Section OverheadResourceModelValidSBF.
     move => tsk; split; first by unfold fifo_ovh_sbf_slow.
     move => j t1 t2 ARR [TSK PREF] t /andP [NEQ1 NEQ2].
     interval_to_duration t1 t δ.
-    rewrite supply_during_complement; last first.
-    { by apply: overheads_proc_model_provides_unit_supply; eauto 1. }
-    rewrite addKn; apply leq_sub2l.
+    rewrite supply_during_complement.
+    - by apply: overheads_proc_model_provides_unit_supply; eauto 1.
+    - rewrite addKn; apply leq_sub2l.
     apply slowed_respects_pointwise_leq with (f := fun δ => blackout_during sched t1 (t1 + δ)).
     { by move=> ?; rewrite addnA; apply blackout_during_unit_growth. }
     move=> Δ LE; rewrite /fifo_blackout_bound.

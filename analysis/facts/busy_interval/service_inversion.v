@@ -1,7 +1,6 @@
 Require Export prosa.analysis.definitions.service_inversion.busy_prefix.
 Require Export prosa.analysis.facts.busy_interval.pi.
 
-
 (** * Service Inversion Lemmas *)
 (** In this section, we prove a few lemmas about service inversion. *)
 Section ServiceInversion.
@@ -104,7 +103,7 @@ Section ServiceInversion.
       move=> j al ar bl br LE1 LE2.
       rewrite /cumulative_service_inversion.
       have [NEQ1|NEQ1] := leqP al ar; last by rewrite big_geq //.
-      rewrite (big_cat_nat LE1) //=; last by lia.
+      rewrite (big_cat_nat LE1) //=; first by lia.
       by rewrite (big_cat_nat _ LE2) //= addnC -addnA leq_addr //=.
     Qed.
 
@@ -428,7 +427,7 @@ Section ServiceInversionIsBounded.
       Proof.
         rewrite -[service_during _ _ _ _ <= _](leq_add2l (service sched jlp t1)).
         rewrite leq_eqVlt => /orP [/eqP EQ|GT].
-        { by rewrite service_cat; [ rewrite -EQ; move: H_σ_constrained => /andP [A B] | lia]. }
+        { by rewrite service_cat; [ lia | rewrite -EQ; move: H_σ_constrained => /andP [A B]]. }
         exfalso.
         have [pt [LTpt EQ]] : exists pt, pt < t /\ service sched jlp pt = σ.
         { by apply exists_intermediate_service => //; apply unit_supply_is_unit_service. }
@@ -550,19 +549,18 @@ Section ServiceInversionIsBounded.
       have SCHEDjlp : scheduled_at sched jlp t1 by erewrite <-scheduled_jobs_at_iff => //.
       have [NPT| [pt [/andP [LE1 LE2] [PT MIN]]]] := preemption_time_interval_case arr_seq sched t1 t2.
       { rewrite (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //.
-        - by apply: lp_job_bounded_service_max.
-        - by exists t1; split => //; apply/andP; split; [ | move: BUSY => [T _]]; lia. }
+        - by exists t1; split => //; apply/andP; split; [ | move: BUSY => [T _]]; lia.
+        - by apply: lp_job_bounded_service_max. }
       { have LEQ : cumulative_service_inversion arr_seq sched j t1 t2
                    <= cumulative_service_inversion arr_seq sched j t1 pt.
         { have [LE|WF] := leqP t2 pt.
-          { by rewrite (leqRW (service_inversion_widen arr_seq sched j t1 _ _ pt _ _ )) => //. }
+          { by apply: service_inversion_widen => //. }
           { rewrite (service_inversion_cat _ _ _ _ _ pt) //
                     -{2}[_ _ _ j t1 pt]addn0 leq_add2l
                     (leqRW (cumul_service_inv_le_cumul_priority_inv _ _ _ _ _ _ _ _ _ _))//  leqn0.
             rewrite /cumulative_priority_inversion big_nat_cond; apply/eqP; apply big1 => t /andP [NEQ3 _]; apply/eqP.
             by rewrite eqb0; apply: no_priority_inversion_after_preemption_point => //; lia. } }
         rewrite (leqRW LEQ) (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //; clear LEQ.
-        { by apply: lp_job_bounded_service_max => //; lia. }
         { move=> t /andP [NEQ1 NEQ2]; apply/negP => PTt.
           by specialize (MIN _ NEQ1 PTt); move: MIN NEQ2; clear; lia. }
         { exists t1; split => //.
@@ -572,6 +570,7 @@ Section ServiceInversionIsBounded.
           - by rewrite PT in PI.
           - by move: LE2; clear; lia.
           - by clear; lia. }
+        { by apply: lp_job_bounded_service_max => //; lia. }
       }
     }
   Qed.

@@ -132,7 +132,7 @@ Section LowerBoundOnService.
       destruct (leqP (t1 + δ) t2) as [NEQ|NEQ]; last first.
       { move: (job_completes_within_busy_interval _ _ _ _ H_busy_interval) => COMPL.
         apply leq_trans with (job_cost j) => [//|].
-        rewrite /service -(service_during_cat _ _ _ t2); last by apply/andP; split; last apply ltnW.
+        rewrite /service -(service_during_cat _ _ _ t2); first by apply/andP; split; last apply ltnW.
         by apply leq_trans with (service_during sched j 0 t2); [| rewrite leq_addr].
       }
       { move: H_total_workload_is_bounded => BOUND.
@@ -143,7 +143,7 @@ Section LowerBoundOnService.
           + by apply leq_sub2r, (interference_is_complement_to_schedule t1 t2);
               [apply H_busy_interval | apply leqnn | apply NEQ].
           + by rewrite -addnBA // subnn addn0 //.
-        - rewrite /service -[X in _ <= X](service_during_cat _ _ _ t1); first by rewrite leq_addl //.
+        - rewrite /service -[X in _ <= X](service_during_cat _ _ _ t1); last by rewrite leq_addl //.
           by apply/andP; split; last rewrite leq_addr.
       }
     Qed.

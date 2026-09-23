@@ -72,22 +72,20 @@ Section FullyNonPreemptiveModel.
             /job_preemption_points /job_preemptable /fully_nonpreemptive_job_model.
     case: (posnP (job_cost j)) => [ZERO|POS].
     { by rewrite ZERO; compute. }
-    have ->: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n].
-    { clear; simpl; intros.
-      apply/eqP; rewrite eqseq_cons; apply/andP; split=> [//|].
-      have ->:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
-      { clear; move=> t xs P1 P2 H.
-        apply eq_in_filter.
-        move=> x IN. specialize (H _ IN).
-          by destruct (P1 x), (P2 x).
-      }
-      - rewrite filter_pred1_uniq//; first by apply iota_uniq.
-        by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
-      - intros x; rewrite mem_iota => /andP [POS _].
-        by rewrite -lt0n.
+    have -> //=: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n];
+      last by rewrite /distances/= subn0 /max0/= max0n.
+    clear; simpl; intros.
+    apply/eqP; rewrite eqseq_cons; apply/andP; split=> [//|].
+    have -> //=:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
+    { clear; move=> t xs P1 P2 H.
+      apply eq_in_filter.
+      move=> x IN. specialize (H _ IN).
+      by destruct (P1 x), (P2 x).
     }
-    { by rewrite /distances/= subn0 /max0/= max0n. }
-    { by []. }
+    - intros x; rewrite mem_iota => /andP [POS _].
+      by rewrite -lt0n.
+    - rewrite filter_pred1_uniq//; first by apply iota_uniq.
+      by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
   Qed.
 
   (** ... and [job_last_nonpreemptive_segment j] is equal to [job_cost j]. *)
@@ -97,22 +95,21 @@ Section FullyNonPreemptiveModel.
     move=> j.
     rewrite /job_last_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points /job_preemptable /fully_nonpreemptive_job_model.
-    case: (posnP (job_cost j)) => [ZERO|POS]; first by rewrite ZERO; compute.
-    have ->: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n]; last by done.
-    { clear; simpl; intros.
-      apply/eqP; rewrite eqseq_cons; apply/andP; split=> [//|].
-      have ->:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
-      { clear; move=> t xs P1 P2 H.
-        apply eq_in_filter.
-        move=> x IN. specialize (H _ IN).
-          by destruct (P1 x), (P2 x).
-      }
-      - rewrite filter_pred1_uniq //; first by apply iota_uniq.
-        by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
-      - intros x; rewrite mem_iota => /andP [POS _].
-        by rewrite -lt0n.
+    case: (posnP (job_cost j)) => [ZERO|POS]; first by rewrite ZERO //=.
+    have -> //=: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n];
+      last by rewrite /distances/= subn0.
+    clear; simpl; intros.
+    apply/eqP; rewrite eqseq_cons; apply/andP; split=> [//|].
+    have ->:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].
+    { clear; move=> t xs P1 P2 H.
+      apply eq_in_filter.
+      move=> x IN. specialize (H _ IN).
+      by destruct (P1 x), (P2 x).
     }
-    { by rewrite /distances/= subn0. }
+    - intros x; rewrite mem_iota => /andP [POS _].
+      by rewrite -lt0n.
+    - rewrite filter_pred1_uniq //; first by apply iota_uniq.
+      by rewrite mem_iota; apply/andP; split; [|rewrite add1n].
   Qed.
 
 End FullyNonPreemptiveModel.

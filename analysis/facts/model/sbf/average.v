@@ -61,7 +61,7 @@ Section AverageResourceModelValidSBF.
         by apply: leq_trans; first by apply leq_divM.
       }
     }
-    { rewrite -addn1 -addnBAC ?addn1; last by lia.
+    { rewrite -addn1 -addnBAC ?addn1; first by lia.
       by rewrite -addn1 mulnDl mul1n -addn1 -divnDMl //; apply leq_div2r; lia.
     }
   Qed.

@@ -124,16 +124,16 @@ Section LemmasAboutAbstractBusyInterval.
     destruct (leqP t1 t) as [NEQ1|NEQ1]; first destruct (leqP t2 t) as [NEQ2|NEQ2].
     - apply/eqP; rewrite eqn_leq; apply/andP; split.
       + rewrite /service -(service_during_cat _ _ _ t1);
-          [ | by apply/andP; split; lia].
+          [by apply/andP; split; lia | ].
         by rewrite cumulative_service_before_job_arrival_zero; eauto 2.
       + rewrite /service -[in X in _ <= X](service_during_cat _ _ _ t1);
-          [ | by apply/andP; split; lia].
+          [by apply/andP; split; lia | ].
         by (erewrite cumulative_service_before_job_arrival_zero with (t1 := 0)
            || erewrite cumulative_service_before_job_arrival_zero with (t3 := 0)).
     - rewrite /service -(service_during_cat _ _ _ t1);
-        [ | by apply/andP; split; lia].
+        [by apply/andP; split; lia | ].
       by rewrite cumulative_service_before_job_arrival_zero; eauto 2.
-    - rewrite service_during_geq; last by lia.
+    - rewrite service_during_geq; first by lia.
       by rewrite /service cumulative_service_before_job_arrival_zero//; lia.
   Qed.
 
@@ -146,7 +146,7 @@ Section LemmasAboutAbstractBusyInterval.
     move : (H_busy_interval) => [[/andP [LE1 LE2] [QT1 AQT]] QT2].
     rewrite -[service_during _ _ _ _]add0n.
     rewrite -(cumulative_service_before_job_arrival_zero sched j _ 0 _ LE1)//.
-    rewrite service_during_cat; last by apply/andP; split; lia.
+    rewrite service_during_cat; first by apply/andP; split; lia.
     rewrite  -/(completed_by sched j t2).
     exact: job_completes_within_busy_interval.
   Qed.
@@ -282,8 +282,8 @@ Section AbstractBusyIntervalExists.
       rewrite /definitions.cumulative_interference
               /definitions.cumulative_interfering_workload
               /cumul_cond_interference.
-      rewrite (@big_cat_nat _ _ _ t1) //=; last by lia.
-      rewrite [in X in _ <= X](@big_cat_nat _ _ _ t1) //=; last by lia.
+      rewrite (@big_cat_nat _ _ _ t1) //=; first by lia.
+      rewrite [in X in _ <= X](@big_cat_nat _ _ _ t1) //=; first by lia.
       move: H_is_busy_prefix => [_  [/andP [/eqP DD KK ] ADD]].
       rewrite /cumulative_interfering_workload in LE; rewrite (leqRW LE); clear LE.
       rewrite leq_add2r.
@@ -469,8 +469,8 @@ Section AbstractBusyIntervalExists.
             by erewrite <-(service_cat); [apply leq_addl | ]; lia.
           - move: H_is_busy_prefix => [_ [/andP [/eqP D _] _]].
             rewrite -(leq_add2l (definitions.cumulative_interference j 0 t1)) {2}D.
-            rewrite -(big_cat_nat) //=; last by lia.
-            by rewrite -(big_cat_nat) //=; last by lia.
+            rewrite -(big_cat_nat) //=; first by lia.
+            by rewrite -(big_cat_nat) //=; first by lia.
         Qed.
 
         (** ... which is a contradiction with the initial

@@ -5,6 +5,7 @@ Require Export prosa.analysis.definitions.tardiness.
 Require Export prosa.implementation.facts.ideal_uni.prio_aware.
 Require Export prosa.implementation.definitions.task.
 Require Export prosa.implementation.priority.numeric_fixed_priority.
+
 Require Export prosa.implementation.readiness.sequential.
 
 (** ** Fully-Nonpreemptive Fixed-Priority Schedules  *)
@@ -73,7 +74,7 @@ Section Schedule.
     have SC: service sched j t.+1 < job_cost j by move: NCOMP; rewrite /completed_by -ltnNge.
     move: SCHED NCOMP; rewrite !scheduled_at_def /sched /uni_schedule /pmc_uni_schedule
                                /generic_schedule => /eqP SCHED NCOMP.
-    rewrite schedule_up_to_def {1}/allocation_at ifT; first by rewrite SCHED.
+    rewrite schedule_up_to_def {1}/allocation_at ifT; last by rewrite SCHED.
     rewrite /prev_job_nonpreemptive SCHED /job_preemptable /fully_nonpreemptive_job_model.
     move: SC SZ; rewrite /uni_schedule /pmc_uni_schedule /generic_schedule.
     set chp:= choose_highest_prio_job; set sut:= schedule_up_to.

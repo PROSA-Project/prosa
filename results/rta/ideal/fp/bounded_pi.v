@@ -4,6 +4,7 @@ Require Export prosa.analysis.facts.busy_interval.existence.
 Require Export prosa.analysis.abstract.ideal.abstract_seq_rta.
 Require Export prosa.analysis.facts.model.task_cost.
 
+
 (** * Abstract RTA for FP-schedulers with Bounded Priority Inversion *)
 (** In this module we instantiate the Abstract Response-Time analysis
     (aRTA) to FP-schedulers for ideal uniprocessor model of
@@ -254,7 +255,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         rewrite /another_task_hep_job /hep_job /fp_to_jlfp.
         set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).
         rewrite (eq_big (fun j=> pred_task (job_task j)) job_cost) //;
-          last by move=> j'; rewrite /pred_task; move: TSK => /eqP ->.
+          first by move=> j'; rewrite /pred_task; move: TSK => /eqP ->.
         erewrite (eq_big pred_task); [|by done|by move=> tsk'; eauto].
         by apply: workload_of_jobs_bounded; eauto. } }
   Qed.

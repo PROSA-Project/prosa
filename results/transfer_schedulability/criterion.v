@@ -26,6 +26,7 @@ Require Export prosa.util.all.
 (** We build on Prosa's central modeling definitions and many auxiliary lemmas. *)
 
 Require Export prosa.analysis.facts.model.service_of_jobs.
+
 Require Export prosa.analysis.definitions.schedulability.
 
 (** In particular, we restrict our focus exclusively to ideal uniprocessor
@@ -489,7 +490,7 @@ Section TransferSchedulability.
         >= \sum_(j <- critical_jobs t2 t3) remaining_cost_bound j t2.
     Proof.
       move=> t1 t2 t3 /andP[LEQ12 LEQ23].
-      apply: leq_trans; last first.
+      apply: leq_trans; first last.
       { apply: (leq_sum_subseq _ (critical_jobs t2 t3)).
         rewrite subseq_filter //; apply/andP; split; last exact: filter_subseq.
         apply/allP => j.
@@ -498,9 +499,9 @@ Section TransferSchedulability.
         by apply: incompletion_monotonic; first exact: LEQ12. }
       { apply: leq_sum => j _.
         rewrite leq_sub2lE.
-        - exact: service_monotonic.
         - apply: (@leq_trans (online_job_cost j)) => //.
-          exact: service_at_most_cost. }
+          exact: service_at_most_cost.
+        - exact: service_monotonic. }
     Qed.
 
 
@@ -808,7 +809,7 @@ Section TransferSchedulability.
       move: NPS; rewrite /nonpositive_slack.
       rewrite (critical_jobs_filter_complete t1) //
         big_filter_cond big_seq_cond.
-      rewrite (eq_bigr (fun j' => remaining_cost_bound j' t1)); last first.
+      rewrite (eq_bigr (fun j' => remaining_cost_bound j' t1)).
       { move=> j' /andP[IN' /andP[NCOMP' _]].
         rewrite /remaining_cost_bound.
         apply/eqP; rewrite eqn_sub2lE;
@@ -823,16 +824,6 @@ Section TransferSchedulability.
         move: NCOMP' => /negP.
         by rewrite -EQ. }
       { rewrite (eq_bigl (fun j' => (j' \in critical_jobs t1 t2) && (j != j'))).
-        { rewrite -big_seq_cond => NPS.
-          have GT1: remaining_cost_bound j t1 > 1.
-          { move: POS; rewrite /remaining_cost_bound.
-            rewrite /service -service_during_last_plus_before //.
-            rewrite service_at_is_scheduled_at SCHED.
-            by lia. }
-          move: ZS.
-          rewrite (bigID (fun j' => j == j')) /=.
-          rewrite (big_pred1_seq _ _ IN) //; last exact: critical_jobs_uniq.
-          by lia. }
         { move=> j'.
           case IN': (j' \in critical_jobs t1 t2) => //=.
           case: (eqVneq j j') => [<-|NEQ //=];
@@ -841,7 +832,17 @@ Section TransferSchedulability.
           have INCOMP: ~~ online_completed_by j' t1
             by move: IN'; rewrite mem_filter => /andP[/andP[]].
           apply: not_scheduled_remains_incomplete => //.
-          by apply: scheduled_job_at_neq. } }
+          by apply: scheduled_job_at_neq. }
+        { rewrite -big_seq_cond => NPS.
+          have GT1: remaining_cost_bound j t1 > 1.
+          { move: POS; rewrite /remaining_cost_bound.
+            rewrite /service -service_during_last_plus_before //.
+            rewrite service_at_is_scheduled_at SCHED.
+            by lia. }
+          move: ZS.
+          rewrite (bigID (fun j' => j == j')) /=.
+          rewrite (big_pred1_seq _ _ IN) //; first exact: critical_jobs_uniq.
+          by lia. } }
     Qed.
 
     (** With the above helper lemma in place, we can establish
@@ -865,12 +866,6 @@ Section TransferSchedulability.
       apply/andP; split => //.
       rewrite (critical_jobs_filter_complete t1) // big_filter_cond.
       rewrite big_rmcond_in /=.
-      { move: SL => /andP[_ +]; rewrite (remaining_cost_invariant _ t1 t1.+1) //.
-        - by lia.
-        - exact: critical_jobs_uniq.
-        - move=> t /andP[LO HI].
-          exists j; apply/andP; split => //.
-          by have -> : t = t1 by lia. }
       { move=> j' IN'.
         rewrite andbT => /negPn COMP'.
         suff -> : j' = j => //.
@@ -881,6 +876,12 @@ Section TransferSchedulability.
           first by move: IN'; rewrite mem_filter /online_completed_by => /andP[/andP[_ NCOMP'] _].
         move: NEQ; rewrite eq_sym => NEQ.
         by apply: scheduled_job_at_neq. }
+      { move: SL => /andP[_ +]; rewrite (remaining_cost_invariant _ t1 t1.+1) //.
+        - exact: critical_jobs_uniq.
+        - move=> t /andP[LO HI].
+          exists j; apply/andP; split => //.
+          by have -> : t = t1 by lia.
+        - by lia. }
     Qed.
 
     (** **** Case 2: The Critical Job Remains Incomplete *)
@@ -905,7 +906,7 @@ Section TransferSchedulability.
       move=> t1 t2 /andP[_ ZS] LT NPS j SCHED IN NCOMP.
       apply/andP; split => //.
       rewrite (critical_jobs_filter_complete t1) //.
-      rewrite -(@eq_in_filter _ predT); last first.
+      rewrite -(@eq_in_filter _ predT).
       { move=> j' IN'.
         case: (eqVneq j' j) => [-> //| /[1! eq_sym] NEQ //=]; symmetry.
         have INCOMP: ~~ online_completed_by j' t1
@@ -914,11 +915,11 @@ Section TransferSchedulability.
         by apply: scheduled_job_at_neq. }
       { rewrite filter_predT.
         move: ZS; rewrite (remaining_cost_invariant _ t1 t1.+1) //.
-        - by lia.
         - exact: critical_jobs_uniq.
         - move=> t /andP[LO HI].
           exists j; apply/andP; split => //.
-          by have -> : t = t1 by lia. }
+          by have -> : t = t1 by lia.
+        - by lia. }
     Qed.
 
 
@@ -1189,7 +1190,7 @@ Section TransferSchedulability.
     move: ZS; rewrite /remaining_cost_bound.
     (** First, split the sum of remaining cost bounds into a sum of job costs
         and a sum of service received. *)
-    rewrite !sumnB => [|j _|j _]; try exact: service_at_most_cost.
+    rewrite !sumnB => [j _|j _|]; try exact: service_at_most_cost.
     move=> /eqP ZS.
     (** Next, split the service received into the service received up to (but
         not including) time [t1] and the service received during
@@ -1294,6 +1295,4 @@ Section TransferSchedulability.
       for [job_cost_bound := ref_job_cost]. *)
 
 End TransferSchedulability.
-
-
 

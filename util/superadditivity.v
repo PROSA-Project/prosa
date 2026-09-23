@@ -184,10 +184,10 @@ Section MinimalExtensionOfSuperadditiveFunctions.
       rewrite !h_f'_min_extension.
       rewrite -SUM.
       destruct a as [|a'] eqn:EQa; destruct b as [|b'] eqn:EQb => //=.
-      { rewrite add0n eq_refl superadditive_first_zero; first by rewrite add0n.
-        by apply h_superadditive_until; lia. }
-      { rewrite addn0 eq_refl superadditive_first_zero; first by rewrite addn0.
-        by apply h_superadditive_until; lia. }
+      { rewrite add0n eq_refl superadditive_first_zero; first by apply h_superadditive_until; lia.
+        by rewrite add0n. }
+      { rewrite addn0 eq_refl superadditive_first_zero; first by apply h_superadditive_until; lia.
+        by rewrite addn0. }
       { rewrite -!EQa -!EQb eq_refl //=.
         rewrite -{1}(addn0 a) eqn_add2l {1}EQb //=.
         rewrite -{1}(add0n b) eqn_add2r {2}EQa //=.
@@ -215,4 +215,3 @@ Section MinimalExtensionOfSuperadditiveFunctions.
   End Facts.
 
 End MinimalExtensionOfSuperadditiveFunctions.
-

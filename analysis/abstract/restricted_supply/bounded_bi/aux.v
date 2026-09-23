@@ -1,6 +1,5 @@
 Require Export prosa.analysis.abstract.restricted_supply.iw_instantiation.
 
-
 (** * Helper Lemmas for Bounded Busy Interval Lemmas *)
 
 (** In this section, we introduce a few lemmas that facilitate the
@@ -108,8 +107,8 @@ Section BoundedBusyIntervalsAux.
     clear LE; move: PREF => [LT [QT1 [NQT QT2]]].
     specialize (NQT t ltac:(lia)); apply: NQT => s ARR HEP BF.
     have EQ2: workload_of_hep_jobs arr_seq j 0 t = service_of_hep_jobs arr_seq sched j 0 t.
-    { rewrite /workload_of_hep_jobs (workload_of_jobs_cat _ t1); last by lia.
-      rewrite /service_of_hep_jobs (service_of_jobs_cat_scheduling_interval _ _ _ _ _ 0 t t1) //; last by lia.
+    { rewrite /workload_of_hep_jobs (workload_of_jobs_cat _ t1); first by lia.
+      rewrite /service_of_hep_jobs (service_of_jobs_cat_scheduling_interval _ _ _ _ _ 0 t t1) //; first by lia.
       rewrite /workload_of_hep_jobs in EQ; rewrite EQ; clear EQ.
       apply/eqP; rewrite eqn_add2r.
       replace (service_of_jobs sched (hep_job^~ j) (arrivals_between arr_seq 0 t1) t1 t) with 0; last first.
@@ -154,11 +153,11 @@ Section BoundedBusyIntervalsAux.
       }
     }
     rewrite cumulative_interfering_workload_split // cumulative_interference_split //.
-    rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //; last by apply PREF.
+    rewrite cumulative_iw_hep_eq_workload_of_ohep cumulative_i_ohep_eq_service_of_ohep //; first by apply PREF.
     rewrite -[leqRHS]addnC -[leqRHS]addnA [(_ + workload_of_job _ _ _ _)]addnC.
     rewrite workload_job_and_ahep_eq_workload_hep //.
     rewrite -addnC -addnA [(_ + service_during _ _ _ _ )]addnC.
-    rewrite service_plus_ahep_eq_service_hep //; last by move: PREF => [_ [_ [_ /andP [A B]]]].
+    rewrite service_plus_ahep_eq_service_hep //; first by move: PREF => [_ [_ [_ /andP [A B]]]].
     rewrite ltn_add2l.
     by apply: service_lt_workload_in_busy; eauto; lia.
   Qed.

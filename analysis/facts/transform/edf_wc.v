@@ -4,7 +4,6 @@ Require Export prosa.analysis.facts.transform.wc_correctness.
 Require Export prosa.analysis.facts.behavior.deadlines.
 Require Export prosa.analysis.facts.readiness.backlogged.
 
-
 (** * Optimality of Work-Conserving EDF on Ideal Uniprocessors *)
 
 (** In this file, we establish the foundation needed to connect the EDF and
@@ -392,7 +391,7 @@ Section EDFTransformWorkConservationLemmas.
     have IDENT:  identical_prefix sched_edf (edf_transform_prefix sched t.+1) t.+1
       by rewrite /sched_edf/edf_transform => t' LE_t; apply (edf_prefix_inclusion) => //; apply sched_satisfies_behavior_premises.
     rewrite (backlogged_prefix_invariance _ _ (edf_transform_prefix sched t.+1) t.+1) // => BL;
-            last by apply: basic_readiness_nonclairvoyance.
+            first by apply: basic_readiness_nonclairvoyance.
     have WC_trans: work_conserving arr_seq  (edf_transform_prefix sched (succn t))
       by eapply edf_transform_prefix_maintains_work_conservation; eauto; split => //; apply sched_satisfies_behavior_premises.
     move: (WC_trans _ _ ARR BL) => [j_other SCHED_AT].

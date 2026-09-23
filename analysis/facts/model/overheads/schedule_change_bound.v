@@ -3,6 +3,7 @@ Require Export prosa.analysis.facts.completes_at.
 Require Export prosa.analysis.facts.model.overheads.priority_bump.
 Require Export prosa.analysis.facts.model.overheads.schedule_change.
 Require Export prosa.analysis.facts.model.arrival_curves.
+
 Require Export prosa.analysis.facts.priority.fifo.
 
 (** In this file, we prove upper bounds on the total number of
@@ -350,15 +351,16 @@ Section ScheduleChangesBoundedHelper.
   Proof.
     rewrite !size_filter; apply: leq_trans.
     { by rewrite count_predUI'; apply leqnn. }
-    { rewrite -[2]addn1 mulnDl mul1n -addnBA; last first.
+    { rewrite -[2]addn1 mulnDl mul1n -addnBA.
       { by apply sub_count_seq => to _ /andP [_ B]; apply: B. }
-      rewrite -!size_filter.
-      apply leq_add; first by apply: priority_bumps_bounded_by_hep_arrivals.
-      rewrite leq_subLR; apply: leq_trans.
-      { apply: some_job_completes_bound; try done. }
-      { rewrite addnC; apply leq_add.
-        { by apply: lp_completions_bounded_by_prio_bumps_completions. }
-        { by apply: hep_completions_bounded_by_arrivals. }
+      { rewrite -!size_filter.
+        apply leq_add; first by apply: priority_bumps_bounded_by_hep_arrivals.
+        rewrite leq_subLR; apply: leq_trans.
+        { apply: some_job_completes_bound; try done. }
+        { rewrite addnC; apply leq_add.
+          { by apply: lp_completions_bounded_by_prio_bumps_completions. }
+          { by apply: hep_completions_bounded_by_arrivals. }
+        }
       }
     }
   Qed.
@@ -384,7 +386,7 @@ Section ScheduleChangesBoundedHelper.
     eapply leq_trans; first apply some_job_completes_bound.
     eapply leq_trans.
     { apply leq_add; first by apply hep_completions_bounded_by_arrivals.
-      by rewrite lp_completions_bounded_by_arrivals; [ apply leqnn | ].
+      by rewrite lp_completions_bounded_by_arrivals; [ | apply leqnn ].
     }
     lia.
   Qed.

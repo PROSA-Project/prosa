@@ -281,14 +281,9 @@ Proof.
     by rewrite /g; lia.
   }
   have SLOW : forall n, g n.+1 <= g n + 1.
-  { intros n; rewrite /g -addn1 leq_subLR.
-    have [O1|O2] := leqP (slowed f n) n.
-    { rewrite addnA addnBA // [_ + n]addnC -addnBA; first by lia.
-      by apply slowed_respects_monotone => //; lia.
-    }
-    { by have LE: slowed f n <=  slowed f (n + 1);
-      [apply slowed_respects_monotone => //; lia | lia].
-    }
+  { intros n.
+    have LE: slowed f n <= slowed f n.+1 by apply slowed_respects_monotone => //.
+    by rewrite /g; lia.
   }
   have SLLE: forall n, slowed f n <= f n by intros n; induction n as [|n IH];[ simpl; lia | apply geq_minl].
   have LEG: Δ - f Δ <= g Δ by apply: leq_sub => //.

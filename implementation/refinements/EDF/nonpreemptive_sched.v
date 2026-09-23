@@ -5,6 +5,7 @@ Require Export prosa.analysis.definitions.tardiness.
 Require Export prosa.implementation.facts.ideal_uni.prio_aware.
 Require Export prosa.implementation.definitions.task.
 Require Export prosa.implementation.priority.edf.
+
 Require Export prosa.implementation.readiness.basic.
 
 (** ** Fully-Nonpreemptive Earliest-Deadline-First Schedules  *)
@@ -75,7 +76,7 @@ Section Schedule.
     move: SCHED NCOMP.
     rewrite !scheduled_at_def /sched /uni_schedule
             /pmc_uni_schedule /generic_schedule => /eqP SCHED NCOMP.
-    rewrite schedule_up_to_def {1}/allocation_at ifT; first by rewrite SCHED.
+    rewrite schedule_up_to_def {1}/allocation_at ifT; last by rewrite SCHED.
     rewrite /prev_job_nonpreemptive SCHED /job_preemptable /fully_nonpreemptive_job_model.
     move: SERV_COST SERV_ZERO; rewrite /uni_schedule /pmc_uni_schedule /generic_schedule.
     replace (_ (_ (_ _ _) _ t) j _) with (service sched j t.+1); last first.

@@ -54,7 +54,7 @@ Section TDMAFacts.
       task_slot_offset ts task + task_time_slot task <= TDMA_cycle ts.
     Proof.
       rewrite /task_slot_offset /TDMA_cycle.
-      rewrite addnC (bigD1_seq task) //=; last by exact: (set_uniq ts).
+      rewrite addnC (bigD1_seq task) //=; first by exact: (set_uniq ts).
       rewrite leq_add2l big_mkcond.
       replace (\sum_(i <- ts | i != task) task_time_slot i)
         with (\sum_(i <- ts ) if i != task then task_time_slot i else 0).

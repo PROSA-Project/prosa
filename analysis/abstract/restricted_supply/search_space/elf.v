@@ -3,6 +3,7 @@ Require Export prosa.analysis.abstract.search_space.
 Require Export prosa.analysis.definitions.blocking_bound.elf.
 Require Export prosa.analysis.facts.workload.elf_athep_bound.
 
+
 (** * Abstract Search Space is a Subset of Restricted Supply ELF Search Space *)
 Section SearchSpaceSubset.
 
@@ -99,7 +100,7 @@ Section SearchSpaceSubset.
     move => A [-> | [/andP [POSA LTL] [x [LTx INSP2]]]]; apply/andP; split => //.
     { apply/orP; left; apply/orP; right.
       rewrite /task_rbf_changes_at /task_rbf task_rbf_0_zero //=;
-        last by apply: valid_arrival_curve_to_max_rbf.
+        first by apply: valid_arrival_curve_to_max_rbf.
       rewrite eq_sym -lt0n add0n.
       by apply task_rbf_epsilon_gt_0 => //. }
     { apply contraT; rewrite !negb_or => /andP [/andP [/negPn/eqP PI /negPn/eqP RBF]  WL].

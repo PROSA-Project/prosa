@@ -189,17 +189,18 @@ Section AbstractRTAforFPwithArrivalCurves.
         last eapply task_rbf_without_job_under_analysis => //=.
       - rewrite (workload_of_jobs_equiv_pred _  _
                    (another_hep_job_of_same_task^~ j));
-          last by move => jo IN1; lia.
+          first by move => jo IN1; lia.
         set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
-        rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) ));
-          last first.
+        rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) )).
         { move => j' _.
           rewrite /another_hep_job_of_same_task /hep_job_of_same_task /another_hep_job.
           move : H_job_of_task => /eqP ->.
           lia. }
-        rewrite workload_minus_job_cost'; [apply leqnn| by done|].
-        rewrite job_arrival_in_bounds //=.
-        by split; [| apply /andP; split] => //=.
+        rewrite workload_minus_job_cost'.
+        + by apply arrivals_uniq.
+        + rewrite job_arrival_in_bounds //=.
+          by split; [| apply /andP; split] => //=.
+        + apply leqnn.
       -  rewrite /task_workload_between /task_workload.
          move : H_job_of_task => TSK.
          move : TSK => /eqP TSK.
@@ -231,13 +232,15 @@ Section AbstractRTAforFPwithArrivalCurves.
       - eapply task_rbf_without_job_under_analysis with (t1 := t1) => //=.
         lia.
       - set (hep_job_of_same_task := (fun x : Job => hep_job x j && (job_task x == tsk))).
-        rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) ));
-          last first.
+        rewrite (workload_of_jobs_equiv_pred _ _ (fun x => hep_job_of_same_task x && (x != j) )).
         { move => j' _.
           rewrite /another_hep_job_of_same_task /hep_job_of_same_task /another_hep_job.
           move : H_job_of_task => /eqP ->.
           lia. }
-        rewrite workload_minus_job_cost' //=.
+        rewrite workload_minus_job_cost'.
+        + by apply arrivals_uniq.
+        + apply arrived_between_implies_in_arrivals => //=.
+          apply /andP; split; [done| lia].
         + apply leq_sub; last first.
           * rewrite /hep_job_of_same_task.
             case (hep_job j j && (job_task j == tsk)) eqn: EQ1; try done.
@@ -249,8 +252,6 @@ Section AbstractRTAforFPwithArrivalCurves.
             apply workload_of_jobs_weaken.
             move : H_job_of_task => /eqP TSK.
             by move => jo /andP[_ /eqP TSK']; apply /eqP; rewrite -TSK TSK'.
-        + apply arrived_between_implies_in_arrivals => //=.
-          apply /andP; split; [done| lia].
     Qed.
 
     (** Combining the above two bounds, we obtain the final bound on the

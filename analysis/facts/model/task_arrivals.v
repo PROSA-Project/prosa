@@ -275,7 +275,7 @@ Section TaskArrivals.
         now rewrite -task_arrivals_cat.
       }
       move : CAT => [xs ARR_CAT].
-      now rewrite -ARR_CAT index_cat ifT; last by apply arrives_in_task_arrivals_up_to.
+      by rewrite -ARR_CAT index_cat ifT; first by apply arrives_in_task_arrivals_up_to.
     }
     rewrite /job_index EQ_IND nth_index => //.
     rewrite mem_filter; apply /andP.

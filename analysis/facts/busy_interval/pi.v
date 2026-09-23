@@ -140,11 +140,11 @@ Section PriorityInversionIsBounded.
       move: H_t_in_busy => /andP [GE LT].
       have ARR := low_priority_job_arrives_before_busy_interval_prefix .
       exists t1.-1; split.
-      { by rewrite prednK; last apply leq_ltn_trans with (job_arrival jlp). }
+      { by rewrite prednK; first apply leq_ltn_trans with (job_arrival jlp). }
       eapply neg_pt_scheduled_at => //.
-      - rewrite prednK; last by apply leq_ltn_trans with (job_arrival jlp).
+      - rewrite prednK; first by apply leq_ltn_trans with (job_arrival jlp).
         apply lower_priority_job_continuously_scheduled => //. lia.
-      - rewrite prednK; last by apply leq_ltn_trans with (job_arrival jlp).
+      - rewrite prednK; first by apply leq_ltn_trans with (job_arrival jlp).
         apply lower_priority_job_scheduled_implies_no_preemption_time.
         by lia.
     Qed.
@@ -377,10 +377,8 @@ Section PriorityInversionIsBounded.
       apply/negP; intros SCHED2.
       specialize (QT jhp).
       feed_n 3 QT => //.
-      - have MATE: jobs_must_arrive_to_execute sched by [].
-        by have HA: has_arrived jhp t by exact: MATE.
-      - apply completed_implies_not_scheduled in QT => //.
-        by move: QT => /negP NSCHED; apply: NSCHED.
+      apply completed_implies_not_scheduled in QT => //.
+      by move: QT => /negP NSCHED; apply: NSCHED.
     Qed.
 
     (** Thus, there must be a preemption time in the interval [t1, t1
@@ -513,11 +511,11 @@ Section PriorityInversionIsBounded.
             apply T; apply: NPPJ; apply/andP; split.
             { by apply service_monotonic; rewrite leq_addr. }
             rewrite /service  -(service_during_cat _ _ _ t1).
+            { by apply/andP; split; [|rewrite leq_addr]. }
             { rewrite ltn_add2l; rewrite ltn_add2l in LT.
               apply leq_ltn_trans with Δ => [|//].
               rewrite -{2}(sum_of_ones t1 Δ).
               by rewrite leq_sum. }
-            { by apply/andP; split; [|rewrite leq_addr]. }
           Qed.
 
           (** Thus, assuming an ideal-progress processor model, job [jlp]
@@ -533,16 +531,16 @@ Section PriorityInversionIsBounded.
               first exact: idle_time_is_pt.
             have [EQ|NEQ] := (eqVneq jlp j').
             { move: (SCHED'); rewrite -(scheduled_job_at_scheduled_at arr_seq) // -EQ /preemption_time => /eqP ->.
-              rewrite  /service -(service_during_cat _ _ _ t1); last first.
-              { by apply/andP; split; last rewrite leq_addr. }
-              have ->: service_during sched jlp t1 (t1 + fpt) = fpt => //.
-              { rewrite -{2}(sum_of_ones t1 fpt) /service_during.
-                apply/eqP; rewrite eqn_leq //; apply/andP; split.
-                + by rewrite leq_sum.
-                + rewrite big_nat_cond [in X in _ <= X]big_nat_cond.
-                  rewrite leq_sum //.
-                  move => x /andP [HYP _].
-                  exact/H_progress/continuously_scheduled_between_preemption_points. } }
+              rewrite /service -(service_during_cat _ _ _ t1).
+              - by apply/andP; split; last rewrite leq_addr.
+              - have ->: service_during sched jlp t1 (t1 + fpt) = fpt => //.
+                { rewrite -{2}(sum_of_ones t1 fpt) /service_during.
+                  apply/eqP; rewrite eqn_leq //; apply/andP; split.
+                  + by rewrite leq_sum.
+                  + rewrite big_nat_cond [in X in _ <= X]big_nat_cond.
+                    rewrite leq_sum //.
+                    move => x /andP [HYP _].
+                    exact/H_progress/continuously_scheduled_between_preemption_points. } }
             { case: (posnP fpt) => [ZERO|POS].
               { subst fpt; rewrite addn0 in SCHED'.
                 exfalso; move: NEQ => /negP; apply; apply/eqP.
@@ -565,17 +563,16 @@ Section PriorityInversionIsBounded.
             rewrite leq_add2l.
             unfold max_lp_nonpreemptive_segment.
             rewrite (big_rem jlp) //=.
-            { rewrite H_jlp_low_priority //=.
+            - apply: arrived_between_implies_in_arrivals => [//|//|].
+              apply/andP; split=> [//|].
+              eapply low_priority_job_arrives_before_busy_interval_prefix with t1; eauto 2.
+              by move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]]; apply/andP.
+            - rewrite H_jlp_low_priority //=.
               have NZ: service sched jlp t1 < job_cost jlp by exact: service_lt_cost.
-              rewrite ifT; last lia.
+              rewrite ifT; first lia.
               apply leq_trans with (job_max_nonpreemptive_segment jlp - ε).
-              - by apply H_progr_le_max_nonp_segment.
-              - by rewrite leq_maxl.
-            }
-            apply: arrived_between_implies_in_arrivals => [//|//|].
-            apply/andP; split=> [//|].
-            eapply low_priority_job_arrives_before_busy_interval_prefix with t1; eauto 2.
-            by move: (H_busy_interval_prefix) => [NEM [QT1 [NQT HPJ]]]; apply/andP.
+              + by apply H_progr_le_max_nonp_segment.
+              + by rewrite leq_maxl.
           Qed.
 
         End FirstPreemptionPointOfjlp.

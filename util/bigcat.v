@@ -1,6 +1,7 @@
 Require Export mathcomp.zify.zify.
 Require Export prosa.util.tactics prosa.util.notation.
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+
 Require Export prosa.util.tactics prosa.util.list.
 
 (** In this section, we introduce lemmas about the concatenation
@@ -26,7 +27,7 @@ Section BigCatNatLemmas.
     rewrite -> big_cat_nat with (n := j); simpl; [| by ins | by apply ltnW].
     rewrite mem_cat; apply/orP; right.
     destruct n; first by rewrite ltn0 in LE0.
-    rewrite big_nat_recl; last by ins.
+    rewrite big_nat_recl; first by ins.
     by rewrite mem_cat; apply/orP; left.
   Qed.
 
@@ -60,7 +61,8 @@ Section BigCatNatLemmas.
     move=> x; elim=> [//|n IHn] j f' Hj Hx.
     rewrite big_ord_recr /= mem_cat; apply /orP.
     move: Hj; rewrite ltnS leq_eqVlt => /orP [/eqP Hj|Hj].
-    - by right; rewrite (_ : ord_max = j); [|apply ord_inj].
+    - have EQ: ord_max = j by apply ord_inj; rewrite /= Hj.
+      by right; rewrite EQ.
     - left.
       apply (IHn (Ordinal Hj)); [by []|].
       by set j' := widen_ord _ _; have -> : j' = j; [apply ord_inj|].
@@ -88,7 +90,7 @@ Section BigCatNatLemmas.
       rewrite -[n2](addKn n1).
       rewrite -addnBA //; set delta := n2 - n1.
       elim: delta => [|delta IHdelta]; first by rewrite addn0 big_geq.
-      rewrite addnS big_nat_recr /=; last by apply leq_addr.
+      rewrite addnS big_nat_recr /=; first by apply leq_addr.
       rewrite cat_uniq; apply/andP; split; first by apply IHdelta.
       apply /andP; split; last by apply H_uniq_seq.
       rewrite -all_predC; apply/allP; intros x INx.
@@ -292,7 +294,7 @@ Section BigCatLemmas.
         apply/neqP; intros EQ; subst x'.
         move: UNI; rewrite cons_uniq => /andP [NIN _].
         by move: NIN => /negP NIN; apply: NIN. }
-      { rewrite big_cons IHxs //; last by move:UNI; rewrite cons_uniq=> /andP[_ ?].
+      { rewrite big_cons IHxs //; first by move:UNI; rewrite cons_uniq=> /andP[_ ?].
         have NEQ: (x' != y); last by rewrite seq_different_elements_nil.
         apply/neqP; intros EQ; subst x'.
         move: UNI; rewrite cons_uniq => /andP [NIN _].
