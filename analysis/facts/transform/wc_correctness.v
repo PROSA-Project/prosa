@@ -280,7 +280,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
             t <= t' < max_dl ->
             ~~ (relevant_pstate t) (sched t').
         Proof.
-            by apply (search_arg_none _ _ (fun _ _ => false)).
+          by apply (search_arg_none _ _ (fun _ _ => false)).
         Qed.
 
         (** Since [j] is ready at time [t], then it must be incomplete. *)

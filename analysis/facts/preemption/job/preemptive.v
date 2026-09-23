@@ -28,7 +28,7 @@ Section FullyPreemptiveModel.
   Lemma valid_fully_preemptive_model :
     valid_preemption_model arr_seq sched.
   Proof.
-      by intros j ARR; repeat split; intros t CONTR.
+    by intros j ARR; repeat split; intros t CONTR.
   Qed.
 
   (** We also prove that under the fully preemptive model

@@ -144,6 +144,8 @@ QUANTIFIER_FOR_INDENTATION_CHECK = re.compile(
     re.MULTILINE | re.DOTALL,
 )
 
+PROOF_FOR_INDENTATION_CHECK = re.compile(r"(?<![\w'])Proof\.")
+
 INDENT_SPACES = 2
 
 SECTION_SCOPE_KEYWORDS = re.compile(
@@ -165,6 +167,22 @@ def lint_file(opts, fpath):
 
     def matches_of(regex, start=0, end=-1):
         return (m for m in regex.finditer(src[start:end]) if m.span() not in comments)
+
+    def first_code_offset(start, end):
+        i = start
+        comment_depth = 0
+        while i < end:
+            if src.startswith("(*", i):
+                comment_depth += 1
+                i += 2
+            elif src.startswith("*)", i) and comment_depth:
+                comment_depth -= 1
+                i += 2
+            elif comment_depth or src[i].isspace():
+                i += 1
+            else:
+                return i
+        return None
 
     for i, (rule, msg, shift) in enumerate(ISSUES):
         for m in matches_of(rule):
@@ -215,6 +233,35 @@ def lint_file(opts, fpath):
                     f"{fpath}:{lineno[m.span('nline')[0]]}: bad indentation after "
                     f"{m.group('quantifier')} (expected {quantifier_indentation + INDENT_SPACES}, "
                     f"found {expression_indentation})",
+                    0,
+                    1,
+                )
+            )
+
+    for m in matches_of(PROOF_FOR_INDENTATION_CHECK):
+        proof_line_start = lineno.line_start_for_offset(m.start())
+        if src[proof_line_start : m.start()].strip():
+            continue
+
+        proof_range = proofs.ranges[m.start()]
+        if proof_range is None:
+            continue
+        nline = first_code_offset(m.end(), proof_range[1])
+        if nline is None or lineno[nline] == lineno[m.start()]:
+            continue
+        if re.match(r"(?:Qed|Defined|Admitted|Abort)\.", src[nline:]):
+            continue
+
+        expected_indent = (
+            lineno.visual_offset_within_line(m.start()) + INDENT_SPACES
+        )
+        indentation = lineno.visual_offset_within_line(nline)
+        if indentation != expected_indent:
+            issues.append(
+                (
+                    (nline, nline + 1),
+                    f"{fpath}:{lineno[nline]}: bad indentation after Proof. "
+                    f"(expected {expected_indent}, found {indentation})",
                     0,
                     1,
                 )

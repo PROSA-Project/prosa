@@ -92,7 +92,7 @@ Section ScheduleClass.
   Lemma scheduled_at_def sched (j : Job) t :
     scheduled_at sched j t = (sched t == Some j).
   Proof.
-      by rewrite /scheduled_at scheduled_in_def.
+    by rewrite /scheduled_at scheduled_in_def.
   Qed.
 
   (** ... [service_on], ... *)
@@ -118,7 +118,7 @@ Section ScheduleClass.
   Lemma service_at_is_scheduled_at sched (j : Job) t :
     service_at sched j t = scheduled_at sched j t.
   Proof.
-      by rewrite /service_at service_in_is_scheduled_in.
+    by rewrite /service_at service_in_is_scheduled_in.
   Qed.
 
   (** The ideal processor model is a fully supply-consuming processor
