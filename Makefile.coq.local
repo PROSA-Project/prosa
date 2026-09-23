@@ -4,7 +4,7 @@ include scripts/Makefile.alectryon
 
 # Hack to enable esy support:
 #
-# In the esy container, $HOME is hidden, but this causes Coq to complain.
+# In the esy container, $HOME is hidden, but this causes Rocq to complain.
 # We thus include a dummy $HOME value.
 HOME ?= $(DESTDIR)
 export HOME

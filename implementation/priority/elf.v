@@ -140,7 +140,7 @@ Section PropertiesOfELF.
 End PropertiesOfELF.
 
 (** We add the concrete-policy witness to the [basic_rt_facts] hint database so
-    Coq can apply it automatically where needed. *)
+    Rocq can apply it automatically where needed. *)
 Global Hint Resolve
   ELF_is_ELF_policy
   ELF_is_reflexive

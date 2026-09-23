@@ -9,7 +9,7 @@ Require Export prosa.behavior.all.
     uniprocessor schedule, there are only two possible cases: at a given time,
     either a specific job is scheduled and makes unit progress, or the
     processor is idle. To model this, we simply reuse the standard [option]
-    type from the Coq standard library. *)
+    type from the Rocq standard library. *)
 
 Section State.
 

@@ -26,7 +26,7 @@ Class ProcessorState (Job : JobType) :=
         jobs can be scheduled. In the case of uniprocessors, this is irrelevant
         and may be ignored (by convention, the unit type is used as a
         placeholder in uniprocessor schedules, but this is not
-        important). (Hint to the Coq novice: [finType] just means some type
+        important). (Hint to the Rocq novice: [finType] just means some type
         with finitely many values, i.e., it is possible to enumerate all cores
         of a multi-processor.)  *)
     Core : finType;
@@ -114,7 +114,7 @@ End ProcessorIn.
 Definition schedule {Job : JobType} (PState : ProcessorState Job) :=
   instant -> PState.
 
-(** The following line instructs Coq to not let proofs use knowledge of how
+(** The following line instructs Rocq to not let proofs use knowledge of how
     [job_on] and [service_on] are defined. Instead,
     proofs must rely on basic lemmas about processor state classes. *)
 Global Opaque job_on service_on supply_on.

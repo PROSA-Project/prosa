@@ -882,7 +882,7 @@ Definition strict_prefix_of {T : eqType} (xs ys : seq T) :=
 
 (** We define a helper function that shifts a sequence of numbers "forward" by a
     constant offset, and an analogous version that shifts them "backwards,"
-    removing any number that, in the absence of Coq's saturating subtraction,
+    removing any number that, in the absence of Rocq's saturating subtraction,
     would become negative. These functions are useful in transforming abstract RTA's
     search space. *)
 Definition shift_points_pos (xs : seq nat) (s : nat) : seq nat :=

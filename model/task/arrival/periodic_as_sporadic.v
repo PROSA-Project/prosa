@@ -7,7 +7,7 @@ Require Export prosa.model.task.arrival.periodic.
     valid sporadic arrivals sequence), it is sometimes convenient to apply
     analyses for sporadic tasks to periodic tasks. We therefore provide an
     automatic "conversion" of periodic tasks to sporadic tasks, i.e., we tell
-    Coq that it may use a periodic task's [task_period] parameter also as the
+    Rocq that it may use a periodic task's [task_period] parameter also as the
     task's minimum inter-arrival time [task_min_inter_arrival_time]
     parameter. *)
 

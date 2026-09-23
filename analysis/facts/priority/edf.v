@@ -130,7 +130,7 @@ Section PriorityFacts.
 
 End PriorityFacts.
 
-(** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq
+(** We add the above lemma into a "Hint Database" basic_rt_facts, so Rocq
     will be able to apply it automatically. *)
 Global Hint Resolve
   EDF_policy_is_reflexive

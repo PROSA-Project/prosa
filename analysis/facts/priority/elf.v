@@ -194,7 +194,7 @@ Section ELFBasicFacts.
 End ELFBasicFacts.
 
 (** We add the generally useful ELF facts into the [basic_rt_facts] hint
-    database, so Coq can apply them automatically where needed. *)
+    database, so Rocq can apply them automatically where needed. *)
 Global Hint Resolve
     ELF_policy_is_reflexive
     ELF_policy_is_transitive

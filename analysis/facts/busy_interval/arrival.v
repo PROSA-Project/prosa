@@ -38,7 +38,7 @@ Section BasicFacts.
 
 End BasicFacts.
 
-(** We add the above facts into the "Hint Database" basic_rt_facts, so Coq will
+(** We add the above facts into the "Hint Database" basic_rt_facts, so Rocq will
     be able to apply them automatically where needed. *)
 Global Hint Resolve
   busy_interval_prefix_job_arrival

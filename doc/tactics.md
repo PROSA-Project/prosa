@@ -26,9 +26,9 @@ Tactics taken from the standard library of Viktor Vafeiadis.
 
 *To be continued… please help out.*
 
-## Standard Coq Tactics
+## Standard Rocq Tactics
 
-Generally speaking, in new code, prefer `ssreflect` tactics over standard Coq tactics whenever possible. While the current code base is a mix of classic Coq tactics and `ssreflect` tactics, that's only a historical accident not worth emulating. 
+Generally speaking, in new code, prefer `ssreflect` tactics over standard Rocq tactics whenever possible. While the current code base is a mix of classic Rocq tactics and `ssreflect` tactics, that's only a historical accident not worth emulating.
 
 - `lia`: Solves arithmetic goals, including ones with `ssreflect`'s definitions (thanks to the `coq-mathcomp-zify` dependency).
 

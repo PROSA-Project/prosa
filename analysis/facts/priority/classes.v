@@ -289,7 +289,7 @@ Section FPRemarks.
 
 End FPRemarks.
 
-(** We add some lemmas into the "Hint Database" basic_rt_facts, so Coq will be
+(** We add some lemmas into the "Hint Database" basic_rt_facts, so Rocq will be
     able to apply it automatically. *)
 Global Hint Resolve
   respects_sequential_tasks

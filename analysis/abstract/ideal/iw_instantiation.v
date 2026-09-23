@@ -686,7 +686,7 @@ Global Opaque another_hep_job_interference
        cumulative_other_hep_jobs_interfering_workload
        other_hep_jobs_interfering_workload.
 
-(** We add some facts into the "Hint Database" basic_rt_facts, so Coq will be
+(** We add some facts into the "Hint Database" basic_rt_facts, so Rocq will be
     able to apply them automatically where needed. *)
 Global Hint Resolve
        abstract_busy_interval_classic_quiet_time

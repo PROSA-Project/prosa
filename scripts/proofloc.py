@@ -182,7 +182,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Proof counting tool")
 
     parser.add_argument(
-        "input_files", nargs="*", metavar="Coq-file", help="input Coq files (*.v)"
+        "input_files", nargs="*", metavar="Rocq-file", help="input Rocq files (*.v)"
     )
 
     parser.add_argument(

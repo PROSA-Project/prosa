@@ -66,7 +66,7 @@ Section ValidTaskArrivalSequence.
 
 End ValidTaskArrivalSequence.
 
-(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Rocq
     will be able to apply them automatically. *)
 Hint Resolve
      valid_task_arrival_sequence_valid_arrivals

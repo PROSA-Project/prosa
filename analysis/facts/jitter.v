@@ -178,7 +178,7 @@ Section JitterPropagationFacts.
 
   (** As one would think, the set of scheduled jobs remains unchanged. For
       technical reasons (dependence of the definition of [scheduled_jobs_at] on
-      the arrival sequence), this is a lot less obvious at the Coq level than
+      the arrival sequence), this is a lot less obvious at the Rocq level than
       one intuitively might expect. *)
   Lemma jitter_scheduled_jobs_at_equiv :
     forall t j,

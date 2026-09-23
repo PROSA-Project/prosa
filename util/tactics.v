@@ -129,13 +129,13 @@ Ltac done := solve [ ssreflect.done | eauto 4 with basic_rt_facts ].
 #[export] Hint Resolve I : basic_rt_facts.
 
 (** Note: [idtac] is a no-op. However, it suppresses the default obligation tactic,
-    which uses [intros] to introduce unnamed variables. This is a Coq technicality
+    which uses [intros] to introduce unnamed variables. This is a Rocq technicality
     that a casual reader may safely ignore. It is necessary to avoid triggering one
     of Prosa's continuous integration checks that validates that no proof scripts
     depend on automatically generated names.  *)
 #[global] Obligation Tactic := idtac.
 
-(** The mathematical components library turns off Coq's support for the enforcement
+(** The mathematical components library turns off Rocq's support for the enforcement
     of structured sub-proofs. We do want structured sub-proofs in Prosa, however, so
     here we turn strict checking back on. *)
 #[global] Set Bullet Behavior "Strict Subproofs".

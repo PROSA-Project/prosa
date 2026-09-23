@@ -227,7 +227,7 @@ Section ScheduleClass.
 End ScheduleClass.
 
 (** * Automation *)
-(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Rocq
     will be able to apply them automatically. *)
 Global Hint Resolve ideal_proc_model_is_a_uniprocessor_model
      ideal_proc_model_provides_unit_supply

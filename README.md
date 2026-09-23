@@ -1,6 +1,6 @@
 # Prosa: Formally Proven Schedulability Analysis
 
-This repository contains the main specification & proof development of the [Prosa open-source project](https://prosa.mpi-sws.org). Technically, Prosa is a library for the [Rocq Prover](https://rocq-prover.org) (previously known as the [Coq Proof Assistant](https://rocq-prover.org/about#Name)).
+This repository contains the main specification & proof development of the [Prosa open-source project](https://prosa.mpi-sws.org). Technically, Prosa is a library for the [Rocq Prover](https://rocq-prover.org).
 
 The Prosa project was launched in 2016. From 2018–2021, Prosa was refactored and enhanced in the context of the [RT-Proofs research project](https://rt-proofs.inria.fr/) (funded jointly by ANR and DFG, projects ANR-17-CE25-0016 and DFG-391919384, respectively).
 
@@ -101,7 +101,7 @@ esy
 ```
 
 Note that `esy` uses an internal compilation environment, which is not exported to the current shell.
-To work within this environment, prefix any command with `esy`: for instance `esy coqide` to run your system’s CoqIDE within the right environment.
+To work within this environment, prefix any command with `esy`: for instance, `esy coqide` launches the IDE within the right environment.
 Alternatively, `esy shell` opens a shell within its environment.
 
 ### Manual Compilation From Sources
@@ -118,7 +118,7 @@ Besides Rocq itself, Prosa depends on
 
 1. the `ssreflect` library of the [Mathematical Components project](https://math-comp.github.io),
 2. the [Micromega support for the Mathematical Components library](https://github.com/math-comp/mczify) provided by `mczify`, and
-3. the [Coq Effective Algebra Library](https://github.com/coq-community/coqeal) (optional, needed only for POET-related refinements).
+3. the [CoqEAL library](https://github.com/coq-community/coqeal) (optional, needed only for POET-related refinements).
 
 These dependencies can be easily installed with OPAM.
 

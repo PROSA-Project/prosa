@@ -45,7 +45,7 @@ Section FPPolicyFacts.
 End FPPolicyFacts.
 
 (** We add the generally useful FP-policy facts into the [basic_rt_facts] hint
-    database, so Coq can apply them automatically where needed. *)
+    database, so Rocq can apply them automatically where needed. *)
 Global Hint Resolve
     FP_policy_is_reflexive
     FP_policy_is_transitive

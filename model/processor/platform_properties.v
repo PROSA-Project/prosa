@@ -61,7 +61,7 @@ End ProcessorModels.
 
 (** We add the reduction from [unit_supply_proc_model] to
     [unit_service_proc_model] into the "Hint Database" basic_rt_facts,
-    so Coq will be able to apply it automatically where needed. *)
+    so Rocq will be able to apply it automatically where needed. *)
 Global Hint Resolve
        unit_supply_is_unit_service
   : basic_rt_facts.

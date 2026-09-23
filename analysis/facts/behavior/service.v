@@ -921,7 +921,7 @@ Section ServiceInTwoSchedules.
 End ServiceInTwoSchedules.
 
   (** We add some facts into the "Hint Database" basic_rt_facts, so
-      Coq will be able to apply them automatically where needed. *)
+      Rocq will be able to apply them automatically where needed. *)
 Global Hint Resolve
        served_at_and_receives_service_consistent
   : basic_rt_facts.

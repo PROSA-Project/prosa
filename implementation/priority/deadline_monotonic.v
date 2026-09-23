@@ -37,7 +37,7 @@ Section Properties.
 
 End Properties.
 
-(** We add the above facts into the [basic_rt_facts] hint database so Coq can
+(** We add the above facts into the [basic_rt_facts] hint database so Rocq can
     apply them automatically where needed. *)
 Global Hint Resolve
   DM_is_DM_policy

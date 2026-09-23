@@ -63,7 +63,7 @@ Section ArrivalCurvePropagation.
     if delta is 0 then 0
     else max_arrivals (task1_of tsk2) (delta + delay_bound tsk2).
 
-  (** ... and register this definition with Coq as a type class instance. *)
+  (** ... and register this definition with Rocq as a type class instance. *)
   #[local]
   Instance propagated_arrival_curve : MaxArrivals Task2 :=
   {

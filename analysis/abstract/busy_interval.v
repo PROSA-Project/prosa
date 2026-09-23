@@ -535,7 +535,7 @@ Section AbstractBusyIntervalExists.
 End AbstractBusyIntervalExists.
 
 
-(** We add some facts into the "Hint Database" basic_rt_facts, so Coq will be
+(** We add some facts into the "Hint Database" basic_rt_facts, so Rocq will be
     able to apply them automatically where needed. *)
 Global Hint Resolve
   abstract_busy_interval_arrivals_before

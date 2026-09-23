@@ -256,6 +256,6 @@ Section RunToCompletionThreshold.
 
 End RunToCompletionThreshold.
 
-(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Rocq
     will be able to apply them automatically. *)
 Global Hint Resolve job_run_to_completion_threshold_le_job_cost : basic_rt_facts.

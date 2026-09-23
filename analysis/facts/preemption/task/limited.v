@@ -119,7 +119,7 @@ Section LimitedPreemptionsModel.
 
 End LimitedPreemptionsModel.
 
-(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Coq will be able to apply them automatically. *)
+(** We add the above lemmas into a "Hint Database" basic_rt_facts, so Rocq will be able to apply them automatically. *)
 Global Hint Resolve
      valid_fixed_preemption_points_model_lemma
      fixed_preemption_points_model_is_model_with_bounded_nonpreemptive_regions

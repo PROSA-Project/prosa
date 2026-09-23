@@ -99,7 +99,7 @@ Section Abstract_RTA.
       of equation [F : task_rtc tsk + IBF_P tsk A F ≤ F]. *)
 
   (** To formalize the dependency of [IBF_P] on the relative arrival
-      time in Coq, we introduce a predicate that tests whether a job
+      time in Rocq, we introduce a predicate that tests whether a job
       [j] arrives exactly [A] time units after the beginning of its
       busy interval, which is unique (if it exists). *)
   Definition relative_arrival_time_of_job_is_A (j : Job) (A : duration) :=
@@ -131,7 +131,7 @@ Section Abstract_RTA.
       solution of the first fixpoint equation. *)
 
   (** To formalize the dependency of [IBF_NP] on the relative time
-      when job [j] receives [task_rtc tsk] units of service in Coq, we
+      when job [j] receives [task_rtc tsk] units of service in Rocq, we
       introduce a predicate that tests whether a job [j] has more than
       [task_rtc tsk] units of service at a time instant [t1 + F],
       where [t1] is the beginning of [j]'s busy interval. The first

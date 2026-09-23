@@ -4,7 +4,7 @@ Require Export prosa.model.priority.definitions.
 
 (** Since there are natural interpretations of FP and JLFP policies as JLFP and
     JLDP policies, respectively, we define conversions that express these
-    generalizations. In practice, this means that Coq will be able to
+    generalizations. In practice, this means that Rocq will be able to
     automatically satisfy a JLDP assumption if a JLFP or FP policy is in
     scope. *)
 
@@ -111,7 +111,7 @@ Section PriorityRelationsConversion.
 
 End PriorityRelationsConversion.
 
-(** We add the above lemmas into the "Hint Database" basic_rt_facts, so Coq
+(** We add the above lemmas into the "Hint Database" basic_rt_facts, so Rocq
     will be able to apply them automatically. *)
 Global Hint Resolve
     reflexive_priorities_FP_implies_JLFP

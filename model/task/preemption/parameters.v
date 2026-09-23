@@ -49,7 +49,7 @@ Section MaxAndLastNonpreemptiveSegment.
 
 End MaxAndLastNonpreemptiveSegment.
 
-(** To avoid having to specify redundant information, we allow Coq to
+(** To avoid having to specify redundant information, we allow Rocq to
     automatically infer a task's maximum non-preemptive segment length if its
     preemption points are known. *)
 #[global]

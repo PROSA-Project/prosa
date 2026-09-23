@@ -1,21 +1,21 @@
 # Writing and Coding Guidelines
 
-This project targets Coq *non*-experts. Accordingly, great emphasis is placed on keeping it as simple and as accessible as possible.
+This project targets Rocq *non*-experts. Accordingly, great emphasis is placed on keeping it as simple and as accessible as possible.
 
 ## Core Principles
 
 1. **Readability** matters most. Specifications that are difficult to grasp are fundamentally no more trustworthy than pen&paper proofs.
 2. Being **explicit** is good. The overarching goal is to make it easy for the (non-expert) reader. Being explicit and (within reason) verbose and at times repetitive helps to make a spec more readable because most statements can then be understood within a local scope. Conversely, any advanced "magic" that works behind the scenes can quickly render a spec unreadable to novices.
-3. **Good names** are essential. Choose long, self-explanatory names. Even if this means "more work" when typing the name a lot, it greatly helps with providing a helpful intuition to the reader. (Note to advanced users: if you find the long names annoying, consider using [Company Coq](https://github.com/cpitclaudel/company-coq)'s auto-completion features.)
+3. **Good names** are essential. Choose long, self-explanatory names. Even if this means "more work" when typing the name a lot, it greatly helps with providing a helpful intuition to the reader. (Note to advanced users: if you find the long names annoying, consider using your editor's auto-completion features.)
 4. **Comment** profusely. Make an effort to comment all high-level steps and definitions. In particular, comment all hypotheses, definitions, lemmas, etc.
-5. **Keep it simple.** Shy away from advanced Coq techniques. At the very least, the spec and all lemma/theorem claims should be readable and understandable with a basic understanding of Coq (proofs are not expected to be readable).
+5. **Keep it simple.** Shy away from advanced Rocq techniques. At the very least, the spec and all lemma/theorem claims should be readable and understandable with a basic understanding of Rocq (proofs are not expected to be readable).
 
 
 ## Readability Advice
 
 - Use many, mostly short sections. Sections are a great way to structure code and to guide the reader; they serve the reader by establishing a local scope that is easier to remember.
 - Keep definitions and proofs in separate sections, and ideally in different files. This makes the definitions short, and more clearly separates the computation of the actual analysis results from their validity arguments.
-- Make extensive use of the `Hypothesis` feature. Hypotheses are very readable and are accessible even to non-Coq users, especially when paired with self-explanatory names.
+- Make extensive use of the `Hypothesis` feature. Hypotheses are very readable and are accessible even to non-Rocq users, especially when paired with self-explanatory names.
 - Consider renaming general concepts with `let` bindings to introduce local names that are more meaningful.
 - Interleave running commentary *as if you were writing a paper* with the actual definitions and lemmas. This helps greatly with making the spec more accessible to everyone. See [`results.fifo.rta`](../results/fifo/rta.v) for a nice example of this style.
 - When commenting, be careful not to leave any misspelled words: Prosa's CI system includes a spell-checker that will flag potential errors.
@@ -42,7 +42,7 @@ Examples: `task_cost`, `task_deadline`.
 
 ## Use of Spaces
 1. Avoid trailing white-space characters in all files. (Use `M-x delete-trailing-whitespace` in `emacs` to delete trailing white-space characters. Add `(add-hook 'before-save-hook 'delete-trailing-whitespace)` to your `~/.emacs` file to automate this.)
-2. In lemmas, hypotheses, variable and definition declarations, follow modern Coq style by using a space before and after each colon. For example:
+2. In lemmas, hypotheses, variable and definition declarations, follow modern Rocq style by using a space before and after each colon. For example:
 
 ```
 Variable foo : ItsType.
@@ -57,11 +57,11 @@ Lemma foo_lower_bound : foo + 1 >= 4.
 ```
 
 
-## Coq Features
+## Rocq Features
 
 - We use type classes sparingly. Primarily, type classes are used to introduce new job and task parameters, and to express key modeling assumptions (e.g., whether jobs can self-suspend or not).
 - When a type class exposes functions or relations, put them in record fields, even if there is only one member. For example, use `Class JobCost Job := { job_cost : Job -> work }`, not `Class JobCost Job := job_cost : Job -> work`. This gives typeclass inference a class-shaped head symbol and avoids confusing unrelated singleton classes with generic function types. Add a `Coercion ... : ... >-> Funclass` only when applying class values as functions is an intentional part of the interface.
-- We rely heavily on type inference. Top-level definitions do *not* require type annotations if the semantics are clear from context and Coq can figure out the specific types.
+- We rely heavily on type inference. Top-level definitions do *not* require type annotations if the semantics are clear from context and Rocq can figure out the specific types.
 - We tend to not use a lot of custom syntax/notation. Heavy use of custom syntax reduces readability because readers are forced to remember all local syntax definitions.
 - We rely heavily on ssreflect notation.
 
@@ -91,7 +91,7 @@ A brief explanation of implicit arguments can be found when discussing
 
 ## Stating Dependencies with `Require Import` and `Require Export`
 
-1. Prefer `Require Export full.path.to.module.that.you.want` over `From full.path.to.module.that.you Require Export want` because (as of Coq 8.10) the latter is brittle w.r.t. the "auto-magic" module finding heuristics employed by Coq (see also: Coq issues [9080](https://github.com/coq/coq/issues/9080), [9839](https://github.com/coq/coq/issues/9839), and [11124](https://github.com/coq/coq/issues/11124)).
+1. Prefer `Require Export full.path.to.module.that.you.want` over `From full.path.to.module.that.you Require Export want` because the latter can be brittle with automatic module-finding heuristics (see issues [9080](https://github.com/coq/coq/issues/9080), [9839](https://github.com/coq/coq/issues/9839), and [11124](https://github.com/coq/coq/issues/11124)).
 Exception to this rule: ssreflect and other standard library imports.
 2. Avoid repetitive, lengthy blocks of `Require Import` statements at the beginning of files through the judicious use of `Require Export`.
 4. Always require external libraries first, i.e., *before* stating any Prosa-internal dependencies. This way, an addition in external libraries
@@ -142,13 +142,13 @@ Generally try to make proofs as robust to (minor) changes in definitions as poss
 2. General principle: **Rewrite with equalities, do not unfold definitions.**
 Avoid unfolding definitions in anything but “basic facts” files. Main proofs should not unfold low-level definitions, processor models, etc. Rather, they should rely exclusively on basic facts so that we can change representations without breaking high-level proofs.
 3. In particular, for case analysis, prefer basic facts that express all possible cases as a disjunction. Do not destruct the actual definitions directly.
-    - Aside: Sometimes, it is more convenient to use a specific inductive type rather than a disjunction. See for instance `PeanoNat.Nat.compare_spec` in the Coq standard library or Section 4.2.1 of the [Mathcomp book](https://math-comp.github.io/mcb/book.pdf) for more details. However, we generally prefer the use of a disjunction for readability whenever possible and reasonable.
+    - Aside: Sometimes, it is more convenient to use a specific inductive type rather than a disjunction. See for instance `PeanoNat.Nat.compare_spec` in the Rocq standard library or Section 4.2.1 of the [Mathcomp book](https://math-comp.github.io/mcb/book.pdf) for more details. However, we generally prefer the use of a disjunction for readability whenever possible and reasonable.
 4. Do not explicitly reference proof terms in type classes (because they might change with the representation). Instead, introduce lemmas that restate the proof term in a general, abstract way that is unlikely to change and rely on those.
 Guideline: do not name proof terms in type classes to prevent explicit dependencies.
 
 ### Auto-Generated Names
 
-Some tactics, like `intros.` (without arguments) can introduce hypotheses with automatically generated names (typically `H`, `H0`, `H1`, `H2`). The use of such tactic should be avoided as they make the proofs less robust (any change can easily shift the naming). Note that ssreflect offers `move=> ?` that can be used when naming is not needed, while still being robust, because it ensures the automatically named hypotheses cannot be explicitly mentioned in the proof script. The fact that no automatically generated name is explicitly referred to is checked in the CI with the `-mangle-names` option of Coq.
+Some tactics, like `intros.` (without arguments) can introduce hypotheses with automatically generated names (typically `H`, `H0`, `H1`, `H2`). The use of such tactic should be avoided as they make the proofs less robust (any change can easily shift the naming). Note that ssreflect offers `move=> ?` that can be used when naming is not needed, while still being robust, because it ensures the automatically named hypotheses cannot be explicitly mentioned in the proof script. The fact that no automatically generated name is explicitly referred to is checked in the CI with the `-mangle-names` option of Rocq.
 
 
 ### Choice of Tactics
@@ -176,12 +176,12 @@ In new code, prefer *ssreflect* style:
 
 If you have trouble getting the ssreflect tactics to work, **ask for help** instead of reverting to non-ssreflect tactics.
 
-**Note**: it can be effective to ask conversational AI tools such as `ChatGPT` for examples, usage instructions, and explanations. Try prompts such as: "In the context of Coq with the ssreflect library, please explain how one performs case analysis in idiomatic ssreflect style."
+**Note**: it can be effective to ask conversational AI tools such as `ChatGPT` for examples, usage instructions, and explanations. Try prompts such as: "In the context of Rocq with the ssreflect library, please explain how one performs case analysis in idiomatic ssreflect style."
 
 Document non-standard tactics that you use in the [list of tactics](doc/tactics.md). For new users, it can be quite difficult to identify the right tactics to use. This list is intended to give novices a starting to point in the search for the "right" tools.
 
 ### Forward vs backward reasoning
-Although the primary focus of Prosa is on the quality of the overall structure and the specifications, good proofs are short and readable. Since Coq tends to favor backward reasoning, try to adhere to it. Forward reasoning tends to be more verbose and to generate needlessly convoluted proof trees. To get an idea, read the following snippet:
+Although the primary focus of Prosa is on the quality of the overall structure and the specifications, good proofs are short and readable. Since Rocq tends to favor backward reasoning, try to adhere to it. Forward reasoning tends to be more verbose and to generate needlessly convoluted proof trees. To get an idea, read the following snippet:
 
 ```coq
 (** Let's say we have piecewise [A->B->C->D]. *)

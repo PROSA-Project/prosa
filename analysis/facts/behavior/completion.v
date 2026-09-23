@@ -388,7 +388,7 @@ Section CompletedJobs.
 
 End CompletedJobs.
 
-(** We add the above lemma into a "Hint Database" basic_rt_facts, so Coq
+(** We add the above lemma into a "Hint Database" basic_rt_facts, so Rocq
     will be able to apply it automatically. *)
 Global Hint Resolve valid_schedule_implies_completed_jobs_dont_execute : basic_rt_facts.
 
