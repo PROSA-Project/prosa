@@ -147,6 +147,7 @@ QUANTIFIER_FOR_INDENTATION_CHECK = re.compile(
 PROOF_FOR_INDENTATION_CHECK = re.compile(r"(?<![\w'])Proof\.")
 
 INDENT_SPACES = 2
+COQDOC_INDENT_SPACES = 4
 
 SECTION_SCOPE_KEYWORDS = re.compile(
     r"(?P<keyword>Variable|Variables|Hypothesis|Context|Local|Instance|Notation|Let)[^.]+\.|"
@@ -266,6 +267,56 @@ def lint_file(opts, fpath):
                     1,
                 )
             )
+
+    for s, e in comments.ranges:
+        # Rocqdoc comment ranges start immediately after the opening marker.
+        start = s - 3
+        if start < 0 or src[start:s] != "(**" or "\n" not in src[s:e]:
+            continue
+
+        opener_indentation = lineno.offset_within_line(start)
+        expected_indent = opener_indentation + COQDOC_INDENT_SPACES
+        in_code_block = False
+        offset = s
+        for line_index, raw_line in enumerate(src[s:e].splitlines(keepends=True)):
+            line_start = offset
+            offset += len(raw_line)
+            if line_index == 0:
+                # The first line starts directly after `(**`; only continuation
+                # lines are subject to this rule.
+                continue
+
+            line = raw_line.rstrip("\r\n")
+            if in_code_block:
+                if ">>" in line:
+                    in_code_block = False
+                continue
+            if "<<" in line:
+                in_code_block = ">>" not in line
+                continue
+            if not line.strip():
+                continue
+
+            indentation = len(line) - len(line.lstrip(" \t"))
+            if indentation < expected_indent and not (
+                opener_indentation == 0 and indentation == 0
+            ):
+                issue = line_start + indentation
+                expected_description = (
+                    f"0 or at least {expected_indent}"
+                    if opener_indentation == 0
+                    else f"at least {expected_indent}"
+                )
+                issues.append(
+                    (
+                        (issue, issue + 1),
+                        f"{fpath}:{lineno[issue]}: bad coqdoc comment indentation "
+                        f"(expected {expected_description}, found {indentation})",
+                        0,
+                        1,
+                    )
+                )
+                break
 
     for m in NONROCQDOC_COMMENT.finditer(src):
         if m.span() in proofs:
