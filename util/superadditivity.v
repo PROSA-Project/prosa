@@ -72,7 +72,7 @@ Section Facts.
   Section SuperadditiveFunctions.
 
     (** Assume that [f] is superadditive. *)
-    Hypothesis h_superadditive : superadditive f.
+    Hypothesis H_superadditive : superadditive f.
 
     (** First, we show that [f] must also be monotone. *)
     Lemma superadditive_monotone :
@@ -81,7 +81,7 @@ Section Facts.
       move=> x y LEQ.
       apply leq_trans with (f x + f (y - x)).
       - by lia.
-      - apply h_superadditive.
+      - apply H_superadditive.
         by lia.
     Qed.
 
@@ -96,7 +96,7 @@ Section Facts.
       rewrite !mulSnr.
       apply leq_trans with (f (m * n) + f n).
       - by rewrite leq_add2r.
-      - by apply h_superadditive.
+      - by apply H_superadditive.
     Qed.
 
     (** In the next section, we show that any superadditive function that is not
@@ -105,14 +105,14 @@ Section Facts.
     Section NonZeroSuperadditiveFunctions.
 
       (** Assume that [f] is not the zero constant function ... *)
-      Hypothesis h_non_zero : exists n, f n > 0.
+      Hypothesis H_non_zero : exists n, f n > 0.
 
       (** ... then, [f] will eventually grow larger than any number. *)
       Lemma superadditive_unbounded :
         forall t, exists n', t <= f n'.
       Proof.
         move=> t.
-        move: h_non_zero => [n LT_n].
+        move: H_non_zero => [n LT_n].
         exists (t * n).
         apply leq_trans with (t * f n).
         - by apply leq_pmulr.
@@ -164,13 +164,13 @@ Section MinimalExtensionOfSuperadditiveFunctions.
     Variable h : nat.
 
     (** ... and assume that we know [f] to be superadditive until [h]. *)
-    Hypothesis h_superadditive_until : superadditive_until f h.
+    Hypothesis H_superadditive_until : superadditive_until f h.
 
     (** Moreover, consider a second function, [f'], which is equivalent to
         [f] in all of its points except for [h], in which its value is exactly
         the superadditive extension of [f] in [h]. *)
     Variable f' : nat -> nat.
-    Hypothesis h_f'_min_extension :
+    Hypothesis H_f'_min_extension :
       forall t,
         f' t = if t == h
                then minimal_superadditive_extension h
@@ -181,12 +181,12 @@ Section MinimalExtensionOfSuperadditiveFunctions.
       superadditive_at f' h.
     Proof.
       move => a b SUM.
-      rewrite !h_f'_min_extension.
+      rewrite !H_f'_min_extension.
       rewrite -SUM.
       destruct a as [|a'] eqn:EQa; destruct b as [|b'] eqn:EQb => //=.
-      { rewrite add0n eq_refl superadditive_first_zero; first by apply h_superadditive_until; lia.
+      { rewrite add0n eq_refl superadditive_first_zero; first by apply H_superadditive_until; lia.
         by rewrite add0n. }
-      { rewrite addn0 eq_refl superadditive_first_zero; first by apply h_superadditive_until; lia.
+      { rewrite addn0 eq_refl superadditive_first_zero; first by apply H_superadditive_until; lia.
         by rewrite addn0. }
       { rewrite -!EQa -!EQb eq_refl //=.
         rewrite -{1}(addn0 a) eqn_add2l {1}EQb //=.
@@ -204,9 +204,9 @@ Section MinimalExtensionOfSuperadditiveFunctions.
     Proof.
       move=> t LEQh a b SUM.
       destruct (ltngtP t h) as [LT | GT | EQ].
-      - rewrite !h_f'_min_extension.
+      - rewrite !H_f'_min_extension.
         rewrite !ltn_eqF; try lia.
-        by apply h_superadditive_until.
+        by apply H_superadditive_until.
       - by lia.
       - rewrite EQ in SUM; rewrite EQ.
         by apply minimal_extension_superadditive_at_horizon.

@@ -67,7 +67,7 @@ Section FixpointSearch.
     Hypothesis H_f_mono : monotone leq f.
 
     (** ... and not zero at 1. *)
-    Hypothesis F1 : f 1 > 0.
+    Hypothesis H_F1 : f 1 > 0.
 
     (** Assuming the function is monotonic, there is no fixpoint between [a] and
         [c], if [f a = c]. *)
@@ -183,7 +183,7 @@ Section FixpointSearch.
     Proof.
       move=> FFP x /andP [POS LT].
       apply: (ffpf_finds_none 1 h).
-      - by move: F1; case (f 1) => //.
+      - by move: H_F1; case (f 1) => //.
       - by rewrite subn1; exact /leq_pred.
       - by exact: FFP.
       - by apply /andP; split.

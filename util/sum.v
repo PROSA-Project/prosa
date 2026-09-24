@@ -284,14 +284,14 @@ Section SumOfTwoIntervals.
 
   (** Assume that the two functions match point-wise with each other, with the points taken
       in their respective interval. *)
-  Hypothesis equal_before_d : forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
+  Hypothesis H_equal_before_d : forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
 
   (** Then the summations of [F1] over <<[t1, t1 + d)>> and [F2] over
       <<[t2, t2 + d)>> are equal. *)
   Lemma big_sum_eq_in_eq_sized_intervals :
     \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
   Proof.
-    elim: d equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.
+    elim: d H_equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.
     rewrite !addnS !big_nat_recr => //; try by lia.
     by rewrite IHn.
   Qed.

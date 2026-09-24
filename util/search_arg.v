@@ -171,9 +171,9 @@ Section ArgSearch.
   Qed.
 
   (** Let us assume that [R] is a reflexive and transitive total order... *)
-  Hypothesis R_reflexive : reflexive R.
-  Hypothesis R_transitive : transitive R.
-  Hypothesis R_total : total R.
+  Hypothesis H_R_reflexive : reflexive R.
+  Hypothesis H_R_transitive : transitive R.
+  Hypothesis H_R_total : total R.
 
   (** ...then [search_arg] yields an extremum w.r.t. <<[a, b)>>, that is, if
       [search_arg] yields a point x, then [R (f x) (f y)] holds for any [y] in the
@@ -199,13 +199,13 @@ Section ArgSearch.
         injection some_x_is => x_is; rewrite -{}x_is //;
         move: y_lt_Sn; rewrite ltnS;
         rewrite leq_eqVlt => /orP [/eqP EQ | y_lt_n].
-      + by rewrite EQ; apply (R_reflexive (f n)).
-      + apply (R_transitive (f q)) => //.
+      + by rewrite EQ; apply (H_R_reflexive (f n)).
+      + apply (H_R_transitive (f q)) => //.
         move: (IND q REC y) => HOLDS.
         apply HOLDS => //.
         by apply /andP; split.
       + rewrite EQ.
-        move: (R_total (f q) (f n)) => /orP [R_qn | R_nq] //.
+        move: (H_R_total (f q) (f n)) => /orP [R_qn | R_nq] //.
         by move: REL => /negP.
       + move: (IND q REC y) => HOLDS.
         apply HOLDS => //.
@@ -219,7 +219,7 @@ Section ArgSearch.
       move=> y /andP [a_le_y y_lt_Sn] Pfy.
       move: y_lt_Sn. rewrite ltnS.
       rewrite leq_eqVlt => /orP [/eqP EQ | y_lt_n].
-      + by rewrite -n_is EQ; apply (R_reflexive (f n)).
+      + by rewrite -n_is EQ; apply (H_R_reflexive (f n)).
       + exfalso.
         move: REC. rewrite search_arg_none => NONE.
         move: (NONE y) => not_Pfy.

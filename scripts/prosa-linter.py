@@ -101,6 +101,12 @@ ISSUES = [
     ]
 ]
 
+HYPOTHESIS_DECLARATION = re.compile(
+    r"\bHypothes(?:is|es)\s+(?P<names>[\w][\w']*(?:\s+[\w][\w']*)*)\s*:",
+    re.MULTILINE,
+)
+HYPOTHESIS_NAME = re.compile(r"[\w][\w']*")
+
 EXCEPTIONS = [
     r"%:R",  # MathComp syntax for nat -> ring coercion
     ("", r"[::", "]"),  # MathComp empty list notation
@@ -199,6 +205,25 @@ def lint_file(opts, fpath):
                 )
             )
 
+    for m in matches_of(HYPOTHESIS_DECLARATION):
+        for name in HYPOTHESIS_NAME.finditer(m.group("names")):
+            if name.group() == "_" or name.group().startswith("H_"):
+                continue
+            issue = (
+                m.start("names") + name.start(),
+                m.start("names") + name.end(),
+            )
+            rule = f" [rule: {len(ISSUES) + 1}]" if opts.show_rule_number else ""
+            issues.append(
+                (
+                    issue,
+                    f"{fpath}:{lineno[issue[0]]}: coding style{rule}: "
+                    "hypothesis names should start with 'H_'",
+                    0,
+                    0,
+                )
+            )
+
     rocqdoc_comments = [
         (s, e)
         for s, e in comments.ranges
@@ -224,7 +249,7 @@ def lint_file(opts, fpath):
         else:
             issue = (next_content_start, next_content_start + 1)
             msg = "coqdoc comment should start with '...' to continue the previous comment"
-        rule = f" [rule: {len(ISSUES) + 1}]" if opts.show_rule_number else ""
+        rule = f" [rule: {len(ISSUES) + 2}]" if opts.show_rule_number else ""
         issues.append(
             (
                 issue,

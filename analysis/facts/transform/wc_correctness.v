@@ -240,15 +240,15 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
         (** ...let [t_swap] be a time instant found by the search procedure. *)
         Variable t_swap : instant.
-        Hypothesis search_result_found : search_result = Some t_swap.
+        Hypothesis H_search_result_found : search_result = Some t_swap.
 
         (** We show that, since the search only yields relevant processor states, a job is found. *)
         Lemma make_wc_at_case_result_found :
           exists j : Job,
             swapped sched t t_swap t = Some j.
         Proof.
-          apply search_arg_pred in search_result_found.
-          move:search_result_found; rewrite /relevant_pstate.
+          apply search_arg_pred in H_search_result_found.
+          move:H_search_result_found; rewrite /relevant_pstate.
           destruct (sched t_swap) as [j_swap|] eqn:SCHED => [|//].
           move=>ARR. rewrite /swapped /replace_at.
           destruct (t_swap == t) eqn:SAME_SWAP.

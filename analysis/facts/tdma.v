@@ -17,7 +17,7 @@ Section TDMAFacts.
     Hypothesis H_task_in_ts : task \in ts.
 
     (** Assume task_time_slot is valid time slot*)
-    Hypothesis time_slot_positive :
+    Hypothesis H_time_slot_positive :
       valid_time_slot ts.
 
     (** Obviously, the TDMA cycle is greater or equal than any task time slot which is
@@ -34,7 +34,7 @@ Section TDMAFacts.
     Lemma TDMA_cycle_positive :
       TDMA_cycle ts > 0.
     Proof.
-      move:time_slot_positive=>/(_ task H_task_in_ts)/leq_trans;apply;apply TDMA_cycle_ge_each_time_slot.
+      move:H_time_slot_positive=>/(_ task H_task_in_ts)/leq_trans;apply;apply TDMA_cycle_ge_each_time_slot.
     Qed.
 
     (** Slot offset is less then cycle *)
@@ -70,19 +70,19 @@ Section TDMAFacts.
     Hypothesis H_task_in_ts : task \in ts.
 
     (** Assume task_time_slot is valid time slot*)
-    Hypothesis time_slot_positive :
+    Hypothesis H_time_slot_positive :
       valid_time_slot ts.
 
     (** Assume that slot order is total, ... *)
-    Hypothesis slot_order_total :
+    Hypothesis H_slot_order_total :
       total_slot_order ts.
 
     (** ... antisymmetric, ... *)
-    Hypothesis slot_order_antisymmetric :
+    Hypothesis H_slot_order_antisymmetric :
       antisymmetric_slot_order ts.
 
     (** ... and transitive. *)
-    Hypothesis slot_order_transitive :
+    Hypothesis H_slot_order_transitive :
       transitive_slot_order.
 
     (** Then, we can prove that the difference value between two offsets is
@@ -102,8 +102,8 @@ Section TDMAFacts.
       - rewrite leq_add2l. apply leq_sum_seq => i IN T.
         case (slot_order i tsk1)eqn:SI2;auto. case (i==tsk1)eqn:IT2;auto;simpl.
         case (i==tsk2)eqn:IT1;simpl;auto.
-        + by move/eqP in IT1;rewrite IT1 in SI2;apply slot_order_antisymmetric in ORDER;auto;apply ORDER in SI2;move/eqP in NEQ.
-        + by rewrite (slot_order_transitive _ _ _ SI2 ORDER).
+        + by move/eqP in IT1;rewrite IT1 in SI2;apply H_slot_order_antisymmetric in ORDER;auto;apply ORDER in SI2;move/eqP in NEQ.
+        + by rewrite (H_slot_order_transitive _ _ _ SI2 ORDER).
       - symmetry. rewrite big_mkcond /=. rewrite->bigD1_seq with (j:=tsk1);auto;last by apply (set_uniq ts).
         move/eqP /eqP in ORDER. move/eqP in NEQ. rewrite ORDER //=. apply /eqP.
         have TS2: (tsk1 != tsk2) = true .
@@ -141,7 +141,7 @@ Section TDMAFacts.
       case (O1 <= t %% cycle) eqn:O1T; case (O2 <= t %% cycle) eqn:O2T; intros G1 G2; try lia.
       rewrite ltn_subLR // in G1; rewrite ltn_subLR // in G2.
       case (tsk1 == tsk2) eqn:NEQ; move/eqP in NEQ; auto.
-      destruct (slot_order_total tsk1 tsk2) as [order | order]; auto.
+      destruct (H_slot_order_total tsk1 tsk2) as [order | order]; auto.
       all: by apply relation_offset in order; fold O1 O2 in order; try lia; auto; apply/eqP; auto.
     Qed.
 

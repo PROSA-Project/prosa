@@ -131,7 +131,7 @@ Section Suspensions.
 
       (** Consider a point [tf] inside <<[t1, t2)>>. *)
       Variable tf : instant.
-      Hypothesis INtf : t1 <= tf < t2.
+      Hypothesis H_INtf : t1 <= tf < t2.
 
       (** Let [tf] be the first point in the interval <<[t1, t2)>> that is also inside
           the self-suspension segment. *)

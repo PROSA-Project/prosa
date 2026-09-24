@@ -57,7 +57,7 @@ Section Facts.
   Section SubadditiveFunctions.
 
     (** Assume that [f] is subadditive. *)
-    Hypothesis h_subadditive : subadditive f.
+    Hypothesis H_subadditive : subadditive f.
 
     (** Then, we prove that moving any non-zero factor [m] outside of the arguments
         of [f] leads to a bigger or equal number. *)
@@ -70,7 +70,7 @@ Section Facts.
       elim: m => [ | m IHm]; first by rewrite !mul1n.
       rewrite mulSnr [X in _ <= X]mulSnr.
       move: IHm; rewrite -(leq_add2r (f n)).
-      exact /leq_trans/h_subadditive.
+      exact /leq_trans/H_subadditive.
     Qed.
 
   End SubadditiveFunctions.
