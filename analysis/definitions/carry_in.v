@@ -1,7 +1,8 @@
 Require Export prosa.model.priority.classes.
+Require Export prosa.analysis.facts.behavior.arrivals.
 
-(** * No Carry-In *)
-(** In this module, we define the notion of a time without any carry-in work. *)
+(** * Carry-In Work *)
+(** In this module, we characterize work remaining from earlier releases. *)
 Section NoCarryIn.
 
   (** Consider any type of tasks ... *)
@@ -27,5 +28,26 @@ Section NoCarryIn.
       arrives_in arr_seq j_o ->
       arrived_before j_o t ->
       completed_by sched j_o t.
+
+  (** Conversely, there exists a carry-in job if any earlier-arrived job is
+      still incomplete. *)
+  Definition exists_carry_in (t : instant) :=
+    has (fun j => ~~ completed_by sched j t) (arrivals_before arr_seq t).
+
+  (** We connect the Boolean search to the propositional condition via reflection. *)
+  Lemma exists_carry_inP :
+    forall t, reflect (~ no_carry_in t) (exists_carry_in t).
+  Proof.
+    move=> t; apply: (iffP idP).
+    - move/hasP=> [j H_in /negP H_unfinished] H_empty.
+      apply: H_unfinished; apply: H_empty.
+      + exact: in_arrivals_implies_arrived H_in.
+      + exact: in_arrivals_implies_arrived_before H_in.
+    - move=> H_carry; apply/negPn/negP => /hasPn H_complete.
+      apply: H_carry => j H_arrival H_before.
+      have H_in : j \in arrivals_before arr_seq t.
+      { by apply: arrived_between_implies_in_arrivals. }
+      by move: (H_complete j H_in); rewrite negbK.
+  Qed.
 
 End NoCarryIn.
