@@ -26,6 +26,31 @@ Section JobArrivalSeparation.
   Hypothesis H_periodic_model : respects_periodic_task_model arr_seq tsk.
   Hypothesis H_valid_period : valid_period tsk.
 
+  (** Index differences measure elapsed release periods, allowing us to
+      compare jobs independently of the task's initial offset. *)
+  Lemma periodic_job_index_separation :
+    forall k j1 j2,
+      arrives_in arr_seq j1 ->
+      arrives_in arr_seq j2 ->
+      job_task j1 = tsk ->
+      job_task j2 = tsk ->
+      job_index arr_seq j2 = job_index arr_seq j1 + k ->
+      job_arrival j2 = job_arrival j1 + k * task_period tsk.
+  Proof.
+    clear H_valid_period.
+    elim=> [|k IH] j1 j2 H_arr1 H_arr2 H_task1 H_task2 H_index.
+    - have -> : j2 = j1.
+      { apply: (equal_index_implies_equal_jobs arr_seq H_valid_arrival_sequence)
+          => //; by rewrite ?H_task1 ?H_task2 ?H_index ?addn0. }
+      by rewrite mul0n addn0.
+    - have H_positive : job_index arr_seq j2 > 0 by rewrite H_index; lia.
+      have [jp [H_arrp [H_indexp [H_taskp H_arrival]]]] :=
+        H_periodic_model j2 H_arr2 H_positive H_task2.
+      have H_step : job_index arr_seq jp = job_index arr_seq j1 + k by lia.
+      rewrite H_arrival (IH j1 jp H_arr1 H_arrp H_task1 H_taskp H_step).
+      by rewrite mulSn; lia.
+  Qed.
+
   (** In this section we show that two consecutive jobs of a periodic
       task have their arrival times separated by their task's
       period. *)
@@ -40,19 +65,11 @@ Section JobArrivalSeparation.
     Hypothesis H_j2_of_task : job_task j2 = tsk.
     Hypothesis H_consecutive_jobs : job_index arr_seq j2 = job_index arr_seq j1 + 1.
 
-    (** We show that if job [j1] and [j2] are consecutive jobs with [j2]
-        arriving after [j1], then their arrival times are separated by
-        their task's period. *)
-    Lemma consecutive_job_separation :
+    (** Consecutive releases specialize the general index correspondence
+        to a single period. *)
+    Corollary consecutive_job_separation :
       job_arrival j2 = job_arrival j1 + task_period tsk.
-    Proof.
-      move : (H_periodic_model j2) => PERIODIC.
-      feed_n 3 PERIODIC => //; first by rewrite H_consecutive_jobs; lia.
-      move : PERIODIC => [pj' [ARR_IN_PJ' [INDPJ'J' [TSKPJ' ARRPJ']]]].
-      rewrite H_consecutive_jobs addnK in INDPJ'J'.
-      apply equal_index_implies_equal_jobs in INDPJ'J' => //; last by rewrite TSKPJ'.
-      by rewrite INDPJ'J' in ARRPJ'; lia.
-    Qed.
+    Proof. by rewrite (periodic_job_index_separation 1 j1 j2) // mul1n. Qed.
 
   End ConsecutiveJobSeparation.
 

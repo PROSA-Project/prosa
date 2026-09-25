@@ -242,3 +242,228 @@ Section PeriodicLemmas.
   Qed.
 
 End PeriodicLemmas.
+
+(** ** Jobs in Adjacent Hyperperiods *)
+
+Section AdjacentHyperperiodJobs.
+
+  (** Consider periodic tasks, their jobs, ... *)
+  Context {Task : TaskType} `{PeriodicModel Task}.
+  Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
+
+  (** ... and a valid arrival sequence of such jobs. *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+
+  (** Consider a given task set ... *)
+  Variable ts : TaskSet Task.
+
+  (** ... and any valid periodic task in this set. *)
+  Variable tsk : Task.
+  Hypothesis H_task_in_ts : tsk \in ts.
+  Hypothesis H_valid_period : valid_period tsk.
+  Hypothesis H_periodic_task : respects_periodic_task_model arr_seq tsk.
+
+  (** Trivially, the hyperperiod can be expressed in terms of the task's period. *)
+  Lemma hyperperiod_as_job_count :
+    hyperperiod ts = jobs_per_hyperperiod ts tsk * task_period tsk.
+  Proof.
+    rewrite /jobs_per_hyperperiod.
+    have [k ->] := hyperperiod_int_mult_of_any_task ts tsk H_task_in_ts.
+    by rewrite mulnK.
+  Qed.
+
+  (** By definition, the task stays the same going forwards ...  *)
+  Lemma next_hyperperiod_job_task :
+    forall j,
+      job_task (next_hyperperiod_job ts arr_seq j) = job_task j.
+  Proof.
+    move=> j; rewrite /next_hyperperiod_job/same_task.
+    case HEAD: [seq _ <- _ | _] => [|j' js] //=.
+    have: j' \in [seq x <- arr_seq (job_arrival j + hyperperiod ts) | same_task x j]
+      by rewrite HEAD mem_head.
+    by rewrite mem_filter => /andP [/eqP].
+  Qed.
+
+  (** ... and also backwards. *)
+  Lemma prev_hyperperiod_job_task :
+    forall j,
+      job_task (prev_hyperperiod_job ts arr_seq j) = job_task j.
+  Proof.
+    move=> j; rewrite /prev_hyperperiod_job/same_task.
+    case HEAD: [seq _ <- _ | _ ] => [|j' js] //=.
+    have: j' \in [seq x <- arr_seq (job_arrival j - hyperperiod ts) | same_task x j]
+      by rewrite HEAD  mem_head.
+    by rewrite mem_filter => /andP [/eqP].
+  Qed.
+
+
+  (** The list of task-specific arrivals is a singleton list. *)
+  Local Fact prev_next_hyperperiod_job_selection :
+    forall j j' t,
+      arrives_in arr_seq j' ->
+      job_task j = tsk ->
+      job_task j' = tsk ->
+      job_arrival j' = t ->
+      [seq j'' <- arr_seq t | same_task j'' j] = [::j'].
+  Proof.
+    move=> j j' t IN TSK  TSK' ARR.
+    rewrite /same_task TSK.
+    by apply: only_j_at_job_arrival_j.
+  Qed.
+
+  (** We can identify the next job based on its arrival time. *)
+  Lemma next_hyperperiod_job_from_arrival :
+    forall j j',
+      arrives_in arr_seq j' ->
+      job_task j = tsk ->
+      job_task j' = tsk ->
+      job_arrival j' = job_arrival j + hyperperiod ts ->
+      next_hyperperiod_job ts arr_seq j = j'.
+  Proof.
+    move=> j j'  IN TSK TSK' ARR.
+    by rewrite /next_hyperperiod_job (prev_next_hyperperiod_job_selection j j').
+  Qed.
+
+  (** We can also identify the previous job based on its arrival time. *)
+  Lemma prev_hyperperiod_job_from_arrival :
+    forall j j',
+      arrives_in arr_seq j' ->
+      job_task j = tsk ->
+      job_task j' = tsk ->
+      job_arrival j' = job_arrival j - hyperperiod ts ->
+      prev_hyperperiod_job ts arr_seq j = j'.
+  Proof.
+    move=> j j' IN TSK TSK' ARR.
+    by rewrite /prev_hyperperiod_job (prev_next_hyperperiod_job_selection j j').
+  Qed.
+
+  (** *** Forward Correspondence *)
+
+  Section ForwardCorrespondence.
+
+    (** Suppose [tsk] releases jobs indefinitely. *)
+    Hypothesis H_infinite_jobs : infinite_jobs arr_seq tsk.
+
+    (** Consider any job of the task under analysis. *)
+    Variable j : Job.
+    Hypothesis H_arrives : arrives_in arr_seq j.
+    Hypothesis H_tsk : job_task j = tsk.
+
+    (** We establish some basic facts about the "matching" job in the next
+        hyperperiod in one go, which we then expose as individual facts. *)
+    Local Fact next_hyperperiod_job_properties :
+      let
+        j' := next_hyperperiod_job ts arr_seq j
+      in
+      [/\ arrives_in arr_seq j'
+       , job_task j' = tsk
+       , job_arrival j' = job_arrival j + hyperperiod ts
+       & job_index arr_seq j' = job_index arr_seq j + jobs_per_hyperperiod ts tsk].
+    Proof.
+      have [j' [IN' [TSK' IDX']]] :=
+        H_infinite_jobs (job_index arr_seq j + jobs_per_hyperperiod ts tsk).
+      have ARR' : job_arrival j' = job_arrival j + hyperperiod ts
+        by rewrite hyperperiod_as_job_count; apply: periodic_job_index_separation.
+      by rewrite (next_hyperperiod_job_from_arrival j j').
+    Qed.
+
+    (** The successor belongs to the arrival sequence, ... *)
+    Fact next_hyperperiod_job_arrives :
+      arrives_in arr_seq (next_hyperperiod_job ts arr_seq j).
+    Proof. by have [] := next_hyperperiod_job_properties. Qed.
+
+    (** ... has an arrival time exactly one hyperperiod apart, ...  *)
+    Fact next_hyperperiod_job_arrival :
+      job_arrival (next_hyperperiod_job ts arr_seq j)
+      = job_arrival j + hyperperiod ts.
+    Proof. by have [] := next_hyperperiod_job_properties. Qed.
+
+    (** ... and the obvious job index. *)
+    Fact next_hyperperiod_job_index :
+      job_index arr_seq (next_hyperperiod_job ts arr_seq j)
+      = job_index arr_seq j + jobs_per_hyperperiod ts tsk.
+    Proof. by have [] := next_hyperperiod_job_properties. Qed.
+
+    (** The "prev" and "next" operations cancel out. *)
+    Fact prev_next_hyperperiod_job :
+      prev_hyperperiod_job ts arr_seq (next_hyperperiod_job ts arr_seq j)
+      = j.
+    Proof.
+      apply: prev_hyperperiod_job_from_arrival => //.
+      - by rewrite next_hyperperiod_job_task.
+      - by rewrite next_hyperperiod_job_arrival // addnK.
+    Qed.
+
+  End ForwardCorrespondence.
+
+  (** ** Backward Correspondence *)
+
+  Section BackwardCorrespondence.
+
+    (** Consider a job of the task with at least one hyperperiod's worth
+        of earlier releases. *)
+    Variable j : Job.
+    Hypothesis H_arrives : arrives_in arr_seq j.
+    Hypothesis H_tsk : job_task j = tsk.
+    Hypothesis H_index : jobs_per_hyperperiod ts tsk <= job_index arr_seq j.
+
+    (** We establish the properties of the matching job in the previous
+        hyperperiod together, then expose them individually. *)
+    Local Fact prev_hyperperiod_job_properties :
+      let j' := prev_hyperperiod_job ts arr_seq j in
+      [/\ arrives_in arr_seq j'
+       , job_task j' = tsk
+       , job_arrival j' + hyperperiod ts = job_arrival j
+       & job_index arr_seq j' = job_index arr_seq j - jobs_per_hyperperiod ts tsk].
+    Proof.
+      case COUNT: (jobs_per_hyperperiod ts tsk) => [|k].
+      - have HP0 : hyperperiod ts = 0 by rewrite hyperperiod_as_job_count COUNT.
+        have -> : prev_hyperperiod_job ts arr_seq j = j
+          by apply: prev_hyperperiod_job_from_arrival => //; rewrite HP0 subn0.
+        by split => //; rewrite ?COUNT ?HP0 ?addn0 ?subn0.
+      - have LT : job_index arr_seq j - jobs_per_hyperperiod ts tsk < job_index arr_seq j by lia.
+        have [j' [_ [TSK' [IN' IDX']]]] :=
+          exists_jobs_before_j arr_seq H_valid_arrival_sequence j H_arrives _ LT.
+        rewrite H_tsk in TSK'.
+        have ARR : job_arrival j = job_arrival j' + hyperperiod ts.
+        { rewrite hyperperiod_as_job_count.
+          apply: periodic_job_index_separation => //.
+          by rewrite IDX' subnK. }
+        have -> : prev_hyperperiod_job ts arr_seq j = j'
+          by apply: prev_hyperperiod_job_from_arrival => //; rewrite ARR addnK.
+        by split => //; lia.
+    Qed.
+
+    (** The predecessor belongs to the arrival sequence, ... *)
+    Fact prev_hyperperiod_job_arrives :
+      arrives_in arr_seq (prev_hyperperiod_job ts arr_seq j).
+    Proof. by have [] := prev_hyperperiod_job_properties. Qed.
+
+    (** ... arrives exactly one hyperperiod earlier, ... *)
+    Lemma prev_hyperperiod_job_arrival :
+      job_arrival (prev_hyperperiod_job ts arr_seq j)
+      = job_arrival j - hyperperiod ts.
+    Proof.
+      have [_ _ ARR _] := prev_hyperperiod_job_properties.
+      by rewrite -ARR addnK.
+    Qed.
+
+    (** ... and has the preceding hyperperiod's job index. *)
+    Fact prev_hyperperiod_job_index :
+      job_index arr_seq (prev_hyperperiod_job ts arr_seq j)
+      = job_index arr_seq j - jobs_per_hyperperiod ts tsk.
+    Proof. by have [] := prev_hyperperiod_job_properties. Qed.
+
+    (** The "next" and "prev" operations cancel out. *)
+    Fact next_prev_hyperperiod_job :
+      next_hyperperiod_job ts arr_seq (prev_hyperperiod_job ts arr_seq j) = j.
+    Proof.
+      have [_ _ ARR _] := prev_hyperperiod_job_properties.
+      apply: next_hyperperiod_job_from_arrival => //.
+      by rewrite prev_hyperperiod_job_task.
+    Qed.
+
+  End BackwardCorrespondence.
+
+End AdjacentHyperperiodJobs.

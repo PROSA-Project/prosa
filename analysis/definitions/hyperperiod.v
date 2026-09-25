@@ -14,6 +14,10 @@ Section Hyperperiod.
       (LCM) of the periods of all tasks in the task set. **)
   Definition hyperperiod : duration := lcml (map task_period ts).
 
+  (** It is sometimes useful to count a task's releases per hyperperiod. *)
+  Definition jobs_per_hyperperiod (tsk : Task) :=
+    hyperperiod %/ task_period tsk.
+
 End Hyperperiod.
 
 (** We characterize the workload of a periodic task set independently of
@@ -30,7 +34,7 @@ Section HyperperiodWorkload.
       available service using integer arithmetic rather than utilization
       fractions. *)
   Definition hyperperiod_workload :=
-    \sum_(tsk <- ts) (hyperperiod ts %/ task_period tsk) * task_cost tsk.
+    \sum_(tsk <- ts) jobs_per_hyperperiod ts tsk * task_cost tsk.
 
 End HyperperiodWorkload.
 
@@ -94,3 +98,29 @@ Section HyperperiodDefinitions.
     nth j (jobs_in_hyperperiod h tsk) (job_index_in_hyperperiod j (starting_instant_of_corresponding_hyperperiod j) tsk).
 
 End HyperperiodDefinitions.
+
+(** ** Jobs in Adjacent Hyperperiods *)
+
+(** These mappings let us compare successive repetitions of a task's
+    release pattern, starting from any arriving job. *)
+Section AdjacentHyperperiodJobs.
+
+  (** Consider periodic tasks and their jobs. *)
+  Context {Task : TaskType} `{PeriodicModel Task}.
+  Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
+
+  (** Consider a given task set ... *)
+  Variable ts : TaskSet Task.
+
+  (** ... and an arrival sequence of these tasks. *)
+  Variable arr_seq : arrival_sequence Job.
+
+  (** We define the "matching" occurrence of a job in the next hyperperiod ... *)
+  Definition next_hyperperiod_job (j : Job) :=
+    head j [seq j' <- arr_seq (job_arrival j + hyperperiod ts) | same_task j' j].
+
+  (** ... and also in the previous hyperperiod (if any). *)
+  Definition prev_hyperperiod_job (j : Job) :=
+    head j [seq j' <- arr_seq (job_arrival j - hyperperiod ts) | same_task j' j].
+
+End AdjacentHyperperiodJobs.
