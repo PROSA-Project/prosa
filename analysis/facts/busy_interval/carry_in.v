@@ -6,6 +6,46 @@ Require Export prosa.analysis.definitions.readiness.
 Require Export prosa.model.schedule.work_conserving.
 Require Export prosa.util.tactics.
 
+(** * Pending Work after a No-Carry-In Instant *)
+
+(** A no-carry-in instant lets us account for pending work using
+    only subsequent arrivals. *)
+Section NoCarryInFacts.
+
+  (** Consider jobs with arrival times and execution costs. *)
+  Context {Job : JobType} `{JobArrival Job} `{JobCost Job}.
+
+  (** Allow for any processor model. *)
+  Context {PState : ProcessorState Job}.
+
+  (** Consider a consistent arrival sequence ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
+
+  (** ... and a schedule of the arriving jobs. *)
+  Variable sched : schedule PState.
+
+  (** Within an interval starting without carry-in, every pending job
+      belongs to that interval's arrivals. *)
+  Lemma pending_job_not_carried_in :
+    forall start stop t j,
+      no_carry_in arr_seq sched start ->
+      start <= t < stop ->
+      arrives_in arr_seq j ->
+      pending sched j t ->
+      j \in arrivals_between arr_seq start stop.
+  Proof.
+    move=> start stop t j NCI /andP [AFTER BEFORE] ARR /andP [ARRIVED INCOMP].
+    apply: arrived_between_implies_in_arrivals => //.
+    apply/andP; split; last exact: leq_ltn_trans ARRIVED BEFORE.
+    case: (leqP start (job_arrival j)) => // EARLY.
+    exfalso; move/negP: INCOMP; apply.
+    apply: completion_monotonic; first exact: AFTER.
+    exact: NCI.
+  Qed.
+
+End NoCarryInFacts.
+
 (** * Busy Interval From Workload Bound *)
 
 (** In the following, we derive an alternative condition for the existence of a
