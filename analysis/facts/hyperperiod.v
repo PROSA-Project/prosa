@@ -1,5 +1,8 @@
 Require Export prosa.analysis.definitions.hyperperiod.
 Require Export prosa.analysis.facts.periodic.task_arrivals_size.
+Require Export prosa.analysis.facts.sporadic.arrival_bound.
+Require Export prosa.analysis.facts.model.workload.
+Require Export prosa.analysis.facts.model.task_cost.
 Require Export prosa.util.div_mod.
 Require Export prosa.util.tactics.
 
@@ -467,3 +470,54 @@ Section AdjacentHyperperiodJobs.
   End BackwardCorrespondence.
 
 End AdjacentHyperperiodJobs.
+
+(** ** Workload in a Hyperperiod *)
+
+(** The task parameters bound the work released in any hyperperiod. *)
+Section HyperperiodWorkloadBound.
+
+  (** Consider periodic tasks with worst-case execution costs ... *)
+  Context {Task : TaskType} `{PeriodicModel Task} `{TaskCost Task}.
+
+  (** ... and their jobs. *)
+  Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job} `{JobCost Job}.
+
+  (** Consider a given set of such periodic tasks ...  *)
+  Variable ts : TaskSet Task.
+  Hypothesis H_valid_periods : valid_periods ts.
+
+  (** ... and a corresponding valid arrival sequence. *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+  Hypothesis H_periodic_arrivals : taskset_respects_periodic_task_model arr_seq ts.
+  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+  (** If task WCETs bound the execution requirements of arriving jobs, ... *)
+  Hypothesis H_valid_job_costs : arrivals_have_valid_job_costs arr_seq.
+
+  (** ... then the total workload in any hyperperiod-sized interval
+      is upper-bounded by the hyperperiod workload.  *)
+  Lemma workload_in_hyperperiod_bounded :
+    forall start,
+      total_workload_between arr_seq start (start + hyperperiod ts)
+      <= hyperperiod_workload ts.
+  Proof.
+    move=> start.
+    apply: (@leq_trans (\sum_(tsk <- ts)
+      task_workload_between arr_seq tsk start (start + hyperperiod ts))).
+    - apply: workload_of_jobs_le_sum_over_partitions => // j IN.
+      by apply/H_all_jobs_from_taskset/in_arrivals_implies_arrived.
+    - rewrite /hyperperiod_workload.
+      apply: leq_sum_seq => tsk IN _.
+      rewrite /task_workload_between /task_workload /workload_of_jobs -big_filter mulnC.
+      apply: leq_trans; first apply: sum_job_costs_bounded.
+      + move=> j /[! mem_filter] /andP [TSK ARR]; apply/andP; split=> //.
+        by apply/H_valid_job_costs/in_arrivals_implies_arrived.
+      + rewrite leq_mul2l; apply/orP; right.
+        apply: leq_trans; first by apply: sporadic_task_arrivals_bound.
+        rewrite /max_sporadic_arrivals /task_min_inter_arrival_time /periodic_as_sporadic
+          addKn /div_ceil /jobs_per_hyperperiod ifT //.
+        by apply/lcm_seq_is_mult_of_all_ints/map_f.
+  Qed.
+
+End HyperperiodWorkloadBound.
