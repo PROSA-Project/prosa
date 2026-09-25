@@ -16,6 +16,24 @@ Section Hyperperiod.
 
 End Hyperperiod.
 
+(** We characterize the workload of a periodic task set independently of
+    any particular arrival sequence or schedule. *)
+Section HyperperiodWorkload.
+
+  (** Consider periodic tasks with worst-case execution costs ... *)
+  Context {Task : TaskType} `{PeriodicModel Task} `{TaskCost Task}.
+
+  (** ... and the task set whose workload is to be analyzed. *)
+  Variable ts : TaskSet Task.
+
+  (** Hyperperiod workload lets us compare periodic execution demand with
+      available service using integer arithmetic rather than utilization
+      fractions. *)
+  Definition hyperperiod_workload :=
+    \sum_(tsk <- ts) (hyperperiod ts %/ task_period tsk) * task_cost tsk.
+
+End HyperperiodWorkload.
+
 (** In this section we provide basic definitions concerning the hyperperiod
     of all tasks in a task set. *)
 Section HyperperiodDefinitions.
