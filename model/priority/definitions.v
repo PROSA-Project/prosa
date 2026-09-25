@@ -90,6 +90,16 @@ Section Priorities.
     (** A JLFP policy is total if the relation among "jobs" is total. *)
     Definition total_job_priorities := total hep_job.
 
+    (** Antisymmetry on arriving jobs resolves priority ties uniquely among
+        the jobs that the scheduler may select. *)
+    Definition antisymmetric_job_priorities (arr_seq : arrival_sequence Job) :=
+      forall j1 j2,
+        arrives_in arr_seq j1 ->
+        arrives_in arr_seq j2 ->
+        hep_job j1 j2 ->
+        hep_job j2 j1 ->
+        j1 = j2.
+
     (** Recall that jobs of a sequential task are necessarily executed in the
         order that they arrive.
 
