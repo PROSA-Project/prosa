@@ -92,6 +92,7 @@ MathComp
 MathComp's
 hyperperiod
 hyperperiods
+hyperperiod's
 pointwise
 notational
 multiset
@@ -101,6 +102,7 @@ superadditivity
 superadditive
 subadditivity
 subadditive
+antisymmetry
 subinterval
 slackless
 subsequences
@@ -156,11 +158,13 @@ bigop
 subexpression
 IBFs
 boundedness
+resettable
 RHS
 LHS
 subsequence
 Baruah
 exceedance
+scheduler's
 CRPD
 FIFO's
 EDF's
@@ -171,3 +175,5 @@ typeclasses
 compositional
 durations
 lossy
+Pina
+Guidolin
