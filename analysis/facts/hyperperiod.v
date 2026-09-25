@@ -80,8 +80,8 @@ Section PeriodicLemmas.
   Hypothesis H_valid_period : valid_period tsk.
   Hypothesis H_periodic_task : respects_periodic_task_model arr_seq tsk.
 
-  (** Assume we have an infinite sequence of jobs in the arrival sequence. *)
-  Hypothesis H_infinite_jobs : infinite_jobs arr_seq.
+  (** Each task in [ts] continues releasing jobs indefinitely. *)
+  Hypothesis H_infinite_jobs : tasks_have_infinite_arrivals arr_seq ts.
 
   (** Let [O_max] denote the maximum task offset in [ts] and let
       [HP] denote the hyperperiod of all tasks in [ts]. *)

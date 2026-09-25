@@ -53,8 +53,8 @@ Section ValidJobCostsShifted.
       job_cost (corresponding_job_in_hyperperiod ts arr_seq j' (starting_instant_of_corresponding_hyperperiod ts j) (job_task j'))
     else job_cost j'.
 
-  (** Assume that we have an infinite sequence of jobs. *)
-  Hypothesis H_infinite_jobs : infinite_jobs arr_seq.
+  (** Each task in [ts] continues releasing jobs indefinitely. *)
+  Hypothesis H_infinite_jobs : tasks_have_infinite_arrivals arr_seq ts.
 
   (** Assume all jobs in the arrival sequence [arr_seq] belong to some task
       in [ts]. *)

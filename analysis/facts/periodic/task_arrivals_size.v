@@ -100,8 +100,8 @@ Section TaskArrivalsSize.
       of an infinite sequence of jobs. *)
   Section TaskArrivalsInCaseOfInfiniteJobs.
 
-    (** Assume that we have an infinite sequence of jobs. *)
-    Hypothesis H_infinite_jobs : infinite_jobs arr_seq.
+    (** The task whose arrivals we count continues releasing jobs indefinitely. *)
+    Hypothesis H_infinite_jobs : infinite_jobs arr_seq tsk.
 
     (** We show that for any number [n], there exists a job [j] of task [tsk]
         such that [job_index] of [j] is equal to [n] and [j] arrives
@@ -114,7 +114,7 @@ Section TaskArrivalsSize.
         /\ job_index arr_seq j = n.
     Proof.
       move=> n.
-      destruct (H_infinite_jobs tsk n) as [j [ARR [TSK IND]]].
+      move: (H_infinite_jobs n) => [j [ARR [TSK IND]]].
       exists j; repeat split => //.
       exact: (periodic_arrival_times arr_seq).
     Qed.
