@@ -60,3 +60,25 @@ Section ValidPeriodicTaskModel.
     forall tsk, tsk \in ts -> respects_periodic_task_model tsk.
 
 End ValidPeriodicTaskModel.
+
+(** ** Constrained Offsets *)
+
+(** Constrained offsets ensure that every task begins releasing jobs within
+    its first period, simplifying bounds on the initial transient. *)
+Section ConstrainedOffsets.
+
+  (** Consider periodic tasks with offsets. *)
+  Context {Task : TaskType} `{PeriodicModel Task} `{TaskOffset Task}.
+
+  (** We say a task's offset is _constrained_ if its offset is less than
+      its period ... *)
+  Definition constrained_offset (tsk : Task) :=
+    task_offset tsk < task_period tsk.
+
+  (** ... and lift this notion to task sets. *)
+  Definition constrained_offsets (ts : TaskSet Task) :=
+    forall tsk,
+      tsk \in ts ->
+      constrained_offset tsk.
+
+End ConstrainedOffsets.
