@@ -1,4 +1,6 @@
 Require Export prosa.model.priority.edf.
+Require Export prosa.model.task.absolute_deadline.
+Require Export prosa.analysis.facts.hyperperiod.
 
 (** * EDF Priority Policy *)
 
@@ -54,6 +56,44 @@ Section PropertiesOfEDF.
 
 End PropertiesOfEDF.
 
+(** EDF's deadline order repeats with a periodic workload. *)
+Section EDFHyperperiodPriorities.
+
+  (** Consider periodic tasks with relative deadlines ... *)
+  Context {Task : TaskType} `{PeriodicModel Task} `{TaskDeadline Task}.
+
+  (** ... and jobs whose absolute deadlines are derived from their tasks. *)
+  Context {Job : JobType} `{JobTask Job Task} `{JobArrival Job}.
+
+  (** Consider a task set with valid periods ... *)
+  Variable ts : TaskSet Task.
+  Hypothesis H_valid_periods : valid_periods ts.
+
+  (** ... generating a valid arrival sequence of jobs of these tasks ... *)
+  Variable arr_seq : arrival_sequence Job.
+  Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
+  Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
+
+  (** ... with periodic releases continuing indefinitely. *)
+  Hypothesis H_periodic_arrivals : taskset_respects_periodic_task_model arr_seq ts.
+  Hypothesis H_infinite_jobs : tasks_have_infinite_arrivals arr_seq ts.
+
+  (** Shifting any two given two jobs by one hyperperiod preserves their
+      deadline order. *)
+  Fact EDF_priorities_consistent_across_hyperperiods :
+    priorities_consistent_across_hyperperiods ts arr_seq (EDF Job).
+  Proof.
+    move=> j1 j2 ARR1 ARR2.
+    rewrite !EDF_hep_job /job_deadline /job_deadline_from_task_deadline
+      !next_hyperperiod_job_task
+      (next_hyperperiod_job_arrival arr_seq _ ts (job_task j1)) //
+      (next_hyperperiod_job_arrival arr_seq _ ts (job_task j2)) //.
+    by rewrite [job_arrival j1 + _ + _]addnAC
+      [job_arrival j2 + _ + _]addnAC leq_add2r.
+  Qed.
+
+End EDFHyperperiodPriorities.
+
 (** We add the above lemmas into a "Hint Database" basic_rt_facts, so Rocq
     will be able to apply them automatically. *)
 Global Hint Resolve
@@ -61,4 +101,5 @@ Global Hint Resolve
      EDF_is_reflexive
      EDF_is_transitive
      EDF_is_total
+     EDF_priorities_consistent_across_hyperperiods
   : basic_rt_facts.
