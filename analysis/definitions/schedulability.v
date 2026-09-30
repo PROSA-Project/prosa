@@ -3,8 +3,8 @@ Require Import prosa.model.task.absolute_deadline.
 
 (** * Schedulability *)
 
-(** In the following section we define the notion of schedulable
-    task. *)
+(** In the following section we define the notion of _schedulable_
+    task and task sets. *)
 Section Task.
 
   (** Consider any type of tasks, ... *)
@@ -20,32 +20,42 @@ Section Task.
   (** ... and any kind of processor state. *)
   Context {PState : ProcessorState Job}.
 
-  (** Consider any job arrival sequence... *)
+  (** Consider any job arrival sequence ... *)
   Variable arr_seq : arrival_sequence Job.
 
-  (** ...and any schedule of these jobs. *)
+  (** ... and any schedule of these jobs. *)
   Variable sched : schedule PState.
 
-  (** Let [tsk] be any task that is to be analyzed. *)
-  Variable tsk : Task.
+  Section SingleTask.
 
-  (** Then, we say that R is a response-time bound of [tsk] in this schedule ... *)
-  Variable R : duration.
+    (** Let [tsk] be any task that is to be analyzed. *)
+    Variable tsk : Task.
 
-  (** ... iff any job [j] of [tsk] in this arrival sequence has
-         completed by [job_arrival j + R]. *)
-  Definition task_response_time_bound :=
-    forall j,
-      arrives_in arr_seq j ->
-      job_of_task tsk j ->
-      job_response_time_bound sched j R.
+    (** Then, we say that R is a response-time bound of [tsk] in this schedule ... *)
+    Variable R : duration.
 
-  (** We say that a task is schedulable if all its jobs meet their deadline. *)
-  Definition schedulable_task :=
-    forall j,
-      arrives_in arr_seq j ->
-      job_of_task tsk j ->
-      job_meets_deadline sched j.
+    (** ... iff any job [j] of [tsk] in this arrival sequence has
+        completed by [job_arrival j + R]. *)
+    Definition task_response_time_bound :=
+      forall j,
+        arrives_in arr_seq j ->
+        job_of_task tsk j ->
+        job_response_time_bound sched j R.
+
+    (** We say that a task is schedulable if all its jobs meet their deadline. *)
+    Definition schedulable_task :=
+      forall j,
+        arrives_in arr_seq j ->
+        job_of_task tsk j ->
+        job_meets_deadline sched j.
+
+  End SingleTask.
+
+  (** A task set is schedulable when all tasks are schedulable. *)
+  Definition taskset_schedulable (ts : TaskSet Task) :=
+    forall tsk,
+      tsk \in ts ->
+      schedulable_task tsk.
 
 End Task.
 
