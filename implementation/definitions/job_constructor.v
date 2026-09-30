@@ -16,7 +16,7 @@ Definition Job := concrete_job : eqType.
 (** We first define a job-generation function that produces one concrete job of
     the given task, with the given job ID, arriving at the given time ... *)
 Definition generate_job_at tsk t id : Job :=
-  {| task.job_id := id
+  {| task.concrete_job_id := id
   ;  task.concrete_job_arrival := t
   ;  task.concrete_job_cost := task_cost tsk
   ;  task.concrete_job_deadline := t + task_deadline tsk

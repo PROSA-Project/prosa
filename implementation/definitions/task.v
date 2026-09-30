@@ -1,5 +1,6 @@
 From HB Require Import structures.
 Require Export prosa.implementation.definitions.arrival_bound.
+Require Export prosa.implementation.definitions.parameters.
 Require Export prosa.model.task.arrival.curves.
 Require Export prosa.model.priority.numeric_fixed_priority.
 
@@ -18,7 +19,7 @@ Require Export prosa.model.priority.numeric_fixed_priority.
 (** A task comprises an ID, a cost, an arrival bound, a deadline
     and a priority. The ID is required to ensure uniqueness. *)
 Structure concrete_task :=
-  { task_id: nat
+  { concrete_task_id: nat
   ; concrete_task_cost: nat
   ; concrete_task_arrival: task_arrivals_bound
   ; concrete_task_deadline: instant
@@ -28,7 +29,7 @@ Structure concrete_task :=
 (** To make it compatible with ssreflect, we define a decidable
     equality for concrete tasks. *)
 Definition task_eqdef (t1 t2 : concrete_task) :=
-  (task_id t1 == task_id t2)
+  (concrete_task_id t1 == concrete_task_id t2)
   && (concrete_task_cost t1 == concrete_task_cost t2)
   && (concrete_task_arrival t1 == concrete_task_arrival t2)
   && (concrete_task_deadline t1 == concrete_task_deadline t2)
@@ -64,7 +65,7 @@ HB.instance Definition _  := hasDecEq.Build concrete_task eqn_task.
 (** A job comprises an id, an arrival time, a cost, a deadline and the
     task it belongs to. *)
 Record concrete_job :=
-  { job_id: nat
+  { concrete_job_id: nat
   ; concrete_job_arrival: instant
   ; concrete_job_cost: nat
   ; concrete_job_deadline: instant
@@ -88,7 +89,7 @@ Definition concrete_max_arrivals tsk Δ :=
 (** To make it compatible with ssreflect, we define a decidable
     equality for concrete jobs. *)
 Definition job_eqdef (j1 j2 : concrete_job) :=
-  (job_id j1 == job_id j2)
+  (concrete_job_id j1 == concrete_job_id j2)
   && (concrete_job_arrival j1 == concrete_job_arrival j2)
   && (concrete_job_cost j1 == concrete_job_cost j2)
   && (concrete_job_deadline j1 == concrete_job_deadline j2)
@@ -132,6 +133,11 @@ Section Parameters.
   (** First, we connect the above definition of tasks with the
       generic Prosa task-parameter interfaces. *)
   Let Task := concrete_task : eqType.
+  (** We expose the stored identifier through the task-parameter interface. *)
+  #[global,program] Instance concrete_task_id_instance : TaskId Task :=
+  {
+    task_id := concrete_task_id
+  }.
   #[global,program] Instance concrete_task_cost_instance : TaskCost Task :=
   {
     task_cost := concrete_task_cost
@@ -151,6 +157,11 @@ Section Parameters.
 
   (** Second, we do the same for the above definition of job. *)
   Let Job := concrete_job : eqType.
+  (** We expose the stored identifier through the job-parameter interface. *)
+  #[global,program] Instance concrete_job_id_instance : JobId Job :=
+  {
+    job_id := concrete_job_id
+  }.
   #[global,program] Instance concrete_job_task_instance : JobTask Job Task :=
   {
     job_task := concrete_job_task

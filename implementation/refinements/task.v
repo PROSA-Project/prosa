@@ -107,7 +107,7 @@ Definition taskT_to_task (tsk : @task_T N) : Task :=
        task_deadline_T := deadline;
        task_priority_T := priority |}
     =>
-    {| task.task_id := nat_of_bin id;
+    {| task.concrete_task_id := nat_of_bin id;
        task.concrete_task_cost := nat_of_bin cost;
        task.concrete_task_arrival := task_abT_to_task_ab arrival_bound;
        task.concrete_task_deadline := nat_of_bin deadline;
@@ -121,7 +121,7 @@ Definition Rtask := fun_hrel taskT_to_task.
       task to a generic one. *)
 Definition task_to_taskT (tsk : Task) : @task_T N :=
   match tsk with
-  | {| task.task_id := id;
+  | {| task.concrete_task_id := id;
        task.concrete_task_cost := cost;
        task.concrete_task_arrival := arrival_bound;
        task.concrete_task_deadline := deadline;
