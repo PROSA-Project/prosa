@@ -1,4 +1,5 @@
 Require Export prosa.model.task.arrival.periodic.
+Require Export prosa.model.priority.classes.
 Require Export prosa.util.lcmseq.
 
 (** In this file we define the notion of a hyperperiod for periodic tasks. *)
@@ -122,5 +123,25 @@ Section AdjacentHyperperiodJobs.
   (** ... and also in the previous hyperperiod (if any). *)
   Definition prev_hyperperiod_job (j : Job) :=
     head j [seq j' <- arr_seq (job_arrival j - hyperperiod ts) | same_task j' j].
+
+  (** A repeating release pattern yields repeating scheduling decisions when
+      corresponding jobs retain their relative priorities. *)
+  Section HyperperiodPriorities.
+
+    (** Consider a job-level fixed-priority policy. *)
+    Context (JLFP : JLFP_policy Job).
+
+    (** Priority comparisons, including the resolution of ties, agree across
+        successive repetitions of the workload. *)
+    Definition priorities_consistent_across_hyperperiods :=
+      forall j1 j2,
+        arrives_in arr_seq j1 ->
+        arrives_in arr_seq j2 ->
+        hep_job
+          (next_hyperperiod_job j1)
+          (next_hyperperiod_job j2)
+        = hep_job j1 j2.
+
+  End HyperperiodPriorities.
 
 End AdjacentHyperperiodJobs.
