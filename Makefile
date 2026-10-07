@@ -60,7 +60,7 @@ mangle-namesCoqProject: commonCoqProject
 	  -print | scripts/module-toc-order.py >> $(COQ_PROJ)
 
 $(COQ_MAKEFILE): $(COQ_PROJ)
-	@coq_makefile -f $< -o $@ COQDOCEXTRAFLAGS = "--parse-comments --external https://math-comp.github.io/htmldoc/ mathcomp --external mathcomp https://math-comp.github.io/htmldoc/"
+	@rocq makefile -f $< -o $@ COQDOCEXTRAFLAGS = "--parse-comments --external https://math-comp.github.io/htmldoc/ mathcomp --external mathcomp https://math-comp.github.io/htmldoc/"
 
 install htmlpretty clean cleanall validate alectryon: $(COQ_MAKEFILE)
 	$(MAKE) -f $(COQ_MAKEFILE) $@
