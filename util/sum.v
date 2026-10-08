@@ -22,24 +22,6 @@ Section SumsOverSequences.
     (** Consider any function that yields natural numbers. *)
     Variable (F : I -> nat).
 
-    (** We start showing that having every member of [r] equal to zero is equivalent to
-        having the sum of all the elements of [r] equal to zero, and vice-versa. *)
-    Lemma sum_nat_eq0_nat :
-      (\sum_(i <- r | P i) F i == 0) = all (fun x => F x == 0) [seq x <- r | P x].
-    Proof.
-      elim: r => [|x r' IH]; rewrite ?big_nil//= big_cons.
-      by case: ifP; rewrite ?addn_eq0 IH.
-    Qed.
-
-    (** In the same way, if at least one element of [r] is not zero, then the sum of all
-        elements of [r] must be strictly positive, and vice-versa. *)
-    Lemma sum_nat_gt0 :
-      (0 < \sum_(i <- r | P i) F i) = has (fun x => 0 < F x) [seq x <- r | P x].
-    Proof.
-      apply/negb_inj; rewrite lt0n negbK sum_nat_eq0_nat -all_predC.
-      by apply/eq_all => ?; rewrite /= lt0n negbK.
-    Qed.
-
     (** We prove that if any element of [r] is bounded by constant [c],
         then the sum of the whole set is bounded by [c * size r]. *)
     Lemma sum_majorant_constant c :
@@ -128,10 +110,7 @@ Section SumsOverSequences.
       (forall i, i \in r -> P1 i -> P2 i) ->
       \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
     Proof.
-      move=> imp; rewrite [X in _ <= X](bigID P1)/=.
-      rewrite big_seq_cond [X in _ <= X + _]big_seq_cond.
-      rewrite (eq_bigl (fun i => [&& i \in r, P2 i & P1 i])) ?leq_addr// => i.
-      by case ir: (i \in r); case P1i: (P1 i); rewrite ?andbF //= (imp i).
+      by move=> imp; apply: (sub_in_le_big leqnn (fun m n => leq_addr n m)).
     Qed.
 
   End SumOfTwoFunctions.
@@ -244,7 +223,7 @@ Lemma big_nat_eq0 m n F :
 Proof.
   split.
   - rewrite /index_iota => /eqP.
-    rewrite sum_nat_eq0_nat filter_predT => /allP ZERO i.
+    rewrite sum_nat_seq_eq0 -all_filter filter_predT => /allP ZERO i.
     rewrite -mem_index_iota /index_iota => IN.
     by apply/eqP; apply ZERO.
   - move=> ZERO.
@@ -268,7 +247,6 @@ Proof.
     { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
     by exists z; split=> //; rewrite LE/= ltnS ltnW. }
 Qed.
-
 
 (** In this section, we show how it is possible to equate the result of two sums performed
     on two different functions and on different intervals, provided that the two functions
@@ -297,7 +275,6 @@ Section SumOfTwoIntervals.
   Qed.
 
 End SumOfTwoIntervals.
-
 
 (** In this section, we relate the sum of items with the sum over partitions of those items. *)
 Section SumOverPartitions.
@@ -509,7 +486,8 @@ Proof.
     rewrite big_cons in TWO.
     move: (LE x (mem_head x xs)); rewrite leq_eqVlt => /orP [/eqP EQ | LT].
     { exists x; rewrite EQ -addn1 leq_add2l in TWO.
-      move: TWO; rewrite sum_nat_gt0 => /hasP [x2]; rewrite mem_filter => /andP [_ IN] POS; exists x2.
+      move: TWO; rewrite lt0n sum_nat_seq_neq0 /= => /hasP [x2 IN NONZERO]; exists x2.
+      have POS: 0 < p x2 by rewrite lt0n.
       split; first by apply/negP => /eqP EQT; subst; move: UNIQ; rewrite //= IN.
       split; first by rewrite mem_head.
       split; first by rewrite in_cons IN orbT.

@@ -43,16 +43,17 @@ Section JobIndexLemmas.
     Lemma case_arrival_lte_implies_equal_job :
       job_arrival j1 <= job_arrival j2 -> j1 = j2.
     Proof.
-      move => ARR_LT.
-      move: H_equal_index => IND.
-      apply task_arrivals_up_to_prefix_cat with (arr_seq := arr_seq) in ARR_LT => //.
-      move : ARR_LT => [xs ARR_CAT].
-      apply eq_ind_in_seq with (xs := task_arrivals_up_to_job_arrival arr_seq j2) => //.
-      - by rewrite -/(job_index _ _) -IND -ARR_CAT index_cat ifT;
-          try apply arrives_in_task_arrivals_up_to.
-      - rewrite -ARR_CAT mem_cat; apply /orP.
-        by left; apply arrives_in_task_arrivals_up_to.
-      - by apply arrives_in_task_arrivals_up_to.
+      move=> ARR_LT.
+      apply: (index_inj j1 (s := task_arrivals_up_to_job_arrival arr_seq j2)).
+      - rewrite /task_arrivals_up_to_job_arrival -H_same_task
+                (task_arrivals_cat _ _ (job_arrival j1)) // mem_cat.
+        apply/orP; left.
+        by apply: arrives_in_task_arrivals_up_to.
+      - by apply: arrives_in_task_arrivals_up_to.
+      - rewrite -/(job_index _ _) -H_equal_index /job_index.
+        rewrite /task_arrivals_up_to_job_arrival -H_same_task
+                [in LHS](task_arrivals_cat _ _ (job_arrival j1)) // index_cat ifT //.
+        by apply: arrives_in_task_arrivals_up_to.
     Qed.
 
     (** And similarly if [j1] arrives after [j2], we show that
@@ -60,16 +61,17 @@ Section JobIndexLemmas.
     Lemma case_arrival_gt_implies_equal_job :
       job_arrival j1 > job_arrival j2 -> j1 = j2.
     Proof.
-      move=> LT.
-      move: H_equal_index => IND.
-      apply ltnW, (task_arrivals_up_to_prefix_cat arr_seq) in LT => //.
-      move: LT => [xs ARR_CAT].
-      apply (eq_ind_in_seq _ _ (task_arrivals_up_to_job_arrival arr_seq j1)) => //.
-      - by rewrite -/(job_index _ _) IND -ARR_CAT index_cat ifT;
-          try apply arrives_in_task_arrivals_up_to.
-      - by apply arrives_in_task_arrivals_up_to.
-      - rewrite -ARR_CAT mem_cat; apply /orP.
-        by left; apply arrives_in_task_arrivals_up_to.
+      move=> /ltnW LT.
+      apply: (index_inj j1 (s := task_arrivals_up_to_job_arrival arr_seq j1)).
+      - by apply: arrives_in_task_arrivals_up_to.
+      - rewrite /task_arrivals_up_to_job_arrival H_same_task
+                (task_arrivals_cat _ _ (job_arrival j2)) // mem_cat.
+        apply/orP; left.
+        by apply: arrives_in_task_arrivals_up_to.
+      - rewrite -/(job_index _ _) H_equal_index /job_index.
+        rewrite /task_arrivals_up_to_job_arrival H_same_task
+                [in RHS](task_arrivals_cat _ _ (job_arrival j2)) // index_cat ifT //.
+        by apply: arrives_in_task_arrivals_up_to.
     Qed.
 
     (** And finally we show that irrespective of the relation between the arrival

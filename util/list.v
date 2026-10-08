@@ -35,12 +35,6 @@ Proof.
   - by apply IHxs_l.
 Qed.
 
-(** We also prove that [last0 xs = xs [| size xs -1 |] ]. *)
-Lemma last0_nth :
-  forall xs,
-    last0 xs = nth 0 xs (size xs).-1.
-Proof. by intros; rewrite nth_last. Qed.
-
 (** We prove that for any non-empty sequence [xs] there is a sequence [xsh]
     such that [xsh ++ [::last0 x] = [xs]]. *)
 Lemma last0_ex_cat :
@@ -219,44 +213,6 @@ Qed.
 
 (** * Additional Lemmas about [rem] *)
 
-(** We prove that if [x] lies in [xs] excluding [y], then
-    [x] also lies in [xs]. *)
-Lemma rem_in :
-  forall {X : eqType} (x y : X) (xs : seq X),
-    x \in rem y xs -> x \in xs.
-Proof.
-  move=> X x y; elim=> [|a xs IHxs] /= H.
-  { by rewrite in_nil in H. }
-  { rewrite in_cons; apply/orP.
-    destruct (a == y) eqn:EQ.
-    { by move: EQ => /eqP EQ; subst a; right. }
-    { move: H; rewrite in_cons => /orP [/eqP H | H].
-      - by subst a; left.
-      - by right; apply IHxs.
-    }
-  }
-Qed.
-
-(** Similarly, we prove that if [x <> y] and [x] lies in [xs],
-    then [x] lies in [xs] excluding [y]. *)
-Lemma in_neq_impl_rem_in :
-  forall {X : eqType} (x y : X) (xs : seq X),
-    x \in xs ->
-    x != y ->
-    x \in rem y xs.
-Proof.
-  move=> X x y; elim=> [//|a xs IHxs].
-  rewrite in_cons => /orP [/eqP EQ | IN]; intros NEQ.
-  { rewrite -EQ //=.
-    move: NEQ; rewrite -eqbF_neg => /eqP ->.
-    by rewrite in_cons; apply/orP; left.
-  }
-  { simpl; destruct (a == y) eqn:AD; first by done.
-    rewrite in_cons; apply/orP; right.
-    by apply IHxs.
-  }
-Qed.
-
 (** We prove that if we remove an element [x] for which [P x] from a
     filter, then the size of the filter decreases by [1]. *)
 Lemma filter_size_rem :
@@ -280,27 +236,6 @@ Proof.
 Qed.
 
 (** * Misc. Additional Lemmas about Sequences *)
-
-(** First, we show that a sequence [xs] contains the same elements
-    as a sequence [undup xs]. *)
-Lemma in_seq_equiv_undup :
-  forall {X : eqType} (xs : seq X) (x : X),
-    (x \in undup xs) = (x \in xs).
-Proof.
-  move=> X xs; induction xs as [ | x0 xs IHxs]; first by done.
-  move=> x; rewrite in_cons //=; case IN: (x0 \in xs).
-  - case EQ: (x == x0).
-    + by move: EQ => /eqP EQ; subst; rewrite orTb IHxs.
-    + by rewrite orFb; apply IHxs.
-  - by rewrite in_cons IHxs.
-Qed.
-
-(** We show that if [n > 0], then [nth (x::xs) n = nth xs (n-1)]. *)
-Lemma nth0_cons :
-  forall x xs n,
-    n > 0 ->
-    nth 0 (x :: xs) n = nth 0 xs n.-1.
-Proof. by move=> ? ? []. Qed.
 
 (** Equality of singleton lists is identical to equality of option types. *)
 Lemma seq1_some {T : eqType} :
@@ -351,48 +286,6 @@ Proof.
     by subst; exists (a::xsl), xsr.
 Qed.
 
-(** We prove that for any two sequences [xs] and [ys] the fact that [xs] is a sub-sequence
-    of [ys] implies that the size of [xs] is at most the size of [ys]. *)
-Lemma subseq_leq_size :
-  forall {X : eqType} (xs ys : seq X),
-    uniq xs ->
-    (forall x, x \in xs -> x \in ys) ->
-    size xs <= size ys.
-Proof.
-  intros X xs ys UNIQ SUB.
-  have EXm: exists m, size ys <= m; first by exists (size ys).
-  move: EXm => [m SIZEm].
-  move: xs ys SIZEm UNIQ SUB.
-  elim: m => [|m IHm] xs ys SIZEm UNIQ SUB.
-  { move: SIZEm; rewrite leqn0 size_eq0 => /eqP SIZEm; subst ys.
-    destruct xs as [|s xs]; first by done.
-    specialize (SUB s).
-    by feed SUB; [rewrite in_cons; apply/orP; left | done].
-  }
-  { destruct xs as [ | x xs]; first by done.
-    move: (@in_cat _ x ys) => Lem.
-    feed Lem; first by apply SUB; rewrite in_cons; apply/orP; left.
-    move: Lem => [ysl [ysr EQ]]; subst ys.
-    rewrite !size_cat //= -addnC add1n addSn ltnS -size_cat; eapply IHm.
-    - move: SIZEm; rewrite !size_cat //= => SIZE.
-      by rewrite add1n addnS ltnS addnC in SIZE.
-    - by move: UNIQ; rewrite cons_uniq => /andP [_ UNIQ].
-    - intros a IN.
-      destruct (a == x) eqn: EQ.
-      { exfalso.
-        move: EQ UNIQ; rewrite cons_uniq => /eqP EQ /andP [NIN UNIQ].
-        by subst; move: NIN => /negP NIN; apply: NIN.
-      }
-      { specialize (SUB a).
-        feed SUB; first by rewrite in_cons; apply/orP; right.
-        clear IN; move: SUB; rewrite !mem_cat => /orP [IN| /orP [IN|IN]].
-        - by apply/orP; right.
-        - by exfalso; move: IN; rewrite in_cons => /orP [IN|IN]; [rewrite IN in EQ | ].
-        - by apply/orP; left.
-      }
-  }
-Qed.
-
 (** Given two sequences [xs] and [ys], two elements [x] and [y], and
     an index [idx] such that [nth xs idx = x, nth ys idx = y], we
     show that the pair [(x, y)] is in [zip xs ys]. *)
@@ -432,21 +325,6 @@ Proof.
   + by intros; apply ALLF; rewrite in_cons; apply/orP; right.
 Qed.
 
-(** We show that any two elements having the same index in a
-    sequence must be equal. *)
-Lemma eq_ind_in_seq :
-  forall {X : eqType} (a b : X) (xs : seq X),
-    index a xs = index b xs ->
-    a \in xs ->
-    b \in xs ->
-    a = b.
-Proof.
-  move=> X a b xs EQ IN_a IN_b.
-  move: (nth_index a IN_a) => EQ_a.
-  move: (nth_index a IN_b) => EQ_b.
-  by rewrite -EQ_a -EQ_b EQ.
-Qed.
-
 (** We show that the nth element in a sequence is either in the
     sequence or is the default element. *)
 Lemma default_or_in :
@@ -478,7 +356,6 @@ Proof.
   by rewrite nth_uniq.
 Qed.
 
-
 (** The predicate [all] implies the predicate [has], if the sequence is not empty. *)
 Lemma has_all_nilp {T : eqType} :
   forall (s : seq T) (P : pred T),
@@ -489,7 +366,6 @@ Proof.
   case => // a s P /allP ALL _.
   by apply /hasP; exists a; [|move: (ALL a); apply]; exact: mem_head.
 Qed.
-
 
 (** * Additional Lemmas about [sorted] *)
 
@@ -517,33 +393,7 @@ Proof.
   { by eapply IHxs, path_sorted; eauto. }
 Qed.
 
-(** We show that if a sequence [xs1 ++ xs2] is sorted, then both
-    subsequences [xs1] and [xs2] are sorted as well. *)
-Lemma sorted_cat :
-  forall {X : eqType} {R : rel X} (xs1 xs2 : seq X),
-    transitive R ->
-    sorted R (xs1 ++ xs2) -> sorted R xs1 /\ sorted R xs2.
-Proof.
-  move=> X R; elim=> [//|a xs1 IHxs1] xs2 TR SORT; split.
-  { move: SORT; rewrite /= path_sortedE// all_cat => /andP[/andP[ALL1 ALL2] SORT].
-    rewrite path_sortedE//; apply/andP; split=> //.
-    exact: (proj1 (IHxs1 _ _ SORT)).
-  }
-  { simpl in *; move: SORT; rewrite //= path_sortedE // all_cat => /andP [/andP [ALL1 ALL2] SORT].
-    by apply IHxs1.
-  }
-Qed.
-
-
 (** * Additional Lemmas about [last] *)
-
-(** First, we show that the default element does not change the
-    value of [last] for non-empty sequences.  *)
-Lemma nonnil_last :
-  forall {X : eqType} (xs : seq X) (d1 d2 : X),
-    xs != [::] ->
-    last d1 xs = last d2 xs.
-Proof. by move=> X xs d1 d2; elim: xs => [//|a xs IHxs] _. Qed.
 
 (** We show that if a sequence [xs] contains an element that
     satisfies a predicate [P], then the last element of [filter P xs]
@@ -581,7 +431,6 @@ Fixpoint rem_all {X : eqType} (x : X) (xs : seq X) :=
   | a :: xs =>
     if a == x then rem_all x xs else a :: rem_all x xs
   end.
-
 
 (** First we prove that [x ∉ rem_all x xs]. *)
 Lemma nin_rem_all :
@@ -864,7 +713,6 @@ Lemma count_predUI' :
 Proof.
   by move=> P1 P2 xs; rewrite -(count_predUI P1 P2 xs) -addnBA // subnn addn0.
 Qed.
-
 
 (** * Prefix Definitions *)
 

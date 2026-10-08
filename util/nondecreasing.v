@@ -402,13 +402,13 @@ Section NondecreasingSequence.
         ** apply IHn; first by done.
            by eapply nondecreasing_sequence_cons; eauto.
         ** destruct xs as [ | x1 xs]; first by done.
-           by rewrite [in X in _ <= X]nth0_cons //.
+           by rewrite [in X in _ <= X]nth_cons //.
       * rewrite nodup_sort_2cons_lt //; simpl.
         case (posnP (size (undup (x2 :: xs))).-1) as [Z|POS].
         ** rewrite Z; simpl.
            apply leq_trans with ([:: x1, x2 & xs] [|0|]); first by done.
            by apply NonDec; apply/andP; split; simpl.
-        ** rewrite nth0_cons //.
+        ** rewrite nth_cons POS.
            eapply leq_trans; first apply IHn; eauto using nondecreasing_sequence_cons.
            by destruct xs as [ |? xs]; [exfalso| destruct xs].
   Qed.

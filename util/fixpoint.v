@@ -255,7 +255,7 @@ Proof.
     move: ALL => /allP //=; apply.
     by rewrite /fps; exact: map_f.
   - rewrite H.
-    apply leq_bigmax_cond_seq; [|move: ALL => /allP //=; apply].
+    apply: leq_bigmax_seq; [|move: ALL => /allP //=; apply].
     all: by rewrite /fps; exact: map_f.
 Qed.
 

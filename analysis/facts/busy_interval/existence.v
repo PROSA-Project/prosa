@@ -300,7 +300,7 @@ Section ExistsBusyIntervalJLFP.
         by eapply leq_trans; [apply leqnn | apply SCH; eauto using arrivals_uniq with basic_rt_facts]. }
       { rewrite [in X in X <= _]big_nat_cond [in X in _ <= X]big_nat_cond //=
                 leq_sum // => t' /andP [/andP [LT GT] _].
-        rewrite sum_nat_gt0 filter_predT; apply/hasP.
+        rewrite lt0n sum_nat_seq_neq0 /=; apply/hasP.
         have [Idle|[jo Sched_jo]] := (scheduled_at_cases _ H_valid_arrival_time sched ltac:(auto) ltac:(auto) t').
         { exfalso; move: LT; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
           { subst t'.
@@ -323,7 +323,7 @@ Section ExistsBusyIntervalJLFP.
             apply/andP; split=> [//|].
             apply H_jobs_must_arrive_to_execute in Sched_jo.
             by apply leq_ltn_trans with t'.
-          - by apply: H_progress. } }
+          - by rewrite -lt0n; apply: H_progress. } }
     Qed.
 
 

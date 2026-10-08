@@ -62,7 +62,7 @@ Section FullyConsumingModelLemmas.
     apply sum_le_summation_range in SERV.
     move: SERV => [x [/andP [GEx LEx] L]].
     exists x; split; first by apply/andP; split.
-    move: L => /eqP; rewrite addn_eq0 eqb0 sum_nat_eq0_nat filter_predT => /andP [SUP /allP L].
+    move: L => /eqP; rewrite addn_eq0 eqb0 sum_nat_seq_eq0 -all_filter filter_predT => /andP [SUP /allP L].
     apply/negPn/negP; rewrite is_nonidle_iff //= => [[j SCHED]].
     have /eqP: service_at sched j x == 0.
     { apply/L/arrived_between_implies_in_arrivals => //.
@@ -135,7 +135,7 @@ Section IdealModelLemmas.
     move: SERV => [x [/andP [GEx LEx] L]].
     exists x; split; first by apply/andP; split.
     apply/negPn/negP; rewrite is_nonidle_iff //= => [[j SCHED]].
-    move: L => /eqP; rewrite sum_nat_eq0_nat filter_predT => /allP L.
+    move: L => /eqP; rewrite sum_nat_seq_eq0 -all_filter filter_predT => /allP L.
     have /eqP:  service_at sched j x == 0.
     { apply/L/arrived_between_implies_in_arrivals => //.
       rewrite /arrived_between; apply/andP; split => //.

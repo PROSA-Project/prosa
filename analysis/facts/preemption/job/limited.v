@@ -99,7 +99,7 @@ Section ModelWithLimitedPreemptions.
       move: H_valid_limited_preemptions_job_model => [BEG [END _]].
       have EQ: 2 = size [::0; job_cost j] => [//|].
       rewrite EQ; clear EQ.
-      apply subseq_leq_size.
+      apply: uniq_leq_size.
       - rewrite !cons_uniq.
         { apply/andP; split.
           + rewrite in_cons negb_or; apply/andP; split=> [|//].

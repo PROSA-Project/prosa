@@ -134,7 +134,7 @@ Section GenericModelLemmas.
     Lemma service_of_jobs_pred_impl :
       (forall j : Job, j \in jobs -> P1 j -> P2 j) ->
       service_of_jobs sched P1 jobs t1 t2 <= service_of_jobs sched P2 jobs t1 t2.
-    Proof. by intros IMPL; apply leq_sum_seq_pred; eauto. Qed.
+    Proof. by move=> IMPL; apply: leq_sum_seq_pred. Qed.
 
     (** Similarly, we show that if [P1] is equivalent to [P2], then the service
         of [{jobs | P1}] is equal to the service of [{jobs | P2}]. *)
@@ -476,7 +476,7 @@ Section UnitServiceUniProcessorModelLemmas.
     Proof.
       intros t.
       eapply leq_trans.
-      { by apply leq_sum_seq_pred with (P2 := predT); intros. }
+      { by apply: leq_sum_seq_pred. }
       simpl; elim: jobs H_no_duplicate_jobs => [|j js IHjs] uniq_js.
       - by rewrite big_nil.
       - feed IHjs; first by move: uniq_js; rewrite cons_uniq => /andP [_ U].
@@ -642,7 +642,7 @@ Section UnitServiceUniProcessorModelLemmas.
         { move=> /hasP [jo IN /andP [Pjo SERVjo]].
           apply/eqP; rewrite eqn_leq; apply/andP; split.
           - by apply service_of_jobs_le_1 => //.
-          - by rewrite sum_nat_gt0; apply/hasP; exists jo => //; rewrite mem_filter IN Pjo. }
+          - by rewrite lt0n sum_nat_seq_neq0 /=; apply/hasP; exists jo => //; rewrite Pjo /= -lt0n. }
         { move=> /hasPn ALL; rewrite big1_seq // => jo /andP [Pjo IN].
           move: (ALL _ IN); rewrite negb_and => /orP [A | B]; first by rewrite Pjo in A.
           by move: B; rewrite /receives_service_at -leqNgt leqn0 => /eqP ->. } }

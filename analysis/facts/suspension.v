@@ -146,7 +146,7 @@ Section Suspensions.
       Local Lemma suspension_zero_before :
         \sum_(t1 <= t < tf | service sched j t == ρ) suspended sched j t = 0.
       Proof.
-        apply /eqP; rewrite sum_nat_eq0_nat.
+        apply /eqP; rewrite sum_nat_seq_eq0 -all_filter.
         apply /allP => [to /[!mem_filter]/andP[SERVto /[!mem_index_iota]INto]].
         move: (H_before_tf to INto); rewrite SERVto andbT.
         by move => /negPf ->.
@@ -161,7 +161,8 @@ Section Suspensions.
         apply: leq_trans;
           first by apply sum_majorant_constant with (c := 1) => ? ? ?; lia.
         rewrite mul1n -sum1_size big_filter.
-        apply leq_trans with (n := \sum_(t0 <- index_iota tf t2) 1); first by apply leq_sum_seq_pred.
+        apply: (leq_trans (n := \sum_(t0 <- index_iota tf t2) 1));
+          first by apply: leq_sum_seq_pred.
         by rewrite sum1_size size_iota.
       Qed.
 
@@ -175,7 +176,7 @@ Section Suspensions.
         have PENDj : pending sched j tf by apply suspended_implies_pending.
         erewrite big_cat_nat with (n := tf + job_suspension j ρ); rewrite //=; try by lia.
         have ->: \sum_(tf + job_suspension j ρ <= t < t2 | service sched j t == ρ) suspended sched j t = 0.
-        { apply /eqP; rewrite sum_nat_eq0_nat //=.
+        { apply /eqP; rewrite sum_nat_seq_eq0 -all_filter //=.
           apply /negP => /negP /allPn[to INto NOTSUSto].
           have A : forall b : bool, b > 0 -> b by lia.
           move: NOTSUSto; rewrite -lt0n => /A NOTSUSto.
@@ -195,7 +196,7 @@ Section Suspensions.
           apply: leq_trans; first by apply sum_majorant_constant with (c := 1) => ? ? ?; lia.
           rewrite mul1n -sum1_size big_filter.
           apply leq_trans with (n := \sum_(t0 <- index_iota tf (tf + job_suspension j ρ)) 1);
-            first by apply leq_sum_seq_pred.
+            first by apply: leq_sum_seq_pred.
           by rewrite sum1_size size_iota; lia.
       Qed.
 
@@ -270,7 +271,7 @@ Section Suspensions.
       { move: (exists_some_point HAS) => [tf [INtf [SUStf [SERVtf tfFirst]]]].
         by apply: suspension_bounded_in_interval_aux. }
       have ->: \sum_(t1 <= t < t2 | service sched j t == ρ) suspended sched j t = 0 => //=.
-      apply /eqP; rewrite sum_nat_eq0_nat.
+      apply /eqP; rewrite sum_nat_seq_eq0 -all_filter.
       apply /allP => [to INto].
       move: INto; rewrite mem_filter => /andP[SERVto INto].
       move: (NOTHAS to INto); rewrite SERVto andbT.

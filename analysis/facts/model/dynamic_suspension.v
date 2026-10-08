@@ -76,10 +76,10 @@ Section TotalSuspensionBounded.
       { erewrite big_cat_nat with (n := job_cost j) => //=.
         have ->: \sum_(job_cost j <= r < service sched j (t1 + Δ) + 1)
           \sum_(t1 <= t < t1 + Δ | service sched j t == r) suspended sched j t = 0.
-        { apply /eqP; rewrite sum_nat_eq0_nat.
+        { apply /eqP; rewrite sum_nat_seq_eq0 -all_filter.
           apply /allP => [r INr].
           move: INr; rewrite mem_filter andTb mem_index_iota => INr.
-          rewrite sum_nat_eq0_nat; apply /allP => [to INto].
+          rewrite sum_nat_seq_eq0 -all_filter; apply /allP => [to INto].
           move: INto; rewrite mem_filter => /andP[/eqP SERVto INto].
           rewrite /suspended.
           have /negPf ->: ~~ pending sched j to; last by rewrite andbF.

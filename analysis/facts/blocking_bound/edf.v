@@ -78,10 +78,10 @@ Section  MaxNPSegmentIsBounded.
   Proof.
     move=> t1 t2 BUSY; rewrite /max_lp_nonpreemptive_segment /blocking_bound.
     apply: leq_trans;first by exact: max_np_job_segment_bounded_by_max_np_task_segment.
-    apply /bigmax_leq_seqP => j' JINB NOTHEP.
+    apply /bigmax_leqP_seq => j' JINB NOTHEP.
     have ARR': arrives_in arr_seq j'
       by apply: in_arrivals_implies_arrived; exact: JINB.
-    apply leq_bigmax_cond_seq with (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
+    apply: (leq_bigmax_seq (job_task j'));
       first by apply H_all_jobs_from_taskset.
     apply in_arrivals_implies_arrived_between in JINB => [|//].
     move: JINB => /andP [_ TJ'].

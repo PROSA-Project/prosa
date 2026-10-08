@@ -231,7 +231,7 @@ Section BoundedBusyIntervals.
         set P := (fun j' : Job => (job_deadline j' <= job_deadline jlp) && (job_task j' == tsk_o)).
         rewrite -(leqRW (rbf_spec' _ _ _ P _ _ _)) /P //.
         by move=> ? /andP[].
-      + by move=> jo IN; rewrite in_seq_equiv_undup;
+      + by move=> jo IN; rewrite mem_undup;
           apply: H_all_jobs_from_taskset; apply: in_arrivals_implies_arrived.
       + move=> jo IN.
         have ARRjo : t1 <= job_arrival jo by apply: job_arrival_between_ge.
@@ -256,7 +256,7 @@ Section BoundedBusyIntervals.
       move: (H_busy_prefix) => [_ [_ [_ /andP [ARRj _]]]].
       have [t_sched [_ SCHEDjlp]]: exists t, t1 <= t < t1 + Δ /\ scheduled_at sched jlp t
           by apply cumulative_service_implies_scheduled; rewrite -EQs.
-      apply leq_bigmax_sup; exists (job_task jlp); split => //; last split; rewrite /D.
+      apply: (bigmaxn_sup_seq (job_task jlp)) => //; rewrite /D.
       { move: (H_job_of_tsk) => /eqP <-.
         by apply: lower_priority_job_accounted_for. }
       { apply leq_add; last by apply: hep_workload_bound.
@@ -295,7 +295,7 @@ Section BoundedBusyIntervals.
   Proof.
     eapply leq_trans; last by apply H_fixed_point.
     unfold longest_busy_interval_with_pi.
-    apply/bigmax_leq_seqP => tskl IN DLT.
+    apply/bigmax_leqP_seq => tskl IN DLT.
     unfold total_request_bound_function.
     rewrite [leqRHS](bigID (fun tskh => task_deadline tskh < task_deadline tskl)) //=.
     rewrite addnC leq_add //.

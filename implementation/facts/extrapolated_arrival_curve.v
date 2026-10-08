@@ -170,13 +170,14 @@ Section ArrivalCurvePrefixSortedLtn.
   Lemma step_at_agrees_with_steps_of :
     forall t v, (t, v) \in steps_of ac_prefix -> step_at ac_prefix t = (t, v).
   Proof.
-    case: ac_prefix H_sorted_ltn => [h steps] + //= ? ? IN.
-    move: IN => /in_cat //= [steps__l [steps__r ->]] /sorted_cat //=; case => //= [|_ +]; first by apply ltn_steps_is_transitive.
-    rewrite /step_at filter_cat last_cat (nonnil_last _ _ (0,0)); first by rewrite //= leqnn.
-    rewrite //= path_sortedE; auto using ltn_steps_is_transitive; rewrite //= leqnn => /andP [ALL SORT].
-    replace (filter _ _ ) with (@nil (nat * nat)) => [//|].
+    case: ac_prefix H_sorted_ltn => [h steps] + //= t v IN.
+    move: IN => /in_cat //= [steps__l [steps__r ->]] /cat_sorted2 /= [_ SORT].
+    move: SORT.
+    rewrite /step_at filter_cat last_cat (@set_last_default _ _ (0, 0) _); first by rewrite //= leqnn.
+    rewrite /= (path_sortedE ltn_steps_is_transitive) /= leqnn => /andP [ALL _].
+    have -> : [seq step <- steps__r | fst step <= t] = [::]; last by [].
     rewrite filter_in_pred0 // => x IN; rewrite -ltnNge.
-    by move: ALL => /allP ALL; move: (ALL _ IN); rewrite /ltn_steps //= => /andP [LT _ ].
+    by move: ALL => /allP ALL; move: (ALL _ IN); rewrite /ltn_steps /= => /andP [LT _].
   Qed.
 
 End ArrivalCurvePrefixSortedLtn.

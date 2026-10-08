@@ -282,8 +282,8 @@ Section ServiceInversionIsBounded.
         /\ ~~ hep_job jlp j
         /\ receives_service_at sched jlp to.
     Proof.
-      move: H_service_inversion_positive; rewrite sum_nat_gt0 filter_predT => /hasP [t' IN POS].
-      rewrite mem_index_iota in IN; rewrite lt0b in POS.
+      move: H_service_inversion_positive; rewrite lt0n sum_nat_seq_neq0 /= => /hasP [t' IN POS].
+      rewrite mem_index_iota in IN; rewrite -lt0n lt0b in POS.
       move: POS => /andP [NIN /hasP [jlp INlp LP]].
       exists jlp, t'.
       by rewrite IN LP.
@@ -510,7 +510,7 @@ Section ServiceInversionIsBounded.
       have [ZE|POS] := posnP (service_during sched jlp t1 t); first by rewrite ZE.
       have [st [NEQ SCHED]] := cumulative_service_implies_scheduled _ _ _ _ POS.
       rewrite (leqRW (lp_job_bounded_service _ _)) //.
-      rewrite /max_lp_nonpreemptive_segment -(leqRW (leq_bigmax_cond_seq _ _ _ jlp _ _)) //.
+      rewrite /max_lp_nonpreemptive_segment -(leqRW (leq_bigmax_seq jlp _ _)) //.
       { apply: arrived_between_implies_in_arrivals => //.
         apply/andP; split => //.
         by (apply: low_priority_job_arrives_before_busy_interval_prefix; try apply: H_busy_prefix) => //; lia.

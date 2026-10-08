@@ -261,8 +261,8 @@ Section ScheduleChangesBoundedHelper.
       move=> to; rewrite mem_index_iota => NEQo.
       rewrite big_mkcond //= [in X in _ + X]big_mkcond //= -big_split //=.
       destruct (some_job_completes_at to) eqn:COM; last by done.
-      move: COM => /hasP [jc IN COMP]; rewrite sum_nat_gt0; apply/hasP; exists jc.
-      { by rewrite mem_filter //=; apply: arrivals_between_sub; [ | | apply IN]; lia. }
+      move: COM => /hasP [jc IN COMP]; rewrite lt0n sum_nat_seq_neq0 /=; apply/hasP; exists jc.
+      { by apply: arrivals_between_sub; [ | | apply IN]; lia. }
       { by destruct (hep_job _ _); rewrite COMP. }
     }
     rewrite leq_add2r big_nat_cond [leqRHS]big_nat_cond.
@@ -289,9 +289,9 @@ Section ScheduleChangesBoundedHelper.
          \sum_(jhp <- arrivals_between arr_seq t1 t) scheduled_at sched jhp to).
     { rewrite big_mkcond [leqRHS]big_mkcond //= big_seq [leqRHS]big_seq //=; apply leq_sum.
       move=> to; rewrite mem_index_iota => NEQto.
-      destruct (priority_bump sched to) eqn:PB => //; rewrite sum_nat_gt0.
+      case PB: (priority_bump sched to) => //; rewrite lt0n sum_nat_seq_neq0 /=.
       edestruct priority_bump_implies_hp_arrival_in_prefix as [jhp [SCHED ARR]]; last first.
-      { by apply/hasP; exists jhp; [rewrite mem_filter | rewrite SCHED]. }
+      { by apply/hasP; exists jhp; [exact: ARR | rewrite SCHED]. }
       all: try apply H_busy_interval_prefix; try apply PB; try done; lia.
     }
     { rewrite exchange_big [leqRHS]big_mkcond //= big_seq [leqRHS]big_seq //=.

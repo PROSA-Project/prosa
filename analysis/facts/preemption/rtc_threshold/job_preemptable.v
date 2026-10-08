@@ -83,7 +83,7 @@ Section RunToCompletionThreshold.
   Proof.
     intros POS.
     replace 2 with (size [::0; job_cost j]) => [|//].
-    apply subseq_leq_size.
+    apply: uniq_leq_size.
     - apply/andP; split.
       + rewrite !in_cons Bool.negb_orb.
         by apply/andP; split; [rewrite neq_ltn POS|].
@@ -121,7 +121,7 @@ Section RunToCompletionThreshold.
     0 < job_last_nonpreemptive_segment j.
   Proof.
     intros COST. unfold job_last_nonpreemptive_segment.
-    rewrite last0_nth function_of_distances_is_correct subn_gt0.
+    rewrite /last0 -nth_last function_of_distances_is_correct subn_gt0.
     rewrite [size _]pred_Sn -addn1-addn1.
     rewrite -size_of_seq_of_distances ?addn1; first by apply size_of_preemption_points.
     rewrite prednK.
@@ -225,7 +225,7 @@ Section RunToCompletionThreshold.
     specialize (EQ (job_preemption_points j) ρ (size (job_preemption_points j)).-2 ).
     feed_n 2 EQ; first by apply preemption_points_nondecreasing.
     { apply/andP; split=> [//|].
-      rewrite prednK; last by rewrite -last0_nth.
+      rewrite prednK; last by rewrite /last0 nth_last.
       rewrite -(leq_add2r 1) !addn1 prednK.
       - by eapply leq_trans; last apply size_of_preemption_points.
       - exact: size_of_preemption_points.

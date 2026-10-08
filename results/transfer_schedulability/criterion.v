@@ -349,7 +349,7 @@ Section TransferSchedulability.
       suff: online_remaining_cost j t == 0 by rewrite /online_remaining_cost; lia.
       have REM0: remaining_cost_bound j t == 0.
       { move: ZERO.
-        rewrite sum_nat_eq0_nat => /allP; apply.
+        rewrite sum_nat_seq_eq0 -all_filter => /allP; apply.
         by rewrite mem_filter; apply/andP; split. }
       have := online_remaining_cost_bounded j t.
       by lia.
@@ -1171,10 +1171,10 @@ Section TransferSchedulability.
                   remaining_cost_bound online_job_cost j t2 > 0
                 -> exists2 j, (j \in critical_jobs t1 t2)
                              & ~~ online_completed_by j t2.
-    { rewrite sum_nat_gt0 => /hasP [j IN NZ].
-      exists j; first by move: IN; rewrite filter_predT.
+    { rewrite lt0n sum_nat_seq_neq0 /= => /hasP [j IN NZ].
+      exists j; first by exact: IN.
       rewrite /online_completed_by/completed_by -ltnNge.
-      move: NZ; rewrite /remaining_cost_bound/online_job_cost.
+      move: NZ; rewrite -lt0n /remaining_cost_bound/online_job_cost.
       by lia. }
     (** Hence we proceed to show that the total remaining job cost is non-zero
         at time [t2]. *)

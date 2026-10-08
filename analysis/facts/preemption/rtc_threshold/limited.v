@@ -71,7 +71,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     }
     have EQ: 2 = size [::0; task_cost tsk] by [].
     rewrite EQ; clear EQ.
-    apply subseq_leq_size.
+    apply: uniq_leq_size.
     - rewrite !cons_uniq.
       apply/andP; split=> [|//].
       rewrite in_cons negb_or; apply/andP; split=> [|//].
@@ -108,7 +108,7 @@ Section TaskRTCThresholdLimitedPreemptions.
       by eapply job_last_nonpreemptive_segment_positive; eauto using valid_fixed_preemption_points_model_lemma.
     have T_RTCT__pos : 0 < task_last_nonpr_segment tsk.
     { unfold job_respects_segment_lengths, task_last_nonpr_segment in *.
-      rewrite last0_nth; apply T6; eauto 2.
+      rewrite /last0 -nth_last; apply: T6 => //.
       have F: 1 <= size (distances (task_preemption_points tsk)).
       { apply leq_trans with (size (task_preemption_points tsk) - 1).
         - have F := number_of_preemption_points_in_task_at_least_two; lia.

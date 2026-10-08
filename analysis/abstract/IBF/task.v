@@ -440,8 +440,8 @@ Section TaskIBFtoJobIBF.
             + task_interference arr_seq sched j t.
         Proof.
           rewrite interference_and_service_eq_1 -addn1 addnC leq_add //.
-          rewrite /service_of_jobs_at big_mkcond sum_nat_gt0 filter_predT; apply/hasP.
-          exists j'; last by rewrite H_not_job_of_tsk.
+          rewrite /service_of_jobs_at big_mkcond lt0n sum_nat_seq_neq0 /=; apply/hasP.
+          exists j'; last by rewrite H_not_job_of_tsk -lt0n.
           eapply arrived_between_implies_in_arrivals => //.
           apply/andP; split.
           - move_neq_up CONTR.

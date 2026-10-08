@@ -360,10 +360,10 @@ Section RelationToScheduled.
   Proof.
     move=> t1 t2.
     split=> [|[t [titv nz_serv]]].
-    - rewrite sum_nat_gt0 filter_predT => /hasP [t IN GT0].
-      by exists t; split; [rewrite -mem_index_iota|].
-    - rewrite sum_nat_gt0; apply/hasP.
-      by exists t; [rewrite filter_predT mem_index_iota|].
+    - rewrite lt0n sum_nat_seq_neq0 /= => /hasP [t IN GT0].
+      by exists t; split; [rewrite -mem_index_iota|rewrite lt0n].
+    - rewrite lt0n sum_nat_seq_neq0 /=; apply/hasP.
+      by exists t; [rewrite mem_index_iota|rewrite -lt0n].
   Qed.
 
   (** Thus, any job that receives some service during an interval must be

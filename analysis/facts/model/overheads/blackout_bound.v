@@ -136,8 +136,8 @@ Section TotalBlackoutDueToOverheadsBounded.
     have [Z|POS] := posnP (total_time_in_dispatch sched t1 t2); first by rewrite Z.
     apply total_dispatch_time_eq_job_dispatch_time in NSI2; destruct NSI2 as [oj EQ]; rewrite EQ.
     rewrite EQ in POS; clear EQ.
-    move: POS; rewrite sum_nat_gt0 //= => /hasP [t]; rewrite mem_filter //= mem_index_iota.
-    move=> NEQ; rewrite lt0b => /andP [/eqP SCHED] _.
+    move: POS; rewrite lt0n sum_nat_seq_neq0 /= //= => /hasP [t]; rewrite mem_index_iota.
+    move=> NEQ; rewrite -lt0n lt0b => /andP [/eqP SCHED] _.
     apply H_valid_overheads_model.
     apply/allP => t'; rewrite mem_index_iota => NEQ'; apply/eqP.
     by apply: no_changes_implies_same_scheduled_job; try apply SCHED.
@@ -153,8 +153,8 @@ Section TotalBlackoutDueToOverheadsBounded.
     have [Z|POS] := posnP (total_time_in_context_switch sched t1 t2); first by rewrite Z.
     apply total_cswitch_time_eq_job_cswitch_time in NSI2; destruct NSI2 as [oj EQ]; rewrite EQ.
     rewrite EQ in POS; clear EQ.
-    move: POS; rewrite sum_nat_gt0 //= => /hasP [t]; rewrite mem_filter //= mem_index_iota.
-    move=> NEQ; rewrite lt0b => /andP [/eqP SCHED] _.
+    move: POS; rewrite lt0n sum_nat_seq_neq0 /= //= => /hasP [t]; rewrite mem_index_iota.
+    move=> NEQ; rewrite -lt0n lt0b => /andP [/eqP SCHED] _.
     apply H_valid_overheads_model.
     apply/allP => t'; rewrite mem_index_iota => NEQ'; apply/eqP.
     by apply: no_changes_implies_same_scheduled_job; try apply SCHED.
@@ -170,8 +170,8 @@ Section TotalBlackoutDueToOverheadsBounded.
     have [Z|POS] := posnP (total_time_in_CRPD sched t1 t2); first by rewrite Z.
     apply total_CRPD_time_eq_job_CRPD_time in NSI2; destruct NSI2 as [oj EQ]; rewrite EQ.
     rewrite EQ in POS; clear EQ.
-    move: POS; rewrite sum_nat_gt0 //= => /hasP [t]; rewrite mem_filter //= mem_index_iota.
-    move=> NEQ; rewrite lt0b => /andP [/eqP SCHED] _.
+    move: POS; rewrite lt0n sum_nat_seq_neq0 /= //= => /hasP [t]; rewrite mem_index_iota.
+    move=> NEQ; rewrite -lt0n lt0b => /andP [/eqP SCHED] _.
     apply H_valid_overheads_model.
     apply/allP => t'; rewrite mem_index_iota => NEQ'; apply/eqP.
     by apply: no_changes_implies_same_scheduled_job; try apply SCHED.

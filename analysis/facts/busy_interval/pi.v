@@ -305,8 +305,8 @@ Section PriorityInversionIsBounded.
     \/ priority_inversion arr_seq sched j t1.
   Proof.
     case: (posnP (cumulative_priority_inversion arr_seq sched j t1 t2)); first by left.
-    rewrite sum_nat_gt0 // => /hasP[pi].
-    rewrite mem_filter /= mem_index_iota lt0b => INTL PI_pi.
+    rewrite lt0n sum_nat_seq_neq0 /= // => /hasP[pi].
+    rewrite mem_index_iota -lt0n lt0b => INTL PI_pi.
     by right; apply: pi_continuous =>//; lia.
   Qed.
 

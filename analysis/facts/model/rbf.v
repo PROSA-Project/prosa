@@ -376,7 +376,7 @@ Section DegenerateTotalRBFs.
     move=> tsk IN ZERO j ARR TASK.
     apply: pathological_rbf_response_time_bound; eauto.
     apply /eqP.
-    move: ZERO => /eqP; rewrite sum_nat_eq0_nat => /allP; apply.
+    move: ZERO => /eqP; rewrite sum_nat_seq_eq0 -all_filter => /allP; apply.
     rewrite mem_filter; apply /andP; split => //.
   Qed.
 
@@ -509,7 +509,7 @@ Section RBFFOrFP.
   Proof.
     rewrite /total_ohep_request_bound_function_FP => tsk.
     apply /eqP.
-    rewrite sum_nat_eq0_nat.
+    rewrite sum_nat_seq_eq0 -all_filter.
     apply /allP => tsk' IN.
     apply /eqP.
     apply task_rbf_0_zero => //=.
@@ -756,7 +756,7 @@ Section TaskWorkload.
     rewrite mulnDr mulnC muln1 addnK mulnC.
     apply sum_majorant_constant => j' ARR' /eqP TSK2.
     rewrite -TSK2; apply H_arrivals_have_valid_job_costs.
-    apply rem_in in ARR'.
+    move: ARR' => /mem_rem ARR'.
     by eapply in_arrivals_implies_arrived => //=.
   Qed.
 

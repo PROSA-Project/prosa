@@ -136,7 +136,7 @@ Section RTAforEDFwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Proof.
     move=> A1 A2 LEQ.
     rewrite /blocking_bound.
-    apply: bigmax_subset => tsk_o IN /andP[/andP[OTHER LT] ARR].
+    apply: (sub_in_le_big leqnn (fun m n => leq_maxl m n)) => tsk_o IN /andP[/andP[OTHER LT] ARR].
     by repeat (apply /andP; split) => //; lia.
   Qed.
 

@@ -127,7 +127,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
           rewrite big_seq_cond [in X in _ <= X]big_seq_cond big_mkcond [in X in _ <= X]big_mkcond //=.
           apply leq_sum => tsk' _; rewrite andbC //=.
           destruct (tsk' \in rem (T:=Task) tsk ts) eqn:IN; last by [].
-          apply rem_in in IN.
+          move: IN => /mem_rem IN.
           rewrite addnBAC //=.
           apply: leq_trans;
             last by apply: (rbf_spec arr_seq tsk' _ t1 (job_arrival j + 1 - t1)).

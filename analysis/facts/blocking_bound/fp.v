@@ -69,9 +69,8 @@ Section  MaxNPSegmentIsBounded.
     { rewrite /hep_job /fp_to_jlfp TSK.
       apply: leq_big_max => j' JINB NOTHEP.
       by rewrite leq_sub2r //. }
-    { apply /bigmax_leq_seqP => j' JINB /andP[NOTHEP POS].
-      apply leq_bigmax_cond_seq with
-        (x := (job_task j')) (F := fun tsk => task_max_nonpreemptive_segment tsk - 1);
+    { apply /bigmax_leqP_seq => j' JINB /andP[NOTHEP POS].
+      apply: (leq_bigmax_seq (job_task j'));
         last by done.
       apply: H_all_jobs_from_taskset.
       by apply: in_arrivals_implies_arrived (JINB). }
