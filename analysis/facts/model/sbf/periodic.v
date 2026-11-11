@@ -115,10 +115,13 @@ Section PeriodicResourceModelValidSBF.
       move: ALT => [NEQ|[NEQ|[NEQ|NEQ]]].
       - by rewrite !divn_small //; lia.
       - by rewrite !NEQ divnn POS mul1n divn_small; lia.
-      - have ->: (j + γ) %/ Π = 1 by apply divn_leq; lia.
-        have ->: (j + 1 + γ) %/ Π = 1 by apply divn_leq; lia.
+      - have ->: (j + γ) %/ Π = 1
+          by apply/eqP; rewrite eqn_leq -ltnS ltn_divLR // leq_divRL //; lia.
+        have ->: (j + 1 + γ) %/ Π = 1
+          by apply/eqP; rewrite eqn_leq -ltnS ltn_divLR // leq_divRL //; lia.
         by rewrite mul1n; lia.
-      - have ->: (j + γ) %/ Π = 1 by apply divn_leq; lia.
+      - have ->: (j + γ) %/ Π = 1
+          by apply/eqP; rewrite eqn_leq -ltnS ltn_divLR // leq_divRL //; lia.
         rewrite NEQ divnK; first by apply dvdn_mull, dvdnn.
         by rewrite mulnK //; lia.
     }
@@ -323,42 +326,23 @@ Section PeriodicResourceModelValidSBF.
     Lemma prm_sbf_valid_aux_2 :
       prm_sbf Π γ (t2 - t1) <= supply_during sched t1 t2.
     Proof.
-      rewrite /prm_sbf /supply_bound_function.
-      move: (H_periodic_resource_model) => [POS [LE VAL]].
-      rewrite prm_sbf_valid_aux_21 //
-              -(leqRW prm_sbf_valid_aux_22) //
-              -(leqRW prm_sbf_valid_aux_23) //
-              -(leqRW prm_sbf_valid_aux_24) //.
-      have ->: Π - q1 - (Π - γ) = γ - q1 by lia.
-      have [NEQk1|NEQk2] : k1 + 1 = k2 \/ k1 + 1 < k2 by lia.
-      { subst k2; rewrite subnn mul0n addn0; clear H_k1_lt_k2.
-        have ->: forall a b, a - 2 * b = a - b - b by lia.
-        have ->: (k1 + 1) * Π + q2 - (k1 * Π + q1) = Π + q2 - q1 by lia.
-        have ->: (Π + q2 - q1) = (Π - q1 + q2) by lia.
-        have ->: Π - q1 + q2 - (Π - γ) = q2 + γ - q1 by lia.
-        have [NEQ | NEQ] : (q2 + γ - q1 < Π) \/ (Π <= q2 + γ - q1 < 2 * Π).
-        { by enough (A : q2 + γ - q1 < 2 * Π); lia. }
-        { by rewrite divn_small // !mul0n add0n subn0; lia. }
-        { by have ->: (q2 + γ - q1) %/ Π = 1; [apply divn_leq | ]; lia. }
-      }
-      { have ->: forall a b, a - 2 * b = a - b - b by lia.
-        have ->: k2 * Π + q2 - (k1 * Π + q1) = (k2 - k1) * Π + q2 - q1 by lia.
-        have ->: (k2 - k1) * Π + q2 - q1 - (Π - γ) = (k2 - (k1 + 1)) * Π + q2 - q1 + γ.
-        { rewrite subnBA // -addnBAC; last lia.
-          apply leq_trans with (2 * Π + q2 - q1); first lia.
-          by rewrite leq_sub2r // leq_add2r leq_mul //; lia.
-        }
-        have [k3 ->] : exists k3, (k2 - (k1 + 1)) = k3 + 1 by (exists (k2 - (k1 + 1) - 1); lia).
-        rewrite !mulnDl mul1n.
-        have -> : k3 * Π + Π + q2 - q1 + γ = k3 * Π + (Π + q2 - q1 + γ) by lia.
-        rewrite divnDl ?mulnK // ?mulnDl.
-        have [NEQ | [NEQ | NEQ]] :
-          (Π + q2 - q1 + γ < Π) \/ (Π <= Π + q2 - q1 + γ < 2 * Π) \/ (2 * Π <= Π + q2 - q1 + γ < 3 * Π).
-        { by enough (F : 0 <= Π + q2 - q1 + γ < 3 * Π); lia. }
-        { by rewrite divn_small //; lia. }
-        { by have ->: (Π + q2 - q1 + γ) %/ Π = 1; [apply divn_leq | ]; lia. }
-        { by have ->: (Π + q2 - q1 + γ) %/ Π = 2; [apply divn_leq | ]; lia. }
-      }
+      move: (H_periodic_resource_model) => [POS [LE _]].
+      rewrite prm_sbf_valid_aux_21 // -(leqRW prm_sbf_valid_aux_22) //
+        -(leqRW prm_sbf_valid_aux_23) // -(leqRW prm_sbf_valid_aux_24) //.
+      pose n := k2 - k1.+1.
+      pose blackout := Π - γ.
+      pose ends := Π - q1 - blackout + (q2 - blackout).
+      (** Bound the interval by the reference duration plus the end supply. *)
+      apply: leq_trans (prm_sbf_monotone _ (n * Π + 2 * blackout + ends) _) _.
+      - by rewrite /t1 /t2 -(subnK H_k1_lt_k2) -/n /ends /blackout; lia.
+      (** Use unit growth, then evaluate the SBF at the reference duration. *)
+      - apply: leq_trans (unit_growth_function_k_steps_bounded _ _ _ _) _.
+        + by move=> t; rewrite !addn1; apply: prm_sbf_unit.
+        + rewrite /prm_sbf /supply_bound_function -/blackout.
+          have -> : n * Π + 2 * blackout - blackout = n * Π + blackout by lia.
+          rewrite divnMDl // /ends /blackout addn1 -/n.
+          case: (posnP γ) => [->|POSγ]; first by rewrite subn0 divnn POS /=; lia.
+          by rewrite divn_small; lia.
     Qed.
 
   End Case2.

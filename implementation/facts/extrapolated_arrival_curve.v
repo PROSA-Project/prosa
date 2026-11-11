@@ -211,7 +211,7 @@ Section ExtrapolatedArrivalCurve.
       { by apply/orP; rewrite -leq_eqVlt; apply leq_div2r, ltnW. }
       move: ALT => [/eqP EQ | LT].
       { rewrite EQ leq_add2l; apply value_at_monotone => //.
-        by apply eqdivn_leqmodn; lia.
+        by lia.
       }
       { have EQ: exists k, t1 + k = t2 /\ k > 0.
         { exists (t2 - t1); split; lia. }

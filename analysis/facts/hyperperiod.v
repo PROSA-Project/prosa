@@ -211,10 +211,8 @@ Section PeriodicLemmas.
     apply /andP; split.
     + rewrite addnC -leq_subRL => //.
       by apply leq_divM.
-    + specialize (div_floor_add_g (job_arrival j1 - O_max) HP) => AB.
-      feed_n 1 AB; first by apply valid_periods_imply_pos_hp => //.
-      rewrite ltn_subLR // in AB.
-      by rewrite -/(HP); lia.
+    + rewrite -addnA addnCA -ltn_subLR // -mulSnr.
+      by apply: ltn_ceil; apply: valid_periods_imply_pos_hp.
   Qed.
 
   (** We show that the [corresponding_job_in_hyperperiod] of [j1] in [j2]'s hyperperiod

@@ -95,7 +95,7 @@ Section FastSearchSpaceComputation.
       { by rewrite addn1 ltnS; apply leq_div2r. }
       { rewrite /get_time_steps_of_task EQ.
         have-> := @map_f _ _ fst (steps_of _) (last (0, 0) [seq s <- _ | s.1 <= (A+ε)%%h])=> //.
-        have EQeps: (A + ε) %% h = A %% h + ε by apply addn1_modn_commute.
+        have EQeps: (A + ε) %% h = A %% h + ε by rewrite /h; lia.
         rewrite EQeps in LTe.
         move: (value_at_change_is_in_steps_of _ SORT_LEQ NOINF _ LTe) => [v IN].
         rewrite -EQeps in IN; apply filter_last_mem; apply /hasP.
