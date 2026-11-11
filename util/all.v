@@ -4,6 +4,7 @@ Require Export mathcomp.zify.zify.
 Require Export prosa.util.notation.
 Require Export prosa.util.bigcat.
 Require Export prosa.util.bigop.
+Require Export prosa.util.lcmseq.
 Require Export prosa.util.div_mod.
 Require Export prosa.util.list.
 Require Export prosa.util.nat.

@@ -24,7 +24,10 @@ Section Hyperperiod.
   Lemma hyperperiod_int_mult_of_any_task :
     exists (k : nat),
       hyperperiod ts = k * task_period tsk.
-  Proof. by apply/dvdnP; apply lcm_seq_is_mult_of_all_ints, map_f, H_tsk_in_ts. Qed.
+  Proof.
+    apply/dvdnP.
+    by rewrite /hyperperiod /lcml big_map (big_rem _ H_tsk_in_ts) /= dvdn_lcml.
+  Qed.
 
 End Hyperperiod.
 
@@ -46,9 +49,8 @@ Section ValidPeriodsImplyPositiveHP.
   Lemma valid_periods_imply_pos_hp :
     hyperperiod ts > 0.
   Proof.
-    apply all_pos_implies_lcml_pos.
-    move => b /mapP [x IN EQ]; subst b.
-    now apply H_valid_periods.
+    rewrite /hyperperiod /lcml big_map big_seq.
+    by elim/big_ind: _ => // m n; rewrite lcmn_gt0 => -> ->.
   Qed.
 
 End ValidPeriodsImplyPositiveHP.
@@ -517,7 +519,7 @@ Section HyperperiodWorkloadBound.
         apply: leq_trans; first by apply: sporadic_task_arrivals_bound.
         rewrite /max_sporadic_arrivals /task_min_inter_arrival_time /periodic_as_sporadic
           addKn /div_ceil /jobs_per_hyperperiod ifT //.
-        by apply/lcm_seq_is_mult_of_all_ints/map_f.
+        by rewrite /hyperperiod /lcml big_map (big_rem _ IN) /= dvdn_lcml.
   Qed.
 
 End HyperperiodWorkloadBound.

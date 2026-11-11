@@ -1,6 +1,6 @@
+Require Export prosa.util.all.
 Require Export prosa.model.task.arrival.periodic.
 Require Export prosa.model.priority.classes.
-Require Export prosa.util.lcmseq.
 
 (** In this file we define the notion of a hyperperiod for periodic tasks. *)
 Section Hyperperiod.
