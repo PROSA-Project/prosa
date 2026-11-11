@@ -1,4 +1,5 @@
-From mathcomp Require Export ssreflect ssrnat ssrbool eqtype fintype bigop.
+From mathcomp Require Export ssreflect ssrfun ssrnat ssrbool eqtype seq fintype.
+From mathcomp Require Export bigop div.
 
 Require Export mathcomp.zify.zify.
 Require Export prosa.util.notation.
@@ -7,7 +8,6 @@ Require Export prosa.util.bigop.
 Require Export prosa.util.lcmseq.
 Require Export prosa.util.div_mod.
 Require Export prosa.util.list.
-Require Export prosa.util.nat.
 Require Export prosa.util.sum.
 Require Export prosa.util.seqset.
 Require Export prosa.util.unit_growth.

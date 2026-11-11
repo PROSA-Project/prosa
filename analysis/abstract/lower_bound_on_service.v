@@ -135,9 +135,7 @@ Section LowerBoundOnService.
         rewrite /service -(service_during_cat _ _ _ t2); first by apply/andP; split; last apply ltnW.
         by apply leq_trans with (service_during sched j 0 t2); [| rewrite leq_addr].
       }
-      { move: H_total_workload_is_bounded => BOUND.
-        rewrite addnC in BOUND; apply leq_subRL_impl in BOUND.
-        apply leq_trans with (δ - cumulative_interference j t1 (t1 + δ)) => [//|].
+      { apply leq_trans with (δ - cumulative_interference j t1 (t1 + δ)); first by lia.
         apply leq_trans with (service_during sched j t1 (t1 + δ)).
         - eapply leq_trans.
           + by apply leq_sub2r, (interference_is_complement_to_schedule t1 t2);

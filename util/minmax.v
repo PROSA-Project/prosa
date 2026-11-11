@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
-Require Export prosa.util.notation prosa.util.nat prosa.util.list prosa.util.setoid.
+Require Export prosa.util.notation prosa.util.tactics prosa.util.list prosa.util.setoid.
 
 (** * Additional Lemmas about [\max]. *)
 

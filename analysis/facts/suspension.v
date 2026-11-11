@@ -184,7 +184,7 @@ Section Suspensions.
           move: NOTSUSto; rewrite /suspended.
           have ->//=: suspension_has_passed sched j to.
           { rewrite /suspension_has_passed SERVto; apply /andP; split.
-            { have LT : job_suspension j ρ <= to - tf by apply leq_subRL_impl.
+            { have LT : job_suspension j ρ <= to - tf by lia.
               by move: (leq_add ARRj LT); rewrite subnKC //=; lia. }
             { rewrite /no_progress_for /no_progress.
               have SERVGT : service sched j (to - job_suspension j ρ) >= ρ

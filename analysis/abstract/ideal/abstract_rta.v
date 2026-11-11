@@ -125,7 +125,8 @@ Section AbstractRTAIdeal.
     }
     move: (BUSY) => [PREF _].
     move : (TSK) (BUSY) RTC => /eqP TSKeq [[/andP [LE1 LE2] [QT1 AQT]] QT2] [LEQ RTC].
-    rewrite leq_subRL_impl // addnC -/cumulative_interference.
+    rewrite leq_subRL; first by lia.
+    rewrite addnC -/cumulative_interference.
     destruct (leqP t2 (t1 + F)) as [NEQ1|NEQ1]; last destruct (leqP F Δ) as [NEQ2|NEQ2].
     { rewrite -leq_subLR in NEQ1.
       rewrite -(leqRW NEQ1) (leqRW RTC) (leqRW (service_at_most_cost _ _ _ _ _)) //

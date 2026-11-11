@@ -176,7 +176,7 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
       hep_job jhp j.
   Proof.
     move: (H_t_in_busy_interval) (H_busy_interval_prefix) => /andP [GEt LEt] [SL [QUIET [NOTQUIET INBI]]].
-    have: t <= t2.-1 by rewrite -subn1 leq_subRL_impl // addn1.
+    have: t <= t2.-1 by lia.
     rewrite leq_eqVlt => /orP [/eqP EQUALt2m1 | LTt2m1].
     - by apply scheduled_at_preemption_time_implies_higher_or_equal_priority_eq.
     - by apply scheduled_at_preemption_time_implies_higher_or_equal_priority_lt.

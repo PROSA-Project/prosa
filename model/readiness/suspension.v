@@ -1,6 +1,6 @@
 Require Export prosa.behavior.all.
 Require Export prosa.analysis.definitions.progress.
-Require Export prosa.util.nat.
+Require Export prosa.util.all.
 
 (** * Job Model Parameter for Jobs Exhibiting Self-Suspensions *)
 

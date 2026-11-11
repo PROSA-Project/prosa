@@ -144,7 +144,7 @@ Section UnitService.
     rewrite addnS [LHS]big_nat_recr ?leq_addr//= [X in X + _]IHδ.
     rewrite blackout_during_last_plus_before ?leq_addr// is_blackout_complement.
     have B := supply_at_le_1 (t + δ).
-    by rewrite -addn1 subnACA ?blackout_during_bound; lia.
+    by move: (blackout_during_bound t δ); lia.
   Qed.
 
   (** Similarly, we show that the blackout during a time interval
@@ -157,7 +157,7 @@ Section UnitService.
     move=> t; elim=> [|δ IHδ]; first by rewrite addn0 [LHS]big_geq.
     rewrite addnS [LHS]big_nat_recr ?leq_addr//= [X in X + _]IHδ.
     rewrite supply_during_last_plus_before ?leq_addr// supply_at_complement.
-    by rewrite -addn1 subnACA ?supply_during_bound; lia.
+    by move: (supply_during_bound t δ); lia.
   Qed.
 
   (** The number of blackout time instants in <<[t1, t2)>> is equal to

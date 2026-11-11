@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect ssrbool eqtype ssrnat div seq path fintype bigop.
-Require Export prosa.util.nat prosa.util.rel prosa.util.list.
+Require Export prosa.util.tactics prosa.util.rel prosa.util.list.
 
 (** In the following, we define and prove facts about superadditivity and
     superadditive functions. The definition of superadditivity presented here

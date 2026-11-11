@@ -293,7 +293,8 @@ Section AbstractRTARestrictedSupply.
       rewrite -[X in _ <= X]add0n.
       by erewrite <-cumulative_service_before_job_arrival_zero;
         first erewrite service_during_cat with (t1 := 0) => //; auto; lia. }
-    rewrite /IBF_NP addnBAC // leq_subRL_impl // addnC.
+    rewrite /IBF_NP addnBAC // leq_subRL; first by lia.
+    rewrite addnC.
     have [NEQ1|NEQ1] := leqP t2 (t1 + F); last have [NEQ2|NEQ2] := leqP F Δ.
     { rewrite -leq_subLR in NEQ1.
       rewrite -{1}(leqRW NEQ1) (leqRW RTC) (leqRW (service_at_most_cost _ _ _ _ _)) => //.

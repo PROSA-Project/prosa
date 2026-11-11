@@ -2,7 +2,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop p
 
 Require Export prosa.util.notation.
 Require Export prosa.util.rel.
-Require Export prosa.util.nat.
+Require Export prosa.util.list prosa.util.tactics.
 
 Section SumsOverSequences.
 

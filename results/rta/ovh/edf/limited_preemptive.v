@@ -222,16 +222,16 @@ Section RTAforLimitedPreemptiveEDFModelwithArrivalCurves.
         have [δ [LEδ EQ]]:= slowed_subtraction_value_preservation
                               (jlfp_blackout_bound ts DB CSB CRPDB) F (ltac:(apply jlfp_blackout_bound_monotone => //)).
         exists δ; split; [lia | split].
-        * rewrite /sSBF /jlfp_ovh_sbf_slow /supply_bound_function -EQ.
-          apply: leq_trans; last by apply leq_subRL_impl; rewrite -!addnA in FIX1; apply FIX1.
+        * rewrite /sSBF /jlfp_ovh_sbf_slow /supply_bound_function -EQ
+            /jlfp_blackout_bound.
           have NEQ: bound_on_athep_workload ts tsk A δ <= bound_on_athep_workload ts tsk A F.
           { by apply bound_on_athep_workload_monotone. }
           erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ].
-          by move: FIX1; rewrite /task_intra_IBF; set (c := _ _ (A +1) - ( _ )); lia.
+          by move: FIX1; rewrite /task_intra_IBF /overhead_bound; set (c := _ _ (A +1) - ( _ )); lia.
         * rewrite /sSBF /jlfp_ovh_sbf_slow /supply_bound_function -EQ.
-          apply bound_preserved_under_slowed, leq_subRL_impl; apply: leq_trans; last by apply FIX2.
+          apply bound_preserved_under_slowed.
           erewrite last_segment_eq_cost_minus_rtct; [  | eauto |  eauto ].
-          by move: FIX1; rewrite /task_rtct /jlfp_blackout_bound /overhead_bound; lia.
+          by move: FIX1 FIX2; rewrite /task_rtct /jlfp_blackout_bound /overhead_bound; lia.
   Qed.
 
 End RTAforLimitedPreemptiveEDFModelwithArrivalCurves.

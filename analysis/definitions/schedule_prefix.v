@@ -1,5 +1,5 @@
 Require Export prosa.behavior.ready.
-Require Export prosa.util.nat.
+Require Export prosa.util.all.
 
 (** We define the notion of prefix-equivalence of schedules. *)
 

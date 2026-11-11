@@ -1,5 +1,5 @@
 Require Export prosa.behavior.all.
-Require Import prosa.util.nat.
+Require Import prosa.util.all.
 
 
 (** * Job Model Parameter for Jobs Exhibiting Release Jitter *)
