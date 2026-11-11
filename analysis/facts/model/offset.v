@@ -54,9 +54,8 @@ Section OffsetLemmas.
     tsk \in ts ->
     task_offset tsk <= max_task_offset ts.
   Proof.
-    intros TSK_IN.
-    apply in_max0_le.
-    by apply map_f.
+    move=> TSK_IN.
+    by apply: (leq_bigmax_seq tsk).
   Qed.
 
 End OffsetLemmas.

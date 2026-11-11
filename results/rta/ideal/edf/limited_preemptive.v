@@ -138,10 +138,10 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
     rewrite subKn//.
     rewrite /task_last_nonpr_segment  -(leq_add2r 1) subn1 !addn1 prednK; first last.
     - apply leq_trans with (task_max_nonpreemptive_segment tsk).
-      + by apply last_of_seq_le_max_of_seq.
+      + by apply last_le_bigmax.
       + rewrite -END// ltnW// ltnS//.
         exact: max_distance_in_seq_le_last_element_of_seq.
-    - rewrite /last0 -nth_last.
+    - rewrite -nth_last.
       apply HYP3 => //.
       rewrite -(ltn_add2r 1) !addn1 prednK //.
       move: (number_of_preemption_points_in_task_at_least_two

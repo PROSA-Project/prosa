@@ -102,17 +102,12 @@ Section RunToCompletionThreshold.
   (** Next, we prove that the last element of the sequence of
       preemption points is [job_cost]. *)
   Lemma job_cost_is_last_element_of_preemption_points :
-    job_cost j = last0 (job_preemption_points j).
+    job_cost j = last 0 (job_preemption_points j).
   Proof.
     unfold job_preemption_points.
     edestruct H_valid_preemption_model as [A1 [A2 [A3 A4]]]; eauto 2.
-    erewrite last0_filter.
-    + by apply/eqP; apply eq_refl.
-    + unfold range, index_iota; rewrite subn0 -addn1.
-        by rewrite iotaD; destruct (iota 0 (job_cost j)).
-    + unfold range, index_iota; rewrite subn0 -addn1.
-        by rewrite iotaD last0_cat //.
-    + by apply A2.
+    rewrite last_filter;
+      by rewrite /range /index_iota subn0 -addn1 iotaD last_cat /= add0n.
   Qed.
 
   (** Last non-preemptive segment of a positive-cost job has positive length. *)
@@ -121,7 +116,7 @@ Section RunToCompletionThreshold.
     0 < job_last_nonpreemptive_segment j.
   Proof.
     intros COST. unfold job_last_nonpreemptive_segment.
-    rewrite /last0 -nth_last function_of_distances_is_correct subn_gt0.
+    rewrite -nth_last function_of_distances_is_correct subn_gt0.
     rewrite [size _]pred_Sn -addn1-addn1.
     rewrite -size_of_seq_of_distances ?addn1; first by apply size_of_preemption_points.
     rewrite prednK.
@@ -148,7 +143,7 @@ Section RunToCompletionThreshold.
     intros COST.
     eapply leq_trans.
     - by apply job_last_nonpreemptive_segment_positive.
-    - by apply last_of_seq_le_max_of_seq.
+    - by apply last_le_bigmax.
   Qed.
 
   (** Next we show that max nonpreemptive segment is at most the
@@ -164,10 +159,10 @@ Section RunToCompletionThreshold.
       simpl; unfold job_cannot_become_nonpreemptive_before_execution in *.
         by rewrite A1.
     }
-    { eapply leq_trans; first apply last_of_seq_le_max_of_seq.
+    { eapply leq_trans; first apply last_le_bigmax.
       rewrite job_cost_is_last_element_of_preemption_points.
       apply last_is_max_in_nondecreasing_seq; first by apply preemption_points_nondecreasing.
-      apply max0_in_seq.
+      apply bigmax_mem.
       have LL := size_of_preemption_points POSt.
         by destruct (job_preemption_points j).
     }
@@ -179,7 +174,7 @@ Section RunToCompletionThreshold.
     job_last_nonpreemptive_segment j <= job_cost j.
   Proof.
     eapply leq_trans.
-    - apply last_of_seq_le_max_of_seq.
+    - apply last_le_bigmax.
     - apply job_max_nonpreemptive_segment_le_job_cost.
   Qed.
 
@@ -225,7 +220,7 @@ Section RunToCompletionThreshold.
     specialize (EQ (job_preemption_points j) ρ (size (job_preemption_points j)).-2 ).
     feed_n 2 EQ; first by apply preemption_points_nondecreasing.
     { apply/andP; split=> [//|].
-      rewrite prednK; last by rewrite /last0 nth_last.
+      rewrite prednK; last by rewrite nth_last.
       rewrite -(leq_add2r 1) !addn1 prednK.
       - by eapply leq_trans; last apply size_of_preemption_points.
       - exact: size_of_preemption_points.

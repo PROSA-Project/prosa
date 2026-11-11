@@ -40,8 +40,7 @@ Section WCTransformation.
       that could be moved there. The limit of the search is the maximum deadline of
       every job arrived before the given moment. *)
   Definition max_deadline_for_jobs_arrived_before arrived_before :=
-    let deadlines := map job_deadline (arrivals_up_to arr_seq arrived_before)
-    in max0 deadlines.
+    \max_(j <- arrivals_up_to arr_seq arrived_before) job_deadline j.
 
   (** Next, we define a central element of the work-conserving transformation
       procedure: given an idle allocation at [t], find a job allocation in the future

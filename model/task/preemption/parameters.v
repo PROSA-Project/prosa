@@ -40,12 +40,12 @@ Section MaxAndLastNonpreemptiveSegment.
   (** We define a function [task_max_nonpr_segment] that computes the length of
       the longest non-preemptive segment of a given task. *)
   Definition task_max_nonpr_segment (tsk : Task) :=
-    max0 (distances (task_preemption_points tsk)).
+    (\max_(x <- distances (task_preemption_points tsk)) x).
 
   (** Similarly, [task_last_nonpr_segment] is a function that computes the
       length of the last non-preemptive segment. *)
   Definition task_last_nonpr_segment (tsk : Task) :=
-    last0 (distances (task_preemption_points tsk)).
+    last 0 (distances (task_preemption_points tsk)).
 
 End MaxAndLastNonpreemptiveSegment.
 

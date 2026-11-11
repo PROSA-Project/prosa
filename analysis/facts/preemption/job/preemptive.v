@@ -42,7 +42,7 @@ Section FullyPreemptiveModel.
     move=> j H1.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points.
-    by rewrite H1.
+    by rewrite H1 big_nil.
   Qed.
 
   (** ... or ε when [job_cost j > 0]. *)
@@ -56,7 +56,7 @@ Section FullyPreemptiveModel.
             /job_preemption_points.
     rewrite /job_preemptable /fully_preemptive_job_model.
     rewrite filter_predT.
-    apply max0_of_uniform_set.
+    apply bigmax_of_uniform_seq.
     - rewrite /range /index_iota subn0.
       rewrite [size _]pred_Sn -[in X in _ <= X]addn1 -size_of_seq_of_distances size_iota.
       + by rewrite ltnS.

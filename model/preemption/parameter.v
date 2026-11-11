@@ -47,11 +47,11 @@ Section MaxAndLastNonpreemptiveSegment.
 
   (** Next, we define a function that determines the length of a job's longest
       nonpreemptive segment (or zero if the job is fully preemptive). *)
-  Definition job_max_nonpreemptive_segment (j : Job) := max0 (lengths_of_segments j).
+  Definition job_max_nonpreemptive_segment (j : Job) := (\max_(x <- lengths_of_segments j) x).
 
   (** Similarly, we define a function that yields the length of a job's last
       nonpreemptive segment (or zero if the job is fully preemptive). *)
-  Definition job_last_nonpreemptive_segment (j : Job) := last0 (lengths_of_segments j).
+  Definition job_last_nonpreemptive_segment (j : Job) := last 0 (lengths_of_segments j).
 
   (** * Run-to-Completion Threshold of a Job *)
 

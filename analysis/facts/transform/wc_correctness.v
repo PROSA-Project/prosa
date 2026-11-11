@@ -206,7 +206,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Proof.
       move=> j t' ARR_IN ARR.
       rewrite /max_deadline_for_jobs_arrived_before.
-      apply in_max0_le; apply map_f.
+      apply: (leq_bigmax_seq j); last by [].
       rewrite /arrivals_up_to.
       apply arrived_between_implies_in_arrivals;
         by move:H_arr_seq_valid => [CONS UNIQ].

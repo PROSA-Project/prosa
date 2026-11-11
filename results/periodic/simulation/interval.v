@@ -103,7 +103,7 @@ Section SimulationInterval.
       subtraction and an empty maximum of zero. This translates the paper's
       strict inequality [t > O - T]; in particular, [O = T] requires [t >= 1]. *)
   Definition arrival_periodicity_start :=
-    max0 [seq task_offset tsk + 1 - task_period tsk | tsk <- ts].
+    \max_(tsk <- ts) (task_offset tsk + 1 - task_period tsk).
 
   (** When every task's offset is strictly less than its period, i.e., when all
       tasks have constrained offsets, then this bound reduces to zero, yielding
@@ -113,10 +113,7 @@ Section SimulationInterval.
     arrival_periodicity_start = 0.
   Proof.
     move=> H_constrained_offsets; rewrite /arrival_periodicity_start.
-    case E: [seq task_offset tsk + 1 - task_period tsk | tsk <- ts] => [|x xs] //.
-    apply: max0_of_uniform_set => // y H_y.
-    have /mapP [tsk H_tsk ->] :
-      y \in [seq task_offset tsk + 1 - task_period tsk | tsk <- ts] by rewrite E.
+    apply: big1_seq => tsk H_tsk.
     apply/eqP; rewrite subn_eq0 addn1.
     exact: H_constrained_offsets tsk H_tsk.
   Qed.
@@ -228,8 +225,8 @@ Section SimulationInterval.
     apply: (ltn_leq_trans (n := arrival_periodicity_start
                                + (job_index arr_seq j).+1 * task_period (job_task j))).
     - rewrite mulSn addnA ltn_add2r addnC -leq_subLR -addn1.
-      apply: in_max0_le.
-      by apply: map_f; apply: H_all_jobs_from_taskset.
+      apply: (leq_bigmax_seq (job_task j)); last by [].
+      by apply: H_all_jobs_from_taskset.
     - by rewrite (hyperperiod_as_job_count ts (job_task j)) //
                  leq_add2l leq_mul2r INDEX orbT.
   Qed.

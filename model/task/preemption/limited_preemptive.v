@@ -38,11 +38,11 @@ Section ValidModelWithFixedPreemptionPoints.
 
   (** (1) We require the sequence of preemption points to contain the beginning ... *)
   Definition task_beginning_of_execution_in_preemption_points :=
-    forall tsk, tsk \in ts -> first0 (task_preemption_points tsk) = 0.
+    forall tsk, tsk \in ts -> head 0 (task_preemption_points tsk) = 0.
 
   (** ... and (2) the end of execution. *)
   Definition task_end_of_execution_in_preemption_points :=
-    forall tsk, tsk \in ts -> last0 (task_preemption_points tsk) = task_cost tsk.
+    forall tsk, tsk \in ts -> last 0 (task_preemption_points tsk) = task_cost tsk.
 
   (** (3) Furthermore, we require the sequence of preemption points to be a
           non-decreasing sequence. *)

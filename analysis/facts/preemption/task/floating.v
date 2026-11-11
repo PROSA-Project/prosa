@@ -64,7 +64,8 @@ Section FloatingNonPreemptiveRegionsModel.
     - split.
       + rewrite /job_respects_max_nonpreemptive_segment /job_max_nonpreemptive_segment
               /lengths_of_segments /job_preemption_points; rewrite ZERO; simpl.
-        by rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
+        rewrite /job_preemptable /limited_preemptive_job_model; erewrite zero_in_preemption_points; eauto 2.
+        by rewrite /distances /= big_nil.
       + move => progr; rewrite ZERO leqn0 => /andP [_ /eqP LE].
         exists 0; rewrite LE; split; first by apply/andP; split.
           by eapply zero_in_preemption_points; eauto 2.

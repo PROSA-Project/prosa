@@ -56,7 +56,7 @@ Section LimitedPreemptions.
     (** ... and the end of execution for any job [j] that arrives in the given
         arrival sequence [arr_seq]. *)
     Definition end_of_execution_in_preemption_points :=
-      forall j, arrives_in arr_seq j -> last0 (job_preemptive_points j) = job_cost j.
+      forall j, arrives_in arr_seq j -> last 0 (job_preemptive_points j) = job_cost j.
 
     (** We further require the sequence of preemption points to be a
         non-decreasing sequence. *)

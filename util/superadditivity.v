@@ -148,7 +148,7 @@ Section MinimalExtensionOfSuperadditiveFunctions.
         will be empty, so their maximum will be [0]. In both cases, the extrapolation
         is nonetheless correct. *)
     Definition minimal_superadditive_extension :=
-      max0 [seq f a + f (h-a) | a <- index_iota 1 h].
+      \max_(a <- index_iota 1 h) (f a + f (h-a)).
 
   End Definitions.
 
@@ -184,6 +184,7 @@ Section MinimalExtensionOfSuperadditiveFunctions.
       rewrite !H_f'_min_extension.
       rewrite -SUM.
       destruct a as [|a'] eqn:EQa; destruct b as [|b'] eqn:EQb => //=.
+      { by rewrite /minimal_superadditive_extension /index_iota big_nil. }
       { rewrite add0n eq_refl superadditive_first_zero; first by apply H_superadditive_until; lia.
         by rewrite add0n. }
       { rewrite addn0 eq_refl superadditive_first_zero; first by apply H_superadditive_until; lia.
@@ -192,10 +193,10 @@ Section MinimalExtensionOfSuperadditiveFunctions.
         rewrite -{1}(addn0 a) eqn_add2l {1}EQb //=.
         rewrite -{1}(add0n b) eqn_add2r {2}EQa //=.
         rewrite /minimal_superadditive_extension.
-        apply in_max0_le.
-        apply /mapP; exists a.
-        - by rewrite mem_iota; lia.
-        - by have -> : a + b - a = b by lia. }
+        have EQ: a + b - a = b by lia.
+        rewrite -{1}EQ.
+        apply: (leq_bigmax_seq a) => //.
+        by rewrite mem_index_iota; lia. }
     Qed.
 
     (** And finally, we prove that [f'] is superadditive until [h.+1]. *)

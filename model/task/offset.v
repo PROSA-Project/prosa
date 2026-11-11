@@ -65,6 +65,6 @@ Section MaxTaskOffset.
   Definition task_offsets := map task_offset ts.
 
   (** ... and the maximum among all the task offsets. *)
-  Definition max_task_offset := max0 task_offsets.
+  Definition max_task_offset := \max_(tsk <- ts) task_offset tsk.
 
 End MaxTaskOffset.

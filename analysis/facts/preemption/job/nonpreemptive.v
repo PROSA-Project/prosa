@@ -71,9 +71,9 @@ Section FullyNonPreemptiveModel.
     rewrite /job_max_nonpreemptive_segment /lengths_of_segments
             /job_preemption_points /job_preemptable /fully_nonpreemptive_job_model.
     case: (posnP (job_cost j)) => [ZERO|POS].
-    { by rewrite ZERO; compute. }
+    { by rewrite ZERO /distances /= big_nil. }
     have -> //=: forall n, n>0 -> [seq ρ <- index_iota 0 n.+1 | (ρ == 0) || (ρ == n)] = [:: 0; n];
-      last by rewrite /distances/= subn0 /max0/= max0n.
+      last by rewrite /distances/= subn0 big_seq1.
     clear; simpl; intros.
     apply/eqP; rewrite eqseq_cons; apply/andP; split=> [//|].
     have -> //=:  forall xs P1 P2, (forall x, x \in xs -> ~~ P1 x) -> [seq x <- xs | P1 x || P2 x] = [seq x <- xs | P2 x].

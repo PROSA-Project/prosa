@@ -4,211 +4,63 @@ Require Export mathcomp.zify.zify.
 Require Import prosa.util.tactics.
 Require Export prosa.util.supremum.
 
-(** * Maximum, First, and Last Element of Empty Lists *)
+(** * Last Elements and Maxima of Sequences *)
 
-(** We define a few simple operations on lists that return zero for
-    empty lists: [max0], [first0], and [last0]. *)
-Definition max0 := foldl maxn 0.
-Definition first0 := head 0.
-Definition last0 := last 0.
-
-(** ** Lemmas about [last0]. *)
-
-(** Let [xs] be a non-empty sequence and [x] be an arbitrary element,
-    then we prove that [last0 (x::xs) = last0 xs]. *)
-Lemma last0_cons :
-  forall x xs,
-    xs <> [::] ->
-    last0 (x::xs) = last0 xs.
-Proof. by move=> x; elim. Qed.
-
-(** Similarly, let [xs_r] be a non-empty sequence and [xs_l] be any sequence,
-    we prove that [last0 (xs_l ++ xs_r) = last0 xs_r]. *)
-Lemma last0_cat :
-  forall xs_l xs_r,
-    xs_r <> [::] ->
-    last0 (xs_l ++ xs_r) = last0 xs_r.
+(** Filtering preserves the last element if it satisfies the predicate. *)
+Lemma last_filter {T : Type} (d : T) (xs : seq T) (P : pred T) :
+  P (last d xs) -> last d [seq x <- xs | P x] = last d xs.
 Proof.
-  elim=> [//|xs xs_l IHxs_l] n NEQ.
-  simpl; rewrite last0_cons.
-  - by intros C; apply: NEQ; destruct xs_l.
-  - by apply IHxs_l.
+  case/lastP: xs => [//|ys x].
+  by rewrite last_rcons => Px; rewrite filter_rcons Px last_rcons.
 Qed.
 
-(** We prove that for any non-empty sequence [xs] there is a sequence [xsh]
-    such that [xsh ++ [::last0 x] = [xs]]. *)
-Lemma last0_ex_cat :
-  forall x xs,
-    xs <> [::] ->
-    last0 xs = x ->
-    exists xsh, xsh ++ [::x] = xs.
+(** Removing duplicates preserves the last element. *)
+Lemma last_undup {T : eqType} (d : T) (xs : seq T) :
+  last d (undup xs) = last d xs.
+Proof. by case/lastP: xs => [//|ys x]; rewrite undup_rcons !last_rcons. Qed.
+
+(** The maximum of a nonempty sequence belongs to the sequence. *)
+Lemma bigmax_mem :
+  forall xs : seq nat, xs <> [::] -> (\max_(x <- xs) x) \in xs.
 Proof.
-  move=> x; elim=> [//|a xs IHxs] NEQ LAST.
-  destruct xs.
-  - by exists [::]; move: LAST; rewrite /last0 /= => ->.
-  - feed_n 2 IHxs => //.
-    destruct IHxs as [xsh EQ].
-    by exists (a::xsh); rewrite //= EQ.
+  elim=> [//|a xs IH] _; rewrite big_cons.
+  case: xs IH => [|b xs IH]; first by rewrite big_nil maxn0 mem_head.
+  case: (leqP a (\max_(x <- b :: xs) x)) => LE.
+  - by rewrite in_cons IH // orbT.
+  - by rewrite mem_head.
 Qed.
 
-(** We prove that if [x] is the last element of a sequence [xs] and
-    [x] satisfies a predicate, then [x] remains the last element in
-    the filtered sequence. *)
-Lemma last0_filter :
-  forall x xs (P : nat -> bool),
-    xs <> [::] ->
-    last0 xs = x ->
-    P x ->
-    last0 [seq x <- xs | P x] = x.
-Proof.
-  clear; intros x xs P NEQ LAST PX.
-  destruct (last0_ex_cat x xs NEQ LAST) as [xsh EQ]; subst xs.
-  rewrite filter_cat last0_cat.
-  all:rewrite //= PX //=.
-Qed.
-
-(** ** Lemmas about [max0]. *)
-
-(** First we prove that [max0 (x::xs)] is equal to [max {x, max0 xs}]. *)
-Lemma max0_cons : forall x xs, max0 (x :: xs) = maxn x (max0 xs).
-Proof. by move=> x xs; rewrite /max0 !foldlE /= !big_cons maxnCA. Qed.
-
-(** Next, we prove that if all the numbers of a seq [xs] are equal
-    to a constant [k], then [max0 xs = k]. *)
-Lemma max0_of_uniform_set :
+(** A nonempty sequence whose elements all equal [k] has maximum [k]. *)
+Lemma bigmax_of_uniform_seq :
   forall k xs,
     size xs > 0 ->
     (forall x, x \in xs -> x = k) ->
-    max0 xs = k.
+    (\max_(x <- xs) x) = k.
 Proof.
-  move=> k; elim=> [//|a xs IHxs] SIZE ALL.
-  destruct xs as [|b xs].
-  - rewrite /max0 //= max0n; apply ALL.
-    by rewrite in_cons; apply/orP; left.
-  - rewrite max0_cons IHxs //.
-    + move=> x H; apply ALL.
-      rewrite in_cons; move: H => /orP [/eqP EQ | IN].
-      * by subst x; rewrite !in_cons; apply/orP; right; apply/orP; left.
-      * by rewrite !in_cons; apply/orP; right; apply/orP; right.
-    + by rewrite [a]ALL; [ rewrite in_cons; apply/orP; left | rewrite maxnn].
+  move=> k xs POS ALL; apply: ALL; apply: bigmax_mem.
+  by case: xs POS.
 Qed.
 
-(** We prove that no element in a sequence [xs] is greater than [max0 xs]. *)
-Lemma in_max0_le :
-  forall xs x, x \in xs -> x <= max0 xs.
+(** The last element is bounded by the maximum. *)
+Lemma last_le_bigmax :
+  forall xs, last 0 xs <= \max_(x <- xs) x.
 Proof.
-  elim=> [//|a xs IHxs] x.
-  rewrite in_cons => /orP [/eqP EQ | IN]; subst.
-  - by rewrite !max0_cons leq_maxl.
-  - apply leq_trans with (max0 xs); first by eauto.
-    by rewrite max0_cons; apply leq_maxr.
+  case=> [|x xs]; first by rewrite big_nil.
+  by apply: leq_bigmax_seq; [exact: mem_last | done].
 Qed.
 
-(** We prove that for a non-empty sequence [xs], [max0 xs ∈ xs]. *)
-Lemma max0_in_seq :
-  forall xs,
-    xs <> [::] ->
-    max0 xs \in xs.
-Proof.
-  elim=> [//|a xs IHxs] _.
-  destruct xs as [|n xs].
-  - destruct a => //=.
-    by rewrite /max0 //= max0n in_cons eq_refl.
-  - rewrite max0_cons.
-    move: (leq_total a (max0 (n::xs))) => /orP [LE|LE].
-    + by rewrite maxnE subnKC // in_cons; apply/orP; right; apply IHxs.
-    + rewrite maxnE; move: LE; rewrite -subn_eq0 => /eqP EQ.
-      by rewrite EQ addn0 in_cons; apply/orP; left.
-Qed.
-
-(** We prove a technical lemma stating that one can remove
-    duplicating element from the head of a sequence. *)
-Lemma max0_2cons_eq :
-  forall x xs,
-    max0 (x::x::xs) = max0 (x::xs).
-Proof. by intros; rewrite !max0_cons maxnA maxnn. Qed.
-
-(** Similarly, we prove that one can remove the first element of a
-    sequence if it is not greater than the second element of this
-    sequence. *)
-Lemma max0_2cons_le :
-  forall x1 x2 xs,
-    x1 <= x2 ->
-    max0 (x1::x2::xs) = max0 (x2::xs).
-Proof.
-  by move=> x1 x2 ? ?; rewrite !max0_cons maxnA [maxn x1 x2]maxnE subnKC.
-Qed.
-
-(** We prove that [max0] of a sequence [xs]
-    is equal to [max0] of sequence [xs] without 0s. *)
-Lemma max0_rem0 :
-  forall xs,
-    max0 ([seq x <- xs | 0 < x]) = max0 xs.
-Proof.
-  elim=> [//|a xs IHxs].
-  simpl; destruct a; simpl.
-  - by rewrite max0_cons max0n.
-  - by rewrite !max0_cons IHxs.
-Qed.
-
-(** Note that the last element is at most the max element. *)
-Lemma last_of_seq_le_max_of_seq :
-  forall xs, last0 xs <= max0 xs.
-Proof.
-  intros xs.
-  have EX: exists len, size xs <= len.
-  { by exists (size xs). }
-  move: EX => [len LE].
-  generalize dependent xs; elim: len => [|n IHlen] xs LE.
-  - by intros; move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst.
-  - move: LE; rewrite leq_eqVlt => /orP [/eqP EQ| LE]; last by apply IHlen.
-    destruct xs as [ | x1 xs]; first by inversion EQ.
-    destruct xs as [ | x2 xs]; first by rewrite /max leq_max; apply/orP; right.
-    have ->: last0 [:: x1, x2 & xs] = last0 [:: x2 & xs] by done.
-    rewrite max0_cons leq_max; apply/orP; right; apply IHlen.
-    move: EQ => /eqP; simpl; rewrite eqSS => /eqP EQ.
-    by subst.
-Qed.
-
-(** If any element of a sequence [xs] is less-than-or-equal-to
-    the corresponding element of a sequence [ys], then [max0] of
-    [xs] is less-than-or-equal-to max of [ys]. *)
-Lemma max_of_dominating_seq :
+(** If every element in a set [ys] is greater than the corresponding element
+    in another set [xs] then the maxima of [ys] is also greater than the
+    maxima of [xs]. *)
+Lemma bigmax_leq_nth :
   forall xs ys,
-    (forall n, (nth 0 xs n) <= (nth 0 ys n)) ->
-    max0 xs <= max0 ys.
+    (forall n, nth 0 xs n <= nth 0 ys n) ->
+    (\max_(x <- xs) x) <= \max_(y <- ys) y.
 Proof.
-  intros xs ys.
-  have EX: exists len, size xs <= len /\ size ys <= len.
-  { exists (maxn (size xs) (size ys)).
-    by split; rewrite leq_max; apply/orP; [left | right].
-  }
-  move: EX => [len [LE1 LE2]].
-  generalize dependent xs; generalize dependent ys.
-  elim: len => [ | len IHlen] xs LE1 ys LE2.
-  { by move: LE1 LE2; rewrite !leqn0 !size_eq0 => /eqP E1 /eqP E2; subst. }
-  { move: xs ys LE1 LE2 => [ |x xs] [//|y ys] LE1 LE2 H.
-    { have L: forall xs, (forall n, (nth 0 xs n) = 0) -> max0 xs = 0.
-      { clear; elim=> [//|x xs IHxs] H.
-        rewrite max0_cons.
-        apply/eqP; rewrite eqn_leq; apply/andP; split; last by done.
-        rewrite geq_max; apply/andP; split.
-        - by specialize (H 0); simpl in H; rewrite H.
-        - rewrite leqn0; apply/eqP; apply: IHxs.
-          by move=> n; specialize (H n.+1); simpl in H.
-      }
-      rewrite L //.
-      move=> n0; specialize (H n0).
-      by destruct n0; simpl in *; apply/eqP; rewrite -leqn0.
-    }
-    { rewrite !max0_cons geq_max; apply/andP; split.
-      + rewrite leq_max; apply/orP; left.
-        by specialize (H 0); simpl in H.
-      + rewrite leq_max; apply/orP; right.
-        apply IHlen; try (by rewrite ltnS in LE1, LE2).
-        by move=> n1; specialize (H n1.+1); simpl in H.
-    }
-  }
+  move=> xs ys LE; apply/bigmax_leqP_seq => x /(nthP 0) [i LT <-] _.
+  apply: leq_trans (LE i) _.
+  case: (ltnP i (size ys)) => LTys; last by rewrite nth_default.
+  by apply: leq_bigmax_seq; [exact: mem_nth | done].
 Qed.
 
 (** * Additional Lemmas about [rem] *)

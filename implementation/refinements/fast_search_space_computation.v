@@ -39,24 +39,24 @@ Section FastSearchSpaceComputation.
       is strictly less than the horizon, or it is the horizon. *)
   Lemma steps_lt_horizon_last_eq_horizon :
     (forall s, s \in get_time_steps_of_task tsk -> s < get_horizon_of_task tsk)
-    \/ (last0 (get_time_steps_of_task tsk) = get_horizon_of_task tsk).
+    \/ (last 0 (get_time_steps_of_task tsk) = get_horizon_of_task tsk).
   Proof.
     move: (has_valid_arrival_curve_prefix_tsk _ H_valid_task_set _ H_tsk_in_ts).
     move => [arrival_curve_prefix [EQ [POSh [LARGEh [NOINF [BUR SORT]]]]]].
-    destruct (ltngtP (last0 (get_time_steps_of_task tsk)) (get_horizon_of_task tsk))
+    destruct (ltngtP (last 0 (get_time_steps_of_task tsk)) (get_horizon_of_task tsk))
       as [GT1 | LT1 | EQ1]; last by right.
     { left.
       move => step IN.
-      apply leq_ltn_trans with (n:=last0 (get_time_steps_of_task tsk)) => //.
+      apply leq_ltn_trans with (n:=last 0 (get_time_steps_of_task tsk)) => //.
       move: (time_steps_sorted ts H_valid_task_set tsk H_tsk_in_ts).
       rewrite ltn_sorted_uniq_leq => /andP [TS_UNIQ TS_SORT].
       apply (sorted_leq_index leq_trans leqnn TS_SORT step _ IN) => //=.
-      - by destruct get_time_steps_of_task; last by rewrite /last0 //=; apply mem_last.
+      - by destruct get_time_steps_of_task; last by rewrite //=; apply mem_last.
       - destruct get_time_steps_of_task; rewrite //= -index_mem in IN.
-        by rewrite /last0; simpl (last 0 _); rewrite index_last. }
+        by simpl (last 0 _); rewrite index_last. }
     { exfalso. (* h is at least the last step *)
       destruct get_time_steps_of_task as [|d l] eqn:TS => //.
-      have IN: last0 (d::l) \in d::l by rewrite /last0 //=; apply mem_last.
+      have IN: last 0 (d::l) \in d::l by rewrite //=; apply mem_last.
       unfold large_horizon, get_time_steps_of_task in *.
       rewrite EQ in TS; rewrite TS in LARGEh.
       apply LARGEh in IN.
@@ -249,7 +249,7 @@ Section FastSearchSpaceComputation.
       move => [evec [EMAXeq [POSh [LARGEh [NOINF [BUR SORT]]]]]].
       rewrite /get_time_steps_of_task EMAXeq; unfold specified_bursts in *.
       destruct (time_steps_of evec) => //=.
-      by rewrite /last0 //=; apply mem_last. }
+      by rewrite //=; apply mem_last. }
   Qed.
 
 End FastSearchSpaceComputation.

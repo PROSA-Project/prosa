@@ -66,7 +66,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     have Fact2: 0 < size (task_preemption_points tsk).
     { apply/negPn/negP; rewrite -eqn0Ngt; intros CONTR; move: CONTR => /eqP CONTR.
       move: (END _ H_tsk_in_ts) => EQ.
-      move: EQ; rewrite /last0 -nth_last nth_default; first by rewrite CONTR.
+      move: EQ; rewrite -nth_last nth_default; first by rewrite CONTR.
       by move=> EQ; move: (H_positive_cost); rewrite EQ ltnn.
     }
     have EQ: 2 = size [::0; task_cost tsk] by [].
@@ -81,13 +81,13 @@ Section TaskRTCThresholdLimitedPreemptions.
       + rewrite EQ; clear EQ.
         move: (BEG _ H_tsk_in_ts) => EQ.
         rewrite -EQ; clear EQ.
-        rewrite /first0 -nth0.
+        rewrite -nth0.
         apply/(nthP 0).
         by exists 0.
       + rewrite EQ; clear EQ.
         move: (END _ H_tsk_in_ts) => EQ.
         rewrite -EQ; clear EQ.
-        rewrite /last0 -nth_last.
+        rewrite -nth_last.
         apply/(nthP 0).
         exists ((size (task_preemption_points tsk)).-1) => [|//].
         by rewrite -(leq_add2r 1) !addn1 prednK.
@@ -108,7 +108,7 @@ Section TaskRTCThresholdLimitedPreemptions.
       by eapply job_last_nonpreemptive_segment_positive; eauto using valid_fixed_preemption_points_model_lemma.
     have T_RTCT__pos : 0 < task_last_nonpr_segment tsk.
     { unfold job_respects_segment_lengths, task_last_nonpr_segment in *.
-      rewrite /last0 -nth_last; apply: T6 => //.
+      rewrite -nth_last; apply: T6 => //.
       have F: 1 <= size (distances (task_preemption_points tsk)).
       { apply leq_trans with (size (task_preemption_points tsk) - 1).
         - have F := number_of_preemption_points_in_task_at_least_two; lia.
@@ -120,15 +120,15 @@ Section TaskRTCThresholdLimitedPreemptions.
     have T_RTCT__le : task_last_nonpr_segment tsk <= task_cost tsk.
     { unfold task_last_nonpr_segment. rewrite -COST__task //.
       eapply leq_trans; last by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
-        by apply last_of_seq_le_max_of_seq.
+        by apply last_le_bigmax.
     }
     rewrite subnBA // subnBA // -addnBAC // -addnBAC // !addn1 ltnS.
     erewrite job_parameters_last_np_to_job_limited; eauto 2.
     rewrite distances_positive_undup//.
-    have -> : job_cost j = last0 (undup (job_preemptive_points j)) by rewrite last0_undup; [apply SORT__job | rewrite -COST__job].
+    have -> : job_cost j = last 0 (undup (job_preemptive_points j)) by rewrite last_undup -COST__job.
     rewrite last_seq_minus_last_distance_seq; first by apply nondecreasing_sequence_undup, SORT__job.
     apply leq_trans with( nth 0 (job_preemptive_points j) ((size (job_preemptive_points j)).-2)); first by apply undup_nth_le; eauto 2.
-    have -> : task_cost tsk = last0 (task_preemption_points tsk) by rewrite COST__task.
+    have -> : task_cost tsk = last 0 (task_preemption_points tsk) by rewrite COST__task.
     rewrite last_seq_minus_last_distance_seq; first by apply SORT__task.
     move: TSK__j => /eqP TSK__j; rewrite -TSK__j.
     rewrite T4//.
@@ -149,7 +149,7 @@ Section TaskRTCThresholdLimitedPreemptions.
     rewrite /task_last_nonpr_segment /limited_preemptions_rtc_threshold /task_rtct.
     rewrite subKn // -[leqRHS]subn0 leq_sub //.
     apply leq_trans with (task_max_nonpreemptive_segment tsk).
-    - by apply last_of_seq_le_max_of_seq.
+    - by apply last_le_bigmax.
     - rewrite -END; first by done.
       by apply max_distance_in_seq_le_last_element_of_seq; eauto 2.
   Qed.
