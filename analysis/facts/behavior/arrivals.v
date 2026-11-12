@@ -270,7 +270,7 @@ Section ArrivalSequencePrefix.
         last by rewrite /arrivals_between !big_geq //=; lia.
       case: (leqP t1 t) => LE1;
         last by rewrite [LHS]/arrivals_between big_geq; try lia; rewrite arrivals_between_filter_nil.
-      rewrite /arrivals_between bigcat_nat_filter_eq_filter_bigcat_nat.
+      rewrite /arrivals_between (big_morph _ (filter_cat _) erefl).
       rewrite (big_cat_nat LE1 LE2) //=.
       rewrite !big_nat [X in _ ++ X]big1.
       { move=> t' /andP[LO HI].
@@ -487,17 +487,13 @@ Section ArrivalSequencePrefix.
         (j \in arrivals_between arr_seq t1 t2)
         = (j \in \cat_(tsk <- ts) task_arrivals_between arr_seq tsk t1 t2).
     Proof.
-      move=> t1 t2 j.
-      rewrite /task_arrivals_between.
-      set l:= arrivals_between arr_seq t1 t2.
-      rewrite -{1}(@filter_predT _ l).
-      under eq_big_seq.
-      { move=> tsk tsk_IN.
-        rewrite (@eq_in_filter _ _ (fun j => (predT j) && (job_of_task tsk j))) => //.
-        over. }
-      apply bigcat_partitions => j' IN' pred_true.
-      apply H_all_jobs_from_taskset.
-      by apply in_arrivals_implies_arrived in IN'.
+      move=> t1 t2 j; apply/idP/idP.
+      - move=> IN; apply mem_bigcat with (x := job_task j).
+        + apply: H_all_jobs_from_taskset.
+          exact: in_arrivals_implies_arrived _ _ _ IN.
+        + by rewrite mem_filter /job_of_task eqxx IN.
+      - move=> /mem_bigcat_exists [tsk [_ IN]].
+        by move: IN; rewrite mem_filter => /andP[].
     Qed.
 
   End ArrivalPartition.

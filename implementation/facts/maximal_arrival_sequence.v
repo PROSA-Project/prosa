@@ -108,7 +108,7 @@ Section MaximalArrivalSequence.
         = generate_jobs_at tsk (max_arrivals_at tsk t) t.
     Proof.
       move=> t.
-      rewrite /task_arrivals_at bigcat_filter_eq_filter_bigcat bigcat_seq_uniqK // => tsk0 j INj.
+      rewrite /task_arrivals_at (big_morph _ (filter_cat _) erefl) bigcat_seq_uniqK // => tsk0 j INj.
       apply H_job_generation_valid_jobs in INj.
       by destruct INj.
     Qed.
@@ -129,7 +129,7 @@ Section MaximalArrivalSequence.
         = \sum_(t1 <= t < t2) max_arrivals_at tsk t.
     Proof.
       move=> t1 t2.
-      rewrite /number_of_task_arrivals task_arrivals_between_is_cat_of_task_arrivals_at -size_big_nat.
+      rewrite /number_of_task_arrivals task_arrivals_between_is_cat_of_task_arrivals_at (big_morph _ (@size_cat _) erefl).
       apply eq_big_nat => t RANGE.
       by apply task_arrivals_at_eq.
     Qed.

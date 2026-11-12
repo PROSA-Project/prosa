@@ -291,7 +291,7 @@ Section TaskArrivals.
   Proof.
     intros *.
     rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
-    now apply bigcat_nat_filter_eq_filter_bigcat_nat.
+    by rewrite (big_morph _ (filter_cat _) erefl).
   Qed.
 
   (** The number of jobs of a task [tsk] in the interval <<[t1, t2)>> is the same
@@ -301,9 +301,8 @@ Section TaskArrivals.
       size (task_arrivals_between arr_seq tsk t1 t2)
       = \sum_(t1 <= t < t2) size (task_arrivals_at arr_seq tsk t).
   Proof.
-    intros *.
-    rewrite /task_arrivals_between /task_arrivals_at /arrivals_between.
-    now rewrite size_big_nat bigcat_nat_filter_eq_filter_bigcat_nat.
+    by move=> t1 t2; rewrite task_arrivals_between_is_cat_of_task_arrivals_at
+      (big_morph _ (@size_cat _) erefl).
   Qed.
 
   (** We note that, trivially, the list of task arrivals
