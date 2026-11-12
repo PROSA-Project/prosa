@@ -498,19 +498,6 @@ Section Monotonicity.
 
 End Monotonicity.
 
-(** As a rewriting aid, it is useful to note that summing over "all" elements of
-    [unit : finType] is a no-op. *)
-Lemma sum_unit1 :
-  forall {F : unit -> nat},
-    \sum_r F r = F tt.
-Proof.
-  move=> F.
-  rewrite /index_enum unlock_with -enumT /=.
-  have -> : enum (unit : finType) = [:: tt]
-    by rewrite /(enum _) unlock //=.
-  by rewrite big_seq1.
-Qed.
-
 (** We prove that, given an interval <<[t1, t2)>> and two predicates
     [P1, P2], if [P1] is satisfied at least [n1] times and [P2] is
     satisfied at least [n2] times, then their intersection [P1 ∧ P2]

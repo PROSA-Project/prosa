@@ -39,7 +39,7 @@ Section ScheduleClass.
   Lemma service_in_service_on (j : Job) s :
     service_in j s = service_on j s tt.
   Proof.
-    by rewrite /service_in sum_unit1.
+    by rewrite /service_in (big_pred1_eq _ tt).
   Qed.
 
   (** Furthermore, since the ideal uniprocessor state is represented
@@ -74,7 +74,7 @@ Section ScheduleClass.
   Lemma ideal_proc_model_provides_unit_supply :
     unit_supply_proc_model (processor_state Job).
   Proof.
-    by move=> s; rewrite /supply_in /index_enum sum_unit1.
+    by move=> s; rewrite /supply_in /index_enum (big_pred1_eq _ tt).
   Qed.
 
   (** For ease of rewriting, we restate the definition of [scheduled_in] as a
@@ -129,7 +129,7 @@ Section ScheduleClass.
     move=> j S t SCHED.
     rewrite /service_at /supply_at /supply_in service_in_def.
     move: SCHED; rewrite scheduled_at_def => ->.
-    by rewrite sum_unit1.
+    by rewrite (big_pred1_eq _ tt).
   Qed.
 
   (** The ideal uniprocessor always has supply. *)
@@ -138,7 +138,7 @@ Section ScheduleClass.
       has_supply sched t.
   Proof.
     move=> sched t; rewrite /has_supply /supply_at /supply_in //=.
-    by rewrite sum_unit1.
+    by rewrite (big_pred1_eq _ tt).
   Qed.
 
   (** Next we prove a lemma which helps us to do a case analysis on

@@ -29,7 +29,7 @@ Section ScheduleClass.
     unit_supply_proc_model (rs_processor_state Job).
   Proof.
     move=> sched.
-    by rewrite /supply_in sum_unit1; case: sched.
+    by rewrite /supply_in (big_pred1_eq _ tt); case: sched.
   Qed.
 
   (** Restricted-supply processor model is a fully supply-consuming
@@ -38,7 +38,7 @@ Section ScheduleClass.
     fully_consuming_proc_model (rs_processor_state Job).
   Proof.
     move=> j S t.
-    rewrite /scheduled_at /scheduled_in /scheduled_on /service_at /supply_at /supply_in /service_in !sum_unit1.
+    rewrite /scheduled_at /scheduled_in /scheduled_on /service_at /supply_at /supply_in /service_in !(big_pred1_eq _ tt).
     case (S t) => //=.
     - by move => /existsP [_] /eqP.
     - by move => j0 /existsP [_]; rewrite (inj_eq Some_inj) => /eqP ->; rewrite eqxx.

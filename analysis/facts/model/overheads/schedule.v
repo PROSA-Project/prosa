@@ -30,7 +30,7 @@ Section OverheadsProceProperties.
     unit_supply_proc_model (overheads.processor_state Job).
   Proof.
     rewrite /unit_supply_proc_model.
-    move=> s; rewrite /supply_in sum_unit1.
+    move=> s; rewrite /supply_in (big_pred1_eq _ tt).
     by case: s.
   Qed.
 

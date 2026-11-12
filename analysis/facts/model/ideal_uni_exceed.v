@@ -14,7 +14,7 @@ Section ExceedanceProcStateProperties.
     rewrite /unit_supply_proc_model.
     move => s.
     destruct s => //=.
-    all : by rewrite /supply_in //=;rewrite sum_unit1.
+    all : by rewrite /supply_in //=;rewrite (big_pred1_eq _ tt).
   Qed.
 
   (** The usually opaque predicates are made transparent for this section
@@ -58,10 +58,10 @@ Section ExceedanceProcStateProperties.
     apply scheduled_at_procstate in SCHED1.
     move : SCHED1 => [SCHED1 | SCHED1].
     - by rewrite /service_at /service_in /exceedance_service_on /supply_at /supply_in
-      !/exceedance_service_on //= SCHED1 sum_unit1 // sum_unit1 //
+      !/exceedance_service_on //= SCHED1 (big_pred1_eq _ tt) // (big_pred1_eq _ tt) //
       /exceedance_service_on /exceedance_supply_on eq_refl.
     - by rewrite /service_at /service_in /exceedance_service_on /supply_at /supply_in
-        !/exceedance_service_on //= SCHED1 sum_unit1 // sum_unit1 //
+        !/exceedance_service_on //= SCHED1 (big_pred1_eq _ tt) // (big_pred1_eq _ tt) //
         /exceedance_service_on /exceedance_supply_on eq_refl.
   Qed.
 
@@ -70,7 +70,7 @@ Section ExceedanceProcStateProperties.
   Lemma eps_is_unit_service : unit_service_proc_model (exceedance_proc_state Job).
   Proof.
     move => j pstate.
-    rewrite /service_in /service_on //= sum_unit1 /exceedance_service_on.
+    rewrite /service_in /service_on //= (big_pred1_eq _ tt) /exceedance_service_on.
     destruct pstate =>//=.
     by apply leq_b1.
   Qed.
@@ -102,7 +102,7 @@ Section ExceedanceProcStateProperties1.
     is_blackout sched t = is_exceedance_exec (sched t).
   Proof.
     rewrite /is_blackout /has_supply /supply_at /supply_in
-    /is_exceedance_exec //= sum_unit1 /exceedance_supply_on.
+    /is_exceedance_exec //= (big_pred1_eq _ tt) /exceedance_supply_on.
     destruct (sched t) eqn : PSTATE; try done.
   Qed.
 

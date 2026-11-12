@@ -49,7 +49,7 @@ Section TotalBlackoutDueToOverheadsBounded.
     rewrite /blackout_during /total_time_in_dispatch /total_time_in_context_switch /total_time_in_CRPD.
     rewrite -!big_split //= big_nat_cond [RHS]big_nat_cond; apply eq_bigr => t /andP [NEQ _].
     rewrite /is_blackout /has_supply -eqn0Ngt /supply_at /is_dispatch /is_context_switch /is_CRPD.
-    by destruct (sched t) eqn:EQ; rewrite /supply_in //= sum_unit1.
+    by destruct (sched t) eqn:EQ; rewrite /supply_in //= (big_pred1_eq _ tt).
   Qed.
 
   (** If there are no schedule changes in the interval <<[t1, t2)>>,
