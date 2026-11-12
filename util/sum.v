@@ -379,15 +379,13 @@ Section SumOverPartitions.
   Lemma reorder_summation : \sum_(x <- xs | P x && (x_to_y x != y')) f x <=
                 \sum_(y <- ys | y != y') sum_of_partition y.
   Proof.
-    rewrite (exchange_big_dep (fun x =>P x && (x_to_y x != y'))) //=.
-    - move => y_of_x' x' /negP NEQ /andP [EQ1 /eqP EQ2].
-      rewrite EQ1 Bool.andb_true_l; apply/negP; intros CONTR.
-      apply: NEQ; clear EQ1.
-      by rewrite -EQ2.
-    - rewrite  big_seq_cond [X in _ <= X]big_seq_cond.
-      apply leq_sum => x' /andP [ARRo /andP [Px' NEQ]].
-      rewrite (big_rem (x_to_y x')) //=.
-      by rewrite Px' eq_refl NEQ andTb andTb leq_addr.
+    rewrite -[X in _ <= X]big_filter.
+    apply: (leq_trans (sum_over_partitions_le X Y x_to_y f
+      (fun x => P x && (x_to_y x != y')) xs [seq y <- ys | y != y'] _)).
+    - move=> x IN /andP[Px NE].
+      by rewrite mem_filter NE /=; apply: H_no_partition_missing.
+    - apply: leq_sum => y _; apply: leq_sum_seq_pred => x _.
+      by move=> /andP[/andP[Px _] EQ]; apply/andP.
   Qed.
 
 End SumOverPartitions.
@@ -398,7 +396,7 @@ End SumOverPartitions.
 Lemma sum_of_ones :
   forall t Δ,
     \sum_(t <= x < t + Δ) 1 = Δ.
-Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
+Proof. by move=> t Δ; rewrite sum_nat_const_nat muln1 addKn. Qed.
 
 (** Next, we show that a sum of natural numbers equals zero if and only
     if all terms are zero. *)
@@ -406,13 +404,10 @@ Lemma big_nat_eq0 m n F :
   \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
 Proof.
   split.
-  - rewrite /index_iota => /eqP.
-    rewrite sum_nat_seq_eq0 -all_filter filter_predT => /allP ZERO i.
-    rewrite -mem_index_iota /index_iota => IN.
-    by apply/eqP; apply ZERO.
-  - move=> ZERO.
-    have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
-    exact: big1_eq.
+  - move=> /eqP; rewrite sum_nat_seq_eq0 => /allP ZERO i.
+    by rewrite -mem_index_iota => /ZERO/eqP.
+  - move=> ZERO; rewrite big_nat.
+    by apply: big1 => i /ZERO ->.
 Qed.
 
 (** In this section, we show how it is possible to equate the result of two sums performed
@@ -436,9 +431,9 @@ Section SumOfTwoIntervals.
   Lemma big_sum_eq_in_eq_sized_intervals :
     \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
   Proof.
-    elim: d H_equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.
-    rewrite !addnS !big_nat_recr => //; try by lia.
-    by rewrite IHn.
+    rewrite (big_addn 0 _ t1) (big_addn 0 _ t2) !addKn.
+    apply: eq_big_nat => i /andP[_ LT].
+    by rewrite [i + t1]addnC [i + t2]addnC H_equal_before_d.
   Qed.
 
 End SumOfTwoIntervals.
@@ -468,10 +463,7 @@ Section Monotonicity.
   Lemma sum_leq_mono :
     monotone leq f.
   Proof.
-    move=> x y LEQ.
-    rewrite /f big_seq_cond [in X in _ <= X]big_seq_cond.
-    apply: leq_sum => i /andP [IN _].
-    by apply: H_mono.
+    by move=> x y LE; apply: leq_sum_seq => i IN _; apply: H_mono.
   Qed.
 
 End Monotonicity.
@@ -486,20 +478,12 @@ Lemma pigeonhole_on_interval :
     n2 <= \sum_(t1 <= t < t2) P2 t ->
     (n1 + n2) - (t2 - t1) <= \sum_(t1 <= t < t2) (P1 t && P2 t).
 Proof.
-  move=> P1 P2 t1 t2.
-  have [Z|LE] := leqP t1 t2; last by move=> n1 n2; rewrite !big_geq; lia.
-  interval_to_duration t1 t2 Δ.
-  have -> : t1 + Δ - t1 = Δ by lia.
-  induction Δ as [ | Δ IHΔ]; first by move=> n1 n2; rewrite !big_geq; lia.
-  move=> n1 n2 LE1 LE2.
-  rewrite addnS big_nat_recr //=; first by apply leq_addr.
-  specialize (IHΔ (n1 - P1 (t1 + Δ)) (n2 - P2 (t1 + Δ))).
-  feed_n 2 IHΔ.
-  { rewrite addnS big_nat_recr //= in LE1; first by apply leq_addr.
-    by lia. }
-  { rewrite addnS big_nat_recr //= in LE2; first by apply leq_addr.
-    by lia. }
-  by lia.
+  move=> P1 P2 t1 t2 n1 n2.
+  rewrite -!big_mkcond !sum1_count leq_subLR => LE1 LE2.
+  apply: (leq_trans (leq_add LE1 LE2)).
+  rewrite -count_predUI leq_add2r.
+  by move: (count_size (predU P1 P2) (index_iota t1 t2));
+    rewrite /index_iota size_iota.
 Qed.
 
 (** If a function [p] (bounded by 1) sums to at least two over a list
@@ -517,33 +501,15 @@ Lemma sum_ge_2_seq :
       /\ p x1 == 1
       /\ p x2 == 1.
 Proof.
-  intros X xs.
-  have [B EX]: exists B, size xs <= B by (exists (size xs)).
-  move: xs EX; induction B as [ | B IHB].
-  { intros xs SIZE p UNIQ LE TWO.
-    move: SIZE; rewrite leqn0 => /eqP SIZE; apply size0nil in SIZE; subst xs.
-    by rewrite big_nil in TWO.
-  }
-  { intros xs SIZE p UNIQ LE TWO.
-    destruct xs as [ | x xs]; first by rewrite big_nil in TWO.
-    rewrite big_cons in TWO.
-    move: (LE x (mem_head x xs)); rewrite leq_eqVlt => /orP [/eqP EQ | LT].
-    { exists x; rewrite EQ -addn1 leq_add2l in TWO.
-      move: TWO; rewrite lt0n sum_nat_seq_neq0 /= => /hasP [x2 IN NONZERO]; exists x2.
-      have POS: 0 < p x2 by rewrite lt0n.
-      split; first by apply/negP => /eqP EQT; subst; move: UNIQ; rewrite //= IN.
-      split; first by rewrite mem_head.
-      split; first by rewrite in_cons IN orbT.
-      split; first by rewrite EQ.
-      move: (LE x2 ltac:(rewrite in_cons IN orbT //)) => LE1. lia.
-    }
-    { edestruct IHB with (xs := xs) as [x1 [x2 [NEQ [IN1 [IN2 [EQ1 EQ2]]]]]]; eauto 1.
-      { by move: UNIQ; rewrite //= => /andP [_ UNIQ]. }
-      { by intros; apply LE; rewrite in_cons; apply/orP; right. }
-      { lia. }
-      { by exists x1, x2; rewrite NEQ !in_cons IN1 IN2 !orbT EQ1 EQ2. }
-    }
-  }
+  move=> X xs p UNIQ LE TWO.
+  have SUM : \sum_(x <- xs) p x = size [seq x <- xs | p x == 1].
+  { rewrite size_filter -sum1_count [RHS]big_mkcond.
+    apply: eq_big_seq => x IN.
+    by move: (LE x IN); case: (p x) => [|[|n]] //=. }
+  rewrite SUM in TWO.
+  have [x [y [NE [INx INy]]]] := exists_two _ TWO (filter_uniq _ UNIQ).
+  move: INx INy; rewrite !mem_filter => /andP[Px INx] /andP[Py INy].
+  by exists x, y; repeat split => //; apply/eqP.
 Qed.
 
 (** Similarly to [sum_ge_2_seq], if a function [p] bounded by [1] sums
@@ -558,13 +524,10 @@ Lemma sum_ge_2_nat :
       /\ p to1 == 1
       /\ p to2 == 1.
 Proof.
-  intros t1 t2 p LE TWO.
-  edestruct @sum_ge_2_seq with (xs := index_iota t1 t2) (p := p) as [x1 [x2 [NEQ [IN1 [IN2 [EQ1 EQ2]]]]]].
-  { by apply iota_uniq. }
-  { by intros; apply LE. }
-  { by done. }
-  { move: NEQ; erewrite mem_index_iota in IN1, IN2; rewrite neq_ltn => /orP [LT|LT].
-    { exists x1, x2; repeat split; try done; lia. }
-    { exists x2, x1; repeat split; try done; lia. }
-  }
+  move=> t1 t2 p LE TWO.
+  have [x [y [NE [INx [INy [Px Py]]]]]] :=
+    sum_ge_2_seq (index_iota t1 t2) p (iota_uniq _ _) (fun t _ => LE t) TWO.
+  move: INx INy; rewrite !mem_index_iota => /andP[Lx Ux] /andP[Ly Uy].
+  move: NE; rewrite neq_ltn => /orP[LT|LT];
+    [exists x, y | exists y, x]; repeat split => //.
 Qed.
