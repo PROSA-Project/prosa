@@ -97,7 +97,7 @@ Section RunToCompletionThreshold.
   (** Next we show that the sequence of preemption points is a non-decreasing sequence. *)
   Lemma preemption_points_nondecreasing :
     nondecreasing_sequence (job_preemption_points j).
-  Proof. by apply increasing_implies_nondecreasing, iota_is_increasing_sequence. Qed.
+  Proof. by apply: (sorted_filter leq_trans); apply: iota_sorted. Qed.
 
   (** Next, we prove that the last element of the sequence of
       preemption points is [job_cost]. *)
@@ -117,22 +117,13 @@ Section RunToCompletionThreshold.
   Proof.
     intros COST. unfold job_last_nonpreemptive_segment.
     rewrite -nth_last function_of_distances_is_correct subn_gt0.
-    rewrite [size _]pred_Sn -addn1-addn1.
-    rewrite -size_of_seq_of_distances ?addn1; first by apply size_of_preemption_points.
-    rewrite prednK.
-    - rewrite -(leq_add2r 1) !addn1 prednK.
-      + rewrite ltnW //; apply size_of_preemption_points; eauto.
-      + apply size_of_preemption_points; eauto.
-    - apply iota_is_increasing_sequence; apply/andP; split.
-      + rewrite -(leq_add2r 2) !addn2.
-        rewrite prednK//.
-        rewrite -(leq_add2r 1) !addn1.
-        rewrite prednK.
-        * by rewrite ltnW //; apply size_of_preemption_points.
-        * by apply size_of_preemption_points.
-      + rewrite -(leq_add2r 1) !addn1.
-        unfold job_preemption_points, range.
-        by rewrite prednK ?ltnS// ltnW// size_of_preemption_points.
+    rewrite size_of_seq_of_distances.
+    apply: (sorted_ltn_nth ltn_trans 0
+      (sorted_filter ltn_trans _ (iota_ltn_sorted _ _)));
+      move: (size_of_preemption_points COST);
+      rewrite ?inE /job_preemption_points /range /index_iota subn0;
+      case: (size [seq ρ <- iota 0 (job_cost j).+1 | job_preemptable j ρ])
+        => [|[|n]] //=.
   Qed.
 
   (** Max nonpreemptive segment of a positive-cost job has positive length. *)

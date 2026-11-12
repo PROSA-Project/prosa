@@ -4,277 +4,50 @@ Require Export prosa.util.tactics.
 Require Export prosa.util.list.
 
 (** * Non-Decreasing Sequence and Distances *)
-(** In this file we introduce the notion of a non-decreasing sequence. *)
+(** In this file we prove properties of sorted sequences and the distances
+    between consecutive elements. *)
+
+(** TODO: All lemmas in this file unrelated to distances are being contributed
+    to MathComp. With the next MathComp release containing these results,
+    replace their uses with upstream lemmas, delete the local lemmas, and
+    rename this file to [distances.v]. *)
+
 Section NondecreasingSequence.
 
   (** First, let's introduce the notion of the nth element of a sequence. *)
   Notation "xs [| n |]" := (nth 0 xs n) (at level 30).
 
-  (** We say that a sequence [xs] is non-decreasing iff for any two indices [n1] and [n2]
-      such that [n1 <= n2 < size [xs]] condition [[xs][n1] <= [xs][n2]] holds. *)
-  Definition nondecreasing_sequence (xs : seq nat) :=
-    forall n1 n2,
-      n1 <= n2 < size xs ->
-      xs[|n1|] <= xs[|n2|].
+  (** A sequence is non-decreasing if its elements are sorted with [leq]. *)
+  Definition nondecreasing_sequence (xs : seq nat) := sorted leq xs.
 
-  (** Similarly, we define an increasing sequence. *)
-  Definition increasing_sequence (xs : seq nat) :=
-    forall n1 n2,
-      n1 < n2 < size xs ->
-      xs[|n1|] < xs[|n2|].
-
-  (** For a non-decreasing sequence we define the notion of
-      distances between neighboring elements of the sequence. *)
-  (** Example:
-      Consider the following sequence of natural numbers: [xs] = [:: 1; 10; 10; 17; 20; 41].
-      Then [drop 1 xs] is equal to [:: 10; 10; 17; 20; 41].
-      Then [zip xs (drop 1 xs)] is equal to [:: (1,10); (10,10); (10,17); (17,20); (20,41)]
-      And after the mapping [map (fun '(x1, x2) => x2 - x1)] we end up with [:: 9; 0; 7; 3; 21]. *)
+  (** The distances between neighboring elements are their natural-number
+      differences. [pairmap] applies subtraction to each consecutive pair,
+      starting with the first element and the tail of the sequence.
+      For example, [distances [:: 1; 10; 10; 17; 20; 41]] yields
+      [[:: 9; 0; 7; 3; 21]]. Empty and singleton sequences have no distances. *)
   Definition distances (xs : seq nat) :=
-    map (fun '(x1, x2) => x2 - x1) (zip xs (drop 1 xs)).
-
-  (** * Properties of Increasing Sequence *)
-  (** In this section we prove a few lemmas about increasing sequences. *)
-
-  (** Note that a filtered iota sequence is an increasing sequence. *)
-  Lemma iota_is_increasing_sequence :
-    forall a b P,
-      increasing_sequence [seq x <- index_iota a b | P x].
-  Proof.
-    clear=> a b P.
-    have EX : exists k, b - a <= k.
-    { by exists (b-a). } destruct EX as [k BO].
-    revert a b P BO; elim: k => [ |k IHk].
-    { move => a b P BO n1 n2.
-      move: BO; rewrite leqn0 => /eqP BO.
-      rewrite /index_iota BO; simpl.
-      by move => /andP [_ F].
-    }
-    { move => a b P BO n1 n2 /andP [GE LT].
-      case: (leqP b a) => [N|N].
-      - move: N; rewrite -subn_eq0 => /eqP EQ.
-        by rewrite /index_iota EQ //= in LT.
-      - rewrite index_iota_lt_step; first by done.
-        simpl; destruct (P a) eqn:PA.
-        + destruct n1, n2; try done; simpl.
-          * apply iota_filter_gt; first by done.
-            by rewrite index_iota_lt_step // //= PA //= in LT.
-          * apply IHk; try lia.
-            apply/andP; split; first by done.
-            by rewrite index_iota_lt_step // //= PA //= in LT.
-        + apply IHk; try lia.
-          apply/andP; split; first by done.
-          by rewrite index_iota_lt_step // //= PA //= in LT.
-    }
-  Qed.
-
-  (** We prove that any increasing sequence is also a non-decreasing
-      sequence. *)
-  Lemma increasing_implies_nondecreasing :
-    forall xs,
-      increasing_sequence xs ->
-      nondecreasing_sequence xs.
-  Proof.
-    intros ? INC n1 n2.
-    move => /andP [+ LT2]; rewrite leq_eqVlt => /orP [/eqP -> //| LT1].
-    by apply: ltnW; apply: INC; apply/andP.
-  Qed.
+    pairmap (fun x y => y - x) (head 0 xs) (behead xs).
 
   (** * Properties of Non-Decreasing Sequence *)
   (** In this section we prove a few lemmas about non-decreasing sequences. *)
 
-  (** First we prove that if [0 ∈ xs], then
-      [0] is the first element of [xs]. *)
-  Lemma nondec_seq_zero_first :
-    forall xs,
-      (0 \in xs) ->
-      nondecreasing_sequence xs ->
-      head 0 xs = 0.
-  Proof.
-    move=> xs.
-    destruct xs as [ | x xs]; first by done.
-    destruct x as [ | x]; first by done.
-    rewrite in_cons => /orP [/eqP EQ | IN] ND; first by done.
-    exfalso.
-    have NTH := nth_index 0 IN.
-    specialize (ND 0 (index 0 xs).+1).
-    feed ND.
-    { apply/andP; split; first by done.
-        by simpl; rewrite ltnS index_mem. }
-    by simpl in ND; rewrite NTH in ND.
-  Qed.
-
-  (** If [x1::x2::xs] is a non-decreasing sequence, then either
-      [x1 = x2] or [x1 < x2]. *)
-  Lemma nondecreasing_sequence_2cons_leVeq :
-    forall x1 x2 xs,
-      nondecreasing_sequence (x1 :: x2 :: xs) ->
-      x1 = x2 \/ x1 < x2.
-  Proof.
-    move=> x1 x2 xs ND.
-    destruct (ltngtP x1 x2) as [LT | GT | EQ]; auto.
-    move_neq_down GT.
-    by specialize (ND 0 1); apply ND.
-  Qed.
-
-  (** We prove that if [x::xs] is a non-decreasing sequence,
-      then [xs] also is a non-decreasing sequence. *)
-  Lemma nondecreasing_sequence_cons :
-    forall x xs,
-      nondecreasing_sequence (x :: xs) ->
-      nondecreasing_sequence xs.
-  Proof.
-    intros ? ? ND.
-    move => n1 n2 /andP [LT1 LT2].
-    specialize (ND n1.+1 n2.+1).
-    apply ND.
-    apply/andP; split.
-    - by rewrite ltnS.
-    - by simpl; rewrite ltnS.
-  Qed.
-
-  (** Let [xs] be a non-decreasing sequence,
-      then for [x] s.t. [∀ y ∈ xs, x ≤ y]
-      [x::xs] is a non-decreasing sequence. *)
-  Lemma nondecreasing_sequence_add_min :
-    forall x xs,
-      (forall y, y \in xs -> x <= y) ->
-      nondecreasing_sequence xs ->
-      nondecreasing_sequence (x :: xs).
-  Proof.
-    move=> x xs MIN ND [ |n1] [ | n2] //.
-    move=> /andP [_ S] //=.
-    apply leq_trans with (xs [| 0 |]).
-    - apply MIN; apply mem_nth.
-      simpl in *; rewrite ltnS in S.
-      by apply leq_ltn_trans with n2.
-    - by apply ND; apply/andP; split.
-  Qed.
-
-  (** We prove that if [x::xs] is a non-decreasing sequence,
-      then [x::x::xs] also is a non-decreasing sequence. *)
-  Lemma nondecreasing_sequence_cons_double :
-    forall x xs,
-      nondecreasing_sequence (x :: xs) ->
-      nondecreasing_sequence (x :: x :: xs).
-  Proof.
-    intros ? ? ND.
-    move => [ | n1] [ | n2] /andP [LT1 LT2]; try done.
-    - specialize (ND 0 n2).
-      by apply ND; rewrite //= ltnS in LT2.
-    - apply ND.
-      apply/andP; split.
-      + by rewrite ltnS in LT1.
-      + by rewrite //= ltnS in LT2.
-  Qed.
-
-  (** We prove that if [x::xs] is a non-decreasing sequence,
-      then [x] is a minimal element of [xs]. *)
-  Lemma nondecreasing_sequence_cons_min :
-    forall x xs,
-      nondecreasing_sequence (x :: xs) ->
-      (forall y, y \in xs -> x <= y).
-  Proof.
-    intros x xs ND y IN.
-    have IDX := nth_index 0 IN.
-    specialize (ND 0 (index y xs).+1).
-    move: (IN) => IDL; rewrite -index_mem in IDL.
-    feed ND.
-    { by apply/andP; split; last rewrite //= ltnS. }
-    eapply leq_trans; first by apply ND.
-    by rewrite //= IDX.
-  Qed.
-
-  (** We also prove a similar lemma for strict minimum. *)
-  Corollary nondecreasing_sequence_cons_smin :
-    forall x1 x2 xs,
-      x1 < x2 ->
-      nondecreasing_sequence (x1 :: x2 :: xs) ->
-      (forall y, y \in x2 :: xs -> x1 < y).
-  Proof.
-    intros ? ? ? LT ND ? IN.
-    eapply leq_trans; first by apply LT.
-    apply nondecreasing_sequence_cons in ND.
-    eapply nondecreasing_sequence_cons_min; last by apply IN.
-    by apply nondecreasing_sequence_cons_double.
-  Qed.
-
-  (** Next, we prove that no element can lie strictly between two
-      neighboring elements and still belong to the list. *)
+  (** No element can lie strictly between two neighboring elements
+      and still belong to the list. *)
   Lemma antidensity_of_nondecreasing_seq :
     forall (xs : seq nat) (x : nat) (n : nat),
       nondecreasing_sequence xs ->
       xs[|n|] < x < xs[|n.+1|] ->
       ~~ (x \in xs).
   Proof.
-    move=> xs x n STR H; apply/negP => /nthP => /(_ 0) [ind LE HHH].
-    subst x; rename ind into x.
-    destruct (n.+1 < size xs) eqn:Bt; last first.
-    { move: Bt => /negP /negP; rewrite -leqNgt => Bt.
-      apply nth_default with (x0 := 0) in Bt.
-      by rewrite Bt in H; move: H => /andP [_ T]. }
-    have B1: n.+1 < size xs; first by done. clear Bt.
-    have B2: n < size xs; first by apply leq_ltn_trans with n.+1.
-    have GT: n < x.
-    { move: H => /andP [T _].
-      rewrite ltnNge; apply/negP; intros CONTR.
-      specialize (STR x n).
-      feed STR.
-      { by apply/andP; split. }
-      by move: STR; rewrite leqNgt => /negP STR; apply: STR.
-    }
-    have LT: x < n.+1.
-    { clear GT.
-      move: H => /andP [_ T].
-      rewrite ltnNge; apply/negP; intros CONTR.
-      move: CONTR; rewrite leq_eqVlt => /orP [/eqP EQ | CONTR].
-      - by subst; rewrite ltnn in T.
-      - specialize (STR n.+1 x).
-        feed STR.
-        { by apply/andP; split; first apply ltnW. }
-        by move: STR; rewrite leqNgt => /negP STR; apply: STR.
-    }
-    by move: LT; rewrite ltnNge => /negP LT; apply: LT.
-  Qed.
-
-  (** Alternatively, consider an arbitrary natural number x that is
-      bounded by the first and the last element of a sequence
-      [xs]. Then there is an index n such that [xs[n] <= x] and [x < xs[n+1]]. *)
-  Lemma belonging_to_segment_of_seq_is_total :
-    forall (xs : seq nat) (x : nat),
-      2 <= size xs ->
-      head 0 xs <= x < last 0 xs ->
-      exists n,
-        n.+1 < size xs
-        /\ xs[|n|] <= x < xs[|n.+1|].
-  Proof.
-    move=> xs x SIZE LAST.
-    have EX: exists n, size xs <= n by exists (size xs). move: EX => [n LE].
-    destruct n as [ |n]; first by destruct xs.
-    destruct n as [ |n]; first by destruct xs as [ |? xs]; last destruct xs.
-    generalize dependent xs.
-    elim: n => [ |n IHn] xs SIZE LAST LE.
-    { by destruct xs as [ |? xs]; [ | destruct xs as [ |? xs]; [ | destruct xs; [exists 0 | ] ] ]. }
-    { destruct xs as [ |n0 xs]; [ | destruct xs as [ |n1 xs]; [ | ]]; try by done.
-      destruct xs as [ |n2 xs]; first by (exists 0).
-      destruct (leqP n1 x) as [NEQ|NEQ]; last first.
-      { exists 0; split; auto. move: LAST => /andP [LAST _].
-        by apply/andP; split. }
-      { specialize (IHn [:: n1, n2 & xs]).
-        feed_n 3 IHn.
-        { by done. }
-        { move: LAST => /andP [LAST1 LAST2].
-          apply/andP; split; first by done.
-          apply leq_trans with (last 0 [:: n0, n1, n2 & xs]); first by done.
-          by rewrite !last_cons.
-        }
-        { by rewrite -(ltn_add2r 1) !addn1. }
-        move: IHn => [idx [SI /andP [G L]]].
-        exists idx.+1; split.
-        - by simpl in *; rewrite -addn1 -[in X in _ <= X]addn1 leq_add2r.
-        - by apply/andP; split.
-      }
-    }
+    move=> xs x n SORT /andP [LOW HIGH]; apply/negP=> /(nthP 0) [i i_lt EQ].
+    subst x.
+    have [N|BAD] := ltnP n.+1 (size xs); last first.
+    { by move: HIGH; rewrite [nth 0 xs n.+1]nth_default //. }
+    have [LE|GT] := leqP i n.
+    - by move: (sorted_leq_nth leq_trans leqnn 0 SORT i n i_lt (ltnW N) LE);
+        rewrite leqNgt LOW.
+    - by move: (sorted_leq_nth leq_trans leqnn 0 SORT n.+1 i N i_lt GT);
+        rewrite leqNgt HIGH.
   Qed.
 
   (** Note that the last element of a non-decreasing sequence is the max element. *)
@@ -284,115 +57,47 @@ Section NondecreasingSequence.
       (x \in xs) ->
       x <= last 0 xs.
   Proof.
-    move=> xs x STR IN.
-    have NEQ: forall x y, x = y \/ x != y.
-    { clear=> t x y.
-      destruct (x == y) eqn:EQ.
-      - by left; apply/eqP.
-      - by right.
-    }
-    move: {NEQ} (NEQ _ x (last 0 xs)) => [EQ|NEQ].
-    { by subst x. }
-    { move: IN => /nthP EX.
-      specialize (EX 0).
-      move: EX => [id SIZE EQ].
-      rewrite -nth_last -EQ; subst x.
-      rewrite -addn1 in SIZE.
-      apply STR; apply/andP.
-      have POS: 0 < size xs.
-      { by apply leq_trans with (id + 1); first rewrite addn1. }
-      split.
-      - by rewrite -(leq_add2r 1) !addn1 prednK // -addn1.
-      - by rewrite prednK.
-    }
+    move=> [ |a xs] x SORT // /(nthP 0) [i LT <-].
+    rewrite -nth_last.
+    by apply: (sorted_leq_nth leq_trans leqnn 0 SORT); rewrite ?inE /= // -ltnS.
   Qed.
 
   (** * Properties of [Undup] of Non-Decreasing Sequence *)
-  (** In this section we prove a few lemmas about [undup] of non-decreasing sequences. *)
+  (** We compare elements of a non-decreasing sequence before and after [undup]. *)
 
-  (** First we prove that [undup x::x::xs] is equal to [undup x::xs]. *)
-  Remark nodup_sort_2cons_eq :
-    forall {X : eqType} (x : X) (xs : seq X),
-      undup (x::x::xs) = undup (x::xs).
-  Proof.
-    move=> X x xs; rewrite {2 3}[cons] lock //= -lock.
-    rewrite in_cons eq_refl; simpl.
-    by destruct (x \in xs).
-  Qed.
-
-  (** For non-decreasing sequences we show that the fact that
-      [x1 < x2] implies that [undup x1::x2::xs = x1::undup x2::xs]. *)
-  Lemma nodup_sort_2cons_lt :
-    forall x1 x2 xs,
-      x1 < x2 ->
-      nondecreasing_sequence (x1::x2::xs) ->
-      undup (x1::x2::xs) = x1 :: undup (x2::xs).
-  Proof.
-    move=> x1 x2 xs H H0; rewrite {2 3 4}[cons] lock //= -lock.
-    rewrite in_cons.
-    have -> : (x1 == x2) = false.
-    { by apply/eqP/eqP; rewrite neq_ltn; rewrite H. }
-    rewrite [cons]lock //= -lock.
-    have -> : (x1 \in xs) = false; last by done.
-    apply/eqP; rewrite eqbF_neg.
-    apply nondecreasing_sequence_cons in H0.
-    apply/negP; intros ?; eauto 2.
-    by eapply nondecreasing_sequence_cons_min in H0; eauto 2; lia.
-  Qed.
-
-  (** Non-decreasing sequence remains non-decreasing after application of [undup]. *)
-  Lemma nondecreasing_sequence_undup :
-    forall xs,
-      nondecreasing_sequence xs ->
-      nondecreasing_sequence (undup xs).
-  Proof.
-    move=> xs.
-    have EX: exists len, size xs <= len.
-    { by exists (size xs). } destruct EX as [n BO].
-    revert xs BO; elim: n => [ |n IHn].
-    - by intros xs; rewrite leqn0 size_eq0 => /eqP EQ; subst xs.
-    - intros [ |x1 [ | x2 xs]] Size NonDec; try done.
-      destruct (nondecreasing_sequence_2cons_leVeq _ _ _ NonDec) as [EQ|LT].
-      + subst; rename x2 into x.
-        by rewrite nodup_sort_2cons_eq; apply IHn; eauto using nondecreasing_sequence_cons.
-      + rewrite nodup_sort_2cons_lt //.
-        apply nondecreasing_sequence_add_min.
-        * move=> y H.
-        eapply nondecreasing_sequence_cons_min with (y := y) in NonDec; auto.
-        rewrite -mem_undup; eauto using nondecreasing_sequence_cons.
-        * by apply IHn; eauto using nondecreasing_sequence_cons.
-  Qed.
-
-  (** We also show that the penultimate element of a sequence [undup xs]
-      is bounded by the penultimate element of sequence [xs]. *)
+  (** Counting from the end, each element of [undup xs] is bounded by
+      the corresponding element of the non-decreasing sequence [xs].
+      Here [n = 0] selects the last element; indices past the beginning
+      saturate at zero. *)
   Lemma undup_nth_le :
-    forall xs,
+    forall xs n,
       nondecreasing_sequence xs ->
-      undup xs [| (size (undup xs)).-2 |] <= xs [| (size xs).-2 |].
+      undup xs [| size (undup xs) - n.+1 |]
+        <= xs [| size xs - n.+1 |].
   Proof.
-    Opaque undup.
-    move=> xs.
-    have EX: exists len, size xs <= len by (exists (size xs)).
-    destruct EX as [n BO].
-    revert xs BO; elim: n => [ |n IHn].
-    - by intros xs; rewrite leqn0 size_eq0 => /eqP EQ; subst xs.
-    - intros [ |x1 [ | x2 xs]] Size NonDec; try done.
-      destruct (nondecreasing_sequence_2cons_leVeq _ _ _ NonDec) as [EQ|LT].
-      * subst; rename x2 into x.
-        rewrite nodup_sort_2cons_eq //.
-        eapply leq_trans.
-        ** apply IHn; first by done.
-           by eapply nondecreasing_sequence_cons; eauto.
-        ** destruct xs as [ | x1 xs]; first by done.
-           by rewrite [in X in _ <= X]nth_cons //.
-      * rewrite nodup_sort_2cons_lt //; simpl.
-        case (posnP (size (undup (x2 :: xs))).-1) as [Z|POS].
-        ** rewrite Z; simpl.
-           apply leq_trans with ([:: x1, x2 & xs] [|0|]); first by done.
-           by apply NonDec; apply/andP; split; simpl.
-        ** rewrite nth_cons POS.
-           eapply leq_trans; first apply IHn; eauto using nondecreasing_sequence_cons.
-           by destruct xs as [ |? xs]; [exfalso| destruct xs].
+    elim=> [ |a [ |b xs] IH] n SORT //.
+    move: (SORT) => /andP [AB _].
+    move: AB; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
+    - subst b; rewrite undup_cons_duplicate.
+      apply: leq_trans (IH n (path_sorted SORT)) _.
+      rewrite /= !subSS.
+      case: n => [ |n]; first by rewrite !subn0 !nth_cons.
+      rewrite subSS subnS.
+      by case: (size xs - n) => [ |m].
+    - rewrite [undup (a :: b :: xs)]/undup ifN.
+      + rewrite in_cons negb_or neq_ltn LT /=.
+        apply/negP=> IN.
+        by move: (allP (order_path_min leq_trans (path_sorted SORT)) _ IN);
+          rewrite leqNgt LT.
+      + rewrite /= subSS.
+        case: (posnP (size (undup (b :: xs)) - n)) => [ZERO|POS].
+        * rewrite ZERO /=.
+          by apply: (sorted_leq_nth leq_trans leqnn 0 SORT
+            0 (size [:: a, b & xs] - n.+1)); rewrite ?inE ?ltn_subrL //=.
+        * rewrite [in X in X <= _]nth_cons POS [in X in _ <= X]nth_cons
+            (leq_trans POS (leq_sub2r n (size_undup (b :: xs)))).
+          rewrite -!subnS.
+          exact: IH n (path_sorted SORT).
   Qed.
 
 
@@ -404,83 +109,7 @@ Section NondecreasingSequence.
   Lemma distances_unfold_2cons :
     forall x0 x1 xs,
       distances (x0::x1::xs) = (x1 - x0) :: distances (x1::xs).
-  Proof. by intros; rewrite /distances //= drop0. Qed.
-
-  (** Similarly, we prove a lemma stating that two consecutive
-      appends to a sequence in [distances] function ([distances(xs
-      ++ [:: a; b])]) can be rewritten as [distances(xs ++ [:: a])
-      ++ [:: b - a]]. *)
-  Lemma distances_unfold_2app_last :
-    forall (a b : nat) (xs : seq nat),
-      distances (xs ++ [:: a; b])
-      = distances (xs ++ [:: a]) ++ [:: b - a].
-  Proof.
-    move=> a b xs.
-    have EX: exists n, size xs <= n by (exists (size xs)).
-    destruct EX as [n LE].
-    elim: n xs LE => [ |n IHn] xs LE.
-    - by move: LE; rewrite leqn0 size_eq0 => /eqP LE; subst.
-    - destruct xs as [ | x0 xs]; first by unfold distances.
-      destruct xs as [ | x1 xs]; first by unfold distances.
-      have -> : distances ([:: x0, x1 & xs] ++ [:: a; b]) =  x1 - x0 :: distances ((x1 :: xs) ++ [:: a; b]).
-      { by simpl; rewrite distances_unfold_2cons. }
-      rewrite IHn; first by simpl in *; rewrite -(leq_add2r 1) !addn1.
-      have -> : distances ([:: x0, x1 & xs] ++ [:: a]) = x1 - x0 :: distances ((x1 :: xs) ++ [:: a]); last by done.
-      by rewrite //= distances_unfold_2cons.
-  Qed.
-
-  (** We also prove a lemma stating that _one_ append to a sequence
-      in the [distances] function (i.e., [distances(xs ++ [:: x])])
-      can be rewritten as [distances xs ++ [:: x - last 0 xs]]. *)
-  Lemma distances_unfold_1app_last :
-    forall x xs,
-      size xs >= 1 ->
-      distances (xs ++ [:: x]) = distances xs ++ [:: x - last 0 xs].
-  Proof.
-    intros x xs POS.
-    have EX: exists n, size xs <= n by (exists (size xs)).
-    destruct EX as [n LE].
-    elim: n x xs LE POS => [ |n IHn] x xs LE POS.
-    - by move: LE; rewrite leqn0 size_eq0 => /eqP LE; subst.
-    - move: LE; rewrite leq_eqVlt => /orP [/eqP LEN' | LE]; last first.
-      + by rewrite ltnS in LE; apply IHn.
-      + destruct (seq_elim_last _ _ LEN') as [x__new [xs__l [EQ2 LEN]]].
-        subst xs; clear LEN' POS; rename xs__l into xs.
-        rewrite -catA.
-        rewrite distances_unfold_2app_last.
-        destruct xs; first by done.
-        by rewrite IHn // ?LEN // last_cat.
-  Qed.
-
-  (** We prove that the difference between any two neighboring elements is
-      bounded by the max element of the distances-sequence. *)
-  Lemma distance_between_neighboring_elements_le_max_distance_in_seq :
-    forall (xs : seq nat) (n : nat),
-      xs[|n.+1|] - xs[|n|] <= (\max_(x <- distances xs) x).
-  Proof.
-    intros xs id.
-    apply leq_trans with (distances xs [| id |]).
-    - rewrite leq_eqVlt; apply/orP; left; apply/eqP.
-      have EX: exists n, size xs <= n by (exists (size xs)).
-      move: EX => [n LE]; move: xs id LE.
-      elim: n => [ |n IHn] xs id LE.
-      { move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst.
-        by rewrite !nth_default.
-      }
-      { move: LE; rewrite leq_eqVlt => /orP [/eqP EQ|LT]; last first.
-        { by apply IHn; rewrite ltnS in LT. }
-        destruct xs as [ | n0 xs]; first by done.
-        destruct xs as [ | n1 xs]; first by destruct id; [simpl |rewrite !nth_default].
-        have ->: distances [:: n0, n1 & xs] = (n1 - n0) :: distances [:: n1 & xs].
-        { by rewrite /distances //= drop0. }
-        destruct id; first by done.
-        rewrite //= -IHn //=.
-        by move: EQ => /eqP; rewrite //= eqSS => /eqP EQ; rewrite -EQ.
-      }
-    - case: (ltnP id (size (distances xs))) => SIZE.
-      + by apply: leq_bigmax_seq; [exact: mem_nth | done].
-      + by rewrite nth_default.
-  Qed.
+  Proof. by []. Qed.
 
   (** Note that the distances-function has the expected behavior indeed. I.e. an element
       on the position [n] of the distance-sequence is equal to the difference between
@@ -489,63 +118,44 @@ Section NondecreasingSequence.
     forall (xs : seq nat) (n : nat),
       (distances xs)[|n|] = xs[|n.+1|] - xs[|n|].
   Proof.
-    intros xs.
-    have EX: exists len, size xs <= len by (exists (size xs)).
-    move: EX => [len LE]; move: xs LE.
-    elim: len => [ |len IHlen] xs LE n.
-    { by move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst; destruct n. }
-    move: LE; rewrite leq_eqVlt => /orP [/eqP EQ| LE]; last by apply IHlen.
-    destruct xs as [ | x1 xs]; first by done.
-    destruct xs as [ | x2 xs]; first by destruct n as [ | [ | ]].
-    destruct n as [ |n]; first by done.
-    have ->: distances [:: x1, x2 & xs] [|n.+1|] = distances [::x2 & xs] [| n |].
-    { have ->: distances [:: x1, x2 & xs] = (x2 - x1) :: distances [::x2 & xs]; last by done.
-      { by rewrite /distances //= drop0. }
-    }
-    have ->: [:: x1, x2 & xs] [|n.+2|] - [:: x1, x2 & xs] [|n.+1|] = [:: x2 & xs] [|n.+1|] - [:: x2 & xs] [|n|] by done.
-    apply IHlen.
-    by move: EQ => /eqP; rewrite //= eqSS => /eqP <-.
+    move=> [ |x xs] n; first by case: n.
+    rewrite /distances /=.
+    have [LT|GE] := ltnP n (size xs).
+    - by rewrite (nth_pairmap 0 0) //.
+    - by rewrite (nth_default 0 GE) sub0n nth_default ?size_pairmap.
   Qed.
 
-  (** We show that the size of a distances-sequence is one less
-      than the size of the original sequence. *)
+  (** The sequence of distances has length [(size xs).-1], including
+      when [xs] is empty. *)
   Lemma size_of_seq_of_distances :
     forall (xs : seq nat),
-      2 <= size xs ->
-      size xs = size (distances xs) + 1.
+      size (distances xs) = (size xs).-1.
   Proof.
-    intros xs.
-    have EX: exists len, size xs <= len by (exists (size xs)).
-    move: EX => [len LE]; move: xs LE.
-    elim: len => [ |len IHlen] xs LE SIZE.
-    { by move: LE; rewrite leqn0 size_eq0 => /eqP EQ; subst. }
-    { move: LE; rewrite leq_eqVlt => /orP [/eqP EQ| LE]; last by apply IHlen.
-      destruct xs as [ | x1 xs]; first by inversion EQ.
-      destruct xs as [ | x2 xs]; first by inversion SIZE.
-      destruct xs as [ | x3 xs]; first by done.
-      clear SIZE.
-      have ->: size [:: x1, x2, x3 & xs] = size [:: x2, x3 & xs] + 1 by rewrite addn1.
-      have ->: size (distances [:: x1, x2, x3 & xs]) = size (distances [:: x2, x3 & xs]) + 1 by rewrite addn1.
-      apply/eqP; rewrite eqn_add2r; apply/eqP.
-      apply IHlen; last by done.
-      by move: EQ => /eqP; rewrite //= eqSS => /eqP <-.
-    }
+    by move=> xs; rewrite /distances size_pairmap size_behead.
   Qed.
+
+  (** We prove that the difference between any two neighboring elements is
+      bounded by the max element of the distances-sequence. *)
+  Lemma distance_between_neighboring_elements_le_max_distance_in_seq :
+    forall (xs : seq nat) (n : nat),
+      xs[|n.+1|] - xs[|n|] <= (\max_(x <- distances xs) x).
+  Proof.
+    move=> xs n.
+    rewrite -function_of_distances_is_correct.
+    have [LT|GE] := ltnP n (size (distances xs)).
+    - by apply: leq_bigmax_seq; [exact: mem_nth | done].
+    - by rewrite nth_default.
+  Qed.
+
 
   (** We prove that [index_iota 0 n] produces a sequence of numbers
       which are always one unit apart from each other. *)
   Lemma distances_of_iota_ε :
     forall n x, x \in distances (index_iota 0 n) -> x = ε.
   Proof.
-    move=> n x; elim: n => [ |n IHn] IN.
-    - by unfold index_iota, distances in IN.
-    - destruct n; first by unfold distances, index_iota in IN.
-      move: IN; rewrite -addn1 /index_iota subn0 iotaD add0n.
-      rewrite distances_unfold_1app_last; first by rewrite size_iota.
-      rewrite mem_cat => /orP [IN|IN].
-      + by apply IHn; rewrite /index_iota subn0; simpl.
-      + by move: IN;
-          rewrite -addn1 iotaD last_cat add0n addn1 // subSnn in_cons => /orP [/eqP EQ|F]; subst.
+    move=> n x /(nthP 0) [i LT <-].
+    move: LT; rewrite size_of_seq_of_distances /index_iota subn0 size_iota ltn_predRL => LT.
+    by rewrite function_of_distances_is_correct !nth_iota ?add0n ?subSnn //; exact: ltnW LT.
   Qed.
 
   (** * Properties of Distances of Non-Decreasing Sequence *)
@@ -560,45 +170,17 @@ Section NondecreasingSequence.
       (exists x y, x \in xs /\ y \in xs /\ x <> y) ->
       0 < (\max_(x <- distances xs) x).
   Proof.
-    move => xs SIZE [x [y [/nthP INx [/nthP INy /eqP NEQ]]]].
-    move: (INx 0) (INy 0) => [indx SIZEx EQx] [indy SIZEy EQy].
-    suff L:
-      forall (x y indx indy : nat),
-        indx < size xs -> indy < size xs ->
-        nondecreasing_sequence xs ->
-        x < y -> xs [|indx|] = x -> xs [|indy|] = y ->
-        0 < (\max_(x <- distances xs) x).
-    {  move: NEQ; rewrite neq_ltn => /orP [LT|LT].
-       - by apply: (L x y indx indy).
-       - by apply: (L y x indy indx). }
-    clear; intros x y indx indy SIZEx SIZEy SIZE LT EQx EQy.
-    have LTind: indx < indy.
-    { rewrite ltnNge; apply/negP; intros CONTR.
-      subst x y; move: LT; rewrite ltnNge => /negP; apply.
-      by apply SIZE; apply/andP. }
-    have EQ: exists Δ, indy = indx + Δ; [by exists (indy - indx); lia | move: EQ => [Δ EQ]; subst indy].
-    have F: exists ind, indx <= ind < indx + Δ /\ xs[|ind|] < xs[|ind.+1|].
-    { subst x y; clear SIZEx SIZEy; revert xs indx LTind SIZE LT.
-      elim: Δ => [ |Δ IHΔ] xs indx LTind SIZE LT; first by lia.
-      destruct (posnP Δ) as [ZERO|POS].
-      { by subst Δ; exists indx; split; [rewrite addn1; apply/andP | rewrite addn1 in LT]; auto. }
-      have ALT: xs[|indx + Δ|] == xs[|indx + Δ.+1|] \/ xs[|indx + Δ|] < xs[|indx + Δ.+1|].
-      { apply/orP; rewrite -leq_eqVlt addnS.
-        apply SIZE; apply/andP; split; first by done.
-        rewrite ltnNge; apply/negP; intros CONTR.
-        move: LT; rewrite ltnNge => /negP LT; apply: LT.
-        by rewrite nth_default ?addnS. }
-      move: ALT => [/eqP EQ|LT'].
-      - edestruct (IHΔ) as [ind [B UP]]; eauto 5 using addn1, leq_add2l.
-        exists ind; split; last by done.
-        move: B => /andP [B1 B2]; apply/andP; split; first by done.
-        by rewrite addnS ltnS ltnW.
-      - exists (indx + Δ); split; last by rewrite -addnS.
-        by apply/andP; split; [rewrite leq_addr | rewrite addnS].  }
-    move: F => [ind [/andP [B1 B2] UP]].
-    apply leq_trans with (xs [|ind.+1|] - xs [|ind|]).
-    - by rewrite subn_gt0.
-    - by apply distance_between_neighboring_elements_le_max_distance_in_seq.
+    elim => [ |a xs IH] SORT; first by move=> [x [y [INx _]]].
+    case: xs IH SORT => [ |b xs] IH SORT [x [y [INx [INy NEQ]]]].
+    { move: INx INy; rewrite !in_cons !orbF => /eqP EQx /eqP EQy.
+      by subst x y; exfalso; apply: NEQ. }
+    have /andP [AB _] := SORT.
+    rewrite distances_unfold_2cons big_cons /= leq_max.
+    move: AB; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
+    - subst b; apply/orP; right; apply: IH; first exact: path_sorted SORT.
+      exists x, y; split; first by move: INx; rewrite !in_cons orbA orbb.
+      split=> //; by move: INy; rewrite !in_cons orbA orbb.
+    - apply/orP; left; by rewrite subn_gt0.
   Qed.
 
   (** Given a non-decreasing sequence [xs] with length [n], we show that the difference
@@ -609,16 +191,11 @@ Section NondecreasingSequence.
       nondecreasing_sequence xs ->
       last 0 xs - last 0 (distances xs) = xs [| (size xs).-2 |].
   Proof.
-    unfold nondecreasing_sequence in *.
-    intros xs SIS.
-    destruct xs as [ | x1 xs]; first by done.
-    destruct xs as [ | x2 xs]; first by rewrite subn0.
-    rewrite -[in X in _ - X]nth_last function_of_distances_is_correct prednK; first by done.
-    set [:: x1, x2 & xs] as X.
-    rewrite -nth_last size_of_seq_of_distances; first by done.
-    rewrite !addn1 -pred_Sn subKn; last by done.
-    rewrite /X; apply SIS; apply/andP; split; first by simpl.
-    by rewrite [in X in _ < X]size_of_seq_of_distances; last rewrite addn1.
+    move=> [ |a [ |b xs]] SORT //; first by rewrite subn0.
+    rewrite -!nth_last size_of_seq_of_distances function_of_distances_is_correct /=.
+    apply: subKn.
+    by apply: (sorted_leq_nth leq_trans leqnn 0 SORT
+        (size [:: a, b & xs]).-2 (size [:: a, b & xs]).-1); rewrite ?inE /=.
   Qed.
 
   (** The max element of the distances-sequence of a sequence [xs]
@@ -629,33 +206,12 @@ Section NondecreasingSequence.
       nondecreasing_sequence xs ->
       (\max_(x <- distances xs) x) <= last 0 xs.
   Proof.
-    move=> xs H.
-    have SIZE: size xs < 2 \/ 2 <= size xs.
-    { by destruct (size xs) as [ | n]; last destruct n; auto. }
-    move: SIZE => [LT | SIZE2].
-    { by destruct xs as [ |x [ |y xs]]; rewrite /distances /= ?big_nil. }
-    apply leq_trans with (last 0 xs - head 0 xs); last by apply leq_subr.
-    apply/bigmax_leqP_seq => d IN _.
-    move: IN => /nthP T; specialize (T 0); move: T => [idx IN DIST].
-    rewrite function_of_distances_is_correct in DIST.
-    rewrite -DIST leq_sub //.
-    { destruct (xs [|idx.+1|] == last 0 xs) eqn:EQ.
-      - by rewrite leq_eqVlt; apply/orP; left.
-      - rewrite -nth_last. apply H.
-        rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; first by done.
-        move: IN; rewrite leq_eqVlt => /orP [/eqP KK|KK].
-        + move: EQ; rewrite -nth_last -{1}KK -[_.+2.-1]pred_Sn => /eqP; by done.
-        + apply/andP; split; first rewrite -(ltn_add2r 1) !addn1 prednK //.
-        by rewrite prednK //; apply ltn_trans with idx.+2.
-    }
-    { destruct (head 0 xs == xs [|idx|]) eqn:EQ.
-      - by rewrite leq_eqVlt; apply/orP; left.
-      - rewrite -nth0. apply H.
-        rewrite -(ltn_add2r 1) addn1 -size_of_seq_of_distances in IN; first by done.
-        destruct idx as [ |idx]; first by move: EQ; rewrite -nth0 => /eqP.
-        apply/andP; split; first by done.
-        by apply ltn_trans with idx.+2.
-    }
+    elim => [ |a [ |b xs] IH] SORT; rewrite ?big_nil //.
+    rewrite distances_unfold_2cons big_cons /= geq_max.
+    apply/andP; split.
+    - apply: leq_trans (leq_subr a b) _.
+      by apply: last_is_max_in_nondecreasing_seq SORT _; rewrite !in_cons eqxx orbT.
+    - exact: IH (path_sorted SORT).
   Qed.
 
   (** Let [xs] be a non-decreasing sequence. We prove that
@@ -667,37 +223,26 @@ Section NondecreasingSequence.
       nondecreasing_sequence xs ->
       distances [seq ρ <- index_iota 0 k.+1 | ρ \in xs] = [seq x <- distances xs | 0 < x].
   Proof.
-    intros xs.
-    have EX: exists len, size xs <= len by (exists (size xs)).
-    destruct EX as [n BO].
-    elim: n xs BO => [ |n IHn] xs Len k Bound NonDec.
-    { move: Len; rewrite leqn0 size_eq0 => /eqP T; subst.
-      by rewrite filter_pred0.
-    }
-    { destruct xs as [ |x1 [ |x2 xs]].
-      - by rewrite filter_pred0.
-      - by rewrite index_iota_filter_singl; first (rewrite ltnS; apply Bound; rewrite in_cons; apply/orP; left).
-      - have LEx1: x1 <= k by apply Bound; rewrite in_cons eq_refl.
-        have LEx2: x2 <= k by apply Bound; rewrite !in_cons eq_refl orbT.
-        have M1: forall y : nat, y \in x2 :: xs -> x1 <= y by apply nondecreasing_sequence_cons_min.
-        have M2: forall x : nat, x \in x2 :: xs -> x <= k by intros; apply Bound; rewrite in_cons; apply/orP; right.
-        have M3: forall y : nat, y \in xs -> x2 <= y by apply nondecreasing_sequence_cons in NonDec; apply nondecreasing_sequence_cons_min.
-        destruct (nondecreasing_sequence_2cons_leVeq _ _ _ NonDec).
-        + subst; rewrite distances_unfold_2cons.
-          replace ((@filter nat (fun x : nat => leq (S O) x) (@cons nat (subn x2 x2) (distances (@cons nat x2 xs)))))
-            with ([seq x <- distances (x2 :: xs) | 0 < x]); last by rewrite subnn.
-          rewrite range_filter_2cons.
-            by apply IHn; eauto 2 using nondecreasing_sequence_cons.
-        + have M4: forall y : nat, y \in x2 :: xs -> x1 < y by apply nondecreasing_sequence_cons_smin.
-          rewrite distances_unfold_2cons.
-          rewrite range_iota_filter_step // rem_lt_id //.
-          replace ((@filter nat (fun x : nat => leq (S O) x) (@cons nat (subn x2 x1) (distances (@cons nat x2 xs)))))
-            with (x2 - x1 :: [seq x <- distances (x2 :: xs) | 0 < x]); last first.
-          { simpl; replace (0 < x2 - x1) with true; first by done.
-              by apply/eqP; rewrite eq_sym; rewrite eqb_id subn_gt0. }
-          rewrite -(IHn _ _ k) //; first eapply nondecreasing_sequence_cons; eauto 2.
-          by rewrite {1}range_iota_filter_step // distances_unfold_2cons {1}range_iota_filter_step //.
-    }
+    elim=> [ |a [ |b xs] IH] k Bound SORT.
+    - by rewrite filter_pred0.
+    - by rewrite index_iota_filter_singl; first (rewrite ltnS; apply: Bound; rewrite in_cons eqxx).
+    - have LEa: a <= k by apply: Bound; rewrite in_cons eqxx.
+      have LEb: b <= k by apply: Bound; rewrite !in_cons eqxx orbT.
+      have M2: forall y, y \in b :: xs -> y <= k.
+      { move=> y IN; apply: Bound; by rewrite in_cons IN orbT. }
+      have M3: forall y, y \in xs -> b <= y
+        by apply/allP; exact: order_path_min leq_trans (path_sorted SORT).
+      have /andP [AB _] := SORT.
+      move: AB; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
+      + subst b; rewrite distances_unfold_2cons subnn [RHS]/= range_filter_2cons.
+        by apply: IH; [exact: M2|exact: path_sorted SORT].
+      + have M4: forall y, y \in b :: xs -> a < y.
+        { move=> y; rewrite in_cons => /orP [/eqP -> //|IN].
+          exact: leq_trans LT (M3 _ IN). }
+        rewrite distances_unfold_2cons [RHS]/= subn_gt0 LT [RHS]/=.
+        rewrite range_iota_filter_step // rem_lt_id //.
+        rewrite -(IH k) //; first exact: path_sorted SORT.
+        by rewrite {1}range_iota_filter_step // distances_unfold_2cons {1}range_iota_filter_step //.
   Qed.
 
   (** Let [xs] again be a non-decreasing sequence. We prove that
@@ -708,87 +253,35 @@ Section NondecreasingSequence.
       nondecreasing_sequence xs ->
       [seq d <- distances xs | 0 < d] = distances (undup xs).
   Proof.
-    move=> xs NonDec.
-    rewrite -(distances_iota_filtered _ ((\max_(x <- xs) x))); [by move=> x IN; apply: leq_bigmax_seq | by done | ].
-    enough ([seq ρ <- index_iota 0 ((\max_(x <- xs) x)).+1 | ρ \in xs] = (undup xs)) as IN; first by rewrite IN.
-    have EX: exists len, size xs <= len.
-    { exists (size xs); now simpl. } destruct EX as [n BO].
-    elim: n xs NonDec BO => [ |n IHn].
-    - by intros xs _; rewrite leqn0 size_eq0 => /eqP ->; rewrite filter_pred0.
-    - intros [ |x1 [ | x2 xs]].
-      + by rewrite filter_pred0.
-      + by rewrite big_seq1 index_iota_filter_singl //=; rewrite ltnS.
-      + intros NonDec Size.
-        destruct (nondecreasing_sequence_2cons_leVeq _ _ _ NonDec) as [EQ|LT].
-        * subst; rename x2 into x.
-          rewrite nodup_sort_2cons_eq range_filter_2cons.
-          have -> : (\max_(y <- [:: x, x & xs]) y) = \max_(y <- x :: xs) y
-            by rewrite !big_cons maxnA maxnn.
-          by apply IHn; [ eapply nondecreasing_sequence_cons; eauto | by done].
-        * rewrite nodup_sort_2cons_lt //.
-          have -> : (\max_(y <- [:: x1, x2 & xs]) y) = \max_(y <- x2 :: xs) y
-            by rewrite !big_cons maxnA (maxn_idPr (ltnW LT)).
-          rewrite index_iota_filter_step; [
-            by apply/andP; split; [ by done
-               | rewrite ltnS; apply leq_trans with x2;
-               [ by rewrite ltnW | apply: leq_bigmax_seq => //; by rewrite in_cons eq_refl]]
-          | by apply nondecreasing_sequence_cons_min
-          | ].
-          rewrite rem_lt_id //; first by apply nondecreasing_sequence_cons_smin.
-          by rewrite IHn //; eauto using nondecreasing_sequence_cons.
+    move=> xs SORT.
+    rewrite -(distances_iota_filtered _ ((\max_(x <- xs) x))); [by move=> x IN; apply: leq_bigmax_seq|exact: SORT| ].
+    congr (distances _).
+    apply: (irr_sorted_eq ltn_trans ltnn).
+    - by apply: (sorted_filter ltn_trans); apply: iota_ltn_sorted.
+    - by rewrite ltn_sorted_uniq_leq undup_uniq (undup_sorted leq_trans SORT).
+    - move=> x; rewrite mem_filter mem_index_iota leq0n /= mem_undup.
+      case IN: (x \in xs) => //=.
+      by rewrite ltnS; apply: leq_bigmax_seq.
   Qed.
 
-  (** Consider two non-decreasing sequences [xs] and [ys] and assume that
-      (1) first element of [xs] is at most the first element of [ys] and
-      (2) distances-sequences of [xs] is dominated by distances-sequence of
-      [ys]. Then [xs] is dominated by [ys].  *)
+  (** Consider two sequences [xs] and [ys] of equal length, with [ys]
+      non-decreasing. If the first element and all neighboring differences
+      of [xs] are bounded by those of [ys], then [xs] is dominated by [ys]. *)
   Lemma domination_of_distances_implies_domination_of_seq :
     forall (xs ys : seq nat),
       head 0 xs <= head 0 ys ->
-      2 <= size xs ->
-      2 <= size ys ->
       size xs = size ys ->
-      nondecreasing_sequence xs ->
       nondecreasing_sequence ys ->
       (forall n, (distances xs)[|n|] <= (distances ys)[|n|]) ->
       (forall n, xs[|n|] <= ys[|n|]).
   Proof.
-    intros xs ys.
-    have EX: exists len, size xs <= len /\ size ys <= len.
-    { exists (maxn (size xs) (size ys)).
-      by split; rewrite leq_max; apply/orP; [left | right].
-    } move: EX => [len [LE1 LE2]].
-    generalize dependent xs; generalize dependent ys.
-    elim: len => [ |len IHlen].
-    { move=> ys + xs + H H0 h1 H2 H3 H4 H5 n.
-      by rewrite !leqn0 !size_eq0 => /eqP -> /eqP ->. }
-    { intros ys LycSIZE xs LxSIZE FLE Sxs Sys SIZEEQ STRxs STRys LE n.
-      destruct xs as [ | x1 xs], ys as [ | y1 ys]; try by done.
-      destruct xs as [ | x2 xs], ys as [ | y2 ys]; try by done.
-      have F: x2 <= y2.
-      { specialize (STRxs 0 1); feed STRxs; first by done.
-        specialize (STRys 0 1); feed STRys; first by done.
-        specialize (LE 0); simpl in LE, FLE.
-        rewrite leqNgt; apply/negP; intros NEQ.
-        move: LE; rewrite leqNgt => /negP LE; apply: LE.
-        rewrite -(ltn_add2r x1) subnK // addnBAC // -(ltn_add2r y1) subnK.
-        - by apply leq_trans with y2; auto using leq_addr.
-        - by eapply leq_ltn_trans; [erewrite leq_add2l | erewrite ltn_add2r].
-      }
-      destruct xs as [ | x3 xs], ys as [ | y3 ys]; try by done.
-      { by destruct n as [ |n]; [ | destruct n]. }
-      destruct n => //.
-      simpl; apply: IHlen => //.
-      - move => m1 m2 /andP [B1 B2].
-        apply (STRxs m1.+1 m2.+1); apply/andP; split.
-        + by rewrite ltnS.
-        + by rewrite -(ltn_add2r 1) !addn1 in B2.
-      - move => m1 m2 /andP [B1 B2].
-        apply (STRys m1.+1 m2.+1); apply/andP; split.
-        + by rewrite ltnS.
-        + by rewrite -(ltn_add2r 1) !addn1 in B2.
-      - by move=> n0; specialize (LE n0.+1); simpl in LE.
-    }
+    move=> xs ys HEAD EQ SORT LE; elim=> [ |n IH]; first exact: HEAD.
+    have [N|GE] := ltnP n.+1 (size xs).
+    - move: (LE n); rewrite !function_of_distances_is_correct.
+      rewrite EQ in N.
+      move: (sorted_leq_nth leq_trans leqnn 0 SORT n n.+1 (ltnW N) N (leqnSn n)).
+      by lia.
+    - by rewrite !nth_default // -EQ.
   Qed.
 
 End NondecreasingSequence.

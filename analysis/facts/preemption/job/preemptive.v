@@ -58,9 +58,7 @@ Section FullyPreemptiveModel.
     rewrite filter_predT.
     apply bigmax_of_uniform_seq.
     - rewrite /range /index_iota subn0.
-      rewrite [size _]pred_Sn -[in X in _ <= X]addn1 -size_of_seq_of_distances size_iota.
-      + by rewrite ltnS.
-      + by rewrite -pred_Sn.
+      by rewrite size_of_seq_of_distances size_iota.
     - by apply distances_of_iota_ε.
   Qed.
 

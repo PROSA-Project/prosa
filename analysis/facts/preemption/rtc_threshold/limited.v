@@ -110,10 +110,9 @@ Section TaskRTCThresholdLimitedPreemptions.
     { unfold job_respects_segment_lengths, task_last_nonpr_segment in *.
       rewrite -nth_last; apply: T6 => //.
       have F: 1 <= size (distances (task_preemption_points tsk)).
-      { apply leq_trans with (size (task_preemption_points tsk) - 1).
-        - have F := number_of_preemption_points_in_task_at_least_two; lia.
-        - rewrite [in X in X - 1]size_of_seq_of_distances; [apply number_of_preemption_points_in_task_at_least_two | lia].
-      } lia.
+      { by rewrite size_of_seq_of_distances ltn_predRL;
+          apply: number_of_preemption_points_in_task_at_least_two. }
+      lia.
     }
     have J_RTCT__le : job_last_nonpreemptive_segment j <= job_cost j
       by eapply job_last_nonpreemptive_segment_le_job_cost; eauto using valid_fixed_preemption_points_model_lemma.
@@ -126,16 +125,16 @@ Section TaskRTCThresholdLimitedPreemptions.
     erewrite job_parameters_last_np_to_job_limited; eauto 2.
     rewrite distances_positive_undup//.
     have -> : job_cost j = last 0 (undup (job_preemptive_points j)) by rewrite last_undup -COST__job.
-    rewrite last_seq_minus_last_distance_seq; first by apply nondecreasing_sequence_undup, SORT__job.
-    apply leq_trans with( nth 0 (job_preemptive_points j) ((size (job_preemptive_points j)).-2)); first by apply undup_nth_le; eauto 2.
+    rewrite last_seq_minus_last_distance_seq; first by apply: (undup_sorted leq_trans); apply: SORT__job.
+    apply leq_trans with( nth 0 (job_preemptive_points j) ((size (job_preemptive_points j)).-2)).
+    { rewrite -!subn2.
+      by apply: (undup_nth_le _ 1); eauto 2. }
     have -> : task_cost tsk = last 0 (task_preemption_points tsk) by rewrite COST__task.
     rewrite last_seq_minus_last_distance_seq; first by apply SORT__task.
     move: TSK__j => /eqP TSK__j; rewrite -TSK__j.
     rewrite T4//.
     apply domination_of_distances_implies_domination_of_seq; try eauto 2.
     - erewrite zero_is_first_element; eauto.
-    - eapply number_of_preemption_points_at_least_two; eauto 2.
-    - by rewrite TSK__j; eapply number_of_preemption_points_in_task_at_least_two.
     - by apply SORT__task; rewrite TSK__j.
   Qed.
 

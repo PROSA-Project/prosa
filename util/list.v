@@ -1,5 +1,5 @@
-From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq path fintype bigop.
-Require Export mathcomp.zify.zify.
+From mathcomp Require Import ssreflect ssrbool eqtype ssrnat seq fintype bigop.
+Require Export mathcomp.boot.path mathcomp.zify.zify.
 
 Require Import prosa.util.tactics.
 Require Export prosa.util.supremum.
@@ -61,6 +61,16 @@ Proof.
   apply: leq_trans (LE i) _.
   case: (ltnP i (size ys)) => LTys; last by rewrite nth_default.
   by apply: leq_bigmax_seq; [exact: mem_nth | done].
+Qed.
+
+(** * Additional Lemmas about [undup] *)
+
+(** Removing duplicates discards one of two equal elements at the head. *)
+Lemma undup_cons_duplicate :
+  forall {X : eqType} (x : X) (xs : seq X),
+    undup (x :: x :: xs) = undup (x :: xs).
+Proof.
+  by move=> X x xs; rewrite [in LHS]/undup in_cons eqxx.
 Qed.
 
 (** * Additional Lemmas about [rem] *)
@@ -217,6 +227,28 @@ Lemma has_all_nilp {T : eqType} :
 Proof.
   case => // a s P /allP ALL _.
   by apply /hasP; exists a; [|move: (ALL a); apply]; exact: mem_head.
+Qed.
+
+(** If [head 0 xs <= x < last 0 xs], then some neighboring elements
+    bracket [x]. The sequence [xs] need not be sorted. *)
+Lemma belonging_to_segment_of_seq_is_total :
+  forall (xs : seq nat) (x : nat),
+    head 0 xs <= x < last 0 xs ->
+    exists n,
+      n.+1 < size xs
+      /\ nth 0 xs n <= x < nth 0 xs n.+1.
+Proof.
+  move=> xs x.
+  elim: xs => [ |a [ |b xs] IH] /andP [HEAD LAST] //; last first;
+    last by move: LAST; rewrite ltnNge HEAD.
+  case: xs IH HEAD LAST => [ |c xs] IH HEAD LAST.
+  - by exists 0; split=> //; apply/andP; split.
+  - have [LE|LT] := leqP b x.
+    + suff /IH [n [N B]] : b <= x < last 0 [:: b, c & xs];
+        last by apply/andP; split.
+      exists n.+1; split; first by rewrite /= ltnS.
+      exact: B.
+    + by exists 0; split=> //; apply/andP; split.
 Qed.
 
 (** * Additional Lemmas about [sorted] *)

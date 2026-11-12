@@ -146,8 +146,7 @@ Section RTAforFixedPreemptionPointsModelwithArrivalCurves.
       rewrite -(ltn_add2r 1) !addn1 prednK //.
       move: (number_of_preemption_points_in_task_at_least_two
                _ _ H_valid_model_with_fixed_preemption_points _ H_tsk_in_ts POSt) => Fact2.
-      move: (Fact2) => Fact3.
-      by rewrite size_of_seq_of_distances // addn1 ltnS // in Fact2.
+      by rewrite size_of_seq_of_distances ltn_predRL.
   Qed.
 
 End RTAforFixedPreemptionPointsModelwithArrivalCurves.

@@ -60,9 +60,12 @@ Section ModelWithLimitedPreemptions.
         [job_preemptive_points] is 0. *)
     Lemma zero_is_first_element : head 0 (job_preemptive_points j) = 0.
     Proof.
-      have F := zero_in_preemption_points.
-      destruct H_valid_limited_preemptions_job_model as [_ [_ C]]; specialize (C j H_j_arrives).
-        by apply nondec_seq_zero_first.
+      move: H_valid_limited_preemptions_job_model => [_ [_ SORT]].
+      move: (SORT j H_j_arrives) zero_in_preemption_points.
+      case: (job_preemptive_points j) => [ |a xs] //.
+      move=> ND; rewrite in_cons => /orP [/eqP <- //|IN].
+      apply/eqP; rewrite -leqn0.
+      exact: (allP (order_path_min leq_trans ND)) 0 IN.
     Qed.
 
     (** We prove that the list of preemption points is not empty. *)
@@ -143,12 +146,8 @@ Section ModelWithLimitedPreemptions.
           /\ nth 0 (job_preemptive_points j) n < ρ < nth 0 (job_preemptive_points j) n.+1.
     Proof.
       intros ρ LE NotIN.
-      case: (posnP (job_cost j)) => [ZERO|POS].
-      { exfalso; move: NotIN => /negP NIN; apply: NIN.
-        move: LE. rewrite ZERO leqn0 => /eqP ->.
-          by apply zero_in_preemption_points. }
       move: (belonging_to_segment_of_seq_is_total
-               (job_preemptive_points j) ρ (number_of_preemption_points_at_least_two POS)
+               (job_preemptive_points j) ρ
                (antidensity_of_preemption_points _ LE NotIN)) => [n [SIZE2 /andP [N1 N2]]].
       exists n; split=> [//|].
       apply/andP; split=> [|//].
