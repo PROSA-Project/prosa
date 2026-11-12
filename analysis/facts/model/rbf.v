@@ -427,10 +427,10 @@ Section FP_RBF_partitioning.
       = total_hp_request_bound_function_FP ts tsk L
         + total_ep_request_bound_function_FP ts tsk L.
   Proof.
-    move=> L; apply sum_split_exhaustive_mutually_exclusive_preds => t.
-    - by rewrite -andb_orr orNb Bool.andb_true_r.
-    - rewrite !negb_and; case: (hep_task _ _) =>//=.
-      by case: (hep_task _ _)=>//.
+    move=> L.
+    rewrite /total_hep_request_bound_function_FP /total_hp_request_bound_function_FP
+      /total_ep_request_bound_function_FP (bigID (fun t => ~~ hep_task tsk t)) /=.
+    by congr (_ + _); apply: eq_bigl => t; rewrite /hp_task /ep_task ?negbK.
   Qed.
 
   (** Now, assume that the priorities are reflexive. *)

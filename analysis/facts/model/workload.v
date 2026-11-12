@@ -103,22 +103,12 @@ Section WorkloadFacts.
         = workload_of_jobs (another_task_hep_job^~j) jobs
           + workload_of_jobs (another_hep_job_of_same_task^~j) jobs.
     Proof.
-      move => jobs j.
-      rewrite /workload_of_jobs.
-      apply sum_split_exhaustive_mutually_exclusive_preds  => jo.
-      - rewrite /another_hep_job /another_task_hep_job /another_hep_job_of_same_task
-          /same_task /another_hep_job.
-        case (hep_job jo j) eqn: EQ1;
-          case (jo != j) eqn: EQ2;
-          case (job_task jo != job_task j) eqn: EQ3; try lia.
-        move : EQ2 => /eqP EQ2.
-        rewrite EQ2 in EQ3.
-        contradict EQ3.
-        by apply /negP /negPn /eqP.
-      - rewrite /another_hep_job /another_task_hep_job /another_hep_job_of_same_task
-          /same_task /another_hep_job.
-        by case (hep_job jo j) eqn: EQ1; case (jo != j) eqn: EQ2;
-          case (job_task jo != job_task j) eqn: EQ3; try lia.
+      move=> jobs j.
+      rewrite /workload_of_jobs (bigID (fun jo => job_task jo != job_task j)) /=.
+      congr (_ + _); apply: eq_bigl => jo.
+      - rewrite /another_hep_job /another_task_hep_job.
+        by case: (eqVneq jo j) => [->|NE]; rewrite ?eqxx ?NE ?andbF ?andbT.
+      - by rewrite /another_hep_job_of_same_task negbK.
     Qed.
 
   End WorkloadPartitioningByPriority.

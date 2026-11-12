@@ -394,28 +394,6 @@ End SumOverPartitions.
 
 (** * Additional Sum Lemmas *)
 
-Section SumOverDisjointPredicates.
-
-  (** Consider a sequence [r], a predicate [P], and natural-number summands [F]. *)
-  Variables (I : eqType) (r : seq I) (P : pred I) (F : I -> nat).
-
-  (** Next, we show that if the predicate [P] is a disjunction of the predicates [Q]
-      and [R], and [Q] and [R] can never be simultaneously satisfied by any element,
-      then the sum of elements in [r] respecting [P] can be obtained by adding the sum of
-      elements in [r] respecting [Q] and the elements in [r] respecting [R]. *)
-  Lemma sum_split_exhaustive_mutually_exclusive_preds :
-    forall Q R,
-      (forall x, P x =  (Q x) || (R x)) -> (forall x, ~~(Q x && R x))
-        -> \sum_(r <- r | P r) F r = \sum_(r <- r | Q r) F r + \sum_(r <- r | R r) F r.
-  Proof.
-    move=> Q R XOR nAnd.
-    rewrite (bigID Q) /=; congr (_ + _); apply eq_bigl=> i;
-      specialize (XOR i); rewrite XOR; specialize (nAnd i);
-      by case: (Q i) nAnd; case : (R i).
-  Qed.
-
-End SumOverDisjointPredicates.
-
 (** First, we prove that the sum of Δ ones is equal to Δ     . *)
 Lemma sum_of_ones :
   forall t Δ,
