@@ -4,6 +4,8 @@ Require Export prosa.util.notation.
 Require Export prosa.util.rel.
 Require Export prosa.util.list prosa.util.tactics.
 
+(** * Lemmas Awaiting a MathComp Release *)
+
 Section SumsOverSequences.
 
   (** Consider any type [I] with a decidable equality ... *)
@@ -24,6 +26,9 @@ Section SumsOverSequences.
 
     (** We prove that if any element of [r] is bounded by constant [c],
         then the sum of the whole set is bounded by [c * size r]. *)
+    (** TODO: MathComp's [leq_sum_const] covers this lemma (proposed PR #1664).
+        Replace it after adopting the next MathComp release containing that result:
+        https://github.com/math-comp/math-comp/pull/1664. *)
     Lemma sum_majorant_constant c :
       (forall a, a \in r -> P a -> F a <= c) ->
       \sum_(j <- r | P j) F j <= c * (size [seq j <- r | P j]).
@@ -34,24 +39,12 @@ Section SumsOverSequences.
       apply: leq_sum => i /andP[ir Pi]; exact: Fa_le_c.
     Qed.
 
-    (** Next, we show that if the predicate [P] is a disjunction of the predicates [Q]
-        and [R], and [Q] and [R] can never be simultaneously satisfied by any element,
-        then the sum of elements in [r] respecting [P] can be obtained by adding the sum of
-        elements in [r] respecting [Q] and the elements in [r] respecting [R]. *)
-    Lemma sum_split_exhaustive_mutually_exclusive_preds :
-      forall Q R,
-        (forall x, P x =  (Q x) || (R x)) -> (forall x, ~~(Q x && R x))
-          -> \sum_(r <- r | P r) F r = \sum_(r <- r | Q r) F r + \sum_(r <- r | R r) F r.
-    Proof.
-      move=> Q R XOR nAnd.
-      rewrite (bigID Q) /=; congr (_ + _); apply eq_bigl=> i;
-        specialize (XOR i); rewrite XOR; specialize (nAnd i);
-        by case: (Q i) nAnd; case : (R i).
-    Qed.
-
     (** We also prove that the maximum value taken by a function over elements of
         a range [r] satisfying any predicate [P] is always smaller than the sum of the
         function over the elements. *)
+    (** TODO: MathComp's [bigmax_leq_sum] covers this lemma (proposed PR #1664).
+        Replace it after adopting the next MathComp release containing that result:
+        https://github.com/math-comp/math-comp/pull/1664. *)
     Lemma bigmax_leq_sum :
       \max_(i <- r | P i) F i <= \sum_(i <- r | P i) F i.
     Proof. by apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2; lia. Qed.
@@ -59,6 +52,9 @@ Section SumsOverSequences.
     (** We show that if [r1] is a subsequence of [r2], then the sum of
         function [F] over elements satisfying predicate [P] in [r1] is
         less than or equal to the sum over elements satisfying [P] in [r2].  *)
+    (** TODO: MathComp's [leq_sum_subseq] covers this lemma (proposed PR #1664).
+        Replace it after adopting the next MathComp release containing that result:
+        https://github.com/math-comp/math-comp/pull/1664. *)
     Lemma sum_le_subseq :
       forall r1 r2,
         subseq r1 r2 ->
@@ -84,6 +80,9 @@ Section SumsOverSequences.
     (** Assume that [E2] dominates [E1] in all the points contained in the set [r] and respecting
         the predicate [P]. We prove that, if we sum both functions over those points, then the sum
         of [E2] will dominate the sum of [E1]. *)
+    (** TODO: MathComp's [leq_sum_in] covers this lemma (merged PR #1651).
+        Replace it after adopting the next MathComp release containing that result:
+        https://github.com/math-comp/math-comp/pull/1651. *)
     Lemma leq_sum_seq :
       (forall i, i \in r -> P i -> E1 i <= E2 i) ->
       \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
@@ -94,6 +93,9 @@ Section SumsOverSequences.
 
     (** In the same way, if [E1] equals [E2] in all the points considered above, then also the two
         sums will be identical. *)
+    (** TODO: MathComp's [eq_big_in] covers this lemma (proposed PR #1664).
+        Replace it after adopting the next MathComp release containing that result:
+        https://github.com/math-comp/math-comp/pull/1664. *)
     Lemma eq_sum_seq :
       (forall i, i \in r -> P i -> E1 i == E2 i) ->
       \sum_(i <- r | P i) E1 i = \sum_(i <- r | P i) E2 i.
@@ -106,6 +108,9 @@ Section SumsOverSequences.
         the set [r]. We prove that, if we sum both functions over those
         points, then the sum of [E] conditioned by [P2] will dominate
         the sum of [E] conditioned by [P1]. *)
+    (** TODO: MathComp's [sub_in_leq_sum] covers this lemma (merged PR #1650).
+        Replace it after adopting the next MathComp release containing that result:
+        https://github.com/math-comp/math-comp/pull/1650. *)
     Lemma leq_sum_seq_pred :
       (forall i, i \in r -> P1 i -> P2 i) ->
       \sum_(i <- r | P1 i) E i <= \sum_(i <- r | P2 i) E i.
@@ -123,6 +128,9 @@ End SumsOverSequences.
 
     First, we observe that summing over a subset of a given sequence, if all
     summands are natural numbers, cannot yield a larger sum. *)
+(** TODO: MathComp's [leq_sum_subseq] covers this lemma (proposed PR #1664).
+    Replace it after adopting the next MathComp release containing that result:
+    https://github.com/math-comp/math-comp/pull/1664. *)
 Lemma leq_sum_subseq (I : eqType) (r r' : seq I) (P : pred I) (F : I -> nat) :
   subseq r r' ->
   \sum_(i <- r | P i) F i <= \sum_(i <- r' | P i) F i.
@@ -140,6 +148,9 @@ Qed.
     Requiring the absence of duplicates in [r] is a simple way to guarantee that
     the set inclusion [r <= rs] implies the actually required multiset
     inclusion. *)
+(** TODO: MathComp's [uniq_sub_le_big] covers this lemma (merged PR #1661).
+    Replace it after adopting the next MathComp release containing that result:
+    https://github.com/math-comp/math-comp/pull/1661. *)
 Lemma leq_sum_sub_uniq (I : eqType) (r : seq I) (F : I -> nat) (rs : seq I) :
   uniq r -> {subset r <= rs} ->
   \sum_(i <- r) F i <= \sum_(i <- rs) F i.
@@ -175,6 +186,9 @@ Section SumsOverSequences.
   (** First, as an auxiliary lemma, we observe that, if [E1 j] is less than [E2
       j] for some element [j] involved in a summation (filtered by [P]), then
       the corresponding totals are not equal. *)
+  (** TODO: MathComp's [ltn_sum_leq_seq] covers this lemma (merged PR #1651).
+      Replace it after adopting the next MathComp release containing that result:
+      https://github.com/math-comp/math-comp/pull/1651. *)
   Lemma ltn_sum_leq_seq j :
     j \in r ->
     P j ->
@@ -191,6 +205,9 @@ Section SumsOverSequences.
       statements hold (1) [E1 i] is less than or equal to [E2 i] and (2) the sum
       [E1 x_1, ..., E1 x_n] is equal to the sum of [E2 x_1, ..., E2 x_n], then
       [E1 x] is equal to [E2 x] for any element x of [xs]. *)
+  (** TODO: MathComp's [eq_sum_leq_seq] covers this lemma (merged PR #1651).
+      Replace it after adopting the next MathComp release containing that result:
+      https://github.com/math-comp/math-comp/pull/1651. *)
   Lemma eq_sum_leq_seq :
     (forall i, i \in r -> P i -> E1 i <= E2 i) ->
     \sum_(x <- r | P x) E1 x == \sum_(x <- r | P x) E2 x
@@ -207,32 +224,11 @@ Section SumsOverSequences.
 
 End SumsOverSequences.
 
-(** In the following, we prove a variety of simple properties of sums over
-    ranges. *)
-
-(** First, we prove that the sum of Δ ones is equal to Δ     . *)
-Lemma sum_of_ones :
-  forall t Δ,
-    \sum_(t <= x < t + Δ) 1 = Δ.
-Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
-
-(** Next, we show that a sum of natural numbers equals zero if and only
-    if all terms are zero. *)
-Lemma big_nat_eq0 m n F :
-  \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
-Proof.
-  split.
-  - rewrite /index_iota => /eqP.
-    rewrite sum_nat_seq_eq0 -all_filter filter_predT => /allP ZERO i.
-    rewrite -mem_index_iota /index_iota => IN.
-    by apply/eqP; apply ZERO.
-  - move=> ZERO.
-    have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
-    exact: big1_eq.
-Qed.
-
 (** Moreover, the fact that the sum is smaller than the range of the summation
     implies the existence of a zero element. *)
+(** TODO: MathComp's [sum_nat_lt_count] covers this lemma (proposed PR #1664).
+    Replace it after adopting the next MathComp release containing that result:
+    https://github.com/math-comp/math-comp/pull/1664. *)
 Lemma sum_le_summation_range :
   forall f t Δ,
     \sum_(t <= x < t + Δ) f x < Δ ->
@@ -247,34 +243,6 @@ Proof.
     { by apply leq_ltn_trans with (\sum_(t <= i < t + Δ) f i + n); first rewrite leq_addr. }
     by exists z; split=> //; rewrite LE/= ltnS ltnW. }
 Qed.
-
-(** In this section, we show how it is possible to equate the result of two sums performed
-    on two different functions and on different intervals, provided that the two functions
-    match point-wise. *)
-Section SumOfTwoIntervals.
-
-  (** Consider two equally-sized intervals <<[t1, t1+d)>> and <<[t2, t2+d)>>... *)
-  Variable (t1 t2 : nat).
-  Variable (d : nat).
-
-  (** ...and two functions [F1] and [F2]. *)
-  Variable (F1 F2 : nat -> nat).
-
-  (** Assume that the two functions match point-wise with each other, with the points taken
-      in their respective interval. *)
-  Hypothesis H_equal_before_d : forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
-
-  (** Then the summations of [F1] over <<[t1, t1 + d)>> and [F2] over
-      <<[t2, t2 + d)>> are equal. *)
-  Lemma big_sum_eq_in_eq_sized_intervals :
-    \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
-  Proof.
-    elim: d H_equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.
-    rewrite !addnS !big_nat_recr => //; try by lia.
-    by rewrite IHn.
-  Qed.
-
-End SumOfTwoIntervals.
 
 (** In this section, we relate the sum of items with the sum over partitions of those items. *)
 Section SumOverPartitions.
@@ -303,6 +271,9 @@ Section SumOverPartitions.
 
   (** We prove that summation of [f x] over all [x] is less than or equal to the summation of
       [sum_of_partition] over all partitions. *)
+  (** TODO: MathComp's [leq_sum_partition] covers this lemma (merged PR #1659).
+      Replace it after adopting the next MathComp release containing that result:
+      https://github.com/math-comp/math-comp/pull/1659. *)
   Lemma sum_over_partitions_le :
     \sum_(x <- xs | P x) f x
     <= \sum_(y <- ys) sum_of_partition y.
@@ -323,25 +294,6 @@ Section SumOverPartitions.
     exact: mem_head.
   Qed.
 
-  (** Consider a partition [y']. *)
-  Variable y' : Y.
-
-  (** We prove that the sum of items excluding all items from a partition [y']
-      is less-than-or-equal to the sum over all partitions except [y']. *)
-  Lemma reorder_summation : \sum_(x <- xs | P x && (x_to_y x != y')) f x <=
-                \sum_(y <- ys | y != y') sum_of_partition y.
-  Proof.
-    rewrite (exchange_big_dep (fun x =>P x && (x_to_y x != y'))) //=.
-    - move => y_of_x' x' /negP NEQ /andP [EQ1 /eqP EQ2].
-      rewrite EQ1 Bool.andb_true_l; apply/negP; intros CONTR.
-      apply: NEQ; clear EQ1.
-      by rewrite -EQ2.
-    - rewrite  big_seq_cond [X in _ <= X]big_seq_cond.
-      apply leq_sum => x' /andP [ARRo /andP [Px' NEQ]].
-      rewrite (big_rem (x_to_y x')) //=.
-      by rewrite Px' eq_refl NEQ andTb andTb leq_addr.
-  Qed.
-
   (** In this section, we prove a stronger result about the equality between
       the sum over all items and the sum over all partitions of those items. *)
   Section Equality.
@@ -354,6 +306,9 @@ Section SumOverPartitions.
 
     (** We prove that summation of [f x] over all [x] is equal to the summation of
         [sum_of_partition] over all partitions. *)
+    (** TODO: MathComp's [partition_big_seq] covers this lemma (merged PR #1659).
+        Replace it after adopting the next MathComp release containing that result:
+        https://github.com/math-comp/math-comp/pull/1659. *)
     Lemma sum_over_partitions_eq :
       \sum_(x <- xs | P x) f x
       = \sum_(y <- ys) sum_of_partition y.
@@ -387,6 +342,129 @@ Section SumOverPartitions.
   End Equality.
 
 End SumOverPartitions.
+
+(** In this section, we relate the sum of items with the sum over partitions of those items. *)
+Section SumOverPartitions.
+
+  (** Consider an item type [X] and a partition type [Y]. *)
+  Variable X Y : eqType.
+
+  (** [x_to_y] is the mapping from an item to the partition it is contained in. *)
+  Variable x_to_y : X -> Y.
+
+  (** Consider [f], a function from [X] to [nat]. *)
+  Variable f : X -> nat.
+
+  (** Consider an arbitrary predicate [P] on [X]. *)
+  Variable P : pred X.
+
+  (** Consider a sequence of items [xs] and a sequence of partitions [ys]. *)
+  Variable xs : seq X.
+  Variable ys : seq Y.
+
+  (** We assume that any item in [xs] has its corresponding partition in the sequence of partitions [ys]. *)
+  Hypothesis H_no_partition_missing : forall x, x \in xs -> P x -> x_to_y x \in ys.
+
+  (** Consider the sum of [f x] over all [x] in a given partition [y]. *)
+  Let sum_of_partition y := \sum_(x <- xs | P x && (x_to_y x == y)) f x.
+
+  (** Consider a partition [y']. *)
+  Variable y' : Y.
+
+  (** We prove that the sum of items excluding all items from a partition [y']
+      is less-than-or-equal to the sum over all partitions except [y']. *)
+  (** TODO: MathComp's [leq_sum_partition] subsumes this corollary (merged PR #1659).
+      Replace it after adopting the next MathComp release containing that result:
+      https://github.com/math-comp/math-comp/pull/1659. *)
+  Lemma reorder_summation : \sum_(x <- xs | P x && (x_to_y x != y')) f x <=
+                \sum_(y <- ys | y != y') sum_of_partition y.
+  Proof.
+    rewrite (exchange_big_dep (fun x =>P x && (x_to_y x != y'))) //=.
+    - move => y_of_x' x' /negP NEQ /andP [EQ1 /eqP EQ2].
+      rewrite EQ1 Bool.andb_true_l; apply/negP; intros CONTR.
+      apply: NEQ; clear EQ1.
+      by rewrite -EQ2.
+    - rewrite  big_seq_cond [X in _ <= X]big_seq_cond.
+      apply leq_sum => x' /andP [ARRo /andP [Px' NEQ]].
+      rewrite (big_rem (x_to_y x')) //=.
+      by rewrite Px' eq_refl NEQ andTb andTb leq_addr.
+  Qed.
+
+End SumOverPartitions.
+
+(** * Additional Sum Lemmas *)
+
+Section SumOverDisjointPredicates.
+
+  (** Consider a sequence [r], a predicate [P], and natural-number summands [F]. *)
+  Variables (I : eqType) (r : seq I) (P : pred I) (F : I -> nat).
+
+  (** Next, we show that if the predicate [P] is a disjunction of the predicates [Q]
+      and [R], and [Q] and [R] can never be simultaneously satisfied by any element,
+      then the sum of elements in [r] respecting [P] can be obtained by adding the sum of
+      elements in [r] respecting [Q] and the elements in [r] respecting [R]. *)
+  Lemma sum_split_exhaustive_mutually_exclusive_preds :
+    forall Q R,
+      (forall x, P x =  (Q x) || (R x)) -> (forall x, ~~(Q x && R x))
+        -> \sum_(r <- r | P r) F r = \sum_(r <- r | Q r) F r + \sum_(r <- r | R r) F r.
+  Proof.
+    move=> Q R XOR nAnd.
+    rewrite (bigID Q) /=; congr (_ + _); apply eq_bigl=> i;
+      specialize (XOR i); rewrite XOR; specialize (nAnd i);
+      by case: (Q i) nAnd; case : (R i).
+  Qed.
+
+End SumOverDisjointPredicates.
+
+(** First, we prove that the sum of Δ ones is equal to Δ     . *)
+Lemma sum_of_ones :
+  forall t Δ,
+    \sum_(t <= x < t + Δ) 1 = Δ.
+Proof. by move=> t Δ; rewrite big_const_nat iter_addn_0 mul1n addKn. Qed.
+
+(** Next, we show that a sum of natural numbers equals zero if and only
+    if all terms are zero. *)
+Lemma big_nat_eq0 m n F :
+  \sum_(m <= i < n) F i = 0 <-> (forall i, m <= i < n -> F i = 0).
+Proof.
+  split.
+  - rewrite /index_iota => /eqP.
+    rewrite sum_nat_seq_eq0 -all_filter filter_predT => /allP ZERO i.
+    rewrite -mem_index_iota /index_iota => IN.
+    by apply/eqP; apply ZERO.
+  - move=> ZERO.
+    have-> : \sum_(m <= i < n) F i = \sum_(m <= i < n) 0 by apply eq_big_nat.
+    exact: big1_eq.
+Qed.
+
+(** In this section, we show how it is possible to equate the result of two sums performed
+    on two different functions and on different intervals, provided that the two functions
+    match point-wise. *)
+Section SumOfTwoIntervals.
+
+  (** Consider two equally-sized intervals <<[t1, t1+d)>> and <<[t2, t2+d)>>... *)
+  Variable (t1 t2 : nat).
+  Variable (d : nat).
+
+  (** ...and two functions [F1] and [F2]. *)
+  Variable (F1 F2 : nat -> nat).
+
+  (** Assume that the two functions match point-wise with each other, with the points taken
+      in their respective interval. *)
+  Hypothesis H_equal_before_d : forall g, g < d -> F1 (t1 + g) = F2 (t2 + g).
+
+  (** Then the summations of [F1] over <<[t1, t1 + d)>> and [F2] over
+      <<[t2, t2 + d)>> are equal. *)
+  Lemma big_sum_eq_in_eq_sized_intervals :
+    \sum_(t1 <= t < t1 + d) F1 t = \sum_(t2 <= t < t2 + d) F2 t.
+  Proof.
+    elim: d H_equal_before_d => [|n IHn] eq; first by rewrite !addn0 !big_geq.
+    rewrite !addnS !big_nat_recr => //; try by lia.
+    by rewrite IHn.
+  Qed.
+
+End SumOfTwoIntervals.
+
 
 (** We observe a trivial monotonicity-preserving property with regard to
     [leq]. *)
