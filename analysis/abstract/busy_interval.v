@@ -331,7 +331,7 @@ Section AbstractBusyIntervalExists.
           move: PE; rewrite negb_and -leqNgt => /orP [ | /negPn COMPL] => //; exfalso.
           apply completion_monotonic with (t' := t_busy) in COMPL.
           - by move: NCOM => /negP.
-          - by rewrite -ltnS; eapply bigmax_ltn_ord.
+          - by rewrite -ltnS; apply: bigmax_ltn_ord.
         }
         repeat split; auto 2; try apply QUIET => //=.
         move => t0 /andP [GTlast LTbusy] QUIET0.

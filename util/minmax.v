@@ -3,6 +3,51 @@ Require Export prosa.util.notation prosa.util.tactics prosa.util.list prosa.util
 
 (** * Additional Lemmas about [\max]. *)
 
+(** For a positive [n], the maximum of any subset of [{0, …, n-1}]
+    is smaller than [n], including when the subset is empty. *)
+Lemma bigmax_ltn_ord :
+  forall (n : nat) (P : pred nat),
+    n > 0 ->
+    \max_(i < n | P i) i < n.
+Proof.
+  move=> [|n] P // _.
+  by rewrite ltnS; apply/bigmax_leqP => i _; exact: leq_ord.
+Qed.
+
+(** Given a predicate [P] and an ordinal [i0 ∈ {0, …, n-1}] satisfying
+    [P], we show that the maximum of [{i ∈ {0, …, n-1} | P i}]
+    also satisfies [P]. *)
+Lemma bigmax_pred :
+  forall (n : nat) (P : pred nat) (i0 : 'I_n),
+    P i0 ->
+    P (\max_(i < n | P i) i).
+Proof.
+  move=> n P i0 Pi0.
+  rewrite (bigmax_eq_arg i0 Pi0).
+  by case: arg_maxnP.
+Qed.
+
+(** Additionally, we observe that, if two predicates yield different maxima,
+    then there must exist a witness that satisfies only one of the
+    predicates. *)
+Lemma bigmax_witness_diff {T : eqType} :
+  forall {xs : seq T} {P1 P2 F},
+    \max_(x <- xs | P1 x) F x < \max_(x <- xs | P2 x) F x ->
+    exists x, x \in xs /\ ~~ P1 x /\ P2 x.
+Proof.
+  move=> xs P1 P2 F LT.
+  case: (boolP (has (fun x => ~~ P1 x && P2 x) xs))
+    => [/hasP [x IN /andP [NPx Px]]|/hasPn NONE]; first by exists x.
+  exfalso; move: LT; rewrite ltnNge => /negP; apply.
+  apply/bigmax_leqP_seq => x IN Px.
+  apply: leq_bigmax_seq => //.
+  by move: (NONE x IN); rewrite Px andbT negbK.
+Qed.
+
+(** TODO: MathComp's [le_bigmax2_seq] covers this lemma (proposed PR #1672).
+    Replace it after adopting the next MathComp release containing that result:
+    https://github.com/math-comp/math-comp/pull/1672. *)
+
 (** Given two functions [F1] and [F2], a predicate [P], and sequence
     [xs], we show that if [F1 x <= F2 x] for any [x \in xs] such that
     [P x], then [max] of [{F1 x | ∀ x ∈ xs, P x}] is bounded by the
@@ -17,75 +62,9 @@ Proof.
   by apply: leq_bigmax_seq.
 Qed.
 
-(** We show that for a positive [n], [max] of [{0, …, n-1}] is
-    smaller than [n]. *)
-Lemma bigmax_ord_ltn_identity :
-  forall (n : nat),
-    n > 0 ->
-    \max_(i < n) i < n.
-Proof.
-  intros [ | n] POS; first by rewrite ltn0 in POS.
-  clear POS.
-  elim: n => [|n IHn]; first by rewrite big_ord_recr /= big_ord0 maxn0.
-  by rewrite big_ord_recr /= /maxn IHn.
-Qed.
-
-(** We state the next lemma in terms of _ordinals_.  Given a natural
-    number [n], a predicate [P], and an ordinal [i0 ∈ {0, …, n-1}]
-    satisfying [P], we show that [max {i | P i} < n].  Note that the
-    element satisfying [P] is needed to prove that [{i | P i}] is
-    not empty. *)
-Lemma bigmax_ltn_ord :
-  forall (n : nat) (P : pred nat) (i0 : 'I_n),
-    P i0 ->
-    \max_(i < n | P i) i < n.
-Proof.
-  intros n P i0 Pi.
-  destruct n as [|n]; first by destruct i0 as [i0 P0]; move: (P0) => P0'; rewrite ltn0 in P0'.
-  rewrite big_mkcond.
-  apply leq_ltn_trans with (n := \max_(i < n.+1) i).
-  - apply/bigmax_leqP => i _.
-    destruct (P i); last by done.
-    by apply leq_bigmax_cond.
-  - by apply bigmax_ord_ltn_identity.
-Qed.
-
-(** Next, we show that, given a natural number [n], a predicate
-    [P], and an ordinal [i0 ∈ {0, …, n-1}] satisfying [P],
-    [max {i | P i} < n] also satisfies [P]. *)
-Lemma bigmax_pred :
-  forall (n : nat) (P : pred nat) (i0 : 'I_n),
-    P i0 ->
-    P (\max_(i < n | P i) i).
-Proof.
-  intros n P i0 Pi0.
-  elim: n i0 Pi0 => [|n IHn] i0 Pi0.
-  { by destruct i0 as [i0 P0]; move: (P0) => P1; rewrite ltn0 in P1. }
-  { rewrite big_mkcond big_ord_recr /=.
-    destruct (P n) eqn:Pn.
-    { destruct n as [|n]; first by rewrite big_ord0 maxn0.
-      unfold maxn at 1.
-      destruct (\max_(i < n.+1) (match P (@nat_of_ord (S n) i) return nat with
-                                 | true => @nat_of_ord (S n) i
-                                 | false => O
-                                 end) < n.+1) eqn:Pi; first by rewrite Pi.
-      exfalso.
-      apply negbT in Pi; move: Pi => /negP BUG; apply: BUG.
-      apply leq_ltn_trans with (n := \max_(i < n.+1) i).
-      { apply/bigmax_leqP; rewrite //= => i _.
-        by destruct (P i); first apply leq_bigmax_cond.
-      }
-      { by apply bigmax_ord_ltn_identity. }
-    }
-    { rewrite maxn0 -big_mkcond /=.
-      have LT: i0 < n; last by rewrite (IHn (Ordinal LT)).
-      rewrite ltn_neqAle; apply/andP; split;
-        last by rewrite -ltnS; apply ltn_ord.
-      apply/negP => /eqP BUG.
-      by rewrite -BUG Pi0 in Pn.
-    }
-  }
-Qed.
+(** TODO: Replace this lemma with MathComp's [eq_bigmax_seq] after adopting
+    the next release containing that result (PR #1652):
+    https://github.com/math-comp/math-comp/pull/1652 *)
 
 (** Furthermore, we observe that, if there is any element that satisfies the
     predicate, then there exists a witness for the computed maximum. *)
@@ -94,51 +73,11 @@ Lemma bigmax_witness {T : eqType} :
     has P xs ->
     exists x, x \in xs /\ P x /\ (F x = \max_(x <- xs | P x) F x).
 Proof.
-  move=> xs P F.
-  elim: xs => // a xs IH HAS.
-  case: (boolP (P a)); last first.
-  { move=> /negPf NOT.
-    move: HAS; rewrite /has NOT //= -/(has P xs) => HAS.
-    move: (IH HAS) => [x [IN [Px Fx]]].
-    exists x; repeat split => //;
-                          first by rewrite in_cons; apply /orP; right.
-    by rewrite big_cons ifF. }
-  { move=> Pa.
-    case: (boolP (has P xs)) => HAS'; last first.
-    { exists a; repeat split => //; first by apply: mem_head.
-      by rewrite big_cons ifT // big_hasC. }
-    { move: (IH HAS') => [x [IN [Px MAX]]].
-      case: (leqP (\max_(x <- xs | P x) F x) (F a)).
-      { move=> LEQ. exists a.
-        repeat split => //; first by rewrite mem_head.
-        rewrite big_cons ifT //= [maxn (_) (_)]/maxn ifF //.
-        by lia. }
-      { move=> LT. exists x.
-        repeat split => //; first by rewrite in_cons; apply /orP; right.
-        by rewrite big_cons ifT //= [maxn (_) (_)]/maxn ifT. } } }
+  move=> xs P F HAS.
+  have NE : [seq F x | x <- xs & P x] <> [::]
+    by apply/eqP; rewrite -size_eq0 size_map size_filter -lt0n -has_count.
+  move: (bigmax_mem _ NE).
+  rewrite big_map big_filter => /mapP [x IN MAX].
+  move: IN; rewrite mem_filter => /andP [Px IN].
+  by exists x; repeat split=> //; rewrite MAX.
 Qed.
-
-(** Additionally, we observe that, if two predicates yield different maxima,
-    then there must exist a witness that satisfies only one of the
-    predicates. *)
-Lemma bigmax_witness_diff {T : eqType} :
-  forall {xs : seq T} {P1 P2 F},
-    \max_(x <- xs | P1 x) F x < \max_(x <- xs | P2 x) F x ->
-    exists x, x \in xs /\ ~~ P1 x /\ P2 x.
-Proof.
-  move=> xs P1 P2 F LT.
-  case: (boolP (has P1 xs)) => HP1;
-                                case: (boolP (has P2 xs)) => HP2.
-  { move: (bigmax_witness F HP2) => [x2 [IN2 [Px2 MAX2]]].
-    exists x2; repeat split => //.
-    apply: contraT => /negPn Px1; exfalso.
-    have BOUNDED: F x2 <=  \max_(x <- xs | P1 x) F x by apply: leq_bigmax_seq.
-    by lia. }
-  { by exfalso; move: LT; rewrite (big_hasC _ _ _ HP2). }
-  { move: (bigmax_witness F HP2) => [x2 [IN2 [Px2 MAX2]]].
-    exists x2; repeat split => //.
-    move: HP1 => /hasPn HP1.
-    by move: (HP1 x2 IN2). }
-  { by exfalso; move: LT; rewrite !big_hasC. }
-Qed.
-

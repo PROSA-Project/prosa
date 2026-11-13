@@ -392,10 +392,10 @@ Section ExistsBusyIntervalJLFP.
             feed (QUIET j H_from_arrival_sequence); first by apply H_priority_is_reflexive.
             specialize (QUIET BEFORE).
             apply completion_monotonic with (t' := t_busy) in QUIET; first by rewrite QUIET in NOTCOMP.
-              by apply bigmax_ltn_ord with (i0 := t).
+              by rewrite -ltnS; apply: bigmax_ltn_ord.
           }
           repeat split=> //.
-          * by apply bigmax_ltn_ord with (i0 := t).
+          * by apply: bigmax_ltn_ord.
           * move => t0 /andP [GTlast LTbusy] QUIET0.
             have PRED0: quiet_time_dec t0 by apply/quiet_time_P.
             move: (@leq_bigmax_cond _ (fun (x: 'I_t_busy.+1) => quiet_time_dec x) (fun x => x) (Ordinal LTbusy) PRED0) => /=.
