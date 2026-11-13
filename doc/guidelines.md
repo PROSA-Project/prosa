@@ -145,6 +145,7 @@ Avoid unfolding definitions in anything but “basic facts” files. Main proofs
     - Aside: Sometimes, it is more convenient to use a specific inductive type rather than a disjunction. See for instance `PeanoNat.Nat.compare_spec` in the Rocq standard library or Section 4.2.1 of the [Mathcomp book](https://math-comp.github.io/mcb/book.pdf) for more details. However, we generally prefer the use of a disjunction for readability whenever possible and reasonable.
 4. Do not explicitly reference proof terms in type classes (because they might change with the representation). Instead, introduce lemmas that restate the proof term in a general, abstract way that is unlikely to change and rely on those.
 Guideline: do not name proof terms in type classes to prevent explicit dependencies.
+5. When selecting where to rewrite, prefer patterns over occurrence numbers. For example, prefer `[in leqLHS]` over `{1}`. Patterns make the intended target explicit and are more robust when the surrounding expression changes.
 
 ### Auto-Generated Names
 
