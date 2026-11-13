@@ -78,7 +78,7 @@ Section NondecreasingSequence.
     elim=> [ |a [ |b xs] IH] n SORT //.
     move: (SORT) => /andP [AB _].
     move: AB; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
-    - subst b; rewrite undup_cons_duplicate.
+    - subst b; rewrite [undup (a :: a :: xs)]/undup in_cons eqxx.
       apply: leq_trans (IH n (path_sorted SORT)) _.
       rewrite /= !subSS.
       case: n => [ |n]; first by rewrite !subn0 !nth_cons.
@@ -225,7 +225,9 @@ Section NondecreasingSequence.
   Proof.
     elim=> [ |a [ |b xs] IH] k Bound SORT.
     - by rewrite filter_pred0.
-    - by rewrite index_iota_filter_singl; first (rewrite ltnS; apply: Bound; rewrite in_cons eqxx).
+    - under [in LHS]eq_filter do rewrite mem_seq1.
+      rewrite filter_pred1_uniq ?iota_uniq // mem_index_iota /= ltnS.
+      by apply: Bound; rewrite in_cons eqxx.
     - have LEa: a <= k by apply: Bound; rewrite in_cons eqxx.
       have LEb: b <= k by apply: Bound; rewrite !in_cons eqxx orbT.
       have M2: forall y, y \in b :: xs -> y <= k.
@@ -234,15 +236,18 @@ Section NondecreasingSequence.
         by apply/allP; exact: order_path_min leq_trans (path_sorted SORT).
       have /andP [AB _] := SORT.
       move: AB; rewrite leq_eqVlt => /orP [/eqP EQ|LT].
-      + subst b; rewrite distances_unfold_2cons subnn [RHS]/= range_filter_2cons.
+      + subst b; rewrite distances_unfold_2cons subnn [RHS]/=.
+        under [in LHS]eq_filter do rewrite !in_cons orbA orbb.
         by apply: IH; [exact: M2|exact: path_sorted SORT].
       + have M4: forall y, y \in b :: xs -> a < y.
         { move=> y; rewrite in_cons => /orP [/eqP -> //|IN].
           exact: leq_trans LT (M3 _ IN). }
         rewrite distances_unfold_2cons [RHS]/= subn_gt0 LT [RHS]/=.
-        rewrite range_iota_filter_step // rem_lt_id //.
+        rewrite index_iota_filter_step //.
+        have /all_filterP -> : all (predC1 a) (b :: xs).
+        { apply/allP => y /M4 LTay; apply/eqP; lia. }
         rewrite -(IH k) //; first exact: path_sorted SORT.
-        by rewrite {1}range_iota_filter_step // distances_unfold_2cons {1}range_iota_filter_step //.
+        by rewrite {1}index_iota_filter_step // distances_unfold_2cons {1}index_iota_filter_step //.
   Qed.
 
   (** Let [xs] again be a non-decreasing sequence. We prove that

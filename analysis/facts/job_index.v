@@ -164,12 +164,8 @@ Section JobIndexLemmas.
     job_arrival j1 <= job_arrival j2 ->
     index j1 (task_arrivals_up_to_job_arrival arr_seq j1) = index j1 (task_arrivals_up_to_job_arrival arr_seq j2).
   Proof.
-    rewrite leq_eqVlt => /orP [/eqP LT|LT]; first by rewrite /task_arrivals_up_to_job_arrival LT H_same_task.
-    have CONSISTENT : consistent_arrival_times arr_seq by [].
-    specialize (arrival_lt_implies_strict_prefix arr_seq CONSISTENT (job_task j1) j1 j2) => SUB.
-    feed_n 5 SUB => //; move: SUB => [xs2 [NEMPT2 CAT2]].
-    rewrite -CAT2 index_cat ifT //=.
-    by apply arrives_in_task_arrivals_up_to.
+    move=> /(task_arrivals_up_to_prefix_cat arr_seq j1 j2 H_same_task)/prefixP [xs ->].
+    by rewrite index_cat ifT //; apply: arrives_in_task_arrivals_up_to.
   Qed.
 
   (** We show that the [job_index] of a job [j1] is strictly less than
@@ -258,10 +254,9 @@ Section PreviousJob.
   Lemma prev_job_arr :
     arrives_in arr_seq (prev_job arr_seq j).
   Proof.
-    destruct (default_or_in (job_index arr_seq j - 1) j (task_arrivals_up_to_job_arrival arr_seq j)) as [EQ|IN].
-    + by rewrite /prev_job EQ.
-    + apply in_arrivals_implies_arrived with (t1 := 0) (t2 := (job_arrival j).+1).
-      by move: IN; rewrite mem_filter => /andP [_ IN].
+    apply: (arrives_in_task_arrivals_implies_arrived arr_seq (job_task j) 0 (job_arrival j).+1).
+    rewrite -/(task_arrivals_up_to_job_arrival arr_seq j) /prev_job mem_nthE.
+    by apply/implyP => _; apply: arrives_in_task_arrivals_up_to.
   Qed.
 
   (** We show that the index of [prev_job j] in task arrivals up to [j] is one less

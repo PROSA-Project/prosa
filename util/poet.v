@@ -15,16 +15,10 @@ Lemma forall_exists_implied_by_forall_in_zip :
     (exists ys, size xs = size ys /\ all P_bool (zip xs ys) == true) ->
     (forall x, x \in xs -> exists y, P_prop x y).
 Proof.
-  move=> X Y P_bool P_prop xs EQ TR x IN.
-  destruct TR as [ys [SIZE ALL]].
-  set (idx := index x xs).
-  have x__d : Y by destruct xs, ys.
-  have y__d : Y by destruct xs, ys.
-  exists (nth y__d ys idx); apply EQ; clear EQ.
-  move: ALL => /eqP/allP -> //.
-  eapply in_zip; first by done.
-  exists idx; repeat split.
-  - by rewrite index_mem.
-  - by apply nth_index.
-    Unshelve. by done.
+  move=> X Y P_bool P_prop xs EQ [ys [SIZE /eqP/allP ALL]] x IN.
+  case: ys SIZE ALL => [|y ys] SIZE ALL; first by case: xs IN SIZE ALL.
+  exists (nth y (y :: ys) (index x xs)); apply/EQ/ALL.
+  apply/(nthP (x, y)); exists (index x xs).
+  - by rewrite size_zip -SIZE minnn index_mem.
+  - by rewrite nth_zip // nth_index.
 Qed.

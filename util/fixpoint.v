@@ -214,23 +214,14 @@ Lemma fmfs_finds_fixpoint :
     find_max_fixpoint_of_seq f sp h = Some x ->
     exists2 a, a \in sp & x = f a x.
 Proof.
-  move=> f sp h x NN.
-  rewrite /find_max_fixpoint_of_seq //=.
-  set fps := [seq find_fixpoint (f s) h | s <- sp] => H.
-  have ALL: all (fun opt => opt != None) fps
-              by case: (all _ _) H => //.
-  move: H. rewrite ifT //= => [][]H.
-  have NN': ~~ nilp fps
-    by rewrite /fps /nilp size_map -/(nilp sp).
-  move: (bigmax_witness
-           (fun fp => match fp with | Some x' => x' | None => 0 end)
-           (has_all_nilp _ _ ALL NN'))
-      => //= [w [IN [SOME MAX]]].
-  case: w IN SOME MAX => // w IN _.
-  rewrite {}H => WX.
-  move: IN; rewrite WX /fps => /mapP [a IN FIX].
-  exists a => //.
-  by eapply ffp_finds_fixpoint, ssrfun.esym, FIX.
+  move=> f sp h x NN; rewrite /find_max_fixpoint_of_seq /=.
+  set fps := [seq find_fixpoint (f s) h | s <- sp].
+  case: ifP => // ALL [<-].
+  have HAS: has (fun opt => opt != None) fps
+    by rewrite has_filter (all_filterP ALL) -nilpE /nilp /fps size_map.
+  case: (bigmax_witness (odflt 0) HAS) => [[v|] [IN [_ <-]]] //=.
+  move: IN; rewrite /fps => /mapP [a IN /ssrfun.esym/ffp_finds_fixpoint FIX].
+  by exists a.
 Qed.
 
 (** Furthermore, we show that the result is the maximum of all fixpoints, with

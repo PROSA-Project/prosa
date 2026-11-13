@@ -140,7 +140,7 @@ Section ScheduledJobs.
     Proof.
       move=> j t; rewrite /scheduled_job_at.
       have [/eqP -> //|[j' /eqP -> //=]] := scheduled_jobs_at_uni_cases t.
-      exact: seq1_some.
+      by rewrite !eqE /= andbT.
     Qed.
 
     (** ... and observe that [scheduled_job_at t] behaves as expected: it yields

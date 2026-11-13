@@ -45,15 +45,14 @@ Section TaskArrivals.
       or after [j1]. *)
   Lemma task_arrivals_up_to_prefix_cat :
     forall j1 j2,
-      arrives_in arr_seq j1 ->
-      arrives_in arr_seq j2 ->
       job_task j1 = job_task j2 ->
       job_arrival j1 <= job_arrival j2 ->
-      prefix_of (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
+      prefix (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
   Proof.
-    intros j1 j2 ARR1 ARR2 TSK ARR_LT.
-    exists (task_arrivals_between arr_seq (job_task j1) (job_arrival j1 + 1) (job_arrival j2 + 1)).
-    now rewrite /task_arrivals_up_to_job_arrival !addn1 TSK -task_arrivals_between_cat.
+    move=> j1 j2 TSK LE.
+    rewrite /task_arrivals_up_to_job_arrival /task_arrivals_up_to TSK
+            (task_arrivals_between_cat (job_task j2) 0 (job_arrival j1).+1 (job_arrival j2).+1) //.
+    exact: prefix_prefix.
   Qed.
 
   (** Let [tsk] be any task. *)
@@ -230,27 +229,6 @@ Section TaskArrivals.
     apply mem_bigcat_nat_exists in IN; move : IN => [t' [IN NEQt']].
     rewrite -(H_consistent_arrivals j t') in NEQt' => //.
     now lia.
-  Qed.
-
-  (** We show that for any two jobs [j1] and [j2], task arrivals up to arrival of job [j1] form a
-      strict prefix of task arrivals up to arrival of job [j2]. *)
-  Lemma arrival_lt_implies_strict_prefix :
-    forall j1 j2,
-      job_task j1 = tsk ->
-      job_task j2 = tsk ->
-      arrives_in arr_seq j1 ->
-      arrives_in arr_seq j2 ->
-      job_arrival j1 < job_arrival j2 ->
-      strict_prefix_of (task_arrivals_up_to_job_arrival arr_seq j1) (task_arrivals_up_to_job_arrival arr_seq j2).
-  Proof.
-    intros j1 j2 TSK1 TSK2 ARR_1 ARR_2 ARR_INEQ.
-    exists (task_arrivals_between arr_seq tsk ((job_arrival j1).+1) ((job_arrival j2).+1)).
-    split.
-    - move: (in_nil j2) => /negP => JIN NIL.
-      rewrite -NIL in JIN; contradict JIN.
-      now apply job_in_task_arrivals_between => //; lia.
-    - rewrite /task_arrivals_up_to_job_arrival TSK1 TSK2.
-      now rewrite -task_arrivals_cat; try by lia.
   Qed.
 
   (** For any job [j2] with [job_index] equal to [n], the nth job

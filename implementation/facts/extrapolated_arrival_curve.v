@@ -171,7 +171,7 @@ Section ArrivalCurvePrefixSortedLtn.
     forall t v, (t, v) \in steps_of ac_prefix -> step_at ac_prefix t = (t, v).
   Proof.
     case: ac_prefix H_sorted_ltn => [h steps] + //= t v IN.
-    move: IN => /in_cat //= [steps__l [steps__r ->]] /cat_sorted2 /= [_ SORT].
+    move: IN => /splitPr [steps__l steps__r] /cat_sorted2 /= [_ SORT].
     move: SORT.
     rewrite /step_at filter_cat last_cat (@set_last_default _ _ (0, 0) _); first by rewrite //= leqnn.
     rewrite /= (path_sortedE ltn_steps_is_transitive) /= leqnn => /andP [ALL _].

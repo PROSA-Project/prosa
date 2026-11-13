@@ -122,14 +122,12 @@ Section FastSearchSpaceComputationSubset.
   Proof.
     move=> A; unfold correct_search_space, is_in_search_space.
     rewrite mem_filter => /andP [/andP [LT /orP [CH|CH]] IN]; unfold search_space_emax_EDF.
-    { move: (H_tsk_in_ts) => INTS.
-      apply in_cat in INTS; destruct INTS as [ts_l [ts_r EQ]].
-      rewrite EQ; rewrite big_cat big_cons //= !mem_cat; apply/orP; right; apply/orP; left.
+    { case: (splitPr H_tsk_in_ts) => ts_l ts_r.
+      rewrite big_cat big_cons //= !mem_cat; apply/orP; right; apply/orP; left.
       unfold task_search_space_emax_EDF; rewrite EDF_ss_generalize_FP_ss.
       by eapply task_search_space_subset; eauto. }
     { move: CH => /hasP [tsko INts /andP [NEQtsk NEQ]].
-      apply in_cat in INts; destruct INts as [ts_l [ts_r EQ]]; subst.
-      have INts:tsko \in ts_l++[::tsko]++ts_r by rewrite !mem_cat mem_seq1; apply/orP;right;apply/orP;left.
+      case: (splitPr INts) => ts_l ts_r.
       rewrite big_cat big_cons //= !mem_cat; apply/orP; right; apply/orP; left; apply/mapP.
       exists A.+1; last by lia.
       apply /mapP; exists (A.+1 + task_deadline tsk); last by rewrite -addnBA // subnn addn0.

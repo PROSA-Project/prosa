@@ -58,7 +58,7 @@ Section RunToCompletionThreshold.
     unfold job_preemption_points, range.
     destruct (H_valid_preemption_model j) as [A1 [A2 [A3 A4]]]; auto.
     unfold job_cannot_become_nonpreemptive_before_execution in *.
-    by rewrite index_iota_lt_step//= A1 in_cons eq_refl.
+    by rewrite mem_filter mem_index_iota /= A1.
   Qed.
 
   (** ... and [job_cost] are in preemption points. *)

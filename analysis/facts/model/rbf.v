@@ -751,9 +751,12 @@ Section TaskWorkload.
     <= task_cost tsk * number_of_task_arrivals arr_seq tsk (job_arrival j) (t1 + Δ)
        - task_cost tsk.
   Proof.
+    have IN : j \in arrivals_between arr_seq (job_arrival j) (t1 + Δ)
+      by apply: job_in_arrivals_between.
     rewrite /task_workload_between /task_workload /workload_of_jobs /number_of_task_arrivals.
-    rewrite (big_rem j) //= addnC //= H_job_of_task addnK (filter_size_rem j)//.
-    rewrite mulnDr mulnC muln1 addnK mulnC.
+    rewrite (big_rem j) //= addnC //= H_job_of_task addnK.
+    rewrite /task_arrivals_between size_filter (permP (perm_to_rem IN)) /= H_job_of_task.
+    rewrite mulnDr muln1 addKn -size_filter.
     apply sum_majorant_constant => j' ARR' /eqP TSK2.
     rewrite -TSK2; apply H_arrivals_have_valid_job_costs.
     move: ARR' => /mem_rem ARR'.

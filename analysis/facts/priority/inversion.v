@@ -149,14 +149,9 @@ Section PI.
       = cumulative_priority_inversion arr_seq sched j t1 t_mid
         + cumulative_priority_inversion arr_seq sched j t_mid t2.
   Proof.
-    intros t_mid t1 t2 LE1 LE2.
-    rewrite /cumulative_priority_inversion -big_cat //=.
-    replace (index_iota t1 t_mid ++ index_iota t_mid t2) with (index_iota t1 t2); first by reflexivity.
-    interval_to_duration t1 t_mid δ1.
-    interval_to_duration (t1 + δ1) t2 δ2.
-    rewrite -!addnA /index_iota.
-    erewrite iotaD_impl with (n_le := δ1); last by lia.
-    by rewrite !addKn addnA addKn.
+    move=> t_mid t1 t2 LE1 LE2.
+    rewrite /cumulative_priority_inversion (index_iota_cat t_mid) ?big_cat //.
+    by apply/andP; split.
   Qed.
 
 End PI.

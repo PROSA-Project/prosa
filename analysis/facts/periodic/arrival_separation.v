@@ -106,7 +106,7 @@ Section JobArrivalSeparation.
       elim: s => [|s IHs].
       { intros j1 j2 TSKj1 TSKj2 STEP LT ARRj1 ARRj2; exfalso.
         specialize (earlier_arrival_implies_lower_index arr_seq H_valid_arrival_sequence j1 j2) => LT_IND.
-        feed_n 4 LT_IND => //; first by rewrite TSKj2.
+        feed_n 3 LT_IND => //; first by rewrite TSKj2.
         by lia.
       }
       { intros j1 j2 TSKj1 TSKj2 STEP LT ARRj2 ARRj1.
