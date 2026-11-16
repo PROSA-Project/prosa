@@ -433,8 +433,8 @@ Section FP_RBF_partitioning.
     by congr (_ + _); apply: eq_bigl => t; rewrite /hp_task /ep_task ?negbK.
   Qed.
 
-  (** Now, assume that the priorities are reflexive. *)
-  Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
+  (** Assume that the reference task has at least its own priority. *)
+  Hypothesis H_tsk_self_priority : hep_task tsk tsk.
 
   (** If the task set does not contain duplicates, then the total
       higher-or-equal-priority RBF for any task can be split as the sum of
@@ -463,7 +463,7 @@ Section FP_RBF_partitioning.
     - move => tsko.
       case (tsko == tsk) eqn: EQ; last by lia.
       move : EQ => /eqP ->.
-      by rewrite H_priority_is_reflexive //=.
+      by rewrite H_tsk_self_priority //=.
   Qed.
 
   (** If the task set may contain duplicates, then we can only say that
@@ -485,7 +485,7 @@ Section FP_RBF_partitioning.
     - move => tsko.
       case (tsko ==tsk) eqn: TSKEQ; last by lia.
       move : TSKEQ => /eqP ->.
-      by rewrite (H_priority_is_reflexive tsk) //=.
+      by rewrite H_tsk_self_priority //=.
   Qed.
 
 End FP_RBF_partitioning.

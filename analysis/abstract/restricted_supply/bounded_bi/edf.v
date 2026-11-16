@@ -219,7 +219,8 @@ Section BoundedBusyIntervals.
             task_request_bound_function tsk_hp Δ.
     Proof.
       move=> jlp ARR LP.
-      rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+      rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //;
+        first exact: EDF_policy_is_reflexive.
       apply leq_trans with (workload_of_jobs (fun jo => job_deadline jo <= job_deadline jlp) (arrivals_between arr_seq t1 (t1 + Δ))).
       { apply workload_of_jobs_weaken => jo HEP.
         move: (EDF_policy_deadline_order H_policy_is_EDF _ _ HEP).
@@ -353,7 +354,8 @@ Section BoundedBusyIntervals.
         rewrite subKn; first by apply: sbf_bounded_by_duration => //.
         have [ZERO|POS] := (posnP (cumulative_service_inversion arr_seq sched j t1 (t1 + L))).
         { rewrite ZERO add0n -(leqRW H_fixed_point).
-          rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+          rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //;
+            first exact: EDF_policy_is_reflexive.
           by apply hep_workload_le_total_rbf. }
         { by rewrite -(leqRW longest_bi_with_pi_bounded_by_sbf);
             apply: longest_bi_with_pi_bound_is_valid. }
@@ -387,7 +389,8 @@ Section BoundedBusyIntervals.
         rewrite subKn; first by apply: sbf_bounded_by_duration => //.
         have [ZERO|POS] := (posnP (cumulative_service_inversion arr_seq sched j t1 (t1 + L))).
         { rewrite ZERO add0n -(leqRW H_fixed_point).
-          rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+          rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //;
+            first exact: EDF_policy_is_reflexive.
           by apply hep_workload_le_total_rbf => //; move: (H_busy_prefix_arr) => [LE _]; rewrite -ltnS. }
         { by rewrite -(leqRW longest_bi_with_pi_bounded_by_sbf);
             apply: longest_bi_with_pi_bound_is_valid => //;

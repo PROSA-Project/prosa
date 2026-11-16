@@ -245,10 +245,8 @@ Section HEPService.
   (** ... where jobs do not execute before their arrival. *)
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
 
-  (** Consider a JLFP policy that indicates a higher-or-equal priority
-      relation and assume that the relation is reflexive. *)
+  (** Consider a JLFP policy that indicates a higher-or-equal priority relation. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
   (** Consider an interval <<[t1, t2)>> ... *)
   Variables t1 t2 : instant.
@@ -257,6 +255,9 @@ Section HEPService.
   Variable j : Job.
   Hypothesis H_arrives :  arrives_in arr_seq j.
   Hypothesis H_t1_le_j_arr : t1 <= job_arrival j.
+
+  (** Assume that the reference job has at least its own priority. *)
+  Hypothesis H_j_self_priority : hep_job j j.
 
   (** We prove that the sum of the service during <<[t1, t2)>> of job
       [j] and the service of higher-or-equal priority jobs distinct
@@ -280,7 +281,7 @@ Section HEPService.
     { rewrite /service_of_jobs; erewrite big_pred1_seq => //.
       { move => j'; rewrite /pred1 //=.
         have [A|B] := eqVneq j' j; last by rewrite andbF.
-        by rewrite andbT; subst; apply H_priority_is_reflexive.
+        by rewrite andbT; subst; apply H_j_self_priority.
       }
     }
   Qed.

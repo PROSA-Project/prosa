@@ -163,7 +163,8 @@ Section BoundedBusyIntervals.
           + instantiate (1 := fun _ => blocking_bound ts tsk) => //=.
             by move=> jo t t' ARRo TSKo PREFo; apply: nonpreemptive_segments_bounded_by_blocking => //.
           + by done.
-        - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+        - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //;
+          first exact: H_priority_is_reflexive.
           by apply hep_workload_le_total_hep_rbf.
       Qed.
 
@@ -228,7 +229,8 @@ Section BoundedBusyIntervals.
             - by done.
             - lia.
           }
-          { rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+          { rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //;
+            first exact: H_priority_is_reflexive.
             by apply hep_workload_le_total_hep_rbf. }
         }
       Qed.

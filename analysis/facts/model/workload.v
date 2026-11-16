@@ -196,28 +196,29 @@ Section WorkloadFacts.
       jobs. *)
   Section HEPWorkload.
 
-    (** Consider a JLFP policy that indicates a higher-or-equal
-        priority relation and assume that the relation is
-        reflexive. *)
+    (** Consider a JLFP policy that indicates a higher-or-equal priority relation. *)
     Context {JLFP : JLFP_policy Job}.
-    Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
+
+    (** Consider a reference job that has at least its own priority. *)
+    Variable j : Job.
+    Hypothesis H_j_self_priority : hep_job j j.
 
     (** We prove that the sum of the workload of a job [j] and the
         workload of higher-or-equal priority jobs distinct from [j] is
         equal to the workload of higher-or-equal priority jobs. *)
     Lemma workload_job_and_ahep_eq_workload_hep :
-      forall (j : Job) (t1 t2 : instant),
+      forall t1 t2 : instant,
         workload_of_job arr_seq j t1 t2 + workload_of_other_hep_jobs arr_seq j t1 t2
         = workload_of_hep_jobs arr_seq j t1 t2.
     Proof.
-      move=> j t1 t2.
+      move=> t1 t2.
       rewrite /workload_of_job /workload_of_other_hep_jobs /workload_of_hep_jobs.
       rewrite [RHS](workload_of_jobs_case_on_pred _ _  (fun jhp => jhp != j)).
       have EQ: forall a b c d, a = b -> c = d -> a + c = b + d by lia.
       rewrite addnC; apply EQ; first by reflexivity.
       clear EQ; apply workload_of_jobs_equiv_pred => jo IN.
       have [EQ|NEQ] := eqVneq j jo.
-      { by subst; rewrite andbT; symmetry; apply H_priority_is_reflexive. }
+      { by subst; rewrite andbT; symmetry; apply H_j_self_priority. }
       by rewrite andbF.
     Qed.
 

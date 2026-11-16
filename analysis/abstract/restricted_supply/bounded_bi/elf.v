@@ -172,7 +172,8 @@ Section BoundedBusyIntervals.
           + instantiate (1 := fun (A : duration) => blocking_bound ts tsk A) => //=.
             by move=> jo t t' ARRo TSKo PREFo; apply: nonpreemptive_segments_bounded_by_blocking => //.
           + by done.
-        - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+        - rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //;
+          first exact: ELF_policy_is_reflexive.
           apply workload_of_jobs_bounded => //.
           move=> j'.
           move: H_job_of_tsk => /eqP <-.
@@ -240,7 +241,8 @@ Section BoundedBusyIntervals.
             - by done.
             - lia.
           }
-          { rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //.
+          { rewrite addnC cumulative_iw_hep_eq_workload_of_ohep workload_job_and_ahep_eq_workload_hep //;
+            first exact: ELF_policy_is_reflexive.
             apply workload_of_jobs_bounded => //.
             move=> j'.
             move: H_job_of_tsk => /eqP <-.
