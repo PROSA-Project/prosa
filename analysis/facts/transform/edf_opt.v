@@ -134,12 +134,10 @@ Section FindSwapCandidateFacts.
       by rewrite /earlier_deadline => s1 s2; apply leq_total.
     have TRANS: transitive earlier_deadline
       by rewrite /earlier_deadline => s1 s2 s3; apply leq_trans.
-    have REFL: reflexive earlier_deadline
-      by rewrite /earlier_deadline => s; apply leqnn.
     move: SCHED_j SCHED_j2. rewrite !scheduled_at_def => /eqP SCHED_j /eqP SCHED_j2.
     have ED: earlier_deadline (sched (find_swap_candidate sched t1 j1)) (sched t).
     {
-      move: (search_arg_extremum _ _ _ REFL TRANS TOTAL _ _ _ fsc_search_result) => MIN.
+      move: (search_arg_extremum _ _ _ TRANS TOTAL _ _ _ fsc_search_result) => MIN.
       apply (MIN t).
       - by apply /andP; split.
       - by rewrite /relevant_pstate SCHED_j.

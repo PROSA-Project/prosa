@@ -214,7 +214,7 @@ Section MaximalArrivalSequence.
         rewrite /next_max_arrival /jobs_remaining prefix_up_to_size.
         simpl (t.+1.-1).
         destruct supremum eqn:SUP; last by  move:(supremum_none _ _ SUP); rewrite map_cons.
-        eapply (supremum_spec _ leqnn leq_total leq_trans _ _ SUP).
+        eapply (supremum_spec _ leq_total leq_trans _ _ SUP).
         rewrite /suffix_sum prefix_up_to_size /max_arrivals_at.
         have -> : \sum_(t.+1 - Δ <= i < t.+1) nth 0 (maximal_arrival_prefix tsk i) i
                  = \sum_(t.+1 - Δ <= i < t.+1) nth 0 (maximal_arrival_prefix tsk t) i.

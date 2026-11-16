@@ -4,7 +4,7 @@ From mathcomp Require Import ssreflect ssrbool eqtype seq.
 
 (** This module provides a simple function [supremum] for the computation of a
     maximal element of a sequence, according to any given relation [R]. If the
-    relation [R] is reflexive, total, and transitive, the result of [supremum]
+    relation [R] is total and transitive, the result of [supremum]
     is indeed the supremum of the set of items in the sequence.  *)
 
 Section SelectSupremum.
@@ -85,11 +85,9 @@ Section SelectSupremum.
   (** To prove that [supremum] indeed computes the given sequence's supremum,
       we need to make additional assumptions on [R]. *)
 
-  (** (1) [R] is reflexive. *)
-  Hypothesis H_R_reflexive : reflexive R.
-  (** (2) [R] is total. *)
+  (** (1) [R] is total. *)
   Hypothesis H_R_total : total R.
-  (** (3) [R] is transitive. *)
+  (** (2) [R] is transitive. *)
   Hypothesis H_R_transitive : transitive R.
 
   (** Based on these assumptions, we show that the function [supremum] indeed
@@ -100,27 +98,19 @@ Section SelectSupremum.
       forall y,
         y \in s -> R x y.
   Proof.
-    move=> x s SOME_x.
-    move: x SOME_x (supremum_in _ _ SOME_x).
-    elim: s; first by done.
-    move=> s1 sn IH z SOME_z IN_z_s y.
-    move: SOME_z. rewrite supremum_unfold /choose_superior => SOME_z.
-    destruct (supremum sn) as [b|] eqn:SUPR; last first.
-    { apply supremum_none in SUPR; subst.
-      rewrite mem_seq1 => /eqP ->.
-      by injection SOME_z => ->. }
-    { rewrite in_cons => /orP [/eqP EQy | INy]; last first.
-      - have R_by: R b y
-          by apply IH => //; apply supremum_in.
-        apply: H_R_transitive R_by.
-        destruct (R s1 b) eqn:R_s1b;
-          by injection SOME_z => <-.
-      - move: IN_z_s; rewrite in_cons => /orP [/eqP EQz | INz];
-          first by subst.
-        move: (H_R_total s1 b) => /orP [R_s1b|R_bs1].
-        + move: SOME_z. rewrite R_s1b => SOME_z.
-          by injection SOME_z => EQ; subst.
-        + by destruct (R s1 b); injection SOME_z => EQ; subst. }
+    move=> x s; elim: s x => [|a s IH] x; first by rewrite /supremum.
+    rewrite supremum_unfold /choose_superior.
+    case E: (supremum s) => [b|].
+    - case AB: (R a b).
+      + move=> [<-] y; rewrite in_cons => /orP [/eqP ->|Ys].
+        * by move: (H_R_total a a); rewrite orbb.
+        * apply: H_R_transitive AB _.
+          exact: (IH b E y Ys).
+      + move=> [<-] y; rewrite in_cons => /orP [/eqP ->|Ys].
+        * by move: (H_R_total a b); rewrite AB /=.
+        * exact: (IH b E y Ys).
+    - move=> [<-] y; rewrite (supremum_none _ E) mem_seq1 => /eqP ->.
+      by move: (H_R_total a a); rewrite orbb.
   Qed.
 
 End SelectSupremum.

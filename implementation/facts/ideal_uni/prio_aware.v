@@ -25,9 +25,8 @@ Section PrioAwareUniprocessorScheduler.
   (** ... a preemption model, ... *)
   Context `{JobPreemptable Job}.
 
-  (** ... and reflexive, total, and transitive JLDP priority policy. *)
+  (** ... and a total and transitive JLDP priority policy. *)
   Context {JLDP : JLDP_policy Job}.
-  Hypothesis H_reflexive_priorities : reflexive_priorities JLDP.
   Hypothesis H_total : total_priorities JLDP.
   Hypothesis H_transitive : transitive_priorities JLDP.
 
@@ -121,7 +120,7 @@ Section PrioAwareUniprocessorScheduler.
     move=> j1 j2 t ARRIVES PREEMPT BACK_j1 SCHED_j2.
     case: (boolP (scheduled_at (uni_schedule arr_seq) j1 t)) => [SCHED_j1|NOT_SCHED_j1].
     { have <-: j1 = j2 by apply (ideal_proc_model_is_a_uniprocessor_model j1 j2 (uni_schedule arr_seq) t).
-      by apply H_reflexive_priorities. }
+      by move: (H_total t j1 j1); rewrite orbb. }
     { move: BACK_j1.
       have ->: backlogged (uni_schedule arr_seq) j1 t = backlogged (prefix t) j1 t.
       { apply backlogged_prefix_invariance' with (h := t) => //.

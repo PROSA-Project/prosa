@@ -170,8 +170,7 @@ Section ArgSearch.
       by injection x_is => <-; apply /andP; split.
   Qed.
 
-  (** Let us assume that [R] is a reflexive and transitive total order... *)
-  Hypothesis H_R_reflexive : reflexive R.
+  (** Let us assume that [R] is transitive and total... *)
   Hypothesis H_R_transitive : transitive R.
   Hypothesis H_R_total : total R.
 
@@ -199,7 +198,7 @@ Section ArgSearch.
         injection some_x_is => x_is; rewrite -{}x_is //;
         move: y_lt_Sn; rewrite ltnS;
         rewrite leq_eqVlt => /orP [/eqP EQ | y_lt_n].
-      + by rewrite EQ; apply (H_R_reflexive (f n)).
+      + by rewrite EQ; move: (H_R_total (f n) (f n)); rewrite orbb.
       + apply (H_R_transitive (f q)) => //.
         move: (IND q REC y) => HOLDS.
         apply HOLDS => //.
@@ -219,7 +218,7 @@ Section ArgSearch.
       move=> y /andP [a_le_y y_lt_Sn] Pfy.
       move: y_lt_Sn. rewrite ltnS.
       rewrite leq_eqVlt => /orP [/eqP EQ | y_lt_n].
-      + by rewrite -n_is EQ; apply (H_R_reflexive (f n)).
+      + by rewrite -n_is EQ; move: (H_R_total (f n) (f n)); rewrite orbb.
       + exfalso.
         move: REC. rewrite search_arg_none => NONE.
         move: (NONE y) => not_Pfy.
