@@ -30,17 +30,17 @@ Section FPPolicyFacts.
       hp_task (job_task j) (job_task j') -> @hep_job _ JLFP j j'.
   Proof. by move: H_policy_is_FP => [_ [PRIO _]] j j'; exact: PRIO. Qed.
 
-  (** FP-like job priorities are reflexive by definition. *)
+  (** Totality of FP-like job priorities implies reflexivity. *)
   Fact FP_policy_is_reflexive : reflexive_job_priorities JLFP.
-  Proof. by move: H_policy_is_FP => [_ [_ [REFL _]]]. Qed.
+  Proof. by move=> j; move: H_policy_is_FP => [_ [_ [_ /(_ j j)]]]; rewrite orbb. Qed.
 
   (** FP-like job priorities are transitive by definition. *)
   Fact FP_policy_is_transitive : transitive_job_priorities JLFP.
-  Proof. by move: H_policy_is_FP => [_ [_ [_ [TRANS _]]]]. Qed.
+  Proof. by move: H_policy_is_FP => [_ [_ [TRANS _]]]. Qed.
 
   (** FP-like job priorities are total by definition. *)
   Fact FP_policy_is_total : total_job_priorities JLFP.
-  Proof. by move: H_policy_is_FP => [_ [_ [_ [_ TOTAL]]]]. Qed.
+  Proof. by move: H_policy_is_FP => [_ [_ [_ TOTAL]]]. Qed.
 
 End FPPolicyFacts.
 

@@ -42,17 +42,17 @@ Section ELFBasicFacts.
     by move: H_policy_is_ELF => [_ [ELF _]] j j'; exact: ELF.
   Qed.
 
-  (** ELF priorities are reflexive. *)
+  (** Totality of ELF priorities implies reflexivity. *)
   Lemma ELF_policy_is_reflexive : reflexive_job_priorities JLFP.
-  Proof. by move: H_policy_is_ELF => [_ [_ [REFL _]]]. Qed.
+  Proof. by move=> j; move: H_policy_is_ELF => [_ [_ [_ /(_ j j)]]]; rewrite orbb. Qed.
 
   (** ELF priorities are transitive. *)
   Lemma ELF_policy_is_transitive : transitive_job_priorities JLFP.
-  Proof. by move: H_policy_is_ELF => [_ [_ [_ [TRANS _]]]]. Qed.
+  Proof. by move: H_policy_is_ELF => [_ [_ [TRANS _]]]. Qed.
 
   (** ELF priorities are total. *)
   Lemma ELF_policy_is_total : total_job_priorities JLFP.
-  Proof. by move: H_policy_is_ELF => [_ [_ [_ [_ TOTAL]]]]. Qed.
+  Proof. by move: H_policy_is_ELF => [_ [_ [_ TOTAL]]]. Qed.
 
   (** A job whose task has strictly higher priority has higher-or-equal job
       priority. *)
@@ -126,7 +126,6 @@ Section ELFBasicFacts.
     repeat split.
     - exact: ELF_policy_task_priority_order.
     - exact: ELF_policy_higher_priority_task.
-    - exact: ELF_policy_is_reflexive.
     - exact: ELF_policy_is_transitive.
     - exact: ELF_policy_is_total.
   Qed.

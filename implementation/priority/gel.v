@@ -44,7 +44,6 @@ Section PropertiesOfGEL.
   Proof.
     repeat split.
     - by move=> j1 j2; rewrite GEL_hep_job.
-    - exact: GEL_is_reflexive.
     - exact: GEL_is_transitive.
     - exact: GEL_is_total.
   Qed.

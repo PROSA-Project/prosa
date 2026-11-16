@@ -22,25 +22,25 @@ Section PriorityFacts.
         hep_job j j' -> job_deadline j <= job_deadline j'.
     Proof. by move: H_policy_is_EDF => [EDF _] j j'; exact: EDF. Qed.
 
-    (** The EDF policy is reflexive by assumption. *)
+    (** Totality of the EDF policy implies reflexivity. *)
     Fact EDF_policy_is_reflexive :
       reflexive_job_priorities JLFP.
     Proof.
-      by move: H_policy_is_EDF => [_ [REFL _]].
+      by move=> j; move: H_policy_is_EDF => [_ [_ /(_ j j)]]; rewrite orbb.
     Qed.
 
     (** The EDF policy is transitive by assumption. *)
     Fact EDF_policy_is_transitive :
       transitive_job_priorities JLFP.
     Proof.
-      by move: H_policy_is_EDF => [_ [_ [TRANS _]]].
+      by move: H_policy_is_EDF => [_ [TRANS _]].
     Qed.
 
     (** The EDF policy is total by assumption. *)
     Fact EDF_policy_is_total :
       total_job_priorities JLFP.
     Proof.
-      by move: H_policy_is_EDF => [_ [_ [_ TOTAL]]].
+      by move: H_policy_is_EDF => [_ [_ TOTAL]].
     Qed.
 
     (** A job with a strictly earlier deadline has higher-or-equal

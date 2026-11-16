@@ -65,7 +65,6 @@ Section TiebreakingEDF.
     repeat split.
     - move=> j1 j2; rewrite -EDF_hep_job.
       exact: tiebreaks_by_id_respects_primary_priority.
-    - exact: tiebreaking_edf_is_reflexive.
     - exact: tiebreaking_edf_is_transitive.
     - exact: tiebreaking_edf_is_total.
   Qed.

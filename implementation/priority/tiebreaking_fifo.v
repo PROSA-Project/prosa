@@ -65,7 +65,6 @@ Section TiebreakingFIFO.
     repeat split.
     - move=> j1 j2; rewrite -FIFO_hep_job.
       exact: tiebreaks_by_id_respects_primary_priority.
-    - exact: tiebreaking_fifo_is_reflexive.
     - exact: tiebreaking_fifo_is_transitive.
     - exact: tiebreaking_fifo_is_total.
   Qed.

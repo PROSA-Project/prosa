@@ -49,7 +49,6 @@ Section PropertiesOfEDF.
   Proof.
     repeat split.
     - by move=> j1 j2; rewrite EDF_hep_job.
-    - exact: EDF_is_reflexive.
     - exact: EDF_is_transitive.
     - exact: EDF_is_total.
   Qed.

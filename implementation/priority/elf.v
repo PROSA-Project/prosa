@@ -133,7 +133,6 @@ Section PropertiesOfELF.
       have -> : hp_task (job_task j1) (job_task j2) = false
         by apply/negbTE/ep_not_hp_task.
       by rewrite andTb orFb.
-    - by move=> j; move: (ELF_is_total j j); rewrite orbb.
     - exact: ELF_is_transitive.
     - exact: ELF_is_total.
   Qed.

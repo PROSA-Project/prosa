@@ -50,12 +50,11 @@ Section GELPolicy.
 
   (** A JLFP policy is GEL if it never assigns higher priority to a job with a
       later absolute priority point. Ties among jobs with equal priority points
-      may be resolved by any reflexive, transitive, and total tie-breaking
-      rule. *)
+      may be resolved by any transitive and total tie-breaking
+      rule. Reflexivity follows from totality. *)
   Definition policy_is_GEL (JLFP : JLFP_policy Job) :=
     (forall j1 j2, hep_job j1 j2 ->
                    (job_priority_point j1 <= job_priority_point j2)%R)
-    /\ reflexive_job_priorities JLFP
     /\ transitive_job_priorities JLFP
     /\ total_job_priorities JLFP.
 

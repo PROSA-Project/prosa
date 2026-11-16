@@ -80,7 +80,6 @@ Section TiebreakingELF.
     - move=> j1 j2 EP HEP.
       apply: (ELF_policy_priority_point_order (JLFP := ELF FP)) => //.
       exact: tiebreaks_by_id_respects_primary_priority.
-    - by move=> j; move: (tiebreaking_elf_is_total j j); rewrite orbb.
     - exact: tiebreaking_elf_is_transitive.
     - exact: tiebreaking_elf_is_total.
   Qed.

@@ -16,7 +16,8 @@ Section FPPolicy.
   (** Given an underlying FP policy, a JLFP policy behaves as an FP policy if
       it never inverts task-level priority, and every strict task-priority
       relation is reflected at the job level. Jobs of equal-priority tasks may
-      be ordered by any reflexive, transitive, and total tie-breaking rule. *)
+      be ordered by any transitive and total tie-breaking rule.
+      Reflexivity follows from totality. *)
   Definition policy_is_FP (FP : FP_policy Task) (JLFP : JLFP_policy Job) :=
     (forall j1 j2,
         hep_job j1 j2 ->
@@ -24,7 +25,6 @@ Section FPPolicy.
     /\ (forall j1 j2,
           hp_task (job_task j1) (job_task j2) ->
           hep_job j1 j2)
-    /\ reflexive_job_priorities JLFP
     /\ transitive_job_priorities JLFP
     /\ total_job_priorities JLFP.
 

@@ -66,7 +66,6 @@ Section TiebreakingGEL.
     repeat split.
     - move=> j1 j2; rewrite -GEL_hep_job.
       exact: tiebreaks_by_id_respects_primary_priority.
-    - exact: tiebreaking_gel_is_reflexive.
     - exact: tiebreaking_gel_is_transitive.
     - exact: tiebreaking_gel_is_total.
   Qed.

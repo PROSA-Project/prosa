@@ -45,7 +45,6 @@ Section Properties.
   Proof.
     repeat split.
     - by move=> j1 j2; rewrite FIFO_hep_job.
-    - exact: FIFO_is_reflexive.
     - exact: FIFO_is_transitive.
     - exact: FIFO_is_total.
   Qed.

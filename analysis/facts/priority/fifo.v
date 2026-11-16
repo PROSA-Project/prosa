@@ -29,20 +29,20 @@ Section PriorityFacts.
       hep_job j j' -> job_arrival j <= job_arrival j'.
   Proof. by move: H_policy_is_FIFO => [FIFO _] j j'; exact: FIFO. Qed.
 
-  (** The FIFO policy is reflexive by assumption. *)
+  (** Totality of the FIFO policy implies reflexivity. *)
   Fact FIFO_policy_is_reflexive :
     reflexive_job_priorities JLFP.
-  Proof. by move: H_policy_is_FIFO => [_ [REFL _]]. Qed.
+  Proof. by move=> j; move: H_policy_is_FIFO => [_ [_ /(_ j j)]]; rewrite orbb. Qed.
 
   (** The FIFO policy is transitive by assumption. *)
   Fact FIFO_policy_is_transitive :
     transitive_job_priorities JLFP.
-  Proof. by move: H_policy_is_FIFO => [_ [_ [TRANS _]]]. Qed.
+  Proof. by move: H_policy_is_FIFO => [_ [TRANS _]]. Qed.
 
   (** The FIFO policy is total by assumption. *)
   Fact FIFO_policy_is_total :
     total_job_priorities JLFP.
-  Proof. by move: H_policy_is_FIFO => [_ [_ [_ TOTAL]]]. Qed.
+  Proof. by move: H_policy_is_FIFO => [_ [_ TOTAL]]. Qed.
 
   (** Hence, a strictly earlier-arriving job has higher-or-equal priority. *)
   Fact FIFO_policy_earlier_arrival :
