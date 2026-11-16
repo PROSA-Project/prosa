@@ -41,11 +41,9 @@ Section JLFPInstantiation.
   Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Consider a JLFP-policy that indicates a higher-or-equal priority
-      relation, and assume that this relation is reflexive and
-      transitive. *)
+      relation, and assume that this relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** We also assume that the policy respects sequential tasks,
       meaning that later-arrived jobs of a task don't have higher
@@ -529,9 +527,6 @@ Section JLFPInstantiation.
         about abstract work-conservation also holds. *)
     Hypothesis H_work_conserving : work_conserving_cl.
 
-    (** Assume the scheduling policy under consideration is reflexive. *)
-    Hypothesis H_policy_reflexive : reflexive_job_priorities JLFP.
-
     (** In this section, we prove the correctness of interference
         inside the busy interval, i.e., we prove that if interference
         for a job is [false] then the job is scheduled and vice versa.
@@ -602,13 +597,9 @@ Section JLFPInstantiation.
       - exact: scheduled_implies_no_interference.
     Qed.
 
-    (** Next, in order to prove that these definitions of [I] and [IW]
-        are consistent with sequential tasks, we need to assume that
-        the policy under consideration respects sequential tasks. *)
-    Hypothesis H_policy_respects_sequential_tasks : policy_respects_sequential_tasks JLFP.
-
-    (** We prove that these definitions of [I] and [IW] are consistent
-        with sequential tasks. *)
+    (** Using the assumption that the policy respects sequential tasks, we
+        prove that these definitions of [I] and [IW] are consistent with
+        sequential tasks. *)
     Lemma instantiated_interference_and_workload_consistent_with_sequential_tasks :
       interference_and_workload_consistent_with_sequential_tasks arr_seq sched tsk.
     Proof.
@@ -621,7 +612,7 @@ Section JLFPInstantiation.
       move: NEQ => /andP [_ JAs].
       move: (BUSY) => [[ _ [QT [_ /andP [JAj _]]] _]].
       apply QT => //; first exact: in_arrivals_implies_arrived.
-      apply H_policy_respects_sequential_tasks; first by rewrite  TSK TSKs.
+      apply H_JLFP_respects_sequential_tasks; first by rewrite  TSK TSKs.
       by lia.
     Qed.
 

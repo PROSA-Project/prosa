@@ -33,11 +33,9 @@ Section BoundedBusyIntervals.
   Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority
-      relation, and assume that the relation is reflexive and
-      transitive. *)
+      relation, and assume that the relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.

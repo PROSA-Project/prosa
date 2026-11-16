@@ -78,7 +78,7 @@ Section TiebreakingFP.
     - exact: tiebreaks_by_id_respects_primary_priority.
     - move=> j1 j2 /andP [HEP STRICT].
       exact: tiebreaks_by_id_preserves_strict_priority.
-    - exact: tiebreaking_fp_is_reflexive.
+    - by move=> j; move: (tiebreaking_fp_is_total j j); rewrite orbb.
     - exact: tiebreaking_fp_is_transitive.
     - exact: tiebreaking_fp_is_total.
   Qed.

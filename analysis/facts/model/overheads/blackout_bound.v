@@ -10,13 +10,6 @@ Section TotalBlackoutDueToOverheadsBounded.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider a JLFP-policy that indicates a higher-or-equal priority
-      relation, and assume that this relation is reflexive and
-      transitive. *)
-  Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
-
   (** Consider any valid arrival sequence, ... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.

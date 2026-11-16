@@ -96,7 +96,7 @@ Section PropertiesOfELF.
     - by left; exact: hp_hep_trans.
     - by left; exact: hep_hp_trans HPyz.
     - right; apply /andP; split.
-      * exact: H_transitive_priorities.
+      * exact: H_transitive_priorities HPxy HEPyz.
       * exact: le_trans PPxy PPyz.
   Qed.
 
@@ -133,7 +133,7 @@ Section PropertiesOfELF.
       have -> : hp_task (job_task j1) (job_task j2) = false
         by apply/negbTE/ep_not_hp_task.
       by rewrite andTb orFb.
-    - exact: ELF_is_reflexive.
+    - by move=> j; move: (ELF_is_total j j); rewrite orbb.
     - exact: ELF_is_transitive.
     - exact: ELF_is_total.
   Qed.

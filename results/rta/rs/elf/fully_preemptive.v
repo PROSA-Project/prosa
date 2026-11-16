@@ -120,13 +120,8 @@ Section RTAforFullyPreemptiveELFModelwithArrivalCurves.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-  (** Consider an FP policy that indicates a higher-or-equal priority
-      relation, and assume that the relation is reflexive, transitive,
-      and total. *)
+  (** Consider an FP policy that indicates a higher-or-equal priority relation. *)
   Context (FP : FP_policy Task).
-  Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
-  Hypothesis H_transitive_priorities : transitive_task_priorities FP.
-  Hypothesis H_total_priorities : total_task_priorities FP.
 
   (** Assume that the schedule respects the ELF policy. *)
   Context {JLFP : JLFP_policy Job}.

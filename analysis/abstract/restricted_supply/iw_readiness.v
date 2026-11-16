@@ -42,10 +42,9 @@ Section IWInstantiation.
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
   (** Consider any JLFP policy and assume that the priority relation is
-      reflexive and transitive. *)
+      reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** * Interference and Interfering Workload *)
   (** In the following, we introduce definitions of interference and interfering

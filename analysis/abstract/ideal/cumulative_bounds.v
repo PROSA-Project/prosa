@@ -10,10 +10,9 @@ Section BusyIntervalInequalities.
   Context {Task : TaskType} {Job : JobType} `{JobTask Job Task}.
   Context `{JobArrival Job} `{JobCost Job} {JR : JobReady Job (ideal.processor_state Job)}.
 
-  (** Consider a JLFP policy that is reflexive and respects sequential tasks. *)
+  (** Consider a reflexive JLFP policy. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_policy_respecsts_sequential_tasks : policy_respects_sequential_tasks JLFP.
 
   (** Consider a consistent arrival sequence that does not contain duplicates. *)
   Variable arr_seq : arrival_sequence Job.

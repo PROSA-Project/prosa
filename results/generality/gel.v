@@ -172,9 +172,8 @@ Section GeneralityOfGEL.
     (** With the auxiliary lemma in place, we now state the main assumptions
         under which conditional generality can be shown. *)
 
-    (** Consider any given reflexive and total fixed-priority policy. *)
+    (** Consider any given total fixed-priority policy. *)
     Variable FP : FP_policy Task.
-    Hypothesis H_reflexive : reflexive_task_priorities FP.
     Hypothesis H_total : total_task_priorities FP.
 
     (** We require that the priorities of tasks that feature in the schedule are
@@ -258,7 +257,9 @@ Section GeneralityOfGEL.
             - by move: (RESPECTED j' j t ARR PT BL SCHED); rewrite hep_job_at_fp. }
           exact: (backlogged_job_has_lower_gel_prio _ _ sched t). }}
       { rewrite hep_job_at_fp.
-        case: (boolP (same_task j' j)); first by rewrite /same_task => /eqP ->.
+        case: (boolP (same_task j' j)); first by
+          rewrite /same_task => /eqP ->;
+          rewrite -(orbb (hep_task (job_task j) (job_task j))); apply: H_total.
         move=> DIFF; apply: contraT; rewrite not_hep_hp_task // => HFP.
         have FIN: completed_by sched j (job_arrival j + `|pp_delta (job_task j') (job_task j)|);
           first by exact: H_hp_delta_rtb.

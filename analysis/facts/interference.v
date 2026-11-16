@@ -34,10 +34,9 @@ Section InterferenceProperties.
   (** ... and any schedule. *)
   Variable sched : schedule PState.
 
-  (** Consider a reflexive FP policy and a JLFP policy that behaves like it. *)
+  (** Consider an FP policy and a JLFP policy that behaves like it. *)
   Context {FP : FP_policy Task} {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_FP : policy_is_FP FP JLFP.
-  Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
 
   (** We observe that any higher-priority job must come from a task with
       either higher or equal priority. *)
@@ -129,10 +128,8 @@ Section InterferencePropertiesJLFP.
   Variable tsk : Task.
 
   (** In the following, consider a JLFP-policy that indicates a
-      higher-or-equal priority relation, and assume that this relation
-      is reflexive and transitive. *)
+      higher-or-equal priority relation. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
   (** First, we prove a few rewriting rules under the assumption that
       there is no supply. *)

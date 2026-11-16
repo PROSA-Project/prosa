@@ -31,9 +31,8 @@ Section PriorityInversionIsBounded.
   Variable sched : schedule PState.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
-      and assume that the relation is reflexive and transitive. *)
+      and assume that the relation is transitive. *)
   Context {JLFP : JLFP_policy Job}.
-  Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
   Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** And assume that they define a valid preemption model with

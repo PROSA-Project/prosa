@@ -60,12 +60,6 @@ Section GeneralityOfELF.
 
   Section ELFGeneralizesFixedPriority.
 
-    (** Assume that the underlying task-priority relation has the usual order
-        properties. *)
-    Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
-    Hypothesis H_transitive_priorities : transitive_task_priorities FP.
-    Hypothesis H_total_priorities : total_task_priorities FP.
-
     (** Consider a JLFP policy that behaves as an ELF policy. *)
     Context {JLFP : JLFP_policy Job}.
     Hypothesis H_policy_is_ELF : policy_is_ELF FP JLFP.

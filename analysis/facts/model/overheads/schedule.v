@@ -110,11 +110,9 @@ Section ScheduledInBusyPrefix.
   Context `{JobCost Job}.
 
   (** Consider a JLFP-policy that indicates a higher-or-equal priority
-      relation, and assume that this relation is reflexive and
-      transitive. *)
+      relation, and assume that this relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Consider any arrival sequence with consistent non-duplicate arrivals. *)
   Variable arr_seq : arrival_sequence Job.

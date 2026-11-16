@@ -127,13 +127,8 @@ Section RTAforLimitedPreemptiveELFModelwithArrivalCurves.
   Hypothesis H_schedule_with_limited_preemptions :
     schedule_respects_preemption_model arr_seq sched.
 
-  (** Consider an FP policy that indicates a higher-or-equal priority
-      relation, and assume that the relation is reflexive, transitive
-      and total. *)
+  (** Consider an FP policy that indicates a higher-or-equal priority relation. *)
   Context (FP : FP_policy Task).
-  Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
-  Hypothesis H_transitive_priorities : transitive_task_priorities FP.
-  Hypothesis H_total_priorities : total_task_priorities FP.
 
   (** Assume that the schedule respects the ELF policy. *)
   Context {JLFP : JLFP_policy Job}.

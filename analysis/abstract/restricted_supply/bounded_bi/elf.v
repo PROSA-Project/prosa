@@ -32,13 +32,8 @@ Section BoundedBusyIntervals.
   Hypothesis H_unit_supply_proc_model : unit_supply_proc_model PState.
   Hypothesis H_consumed_supply_proc_model : fully_consuming_proc_model PState.
 
-  (** Consider an FP policy that indicates a higher-or-equal priority
-      relation, and assume that the relation is reflexive, transitive.
-      and total. *)
+  (** Consider an FP policy that indicates a higher-or-equal priority relation. *)
   Context (FP : FP_policy Task).
-  Hypothesis H_priority_is_reflexive : reflexive_task_priorities FP.
-  Hypothesis H_priority_is_transitive : transitive_task_priorities FP.
-  Hypothesis H_total_priorities : total_task_priorities FP.
 
   (** Assume ELF scheduling. *)
   Context {JLFP : JLFP_policy Job}.

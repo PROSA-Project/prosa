@@ -172,10 +172,6 @@ Section BasicLemmas.
     (** Assume the arrival times are consistent. *)
     Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
 
-    (** Assume that the schedule follows the FIFO policy at preemption time. *)
-    Hypothesis H_respects_policy_at_preemption_point :
-      respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
-
     (** Assume the schedule is valid. *)
     Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 

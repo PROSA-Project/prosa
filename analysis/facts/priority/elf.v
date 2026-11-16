@@ -16,13 +16,8 @@ Section ELFBasicFacts.
   (** ... and jobs of these tasks. *)
   Context {Job : JobType} `{JobTask Job Task} `{JobCost Job} {AR : JobArrival Job}.
 
-  (** Consider any arbitrary FP policy ... *)
+  (** Consider any arbitrary FP policy. *)
   Context {FP : FP_policy Task}.
-
-  (** ... that is reflexive, transitive, and total. *)
-  Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
-  Hypothesis H_transitive_priorities : transitive_task_priorities FP.
-  Hypothesis H_total_priorities : total_task_priorities FP.
 
   (** Assume ELF scheduling. *)
   Context {JLFP : JLFP_policy Job}.
@@ -118,7 +113,8 @@ Section ELFBasicFacts.
   Proof.
     move=> j j' /eqP SAME LT.
     apply: ELF_policy_earlier_priority_point.
-    - by rewrite SAME; exact: eq_reflexive.
+    - rewrite SAME /ep_task andbb.
+      exact/ELF_policy_task_priority_order/ELF_policy_is_reflexive.
     - by rewrite /job_priority_point/jpp_from_tpp SAME; lia.
   Qed.
 
@@ -186,7 +182,8 @@ Section ELFBasicFacts.
       have: (job_priority_point j2 <= job_priority_point j1)%R;
         last by rewrite /job_priority_point/jpp_from_tpp SAME; lia.
       apply: ELF_policy_priority_point_order => //.
-      by rewrite SAME; exact: eq_reflexive.
+      rewrite SAME /ep_task andbb.
+      exact/ELF_policy_task_priority_order/ELF_policy_is_reflexive.
     Qed.
 
   End ELFImpliesSequentialTasks.

@@ -130,9 +130,8 @@ Section ExistsBusyIntervalJLFP.
     (** Assume that the schedule is work-conserving ... *)
     Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
-    (** ... and the priority relation is reflexive and transitive. *)
+    (** ... and the priority relation is reflexive. *)
     Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-    Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
     (** Consider any busy interval prefix <<[t1, t2)>>. *)
     Variable t1 t2 : instant.
@@ -341,9 +340,8 @@ Section ExistsBusyIntervalJLFP.
     Hypothesis H_arrival_sequence_is_a_set :
       arrival_sequence_uniq arr_seq.
 
-    (** ... and the priority relation is reflexive and transitive. *)
+    (** ... and the priority relation is reflexive. *)
     Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-    Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
     (** Next, we recall the notion of workload of all jobs released in
         a given interval <<[t1, t2)>> that have higher-or-equal

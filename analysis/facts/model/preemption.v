@@ -347,11 +347,9 @@ Section PreemptionFacts.
   Qed.
 
   (** Consider a JLFP-policy that indicates a higher-or-equal priority
-      relation, and assume that this relation is reflexive and
-      transitive. *)
+      relation, and assume that this relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
 
   (** Assume that the schedule is valid... *)
   Hypothesis H_valid_schedule : valid_schedule sched arr_seq.

@@ -115,9 +115,7 @@ Section AbstractRTAforELFwithArrivalCurves.
       ELF policy is... *)
   Variable FP : FP_policy Task.
 
-  (** ... reflexive, transitive, and total. *)
-  Hypothesis H_reflexive_priorities : reflexive_task_priorities FP.
-  Hypothesis H_transitive_priorities : transitive_task_priorities FP.
+  (** ... total. *)
   Hypothesis H_total_priorities : total_task_priorities FP.
 
   (** We further assume that the schedule complies with the preemption model ... *)
