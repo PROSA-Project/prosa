@@ -137,6 +137,15 @@ Section PI.
 
   (** ** Cumulative Priority Inversion *)
 
+  (** We can express cumulative priority inversion directly in terms of
+      individual instants. This form lets us use the usual rules for sums
+      when reasoning about intervals. *)
+  Lemma cumulative_priority_inversion_def :
+    forall t1 t2,
+      cumulative_priority_inversion arr_seq sched j t1 t2
+      = \sum_(t1 <= t < t2) priority_inversion arr_seq sched j t.
+  Proof. by []. Qed.
+
   (** We observe that the cumulative priority inversion (CPI) that job
       [j] incurs in an interval <<[t1, t2)>> can be split arbitrarily and is equal
       to the sum of CPI in an interval <<[t1, t_mid)>> and CPI in an interval
@@ -150,8 +159,12 @@ Section PI.
         + cumulative_priority_inversion arr_seq sched j t_mid t2.
   Proof.
     move=> t_mid t1 t2 LE1 LE2.
-    rewrite /cumulative_priority_inversion (index_iota_cat t_mid) ?big_cat //.
+    rewrite !cumulative_priority_inversion_def (index_iota_cat t_mid) ?big_cat //.
     by apply/andP; split.
   Qed.
 
 End PI.
+
+(** We let basic proof automation unfold a job's inversion bound so that
+    bounds on tasks can discharge obligations about individual jobs. *)
+#[export] Hint Unfold priority_inversion_of_job_is_bounded_by : basic_rt_facts.

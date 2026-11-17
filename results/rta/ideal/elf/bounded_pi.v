@@ -219,6 +219,7 @@ Section AbstractRTAforELFwithArrivalCurves.
     priority_inversion_is_bounded_by arr_seq sched tsk priority_inversion_bound.
   Proof.
     move=> j ARR TSK POS t1 t2 BUSY_PREF.
+    rewrite -/(cumulative_priority_inversion arr_seq sched j t1 t2).
     have [-> //|/andP[_ /hasP[jlp jlp_at_t1 nHEPj]]]:
       cumulative_priority_inversion arr_seq sched j t1 t2 = 0 \/ priority_inversion arr_seq sched j t1
       by apply: busy_interval_pi_cases.

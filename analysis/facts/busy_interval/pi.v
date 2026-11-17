@@ -690,12 +690,12 @@ Section PriorityInversionIsBounded.
       cumulative_priority_inversion arr_seq sched j t1 ppt.
     Proof.
       have [LEQ|LT_t1t2] := leqP t1 t2;
-        last by rewrite /cumulative_priority_inversion big_geq //; exact: ltnW.
+        last by rewrite !cumulative_priority_inversion_def big_geq //; exact: ltnW.
       have [LEQ_t2ppt|LT] := leqP t2 ppt;
         first by rewrite (cumulative_priority_inversion_cat _ _ _ t2 t1 ppt) //
                  ; exact: leq_addr.
       move: (H_busy_interval_prefix) => [_ [_ [_ /andP [T _]]]].
-      rewrite /cumulative_priority_inversion (@big_cat_nat _ _ _ ppt) //=.
+      rewrite !cumulative_priority_inversion_def (@big_cat_nat _ _ _ ppt) //=.
       rewrite -[X in _ <= X]addn0 leq_add2l leqn0.
       rewrite big_nat_cond big1 // => t /andP[/andP[GEt LEt] _].
       apply/eqP; rewrite eqb0.

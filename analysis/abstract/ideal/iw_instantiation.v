@@ -221,7 +221,7 @@ Section JLFPInstantiation.
         + cumulative_another_hep_job_interference arr_seq sched j t1 t2.
   Proof.
     rewrite /cumulative_interference /cumul_cond_interference /cond_interference /interference.
-    move=> j t1 t2; rewrite -big_split //=.
+    move=> j t1 t2; rewrite cumulative_priority_inversion_def -big_split //=.
     apply/eqP; rewrite eqn_leq; apply/andP; split; rewrite leq_sum//.
     { move => t _; unfold ideal_jlfp_interference.
       by destruct (priority_inversion _ _ _ _), (another_hep_job_interference arr_seq sched j t).
@@ -249,10 +249,9 @@ Section JLFPInstantiation.
       = cumulative_priority_inversion arr_seq sched j t1 t2
         + cumulative_other_hep_jobs_interfering_workload arr_seq j t1 t2.
   Proof.
-    rewrite /cumulative_interfering_workload
-            /cumulative_priority_inversion
-            /cumulative_other_hep_jobs_interfering_workload.
-    by move => j t1 t2; rewrite -big_split //=.
+    move=> j t1 t2.
+    by rewrite /cumulative_interfering_workload cumulative_priority_inversion_def
+               /cumulative_other_hep_jobs_interfering_workload -big_split.
   Qed.
 
   (** Let [j] be any job of task [tsk]. Then the cumulative task
@@ -270,7 +269,7 @@ Section JLFPInstantiation.
         + cumulative_another_task_hep_job_interference arr_seq sched j t1 t2.
   Proof.
     move=> j t1 R ARR TSK NCOMPL.
-    rewrite /cumul_task_interference /cumul_cond_interference.
+    rewrite /cumul_task_interference /cumul_cond_interference cumulative_priority_inversion_def.
     rewrite -big_split //= big_seq_cond [leqRHS]big_seq_cond.
     apply leq_sum => t /andP [IN _].
     rewrite /cond_interference /nonself /interference /ideal_jlfp_interference.

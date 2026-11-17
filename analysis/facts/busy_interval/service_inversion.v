@@ -558,7 +558,7 @@ Section ServiceInversionIsBounded.
           { rewrite (service_inversion_cat _ _ _ _ _ pt) //
                     -{2}[_ _ _ j t1 pt]addn0 leq_add2l
                     (leqRW (cumul_service_inv_le_cumul_priority_inv _ _ _ _ _ _ _ _ _ _))//  leqn0.
-            rewrite /cumulative_priority_inversion big_nat_cond; apply/eqP; apply big1 => t /andP [NEQ3 _]; apply/eqP.
+            rewrite cumulative_priority_inversion_def big_nat_cond; apply/eqP; apply big1 => t /andP [NEQ3 _]; apply/eqP.
             by rewrite eqb0; apply: no_priority_inversion_after_preemption_point => //; lia. } }
         rewrite (leqRW LEQ) (leqRW (no_preemption_impl_service_inv_bounded j _ jlp _ _ _ _ _ )) //; clear LEQ.
         { move=> t /andP [NEQ1 NEQ2]; apply/negP => PTt.

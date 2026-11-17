@@ -80,9 +80,9 @@ Section CondPI.
         ~~ hep_job j' j ->
         P j'.
     { move=> SUFF.
-      apply: eq_in_has => j' => SCHED'.
-      have [_|NHEP] := boolP (hep_job j' j); first by rewrite andFb.
-      by rewrite andTb SUFF. }
+      apply: eq_in_has => j' SCHED' /=.
+      have [_|NHEP] := boolP (hep_job j' j); first by rewrite andbF.
+      by rewrite andbT SUFF. }
     { apply => j' SCHED' NHEP.
       move: SCHED'; rewrite scheduled_jobs_at_iff // => SCHED''.
       have PI: priority_inversion arr_seq sched j t by apply /uni_priority_inversion_P.

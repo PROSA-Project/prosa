@@ -90,11 +90,12 @@ Section PriorityInversionIsBounded.
     priority_inversion_is_bounded_by arr_seq sched tsk blocking_bound.
   Proof.
     move=> j ARR TSK POS t1 t2 PREF.
+    rewrite -/(cumulative_priority_inversion arr_seq sched j t1 t2).
     move: (PREF) => [_ [_ [_ /andP [T _]]]].
     move: H_valid_schedule => [COARR MBR].
     have [NEQ|NEQ] := boolP ((t2-t1) <= blocking_bound (job_arrival j - t1)).
     { apply leq_trans with (t2 -t1) => [|//].
-      rewrite /cumulative_priority_inversion.
+      rewrite cumulative_priority_inversion_def.
       rewrite -[X in _ <= X]addn0 -[t2 - t1]mul1n -iter_addn -big_const_nat.
       by rewrite leq_sum //; move=> t _; destruct (priority_inversion). }
     have [ppt [PPT' /andP[GE LE]]]: exists ppt : instant,
@@ -105,7 +106,7 @@ Section PriorityInversionIsBounded.
     apply leq_trans with (cumulative_priority_inversion arr_seq sched j t1 ppt).
     - by apply: priority_inversion_occurs_only_till_preemption_point =>//.
     - apply leq_trans with (ppt - t1).
-      + rewrite /cumulative_priority_inversion -[X in _ <= X]addn0 -[ppt - t1]mul1n
+      + rewrite cumulative_priority_inversion_def -[X in _ <= X]addn0 -[ppt - t1]mul1n
                 -iter_addn -big_const_nat.
         by rewrite leq_sum //; move=> t _; case: priority_inversion.
       + rewrite leq_subLR.
