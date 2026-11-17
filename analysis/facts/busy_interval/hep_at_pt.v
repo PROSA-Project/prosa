@@ -319,8 +319,8 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
         edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point as [jlp [_ [HEP SCHEDjhp]]] => //.
         { by apply /andP; split; last by apply leq_ltn_trans with t. }
         enough (EQ : jhp = jlp); first by subst.
-        apply: (H_uni _ _ _ prt); eauto;
-          by apply SCH; apply/andP; split.
+        apply: H_uni; last exact: SCHEDjhp.
+        by apply SCH; apply/andP; split.
       - move: E => /eqP /neqP E; rewrite -lt0n subn_gt0 in E.
         apply negbNE; apply/negP; intros LP; rename jhp into jlp.
         edestruct not_quiet_implies_exists_scheduled_hp_job_at_preemption_point
@@ -328,7 +328,7 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
         * by apply/andP; split.
         * move: LP => /negP LP; apply: LP.
           enough (EQ : jhp = jlp); first by subst.
-          apply: (H_uni jhp _ _ tp); eauto.
+          apply: H_uni; first exact: SCHEDjhp.
           by apply SCH; apply/andP; split; first apply leq_trans with t1; auto. }
     repeat split=> //.
     move: (H_busy_interval_prefix) => [SL [QUIET [NOTQUIET EXj]]]; move: (Sched_jhp) => PENDING.

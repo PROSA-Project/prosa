@@ -93,7 +93,7 @@ Section RTAforFullyPreemptiveFIFOModelwithArrivalCurves.
       \sum_(tsko <- ts) task_request_bound_function tsko (job_arrival j - t1 + ε) - task_cost tsk.
   Proof.
     move: (H_busy_window) => [[_ [_ [_ /andP [ARR1 ARR2]]]] _].
-    rewrite (cumulative_i_ohep_eq_service_of_ohep _ arr_seq) => //; last  eauto 6 with basic_rt_facts.
+    rewrite (cumulative_i_ohep_eq_service_of_ohep _ arr_seq) => //.
     { by move: (H_busy_window) => [[_ [Q _]] _]. }
     apply: leq_trans; first by apply service_of_jobs_le_workload => //.
     apply: leq_trans;

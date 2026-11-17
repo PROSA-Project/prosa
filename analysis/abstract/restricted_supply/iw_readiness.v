@@ -117,7 +117,7 @@ Section IWInstantiation.
             [rewrite eqb0 no_hep_ready_implies_no_another_hep_interference
             | rewrite eqb0 no_hep_ready_implies_no_service_inversion]. }
         { rewrite orbF addn0.
-          have A: forall (a b : bool), (a -> ~~ b) -> a + b <= a || b by lia.
+          have A: forall (a b : bool), (a -> ~~ b) -> a + b <= a || b by clear; lia.
           apply A =>
             /hasP [jhp /served_at_and_receives_service_consistent SERVjo /andP[HEPjo _]].
           have SCHEDjo : scheduled_at sched jhp t by apply service_at_implies_scheduled_at.
@@ -126,9 +126,9 @@ Section IWInstantiation.
             /andP[_ /hasP[jlp /served_at_and_receives_service_consistent SERVjlp NOTHEPjlp]].
           rewrite hep_job_at_jlfp in NOTHEPjlp.
           have SCHEDjlp : scheduled_at sched jlp t by apply service_at_implies_scheduled_at.
-          have NEQ : jlp != jhp by apply /negP => /eqP ?; subst jlp; lia.
+          have NEQ : jlp != jhp by apply /negP => /eqP ?; subst jlp; clear -HEPjo NOTHEPjlp; lia.
           apply scheduled_job_at_neq with (j' := jhp) in SCHEDjlp => //=.
-          by lia.
+          by clear -SCHEDjo SCHEDjlp; lia.
         }
       }
     }
@@ -172,23 +172,23 @@ Section IWInstantiation.
     have [SUP|NOSUP] := boolP (has_supply sched t); last first.
     { by move: (NOSUP); rewrite /is_blackout => -> //=; rewrite andbT andbF //. }
     { move: (SUP); rewrite /is_blackout => ->; rewrite andbT //=.
-      have [NO_HEP_READY | SOME_HEP_READY] := boolP(some_hep_job_ready arr_seq sched j t); try by lia.
+      have [NO_HEP_READY | SOME_HEP_READY] := boolP(some_hep_job_ready arr_seq sched j t); try by clear; lia.
       rewrite orbF addn0.
       rewrite /service_inversion NO_HEP_READY.
       have [IDLE | [j' SCHED]]:= scheduled_at_cases arr_seq ltac:(done) sched ltac:(done) ltac:(done) t.
       { rewrite_neg idle_implies_no_service_inversion;
         rewrite_neg no_hep_job_interference_when_idle;
         rewrite_neg no_hep_task_interference_when_idle.
-        by lia. }
+        by clear; lia. }
       { case SERVtsk : task_served_at => //=.
-        case: pred.service_inversion; try by lia.
+        case: pred.service_inversion; try by clear; lia.
         move: SERVtsk => /negbT.
         erewrite task_served_at_eq_job_of_task => //.
         erewrite interference_ahep_def => //.
         erewrite interference_athep_def => //.
         rewrite /another_hep_job /another_task_hep_job.
         rewrite orbF addn0 /job_of_task => ->.
-        by lia.
+        by clear; lia.
       } }
   Qed.
 
@@ -544,7 +544,7 @@ Section IWInstantiation.
       move: (BUSY) => [[ _ [QT [_ /andP [JAj _]]] _]].
       apply QT => //; first exact: in_arrivals_implies_arrived.
       apply H_policy_respects_sequential_tasks; first by rewrite  TSK TSKs.
-      by apply leq_trans with t1; [lia |].
+      by apply leq_trans with t1; [clear -JAs; lia |].
     Qed.
 
     (** Finally, we show that cumulative interference (I) never exceeds

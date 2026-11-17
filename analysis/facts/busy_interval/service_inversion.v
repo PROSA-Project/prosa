@@ -172,7 +172,7 @@ Section ServiceInversion.
       move=> /andP [NSERV /hasP [s IN LP]]; apply/andP; split.
       { apply/negP => INj; rewrite scheduled_jobs_at_iff in INj => //.
         have EQ : s = j.
-        { apply: H_uniprocessor_proc_model => //.
+        { apply: H_uniprocessor_proc_model; last exact: INj.
           by eapply service_at_implies_scheduled_at, served_at_and_receives_service_consistent. }
         by subst; move: LP => /negP LP; apply: LP; apply H_priority_is_reflexive. }
       { apply/hasP; exists s => //.

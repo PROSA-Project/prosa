@@ -88,9 +88,9 @@ Section ScheduleChangesBoundedHelper.
     { by apply/orP; left; rewrite /priority_bump SCHED1 SCHED2. }
     have [COMPL | NCOMP] := boolP (completed_by sched j1 t).
     { apply/orP; right; apply/hasP; exists j1.
-      { by apply scheduled_at_iff_scheduled_job in SCHED1; apply: arrivals_up_to_scheduled_at => //; lia. }
+      { by apply scheduled_at_iff_scheduled_job in SCHED1; apply: arrivals_up_to_scheduled_at => //; clear -POS; lia. }
       { apply/andP; split => //.
-        have ->: t == 0 = false by lia.
+        have ->: t == 0 = false by clear -POS; lia.
         by rewrite orbF; apply scheduled_implies_not_completed => //; apply scheduled_at_iff_scheduled_job.
       }
     }
@@ -119,8 +119,8 @@ Section ScheduleChangesBoundedHelper.
       number_schedule_changes sched t1.+1 t
       <= size [seq to <- index_iota t1.+1 t | priority_bump sched to || some_job_completes_at to].
   Proof.
-    intros; rewrite /number_schedule_changes !size_filter; apply sub_count_seq => x IN.
-    by apply: schedule_change_caused_by_bump_or_completion => //; rewrite mem_index_iota in IN; lia.
+    move=> t NEQ; rewrite /number_schedule_changes !size_filter; apply sub_count_seq => x IN.
+    by apply: schedule_change_caused_by_bump_or_completion => //; rewrite mem_index_iota in IN; clear -IN NEQ; lia.
   Qed.
 
   (** ** LP and HEP completions are bounded   *)
@@ -166,10 +166,10 @@ Section ScheduleChangesBoundedHelper.
     { apply leq_trans with 0; last by done.
       rewrite leqn0; apply/eqP; rewrite big_seq_cond; apply big1 => jlp2 /andP [ARR2 LP2].
       apply/eqP; rewrite eqb0; apply/negP => COMP.
-      apply scheduled_at_precedes_completes_at in COMP; last by lia.
+      apply scheduled_at_precedes_completes_at in COMP; last by clear -NEQ; lia.
       rewrite [scheduled_at _ _ _ ]Bool.negb_involutive_reverse in COMP.
       move: COMP => /negP SCHED; apply: SCHED.
-      by apply: lower_priority_jobs_never_scheduled_if_no_inversion => //; lia.
+      by apply: lower_priority_jobs_never_scheduled_if_no_inversion => //; clear -NEQ H_t_in_busy_prefix; lia.
     }
     { move: (PI) => /andP [NINS /hasP [jlp INlp LP]]; rewrite scheduled_jobs_at_iff in INlp => //=.
       have [COMPL | NCOMP] := boolP (completes_at sched jlp to); last first.
@@ -182,7 +182,7 @@ Section ScheduleChangesBoundedHelper.
         { by apply: only_one_pi_job; (try exact BUSY) => //; (try move : NEQ H_t_in_busy_prefix; clear; lia). }
         by subst; rewrite COMP in NCOMP.
       }
-      { apply leq_trans with 1; first by apply only_one_job_completes_at_a_time => //; lia.
+      { apply leq_trans with 1; first by apply only_one_job_completes_at_a_time => //; clear -NEQ; lia.
         rewrite lt0b; apply/andP; split.
         { move: (COMPL) => SCHED.
           apply scheduled_at_precedes_completes_at, scheduled_at_iff_scheduled_job in SCHED; last by move: NEQ; clear; lia.
@@ -190,11 +190,12 @@ Section ScheduleChangesBoundedHelper.
           have [jh [SCHEDh HEPh]] : exists ja, scheduled_at sched ja to /\ hep_job ja j.
           { eapply completetion_time_is_preemption_time in COMPL => //.
             by edestruct not_quiet_implies_exists_scheduled_hp_job_after_preemption_point
-              with (t1 := t1) (t2 := t2) (t := to) (tp := to) as [jhp [FF TT]] => //; [lia | lia | exists jhp; split; eapply TT].
+              with (t1 := t1) (t2 := t2) (t := to) (tp := to) as [jhp [FF TT]] => //;
+              [clear -NEQ H_t_in_busy_prefix; lia | clear -NEQ H_t_in_busy_prefix; lia | exists jhp; split; eapply TT].
           }
           apply scheduled_at_iff_scheduled_job in SCHEDh; rewrite SCHEDh; apply/negP => HEPlh.
           by move: LP  => /negP LP; apply: LP; apply: H_priority_is_transitive => //. }
-        { by apply/hasP; exists jlp; [ apply: arrivals_up_to_scheduled_at => //; lia | ]. }
+        { by apply/hasP; exists jlp; [ apply: arrivals_up_to_scheduled_at => //; clear -NEQ; lia | ]. }
       }
     }
   Qed.
@@ -213,11 +214,11 @@ Section ScheduleChangesBoundedHelper.
     apply big1 => jlp LP.
     apply/eqP; rewrite eqb0; apply/negP => COMPL.
     move: (H_busy_interval_prefix) => [_ [_ [NQT _]]].
-    move: (NQT t2.-1 ltac:(lia)); apply => jhp ARR HEP _.
-    apply scheduled_at_precedes_completes_at in COMPL; last by lia.
+    move: (NQT t2.-1 ltac:(clear -NEQ H_t_in_busy_prefix; lia)); apply => jhp ARR HEP _.
+    apply scheduled_at_precedes_completes_at in COMPL; last by clear -NEQ; lia.
     apply: completion_monotonic
       ; last eapply no_later_arrival_hep_job_is_scheduled with (j2 := jlp) (t := to.-1) => //
-      ; [by lia | exact: FIFO_policy_arrival_order |].
+      ; [by clear -NEQ H_t_in_busy_prefix; lia | exact: FIFO_policy_arrival_order |].
     rewrite always_higher_priority_jlfp.
     apply/andP; split => //.
     by move: LP; apply: contraNN.
@@ -292,13 +293,13 @@ Section ScheduleChangesBoundedHelper.
       case PB: (priority_bump sched to) => //; rewrite lt0n sum_nat_seq_neq0 /=.
       edestruct priority_bump_implies_hp_arrival_in_prefix as [jhp [SCHED ARR]]; last first.
       { by apply/hasP; exists jhp; [exact: ARR | rewrite SCHED]. }
-      all: try apply H_busy_interval_prefix; try apply PB; try done; lia.
+      all: try apply H_busy_interval_prefix; try apply PB; try done; clear -NEQto H_t_in_busy_prefix; lia.
     }
     { rewrite exchange_big [leqRHS]big_mkcond //= big_seq [leqRHS]big_seq //=.
       apply leq_sum => jhp ARR; rewrite IF.
       have [LP|HP] := boolP (hep_job jhp j); last first.
       { rewrite leqn0 big_nat_cond big1 // => to /andP [NEQto PB].
-        by apply/eqP; rewrite eqb0; apply: lp_job_should_arrive_early_for_pi => //; lia.
+        by apply/eqP; rewrite eqb0; apply: lp_job_should_arrive_early_for_pi => //; clear -NEQto H_t_in_busy_prefix; lia.
       }
       { rewrite big_mkcond //=; move_neq_up GT; apply sum_ge_2_nat in GT; last first.
         { by intros; destruct priority_bump, (scheduled_at sched) => //. }
@@ -307,18 +308,18 @@ Section ScheduleChangesBoundedHelper.
             (priority_bump sched to2) eqn:PB, (scheduled_at sched jhp to2) eqn:SCHED2 => //.
         clear EQ1 EQ2; move: PB; apply scheduled_at_iff_scheduled_job in SCHED2; rewrite /priority_bump SCHED2.
         have [jo SCHEDo] : exists jo, scheduled_at sched jo to2.-1
-            by apply: job_scheduled_in_busy_interval_prefix => //=; lia.
+            by apply: job_scheduled_in_busy_interval_prefix => //=; clear -LE1 LE2 LE3 H_t_in_busy_prefix; lia.
         apply scheduled_at_iff_scheduled_job in SCHEDo; rewrite SCHEDo => /negP HEP; apply: HEP.
         apply scheduled_at_iff_scheduled_job in SCHEDo.
         eapply priority_higher_than_pending_job_priority with (t1 := to1) (t2 := to2) (t := to2.-1) => //.
         { by apply scheduled_at_iff_scheduled_job in SCHED2. }
-        { intros; rewrite H_basic_readiness /pending; apply/andP; split.
+        { move=> t' NEQ; rewrite H_basic_readiness /pending; apply/andP; split.
           - rewrite /has_arrived; eapply has_arrived_scheduled in SCHED1 => //.
-            by rewrite /has_arrived in SCHED1; lia.
+            by rewrite /has_arrived in SCHED1; clear -SCHED1 NEQ; lia.
           - clear SCHEDo SCHED1; apply scheduled_at_iff_scheduled_job in SCHED2.
-            by eapply incompletion_monotonic; [ | apply scheduled_implies_not_completed => //]; lia.
+            by eapply incompletion_monotonic; [ | apply scheduled_implies_not_completed => //]; clear -NEQ; lia.
         }
-        { lia. }
+        { clear -LE2; lia. }
       }
     }
   Qed.
@@ -332,7 +333,7 @@ Section ScheduleChangesBoundedHelper.
     move=> FIFO; apply/eqP; rewrite -leqn0; move_neq_up POS.
     move: POS; rewrite -has_predT => /hasP [pb]; rewrite mem_filter => /andP [PB IN] _.
     move: IN; rewrite mem_index_iota => IN.
-    eapply no_priority_bumps_in_fifo with (t := pb) in FIFO => //; last by lia.
+    eapply no_priority_bumps_in_fifo with (t := pb) in FIFO => //; last by clear -IN H_t_in_busy_prefix; lia.
     by move: FIFO; rewrite PB.
   Qed.
 
