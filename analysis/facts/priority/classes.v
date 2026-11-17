@@ -77,15 +77,22 @@ Section BasicLemmas.
 
 End BasicLemmas.
 
-(** In this section, we prove a basic consequence of total job-level
-    fixed-priority relations. *)
-Section TotalJLFPProperties.
+(** In this section, we prove basic consequences of reflexive and total
+    job-level fixed-priority relations. *)
+Section JLFPProperties.
 
   (** Consider any type of jobs ... *)
   Context {Job : JobType}.
 
   (** ... and any JLFP policy. *)
   Context {JLFP : JLFP_policy Job}.
+
+  (** We expose job self-priority so automation can apply reflexivity facts
+      to individual comparisons. *)
+  Lemma hep_job_refl :
+    reflexive_job_priorities JLFP ->
+    forall j, hep_job j j.
+  Proof. by []. Qed.
 
   (** If a job does not have higher-or-equal priority than another job, then
       totality gives the priority relation in the opposite direction. *)
@@ -99,7 +106,7 @@ Section TotalJLFPProperties.
     by rewrite (negbTE NHEP).
   Qed.
 
-End TotalJLFPProperties.
+End JLFPProperties.
 
 (** In the following section, we establish properties of [hp_task] and [ep_task] auxiliary
     priority relations defined for FP policies. They are useful in proving properties of the
@@ -293,5 +300,6 @@ End FPRemarks.
     able to apply it automatically. *)
 Global Hint Resolve
   respects_sequential_tasks
+  hep_job_refl
   total_priority_not_hep_job
   : basic_rt_facts.
