@@ -104,13 +104,12 @@ Section Schedulability.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
   Hypothesis H_all_jobs_from_taskset : all_jobs_from_taskset arr_seq ts.
 
-  (** ... under a given total, transitive, reflexive, and antisymmetric JLFP
+  (** ... under a given total, transitive, and antisymmetric JLFP
       scheduling policy whose relative job priorities are consistent across
       hyperperiods. *)
   Context (policy : JLFP_policy Job).
   Hypothesis H_total_priorities : total_job_priorities policy.
   Hypothesis H_transitive_priorities : transitive_job_priorities policy.
-  Hypothesis H_reflexive_priorities : reflexive_job_priorities policy.
   Hypothesis H_antisymmetric_priorities : antisymmetric_job_priorities policy arr_seq.
   Hypothesis H_priority_shift_invariant :
     priorities_consistent_across_hyperperiods ts arr_seq policy.
