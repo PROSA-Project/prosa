@@ -1,5 +1,5 @@
 From mathcomp Require Export ssreflect ssrbool eqtype ssrnat seq fintype bigop div ssrfun.
-Require Export prosa.util.list prosa.util.tactics prosa.util.subadditivity.
+Require Export prosa.util.list prosa.util.tactics.
 
 (** * Additional Lemmas about [divn] and [modn] *)
 
@@ -60,7 +60,7 @@ Lemma div_ceil_monotone1 :
 Proof.
   move=> d m n LEQ; rewrite /div_ceil.
   have LEQd := leq_div2r d LEQ.
-  case Dm: (d %| m); case Dn: (d %| n) => //; first exact: leqW LEQd.
+  case Dm: (d %| m); case Dn: (d %| n) => //.
   rewrite ltn_divRL //.
   apply: leq_trans _ LEQ.
   by rewrite ltn_neqAle -dvdn_eq Dm leq_divM.
