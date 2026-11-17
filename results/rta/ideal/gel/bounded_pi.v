@@ -189,18 +189,20 @@ Section AbstractRTAforGELwithArrivalCurves.
             (arrivals_between arr_seq t1
                `|Num.max 0%R (t1%:R + interval tsk_o A)%R|).
       Proof.
-        have BOUNDED: `|Num.max 0%R (t1%:R + interval tsk_o A)%R| <= t1 + Δ by lia.
+        have BOUNDED: `|Num.max 0%R (t1%:R + interval tsk_o A)%R| <= t1 + Δ
+          by clear -H_Δ_ge; lia.
         rewrite (workload_of_jobs_nil_tail _ _ BOUNDED) // => j' IN' ARR'.
         rewrite /GEL_from.
         case: (eqVneq (job_task j') tsk_o) => TSK'; last by rewrite andbF.
         rewrite andbT; apply: contraT  => /negPn HEP.
-        move: (hep_job_arrives_after_zero H_policy_is_GEL j j' HEP) => GT0.
         move: (hep_job_arrives_before H_policy_is_GEL j j' HEP) => EARLIEST.
         move: H_job_of_tsk; rewrite /job_of_task => /eqP TSK.
         move: ARR'; rewrite /interval  => LATEST.
         have LATEST': ((t1 + A + 1)%:R + task_priority_point tsk
-                       - task_priority_point tsk_o <= (job_arrival j')%:R)%R by lia.
-        by move: LATEST'; rewrite -TSK -TSK' => LATEST'; lia.
+                       - task_priority_point tsk_o <= (job_arrival j')%:R)%R
+          by clear -LATEST; lia.
+        move: LATEST'; rewrite -TSK -TSK' => LATEST'.
+        by clear -LATEST' EARLIEST; lia.
       Qed.
 
     End ShortenRange.
@@ -215,12 +217,12 @@ Section AbstractRTAforGELwithArrivalCurves.
       have [LEQ|LT] := leqP Δ `|Num.max 0%R (interval tsko A)|;
         first by apply: rbf_spec' => // ? /andP[].
       apply: leq_trans;
-        first by apply: total_workload_shorten_range => //; lia.
+        first by apply: total_workload_shorten_range => //; clear -LT; lia.
       have [POS0|NEG] := lerP 0%R (interval tsko A).
       - have -> : `|Num.max 0%R (t1%:R + interval tsko A)%R|
-          = t1 + `|interval tsko A| by lia.
+          = t1 + `|interval tsko A| by clear -POS0; lia.
         by apply: rbf_spec' => // ? /andP[].
-      - by rewrite arrivals_between_geq /workload_of_jobs ?big_nil//; lia.
+      - by rewrite arrivals_between_geq /workload_of_jobs ?big_nil//; clear -NEG; lia.
     Qed.
 
   End HepWorkloadBound.
