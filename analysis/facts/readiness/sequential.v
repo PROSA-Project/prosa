@@ -34,9 +34,9 @@ Section SequentialTasksReadiness.
     by move=> sched j t; rewrite H_basic_sequential_readiness => /andP [_ PRIOR].
   Qed.
 
-  (** Consider any valid schedule of [arr_seq]. *)
+  (** Consider any schedule that respects job readiness. *)
   Variable sched : schedule PState.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** Consider an FP policy that indicates a reflexive
       higher-or-equal priority relation. *)

@@ -127,9 +127,10 @@ Section Schedulability.
       these jobs under a basic readiness model (i.e., without self-suspensions
       or release jitter). *)
   Variable sched : schedule (ideal.processor_state Job).
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Context {RM : JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_basic_readiness : basic_readiness RM.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   #[local] Existing Instance fully_preemptive_job_model.
   Hypothesis H_respects_policy :
@@ -148,6 +149,7 @@ Section Schedulability.
       reference_job_ready RM) => //.
     - exact: periodic_check_valid_periods.
     - apply: uni_schedule_valid; exact: basic_readiness_nonclairvoyance.
+    - apply: uni_schedule_respects_job_readiness; exact: basic_readiness_nonclairvoyance.
     - apply: uni_schedule_work_conserving => //.
       exact: basic_readiness_nonclairvoyance.
     - exact: periodic_check_no_overload.

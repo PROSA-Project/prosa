@@ -149,15 +149,13 @@ Section ELFBasicFacts.
     Context {PState : ProcessorState Job}.
     Hypothesis H_uniproc : uniprocessor_model PState.
 
-    (** Next, consider any schedule of the arrival sequence, ... *)
+    (** Next, consider any valid schedule of the arrival sequence, ... *)
     Variable sched : schedule PState.
+    Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-    (** ... allow for any work-bearing notion of job readiness, ... *)
+    (** ... and allow for any work-bearing notion of job readiness. *)
     Context {RM : JobReady Job PState}.
     Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-    (** ... and assume that the schedule is valid. *)
-    Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
     (** Consider any valid preemption model. *)
     Context `{JobPreemptable Job}.

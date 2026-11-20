@@ -62,7 +62,8 @@ Section RTAforFullyNonPreemptiveEDFModelwithArrivalCurves.
 
   (** Next, consider any valid ideal non-preemptive uniprocessor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
 
   (** ... assume that the schedule is work-conserving,... *)

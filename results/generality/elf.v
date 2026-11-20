@@ -104,7 +104,7 @@ Section GeneralityOfELF.
 
     (** Then in any given valid schedule ... *)
     Variable sched : schedule PState.
-    Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+    Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
     (** ... in which tasks execute sequentially, ... *)
     Hypothesis H_sequential : sequential_tasks arr_seq sched.

@@ -108,9 +108,12 @@ Section AbstractRTAforFIFOwithArrivalCurves.
   (** *** The Schedule *)
 
   (** Finally, consider any arbitrary, valid ideal uniprocessor schedule of the
-      given arrival sequence [arr_seq] (and hence the given task set [ts]). *)
+      given arrival sequence [arr_seq] (and hence the given task set [ts]) ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+
+  (** ... in which jobs execute only if they are ready. *)
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** We assume that the schedule complies with the preemption model ... *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.

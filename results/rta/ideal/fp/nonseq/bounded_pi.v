@@ -57,7 +57,7 @@ Section AbstractRTAforFPwithArrivalCurves.
   (** We consider a valid, ideal uniprocessor schedule that follows a
       work-bearing readiness model. *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
 

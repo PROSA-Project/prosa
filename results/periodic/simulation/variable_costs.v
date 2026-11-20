@@ -74,9 +74,13 @@ Section PeriodicSimulationSustainability.
   (** Both schedules must be valid under their respective cost and readiness
       models. *)
   Hypothesis H_valid_reference_schedule :
-    @valid_schedule _ _ _ sched_reference job_cost_reference job_ready_reference arr_seq.
+    @valid_schedule_of_arrivals _ _ _ sched_reference job_cost_reference arr_seq.
+  Hypothesis H_reference_respects_job_readiness :
+    @respects_job_readiness _ _ _ sched_reference job_cost_reference job_ready_reference.
   Hypothesis H_valid_variable_schedule :
-    @valid_schedule _ _ _ sched_variable job_cost_variable job_ready_variable arr_seq.
+    @valid_schedule_of_arrivals _ _ _ sched_variable job_cost_variable arr_seq.
+  Hypothesis H_variable_respects_job_readiness :
+    @respects_job_readiness _ _ _ sched_variable job_cost_variable job_ready_variable.
 
   (** Both schedules must be work-conserving, but for different reasons. Work
       conservation in the reference schedule supports the finite simulation

@@ -53,9 +53,18 @@ Section PrioAwareUniprocessorScheduler.
 
   (** Second, we similarly note that schedule validity is also maintained. *)
   Corollary uni_schedule_valid :
-    valid_schedule schedule arr_seq.
+    valid_schedule_of_arrivals schedule arr_seq.
   Proof.
     apply np_schedule_valid => //.
+    move=> t jobs j.
+    by apply supremum_in.
+  Qed.
+
+  (** The schedule also respects the given readiness model. *)
+  Corollary uni_schedule_respects_job_readiness :
+    respects_job_readiness schedule.
+  Proof.
+    apply: jobs_must_be_ready => //.
     move=> t jobs j.
     by apply supremum_in.
   Qed.

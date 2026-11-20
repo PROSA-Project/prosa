@@ -30,7 +30,7 @@ This project targets Rocq *non*-experts. Accordingly, great emphasis is placed o
 2. For case a case analysis of `foo`, use `foo_cases` as the lemma name.
 3. For a basic lemma that is intended as a rewriting rule to avoid unfolding a definition `foo` directly, use `foo_def` as the lemma name.
 4. Consistently name predicates that express that something "is valid" (i.e., satisfies basic assumptions) as `valid_*` or `respects_*`.
-Examples: `valid_schedule`, `taskset_respects_sporadic_task_model`.
+Examples: `valid_schedule_of_arrivals`, `taskset_respects_sporadic_task_model`.
 5. Consistently name sections that define what it means to be valid w.r.t. to some concept `Foo` as `ValidFoo`.
 Examples: `ValidSchedule`,  `ValidTask`, `ValidJobOfTask`, `ValidJobsOfTask`.
 6. Job parameters are always prefixed with `job_`.

@@ -511,9 +511,6 @@ Section JLFPInstantiation.
     Context {RM : JobReady Job (ideal.processor_state Job)}.
     Hypothesis H_work_bearing_readiness : work_bearing_readiness RM arr_seq sched.
 
-    (** Assume that the schedule is valid and work-conserving. *)
-    Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-
     (** Note that we differentiate between abstract and classical
         notions of work-conserving schedule. *)
     Let work_conserving_ab := definitions.work_conserving arr_seq sched.

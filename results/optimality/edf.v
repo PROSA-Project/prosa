@@ -38,20 +38,21 @@ Section Optimality.
       then there also exists an EDF schedule in which all deadlines are met. *)
   Theorem EDF_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
-       valid_schedule any_sched arr_seq
+       valid_schedule_of_arrivals any_sched arr_seq
+       /\ respects_job_readiness any_sched
        /\ all_deadlines_of_arrivals_met arr_seq any_sched) ->
     exists edf_sched : schedule (ideal.processor_state Job),
-      valid_schedule edf_sched arr_seq
+      valid_schedule_of_arrivals edf_sched arr_seq
+      /\ respects_job_readiness edf_sched
       /\ all_deadlines_of_arrivals_met arr_seq edf_sched
       /\ EDF_schedule edf_sched.
   Proof.
-    move=> [sched [[COME READY] DL_ARR_MET]].
-    have ARR  := jobs_must_arrive_to_be_ready sched READY.
-    have COMP := completed_jobs_are_not_ready sched READY.
+    move=> [sched [[COME [ARR COMP]] [READY DL_ARR_MET]]].
     move: (all_deadlines_met_in_valid_schedule _ _ COME DL_ARR_MET) => DL_MET.
     set sched' := edf_transform sched.
-    exists sched'. split; last split.
+    exists sched'. split; last split; last split.
     - by apply edf_schedule_is_valid.
+    - by apply: (edf_schedule_respects_job_readiness _ arr_seq).
     - by apply edf_schedule_meets_all_deadlines_wrt_arrivals.
     - by apply edf_transform_ensures_edf.
   Qed.
@@ -62,29 +63,32 @@ Section Optimality.
       met. *)
   Theorem EDF_WC_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
-        valid_schedule any_sched arr_seq
+        valid_schedule_of_arrivals any_sched arr_seq
+        /\ respects_job_readiness any_sched
         /\ all_deadlines_of_arrivals_met arr_seq any_sched) ->
     exists edf_wc_sched : schedule (ideal.processor_state Job),
-      valid_schedule edf_wc_sched arr_seq
+      valid_schedule_of_arrivals edf_wc_sched arr_seq
+      /\ respects_job_readiness edf_wc_sched
       /\ all_deadlines_of_arrivals_met arr_seq edf_wc_sched
       /\ work_conserving arr_seq edf_wc_sched
       /\ EDF_schedule edf_wc_sched.
   Proof.
-    move=> [sched [[COME READY] DL_ARR_MET]].
+    move=> [sched [[COME [ARR COMP]] [READY DL_ARR_MET]]].
     move: (all_deadlines_met_in_valid_schedule _ _ COME DL_ARR_MET) => DL_MET.
     set wc_sched := wc_transform arr_seq sched.
     have wc_COME : jobs_come_from_arrival_sequence wc_sched arr_seq
       by apply wc_jobs_come_from_arrival_sequence.
-    have wc_READY : jobs_must_be_ready_to_execute wc_sched
-      by apply wc_jobs_must_be_ready_to_execute.
+    have wc_READY : respects_job_readiness wc_sched
+      by apply wc_respects_job_readiness.
     have wc_ARR := jobs_must_arrive_to_be_ready wc_sched wc_READY.
     have wc_COMP := completed_jobs_are_not_ready wc_sched wc_READY.
     have wc_DL_ARR_MET : all_deadlines_of_arrivals_met arr_seq wc_sched
       by apply wc_all_deadlines_of_arrivals_met; apply DL_ARR_MET.
     move: (all_deadlines_met_in_valid_schedule _ _ wc_COME wc_DL_ARR_MET) => wc_DL_MET.
     set sched' := edf_transform wc_sched.
-    exists sched'. split; last split; last split.
+    exists sched'. split; last split; last split; last split.
     - by apply edf_schedule_is_valid.
+    - by apply: (edf_schedule_respects_job_readiness _ arr_seq).
     - by apply edf_schedule_meets_all_deadlines_wrt_arrivals.
     - apply edf_transform_maintains_work_conservation; by [ | apply wc_is_work_conserving ].
     - by apply edf_transform_ensures_edf.
@@ -107,18 +111,19 @@ Section Optimality.
       [EDF_WC_optimality] theorem. *)
   Corollary EDF_priority_compliant_WC_optimality :
     (exists any_sched : schedule (ideal.processor_state Job),
-        valid_schedule any_sched arr_seq
+        valid_schedule_of_arrivals any_sched arr_seq
+        /\ respects_job_readiness any_sched
         /\ all_deadlines_of_arrivals_met arr_seq any_sched) ->
     exists priority_compliant_sched : schedule (ideal.processor_state Job),
-      valid_schedule priority_compliant_sched arr_seq
+      valid_schedule_of_arrivals priority_compliant_sched arr_seq
+      /\ respects_job_readiness priority_compliant_sched
       /\ all_deadlines_of_arrivals_met arr_seq priority_compliant_sched
       /\ work_conserving arr_seq priority_compliant_sched
       /\ respects_JLFP_policy_at_preemption_point arr_seq priority_compliant_sched (EDF Job).
   Proof.
-    move /EDF_WC_optimality => [edf_sched [[ARR READY] [DL_MET [WC EDF]]]].
+    move /EDF_WC_optimality => [edf_sched [VALID [READY [DL_MET [WC EDF]]]]].
     exists edf_sched.
-    apply (EDF_schedule_equiv H_basic_readiness arr_seq) in EDF => //.
-    exact: (completed_jobs_are_not_ready edf_sched READY).
+    by apply (EDF_schedule_equiv H_basic_readiness arr_seq) in EDF.
   Qed.
 
 End Optimality.

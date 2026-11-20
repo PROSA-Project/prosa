@@ -335,7 +335,7 @@ Section EDFPrefixWorkConservationLemmas.
   Proof.
     rewrite/sched_trans/edf_transform_prefix. apply (prefix_map_property_invariance ). rewrite /P.
     move=> sched' t  [[H_ARR [H_COMPLETED [H_COME H_all_deadlines_met]]] H_wc_sched].
-    rewrite/scheduled_behavior_premises/valid_schedule; split; first split.
+    rewrite/scheduled_behavior_premises; split; first split.
     - by apply mea_jobs_must_arrive.
     - split; last split.
       + by apply mea_completed_jobs.
@@ -368,7 +368,10 @@ Section EDFTransformWorkConservationLemmas.
 
   (** ... consider a valid ideal uniprocessor schedule ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+
+  (** ... in which jobs execute only if they are ready ... *)
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** ...and in which no scheduled job misses a deadline. *)
   Hypothesis H_no_deadline_misses : all_deadlines_met sched.
@@ -376,8 +379,7 @@ Section EDFTransformWorkConservationLemmas.
   (** We first note that [sched] satisfies [scheduled_behavior_premises]. *)
   Lemma sched_satisfies_behavior_premises : scheduled_behavior_premises arr_seq sched.
   Proof.
-    split; [ apply (jobs_must_arrive_to_be_ready sched) | split; [ apply (completed_jobs_are_not_ready sched) | split]].
-    all: by try apply H_sched_valid.
+    by repeat split.
   Qed.
 
   (** We prove that, if the given schedule [sched] is work-conserving, then the

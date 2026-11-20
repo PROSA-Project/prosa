@@ -124,7 +124,8 @@ Section RTAforFloatingELFModelwithArrivalCurves.
       uniprocessor schedule with limited preemptions of the given
       arrival sequence [arr_seq] (and hence the given task set [ts]). *)
   Variable sched : schedule PState.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_schedule_with_limited_preemptions :
     schedule_respects_preemption_model arr_seq sched.

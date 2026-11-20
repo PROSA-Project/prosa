@@ -86,9 +86,9 @@ Section FromSequentialReadiness.
   Context {JR : JobReady Job PState}.
   Hypothesis H_sequential : sequential_readiness JR arr_seq.
 
-  (** ... then in any valid schedule of the arrival sequence ... *)
+  (** ... then in any schedule that respects job readiness ... *)
   Variable sched : schedule PState.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** ... all tasks execute sequentially. *)
   Lemma sequential_tasks_from_readiness :

@@ -21,10 +21,11 @@ Section PriorityInversionIsBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and any uniprocessor schedule of this arrival sequence. *)
+  (** ... and any valid uniprocessor schedule of this arrival sequence. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uni : uniprocessor_model PState.
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
@@ -41,10 +42,7 @@ Section PriorityInversionIsBounded.
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
-  (** We assume that the schedule is valid ... *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
-
-  (** ... and that the schedule respects the scheduling policy at every
+  (** Assume that the schedule respects the scheduling policy at every
       preemption point. *)
   Hypothesis H_respects_policy :
     respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
@@ -122,9 +120,9 @@ Section PriorityInversionIsBounded.
       exfalso.
       have PP := scheduling_of_any_segment_starts_with_preemption_time _
                    arr_seq H_valid_arrivals
-                   sched H_sched_valid
+                   sched _ _
                    H_valid_preemption_model jlp t H_jlp_scheduled_at_t.
-      feed PP => //.
+      feed_n 3 PP => //.
       move: PP => [pt [/andP [NEQ1 NEQ2] [PT FA]]].
       contradict PT.
       apply /negP.
@@ -593,7 +591,6 @@ Section PriorityInversionIsBounded.
               && job_preemptable jlp pt.
           { have ARRs: arrives_in arr_seq jlp by [].
             move: (proj2 (H_valid_model_with_bounded_nonpreemptive_segments) jlp ARRs) =>[_ EXPP].
-            destruct H_sched_valid as [A B].
             specialize (EXPP (service jlp t1)).
             feed EXPP.
             { apply/andP; split=> [//|].

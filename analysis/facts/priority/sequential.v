@@ -26,15 +26,13 @@ Section SequentialJLFP.
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniproc : uniprocessor_model PState.
 
-  (** Next, consider any schedule of the arrival sequence, ... *)
+  (** Next, consider any valid schedule of the arrival sequence, ... *)
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-  (** ... allow for any work-bearing notion of job readiness, ... *)
+  (** ... and allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)
@@ -43,11 +41,8 @@ Section SequentialJLFP.
   (** ... and assume that it defines a valid preemption model. *)
   Hypothesis H_valid_preemption_model : valid_preemption_model arr_seq sched.
 
-  (** Next, we assume that the schedule respects the scheduling policy at every preemption point... *)
+  (** Next, assume that the schedule respects the scheduling policy at every preemption point. *)
   Hypothesis H_respects_policy : respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
-
-  (** ... and that jobs must arrive to execute. *)
-  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
 
   (** We show that, given two jobs [j1] and [j2], if job [j1] arrives
       no later than job [j2] and [j1] always has higher priority than

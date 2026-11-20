@@ -118,15 +118,15 @@ Section ScheduledInBusyPrefix.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider a schedule, ... *)
+  (** Next, consider a valid schedule, ... *)
   Variable sched : schedule (overheads.processor_state Job).
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** ... allow for any work-bearing notion of job readiness, ... *)
   Context {RM : JobReady Job (overheads.processor_state Job)}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
 
-  (** ... and assume that the schedule is valid and work-conserving. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  (** ... and assume that the schedule is work-conserving. *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** Consider an arbitrary job [j] with positive cost. *)

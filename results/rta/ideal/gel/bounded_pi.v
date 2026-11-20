@@ -42,7 +42,7 @@ Section AbstractRTAforGELwithArrivalCurves.
 
   (** We consider a valid, ideal uniprocessor schedule... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** ... that respects the GEL policy at every preemption point. *)
   Context {JLFP : JLFP_policy Job}.

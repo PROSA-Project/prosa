@@ -15,35 +15,23 @@ Section PriorityBump.
   Context `{JobArrival Job}.
   Context `{JobCost Job}.
 
-  (** Consider a JLFP-policy that indicates a higher-or-equal priority
-      relation, and assume that this relation is reflexive and
-      transitive. *)
+  (** Consider a JLFP-policy with a reflexive higher-or-equal priority relation. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
-  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
-
-  (** We assume the basic model of readiness. *)
-  Context {RM : JobReady Job (overheads.processor_state Job)}.
-  Hypothesis H_basic_readiness : basic_readiness RM.
 
   (** Consider any valid arrival sequence... *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any explicit-overhead uni-processor schedule of this
+  (** ... and any valid explicit-overhead uni-processor schedule of this
       arrival sequence. *)
   Variable sched : schedule (overheads.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
-  Hypothesis H_work_conserving : work_conserving arr_seq sched.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Assume that the preemption model is valid. *)
   Context `{JobPreemptable Job}.
   Hypothesis H_valid_preemption_model :
     valid_preemption_model arr_seq sched.
-
-  (** Assume that the schedule respects the JLFP policy. *)
-  Hypothesis H_respects_policy :
-    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** If a priority bump occurs at time [t], then [t] is a preemption time. *)
   Lemma priority_bump_implies_preemption_time :
@@ -70,6 +58,18 @@ Section PriorityBump.
       by apply/negP => SCHED; apply scheduled_at_iff_scheduled_job in SCHED; rewrite SCHED in SCHED1.
     }
   Qed.
+
+  (** For the following results, assume that priorities are transitive. *)
+  Hypothesis H_priority_is_transitive : transitive_job_priorities JLFP.
+
+  (** We assume the basic model of readiness. *)
+  Context {RM : JobReady Job (overheads.processor_state Job)}.
+  Hypothesis H_basic_readiness : basic_readiness RM.
+
+  (** Assume that the schedule is work-conserving and respects the JLFP policy. *)
+  Hypothesis H_work_conserving : work_conserving arr_seq sched.
+  Hypothesis H_respects_policy :
+    respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 
   (** Consider an arbitrary job [j] with positive cost. *)
   Variable j : Job.
@@ -99,8 +99,8 @@ Section PriorityBump.
     exists jhp; split; try done.
     apply arrived_between_implies_in_arrivals => //; apply/andP; split.
     { by move: ARR => /andP []; lia. }
-    { apply valid_schedule_implies_jobs_must_arrive_to_execute in H_valid_schedule.
-      apply H_valid_schedule in SCHED.
+    { apply valid_schedule_of_arrivals_implies_jobs_must_arrive_to_execute in H_valid_schedule_of_arrivals.
+      apply H_valid_schedule_of_arrivals in SCHED.
       by unfold has_arrived in *; lia.
     }
   Qed.

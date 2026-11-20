@@ -173,19 +173,17 @@ Section SequentialEDF.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any schedule of this arrival sequence, ... *)
+  (** Next, consider any valid schedule of this arrival sequence, ... *)
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** ... assume EDF scheduling, ... *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
 
-  (** ... allow for any work-bearing notion of job readiness, ... *)
+  (** ... and allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)

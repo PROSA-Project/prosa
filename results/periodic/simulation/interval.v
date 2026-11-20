@@ -81,11 +81,11 @@ Section SimulationInterval.
   Context {job_ready_model : JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_basic_readiness : basic_readiness job_ready_model.
 
-  (** In the following, we analyze a given well-formed, _work-conserving_
+  (** In the following, we analyze a given valid, _work-conserving_
       schedule of the workload on an ideal uniprocessor. *)
   #[local] Existing Instance ideal.processor_state.
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** Importantly, we make no assumption on which scheduling policy was used to
@@ -458,7 +458,7 @@ Section SimulationInterval.
       rewrite /execution_repeats_at !service_at_def.
       case SCHED: (sched t) => [j'|] -> //=.
       move /eqP: SCHED; rewrite -scheduled_at_def =>
-           /(valid_schedule_jobs_come_from_arrival_sequence sched arr_seq H_valid_schedule) ARR'.
+           /(valid_schedule_of_arrivals_jobs_come_from_arrival_sequence sched arr_seq H_valid_schedule_of_arrivals) ARR'.
       apply: congr1; rewrite !eqE /=.
       apply/idP/idP; last by move/eqP=> ->; rewrite eqxx.
       move/eqP/(congr1 (prev_hyperperiod_job ts arr_seq)).
@@ -749,7 +749,7 @@ Section SimulationInterval.
           (start + hyperperiod ts + elapsed).
     Proof.
       move=> start elapsed j START [NCI NCI_NEXT] LT REPEAT /[dup] SCHED
-        /(valid_schedule_jobs_come_from_arrival_sequence sched arr_seq H_valid_schedule) ARR.
+        /(valid_schedule_of_arrivals_jobs_come_from_arrival_sequence sched arr_seq H_valid_schedule_of_arrivals) ARR.
       apply: jlfp_pending_highest_priority_job_is_scheduled => //.
       - by rewrite /preemption_time;
           case: (scheduled_job_at arr_seq sched (start + hyperperiod ts + elapsed)).

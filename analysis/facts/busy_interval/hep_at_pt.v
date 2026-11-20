@@ -20,10 +20,11 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and any uniprocessor schedule of this arrival sequence. *)
+  (** ... and any valid uniprocessor schedule of this arrival sequence. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uni : uniprocessor_model PState.
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
@@ -39,9 +40,6 @@ Section ProcessorBusyWithHEPJobAtPreemptionPoints.
   (** Further, allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** We assume that the schedule is valid and that all jobs come from the arrival sequence. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
@@ -245,10 +243,11 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and any uniprocessor schedule of this arrival sequence. *)
+  (** ... and any valid uniprocessor schedule of this arrival sequence. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uni : uniprocessor_model PState.
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
@@ -264,9 +263,6 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
   (** Further, allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** We assume that the schedule is valid. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** Next, we assume that the schedule is work-conserving ... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
@@ -311,8 +307,8 @@ Section ProcessorBusyWithHEPJobAfterPreemptionPoints.
     have HP: hep_job jhp j.
     { have PP := scheduling_of_any_segment_starts_with_preemption_time _
                    arr_seq  H_valid_arrivals
-                   sched H_sched_valid H_valid_preemption_model jhp t Sched_jhp.
-      feed PP => //.
+                   sched _ _ H_valid_preemption_model jhp t Sched_jhp.
+      feed_n 3 PP => //.
       move: PP => [prt [/andP [_ LE] [PR SCH]]].
       case E:(t1 <= prt).
       - move: E => /eqP /eqP E; rewrite subn_eq0 in E.

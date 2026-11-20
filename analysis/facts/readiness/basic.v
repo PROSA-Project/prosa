@@ -39,10 +39,10 @@ Section LiuAndLaylandReadiness.
   Lemma basic_readiness_compliance :
     jobs_must_arrive_to_execute sched ->
     completed_jobs_dont_execute sched ->
-    jobs_must_be_ready_to_execute sched.
+    respects_job_readiness sched.
   Proof.
     move=> ARR COMP.
-    rewrite /jobs_must_be_ready_to_execute =>  j t SCHED.
+    rewrite /respects_job_readiness =>  j t SCHED.
     rewrite H_basic_readiness /pending.
     apply /andP; split.
     - by apply ARR.

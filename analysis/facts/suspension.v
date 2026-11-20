@@ -24,9 +24,9 @@ Section Suspensions.
   Context {RM : JobReady Job PState}.
   Hypothesis H_self_suspension_readiness : self_suspension_readiness RM.
 
-  (** Consider any valid schedule. *)
+  (** Consider any schedule that respects job readiness. *)
   Variable sched : schedule PState.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** ** Basic Lemmas *)
 

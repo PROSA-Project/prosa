@@ -140,16 +140,13 @@ Section SequentialTasks.
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniproc : uniprocessor_model PState.
 
-  (** ... consider any schedule of the arrival sequence, ... *)
+  (** ... consider any valid schedule of the arrival sequence, ... *)
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-  (** ...allow for any work-bearing notion of job readiness, ... *)
+  (** ...allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid w.r.t. said work-bearing
-      readiness model. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)

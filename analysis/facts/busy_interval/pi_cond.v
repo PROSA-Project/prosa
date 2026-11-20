@@ -19,10 +19,11 @@ Section CondPI.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and any ideal uniprocessor schedule of this arrival sequence. *)
+  (** ... and any valid ideal uniprocessor schedule of this arrival sequence. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uni : uniprocessor_model PState.
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)
@@ -38,9 +39,6 @@ Section CondPI.
   (** Further, allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** We assume that the schedule is valid. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.

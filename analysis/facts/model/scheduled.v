@@ -26,10 +26,7 @@ Section ScheduledJobs.
 
   (** Now we establish the validity conditions under which these definitions
       yield the expected results: all jobs must come from the arrival sequence
-      and do not execute before their arrival.
-
-      NB: We do not use [valid_schedule] here to avoid introducing a dependency
-      on a readiness mode. *)
+      and do not execute before their arrival. *)
   Hypothesis H_jobs_come_from_arrival_sequence :
     jobs_come_from_arrival_sequence sched arr_seq.
   Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.

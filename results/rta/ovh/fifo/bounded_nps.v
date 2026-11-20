@@ -104,7 +104,8 @@ Section RTAforFIFOModelwithArrivalCurves.
       overheads_ that corresponds to the given arrival sequence [arr_seq] (and
       hence the given task set [ts]). *)
   Variable sched : schedule (overheads.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
 
   (** We assume that the schedule complies with some valid preemption model.

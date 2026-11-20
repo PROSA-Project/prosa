@@ -167,7 +167,7 @@ Section NPUniprocessorScheduler.
     (** Starting from the previous result we show that, at any instant, only
         a ready job can be scheduled. *)
     Theorem jobs_must_be_ready :
-      jobs_must_be_ready_to_execute schedule.
+      respects_job_readiness schedule.
     Proof.
       move=> j t.
       rewrite scheduled_at_def /schedule/pmc_uni_schedule/allocation_at
@@ -182,9 +182,9 @@ Section NPUniprocessorScheduler.
 
     (** Finally, we show that the generated schedule is valid. *)
     Theorem np_schedule_valid :
-      valid_schedule schedule arr_seq.
+      valid_schedule_of_arrivals schedule arr_seq.
     Proof.
-      split.
+      apply: respects_job_readiness_implies_valid_schedule_of_arrivals.
       - exact: np_schedule_jobs_from_arrival_sequence.
       - exact: jobs_must_be_ready.
     Qed.

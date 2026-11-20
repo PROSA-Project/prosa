@@ -255,20 +255,20 @@ Section PreemptionFacts.
   Context `{Arrival : JobArrival Job}.
   Context `{Cost : JobCost Job}.
 
-  (** Allow for any uniprocessor model ... *)
+  (** Allow for any uniprocessor model. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniproc : uniprocessor_model PState.
-
-  (** ... and for any notion of job readiness. *)
-  Context `{!JobReady Job PState}.
 
   (** Consider any valid arrival sequence. *)
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any valid schedule of this arrival sequence. *)
+  (** Next, consider a schedule of this arrival sequence, where jobs do not
+      execute before arrival. *)
   Variable sched : schedule PState.
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_jobs_come_from_arrival_sequence :
+    jobs_come_from_arrival_sequence sched arr_seq.
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
 
   (** In addition, we assume the existence of a function mapping jobs to their preemption points ... *)
   Context `{JobPreemptable Job}.
@@ -292,13 +292,11 @@ Section PreemptionFacts.
       apply/allP; intros t'.
       by rewrite mem_index_iota ltnS -eqn_leq => /eqP <-.
     }
-    have MATE : jobs_must_arrive_to_execute sched by [].
-    move :  (H_sched_valid) =>  [COME_ARR READY].
     have MIN := ex_minnP EX.
     move: MIN => [mpt /andP [/andP [LT1 SCHEDsmpt] /allP ALL] MIN]; clear EX.
     destruct mpt as [|mpt].
     - exists 0; repeat split.
-      + by apply/andP; split => //; apply MATE.
+      + by apply/andP; split => //; apply H_jobs_must_arrive_to_execute.
       +  eapply (zero_is_pt arr_seq); eauto 2.
       + by intros; apply ALL; rewrite mem_iota subn0 add0n ltnS.
     - have NSCHED: ~~ scheduled_at sched  s mpt.
@@ -315,7 +313,7 @@ Section PreemptionFacts.
       have PP: preemption_time arr_seq sched mpt.+1
                  by eapply (first_moment_is_pt arr_seq)  with (j := s); eauto 2.
       exists mpt.+1; repeat split=> //.
-      + by apply/andP; split=> [|//]; apply MATE in SCHEDsmpt.
+      + by apply/andP; split=> [|//]; apply H_jobs_must_arrive_to_execute in SCHEDsmpt.
       + move => t' /andP [GE LE].
         by apply ALL; rewrite mem_index_iota; apply/andP; split.
   Qed.
@@ -346,15 +344,15 @@ Section PreemptionFacts.
     lia.
   Qed.
 
+  (** For the following priority result, allow for any notion of job readiness. *)
+  Context `{!JobReady Job PState}.
+
   (** Consider a JLFP-policy that indicates a higher-or-equal priority
       relation, and assume that this relation is reflexive. *)
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_priority_is_reflexive : reflexive_job_priorities JLFP.
 
-  (** Assume that the schedule is valid... *)
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
-
-  (** ... and that the schedule respects the JLFP policy. *)
+  (** Assume that the schedule respects the JLFP policy. *)
   Hypothesis H_respects_policy :
     respects_JLFP_policy_at_preemption_point arr_seq sched JLFP.
 

@@ -59,9 +59,12 @@ Section RTAforFullyPreemptiveFPModelwithArrivalCurves.
   Context {RM : JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_basic_sequential_readiness : basic_sequential_readiness RM arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence. *)
+  (** Next, consider any valid ideal uniprocessor schedule of this arrival sequence ... *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+
+  (** ... in which jobs execute only if they are ready. *)
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** Consider an FP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is reflexive and transitive. *)

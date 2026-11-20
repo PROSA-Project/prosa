@@ -34,15 +34,18 @@ Section BoundedBusyIntervalsAux.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider a schedule of this arrival sequence, ... *)
+  (** Next, consider a schedule of this arrival sequence. *)
   Variable sched : schedule PState.
 
-  (** ... allow for any work-bearing notion of job readiness, ... *)
-  Context {RM : JobReady Job PState}.
-  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
+  (** We state the following properties separately so that each lemma depends
+      only on the properties it needs. If they are bundled in one predicate then
+      the automation will drag in dependencies for lemmas that do not need it. *)
+  Hypothesis H_jobs_come_from_arrival_sequence :
+    jobs_come_from_arrival_sequence sched arr_seq.
 
-  (** ... and assume that the schedule is valid. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  (** Assume that jobs do not execute before arrival or after completion. *)
+  Hypothesis H_jobs_must_arrive_to_execute : jobs_must_arrive_to_execute sched.
+  Hypothesis H_completed_jobs_dont_execute : completed_jobs_dont_execute sched.
 
   (** Recall that [busy_intervals_are_bounded_by] is an abstract
       notion. Hence, we need to introduce interference and interfering

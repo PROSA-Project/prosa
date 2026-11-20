@@ -103,18 +103,18 @@ Section BasicLemmas.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrivals : valid_arrival_sequence arr_seq.
 
-  (** ... and the resulting uniprocessor schedule. *)
+  (** ... and the resulting valid uniprocessor schedule. *)
   Context {PState : ProcessorState Job}.
   Hypothesis H_uniproc : uniprocessor_model PState.
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** We assume the basic (i.e., Liu & Layland)
       readiness model under which any pending job is ready. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_basic_readiness : basic_readiness RM.
 
-  (** We assume that the schedule is valid and work-conserving. *)
-  Hypothesis H_schedule_is_valid : valid_schedule sched arr_seq.
+  (** We assume that the schedule is work-conserving. *)
   Hypothesis H_work_conservation : work_conserving arr_seq sched.
 
   (** Suppose jobs have preemption points ... *)
@@ -171,9 +171,6 @@ Section BasicLemmas.
 
     (** Assume the arrival times are consistent. *)
     Hypothesis H_consistent_arrival_times : consistent_arrival_times arr_seq.
-
-    (** Assume the schedule is valid. *)
-    Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
     (** Assume there are no duplicates in the arrival sequence. *)
     Hypothesis H_arrival_sequence_is_a_set : arrival_sequence_uniq arr_seq.

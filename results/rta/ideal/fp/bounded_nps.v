@@ -41,15 +41,13 @@ Section RTAforFPwithBoundedNonpreemptiveSegmentsWithArrivalCurves.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence, ... *)
+  (** Next, consider any valid ideal uniprocessor schedule of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-  (** ... allow for any work-bearing notion of job readiness, ... *)
+  (** ... allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid.  *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)

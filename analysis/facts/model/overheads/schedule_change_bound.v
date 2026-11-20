@@ -39,10 +39,10 @@ Section ScheduleChangesBoundedHelper.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any explicit-overhead uni-processor schedule without
+  (** ... and any valid explicit-overhead uni-processor schedule without
       superfluous preemptions. *)
   Variable sched : schedule (overheads.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_no_superfluous_preemptions : no_superfluous_preemptions sched.
 
@@ -423,10 +423,10 @@ Section JLFP.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any explicit-overhead uni-processor schedule without
+  (** ... and any valid explicit-overhead uni-processor schedule without
       superfluous preemptions of this arrival sequence. *)
   Variable sched : schedule (overheads.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_no_superfluous_preemptions : no_superfluous_preemptions sched.
 
@@ -525,10 +525,10 @@ Section FP.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any explicit-overhead uni-processor schedule without
+  (** ... and any valid explicit-overhead uni-processor schedule without
       superfluous preemptions of this arrival sequence. *)
   Variable sched : schedule (overheads.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_no_superfluous_preemptions : no_superfluous_preemptions sched.
 
@@ -616,10 +616,10 @@ Section FIFO.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any explicit-overhead uni-processor schedule without
+  (** ... and any valid explicit-overhead uni-processor schedule without
       superfluous preemptions of this arrival sequence. *)
   Variable sched : schedule (overheads.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_no_superfluous_preemptions : no_superfluous_preemptions sched.
 

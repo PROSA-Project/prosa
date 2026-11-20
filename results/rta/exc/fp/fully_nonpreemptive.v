@@ -41,7 +41,8 @@ Section RTA.
 
   (** Assume we have a valid, nonpreemptive, and work-conserving schedule. *)
   Variable sched : schedule (exceedance_proc_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
   Hypothesis H_nonpreemptive_sched : nonpreemptive_schedule sched.
 

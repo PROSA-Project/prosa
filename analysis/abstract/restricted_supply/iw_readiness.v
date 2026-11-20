@@ -37,9 +37,12 @@ Section IWInstantiation.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any valid schedule of this arrival sequence. *)
+  (** ... and any valid schedule of this arrival sequence ... *)
   Variable sched : schedule PState.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+
+  (** ... in which jobs execute only if they are ready. *)
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** Consider any JLFP policy and assume that the priority relation is
       reflexive. *)

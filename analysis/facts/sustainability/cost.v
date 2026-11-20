@@ -217,12 +217,16 @@ Section CostSustainability.
       models, and follow the common JLFP policy. *)
 
   Hypothesis H_valid_reference_schedule :
-    @valid_schedule _ _ _ sched_reference job_cost_reference job_ready_reference arr_seq.
+    @valid_schedule_of_arrivals _ _ _ sched_reference job_cost_reference arr_seq.
+  Hypothesis H_reference_respects_job_readiness :
+    @respects_job_readiness _ _ _ sched_reference job_cost_reference job_ready_reference.
   Hypothesis H_reference_respects_policy :
     @respects_JLFP_policy_at_preemption_point _ _ job_cost_reference _
       fully_preemptive_job_model job_ready_reference arr_seq sched_reference JLFP.
   Hypothesis H_valid_reduced_schedule :
-    @valid_schedule _ _ _ sched_reduced job_cost_reduced job_ready_reduced arr_seq.
+    @valid_schedule_of_arrivals _ _ _ sched_reduced job_cost_reduced arr_seq.
+  Hypothesis H_reduced_respects_job_readiness :
+    @respects_job_readiness _ _ _ sched_reduced job_cost_reduced job_ready_reduced.
   Hypothesis H_reduced_respects_policy :
     @respects_JLFP_policy_at_preemption_point _ _ job_cost_reduced _
       fully_preemptive_job_model job_ready_reduced arr_seq sched_reduced JLFP.
@@ -364,8 +368,8 @@ Section CostSustainability.
         exact: leq_trans (IH j ARR) (leq_addr _ _).
       + rewrite (reference_execution_preserved_for_pending_job t IH) //.
         * apply/andP; split; last by rewrite /completed_by -ltnNge.
-          exact: (valid_schedule_implies_jobs_must_arrive_to_execute
-            sched_reference (jr := job_ready_reference)).
+          exact: (valid_schedule_of_arrivals_implies_jobs_must_arrive_to_execute
+            sched_reference arr_seq H_valid_reference_schedule).
         * rewrite !addn1 geq_min ltnS.
           apply/orP; right.
           move: (IH j ARR).

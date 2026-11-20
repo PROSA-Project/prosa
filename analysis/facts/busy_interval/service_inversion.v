@@ -230,15 +230,13 @@ Section ServiceInversionIsBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any uni-processor schedule of this arrival sequence. *)
+  (** ... and any valid uni-processor schedule of this arrival sequence. *)
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-  (** Next, allow for any work-bearing notion of job readiness ... *)
+  (** Next, allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid.  *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** In addition, we assume the existence of a function mapping jobs
       to their preemption points ... *)

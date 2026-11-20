@@ -35,8 +35,8 @@ Section Schedule.
   Definition sched := uni_schedule arr_seq.
 
   (** First, we show that only ready jobs execute. *)
-  Lemma sched_jobs_must_be_ready_to_execute :
-    jobs_must_be_ready_to_execute sched.
+  Lemma sched_respects_job_readiness :
+    respects_job_readiness sched.
   Proof.
     move=> j t SCHED.
     apply jobs_must_be_ready => //.
@@ -48,12 +48,12 @@ Section Schedule.
 
   (** Next, we remark that such a schedule is valid. *)
   Remark sched_valid :
-    valid_schedule sched arr_seq.
+    valid_schedule_of_arrivals sched arr_seq.
   Proof.
-    split.
+    apply: respects_job_readiness_implies_valid_schedule_of_arrivals.
     - apply np_schedule_jobs_from_arrival_sequence.
       by move=> t ???; eapply (supremum_in (hep_job_at t)).
-    - by apply sched_jobs_must_be_ready_to_execute.
+    - by apply sched_respects_job_readiness.
   Qed.
 
   (** Next, we show that an unfinished job scheduled at time [t] is
@@ -66,7 +66,7 @@ Section Schedule.
       scheduled_at sched j t.+1.
   Proof.
     move=> j t SCHED NCOMP.
-    have READY: job_ready sched j t by apply sched_jobs_must_be_ready_to_execute.
+    have READY: job_ready sched j t by apply sched_respects_job_readiness.
     move: READY => /andP[/andP[ARR NC] /allP PRIOR].
     have SZ: 0 < service sched j t.+1.
     { apply scheduled_implies_nonzero_service; last  by simpl; exists t; split.

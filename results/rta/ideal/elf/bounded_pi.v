@@ -109,7 +109,7 @@ Section AbstractRTAforELFwithArrivalCurves.
   (** Finally, we consider any arbitrary, valid ideal uniprocessor schedule of
       the given arrival sequence [arr_seq]. *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Now, we assume that the fixed-priority policy [FP] that parameterizes the
       ELF policy is... *)

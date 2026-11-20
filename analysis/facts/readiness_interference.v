@@ -21,9 +21,9 @@ Section ReadinessInterference.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any valid schedule of the given arrival sequence. *)
+  (** ... and any schedule that respects job readiness. *)
   Variable sched : schedule PState.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** Allow for any JLFP priority policy. *)
   Context {JLFP : JLFP_policy Job}.

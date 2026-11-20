@@ -6,9 +6,9 @@ Require Export analysis.abstract.ideal.iw_instantiation.
 Section BusyIntervalInequalities.
 
   (** Consider any kind of tasks and their jobs, each characterized by
-      an arrival time, a cost, and an arbitrary notion of readiness. *)
+      an arrival time and a cost. *)
   Context {Task : TaskType} {Job : JobType} `{JobTask Job Task}.
-  Context `{JobArrival Job} `{JobCost Job} {JR : JobReady Job (ideal.processor_state Job)}.
+  Context `{JobArrival Job} `{JobCost Job}.
 
   (** Consider a reflexive JLFP policy. *)
   Context {JLFP : JLFP_policy Job}.
@@ -20,7 +20,7 @@ Section BusyIntervalInequalities.
 
   (** Consider any valid ideal uniprocessor schedule defined over this arrival sequence. *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_valid_schedule : valid_schedule sched  arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Consider a set of tasks [ts] that contains all the jobs in the
       arrival sequence. *)

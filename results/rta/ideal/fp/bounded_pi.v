@@ -48,15 +48,13 @@ Section AbstractRTAforFPwithArrivalCurves.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider any ideal uniprocessor schedule of this arrival sequence, ... *)
+  (** Next, consider any valid ideal uniprocessor schedule of this arrival sequence, ... *)
   Variable sched : schedule (ideal.processor_state Job).
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-  (** ... allow for any work-bearing notion of job readiness, ... *)
+  (** ... allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job (ideal.processor_state Job)}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid.  *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** ** Instantiation of Interference *)
   (** We say that job [j] incurs interference at time [t] iff it
@@ -250,7 +248,7 @@ Section AbstractRTAforFPwithArrivalCurves.
         last by eauto 6 with basic_rt_facts.
       apply: leq_trans.
       { apply service_of_jobs_le_workload; first apply ideal_proc_model_provides_unit_service.
-        by apply (valid_schedule_implies_completed_jobs_dont_execute sched arr_seq). }
+        by apply (valid_schedule_of_arrivals_implies_completed_jobs_dont_execute sched arr_seq). }
       { rewrite /workload_of_jobs /total_ohep_rbf /total_ohep_request_bound_function_FP.
         rewrite /another_task_hep_job /hep_job /fp_to_jlfp.
         set (pred_task tsk_other := hep_task tsk_other tsk && (tsk_other != tsk)).

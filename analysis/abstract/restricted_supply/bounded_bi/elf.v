@@ -43,15 +43,13 @@ Section BoundedBusyIntervals.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider a schedule of this arrival sequence, ... *)
+  (** Next, consider a valid schedule of this arrival sequence, ... *)
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-  (** ... allow for any work-bearing notion of job readiness, ... *)
+  (** ... and allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
 
   (** Assume that jobs have bounded non-preemptive segments. *)
   Context `{JobPreemptable Job}.

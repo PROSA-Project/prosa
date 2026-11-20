@@ -223,12 +223,16 @@ Section EMSOFTModel.
   Variable algA algB : Scheduler Omega Job.
 
   (** As discussed in the paper, we restrict our attention to schedulers that
-      always produce well-formed schedules. *)
+      always produce valid schedules in which jobs execute only if they are ready. *)
 
   Hypothesis H_well_formed_A :
-    @valid_schedule _ _ _ (algA omega_0) (evo_costs omega_0) (job_ready omega_0) arr_seq.
+    @valid_schedule_of_arrivals _ _ _ (algA omega_0) (evo_costs omega_0) arr_seq.
+  Hypothesis H_A_respects_job_readiness :
+    @respects_job_readiness _ _ _ (algA omega_0) (evo_costs omega_0) (job_ready omega_0).
   Hypothesis H_well_formed_B :
-    forall omega, @valid_schedule _ _ _ (algB omega) (evo_costs omega) (job_ready omega) arr_seq.
+    forall omega, @valid_schedule_of_arrivals _ _ _ (algB omega) (evo_costs omega) arr_seq.
+  Hypothesis H_B_respects_job_readiness :
+    forall omega, @respects_job_readiness _ _ _ (algB omega) (evo_costs omega) (job_ready omega).
 
 
   (** For brevity, recall the notion of [schedulability_transferred]. We

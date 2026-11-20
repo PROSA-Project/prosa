@@ -855,7 +855,7 @@ Section Optimality.
   Variable sched : schedule (ideal.processor_state Job).
 
   (** ... that corresponds to the given arrival sequence. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** In the following, let [equivalent_edf_schedule] denote the schedule that
       results from the EDF transformation. *)
@@ -869,11 +869,10 @@ Section Optimality.
     (** Then the resulting EDF schedule is a valid schedule for the given
         arrival sequence... *)
     Theorem edf_schedule_is_valid :
-      valid_schedule equivalent_edf_schedule arr_seq.
+      valid_schedule_of_arrivals equivalent_edf_schedule arr_seq.
     Proof.
-      rewrite /valid_schedule; split;
-        first by apply edf_transform_jobs_come_from_arrival_sequence.
-      apply: basic_readiness_compliance => //.
+      split; first exact: edf_transform_jobs_come_from_arrival_sequence.
+      split.
       - exact: edf_transform_jobs_must_arrive.
       - exact: edf_transform_completed_jobs_dont_execute.
     Qed.
@@ -882,6 +881,15 @@ Section Optimality.
     Theorem edf_schedule_meets_all_deadlines :
       all_deadlines_met equivalent_edf_schedule.
     Proof. exact: edf_transform_deadlines_met. Qed.
+
+    (** Under basic readiness, the schedule also respects job readiness. *)
+    Theorem edf_schedule_respects_job_readiness :
+      respects_job_readiness equivalent_edf_schedule.
+    Proof.
+      apply: basic_readiness_compliance => //.
+      - exact: edf_transform_jobs_must_arrive.
+      - exact: edf_transform_completed_jobs_dont_execute.
+    Qed.
 
   End AllDeadlinesMet.
 
@@ -900,9 +908,7 @@ Section Optimality.
       all_deadlines_of_arrivals_met arr_seq equivalent_edf_schedule.
     Proof.
       move=> j ARR_j.
-      move: H_sched_valid => [COME READY].
-      have ARR  := jobs_must_arrive_to_be_ready sched READY.
-      have COMP := completed_jobs_are_not_ready sched READY.
+      move: H_valid_schedule_of_arrivals => [COME [ARR COMP]].
       destruct (job_cost j ==  0) eqn:COST.
       - move: COST => /eqP COST.
         rewrite /job_meets_deadline /completed_by COST.

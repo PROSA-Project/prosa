@@ -359,19 +359,25 @@ Section CompletedJobs.
 
   (** ... and lift this observation also to the level of whole schedules. *)
   Lemma completed_jobs_are_not_ready :
-    jobs_must_be_ready_to_execute sched ->
+    respects_job_readiness sched ->
     completed_jobs_dont_execute sched.
   Proof.
     move=> + j t sch => /(_ j t sch) ready.
     by rewrite less_service_than_cost_is_incomplete ready_implies_incomplete.
   Qed.
 
-  (** Furthermore, in a valid schedule, completed jobs don't execute. *)
-  Corollary valid_schedule_implies_completed_jobs_dont_execute :
+  (** A schedule of jobs from the arrival sequence is valid if it respects
+      job readiness. *)
+  Lemma respects_job_readiness_implies_valid_schedule_of_arrivals :
     forall arr_seq,
-      valid_schedule sched arr_seq ->
-      completed_jobs_dont_execute sched.
-  Proof. move=> ? [? ?]; exact: completed_jobs_are_not_ready. Qed.
+      jobs_come_from_arrival_sequence sched arr_seq ->
+      respects_job_readiness sched ->
+      valid_schedule_of_arrivals sched arr_seq.
+  Proof.
+    move=> ? COME READY; split=> //; split.
+    - exact: jobs_must_arrive_to_be_ready.
+    - exact: completed_jobs_are_not_ready.
+  Qed.
 
   (** We further observe that completed jobs don't execute if scheduled jobs
       always receive non-zero service and cumulative service never exceeds job
@@ -390,13 +396,16 @@ End CompletedJobs.
 
 (** We add the above lemma into a "Hint Database" basic_rt_facts, so Rocq
     will be able to apply it automatically. *)
-Global Hint Resolve valid_schedule_implies_completed_jobs_dont_execute : basic_rt_facts.
+Global Hint Resolve
+       completed_jobs_are_not_ready
+       respects_job_readiness_implies_valid_schedule_of_arrivals
+  : basic_rt_facts.
 
 (** Next, we relate the completion of jobs in schedules with identical prefixes. *)
 Section CompletionInTwoSchedules.
-  (** Consider any processor model and any type of jobs with costs, arrival times, and a notion of readiness. *)
+  (** Consider any processor model and any type of jobs with costs and arrival times. *)
   Context {Job : JobType} {PState : ProcessorState Job}.
-  Context {jc : JobCost Job} {ja : JobArrival Job} {jr : JobReady Job PState}.
+  Context {jc : JobCost Job} {ja : JobArrival Job}.
 
   (** If two schedules share a common prefix, then (in the prefix) jobs
       complete in one schedule iff they complete in the other. *)

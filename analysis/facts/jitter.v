@@ -136,8 +136,8 @@ Section JitterPropagationFacts.
   (** If the given schedule respects release jitter, then it continues to do so
       after we've reinterpreted the release times to be the arrival times. *)
   Lemma jitter_ready_to_execute :
-    @jobs_must_be_ready_to_execute _ original_arrival _ sched _ JitterRM ->
-    @jobs_must_be_ready_to_execute _ release_as_arrival _ sched _ BasicRM.
+    @respects_job_readiness _ original_arrival _ sched _ JitterRM ->
+    @respects_job_readiness _ release_as_arrival _ sched _ BasicRM.
   Proof.
     move=> RDY j t SCHED.
     rewrite H_basic_readiness /pending.
@@ -161,20 +161,23 @@ Section JitterPropagationFacts.
   (** If the given schedule is valid w.r.t. original arrivals, then it
       continues to be valid after reinterpreting release times as arrival
       times. *)
-  Lemma jitter_valid_schedule :
-    @valid_schedule _ original_arrival _ sched _ JitterRM arr_seq ->
-    @valid_schedule _ release_as_arrival _ sched _ BasicRM rel_seq.
+  Lemma jitter_valid_schedule_of_arrivals :
+    @valid_schedule_of_arrivals _ original_arrival _ sched _ arr_seq ->
+    @respects_job_readiness _ original_arrival _ sched _ JitterRM ->
+    @valid_schedule_of_arrivals _ release_as_arrival _ sched _ rel_seq.
   Proof.
-    move => [SRC RDY].
-    split.
+    move=> [SRC _] RDY.
+    apply: respects_job_readiness_implies_valid_schedule_of_arrivals.
     - exact: jitter_prop_same_jobs'.
     - exact: jitter_ready_to_execute.
   Qed.
 
   (** In the following, suppose the given schedule is valid w.r.t. the original
-      arrival times and jitter-affected readiness. *)
-  Hypothesis H_valid_schedule :
-    @valid_schedule _ original_arrival _ sched _ JitterRM arr_seq.
+      arrival times and respects jitter-affected readiness. *)
+  Hypothesis H_valid_schedule_of_arrivals :
+    @valid_schedule_of_arrivals _ original_arrival _ sched _ arr_seq.
+  Hypothesis H_respects_job_readiness :
+    @respects_job_readiness _ original_arrival _ sched _ JitterRM.
 
   (** As one would think, the set of scheduled jobs remains unchanged. For
       technical reasons (dependence of the definition of [scheduled_jobs_at] on
@@ -186,8 +189,8 @@ Section JitterPropagationFacts.
       = (j \in scheduled_jobs_at arr_seq sched t).
   Proof.
     move=> j t.
-    have SRC := @valid_schedule_jobs_come_from_arrival_sequence _ _ sched _
-                  original_arrival JitterRM arr_seq H_valid_schedule.
+    have SRC := @valid_schedule_of_arrivals_jobs_come_from_arrival_sequence _ original_arrival _ _
+                  sched arr_seq H_valid_schedule_of_arrivals.
     rewrite [RHS]scheduled_jobs_at_iff; [|exact: SRC| |] => //.
     rewrite (@scheduled_jobs_at_iff _ release_as_arrival); last by done.
     - exact: valid_release_sequence.
@@ -206,8 +209,8 @@ Section JitterPropagationFacts.
       scheduled_job_at arr_seq sched t = scheduled_job_at rel_seq sched t.
   Proof.
     move=> t UNI.
-    have SRC := @valid_schedule_jobs_come_from_arrival_sequence _ _ sched _
-                  original_arrival JitterRM arr_seq H_valid_schedule.
+    have SRC := @valid_schedule_of_arrivals_jobs_come_from_arrival_sequence _ original_arrival _ _
+                  sched arr_seq H_valid_schedule_of_arrivals.
     (* Note: there is a lot of repetition here because the automation chokes on
        the multiple available type-class instances and/or promptly picks the
        wrong ones. Not pretty, but it works. *)

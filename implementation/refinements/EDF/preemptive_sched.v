@@ -36,10 +36,18 @@ Section Schedule.
 
   (** First, we remark that such a schedule is valid. *)
   Remark sched_valid :
-    valid_schedule sched arr_seq.
+    valid_schedule_of_arrivals sched arr_seq.
   Proof.
     apply uni_schedule_valid => //.
     by apply basic_readiness_nonclairvoyance.
+  Qed.
+
+  (** The schedule also respects basic readiness. *)
+  Remark sched_respects_job_readiness :
+    respects_job_readiness sched.
+  Proof.
+    apply: uni_schedule_respects_job_readiness => //.
+    by apply: basic_readiness_nonclairvoyance.
   Qed.
 
   (** Finally, we show that the fixed-priority policy is respected at each preemption point. *)

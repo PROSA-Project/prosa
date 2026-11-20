@@ -58,7 +58,7 @@ Section AbstractRTAforEDFwithArrivalCurves.
   (** Next, consider any valid ideal uni-processor schedule of this arrival sequence
       that follows the scheduling policy. *)
   Variable sched : schedule (ideal.processor_state Job).
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
   Context {JLFP : JLFP_policy Job}.
   Hypothesis H_policy_is_EDF : policy_is_EDF JLFP.
   Hypothesis H_respects_policy :

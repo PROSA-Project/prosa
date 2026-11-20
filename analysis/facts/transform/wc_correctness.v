@@ -54,7 +54,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
     Variable sched : schedule (ideal.processor_state Job).
 
     (** ...in which jobs must be ready to execute. *)
-    Hypothesis H_jobs_must_be_ready : jobs_must_be_ready_to_execute sched.
+    Hypothesis H_jobs_must_be_ready : respects_job_readiness sched.
 
     (** Consider an arbitrary time instant [t1]. *)
     Variable t1 : instant.
@@ -125,8 +125,8 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Finally we show that, in the transformed schedule, jobs are scheduled
         only if they are ready. *)
-    Lemma fsc_jobs_must_be_ready_to_execute :
-      jobs_must_be_ready_to_execute sched'.
+    Lemma fsc_respects_job_readiness :
+      respects_job_readiness sched'.
     Proof.
       move=> j t SCHED_AT.
       rewrite /sched'.
@@ -135,8 +135,7 @@ Section AuxiliaryLemmasWorkConservingTransformation.
       apply /andP; split; first by apply swap_jobs_must_arrive_to_execute.
       rewrite /completed_by; rewrite -ltnNge.
       apply swapped_completed_jobs_dont_execute => //.
-      - exact: swap_candidate_is_in_future.
-      - exact: completed_jobs_are_not_ready.
+      exact: swap_candidate_is_in_future.
     Qed.
 
   End JobsMustBeReadyFindSwapCandidate.
@@ -407,14 +406,14 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** We also show that the point-wise transformation does not schedule jobs in instants
         in which they are not ready. *)
-    Lemma mwa_jobs_must_be_ready_to_execute :
-      jobs_must_be_ready_to_execute sched ->
-      jobs_must_be_ready_to_execute sched'.
+    Lemma mwa_respects_job_readiness :
+      respects_job_readiness sched ->
+      respects_job_readiness sched'.
     Proof.
       move=> READY.
       rewrite /sched' /make_wc_at.
       destruct (sched t) as [j_orig|] eqn:SCHED_orig => [//|].
-      exact: fsc_jobs_must_be_ready_to_execute.
+      exact: fsc_respects_job_readiness.
     Qed.
 
     (** Finally, we show that the point-wise transformation does not introduce deadline misses. *)
@@ -547,15 +546,15 @@ Section AuxiliaryLemmasWorkConservingTransformation.
 
     (** Similarly, we can show that [sched'] will only schedule jobs if they are
         ready. *)
-    Lemma wc_prefix_jobs_must_be_ready_to_execute :
-      jobs_must_be_ready_to_execute sched ->
-      jobs_must_be_ready_to_execute sched'.
+    Lemma wc_prefix_respects_job_readiness :
+      respects_job_readiness sched ->
+      respects_job_readiness sched'.
     Proof.
       move=> READY.
       rewrite /sched' /wc_transform_prefix.
       apply prefix_map_property_invariance => [|//].
       move=> schedX t ARR.
-      by apply mwa_jobs_must_be_ready_to_execute.
+      by apply mwa_respects_job_readiness.
     Qed.
 
   End PrefixFacts.
@@ -581,11 +580,12 @@ Section WorkConservingTransformation.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_arr_seq_valid : valid_arrival_sequence arr_seq.
 
-  (** ...and an ideal uniprocessor schedule... *)
+  (** ...and a valid ideal uniprocessor schedule... *)
   Variable sched : schedule (ideal.processor_state Job).
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
-  (** ...in which jobs come from the arrival sequence, and must be ready to execute...  *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  (** ...in which jobs must be ready to execute... *)
+  Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
   (** ...and in which no job misses a deadline. *)
   Hypothesis H_all_deadlines_of_arrivals_met : all_deadlines_of_arrivals_met arr_seq sched.
@@ -603,13 +603,13 @@ Section WorkConservingTransformation.
   Qed.
 
   (** Similarly, jobs are only scheduled if they are ready. *)
-  Lemma wc_jobs_must_be_ready_to_execute :
-    jobs_must_be_ready_to_execute sched_wc.
+  Lemma wc_respects_job_readiness :
+    respects_job_readiness sched_wc.
   Proof.
     move=> j t.
     rewrite /scheduled_at /sched_wc /wc_transform -/(scheduled_at _ j t) => SCHED_AT.
     have READY': job_ready (wc_transform_prefix arr_seq sched t.+1) j t by
-                   exact: wc_prefix_jobs_must_be_ready_to_execute.
+                   exact: wc_prefix_respects_job_readiness.
     move: READY'.
     rewrite !H_basic_readiness /pending /completed_by /service.
     rewrite (equal_prefix_implies_same_service_during sched_wc (wc_transform_prefix arr_seq sched t.+1)) //.
@@ -674,15 +674,19 @@ Section WorkConservingTransformation.
       all the properties of validity, does not introduce new deadline misses, and
       establishes the work-conservation property. *)
   Theorem wc_transform_correctness :
-    valid_schedule sched_wc arr_seq
+    valid_schedule_of_arrivals sched_wc arr_seq
+    /\ respects_job_readiness sched_wc
     /\ all_deadlines_of_arrivals_met arr_seq sched_wc
     /\ work_conserving arr_seq sched_wc.
   Proof.
-    repeat split.
-    - apply wc_jobs_come_from_arrival_sequence.
-    - apply wc_jobs_must_be_ready_to_execute.
-    - apply wc_all_deadlines_of_arrivals_met.
-    - apply wc_is_work_conserving.
+    split.
+    - apply: respects_job_readiness_implies_valid_schedule_of_arrivals.
+      + exact: wc_jobs_come_from_arrival_sequence.
+      + exact: wc_respects_job_readiness.
+    - split; first exact: wc_respects_job_readiness.
+      split.
+      + exact: wc_all_deadlines_of_arrivals_met.
+      + exact: wc_is_work_conserving.
   Qed.
 
 End WorkConservingTransformation.

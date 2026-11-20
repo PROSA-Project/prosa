@@ -26,9 +26,10 @@ Section PriorityInversionIsBounded.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** ... and any schedule of this arrival sequence. *)
+  (** ... and any valid schedule of this arrival sequence. *)
   Context {PState : ProcessorState Job}.
   Variable sched : schedule PState.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Consider a JLFP policy that indicates a higher-or-equal priority relation,
       and assume that the relation is transitive. *)
@@ -43,9 +44,6 @@ Section PriorityInversionIsBounded.
   (** Further, allow for any work-bearing notion of job readiness. *)
   Context {RM : JobReady Job PState}.
   Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** We assume that the schedule is valid. *)
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
   (** Next, we assume that the schedule is a work-conserving schedule... *)
   Hypothesis H_work_conserving : work_conserving arr_seq sched.
@@ -92,7 +90,6 @@ Section PriorityInversionIsBounded.
     move=> j ARR TSK POS t1 t2 PREF.
     rewrite -/(cumulative_priority_inversion arr_seq sched j t1 t2).
     move: (PREF) => [_ [_ [_ /andP [T _]]]].
-    move: H_valid_schedule => [COARR MBR].
     have [NEQ|NEQ] := boolP ((t2-t1) <= blocking_bound (job_arrival j - t1)).
     { apply leq_trans with (t2 -t1) => [|//].
       rewrite cumulative_priority_inversion_def.

@@ -38,9 +38,8 @@ Section TotalSuspensionBounded.
   Context {RM : JobReady Job PState}.
   Hypothesis H_self_suspension_readiness : self_suspension_readiness RM.
 
-  (** Consider any valid schedule. *)
+  (** Consider any schedule. *)
   Variable sched : schedule PState.
-  Hypothesis H_valid_schedule : valid_schedule sched arr_seq.
 
   (** Let [tsk] be any task. *)
   Variable tsk : Task.

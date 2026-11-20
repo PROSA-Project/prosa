@@ -199,9 +199,12 @@ Section GeneralityOfGEL.
         (pp_delta (job_task j) (job_task j') > 0)%R.
 
     (** To state the third and fourth assumptions, we require an arbitrary,
-        valid schedule to be given. *)
+        valid schedule to be given ... *)
     Variable sched : schedule PState.
-    Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+    Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
+
+    (** ... in which jobs execute only if they are ready. *)
+    Hypothesis H_respects_job_readiness : respects_job_readiness sched.
 
     (** We require that the difference in relative priority points between a
         higher- and lower-priority task exceeds the maximum response time of the

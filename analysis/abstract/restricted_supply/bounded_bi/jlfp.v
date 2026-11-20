@@ -41,15 +41,9 @@ Section BoundedBusyIntervals.
   Variable arr_seq : arrival_sequence Job.
   Hypothesis H_valid_arrival_sequence : valid_arrival_sequence arr_seq.
 
-  (** Next, consider a schedule of this arrival sequence, ... *)
+  (** Next, consider a valid schedule of this arrival sequence. *)
   Variable sched : schedule PState.
-
-  (** ... allow for any work-bearing notion of job readiness, ... *)
-  Context {RM : JobReady Job PState}.
-  Hypothesis H_job_ready : work_bearing_readiness RM arr_seq sched.
-
-  (** ... and assume that the schedule is valid. *)
-  Hypothesis H_sched_valid : valid_schedule sched arr_seq.
+  Hypothesis H_valid_schedule_of_arrivals : valid_schedule_of_arrivals sched arr_seq.
 
   (** Assume that jobs have bounded non-preemptive segments. *)
   Context `{JobPreemptable Job}.
@@ -281,7 +275,7 @@ Section BoundedBusyIntervals.
   Proof.
     move => j ARR TSK POS.
     have PEND : pending sched j (job_arrival j) by apply job_pending_at_arrival => //.
-    edestruct ( busy_interval_prefix_exists) as [t1 [GE PREFIX]]; eauto 2.
+    edestruct ( busy_interval_prefix_exists) as [t1 [GE PREFIX]] => //.
     exists t1.
     enough(exists t2, job_arrival j < t2 /\ t2 <= t1 + L /\ busy_interval arr_seq sched j t1 t2) as BUSY.
     { move: BUSY => [t2 [LT [LE BUSY]]]; eexists; split; last first.
